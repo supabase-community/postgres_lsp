@@ -1,7 +1,7 @@
 use cstree::Syntax;
 use pg_query::{protobuf::ScanToken, Node, NodeEnum, NodeRef};
 
-use crate::expr_parser::ExprToken;
+use crate::parser::expr_parser::ExprToken;
 
 // this can be generated later
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -768,6 +768,7 @@ pub enum SyntaxKind {
 pub fn convert_pg_query_node_to_syntax_kind(node: &NodeRef) -> Option<SyntaxKind> {
     match node {
         NodeRef::SelectStmt(_) => Some(SyntaxKind::SelectStmt),
+        NodeRef::CreateFunctionStmt(_) => Some(SyntaxKind::CreateFunctionStmt),
         NodeRef::ResTarget(_) => Some(SyntaxKind::ResTarget),
         NodeRef::AExpr(_) => Some(SyntaxKind::AExpr),
         NodeRef::RangeVar(_) => Some(SyntaxKind::RangeVar),
@@ -846,7 +847,6 @@ pub fn convert_pg_query_token_to_syntax_kind(token: &ScanToken) -> Option<Syntax
         301 => Some(SyntaxKind::Attribute),
         302 => Some(SyntaxKind::Authorization),
         303 => Some(SyntaxKind::Backward),
-        304 => Some(SyntaxKind::Before),
         305 => Some(SyntaxKind::BeginP),
         306 => Some(SyntaxKind::Between),
         307 => Some(SyntaxKind::Bigint),

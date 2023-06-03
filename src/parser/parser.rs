@@ -4,14 +4,12 @@ use cstree::interning::Interner;
 use logos::Lexer;
 use logos::Logos;
 
-use crate::expr_parser::parse_expression;
-use crate::syntax::SyntaxKind;
+use crate::parser::expr_parser::parse_expression;
+use crate::parser::syntax::SyntaxKind;
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\f]+")] // Ignore this regex pattern between tokens
 pub enum Token {
-    // instead of the expr token, we can use pg_query and merge afterwards
-    // https://github.com/pganalyze/pg_query.rs/blob/0a893077643dd823c06a43ba4f68fb5bbc9b0d18/src/query.rs#L257
     #[regex("[a-zA-Z0-9_]+[^;]*;"gm)]
     Expr,
     #[regex("\n+"gm)]
@@ -36,11 +34,10 @@ impl<'input> Parser<'input> {
         }
     }
 
-    pub fn parse(&mut self) -> Result<(), String> {
+    pub fn parse(&mut self) {
         self.builder.start_node(SyntaxKind::Root);
         self.parse_next_token();
         self.builder.finish_node();
-        return Ok(());
     }
 
     fn parse_next_token(&mut self) {
@@ -70,7 +67,7 @@ impl<'input> Parser<'input> {
         };
     }
 
-    pub fn finish(mut self) -> (GreenNode, impl Interner) {
+    pub fn finish(self) -> (GreenNode, impl Interner) {
         // assert!(self.lexer.next().map(|t| t == Token::EoF).unwrap_or(true));
         let (tree, cache) = self.builder.finish();
         (tree, cache.unwrap().into_interner().unwrap())

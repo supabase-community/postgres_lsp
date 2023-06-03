@@ -1,25 +1,17 @@
 use std::iter::Peekable;
-use std::ops::Range;
 use std::slice::Iter;
-use std::vec::IntoIter;
 
 use cstree::build::GreenNodeBuilder;
 use cstree::testing::SyntaxNode;
 use logos::Lexer;
 use logos::Logos;
-use pg_query::parse;
-use pg_query::protobuf::ParseResult;
-use pg_query::protobuf::ScanResult;
 use pg_query::protobuf::ScanToken;
-use pg_query::protobuf::Token;
-use pg_query::NodeEnum;
-use pg_query::NodeMut;
 use pg_query::NodeRef;
 
-use crate::syntax::convert_expr_token_to_syntax_kind;
-use crate::syntax::convert_pg_query_node_to_syntax_kind;
-use crate::syntax::convert_pg_query_token_to_syntax_kind;
-use crate::syntax::get_position_for_pg_query_node;
+use crate::parser::syntax::convert_expr_token_to_syntax_kind;
+use crate::parser::syntax::convert_pg_query_node_to_syntax_kind;
+use crate::parser::syntax::convert_pg_query_token_to_syntax_kind;
+use crate::parser::syntax::get_position_for_pg_query_node;
 use crate::SyntaxKind;
 
 // All non-matches characters will emit an error
@@ -110,6 +102,10 @@ pub fn parse_expression<'input, 'builder>(
         println!("####");
         println!("{:?}", node);
     });
+    scan_res.tokens.iter().for_each(|token| {
+        println!("####");
+        println!("{:?}", token);
+    });
 
     ExprParser::new(
         ExprToken::lexer(expression),
@@ -172,10 +168,8 @@ impl<'input, 'builder> ExprParser<'input, 'builder> {
     pub fn parse(&mut self) -> Result<(), String> {
         // get root node
         let root_node = self.nodes.next();
-        let root_node: SyntaxKind = match root_node.unwrap().0 {
-            NodeRef::SelectStmt(_) => SyntaxKind::SelectStmt,
-            _ => return Err("root node is not a select statement".to_string()),
-        };
+        let root_node: SyntaxKind =
+            convert_pg_query_node_to_syntax_kind(&root_node.unwrap().0).unwrap();
         self.builder.start_node(root_node);
         self.parse_token();
 
@@ -218,7 +212,7 @@ impl<'input, 'builder> ExprParser<'input, 'builder> {
                                 self.builder.finish_node();
                             }
                             if depth < &self.curr_depth {
-                                // we are going up, finish prev node
+                                // we are going up, finish another node
                                 println!("## move_node - finish_node",);
                                 self.builder.finish_node();
                             }
@@ -336,8 +330,20 @@ impl<'input, 'builder> ExprParser<'input, 'builder> {
 
 #[test]
 fn test_expr_parser() {
-    let input = "select *,test from contact where (id = '123');";
-    // let input = "select test from contact where id = 123;";
+    // let input = "select *,test from contact where (id = '123');";
+    let input = "select test from contact where id = 123;";
+    // let input = "CREATE FUNCTION add(integer, integer) RETURNS integer
+    // AS 'select $1 + $2;'
+    // LANGUAGE SQL
+    // IMMUTABLE
+    // RETURNS NULL ON NULL INPUT;";
+
+    // non-sql funcs not supported yet
+    //     let input = "CREATE OR REPLACE FUNCTION increment(i integer) RETURNS integer AS $$
+    //         BEGIN
+    //                 RETURN i + 1;
+    //         END;
+    // $$ LANGUAGE plpgsql;";
 
     println!("input: {}", input);
 

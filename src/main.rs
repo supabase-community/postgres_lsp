@@ -1,69 +1,265 @@
-mod expr_parser;
 mod parser;
-mod syntax;
+mod semantic_token;
+use crate::parser::syntax::SyntaxKind;
+use dashmap::DashMap;
+use parser::parser::Parser;
+use ropey::Rope;
+use semantic_token::LEGEND_TYPE;
+use serde_json::Value;
+use tower_lsp::jsonrpc::Result;
+use tower_lsp::lsp_types::*;
+use tower_lsp::{Client, LanguageServer, LspService, Server};
 
-use cstree::syntax::SyntaxNode;
-use parser::Parser;
-use std::fs;
+#[derive(Debug)]
+struct Backend {
+    client: Client,
+    // ast_map: DashMap<String, HashMap<String, Func>>,
+    document_map: DashMap<String, Rope>,
+    // semantic_token_map: DashMap<String, Vec<ImCompleteSemanticToken>>,
+}
 
-use crate::syntax::SyntaxKind;
+#[tower_lsp::async_trait]
+impl LanguageServer for Backend {
+    async fn initialize(&self, _: InitializeParams) -> Result<InitializeResult> {
+        Ok(InitializeResult {
+            server_info: None,
+            offset_encoding: None,
+            capabilities: ServerCapabilities {
+                // inlay_hint_provider: Some(OneOf::Left(true)),
+                // text_document_sync: Some(TextDocumentSyncCapability::Kind(
+                //     TextDocumentSyncKind::FULL,
+                // )),
+                // completion_provider: Some(CompletionOptions {
+                //     resolve_provider: Some(false),
+                //     trigger_characters: Some(vec![".".to_string()]),
+                //     work_done_progress_options: Default::default(),
+                //     all_commit_characters: None,
+                //     completion_item: None,
+                // }),
+                // execute_command_provider: Some(ExecuteCommandOptions {
+                //     commands: vec!["dummy.do_something".to_string()],
+                //     work_done_progress_options: Default::default(),
+                // }),
+                // workspace: Some(WorkspaceServerCapabilities {
+                //     workspace_folders: Some(WorkspaceFoldersServerCapabilities {
+                //         supported: Some(true),
+                //         change_notifications: Some(OneOf::Left(true)),
+                //     }),
+                //     file_operations: None,
+                // }),
+                semantic_tokens_provider: Some(
+                    SemanticTokensServerCapabilities::SemanticTokensRegistrationOptions(
+                        SemanticTokensRegistrationOptions {
+                            text_document_registration_options: {
+                                TextDocumentRegistrationOptions {
+                                    document_selector: Some(vec![DocumentFilter {
+                                        language: Some("nrs".to_string()),
+                                        scheme: Some("file".to_string()),
+                                        pattern: None,
+                                    }]),
+                                }
+                            },
+                            semantic_tokens_options: SemanticTokensOptions {
+                                work_done_progress_options: WorkDoneProgressOptions::default(),
+                                legend: SemanticTokensLegend {
+                                    token_types: LEGEND_TYPE.into(),
+                                    token_modifiers: vec![],
+                                },
+                                range: Some(true),
+                                full: Some(SemanticTokensFullOptions::Bool(true)),
+                            },
+                            static_registration_options: StaticRegistrationOptions::default(),
+                        },
+                    ),
+                ),
+                // definition: Some(GotoCapability::default()),
+                // definition_provider: Some(OneOf::Left(true)),
+                // references_provider: Some(OneOf::Left(true)),
+                // rename_provider: Some(OneOf::Left(true)),
+                ..ServerCapabilities::default()
+            },
+        })
+    }
 
-fn main() {
-    let source = fs::read_to_string("./src/example.sql").unwrap();
-    println!("{:?}", source);
-    let mut parser = Parser::new(&source);
-    parser.parse().unwrap();
-    let (tree, interner) = parser.finish();
-    let root = SyntaxNode::<SyntaxKind>::new_root_with_resolver(tree, interner);
-    dbg!(root);
+    async fn initialized(&self, _: InitializedParams) {
+        self.client
+            .log_message(MessageType::INFO, "initialized!")
+            .await;
+    }
 
-    // https://github.com/domenicquirl/cstree
-    // https://ericlippert.com/2012/06/08/red-green-trees/
-    //
-    // So, for example, to parse a struct definition the parser first "enters" the struct definition node, then parses the struct keyword and type name, then parses each field, and finally "finishes" parsing the struct node.
-    //
-    // 1. lexer: parse string into tokens. cstree will allow us to just move forward until next
-    //    statement. also, for comments, we should be able to store them separately since we are
-    //    just walking over the source code. tokens should be expr, newlines, comments.
-    //    does not work because lexer is "dumb". Token != SyntaxKind, so maybe we do not
-    //    need a real lexer.
-    // 2. parser: parse tokens into cst with cstree. nodes are not typed, and we should be able to
-    //    use pg_query to parse string, and turn that into SyntaxKind tokens.
-    //
-    //
-    //    Notes:
-    //    - maybe we do not real a lexer to parse into statements. we can just use simple string
-    //    operations? or maybe lexer but with metadata on tokens because normally a token
-    //    translates into a constant which is not what we want. instead, we want a token Expr to
-    //    hold the expression string.
+    async fn shutdown(&self) -> Result<()> {
+        Ok(())
+    }
 
-    // problem: comments
-    // general problem: declarative parsing by token will, based on initial research, not work well because we have tokens
-    // within tokens (comment can be within a sql query)
-    // let parser = any::<_, extra::Err<Simple<char>>>()
-    //     .and_is(just(';').not())
-    //     .repeated()
-    //     .collect::<String>()
-    //     .padded()
-    //     .separated_by(just(';'))
-    //     .collect::<Vec<String>>();
-    //
-    // let comment = just("--")
-    //     .then(
-    //         any::<_, extra::Err<Simple<char>>>()
-    //             .and_is(just('\n').not())
-    //             .repeated(),
-    //     )
-    //     .padded();
-    //
-    // let comments = comment.parse(source.as_str());
-    // let result = parser.parse(source.as_str());
-    //
-    // println!("{:?}", source);
-    // println!("{:?}", result);
-    // println!("{:?}", comments);
-    //
-    // let pg_query_result = pg_query::parse("SELECT * FROM contacts").unwrap();
-    //
-    // println!("{:?}", pg_query_result.protobuf.nodes());
+    async fn did_open(&self, params: DidOpenTextDocumentParams) {
+        self.client
+            .log_message(MessageType::INFO, "file opened!")
+            .await;
+        self.on_change(TextDocumentItem {
+            uri: params.text_document.uri,
+            text: params.text_document.text,
+            version: params.text_document.version,
+        })
+        .await
+    }
+
+    async fn did_change(&self, mut params: DidChangeTextDocumentParams) {
+        self.on_change(TextDocumentItem {
+            uri: params.text_document.uri,
+            text: std::mem::take(&mut params.content_changes[0].text),
+            version: params.text_document.version,
+        })
+        .await
+    }
+
+    async fn did_save(&self, _: DidSaveTextDocumentParams) {
+        self.client
+            .log_message(MessageType::INFO, "file saved!")
+            .await;
+    }
+    async fn did_close(&self, _: DidCloseTextDocumentParams) {
+        self.client
+            .log_message(MessageType::INFO, "file closed!")
+            .await;
+    }
+
+    async fn semantic_tokens_full(
+        &self,
+        params: SemanticTokensParams,
+    ) -> Result<Option<SemanticTokensResult>> {
+        return Ok(None);
+    }
+
+    async fn semantic_tokens_range(
+        &self,
+        params: SemanticTokensRangeParams,
+    ) -> Result<Option<SemanticTokensRangeResult>> {
+        return Ok(None);
+    }
+
+    async fn did_change_configuration(&self, _: DidChangeConfigurationParams) {
+        self.client
+            .log_message(MessageType::INFO, "configuration changed!")
+            .await;
+    }
+
+    async fn did_change_workspace_folders(&self, _: DidChangeWorkspaceFoldersParams) {
+        self.client
+            .log_message(MessageType::INFO, "workspace folders changed!")
+            .await;
+    }
+
+    async fn did_change_watched_files(&self, _: DidChangeWatchedFilesParams) {
+        self.client
+            .log_message(MessageType::INFO, "watched files have changed!")
+            .await;
+    }
+
+    async fn execute_command(&self, _: ExecuteCommandParams) -> Result<Option<Value>> {
+        self.client
+            .log_message(MessageType::INFO, "command executed!")
+            .await;
+
+        match self.client.apply_edit(WorkspaceEdit::default()).await {
+            Ok(res) if res.applied => self.client.log_message(MessageType::INFO, "applied").await,
+            Ok(_) => self.client.log_message(MessageType::INFO, "rejected").await,
+            Err(err) => self.client.log_message(MessageType::ERROR, err).await,
+        }
+
+        Ok(None)
+    }
+}
+
+struct TextDocumentItem {
+    uri: Url,
+    text: String,
+    version: i32,
+}
+impl Backend {
+    async fn on_change(&self, params: TextDocumentItem) {
+        let rope = ropey::Rope::from_str(&params.text);
+        self.document_map
+            .insert(params.uri.to_string(), rope.clone());
+        // let (ast, errors, semantic_tokens) = parse(&params.text);
+
+        // let diagnostics = errors
+        //     .into_iter()
+        //     .filter_map(|item| {
+        //         let (message, span) = match item.reason() {
+        //             chumsky::error::SimpleReason::Unclosed { span, delimiter } => {
+        //                 (format!("Unclosed delimiter {}", delimiter), span.clone())
+        //             }
+        //             chumsky::error::SimpleReason::Unexpected => (
+        //                 format!(
+        //                     "{}, expected {}",
+        //                     if item.found().is_some() {
+        //                         "Unexpected token in input"
+        //                     } else {
+        //                         "Unexpected end of input"
+        //                     },
+        //                     if item.expected().len() == 0 {
+        //                         "something else".to_string()
+        //                     } else {
+        //                         item.expected()
+        //                             .map(|expected| match expected {
+        //                                 Some(expected) => expected.to_string(),
+        //                                 None => "end of input".to_string(),
+        //                             })
+        //                             .collect::<Vec<_>>()
+        //                             .join(", ")
+        //                     }
+        //                 ),
+        //                 item.span(),
+        //             ),
+        //             chumsky::error::SimpleReason::Custom(msg) => (msg.to_string(), item.span()),
+        //         };
+        //
+        //         || -> Option<Diagnostic> {
+        //             // let start_line = rope.try_char_to_line(span.start)?;
+        //             // let first_char = rope.try_line_to_char(start_line)?;
+        //             // let start_column = span.start - first_char;
+        //             let start_position = offset_to_position(span.start, &rope)?;
+        //             let end_position = offset_to_position(span.end, &rope)?;
+        //             // let end_line = rope.try_char_to_line(span.end)?;
+        //             // let first_char = rope.try_line_to_char(end_line)?;
+        //             // let end_column = span.end - first_char;
+        //             Some(Diagnostic::new_simple(
+        //                 Range::new(start_position, end_position),
+        //                 message,
+        //             ))
+        //         }()
+        //     })
+        //     .collect::<Vec<_>>();
+        //
+        // self.client
+        //     .publish_diagnostics(params.uri.clone(), diagnostics, Some(params.version))
+        //     .await;
+
+        // if let Some(ast) = ast {
+        //     self.ast_map.insert(params.uri.to_string(), ast);
+        // }
+        // self.client
+        //     .log_message(MessageType::INFO, &format!("{:?}", semantic_tokens))
+        //     .await;
+        // self.semantic_token_map
+        //     .insert(params.uri.to_string(), semantic_tokens);
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    env_logger::init();
+
+    let stdin = tokio::io::stdin();
+    let stdout = tokio::io::stdout();
+
+    let (service, socket) = LspService::build(|client| Backend {
+        client,
+        // ast_map: DashMap::new(),
+        document_map: DashMap::new(),
+        // semantic_token_map: DashMap::new(),
+    })
+    .finish();
+
+    Server::new(stdin, stdout, socket).serve(service).await;
 }
