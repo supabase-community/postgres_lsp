@@ -4,7 +4,7 @@ use cstree::interning::Interner;
 use logos::Lexer;
 use logos::Logos;
 
-use crate::expr_parser::parse_expr;
+use crate::expr_parser::parse_expression;
 use crate::syntax::SyntaxKind;
 
 #[derive(Logos, Debug, PartialEq)]
@@ -56,7 +56,7 @@ impl<'input> Parser<'input> {
                         self.builder.token(SyntaxKind::Newline, self.lexer.slice());
                     }
                     Token::Expr => {
-                        parse_expr(self.lexer.slice(), &mut self.builder);
+                        parse_expression(&self.lexer.slice(), &mut self.builder);
                     }
                 };
                 self.parse_next_token();
