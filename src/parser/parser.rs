@@ -1,6 +1,7 @@
 use cstree::build::GreenNodeBuilder;
 use cstree::green::GreenNode;
 use cstree::interning::Interner;
+use cstree::testing::SyntaxNode;
 use logos::Lexer;
 use logos::Logos;
 
@@ -97,4 +98,22 @@ fn test_lexer() {
 
     assert_eq!(lex.next(), Some(Ok(Token::Expr)));
     assert_eq!(lex.slice(), "select id,username from contact\n\nselect id,name\nfrom contact -- test inline comment\nwhere id = '123';");
+}
+
+#[test]
+fn test_parser() {
+    let input = "select * from contact where id = '123';\n\n-- test comment\n\nselect id,name\nfrom contact -- test inline comment\nwhere id = '123';\n\n";
+
+    println!("input: {}", input);
+
+    let mut builder = GreenNodeBuilder::new();
+
+    parse_expression(input, &mut builder);
+
+    let (tree, cache) = builder.finish();
+    let (tree, interner) = (tree, cache.unwrap().into_interner().unwrap());
+    let root = SyntaxNode::<SyntaxKind>::new_root_with_resolver(tree, interner);
+    dbg!(root);
+
+    assert_eq!(1, 1);
 }

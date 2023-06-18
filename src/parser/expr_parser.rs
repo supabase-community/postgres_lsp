@@ -330,8 +330,8 @@ impl<'input, 'builder> ExprParser<'input, 'builder> {
 
 #[test]
 fn test_expr_parser() {
-    // let input = "select *,test from contact where (id = '123');";
-    let input = "select test from contact where id = 123;";
+    let input = "select *,test from contact where (id = '123');";
+    // let input = "select test from contact where id = 123;";
     // let input = "CREATE FUNCTION add(integer, integer) RETURNS integer
     // AS 'select $1 + $2;'
     // LANGUAGE SQL
