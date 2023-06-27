@@ -10,30 +10,31 @@
 //! statement_parser merges the results of the statement_lexer, and the tokens and nodes from pg_query.rs
 //! into a single concrete syntax tree.
 
-mod expr_lexer;
 mod pg_query_utils;
+mod source_file_lexer;
+mod source_file_parser;
 mod statement_builder;
 mod statement_lexer;
 mod statement_parser;
 mod syntax_error;
 mod syntax_kind;
 
-use cstree::testing::{GreenNode, SyntaxNode};
+use cstree::green::GreenNode;
+use cstree::syntax::SyntaxNode;
 use syntax_error::SyntaxError;
+use syntax_kind::SyntaxKind;
 use triomphe::Arc;
 
-// pg_query.rs only parsed full statements
-// which means that conversion between cst and ast is only possible on statement level
-// we need to implement a trait for the statement level tokens
-
+// /// `Parse` is the result of the parsing: a syntax tree and a collection of
+// /// errors.
 // #[derive(Debug, PartialEq, Eq)]
-// pub struct Parse<T> {
+// pub struct Parse {
 //     green: GreenNode,
 //     errors: Arc<Vec<SyntaxError>>,
 // }
 //
-// impl<T> Clone for Parse<T> {
-//     fn clone(&self) -> Parse<T> {
+// impl Clone for Parse {
+//     fn clone(&self) -> Parse {
 //         Parse {
 //             green: self.green.clone(),
 //             errors: self.errors.clone(),
@@ -41,46 +42,58 @@ use triomphe::Arc;
 //     }
 // }
 //
-// impl<T> Parse<T> {
-//     fn new(green: GreenNode, errors: Vec<SyntaxError>) -> Parse<T> {
+// impl Parse {
+//     fn new(green: GreenNode, errors: Vec<SyntaxError>) -> Parse {
 //         Parse {
 //             green,
 //             errors: Arc::new(errors),
 //         }
 //     }
 //
-//     pub fn syntax_node(&self) -> SyntaxNode<T> {
+//     pub fn syntax_node(&self) -> SyntaxNode<SyntaxKind> {
 //         SyntaxNode::new_root(self.green.clone())
 //     }
 //     pub fn errors(&self) -> &[SyntaxError] {
 //         &self.errors
 //     }
 // }
-
-// impl<T: AstNode> Parse<T> {
-//     pub fn to_syntax(self) -> Parse<SyntaxNode> {
-//         Parse {
-//             green: self.green,
-//             errors: self.errors,
+//
+// impl Parse<SourceFile> {
+//     pub fn debug_dump(&self) -> String {
+//         let mut buf = format!("{:#?}", self.tree().syntax());
+//         for err in self.errors.iter() {
+//             format_to!(buf, "error {:?}: {}\n", err.range(), err);
 //         }
+//         buf
 //     }
 //
-//     pub fn tree(&self) -> T {
-//         T::cast(self.syntax_node()).unwrap()
+//     pub fn reparse(&self, indel: &Indel) -> Parse<SourceFile> {
+//         self.incremental_reparse(indel)
+//             .unwrap_or_else(|| self.full_reparse(indel))
 //     }
 //
-//     pub fn ok(self) -> Result<T, Arc<Vec<SyntaxError>>> {
-//         if self.errors.is_empty() {
-//             Ok(self.tree())
-//         } else {
-//             Err(self.errors)
-//         }
+//     fn incremental_reparse(&self, indel: &Indel) -> Option<Parse<SourceFile>> {
+//         // FIXME: validation errors are not handled here
+//         parsing::incremental_reparse(self.tree().syntax(), indel, self.errors.to_vec()).map(
+//             |(green_node, errors, _reparsed_range)| Parse {
+//                 green: green_node,
+//                 errors: Arc::new(errors),
+//                 _ty: PhantomData,
+//             },
+//         )
+//     }
+//
+//     fn full_reparse(&self, indel: &Indel) -> Parse<SourceFile> {
+//         let mut text = self.tree().syntax().text().to_string();
+//         indel.apply(&mut text);
+//         SourceFile::parse(&text)
 //     }
 // }
 //
-// pub use crate::syntax_kind::SyntaxKind;
+// /// `SourceFile` represents a parse tree for a single Rust file.
+// pub use crate::ast::SourceFile;
 //
-// impl SyntaxKind::SourceFile {
+// impl SourceFile {
 //     pub fn parse(text: &str) -> Parse<SourceFile> {
 //         let (green, mut errors) = parsing::parse_text(text);
 //         let root = SyntaxNode::new_root(green.clone());

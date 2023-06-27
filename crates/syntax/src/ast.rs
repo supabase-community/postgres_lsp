@@ -18,3 +18,5 @@
 // - build ast separately --> but then we need to implement parsing and re-parsing multiple times:
 // bad :(
 //
+// problem: nested statements such as create function do not parse its body
+// the cst needs to parse the sub-statements. we can then convert forth and back as usual

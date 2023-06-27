@@ -28,11 +28,15 @@ pub fn parse_statement<'input, 'builder>(
     input: &'input str,
     builder: &'builder mut GreenNodeBuilder<'static, 'static, SyntaxKind>,
 ) -> Result<(), SyntaxError> {
-    let parsed = match pg_query::parse(input) {
-        Ok(parsed) => parsed,
+    // TODO scan results is always returned!
+    // the parser needs to be refactored to allow results and errors
+    let scanned = match pg_query::scan(input) {
+        Ok(scanned) => scanned,
         Err(e) => {
             // just return error, we might be able to work with a potentially-malformed query too
             // but this is for later
+            println!("scanned error: {:?}, {:?}", e, input);
+            builder.token(SyntaxKind::AnyStatement, input);
             return Err(SyntaxError::new(
                 e.to_string(),
                 TextRange::new(TextSize::from(0), TextSize::from(input.len() as u32)),
@@ -40,11 +44,14 @@ pub fn parse_statement<'input, 'builder>(
         }
     };
 
-    let scanned = match pg_query::scan(input) {
-        Ok(scanned) => scanned,
+    let parsed = match pg_query::parse(input) {
+        Ok(parsed) => parsed,
         Err(e) => {
             // just return error, we might be able to work with a potentially-malformed query too
             // but this is for later
+            println!("parse error: {:?}, {:?}", e, input);
+            println!("{:?}", scanned);
+            builder.token(SyntaxKind::AnyStatement, input);
             return Err(SyntaxError::new(
                 e.to_string(),
                 TextRange::new(TextSize::from(0), TextSize::from(input.len() as u32)),
@@ -86,6 +93,7 @@ impl<'input, 'builder> StatementParser<'input, 'builder> {
     }
 
     pub fn parse(&mut self) {
+        // set nodes and tokens here
         let root_node = match self.pg_query_nodes.next() {
             Some(node) => node,
             None => {
@@ -186,6 +194,26 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_fn() {
+        // todo: create function definitions are not parsed by pg_query. it is just a string.
+        // we need to parse it ourselves
+        let input = "CREATE FUNCTION dup(int) RETURNS dup_result
+    AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
+    LANGUAGE SQL;";
+
+        let res = pg_query::parse(input);
+
+        match res {
+            Ok(res) => {
+                res.protobuf.nodes().iter().for_each(|node| {
+                    println!("{:#?}", node);
+                });
+            }
+            Err(err) => todo!(),
+        }
+    }
+
+    #[test]
     fn test_statement_parser() {
         let input = "select *,test from contact where (id = '123');";
 
@@ -196,6 +224,9 @@ mod tests {
         let (tree, cache) = builder.finish();
         let (tree, interner) = (tree, cache.unwrap().into_interner().unwrap());
         let root = SyntaxNode::<SyntaxKind>::new_root_with_resolver(tree, interner);
+
+        println!("{:#?}", input);
+        println!("{:#?}", root);
 
         assert_eq!(format!("{:#?}", root), "SelectStmt@0..46\n  Select@0..6 \"select\"\n  Whitespace@6..7 \" \"\n  ResTarget@7..8\n    ColumnRef@7..8\n      Ascii42@7..8 \"*\"\n  Ascii44@8..9 \",\"\n  ResTarget@9..13\n    ColumnRef@9..13\n      Ident@9..13 \"test\"\n  Whitespace@13..14 \" \"\n  From@14..18 \"from\"\n  Whitespace@18..19 \" \"\n  RangeVar@19..26\n    Ident@19..26 \"contact\"\n  Whitespace@26..27 \" \"\n  Where@27..32 \"where\"\n  Whitespace@32..33 \" \"\n  Ascii40@33..34 \"(\"\n  AExpr@34..44\n    ColumnRef@34..36\n      Ident@34..36 \"id\"\n    Whitespace@36..37 \" \"\n    Ascii61@37..38 \"=\"\n    Whitespace@38..39 \" \"\n    AConst@39..44\n      Sconst@39..44 \"'123'\"\n  Ascii41@44..45 \")\"\n  Ascii59@45..46 \";\"\n");
     }

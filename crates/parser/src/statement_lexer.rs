@@ -5,6 +5,8 @@
 /// being used. all words are put into the "Word" type and will be defined in more detail by the results of pg_query.rs
 use logos::{Lexer, Logos};
 
+use crate::syntax_kind::SyntaxKind;
+
 #[derive(Logos, Debug, PartialEq)]
 pub enum StatementToken {
     // copied from protobuf::Token. can be generated later
@@ -59,6 +61,41 @@ pub enum StatementToken {
     Tab,
     #[regex("/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/|--[^\n]*"g)]
     Comment,
+}
+
+impl StatementToken {
+    /// Creates a `SyntaxKind` from a `StatementToken`.
+    /// can be generated.
+    pub fn syntax_kind(&self) -> SyntaxKind {
+        match self {
+            StatementToken::Ascii37 => SyntaxKind::Ascii37,
+            StatementToken::Ascii40 => SyntaxKind::Ascii40,
+            StatementToken::Ascii41 => SyntaxKind::Ascii41,
+            StatementToken::Ascii42 => SyntaxKind::Ascii42,
+            StatementToken::Ascii43 => SyntaxKind::Ascii43,
+            StatementToken::Ascii44 => SyntaxKind::Ascii44,
+            StatementToken::Ascii45 => SyntaxKind::Ascii45,
+            StatementToken::Ascii46 => SyntaxKind::Ascii46,
+            StatementToken::Ascii47 => SyntaxKind::Ascii47,
+            StatementToken::Ascii58 => SyntaxKind::Ascii58,
+            StatementToken::Ascii59 => SyntaxKind::Ascii59,
+            StatementToken::Ascii60 => SyntaxKind::Ascii60,
+            StatementToken::Ascii61 => SyntaxKind::Ascii61,
+            StatementToken::Ascii62 => SyntaxKind::Ascii62,
+            StatementToken::Ascii63 => SyntaxKind::Ascii63,
+            StatementToken::Ascii91 => SyntaxKind::Ascii91,
+            StatementToken::Ascii92 => SyntaxKind::Ascii92,
+            StatementToken::Ascii93 => SyntaxKind::Ascii93,
+            StatementToken::Ascii94 => SyntaxKind::Ascii94,
+            StatementToken::Word => SyntaxKind::Word,
+            StatementToken::Whitespace => SyntaxKind::Whitespace,
+            StatementToken::Newline => SyntaxKind::Newline,
+            StatementToken::Tab => SyntaxKind::Tab,
+            StatementToken::Sconst => SyntaxKind::Sconst,
+            StatementToken::Comment => SyntaxKind::Comment,
+            _ => panic!("Unknown StatementToken: {:?}", self),
+        }
+    }
 }
 
 pub fn create_statement_lexer(input: &str) -> Lexer<StatementToken> {

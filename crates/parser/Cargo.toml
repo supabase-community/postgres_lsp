@@ -1,0 +1,10 @@
+[package]
+name = "parser"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+pg_query = "0.7"
+logos = "0.13.0"

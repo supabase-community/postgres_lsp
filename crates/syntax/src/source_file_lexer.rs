@@ -9,7 +9,7 @@ use logos::{Lexer, Logos};
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\f]+")] // Ignore this regex pattern between tokens
-pub enum ExprToken {
+pub enum SourceFileToken {
     // TODO: this only parses based on the semicolon, which will fail for statements that contain
     // subexperessions such as transactions or functions.
     #[regex("[a-zA-Z0-9_]+[^;]*;"gm)]
@@ -20,8 +20,8 @@ pub enum ExprToken {
     Comment,
 }
 
-pub fn create_expr_lexer(input: &str) -> Lexer<ExprToken> {
-    ExprToken::lexer(input)
+pub fn create_source_file_lexer(input: &str) -> Lexer<SourceFileToken> {
+    SourceFileToken::lexer(input)
 }
 
 #[cfg(test)]
@@ -32,24 +32,24 @@ mod tests {
     fn test_expr_lexer() {
         let input = "select * from contact where id = '123';\n\n-- test comment\n\nselect wrong statement;\n\nselect id,username from contact\n\nselect id,name\nfrom contact -- test inline comment\nwhere id = '123';\n\n";
 
-        let mut lex = create_expr_lexer(&input);
+        let mut lex = create_source_file_lexer(&input);
 
-        assert_eq!(lex.next(), Some(Ok(ExprToken::Expr)));
+        assert_eq!(lex.next(), Some(Ok(SourceFileToken::Expr)));
         assert_eq!(lex.slice(), "select * from contact where id = '123';");
 
-        assert_eq!(lex.next(), Some(Ok(ExprToken::Newline)));
+        assert_eq!(lex.next(), Some(Ok(SourceFileToken::Newline)));
 
-        assert_eq!(lex.next(), Some(Ok(ExprToken::Comment)));
+        assert_eq!(lex.next(), Some(Ok(SourceFileToken::Comment)));
         assert_eq!(lex.slice(), "-- test comment");
 
-        assert_eq!(lex.next(), Some(Ok(ExprToken::Newline)));
+        assert_eq!(lex.next(), Some(Ok(SourceFileToken::Newline)));
 
-        assert_eq!(lex.next(), Some(Ok(ExprToken::Expr)));
+        assert_eq!(lex.next(), Some(Ok(SourceFileToken::Expr)));
         assert_eq!(lex.slice(), "select wrong statement;");
 
-        assert_eq!(lex.next(), Some(Ok(ExprToken::Newline)));
+        assert_eq!(lex.next(), Some(Ok(SourceFileToken::Newline)));
 
-        assert_eq!(lex.next(), Some(Ok(ExprToken::Expr)));
+        assert_eq!(lex.next(), Some(Ok(SourceFileToken::Expr)));
         assert_eq!(lex.slice(), "select id,username from contact\n\nselect id,name\nfrom contact -- test inline comment\nwhere id = '123';");
     }
 }
