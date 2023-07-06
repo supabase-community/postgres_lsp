@@ -3,3 +3,8 @@ members = [
     "crates/*",
 ]
 
+[workspace.dependencies]
+parser = { path = "./crates/parser", version = "0.0.0" }
+triomphe = { version = "0.1.8", default-features = false, features = ["std"] }
+
+

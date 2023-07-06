@@ -54,12 +54,16 @@
 // so we will have a `parse_statement` and a `parse_source_file` function
 // the tree always covers all text since we use the scantokens and, if failing, the StatementTokens
 // errors are added to a list, and are not part of the tree
-//
-mod event_buffer;
-mod event_sink;
+
+mod ast_node;
+mod parser;
 mod pg_query_utils;
-mod source_file_lexer;
-mod source_file_parsing;
-mod statement_lexer;
-mod statement_parsing;
+mod source_file;
+mod statement;
+mod syntax_error;
 mod syntax_kind;
+mod syntax_node;
+
+pub use crate::parser::{Parse, Parser};
+pub use crate::syntax_kind::SyntaxKind;
+pub use crate::syntax_node::{SyntaxElement, SyntaxNode, SyntaxToken};

@@ -1,7 +1,7 @@
 mod semantic_token;
 use dashmap::DashMap;
 use log::{debug, error, info, log_enabled, Level};
-use parser::parser::Parser;
+use parser::{Parse, Parser, SyntaxKind, SyntaxNode, SyntaxToken};
 use ropey::Rope;
 use semantic_token::LEGEND_TYPE;
 use serde_json::Value;
@@ -9,9 +9,12 @@ use tower_lsp::jsonrpc::Result;
 use tower_lsp::lsp_types::*;
 use tower_lsp::{Client, LanguageServer, LspService, Server};
 
+use crate::semantic_token::semantic_token_from_syntax_kind;
+
 #[derive(Debug)]
 struct Backend {
     client: Client,
+    parse_map: DashMap<String, Parse>,
     // ast_map: DashMap<String, HashMap<String, Func>>,
     document_map: DashMap<String, Rope>,
     // semantic_token_map: DashMap<String, Vec<ImCompleteSemanticToken>>,
@@ -186,6 +189,16 @@ impl Backend {
         let rope = ropey::Rope::from_str(&params.text);
         self.document_map
             .insert(params.uri.to_string(), rope.clone());
+        let mut parser = Parser::default();
+        parser.parse_source_file(&params.text);
+        let result = parser.finish();
+
+        let semantic_tokens = result.cst.descendants_with_tokens().filter_map(|item| {
+            match SyntaxKind::try_from(item.syntax_kind()) {
+                _ => panic!("unexpected syntax kind"),
+            }
+        });
+
         // let (ast, errors, semantic_tokens) = parse(&params.text);
 
         // let diagnostics = errors

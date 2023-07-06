@@ -3,9 +3,12 @@
 /// pg_query.rs only parses valid statements, and no whitespaces or newlines.
 /// To circumvent this, we use a very simple lexer that just knows what kind of characters are
 /// being used. all words are put into the "Word" type and will be defined in more detail by the results of pg_query.rs
-use logos::{Lexer, Logos};
+use cstree::text::{TextRange, TextSize};
+use logos::Logos;
 
-use crate::syntax_kind::SyntaxKind;
+use crate::{
+    parser::Parser, pg_query_utils::get_position_for_pg_query_node, syntax_kind::SyntaxKind,
+};
 
 #[derive(Logos, Debug, PartialEq)]
 pub enum StatementToken {
@@ -98,19 +101,107 @@ impl StatementToken {
     }
 }
 
-pub fn create_statement_lexer(input: &str) -> Lexer<StatementToken> {
-    StatementToken::lexer(input)
+impl Parser {
+    pub fn parse_statement(&mut self, text: &str, at_offset: Option<u32>) {
+        let offset = at_offset.unwrap_or(0);
+        let range = TextRange::new(
+            TextSize::from(offset),
+            TextSize::from(offset + text.len() as u32),
+        );
+
+        let mut pg_query_tokens = match pg_query::scan(text) {
+            Ok(scanned) => scanned.tokens.into_iter().peekable(),
+            Err(e) => {
+                self.error(e.to_string(), range);
+                Vec::new().into_iter().peekable()
+            }
+        };
+
+        let parsed = pg_query::parse(text);
+        let proto;
+        let mut nodes;
+        let mut pg_query_nodes = match parsed {
+            Ok(parsed) => {
+                proto = parsed.protobuf;
+
+                nodes = proto.nodes();
+
+                nodes.sort_by(|a, b| {
+                    get_position_for_pg_query_node(&a.0).cmp(&get_position_for_pg_query_node(&b.0))
+                });
+
+                nodes.into_iter().peekable()
+            }
+            Err(e) => {
+                self.error(e.to_string(), range);
+                Vec::new().into_iter().peekable()
+            }
+        };
+
+        let mut lexer = StatementToken::lexer(&text);
+
+        // parse root node if no syntax errors
+        if pg_query_nodes.peek().is_some() {
+            let (node, depth, _) = pg_query_nodes.next().unwrap();
+            self.stmt(node.to_enum(), range);
+            self.start_node(SyntaxKind::from_pg_query_node(&node), &depth);
+        }
+
+        while let Some(token) = lexer.next() {
+            match token {
+                Ok(token) => {
+                    let span = lexer.span();
+
+                    // consume pg_query nodes until there is none, or the node is outside of the current text span
+                    while let Some(node) = pg_query_nodes.peek() {
+                        let pos = get_position_for_pg_query_node(&node.0);
+                        if span.contains(&usize::try_from(pos).unwrap()) == false {
+                            break;
+                        } else {
+                            // node is within span
+                            let (node, depth, _) = pg_query_nodes.next().unwrap();
+                            self.start_node(SyntaxKind::from_pg_query_node(&node), &depth);
+                        }
+                    }
+
+                    // consume pg_query token if it is within the current text span
+                    let next_pg_query_token = pg_query_tokens.peek();
+                    if next_pg_query_token.is_some()
+                        && (span.contains(
+                            &usize::try_from(next_pg_query_token.unwrap().start).unwrap(),
+                        ) || span
+                            .contains(&usize::try_from(next_pg_query_token.unwrap().end).unwrap()))
+                    {
+                        self.token(
+                            SyntaxKind::from_pg_query_token(&pg_query_tokens.next().unwrap()),
+                            lexer.slice(),
+                        );
+                    } else {
+                        // fallback to statement token
+                        self.token(token.syntax_kind(), lexer.slice());
+                    }
+                }
+                Err(_) => panic!("Unknown SourceFileToken: {:?}", lexer.span()),
+            }
+        }
+
+        // close up nodes
+        self.consume_token_buffer();
+        self.close_until_depth(1);
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::assert_eq;
+
     use super::*;
 
     #[test]
     fn test_statement_lexer() {
         let input = "select * from contact where id = '123 4 5';";
 
-        let mut lex = create_statement_lexer(&input);
+        let mut lex = StatementToken::lexer(&input);
 
         assert_eq!(lex.next(), Some(Ok(StatementToken::Word)));
         assert_eq!(lex.slice(), "select");
@@ -148,5 +239,16 @@ mod tests {
         assert_eq!(lex.next(), Some(Ok(StatementToken::Sconst)));
 
         assert_eq!(lex.next(), Some(Ok(StatementToken::Ascii59)));
+    }
+
+    #[test]
+    fn test_statement_parser() {
+        let input = "select *,some_col from contact where id = '123 4 5';";
+
+        let mut parser = Parser::default();
+        parser.parse_statement(input, None);
+        let parsed = parser.finish();
+
+        assert_eq!(parsed.cst.text(), input);
     }
 }

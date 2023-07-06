@@ -1,26 +1,33 @@
-use cstree::testing::GreenNodeBuilder;
+use cstree::syntax::ResolvedNode;
+use cstree::{build::GreenNodeBuilder, text::TextRange};
+use pg_query::NodeEnum;
 
+use crate::ast_node::RawStmt;
+use crate::syntax_error::SyntaxError;
 use crate::syntax_kind::{SyntaxKind, SyntaxKindType};
+use crate::syntax_node::SyntaxNode;
 
-pub struct StatementBuilder<'builder> {
-    builder: &'builder mut GreenNodeBuilder<'static, 'static, SyntaxKind>,
+#[derive(Default, Debug)]
+pub struct Parser {
+    inner: GreenNodeBuilder<'static, 'static, SyntaxKind>,
     token_buffer: Vec<(SyntaxKind, String)>,
     curr_depth: i32,
+    errors: Vec<SyntaxError>,
+    stmts: Vec<RawStmt>,
 }
 
-/// Wrapper around GreenNodeBuilder to simplify integration with SyntaxKind
-impl<'builder> StatementBuilder<'builder> {
-    pub fn new(builder: &'builder mut GreenNodeBuilder<'static, 'static, SyntaxKind>) -> Self {
-        return Self {
-            builder,
-            token_buffer: Vec::new(),
-            curr_depth: 0,
-        };
-    }
+#[derive(Debug)]
+pub struct Parse {
+    pub cst: ResolvedNode<SyntaxKind>,
+    pub errors: Vec<SyntaxError>,
+    pub stmts: Vec<RawStmt>,
+}
 
+/// Main parser that controls the cst building process, and collects errors and statements
+impl Parser {
     pub fn close_until_depth(&mut self, depth: i32) {
         while self.curr_depth >= depth {
-            self.builder.finish_node();
+            self.inner.finish_node();
             self.curr_depth -= 1;
         }
     }
@@ -35,17 +42,17 @@ impl<'builder> StatementBuilder<'builder> {
         self.consume_token_buffer();
 
         self.curr_depth = *depth;
-        self.builder.start_node(kind);
+        self.inner.start_node(kind);
     }
 
     pub fn finish_node(&mut self) {
-        self.builder.finish_node();
+        self.inner.finish_node();
     }
 
     /// Drains the token buffer and applies all tokens
     pub fn consume_token_buffer(&mut self) {
         for (kind, text) in self.token_buffer.drain(..) {
-            self.builder.token(kind, &text);
+            self.inner.token(kind, &text);
         }
     }
 
@@ -60,15 +67,32 @@ impl<'builder> StatementBuilder<'builder> {
                 // move up to depth 2 and consume buffered tokens before applying closing token
                 self.close_until_depth(2);
                 self.consume_token_buffer();
-                self.builder.token(kind, text);
+                self.inner.token(kind, text);
             }
             Some(SyntaxKindType::Follow) => {
                 // wait until next node, and apply token at same depth
                 self.token_buffer.push((kind, text.to_string()));
             }
             _ => {
-                self.builder.token(kind, text);
+                self.inner.token(kind, text);
             }
+        }
+    }
+
+    pub fn error(&mut self, error: String, range: TextRange) {
+        self.errors.push(SyntaxError::new(error, range));
+    }
+
+    pub fn stmt(&mut self, stmt: NodeEnum, range: TextRange) {
+        self.stmts.push(RawStmt { stmt, range });
+    }
+
+    pub fn finish(self) -> Parse {
+        let (tree, cache) = self.inner.finish();
+        Parse {
+            cst: SyntaxNode::new_root_with_resolver(tree, cache.unwrap().into_interner().unwrap()),
+            stmts: self.stmts,
+            errors: self.errors,
         }
     }
 }
