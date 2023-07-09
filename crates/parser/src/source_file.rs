@@ -26,7 +26,7 @@ impl Parser {
     pub fn parse_source_file(&mut self, text: &str) {
         let mut lexer = SourceFileToken::lexer(text);
 
-        self.start_node(SyntaxKind::SourceFile, 0);
+        self.start_node_at(SyntaxKind::SourceFile, Some(0));
         while let Some(token) = lexer.next() {
             match token {
                 Ok(token) => {
@@ -92,7 +92,7 @@ select 1;
 
 ";
 
-        let mut parser = Parser::default();
+        let mut parser = Parser::new();
         println!("input {:?}", input);
         parser.parse_source_file(input);
         let parsed = parser.finish();

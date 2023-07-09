@@ -12,8 +12,8 @@ pub enum SyntaxKind {
     Whitespace,
     Newline,
     Tab,
-    Word,         // common value for all keywords (select, from, ...)
-    AnyStatement, // node for unknown statements (e.g. when parsing fails)
+    Word, // common value for all keywords (select, from, ...)
+    Stmt, // node for unknown statements (e.g. when parsing fails)
     // from here copyied from NodeEnum
     Alias,
     RangeVar,

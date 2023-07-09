@@ -103,7 +103,6 @@ impl StatementToken {
 
 impl Parser {
     pub fn parse_statement(&mut self, text: &str, at_offset: Option<u32>) {
-        println!("#### parse_statement: {}", text);
         let offset = at_offset.unwrap_or(0);
         let range = TextRange::new(
             TextSize::from(offset),
@@ -117,7 +116,6 @@ impl Parser {
                 Vec::new().into_iter().peekable()
             }
         };
-        println!("pg_query_tokens: {:?}", pg_query_tokens);
 
         let parsed = pg_query::parse(text);
         let proto;
@@ -139,7 +137,6 @@ impl Parser {
                 Vec::new().into_iter().peekable()
             }
         };
-        println!("pg_query_nodes: {:?}", pg_query_nodes);
 
         let mut lexer = StatementToken::lexer(&text);
 
@@ -147,10 +144,12 @@ impl Parser {
         if pg_query_nodes.peek().is_some() {
             let (node, depth, _) = pg_query_nodes.next().unwrap();
             self.stmt(node.to_enum(), range);
-            self.start_node(SyntaxKind::from_pg_query_node(&node), depth);
+            self.start_node_at(SyntaxKind::from_pg_query_node(&node), Some(depth));
+            self.set_checkpoint(false);
         } else {
             // fallback to generic node as root
-            self.start_node(SyntaxKind::AnyStatement, 1);
+            self.start_node_at(SyntaxKind::Stmt, None);
+            self.set_checkpoint(true);
         }
 
         while let Some(token) = lexer.next() {
@@ -166,7 +165,7 @@ impl Parser {
                         } else {
                             // node is within span
                             let (node, depth, _) = pg_query_nodes.next().unwrap();
-                            self.start_node(SyntaxKind::from_pg_query_node(&node), depth);
+                            self.start_node_at(SyntaxKind::from_pg_query_node(&node), Some(depth));
                         }
                     }
 
@@ -192,8 +191,7 @@ impl Parser {
         }
 
         // close up nodes
-        self.consume_token_buffer();
-        self.close_until_depth(1);
+        self.close_checkpoint();
     }
 }
 
@@ -251,7 +249,7 @@ mod tests {
     fn test_statement_parser() {
         let input = "select *,some_col from contact where id = '123 4 5';";
 
-        let mut parser = Parser::default();
+        let mut parser = Parser::new();
         parser.parse_statement(input, None);
         let parsed = parser.finish();
 
@@ -264,7 +262,7 @@ mod tests {
     fn test_invalid_statement() {
         let input = "select select;";
 
-        let mut parser = Parser::default();
+        let mut parser = Parser::new();
         parser.parse_statement(input, None);
         let parsed = parser.finish();
 

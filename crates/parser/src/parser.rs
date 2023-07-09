@@ -7,13 +7,14 @@ use crate::syntax_error::SyntaxError;
 use crate::syntax_kind::{SyntaxKind, SyntaxKindType};
 use crate::syntax_node::SyntaxNode;
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct Parser {
     inner: GreenNodeBuilder<'static, 'static, SyntaxKind>,
     token_buffer: Vec<(SyntaxKind, String)>,
     curr_depth: i32,
     errors: Vec<SyntaxError>,
     stmts: Vec<RawStmt>,
+    checkpoint: Option<i32>,
     is_parsing_erronous_node: bool,
 }
 
@@ -26,11 +27,44 @@ pub struct Parse {
 
 /// Main parser that controls the cst building process, and collects errors and statements
 impl Parser {
+    pub fn new() -> Self {
+        Self {
+            curr_depth: -1,
+            inner: GreenNodeBuilder::new(),
+            token_buffer: Vec::new(),
+            errors: Vec::new(),
+            stmts: Vec::new(),
+            checkpoint: None,
+            is_parsing_erronous_node: false,
+        }
+    }
+
     pub fn close_until_depth(&mut self, depth: i32) {
-        while self.curr_depth >= depth && depth > 0 {
+        while self.curr_depth >= depth {
             self.finish_node();
             self.curr_depth -= 1;
         }
+    }
+
+    pub fn set_checkpoint(&mut self, is_parsing_erronous_node: bool) {
+        assert!(self.checkpoint.is_none());
+        assert!(self.token_buffer.is_empty());
+        println!("set_checkpoint at {}", self.curr_depth);
+        self.checkpoint = Some(self.curr_depth);
+        self.is_parsing_erronous_node = is_parsing_erronous_node;
+    }
+
+    pub fn close_checkpoint(&mut self) {
+        self.consume_token_buffer();
+        if self.checkpoint.is_some() {
+            self.close_until_depth(self.checkpoint.unwrap());
+        }
+        self.checkpoint = None;
+        self.is_parsing_erronous_node = false;
+    }
+
+    pub fn start_node(&mut self, kind: SyntaxKind) {
+        self.inner.start_node(kind);
     }
 
     /// start a new node of `SyntaxKind` at `depth`
@@ -38,22 +72,19 @@ impl Parser {
     /// and consumes token buffer before starting new node
     ///
     /// if `SyntaxKind` is `SyntaxKind::AnyStatement`, sets `is_parsing_erronous_node` to true
-    pub fn start_node(&mut self, kind: SyntaxKind, depth: i32) {
+    pub fn start_node_at(&mut self, kind: SyntaxKind, depth: Option<i32>) {
+        let depth = depth.unwrap_or(self.curr_depth + 1);
         // close until target depth
         self.close_until_depth(depth);
 
         self.consume_token_buffer();
 
         self.curr_depth = depth;
-        self.inner.start_node(kind);
-        if kind == SyntaxKind::AnyStatement {
-            self.is_parsing_erronous_node = true;
-        }
+        self.start_node(kind);
     }
 
     pub fn finish_node(&mut self) {
         self.inner.finish_node();
-        self.is_parsing_erronous_node = false;
     }
 
     /// Drains the token buffer and applies all tokens
