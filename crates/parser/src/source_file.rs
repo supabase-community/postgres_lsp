@@ -26,7 +26,7 @@ impl Parser {
     pub fn parse_source_file(&mut self, text: &str) {
         let mut lexer = SourceFileToken::lexer(text);
 
-        self.start_node(SyntaxKind::SourceFile, &0);
+        self.start_node(SyntaxKind::SourceFile, 0);
         while let Some(token) = lexer.next() {
             match token {
                 Ok(token) => {
@@ -76,5 +76,31 @@ mod tests {
 
         assert_eq!(lex.next(), Some(Ok(SourceFileToken::Statement)));
         assert_eq!(lex.slice(), "select id,username from contact\n\nselect id,name\nfrom contact -- test inline comment\nwhere id = '123';");
+    }
+
+    #[test]
+    fn test_source_file_parser() {
+        let input = "select id, name from users where id = '1224';
+
+select select;
+
+
+
+
+
+select 1;
+
+";
+
+        let mut parser = Parser::default();
+        println!("input {:?}", input);
+        parser.parse_source_file(input);
+        let parsed = parser.finish();
+
+        dbg!(parsed.errors);
+
+        dbg!(&parsed.cst);
+
+        assert_eq!(parsed.cst.text(), input);
     }
 }

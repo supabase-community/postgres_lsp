@@ -103,6 +103,7 @@ impl StatementToken {
 
 impl Parser {
     pub fn parse_statement(&mut self, text: &str, at_offset: Option<u32>) {
+        println!("#### parse_statement: {}", text);
         let offset = at_offset.unwrap_or(0);
         let range = TextRange::new(
             TextSize::from(offset),
@@ -116,6 +117,7 @@ impl Parser {
                 Vec::new().into_iter().peekable()
             }
         };
+        println!("pg_query_tokens: {:?}", pg_query_tokens);
 
         let parsed = pg_query::parse(text);
         let proto;
@@ -137,6 +139,7 @@ impl Parser {
                 Vec::new().into_iter().peekable()
             }
         };
+        println!("pg_query_nodes: {:?}", pg_query_nodes);
 
         let mut lexer = StatementToken::lexer(&text);
 
@@ -144,7 +147,10 @@ impl Parser {
         if pg_query_nodes.peek().is_some() {
             let (node, depth, _) = pg_query_nodes.next().unwrap();
             self.stmt(node.to_enum(), range);
-            self.start_node(SyntaxKind::from_pg_query_node(&node), &depth);
+            self.start_node(SyntaxKind::from_pg_query_node(&node), depth);
+        } else {
+            // fallback to generic node as root
+            self.start_node(SyntaxKind::AnyStatement, 1);
         }
 
         while let Some(token) = lexer.next() {
@@ -160,7 +166,7 @@ impl Parser {
                         } else {
                             // node is within span
                             let (node, depth, _) = pg_query_nodes.next().unwrap();
-                            self.start_node(SyntaxKind::from_pg_query_node(&node), &depth);
+                            self.start_node(SyntaxKind::from_pg_query_node(&node), depth);
                         }
                     }
 
@@ -248,6 +254,21 @@ mod tests {
         let mut parser = Parser::default();
         parser.parse_statement(input, None);
         let parsed = parser.finish();
+
+        dbg!(&parsed.cst);
+
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_invalid_statement() {
+        let input = "select select;";
+
+        let mut parser = Parser::default();
+        parser.parse_statement(input, None);
+        let parsed = parser.finish();
+
+        dbg!(&parsed.cst);
 
         assert_eq!(parsed.cst.text(), input);
     }

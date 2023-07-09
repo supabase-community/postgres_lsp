@@ -1,4 +1,4 @@
-use parser::{SyntaxKind, SyntaxToken};
+use parser::SyntaxKind;
 use tower_lsp::lsp_types::SemanticTokenType;
 
 /// Semantic token types that are used for highlighting
@@ -49,11 +49,19 @@ pub const LEGEND_TYPE: &[SemanticTokenType] = &[
     SemanticTokenType::OPERATOR,
 ];
 
-pub fn semantic_token_from_syntax_kind(syntax: SyntaxKind) -> Option<SemanticTokenType> {
-    match syntax {
+#[derive(Debug, Clone)]
+pub struct ImCompleteSemanticToken {
+    pub start: usize,
+    pub length: usize,
+    pub token_type: usize,
+}
+
+pub fn semantic_token_from_syntax_kind(syntax: SyntaxKind) -> Option<usize> {
+    let token_type = match syntax {
         SyntaxKind::Ascii37 => Some(SemanticTokenType::OPERATOR),
         SyntaxKind::Ascii42 => Some(SemanticTokenType::OPERATOR),
         SyntaxKind::Ascii43 => Some(SemanticTokenType::OPERATOR),
+        SyntaxKind::Ascii44 => Some(SemanticTokenType::PROPERTY),
         SyntaxKind::Ascii45 => Some(SemanticTokenType::OPERATOR),
         SyntaxKind::Ascii47 => Some(SemanticTokenType::OPERATOR),
         SyntaxKind::Ascii60 => Some(SemanticTokenType::OPERATOR),
@@ -64,6 +72,12 @@ pub fn semantic_token_from_syntax_kind(syntax: SyntaxKind) -> Option<SemanticTok
         SyntaxKind::Select => Some(SemanticTokenType::KEYWORD),
         SyntaxKind::From => Some(SemanticTokenType::KEYWORD),
         SyntaxKind::Where => Some(SemanticTokenType::KEYWORD),
+        SyntaxKind::ColumnRef => Some(SemanticTokenType::PROPERTY),
+        SyntaxKind::RangeVar => Some(SemanticTokenType::CLASS),
         _ => None,
+    };
+    if let Some(token_type) = token_type {
+        return LEGEND_TYPE.iter().position(|item| item == &token_type);
     }
+    None
 }

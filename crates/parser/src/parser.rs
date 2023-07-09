@@ -14,6 +14,7 @@ pub struct Parser {
     curr_depth: i32,
     errors: Vec<SyntaxError>,
     stmts: Vec<RawStmt>,
+    is_parsing_erronous_node: bool,
 }
 
 #[derive(Debug)]
@@ -26,8 +27,8 @@ pub struct Parse {
 /// Main parser that controls the cst building process, and collects errors and statements
 impl Parser {
     pub fn close_until_depth(&mut self, depth: i32) {
-        while self.curr_depth >= depth {
-            self.inner.finish_node();
+        while self.curr_depth >= depth && depth > 0 {
+            self.finish_node();
             self.curr_depth -= 1;
         }
     }
@@ -35,18 +36,24 @@ impl Parser {
     /// start a new node of `SyntaxKind` at `depth`
     /// handles closing previous nodes if necessary
     /// and consumes token buffer before starting new node
-    pub fn start_node(&mut self, kind: SyntaxKind, depth: &i32) {
+    ///
+    /// if `SyntaxKind` is `SyntaxKind::AnyStatement`, sets `is_parsing_erronous_node` to true
+    pub fn start_node(&mut self, kind: SyntaxKind, depth: i32) {
         // close until target depth
-        self.close_until_depth(*depth);
+        self.close_until_depth(depth);
 
         self.consume_token_buffer();
 
-        self.curr_depth = *depth;
+        self.curr_depth = depth;
         self.inner.start_node(kind);
+        if kind == SyntaxKind::AnyStatement {
+            self.is_parsing_erronous_node = true;
+        }
     }
 
     pub fn finish_node(&mut self) {
         self.inner.finish_node();
+        self.is_parsing_erronous_node = false;
     }
 
     /// Drains the token buffer and applies all tokens
@@ -58,10 +65,16 @@ impl Parser {
 
     /// applies token based on its `SyntaxKindType`
     /// if `SyntaxKindType::Close`, closes all nodes until depth 1
-    /// if `SyntaxKindType::Follow`, add token to buffer and wait until next node to apply token at
-    /// same depth
+    /// if `SyntaxKindType::Follow`, add token to buffer and wait until next node to apply token at same depth
     /// otherwise, applies token immediately
+    ///
+    /// if `is_parsing_erronous_node` is true, applies token immediately
     pub fn token(&mut self, kind: SyntaxKind, text: &str) {
+        if self.is_parsing_erronous_node {
+            self.inner.token(kind, text);
+            return;
+        }
+
         match kind.get_type() {
             Some(SyntaxKindType::Close) => {
                 // move up to depth 2 and consume buffered tokens before applying closing token

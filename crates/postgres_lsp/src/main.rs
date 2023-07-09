@@ -1,23 +1,25 @@
 mod semantic_token;
+mod utils;
+
 use dashmap::DashMap;
-use log::{debug, error, info, log_enabled, Level};
-use parser::{Parse, Parser, SyntaxKind, SyntaxNode, SyntaxToken};
+use log::debug;
+use parser::{Parse, Parser};
 use ropey::Rope;
-use semantic_token::LEGEND_TYPE;
+use semantic_token::{ImCompleteSemanticToken, LEGEND_TYPE};
 use serde_json::Value;
 use tower_lsp::jsonrpc::Result;
 use tower_lsp::lsp_types::*;
 use tower_lsp::{Client, LanguageServer, LspService, Server};
 
 use crate::semantic_token::semantic_token_from_syntax_kind;
+use crate::utils::offset_to_position;
 
 #[derive(Debug)]
 struct Backend {
     client: Client,
     parse_map: DashMap<String, Parse>,
-    // ast_map: DashMap<String, HashMap<String, Func>>,
     document_map: DashMap<String, Rope>,
-    // semantic_token_map: DashMap<String, Vec<ImCompleteSemanticToken>>,
+    semantic_token_map: DashMap<String, Vec<ImCompleteSemanticToken>>,
 }
 
 #[tower_lsp::async_trait]
@@ -31,9 +33,9 @@ impl LanguageServer for Backend {
             offset_encoding: None,
             capabilities: ServerCapabilities {
                 // inlay_hint_provider: Some(OneOf::Left(true)),
-                // text_document_sync: Some(TextDocumentSyncCapability::Kind(
-                //     TextDocumentSyncKind::FULL,
-                // )),
+                text_document_sync: Some(TextDocumentSyncCapability::Kind(
+                    TextDocumentSyncKind::FULL,
+                )),
                 // completion_provider: Some(CompletionOptions {
                 //     resolve_provider: Some(false),
                 //     trigger_characters: Some(vec![".".to_string()]),
@@ -45,13 +47,13 @@ impl LanguageServer for Backend {
                 //     commands: vec!["dummy.do_something".to_string()],
                 //     work_done_progress_options: Default::default(),
                 // }),
-                // workspace: Some(WorkspaceServerCapabilities {
-                //     workspace_folders: Some(WorkspaceFoldersServerCapabilities {
-                //         supported: Some(true),
-                //         change_notifications: Some(OneOf::Left(true)),
-                //     }),
-                //     file_operations: None,
-                // }),
+                workspace: Some(WorkspaceServerCapabilities {
+                    workspace_folders: Some(WorkspaceFoldersServerCapabilities {
+                        supported: Some(true),
+                        change_notifications: Some(OneOf::Left(true)),
+                    }),
+                    file_operations: None,
+                }),
                 semantic_tokens_provider: Some(
                     SemanticTokensServerCapabilities::SemanticTokensRegistrationOptions(
                         SemanticTokensRegistrationOptions {
@@ -110,6 +112,9 @@ impl LanguageServer for Backend {
     }
 
     async fn did_change(&self, mut params: DidChangeTextDocumentParams) {
+        self.client
+            .log_message(MessageType::INFO, "file changed!")
+            .await;
         self.on_change(TextDocumentItem {
             uri: params.text_document.uri,
             text: std::mem::take(&mut params.content_changes[0].text),
@@ -133,8 +138,55 @@ impl LanguageServer for Backend {
         &self,
         params: SemanticTokensParams,
     ) -> Result<Option<SemanticTokensResult>> {
-        println!("semantic_tokens_full");
-        return Ok(None);
+        let uri = params.text_document.uri.to_string();
+        self.client
+            .log_message(MessageType::LOG, "semantic_token_full")
+            .await;
+        let semantic_tokens = || -> Option<Vec<SemanticToken>> {
+            let mut im_complete_tokens = self.semantic_token_map.get_mut(&uri)?;
+            let rope = self.document_map.get(&uri)?;
+            im_complete_tokens.sort_by(|a, b| a.start.cmp(&b.start));
+            let mut pre_line = 0;
+            let mut pre_start = 0;
+            let semantic_tokens = im_complete_tokens
+                .iter()
+                .filter_map(|token| {
+                    let line = rope.try_byte_to_line(token.start).ok()? as u32;
+                    let first = rope.try_line_to_char(line as usize).ok()? as u32;
+                    let start = rope.try_byte_to_char(token.start).ok()? as u32 - first;
+                    let delta_line = line - pre_line;
+                    let delta_start = if delta_line == 0 {
+                        start - pre_start
+                    } else {
+                        start
+                    };
+                    let ret = Some(SemanticToken {
+                        delta_line,
+                        delta_start,
+                        length: token.length as u32,
+                        token_type: token.token_type as u32,
+                        token_modifiers_bitset: 0,
+                    });
+                    pre_line = line;
+                    pre_start = start;
+                    ret
+                })
+                .collect::<Vec<_>>();
+            Some(semantic_tokens)
+        }();
+        self.client
+            .log_message(
+                MessageType::LOG,
+                format!("semantic_tokens: {:?}", semantic_tokens),
+            )
+            .await;
+        if let Some(semantic_token) = semantic_tokens {
+            return Ok(Some(SemanticTokensResult::Tokens(SemanticTokens {
+                result_id: None,
+                data: semantic_token,
+            })));
+        }
+        Ok(None)
     }
 
     async fn semantic_tokens_range(
@@ -185,83 +237,60 @@ struct TextDocumentItem {
 }
 impl Backend {
     async fn on_change(&self, params: TextDocumentItem) {
-        debug!("on_change {:?}", params.uri);
+        self.client
+            .log_message(MessageType::INFO, format!("on_change {:?}", params.uri))
+            .await;
         let rope = ropey::Rope::from_str(&params.text);
         self.document_map
             .insert(params.uri.to_string(), rope.clone());
+
+        let rope = ropey::Rope::from_str(&params.text);
         let mut parser = Parser::default();
+
         parser.parse_source_file(&params.text);
+
         let result = parser.finish();
 
-        let semantic_tokens = result.cst.descendants_with_tokens().filter_map(|item| {
-            match SyntaxKind::try_from(item.syntax_kind()) {
-                _ => panic!("unexpected syntax kind"),
-            }
-        });
+        dbg!(&result.cst);
 
-        // let (ast, errors, semantic_tokens) = parse(&params.text);
+        // update semantic tokens
+        let semantic_tokens = result
+            .cst
+            .descendants_with_tokens()
+            .filter_map(|item| match semantic_token_from_syntax_kind(item.kind()) {
+                Some(token_type) => Some(ImCompleteSemanticToken {
+                    start: item.text_range().start().into(),
+                    token_type,
+                    length: item.text_range().len().into(),
+                }),
+                None => None,
+            })
+            .collect::<Vec<_>>();
 
-        // let diagnostics = errors
-        //     .into_iter()
-        //     .filter_map(|item| {
-        //         let (message, span) = match item.reason() {
-        //             chumsky::error::SimpleReason::Unclosed { span, delimiter } => {
-        //                 (format!("Unclosed delimiter {}", delimiter), span.clone())
-        //             }
-        //             chumsky::error::SimpleReason::Unexpected => (
-        //                 format!(
-        //                     "{}, expected {}",
-        //                     if item.found().is_some() {
-        //                         "Unexpected token in input"
-        //                     } else {
-        //                         "Unexpected end of input"
-        //                     },
-        //                     if item.expected().len() == 0 {
-        //                         "something else".to_string()
-        //                     } else {
-        //                         item.expected()
-        //                             .map(|expected| match expected {
-        //                                 Some(expected) => expected.to_string(),
-        //                                 None => "end of input".to_string(),
-        //                             })
-        //                             .collect::<Vec<_>>()
-        //                             .join(", ")
-        //                     }
-        //                 ),
-        //                 item.span(),
-        //             ),
-        //             chumsky::error::SimpleReason::Custom(msg) => (msg.to_string(), item.span()),
-        //         };
+        // publish diagnostics
         //
-        //         || -> Option<Diagnostic> {
-        //             // let start_line = rope.try_char_to_line(span.start)?;
-        //             // let first_char = rope.try_line_to_char(start_line)?;
-        //             // let start_column = span.start - first_char;
-        //             let start_position = offset_to_position(span.start, &rope)?;
-        //             let end_position = offset_to_position(span.end, &rope)?;
-        //             // let end_line = rope.try_char_to_line(span.end)?;
-        //             // let first_char = rope.try_line_to_char(end_line)?;
-        //             // let end_column = span.end - first_char;
-        //             Some(Diagnostic::new_simple(
-        //                 Range::new(start_position, end_position),
-        //                 message,
-        //             ))
-        //         }()
-        //     })
-        //     .collect::<Vec<_>>();
-        //
-        // self.client
-        //     .publish_diagnostics(params.uri.clone(), diagnostics, Some(params.version))
-        //     .await;
+        let diagnostics = result
+            .errors
+            .iter()
+            .map(|error| {
+                Diagnostic::new_simple(
+                    Range {
+                        start: offset_to_position(error.range().start().into(), &rope).unwrap(),
+                        end: offset_to_position(error.range().start().into(), &rope).unwrap(),
+                    },
+                    error.to_string(),
+                )
+            })
+            .collect::<Vec<_>>();
 
-        // if let Some(ast) = ast {
-        //     self.ast_map.insert(params.uri.to_string(), ast);
-        // }
-        // self.client
-        //     .log_message(MessageType::INFO, &format!("{:?}", semantic_tokens))
-        //     .await;
-        // self.semantic_token_map
-        //     .insert(params.uri.to_string(), semantic_tokens);
+        self.client
+            .publish_diagnostics(params.uri.clone(), diagnostics, Some(params.version))
+            .await;
+
+        self.semantic_token_map
+            .insert(params.uri.to_string(), semantic_tokens);
+
+        self.parse_map.insert(params.uri.to_string(), result);
     }
 }
 
@@ -278,7 +307,8 @@ async fn main() {
         client,
         // ast_map: DashMap::new(),
         document_map: DashMap::new(),
-        // semantic_token_map: DashMap::new(),
+        parse_map: DashMap::new(),
+        semantic_token_map: DashMap::new(),
     })
     .finish();
 
