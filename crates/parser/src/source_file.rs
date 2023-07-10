@@ -12,9 +12,7 @@ use crate::{parser::Parser, syntax_kind::SyntaxKind};
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\f]+")] // Ignore this regex pattern between tokens
 pub enum SourceFileToken {
-    // TODO: this only parses based on the semicolon, which will fail for statements that contain
-    // subexperessions such as transactions or functions.
-    #[regex("[a-zA-Z0-9_]+[^;]*;"gm)]
+    #[regex("[a-zA-Z0-9_]+(?:'[^']*'|(?:\\$\\$[^$]*\\$\\$|[^';])+)*;"gm)]
     Statement,
     #[regex("\n+"gm)]
     Newline,

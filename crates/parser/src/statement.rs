@@ -143,6 +143,8 @@ impl Parser {
         // parse root node if no syntax errors
         if pg_query_nodes.peek().is_some() {
             let (node, depth, _) = pg_query_nodes.next().unwrap();
+            // TODO: if root node is a create or alter function stmt, parse the function body
+            // separately
             self.stmt(node.to_enum(), range);
             self.start_node_at(SyntaxKind::from_pg_query_node(&node), Some(depth));
             self.set_checkpoint(false);
