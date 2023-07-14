@@ -5,10 +5,17 @@
 /// being used. all words are put into the "Word" type and will be defined in more detail by the results of pg_query.rs
 use cstree::text::{TextRange, TextSize};
 use logos::Logos;
+use regex::Regex;
 
 use crate::{
     parser::Parser, pg_query_utils::get_position_for_pg_query_node, syntax_kind::SyntaxKind,
 };
+
+#[derive(Logos, Debug, PartialEq)]
+pub enum Test {
+    #[regex("'([^']+)'|\\$(\\w)?\\$.*\\$(\\w)?\\$")]
+    Sconst,
+}
 
 #[derive(Logos, Debug, PartialEq)]
 pub enum StatementToken {
@@ -52,7 +59,8 @@ pub enum StatementToken {
     #[token("^")]
     Ascii94,
     // comments, whitespaces and keywords
-    #[regex("'([^']+)'")]
+    // FIXME: nexted and named dollar quoted strings do not work yet
+    #[regex("'([^']+)'|\\$(\\w)?\\$.*\\$(\\w)?\\$")]
     Sconst,
     #[regex("(\\w+)"gm)]
     Word,
@@ -143,20 +151,36 @@ impl Parser {
         // parse root node if no syntax errors
         if pg_query_nodes.peek().is_some() {
             let (node, depth, _) = pg_query_nodes.next().unwrap();
-            // TODO: if root node is a create or alter function stmt, parse the function body
-            // separately
             self.stmt(node.to_enum(), range);
             self.start_node_at(SyntaxKind::from_pg_query_node(&node), Some(depth));
-            self.set_checkpoint(false);
+            // if there is only one node, there are no children, and we do not need to buffer the
+            // tokens. this happens for example with create or alter function statements.
+            self.set_checkpoint(pg_query_nodes.peek().is_none());
         } else {
             // fallback to generic node as root
             self.start_node_at(SyntaxKind::Stmt, None);
             self.set_checkpoint(true);
         }
 
+        // FIXME: the lexer, for some reason, does not parse dollar quoted string
+        // so we check if the error is one
         while let Some(token) = lexer.next() {
-            match token {
-                Ok(token) => {
+            let t: Option<StatementToken> = match token {
+                Ok(token) => Some(token),
+                Err(_) => {
+                    if Regex::new("'([^']+)'|\\$(\\w)?\\$.*\\$(\\w)?\\$")
+                        .unwrap()
+                        .is_match_at(lexer.slice(), 0)
+                    {
+                        Some(StatementToken::Sconst)
+                    } else {
+                        None
+                    }
+                }
+            };
+
+            match t {
+                Some(token) => {
                     let span = lexer.span();
 
                     // consume pg_query nodes until there is none, or the node is outside of the current text span
@@ -179,6 +203,8 @@ impl Parser {
                         ) || span
                             .contains(&usize::try_from(next_pg_query_token.unwrap().end).unwrap()))
                     {
+                        // TODO: if within function declaration and current token is Sconst, its
+                        // the function body. it should be passed into parse_source_file.
                         self.token(
                             SyntaxKind::from_pg_query_token(&pg_query_tokens.next().unwrap()),
                             lexer.slice(),
@@ -188,7 +214,7 @@ impl Parser {
                         self.token(token.syntax_kind(), lexer.slice());
                     }
                 }
-                Err(_) => panic!("Unknown SourceFileToken: {:?}", lexer.span()),
+                None => panic!("Unknown StatementToken: {:?}", lexer.slice()),
             }
         }
 
@@ -263,6 +289,21 @@ mod tests {
     #[test]
     fn test_invalid_statement() {
         let input = "select select;";
+
+        let mut parser = Parser::new();
+        parser.parse_statement(input, None);
+        let parsed = parser.finish();
+
+        dbg!(&parsed.cst);
+
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_create_sql_function() {
+        let input = "CREATE FUNCTION dup(in int, out f1 int, out f2 text)
+    AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
+    LANGUAGE SQL;";
 
         let mut parser = Parser::new();
         parser.parse_statement(input, None);

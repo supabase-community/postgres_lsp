@@ -15,7 +15,7 @@ pub struct Parser {
     errors: Vec<SyntaxError>,
     stmts: Vec<RawStmt>,
     checkpoint: Option<i32>,
-    is_parsing_erronous_node: bool,
+    is_parsing_flat_node: bool,
 }
 
 #[derive(Debug)]
@@ -35,7 +35,7 @@ impl Parser {
             errors: Vec::new(),
             stmts: Vec::new(),
             checkpoint: None,
-            is_parsing_erronous_node: false,
+            is_parsing_flat_node: false,
         }
     }
 
@@ -46,12 +46,12 @@ impl Parser {
         }
     }
 
-    pub fn set_checkpoint(&mut self, is_parsing_erronous_node: bool) {
+    pub fn set_checkpoint(&mut self, is_parsing_flat_node: bool) {
         assert!(self.checkpoint.is_none());
         assert!(self.token_buffer.is_empty());
         println!("set_checkpoint at {}", self.curr_depth);
         self.checkpoint = Some(self.curr_depth);
-        self.is_parsing_erronous_node = is_parsing_erronous_node;
+        self.is_parsing_flat_node = is_parsing_flat_node;
     }
 
     pub fn close_checkpoint(&mut self) {
@@ -60,7 +60,7 @@ impl Parser {
             self.close_until_depth(self.checkpoint.unwrap());
         }
         self.checkpoint = None;
-        self.is_parsing_erronous_node = false;
+        self.is_parsing_flat_node = false;
     }
 
     pub fn start_node(&mut self, kind: SyntaxKind) {
@@ -101,7 +101,7 @@ impl Parser {
     ///
     /// if `is_parsing_erronous_node` is true, applies token immediately
     pub fn token(&mut self, kind: SyntaxKind, text: &str) {
-        if self.is_parsing_erronous_node {
+        if self.is_parsing_flat_node {
             self.inner.token(kind, text);
             return;
         }
