@@ -1,14 +1,14 @@
-/// A super simple lexer for sql files to work around the main weakness of pg_query.rs.
-///
-/// pg_query.rs only parses valid statements, and also fail to parse all statements if any contain
-/// syntax errors. To circumvent this, we use a lexer to split the input into statements, and then
-/// parse each statement individually.
-///
-/// This lexer does the split.
 use logos::Logos;
 
 use crate::{parser::Parser, syntax_kind::SyntaxKind};
 
+/// A super simple lexer for sql files that splits the input into indivudual statements and
+/// comments.
+///
+/// pg_query.rs only parses valid statements, and also fail to parse all statements if any contain syntax errors.
+/// To circumvent this, we use a lexer to split the input into statements, and then parse each statement individually.
+///
+/// This regex-based lexer does the split.
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\f]+")] // Ignore this regex pattern between tokens
 pub enum SourceFileToken {
@@ -21,6 +21,10 @@ pub enum SourceFileToken {
 }
 
 impl Parser {
+    /// Parse a source file
+    ///
+    /// TODO: rename to `parse_source_at(text: &str, at: Option<u32>)`, and allow parsing substatements, e.g. bodies of create
+    /// function statements.
     pub fn parse_source_file(&mut self, text: &str) {
         let mut lexer = SourceFileToken::lexer(text);
 

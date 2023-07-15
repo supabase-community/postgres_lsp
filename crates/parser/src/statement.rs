@@ -1,8 +1,3 @@
-/// A super simple lexer for sql statements to work around a weakness of pg_query.rs.
-///
-/// pg_query.rs only parses valid statements, and no whitespaces or newlines.
-/// To circumvent this, we use a very simple lexer that just knows what kind of characters are
-/// being used. all words are put into the "Word" type and will be defined in more detail by the results of pg_query.rs
 use cstree::text::{TextRange, TextSize};
 use logos::Logos;
 use regex::Regex;
@@ -11,12 +6,11 @@ use crate::{
     parser::Parser, pg_query_utils::get_position_for_pg_query_node, syntax_kind::SyntaxKind,
 };
 
-#[derive(Logos, Debug, PartialEq)]
-pub enum Test {
-    #[regex("'([^']+)'|\\$(\\w)?\\$.*\\$(\\w)?\\$")]
-    Sconst,
-}
-
+/// A super simple lexer for sql statements.
+///
+/// One weakness of pg_query.rs is that it does not parse whitespace or newlines. To circumvent
+/// this, we use a very simple lexer that just knows what kind of characters are being used. It
+/// does not know anything about postgres syntax or keywords. For example, all words such as `select` and `from` are put into the `Word` type.
 #[derive(Logos, Debug, PartialEq)]
 pub enum StatementToken {
     // copied from protobuf::Token. can be generated later
@@ -110,6 +104,22 @@ impl StatementToken {
 }
 
 impl Parser {
+    /// The main entry point for parsing a statement `text`. `at_offset` is the offset of the statement in the source file.
+    ///
+    /// On a high level, the algorithm works as follows:
+    /// 1. Parse the statement with pg_query.rs and order nodes by their position. If the
+    ///   statement contains syntax errors, the parser will report the error and continue to work without information
+    ///   about the nodes. The result will be a flat list of tokens under the generic `Stmt` node.
+    ///   If successful, the first node in the ordered list will be the main node of the statement,
+    ///   and serves as a root node.
+    /// 2. Scan the statements for tokens with pg_query.rs. This will never fail, even if the statement contains syntax errors.
+    /// 3. Parse the statement with the `StatementToken` lexer. The lexer will be the main vehicle
+    ///    while walking the statement.
+    /// 4. Walk the statement with the `StatementToken` lexer.
+    ///    - at every token, consume all nodes that are within the token's range.
+    ///    - if there is a pg_query token within the token's range, consume it. if not, fallback to
+    ///    the StatementToken. This is the case for e.g. whitespace.
+    /// 5. Close all open nodes for that statement.
     pub fn parse_statement(&mut self, text: &str, at_offset: Option<u32>) {
         let offset = at_offset.unwrap_or(0);
         let range = TextRange::new(

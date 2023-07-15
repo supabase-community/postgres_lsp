@@ -1,8 +1,13 @@
+//! This module bridges the gap between pg_query.rs nodes, and the `SyntaxKind` cstree requires.
+//! Most of the code here can be generated.
+
 use cstree::Syntax;
-/// This file bridges the gap between pg_query.rs nodes, and the syntaxkind cstree requires.
-/// Most of the code here can be generated later.
 use pg_query::{protobuf::ScanToken, NodeRef};
 
+/// An u32 enum of all valid syntax elements (nodes and tokens) of the postgres sql dialect, and a few custom ones
+/// that are not parsed by pg_query.rs, such as `Whitespace`.
+///
+/// Copied from pg_query.rs source code. Can be generated.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Syntax)]
 #[repr(u32)]
 pub enum SyntaxKind {
@@ -12,8 +17,10 @@ pub enum SyntaxKind {
     Whitespace,
     Newline,
     Tab,
-    Word, // common value for all keywords (select, from, ...)
-    Stmt, // node for unknown statements (e.g. when parsing fails)
+    /// common value for all keywords (select, from, ...)
+    Word,
+    /// node for unknown statements (e.g. when parsing fails)
+    Stmt,
     // from here copyied from NodeEnum
     Alias,
     RangeVar,
@@ -764,14 +771,36 @@ pub enum SyntaxKind {
     Uminus,
 }
 
+/// Kind of a `SyntaxKind`
+/// This is the only manual definition required for properly creating a concrete syntax tree.
+/// If a token is of type `Follow`, it is not immediately applied to the syntax tree, but put into
+/// a buffer. Before the next node is started, all buffered tokens are applied to the syntax tree
+/// at the depth of the node that is opened next.
+///
+/// For example, in `select * from contact;`, the whitespace between `*` and `from` should be a direct
+/// child of the `SelectStmt` node. Without this concept, it would be put into the `ColumnRef`
+/// node.
+///
+/// SelectStmt@0..22
+///   Select@0..6 "select"
+///   Whitespace@6..7 " "
+///   ResTarget@7..8
+///     ColumnRef@7..8
+///       Ascii42@7..8 "*"
+///   Whitespace@8..9 " "
+///   From@9..13 "from"
+///   Whitespace@13..14 " "
+///   RangeVar@14..21
+///     Ident@14..21 "contact"
+///   Ascii59@21..22 ";"
 pub enum SyntaxKindType {
     Follow,
     Close,
 }
 
 impl SyntaxKind {
-    /// Converts a `pg_query` node to a `SyntaxKind`.
-    /// can be generated.
+    /// Converts a `pg_query` node to a `SyntaxKind`
+    /// Can be generated
     pub fn from_pg_query_node(node: &NodeRef) -> Self {
         match node {
             NodeRef::SelectStmt(_) => SyntaxKind::SelectStmt,
@@ -785,8 +814,8 @@ impl SyntaxKind {
         }
     }
 
-    /// Converts a `pg_query` ScanToken to a `SyntaxKind`.
-    /// can be generated.
+    /// Converts a `pg_query` ScanToken to a `SyntaxKind`
+    /// Can be generated
     pub fn from_pg_query_token(token: &ScanToken) -> Self {
         match token.token {
             0 => SyntaxKind::Nul,
@@ -1286,7 +1315,7 @@ impl SyntaxKind {
         }
     }
 
-    /// Gets the type of a `SyntaxKind`.
+    /// Returns the `SyntaxKindType` of a `SyntaxKind`
     /// Maybe this can be generated from the ScanToken type in pg_query.rs
     pub fn get_type(&self) -> Option<SyntaxKindType> {
         match self {
