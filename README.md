@@ -15,12 +15,16 @@ Once the parser is stable, and a robust and scalable data model is implemented, 
 At this point however, this is merely a proof of concept for building both a concrete syntax tree and an abstract syntax tree from a potentially malformed PostgreSQL source code. The `postgres_lsp` crate was created only to proof that it works e2e, and is just a very basic language server with semantic highlighting and error diagnostics. Before actual feature development can start, we have to do a bit of groundwork.
 
 1. _Finish the parser_
-   - The parser works, but the enum values for all the different syntax elements and internal conversations are manually written or copied, and, in some places, only cover a few elements required for a simple select statement. To have full coverage without possibilities for a copy and past error, they should be generated from pg_query.rs source code.
-   - There are a few cases such as nested and named dollar quoted strings that cause the parser to fail due to limitations of the regex-based lexer. Nothing that is impossible to fix, or requires any change in the approach though.
+   - The parser works, but the enum values for all the different syntax elements and internal conversations are manually written or copied, and, in some places, only cover a few elements required for a simple select statement. To have full coverage without possibilities for a copy and paste error, they should be generated from pg_query.rs source code.
+   - There are a few cases such as nested and named dollar quoted strings that cause the parser to fail due to limitations of the regex-based lexer. Nothing that is impossible to fix, or requires any fundamental change in the parser though.
 2. _Implement a robust and scalable data model_
-   - TODO
+   - This is still in a research phase
+   - A great rationale on the importance of the data model in a language server can be found [here](https://matklad.github.io/2023/05/06/zig-language-server-and-cancellation.html)
+   - `rust-analyzer`s [`base-db` crate](https://github.com/rust-lang/rust-analyzer/tree/master/crates/base-db) will serve as a role model
+   - The [`salsa`](https://github.com/salsa-rs/salsa) crate will most likely be the underlying data structure
 3. _Setup the language server properly_
-   - TODO
+   - This is still in a research phase
+   - Once again `rust-analyzer` will serve as a role model, and we will most likely implement the same queueing and cancellation approach
 4. _Implement basic language server features_
    - Semantic Highlighting
    - Syntax Error Diagnostics
@@ -37,7 +41,32 @@ At this point however, this is merely a proof of concept for building both a con
    - Jump to definition
    - ... anything you can think of really
 
+## Installation (do not do this yet!)
+
+### Neovim
+
+Add the postgres_lsp executable to your path, and add the following to your config to use it.
+
+```lua
+require('lspconfig.configs').postgres_lsp = {
+  default_config = {
+    name = 'postgres_lsp',
+    cmd = {'postgres_lsp'},
+    filetypes = {'sql'},
+    single_file_support = true,
+    root_dir = util.root_pattern 'root-file.txt'
+  }
+}
+
+lsp.configure("postgres_lsp", {force_setup = true})
+```
+
+## Contributors
+
+- [psteinroe](https://github.com/psteinroe)
+
 ## Acknowledgments
 
 - [rust-analyzer](https://github.com/rust-lang/rust-analyzer) for implementing such a robust, well documented, and feature-rich language server. Great place to learn from.
 - [squawk](https://github.com/sbdchd/squawk) and [pganalyze](https://pganalyze.com) for inspiring the use of libg_query.
+- [copple](https://github.com/kiwicopple) for the support and trust.
