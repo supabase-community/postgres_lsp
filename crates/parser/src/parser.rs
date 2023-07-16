@@ -60,7 +60,7 @@ impl Parser {
 
     /// set a checkpoint at current depth
     ///
-    /// if `is_parsing_flat_node` is true, all tokens will be applied immediately
+    /// if `is_parsing_flat_node` is true, all tokens parsed until this checkpoint is closed will be applied immediately
     pub fn set_checkpoint(&mut self, is_parsing_flat_node: bool) {
         assert!(
             self.checkpoint.is_none(),
@@ -92,8 +92,6 @@ impl Parser {
     /// start a new node of `SyntaxKind` at `depth`
     /// handles closing previous nodes if necessary
     /// and consumes token buffer before starting new node
-    ///
-    /// if `SyntaxKind` is `SyntaxKind::AnyStatement`, sets `is_parsing_erronous_node` to true
     pub fn start_node_at(&mut self, kind: SyntaxKind, depth: Option<i32>) {
         let depth = depth.unwrap_or(self.curr_depth + 1);
         // close until target depth
@@ -122,7 +120,7 @@ impl Parser {
     /// if `SyntaxKindType::Follow`, add token to buffer and wait until next node to apply token at same depth
     /// otherwise, applies token immediately
     ///
-    /// if `is_parsing_erronous_node` is true, applies token immediately
+    /// if `is_parsing_flat_node` is true, applies token immediately
     pub fn token(&mut self, kind: SyntaxKind, text: &str) {
         if self.is_parsing_flat_node {
             self.inner.token(kind, text);
