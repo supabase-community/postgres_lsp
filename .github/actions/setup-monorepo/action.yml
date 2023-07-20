@@ -13,6 +13,6 @@ runs:
   using: composite
   steps:
     - name: 🏗 Setup Toolchain
-    - uses: actions-rs/toolchain@v1
+      uses: actions-rs/toolchain@v1
       with:
         toolchain: ${{ inputs.toolchain }}
