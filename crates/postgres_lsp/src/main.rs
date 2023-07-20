@@ -245,7 +245,7 @@ impl Backend {
             .insert(params.uri.to_string(), rope.clone());
 
         let rope = ropey::Rope::from_str(&params.text);
-        let mut parser = Parser::default();
+        let mut parser = Parser::new();
 
         parser.parse_source_file(&params.text);
 
