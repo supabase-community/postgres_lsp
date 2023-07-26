@@ -1,3 +1,5 @@
+![Postgres Language Server](/docs/images/pls-github.png)
+
 # Postgres Language Server
 
 A Language Server for Postgres. Not SQL with flavours, just Postgres.
