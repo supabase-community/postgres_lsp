@@ -1,0 +1,11 @@
+[package]
+name = "pg_query_proto_parser"
+version = "0.0.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+protobuf-parse = "3.2.0"
+protobuf = "3.2.0"
+convert_case = "0.6.0"

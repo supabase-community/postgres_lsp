@@ -236,8 +236,12 @@ impl Parser {
 #[cfg(test)]
 mod tests {
     use std::assert_eq;
+    use std::fs;
+    use std::path::Path;
 
     use super::*;
+
+    const VALID_STATEMENTS_PATH: &str = "test_data/statements/valid/";
 
     #[test]
     fn test_statement_lexer() {
@@ -284,16 +288,44 @@ mod tests {
     }
 
     #[test]
-    fn test_statement_parser() {
-        let input = "select *,some_col from contact where id = '123 4 5';";
+    fn test_valid_statements() {
+        let p = Path::new(VALID_STATEMENTS_PATH);
+        println!("path: {:?}", p.display());
+        fs::read_dir(VALID_STATEMENTS_PATH)
+            .unwrap()
+            .into_iter()
+            .for_each(|f| {
+                let path = f.unwrap().path();
 
-        let mut parser = Parser::new();
-        parser.parse_statement(input, None);
-        let parsed = parser.finish();
+                let contents = fs::read_to_string(&path).unwrap();
 
-        dbg!(&parsed.cst);
+                println!("testing {}:\n'{}'", path.display(), contents);
 
-        assert_eq!(parsed.cst.text(), input);
+                let mut parser = Parser::new();
+                parser.parse_statement(&contents, None);
+                let parsed = parser.finish();
+
+                let fail = parsed.cst.text() != contents.as_str();
+
+                if fail == true {
+                    dbg!(&parsed.cst);
+                    let parsed = pg_query::parse(contents.as_str());
+                    match parsed {
+                        Ok(n) => {
+                            let proto = n.protobuf;
+                            proto.nodes().iter().for_each(|node| {
+                                println!("####");
+                                println!("{:?}", node);
+                            });
+                        }
+                        Err(e) => {
+                            dbg!(e);
+                        }
+                    }
+                }
+
+                assert_eq!(parsed.cst.text(), contents.as_str())
+            });
     }
 
     #[test]
