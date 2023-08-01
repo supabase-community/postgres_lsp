@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 textwrap = "0.16.0"
+rustfmt-wrapper = "0.2.0"

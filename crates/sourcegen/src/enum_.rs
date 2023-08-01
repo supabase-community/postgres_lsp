@@ -1,4 +1,4 @@
-use crate::builder::Builder;
+use crate::{builder::Builder, Comment};
 
 #[derive(Debug, Clone)]
 pub struct EnumValue {
@@ -10,7 +10,7 @@ pub struct EnumValue {
 #[derive(Debug, Clone)]
 pub struct Enum {
     name: String,
-    comments: Vec<String>,
+    comments: Comment,
     public: bool,
     values: Vec<EnumValue>,
     attributes: Vec<String>,
@@ -19,11 +19,8 @@ pub struct Enum {
 impl Builder for Enum {
     fn finish(&mut self) -> String {
         let mut result = String::new();
-        for comment in &self.comments {
-            result.push_str("/// ");
-            result.push_str(&comment);
-            result.push_str("\n");
-        }
+        result.push_str(self.comments.finish().as_str());
+        result.push_str("\n");
         for attribute in &self.attributes {
             result.push_str(&attribute);
         }
@@ -51,7 +48,7 @@ impl Enum {
     pub fn new(name: String) -> Self {
         Enum {
             name,
-            comments: Vec::new(),
+            comments: Comment::new("///".to_string()),
             public: false,
             values: Vec::new(),
             attributes: Vec::new(),
@@ -64,11 +61,14 @@ impl Enum {
     }
 
     pub fn with_comment(&mut self, comment: String) -> &mut Self {
-        self.comments.push(comment);
+        self.comments.with_text(comment);
         self
     }
 
     pub fn with_value(&mut self, name: String, value: Option<String>) -> &mut Self {
+        if self.values.iter().find(|v| v.name == name).is_some() {
+            return self;
+        }
         self.values.push(EnumValue { name, value });
         self
     }

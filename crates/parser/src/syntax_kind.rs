@@ -2,7 +2,7 @@
 //! Most of the code here can be generated.
 
 use cstree::Syntax;
-use pg_query::{protobuf::ScanToken, NodeRef};
+use pg_query::{protobuf::ScanToken, NodeEnum, NodeRef};
 
 /// An u32 enum of all valid syntax elements (nodes and tokens) of the postgres sql dialect, and a few custom ones
 /// that are not parsed by pg_query.rs, such as `Whitespace`.
@@ -807,7 +807,7 @@ impl SyntaxKind {
             NodeRef::Alias(_) => SyntaxKind::Alias,
             NodeRef::RangeVar(_) => SyntaxKind::RangeVar,
             NodeRef::TableFunc(_) => SyntaxKind::TableFunc,
-            NodeRef::Expr(_) => SyntaxKind::Expr,
+            // NodeRef::Expr(_) => SyntaxKind::Expr,
             NodeRef::Var(_) => SyntaxKind::Var,
             NodeRef::Param(_) => SyntaxKind::Param,
             NodeRef::Aggref(_) => SyntaxKind::Aggref,
@@ -1027,7 +1027,7 @@ impl SyntaxKind {
             NodeRef::Float(_) => SyntaxKind::Float,
             NodeRef::String(_) => SyntaxKind::String,
             NodeRef::BitString(_) => SyntaxKind::BitString,
-            NodeRef::Null(_) => SyntaxKind::Null,
+            // NodeRef::Null(_) => SyntaxKind::Null,
             NodeRef::List(_) => SyntaxKind::List,
             NodeRef::IntList(_) => SyntaxKind::IntList,
             NodeRef::OidList(_) => SyntaxKind::OidList,

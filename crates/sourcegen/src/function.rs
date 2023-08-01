@@ -30,7 +30,7 @@ impl Builder for Function {
             result.push_str(" -> ");
             result.push_str(&return_type);
         }
-        result.push_str("{\n");
+        result.push_str("{\n\t");
         result.push_str(&self.body);
         result.push_str("\n}\n");
         result
@@ -60,8 +60,13 @@ impl Function {
         self
     }
 
-    pub fn with_parameter(&mut self, name: String, type_: String) -> &mut Self {
-        self.parameters.push(format!("{}: {}", name, type_));
+    pub fn with_parameter(&mut self, name: String, type_: Option<String>) -> &mut Self {
+        let mut parameter = name;
+        if let Some(type_) = type_ {
+            parameter.push_str(": ");
+            parameter.push_str(&type_);
+        }
+        self.parameters.push(parameter);
         self
     }
 

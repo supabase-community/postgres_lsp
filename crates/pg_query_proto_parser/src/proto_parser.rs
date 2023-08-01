@@ -50,6 +50,22 @@ impl ProtoParser {
             .collect()
     }
 
+    fn get_enum_variant_name(&self, type_name: &str) -> Option<String> {
+        let variant = self
+            .inner
+            .message_type
+            .iter()
+            .find(|e| e.name == Some("Node".into()))
+            .unwrap()
+            .field
+            .iter()
+            .find(|e| e.type_name().split(".").last().unwrap() == type_name);
+        match variant {
+            Some(v) => Some(v.name.clone().unwrap().to_case(Case::UpperCamel)),
+            None => None,
+        }
+    }
+
     fn nodes(&self) -> Vec<Node> {
         self.inner
             .message_type
@@ -59,23 +75,31 @@ impl ProtoParser {
             .field
             .iter()
             .map(|e| {
-                let name: String = e.json_name.to_owned().unwrap();
-                Node {
-                    // token names in proto are UPPERCASE_SNAKE_CASE
-                    name: name.clone(),
-                    fields: self
-                        .inner
-                        .message_type
-                        .iter()
-                        .find(|n| n.name.clone().unwrap() == name)
-                        .unwrap()
+                let name: String = e.name.to_owned().unwrap().to_case(Case::UpperCamel);
+                let node = self
+                    .inner
+                    .message_type
+                    .iter()
+                    .find(|n| {
+                        n.name.clone().unwrap().to_case(Case::UpperCamel)
+                            == e.json_name.as_ref().unwrap().to_case(Case::UpperCamel)
+                    })
+                    .unwrap();
+
+                let mut fields: Vec<Field> = Vec::new();
+                // from node fields
+                fields.append(&mut
+                        node
                         .field
                         .iter()
-                        .map(|e| {
+                        .filter_map(|e| {
+                            // skip one of fields, they are handled separately
+                            if e.has_oneof_index() {
+                                return None;
+                            }
                             // use label and type to get the field type
                             let type_name: FieldType = match e.type_name() {
-                                ".pg_query.Node" => FieldType::Node,
-                                _ => match e.type_() {
+                                "" => match e.type_() {
                                     protobuf::descriptor::field_descriptor_proto::Type::TYPE_DOUBLE => FieldType::Double,
                                     protobuf::descriptor::field_descriptor_proto::Type::TYPE_FLOAT => FieldType::Float,
                                     protobuf::descriptor::field_descriptor_proto::Type::TYPE_INT64 => FieldType::Int64,
@@ -95,14 +119,62 @@ impl ProtoParser {
                                     protobuf::descriptor::field_descriptor_proto::Type::TYPE_SINT32 => FieldType::Sint32,
                                     protobuf::descriptor::field_descriptor_proto::Type::TYPE_SINT64 => FieldType::Sint64,
                                 },
+                                _ => {
+                                    if !e.type_name().starts_with(".pg_query") {
+                                        panic!("Unknown type: {}", e.type_name());
+
+                                    }
+                                    if e.type_() == protobuf::descriptor::field_descriptor_proto::Type::TYPE_ENUM {
+                                        FieldType::Enum
+                                    } else {
+                                        FieldType::Node
+                                    }
+                                },
                             };
-                            Field {
+                            let mut node_name = None;
+                            let mut enum_variant_name = None;
+                            if e.type_name().starts_with(".pg_query") {
+                                let n = e.type_name().split(".").last().unwrap().to_string();
+                                node_name = Some(n.clone());
+                                if n != "Node" {
+                                    enum_variant_name = self.get_enum_variant_name(e.type_name().split(".").last().unwrap().to_string().as_str());
+                                }
+                            }
+                            // TODO: node name must be derived from the property name in the node
+                            // enum
+                            Some(Field {
                                 name: e.name.clone().unwrap(),
+                                node_name,
+                                enum_variant_name,
                                 field_type: type_name,
                                 repeated: e.label() == Label::LABEL_REPEATED,
-                            }
+                                is_one_of: false,
+                            })
                         })
-                        .collect(),
+                        .collect()
+                    );
+
+                    // one of declarations
+                    fields.append(&mut
+                        node
+                        .oneof_decl
+                        .iter()
+                        .map(|e| {
+                            Field {
+                       name: e.name.clone().unwrap(),
+                       node_name: Some("Node".to_string()),
+                       enum_variant_name: None,
+                       field_type: FieldType::Node,
+                       repeated: false,
+                       is_one_of: true,
+                   }
+                        })
+                        .collect()
+                              );
+                Node {
+                    // token names in proto are UPPERCASE_SNAKE_CASE
+                    name: name.clone(),
+                    fields,
                 }
             })
             .collect()

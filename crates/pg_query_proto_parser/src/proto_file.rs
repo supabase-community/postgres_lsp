@@ -1,5 +1,5 @@
 /// The FieldTypes of a protobuf message
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum FieldType {
     Node,
     Double,
@@ -33,8 +33,11 @@ pub struct Token {
 #[derive(Debug)]
 pub struct Field {
     pub name: String,
+    pub node_name: Option<String>,
+    pub enum_variant_name: Option<String>,
     pub field_type: FieldType,
     pub repeated: bool,
+    pub is_one_of: bool,
 }
 
 /// A libg_query node

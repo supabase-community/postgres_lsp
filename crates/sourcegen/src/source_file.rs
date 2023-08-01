@@ -1,22 +1,25 @@
-use crate::builder::Builder;
+use crate::{builder::Builder, Comment};
+use rustfmt_wrapper::rustfmt;
 
 #[derive(Debug, Clone)]
 pub struct SourceFile {
     content: String,
-    comments: Vec<String>,
+    comments: Comment,
 }
 
 impl Builder for SourceFile {
     fn finish(&mut self) -> String {
         let mut result = String::new();
-        for comment in &self.comments {
-            result.push_str("//! ");
-            result.push_str(&comment);
-            result.push_str("\n");
-        }
+        result.push_str(self.comments.finish().as_str());
         result.push_str("\n");
         result.push_str(&self.content);
-        result
+        match rustfmt(&result) {
+            Ok(formatted) => formatted,
+            Err(e) => {
+                println!("rustfmt error: {:?}", e);
+                result
+            }
+        }
     }
 }
 
@@ -25,12 +28,12 @@ impl SourceFile {
     pub fn new() -> Self {
         SourceFile {
             content: "".to_string(),
-            comments: Vec::new(),
+            comments: Comment::new("//!".to_string()),
         }
     }
 
     pub fn add_comment(&mut self, comment: String) -> &mut SourceFile {
-        self.comments.push(comment);
+        self.comments.with_text(comment);
         self
     }
 

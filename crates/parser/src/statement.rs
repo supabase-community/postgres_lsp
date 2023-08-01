@@ -3,7 +3,8 @@ use logos::Logos;
 use regex::Regex;
 
 use crate::{
-    parser::Parser, pg_query_utils::get_position_for_pg_query_node, syntax_kind::SyntaxKind,
+    parser::Parser, pg_query_utils::get_position_for_pg_query_node,
+    pg_query_utils_generated::get_location, syntax_kind::SyntaxKind,
 };
 
 /// A super simple lexer for sql statements.
@@ -159,6 +160,7 @@ impl Parser {
         let mut lexer = StatementToken::lexer(&text);
 
         // parse root node if no syntax errors
+        // TODO: find root node based on depth
         if pg_query_nodes.peek().is_some() {
             let (node, depth, _) = pg_query_nodes.next().unwrap();
             self.stmt(node.to_enum(), range);
@@ -354,5 +356,24 @@ mod tests {
         dbg!(&parsed.cst);
 
         assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_cst() {
+        let input =
+            "with test as (insert into contact (id) values (1) returning *) select * from test";
+
+        pg_query::parse(input)
+            .unwrap()
+            .protobuf
+            .nodes()
+            .iter()
+            .for_each(|node| {
+                println!("####");
+                println!("{:?}", node);
+                println!("{:?}", get_location(node.0.to_enum()));
+            });
+
+        assert_eq!(1, 1);
     }
 }
