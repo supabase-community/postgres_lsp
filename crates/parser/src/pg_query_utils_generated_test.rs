@@ -10,7 +10,7 @@ mod tests {
 
     #[test]
     fn test_get_children() {
-        let input = "with t as (insert into contact (id) values ('id')) select * from t;";
+        let input = "select id;";
 
         let pg_query_root = match pg_query::parse(input) {
             Ok(parsed) => {
@@ -33,8 +33,17 @@ mod tests {
             Err(_) => None,
         };
 
+        println!("{:?}", pg_query_root);
+
         let result = get_children(&pg_query_root.unwrap(), 1);
 
-        result.iter().for_each(|n| println!("{:?}", n));
+        println!("NUMBER OF CHILDREN: {:?}", result.len());
+
+        // TODO: parse AConst correctly
+
+        result.iter().for_each(|n| {
+            println!("##");
+            println!("{:?}", n)
+        });
     }
 }

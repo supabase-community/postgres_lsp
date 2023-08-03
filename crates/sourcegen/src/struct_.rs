@@ -12,11 +12,13 @@ pub struct Struct {
     name: String,
     fields: Vec<StructField>,
     public: bool,
+    attributes: Vec<String>,
 }
 
 impl Builder for Struct {
     fn finish(&mut self) -> String {
         let mut result = String::new();
+        result.push_str(&self.attributes.join("\n"));
         if self.public {
             result.push_str("pub ");
         }
@@ -50,6 +52,7 @@ impl Struct {
             name,
             fields: Vec::new(),
             public: false,
+            attributes: Vec::new(),
         }
     }
 
@@ -60,6 +63,11 @@ impl Struct {
 
     pub fn with_field(&mut self, name: String, type_: String) -> &mut Self {
         self.fields.push(StructField { name, type_ });
+        self
+    }
+
+    pub fn with_attribute(&mut self, attribute: String) -> &mut Self {
+        self.attributes.push(attribute);
         self
     }
 }

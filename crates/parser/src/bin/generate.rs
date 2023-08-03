@@ -4,17 +4,6 @@ use sourcegen::{
 };
 use std::fs;
 
-// NodeEnum::Expr(_) => todo!(),
-// NodeEnum::SqlvalueFunction(_) => todo!(),
-// NodeEnum::CreatePlangStmt(_) => todo!(),
-// NodeEnum::AlterTsdictionaryStmt(_) => todo!(),
-// NodeEnum::AlterTsconfigurationStmt(_) => todo!(),
-// NodeEnum::Null(_) => todo!(),
-
-const UNKNOWN_NODES: [&str; 0] = [
-    // ignore nodes not known to pg_query.rs
-];
-
 fn main() {
     let parser = ProtoParser::new("./proto/source.proto");
     let file = parser.parse();
@@ -78,12 +67,19 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
         .add_block(
             Struct::new("NestedNode".to_string())
             .public()
+            .with_attribute(
+                Attribute::new("derive".to_string())
+                .with_argument("Debug".to_string(), None)
+                .with_argument("Clone".to_string(), None)
+                .finish()
+            )
             .with_field("node".to_string(), "NodeEnum".to_string())
             .with_field("depth".to_string(), "i32".to_string())
-            .with_field("location".to_string(), "i32".to_string())
+            // .with_field("location".to_string(), "i32".to_string())
             .finish()
         )
         // TODO: 1) always use match or if .is_some() when unwrapping a node and ignore if none
+        // TODO: 1.2) parse AConst manually
         // TODO: 2) add location to NestedNode, and use it in get_children.
         // TODO:    to get location, first check if node has location field.
         // TODO:    if not, use the location of the parent.
@@ -92,6 +88,7 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
         // get_children, we can easily get the location of the actual node because we can just
         // fallback to the location of the immediate parent if the current node does not have a
         // location.
+        //
         .add_block(
             Function::new("get_children".to_string())
                 .public()
@@ -113,12 +110,18 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                                     if field.field_type == FieldType::Node && field.repeated {
                                         content.push_str(
                                             format!(
-                                                "nodes.append(&mut n.{}.iter().flat_map(|x| get_children(&x.node.as_ref().unwrap(), current_depth)).collect());\n",
+                                                "nodes.append(&mut n.{}.iter().flat_map(|x| {{
+                                                    let mut result = vec![];
+                                                    result.append(&mut get_children(&x.node.as_ref().unwrap(), current_depth));
+                                                    result.push(NestedNode {{ node: x.node.as_ref().unwrap().to_owned(), depth: current_depth }});
+                                                    result
+                                                }}).collect());\n",
                                                 field.name.to_string()
                                             ).as_str()
                                         );
                                     } else if field.field_type == FieldType::Node && field.is_one_of == false {
                                         if field.node_name == Some("Node".to_owned()) {
+                                            content.push_str(format!("if n.{}.is_some() {{\n", field.name.to_string()).as_str());
                                             content.push_str(
                                                 format!(
                                                     "let {} = n.{}.as_ref().unwrap().to_owned().node.unwrap();\n",
@@ -142,7 +145,9 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                                                     field.name.to_string()
                                                 ).as_str(),
                                             );
+                                            content.push_str("}\n");
                                         } else {
+                                            content.push_str(format!("if n.{}.is_some() {{\n", field.name.to_string()).as_str());
                                             content.push_str(
                                                 format!(
                                                     "let {} = NodeEnum::{}(n.{}.as_ref().unwrap().to_owned());\n",
@@ -167,6 +172,7 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                                                     field.name.to_string()
                                                 ).as_str()
                                             );
+                                            content.push_str("}\n");
                                         }
                                     }
                                     content.push_str("\n");
@@ -243,9 +249,7 @@ fn generate_syntax_kind(f: &ProtoFile) -> String {
             });
 
             f.nodes.iter().for_each(|node| {
-                if !UNKNOWN_NODES.contains(&node.name.as_str()) {
-                    b.with_value(node.name.to_string(), None);
-                }
+                b.with_value(node.name.to_string(), None);
             });
 
             f.tokens.iter().for_each(|token| {
@@ -301,12 +305,10 @@ fn generate_syntax_kind(f: &ProtoFile) -> String {
                 Match::new("node".to_string())
                 .with(|b| {
                     f.nodes.iter().for_each(|node| {
-                        if !UNKNOWN_NODES.contains(&node.name.as_str()) {
-                            b.with_arm(
-                                format!("NodeEnum::{}(_)", node.name.to_string()),
-                                format!("SyntaxKind::{}", node.name.to_string()),
-                            );
-                        }
+                        b.with_arm(
+                            format!("NodeEnum::{}(_)", node.name.to_string()),
+                            format!("SyntaxKind::{}", node.name.to_string()),
+                        );
                     });
                     b
                 })
