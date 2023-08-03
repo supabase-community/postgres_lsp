@@ -10,7 +10,7 @@ A Language Server for Postgres. Not SQL with flavours, just Postgres.
 
 ## Features
 
-The [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) is an open protocol between code editors and servers that provide the code intelligence tools you are used to work with such as code completion, syntax highlighting, and many more. This project implements such a language server for Postgres, significantly enhancing the dx right within your favorite editor by adding:
+The [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) is an open protocol between code editors and servers that provide the code intelligence tools you are used to work with such as code completion and syntax highlighting. This project implements such a language server for Postgres, significantly enhancing the dx right within your favorite editor by adding:
 
 - Semantic Highlighting
 - Syntax Error Diagnostics
