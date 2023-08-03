@@ -8,9 +8,21 @@ A Language Server for Postgres. Not SQL with flavours, just Postgres.
 
 🚧 This is in active development and is only ready for experimental use.
 
+## Features
+
+The [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) is an open protocol between code editors and servers that provide the code intelligence tools you are used to work with such as code completion, syntax highlighting, and many more. This project implements such a language server for Postgres, significantly enhancing the dx right within your favorite editor by adding:
+
+- Semantic Highlighting
+- Syntax Error Diagnostics
+- Show SQL comments on hover
+- Auto-Completion
+- Code actions such as `Execute the statement under the cursor`, or `Execute the current file`
+- Optionated Code Formatting
+- ... and many more
+
 ## Motivation
 
-Despite an ever rising popularity of Postgres, support for the PostgreSQL language in the IDE or editor of your choice is still limited. There are a few proprietary ones (e.g. [DataGrip](https://www.jetbrains.com/datagrip/)) that work well, but are only available within the respective IDE. Open Source attempts (e.g. [sql-language-server](https://github.com/joe-re/sql-language-server), [pgFormatter](https://github.com/darold/pgFormatter/tree/master), [sql-parser-cst](https://github.com/nene/sql-parser-cst)) provide a generic SQL language server, implementing the Postgres syntax as a flavor of their parser. This always falls short due to the ever evolving and complex syntax of PostgreSQL. 
+Despite an ever rising popularity of Postgres, support for the PostgreSQL language in the IDE or editor of your choice is still limited. There are a few proprietary ones (e.g. [DataGrip](https://www.jetbrains.com/datagrip/)) that work well, but are only available within the respective IDE. Open Source attempts (e.g. [sql-language-server](https://github.com/joe-re/sql-language-server), [pgFormatter](https://github.com/darold/pgFormatter/tree/master), [sql-parser-cst](https://github.com/nene/sql-parser-cst)) provide a generic SQL language server, implementing the Postgres syntax as a flavor of their parser. This always falls short due to the ever evolving and complex syntax of PostgreSQL.
 
 This project will only support PostgreSQL, leveraging parts of the PostgreSQL source (see [libg_query](https://github.com/pganalyze/libpg_query)) to parse the source code reliabaly. This is slightly crazy, but is the only reliable way of parsing all valid PostgreSQL queries. You can find a longer rationale on why This is the way™ [here](https://pganalyze.com/blog/parse-postgresql-queries-in-ruby). Of course, libg_query was built to execute SQL, and not to build a language server, but all of the resulting shortcomings were successfully mitigated in the `parser` crate. Read the [commented source code](./crates/parser/src/lib.rs) for more details on the inner workings of the parser.
 
@@ -47,7 +59,7 @@ This is a proof of concept for building both a concrete syntax tree and an abstr
    - Jump to definition
    - ... anything you can think of really
 
-## Installation 
+## Installation
 
 Do not do this yet! (Unless you want to help with development)
 
