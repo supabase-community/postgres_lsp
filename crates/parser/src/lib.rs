@@ -19,13 +19,14 @@ mod ast_node;
 mod parser;
 mod pg_query_utils;
 mod pg_query_utils_generated;
+mod pg_query_utils_generated_test;
 mod source_file;
 mod statement;
 mod syntax_error;
-mod syntax_kind;
-// mod syntax_kind_generated;
+// mod syntax_kind;
+mod syntax_kind_generated;
 mod syntax_node;
 
 pub use crate::parser::{Parse, Parser};
-pub use crate::syntax_kind::SyntaxKind;
+pub use crate::syntax_kind_generated::SyntaxKind;
 pub use crate::syntax_node::{SyntaxElement, SyntaxNode, SyntaxToken};

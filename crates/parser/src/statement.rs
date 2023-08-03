@@ -3,8 +3,10 @@ use logos::Logos;
 use regex::Regex;
 
 use crate::{
-    parser::Parser, pg_query_utils::get_position_for_pg_query_node,
-    pg_query_utils_generated::get_location, syntax_kind::SyntaxKind,
+    parser::Parser,
+    pg_query_utils_generated::{get_children, get_location},
+    // pg_query_utils::{get_location, get_nested_nodes},
+    syntax_kind_generated::SyntaxKind,
 };
 
 /// A super simple lexer for sql statements.
@@ -136,102 +138,128 @@ impl Parser {
             }
         };
 
-        let parsed = pg_query::parse(text);
-        let proto;
-        let mut nodes;
-        let mut pg_query_nodes = match parsed {
-            Ok(parsed) => {
-                proto = parsed.protobuf;
-
-                nodes = proto.nodes();
-
-                nodes.sort_by(|a, b| {
-                    get_position_for_pg_query_node(&a.0).cmp(&get_position_for_pg_query_node(&b.0))
-                });
-
-                nodes.into_iter().peekable()
-            }
+        // Get root node with depth 1
+        // Since we are parsing only a single statement there can be only a single node at depth 1
+        let pg_query_root = match pg_query::parse(text) {
+            Ok(parsed) => Some(
+                parsed
+                    .protobuf
+                    .nodes()
+                    .iter()
+                    .find(|n| n.1 == 1)
+                    .unwrap()
+                    .0
+                    .to_enum(),
+            ),
             Err(e) => {
                 self.error(e.to_string(), range);
-                Vec::new().into_iter().peekable()
+                None
             }
         };
 
-        let mut lexer = StatementToken::lexer(&text);
+        // let pg_query_children;
+        // if pg_query_root.is_some() {
+        //     let children = get_children(&pg_query_root.unwrap(), 1);
+        //     children.sort_by(|a, b| get_location(a).cmp(get_children(b)));
+        // } else {
+        //     pg_query_children = Vec::new().iter().peekable();
+        // };
 
-        // parse root node if no syntax errors
-        // TODO: find root node based on depth
-        if pg_query_nodes.peek().is_some() {
-            let (node, depth, _) = pg_query_nodes.next().unwrap();
-            self.stmt(node.to_enum(), range);
-            self.start_node_at(SyntaxKind::from_pg_query_node(&node), Some(depth));
-            // if there is only one node, there are no children, and we do not need to buffer the
-            // tokens. this happens for example with create or alter function statements.
-            self.set_checkpoint(pg_query_nodes.peek().is_none());
-        } else {
-            // fallback to generic node as root
-            self.start_node_at(SyntaxKind::Stmt, None);
-            self.set_checkpoint(true);
-        }
-
-        // FIXME: the lexer, for some reason, does not parse dollar quoted string
-        // so we check if the error is one
-        while let Some(token) = lexer.next() {
-            let t: Option<StatementToken> = match token {
-                Ok(token) => Some(token),
-                Err(_) => {
-                    if Regex::new("'([^']+)'|\\$(\\w)?\\$.*\\$(\\w)?\\$")
-                        .unwrap()
-                        .is_match_at(lexer.slice(), 0)
-                    {
-                        Some(StatementToken::Sconst)
-                    } else {
-                        None
-                    }
-                }
-            };
-
-            match t {
-                Some(token) => {
-                    let span = lexer.span();
-
-                    // consume pg_query nodes until there is none, or the node is outside of the current text span
-                    while let Some(node) = pg_query_nodes.peek() {
-                        let pos = get_position_for_pg_query_node(&node.0);
-                        if span.contains(&usize::try_from(pos).unwrap()) == false {
-                            break;
-                        } else {
-                            // node is within span
-                            let (node, depth, _) = pg_query_nodes.next().unwrap();
-                            self.start_node_at(SyntaxKind::from_pg_query_node(&node), Some(depth));
-                        }
-                    }
-
-                    // consume pg_query token if it is within the current text span
-                    let next_pg_query_token = pg_query_tokens.peek();
-                    if next_pg_query_token.is_some()
-                        && (span.contains(
-                            &usize::try_from(next_pg_query_token.unwrap().start).unwrap(),
-                        ) || span
-                            .contains(&usize::try_from(next_pg_query_token.unwrap().end).unwrap()))
-                    {
-                        // TODO: if within function declaration and current token is Sconst, its
-                        // the function body. it should be passed into parse_source_file.
-                        self.token(
-                            SyntaxKind::from_pg_query_token(&pg_query_tokens.next().unwrap()),
-                            lexer.slice(),
-                        );
-                    } else {
-                        // fallback to statement token
-                        self.token(token.syntax_kind(), lexer.slice());
-                    }
-                }
-                None => panic!("Unknown StatementToken: {:?}", lexer.slice()),
-            }
-        }
-
-        // close up nodes
-        self.close_checkpoint();
+        //
+        //     // let mut pg_query_nodes = match parsed {
+        //     //     Ok(parsed) => {
+        //     //         proto = parsed.protobuf;
+        //     //
+        //     //         nodes = proto.nodes();
+        //     //
+        //     //         nodes.sort_by(|a, b| {
+        //     //             get_position_for_pg_query_node(&a.0).cmp(&get_position_for_pg_query_node(&b.0))
+        //     //         });
+        //     //
+        //     //         nodes.into_iter().peekable()
+        //     //     }
+        //     //     Err(e) => {
+        //     //         self.error(e.to_string(), range);
+        //     //         Vec::new().into_iter().peekable()
+        //     //     }
+        //     // };
+        //
+        //     TOD: return depth from get_children()
+        //
+        //     let mut lexer = StatementToken::lexer(&text);
+        //
+        //     // parse root node if no syntax errors
+        //     if pg_query_root.is_some() {
+        //         let root_node = pg_query_root.unwrap();
+        //         self.stmt(root_node, range);
+        //         self.start_node_at(SyntaxKind::new_from_pg_query_node(&root_node), Some(1));
+        //         // if there is only one node, there are no children, and we do not need to buffer the
+        //         // tokens. this happens for example with create or alter function statements.
+        //         self.set_checkpoint(pg_query_children.len() == 0);
+        //     } else {
+        //         // fallback to generic node as root
+        //         self.start_node_at(SyntaxKind::Stmt, None);
+        //         self.set_checkpoint(true);
+        //     }
+        //
+        //     // FIXME: the lexer, for some reason, does not parse dollar quoted string
+        //     // so we check if the error is one
+        //     while let Some(token) = lexer.next() {
+        //         let t: Option<StatementToken> = match token {
+        //             Ok(token) => Some(token),
+        //             Err(_) => {
+        //                 if Regex::new("'([^']+)'|\\$(\\w)?\\$.*\\$(\\w)?\\$")
+        //                     .unwrap()
+        //                     .is_match_at(lexer.slice(), 0)
+        //                 {
+        //                     Some(StatementToken::Sconst)
+        //                 } else {
+        //                     None
+        //                 }
+        //             }
+        //         };
+        //
+        //         match t {
+        //             Some(token) => {
+        //                 let span = lexer.span();
+        //
+        //                 // consume pg_query nodes until there is none, or the node is outside of the current text span
+        //                 while let Some(node) = pg_query_children.peek() {
+        //                     let pos = get_location(&node);
+        //                     if span.contains(&usize::try_from(pos.unwrap()).unwrap()) == false {
+        //                         break;
+        //                     } else {
+        //                         // node is within span
+        //                         // let (node, depth, _) = pg_query_children.next().unwrap();
+        //                         // self.start_node_at(SyntaxKind::from_pg_query_node(&node), Some(depth));
+        //                     }
+        //                 }
+        //
+        //                 // consume pg_query token if it is within the current text span
+        //                 let next_pg_query_token = pg_query_tokens.peek();
+        //                 if next_pg_query_token.is_some()
+        //                     && (span.contains(
+        //                         &usize::try_from(next_pg_query_token.unwrap().start).unwrap(),
+        //                     ) || span
+        //                         .contains(&usize::try_from(next_pg_query_token.unwrap().end).unwrap()))
+        //                 {
+        //                     // TODO: if within function declaration and current token is Sconst, its
+        //                     // the function body. it should be passed into parse_source_file.
+        //                     // self.token(
+        //                     //     SyntaxKind::from_pg_query_token(&pg_query_tokens.next().unwrap()),
+        //                     //     lexer.slice(),
+        //                     // );
+        //                 } else {
+        //                     // fallback to statement token
+        //                     self.token(token.syntax_kind(), lexer.slice());
+        //                 }
+        //             }
+        //             None => panic!("Unknown StatementToken: {:?}", lexer.slice()),
+        //         }
+        //     }
+        //
+        //     // close up nodes
+        //     self.close_checkpoint();
     }
 }
 
@@ -356,24 +384,5 @@ mod tests {
         dbg!(&parsed.cst);
 
         assert_eq!(parsed.cst.text(), input);
-    }
-
-    #[test]
-    fn test_cst() {
-        let input =
-            "with test as (insert into contact (id) values (1) returning *) select * from test";
-
-        pg_query::parse(input)
-            .unwrap()
-            .protobuf
-            .nodes()
-            .iter()
-            .for_each(|node| {
-                println!("####");
-                println!("{:?}", node);
-                println!("{:?}", get_location(node.0.to_enum()));
-            });
-
-        assert_eq!(1, 1);
     }
 }

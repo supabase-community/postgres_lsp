@@ -11,6 +11,7 @@ mod implementation;
 mod imports;
 mod match_;
 mod source_file;
+mod struct_;
 
 pub use attribute::Attribute;
 pub use builder::Builder;
@@ -21,6 +22,7 @@ pub use implementation::Implementation;
 pub use imports::Imports;
 pub use match_::Match;
 pub use source_file::SourceFile;
+pub use struct_::Struct;
 
 #[cfg(test)]
 mod tests {

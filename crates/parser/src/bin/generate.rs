@@ -1,6 +1,6 @@
 use pg_query_proto_parser::{FieldType, ProtoFile, ProtoParser};
 use sourcegen::{
-    Attribute, Builder, Comment, Enum, Function, Implementation, Imports, Match, SourceFile,
+    Attribute, Builder, Comment, Enum, Function, Implementation, Imports, Match, SourceFile, Struct,
 };
 use std::fs;
 
@@ -11,20 +11,8 @@ use std::fs;
 // NodeEnum::AlterTsconfigurationStmt(_) => todo!(),
 // NodeEnum::Null(_) => todo!(),
 
-const UNKNOWN_NODES: [&str; 12] = [
+const UNKNOWN_NODES: [&str; 0] = [
     // ignore nodes not known to pg_query.rs
-    "MergeAction",
-    "MergeStmt",
-    "PlAssignStmt",
-    "AlterDatabaseRefreshCollStmt",
-    "StatsElem",
-    "CteSearchClause",
-    "CteCycleClause",
-    "MergeWhenClause",
-    "PublicationObjSpec",
-    "PublicationTable",
-    "Boolean",
-    "ReturnStmt",
 ];
 
 fn main() {
@@ -52,17 +40,17 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
             Imports::new()
                 .with_import(
                     "pg_query".to_string(),
-                    vec!["NodeEnum".to_string(), "NodeRef".to_string()],
+                    vec!["NodeEnum".to_string()],
                 )
                 .finish(),
         )
         .add_block(
             Function::new("get_location".to_string())
                 .public()
-                .with_parameter("node".to_string(), Some("NodeEnum".to_string()))
+                .with_parameter("node".to_string(), Some("&NodeEnum".to_string()))
                 .with_return_type("Option<i32>".to_string())
                 .with_body(
-                    Match::new("&node".to_string())
+                    Match::new("node".to_string())
                         .with(|b| {
                             f.nodes.iter().for_each(|node| {
                                 let mut right = "None";
@@ -88,25 +76,44 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                 .finish(),
         )
         .add_block(
-            Function::new("get_nested_nodes".to_string())
+            Struct::new("NestedNode".to_string())
+            .public()
+            .with_field("node".to_string(), "NodeEnum".to_string())
+            .with_field("depth".to_string(), "i32".to_string())
+            .with_field("location".to_string(), "i32".to_string())
+            .finish()
+        )
+        // TODO: 1) always use match or if .is_some() when unwrapping a node and ignore if none
+        // TODO: 2) add location to NestedNode, and use it in get_children.
+        // TODO:    to get location, first check if node has location field.
+        // TODO:    if not, use the location of the parent.
+        // in some cases, for example cte, location is on a generic Node child, which has a node prop that
+        // contains the actual node (e.g. insert statement) --> if we get the location within
+        // get_children, we can easily get the location of the actual node because we can just
+        // fallback to the location of the immediate parent if the current node does not have a
+        // location.
+        .add_block(
+            Function::new("get_children".to_string())
                 .public()
-                .with_comment("Returns the node and all its childrens, recursively".to_string())
-                .with_parameter("node".to_string(), Some("NodeEnum".to_string()))
-                .with_return_type("Vec<NodeEnum>".to_string())
-                .with_body(
-                    Match::new("&node".to_string())
+                .with_comment("Returns all children of the node, recursively".to_string())
+                .with_parameter("node".to_string(), Some("&NodeEnum".to_string()))
+                .with_parameter("current_depth".to_string(), Some("i32".to_string()))
+                .with_return_type("Vec<NestedNode>".to_string())
+                .with(|b| {
+                    let mut content = "let current_depth = current_depth + 1;".to_string();
+                    let match_ = Match::new("&node".to_string())
                         .with(|b| {
                             f.nodes.iter().for_each(|node| {
                                 let mut content = "".to_string();
                                 content.push_str("{\n");
                                 content.push_str(
-                                    "let mut nodes: Vec<NodeEnum> = vec![node.clone()];\n",
+                                    "let mut nodes: Vec<NestedNode> = vec![];\n",
                                 );
                                 node.fields.iter().for_each(|field| {
                                     if field.field_type == FieldType::Node && field.repeated {
                                         content.push_str(
                                             format!(
-                                                "nodes.append(&mut n.{}.iter().flat_map(|x| get_nested_nodes(x.node.as_ref().unwrap().to_owned())).collect());\n",
+                                                "nodes.append(&mut n.{}.iter().flat_map(|x| get_children(&x.node.as_ref().unwrap(), current_depth)).collect());\n",
                                                 field.name.to_string()
                                             ).as_str()
                                         );
@@ -114,20 +121,55 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                                         if field.node_name == Some("Node".to_owned()) {
                                             content.push_str(
                                                 format!(
-                                                    "nodes.append(&mut get_nested_nodes(n.{}.as_ref().unwrap().to_owned().node.unwrap()));\n",
+                                                    "let {} = n.{}.as_ref().unwrap().to_owned().node.unwrap();\n",
                                                     field.name.to_string(),
-                                                ).as_str()
+                                                    field.name.to_string(),
+                                                ).as_str(),
+                                            );
+                                            content.push_str(
+                                                format!(
+                                                    "nodes.append(&mut get_children(&{}, current_depth));\n",
+                                                    field.name.to_string()
+                                                ).as_str(),
+
+                                            );
+                                            content.push_str(
+                                                format!(
+                                                    "nodes.push(NestedNode {{
+                                                        node: {},
+                                                        depth: current_depth,
+                                                    }});\n",
+                                                    field.name.to_string()
+                                                ).as_str(),
                                             );
                                         } else {
                                             content.push_str(
                                                 format!(
-                                                    "nodes.append(&mut get_nested_nodes(NodeEnum::{}(n.{}.as_ref().unwrap().to_owned())));\n",
+                                                    "let {} = NodeEnum::{}(n.{}.as_ref().unwrap().to_owned());\n",
+                                                    field.name.to_string(),
                                                     field.enum_variant_name.as_ref().unwrap(),
+                                                    field.name.to_string()
+                                                )
+                                                .as_str()
+                                            );
+                                            content.push_str(
+                                                format!(
+                                                    "nodes.append(&mut get_children(&{}, current_depth));\n",
+                                                    field.name.to_string()
+                                                ).as_str()
+                                            );
+                                            content.push_str(
+                                                format!(
+                                                    "nodes.push(NestedNode {{
+                                                        node: {},
+                                                        depth: current_depth,
+                                                    }});\n",
                                                     field.name.to_string()
                                                 ).as_str()
                                             );
                                         }
                                     }
+                                    content.push_str("\n");
                                 });
                                 content.push_str("nodes\n}");
                                 b.with_arm(
@@ -138,8 +180,14 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
 
                             b
                         })
-                        .finish(),
-                )
+                        .finish();
+
+                    content.push_str(match_.to_string().as_str());
+
+                    b.with_body(content);
+
+                    b
+                })
                 .finish(),
         )
         .finish()
@@ -283,6 +331,7 @@ fn generate_syntax_kind(f: &ProtoFile) -> String {
                            format!("SyntaxKind::{}", token.name.to_string()),
                        );
                    });
+                   b.with_arm("_".to_string(), "panic!(\"Unknown token\")".to_string());
                    b
                })
                .finish()
@@ -311,6 +360,10 @@ fn generate_syntax_kind(f: &ProtoFile) -> String {
                            value.to_string(),
                         );
                    });
+                   b.with_arm(
+                       "_".to_string(),
+                       "None".to_string(),
+                   );
                    b
                })
                .finish()
