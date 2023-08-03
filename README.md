@@ -61,7 +61,9 @@ This is a proof of concept for building both a concrete syntax tree and an abstr
 
 ## Installation
 
-Do not do this yet! (Unless you want to help with development)
+```diff
+- This is not ready for production use. Only install this if you want to help with development. -
+```
 
 ### Neovim
 
