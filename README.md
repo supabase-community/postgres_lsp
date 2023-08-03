@@ -33,7 +33,7 @@ Once the parser is stable, and a robust and scalable data model is implemented, 
 This is a proof of concept for building both a concrete syntax tree and an abstract syntax tree from a potentially malformed PostgreSQL source code. The `postgres_lsp` crate was created to prove that it works end-to-end, and is just a very basic language server with semantic highlighting and error diagnostics. Before further feature development, we have to complete a bit of groundwork:
 
 1. _Finish the parser_
-   - The parser works, but the enum values for all the different syntax elements and internal conversations are manually written or copied, and, in some places, only cover a few elements required for a simple select statement. To have full coverage without possibilities for a copy and paste error, they should be generated from `pg_query.rs` source code.
+   - The parser works, but the enum values for all the different syntax elements and internal conversations are manually written or copied, and, in some places, only cover a few elements required for a simple select statement. To have full coverage without possibilities for a copy and paste error, they should be generated from `pg_query.rs` source code. ([#4](https://github.com/supabase/postgres_lsp/pull/4))
    - There are a few cases such as nested and named dollar quoted strings that cause the parser to fail due to limitations of the regex-based lexer. Nothing that is impossible to fix, or requires any fundamental change in the parser though.
 2. _Implement a robust and scalable data model_
    - This is still in a research phase
