@@ -22,9 +22,9 @@ The [Language Server Protocol](https://microsoft.github.io/language-server-proto
 
 ## Motivation
 
-Despite an ever rising popularity of Postgres, support for the PostgreSQL language in the IDE or editor of your choice is still limited. There are a few proprietary ones (e.g. [DataGrip](https://www.jetbrains.com/datagrip/)) that work well, but are only available within the respective IDE. Open Source attempts (e.g. [sql-language-server](https://github.com/joe-re/sql-language-server), [pgFormatter](https://github.com/darold/pgFormatter/tree/master), [sql-parser-cst](https://github.com/nene/sql-parser-cst)) provide a generic SQL language server, implementing the Postgres syntax as a flavor of their parser. This always falls short due to the ever evolving and complex syntax of PostgreSQL.
+Despite the rising popularity of Postgres, support for the PL/pgSQL in IDEs and editors is limited. While there are some *generic* SQL Language Servers[^1] offering the Postgres syntax as a "flavor" within the parser, they usually fall short due to the ever-evolving and complex syntax of PostgreSQL. There are a few proprietary IDEs[^2] that work well, but the features are only available within the respective IDE. 
 
-This project will only support PostgreSQL, leveraging parts of the PostgreSQL source (see [libg_query](https://github.com/pganalyze/libpg_query)) to parse the source code reliabaly. This is slightly crazy, but is the only reliable way of parsing all valid PostgreSQL queries. You can find a longer rationale on why This is the way™ [here](https://pganalyze.com/blog/parse-postgresql-queries-in-ruby). Of course, libg_query was built to execute SQL, and not to build a language server, but all of the resulting shortcomings were successfully mitigated in the `parser` crate. Read the [commented source code](./crates/parser/src/lib.rs) for more details on the inner workings of the parser.
+This Language Server is designed to support Postgres, and only Postgres. The server uses [libg_query](https://github.com/pganalyze/libpg_query), therefore leveraging the PostgreSQL source to parse the SQL code reliably. Using Postgres within a Language Server might seem unconventional, but it's the only reliable way of parsing all valid PostgreSQL queries. You can find a longer rationale on why This is the Way™ [here](https://pganalyze.com/blog/parse-postgresql-queries-in-ruby). While libg_query was built to execute SQL, and not to build a language server, any shortcomings have been successfully mitigated in the `parser` crate. You can read the [commented source code](./crates/parser/src/lib.rs) for more details on the inner workings of the parser.
 
 Once the parser is stable, and a robust and scalable data model is implemented, the language server will not only provide basic features such as semantic highlighting, code completion and syntax error diagnostics, but also serve as the user interface for all the great tooling of the Postgres ecosystem.
 
@@ -87,7 +87,12 @@ lsp.configure("postgres_lsp", {force_setup = true})
 
 - [psteinroe](https://github.com/psteinroe) (Maintainer)
 
-## Acknowledgments
+## Acknowledgments 
 
 - [rust-analyzer](https://github.com/rust-lang/rust-analyzer) for implementing such a robust, well documented, and feature-rich language server. Great place to learn from.
 - [squawk](https://github.com/sbdchd/squawk) and [pganalyze](https://pganalyze.com) for inspiring the use of libg_query.
+
+## Footnotes
+
+[^1]: Generic SQL Solutions: [sql-language-server](https://github.com/joe-re/sql-language-server), [pgFormatter](https://github.com/darold/pgFormatter/tree/master), [sql-parser-cst](https://github.com/nene/sql-parser-cst)
+[^2]: Proprietary IDEs: [DataGrip](https://www.jetbrains.com/datagrip/)
