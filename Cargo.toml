@@ -1,10 +1,12 @@
 [workspace]
 members = [
     "crates/*",
+    "xtask/"
 ]
+
+[workspace.package]
+rust-version = "1.71"
 
 [workspace.dependencies]
 parser = { path = "./crates/parser", version = "0.0.0" }
 triomphe = { version = "0.1.8", default-features = false, features = ["std"] }
-
-
