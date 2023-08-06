@@ -61,9 +61,8 @@ This is a proof of concept for building both a concrete syntax tree and an abstr
 
 ## Installation
 
-```diff
-- This is not ready for production use. Only install this if you want to help with development. -
-```
+> [!WARNING]
+> This is not ready for production use. Only install this if you want to help with development.
 
 ### Neovim
 
@@ -82,6 +81,24 @@ require('lspconfig.configs').postgres_lsp = {
 
 lsp.configure("postgres_lsp", {force_setup = true})
 ```
+
+### Building from source
+
+You'll need Cargo, Node, and npm installed.
+
+If you are using VS Code, you can install both the server and the client extension by running:
+
+``` sh
+cargo xtask install
+```
+
+If you're not using VS Code, you can install the server by running:
+
+``` sh
+cargo xtask install --server
+```
+
+The server binary will be installed in `.cargo/bin`. Make sure that `.cargo/bin` is in `$PATH`.
 
 ## Contributors
 
