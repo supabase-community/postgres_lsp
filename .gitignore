@@ -17,3 +17,7 @@ Cargo.lock
 # Added by cargo
 
 /target
+
+# File system
+.DS_Store
+desktop.ini
