@@ -17,7 +17,7 @@ The [Language Server Protocol](https://microsoft.github.io/language-server-proto
 - Show SQL comments on hover
 - Auto-Completion
 - Code actions such as `Execute the statement under the cursor`, or `Execute the current file`
-- Optionated Code Formatting
+- Configurable Code Formatting
 - ... and many more
 
 ## Motivation
