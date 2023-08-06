@@ -2,7 +2,7 @@
 
 # Postgres Language Server
 
-A Language Server for Postgres. Not SQL with flavours, just Postgres.
+A Language Server for Postgres. Not SQL with flavors, just Postgres.
 
 ## Status
 
@@ -10,7 +10,7 @@ A Language Server for Postgres. Not SQL with flavours, just Postgres.
 
 ## Features
 
-The [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) is an open protocol between code editors and servers that provide the code intelligence tools you are used to work with such as code completion and syntax highlighting. This project implements such a language server for Postgres, significantly enhancing the dx right within your favorite editor by adding:
+The [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) is an open protocol between code editors and servers to provide code intelligence tools such as code completion and syntax highlighting. This project implements such a language server for Postgres, significantly enhancing the developer experience within your favorite editor by adding:
 
 - Semantic Highlighting
 - Syntax Error Diagnostics
@@ -90,7 +90,7 @@ lsp.configure("postgres_lsp", {force_setup = true})
 ## Acknowledgments 
 
 - [rust-analyzer](https://github.com/rust-lang/rust-analyzer) for implementing such a robust, well documented, and feature-rich language server. Great place to learn from.
-- [squawk](https://github.com/sbdchd/squawk) and [pganalyze](https://pganalyze.com) for inspiring the use of libg_query.
+- [squawk](https://github.com/sbdchd/squawk) and [pganalyze](https://pganalyze.com) for inspiring the use of libpg_query.
 
 ## Footnotes
 
