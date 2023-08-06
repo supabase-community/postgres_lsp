@@ -52,7 +52,7 @@ This is a proof of concept for building both a concrete syntax tree and an abstr
    - ... anything you can think of really
 5. _Integrate all the existing open source tooling_
    - Show migration file lint errors from [squawk](https://github.com/sbdchd/squawk)
-   - Show plpsql lint errors from [plpsql_check](https://github.com/okbob/plpgsql_check)
+   - Show plpsql lint errors from [plpgsql_check](https://github.com/okbob/plpgsql_check)
 6. _Build missing pieces_
    - An optionated code formatter (think prettier for PostgreSQL)
 7. _(Maybe) Support advanced features with declarative schema management_
