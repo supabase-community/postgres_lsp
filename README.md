@@ -6,7 +6,7 @@ A Language Server for Postgres. Not SQL with flavors, just Postgres.
 
 ## Status
 
-🚧 This is in active development and is only ready for experimental use.
+🚧 This is in active development and is only ready for collaborators. The majority of work is still ahead, but we've verified that the approach works. We're making this public so that we can develop it in the open with input from the community.
 
 ## Features
 
