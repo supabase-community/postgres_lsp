@@ -78,8 +78,8 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
             // .with_field("location".to_string(), "i32".to_string())
             .finish()
         )
-        // TODO: 1) always use match or if .is_some() when unwrapping a node and ignore if none
-        // TODO: 1.2) parse AConst manually
+        // TODO: 1) make it a non-recursive fn because recursiveness in rust ist bad.
+        //          --> for loop with array to put next iteration in.
         // TODO: 2) add location to NestedNode, and use it in get_children.
         // TODO:    to get location, first check if node has location field.
         // TODO:    if not, use the location of the parent.
@@ -97,91 +97,126 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                 .with_parameter("current_depth".to_string(), Some("i32".to_string()))
                 .with_return_type("Vec<NestedNode>".to_string())
                 .with(|b| {
-                    let mut content = "let current_depth = current_depth + 1;".to_string();
+                    let mut content = "let mut nodes: Vec<NestedNode> = vec![];\n".to_string();
+                    content.push_str("// Node, depth, location\n");
+                    content.push_str("let mut stack: Vec<(NodeEnum, i32)> = vec![(node.to_owned(), current_depth)];\n");
+                    content.push_str("while stack.len() > 0 {\n");
+                    content.push_str("let (node, depth) = stack.pop().unwrap();\n");
+                    content.push_str("let current_depth = depth + 1;\n");
+
                     let match_ = Match::new("&node".to_string())
                         .with(|b| {
                             f.nodes.iter().for_each(|node| {
-                                let mut content = "".to_string();
-                                content.push_str("{\n");
-                                content.push_str(
-                                    "let mut nodes: Vec<NestedNode> = vec![];\n",
-                                );
-                                node.fields.iter().for_each(|field| {
-                                    if field.field_type == FieldType::Node && field.repeated {
-                                        content.push_str(
-                                            format!(
-                                                "nodes.append(&mut n.{}.iter().flat_map(|x| {{
-                                                    let mut result = vec![];
-                                                    result.append(&mut get_children(&x.node.as_ref().unwrap(), current_depth));
-                                                    result.push(NestedNode {{ node: x.node.as_ref().unwrap().to_owned(), depth: current_depth }});
-                                                    result
-                                                }}).collect());\n",
-                                                field.name.to_string()
-                                            ).as_str()
-                                        );
-                                    } else if field.field_type == FieldType::Node && field.is_one_of == false {
-                                        if field.node_name == Some("Node".to_owned()) {
-                                            content.push_str(format!("if n.{}.is_some() {{\n", field.name.to_string()).as_str());
-                                            content.push_str(
-                                                format!(
-                                                    "let {} = n.{}.as_ref().unwrap().to_owned().node.unwrap();\n",
-                                                    field.name.to_string(),
-                                                    field.name.to_string(),
-                                                ).as_str(),
-                                            );
-                                            content.push_str(
-                                                format!(
-                                                    "nodes.append(&mut get_children(&{}, current_depth));\n",
-                                                    field.name.to_string()
-                                                ).as_str(),
+                                if node.name == "AConst" {
+                                    // AConst is the only node with one of, so we handle it
+                                    // manually
+                                    let content = "{
+            if n.val.is_some() {
+                let value = match n.val.to_owned().unwrap() {
+                    pg_query::protobuf::a_const::Val::Ival(v) => NodeEnum::Integer(v),
+                    pg_query::protobuf::a_const::Val::Fval(v) => NodeEnum::Float(v),
+                    pg_query::protobuf::a_const::Val::Boolval(v) => NodeEnum::Boolean(v),
+                    pg_query::protobuf::a_const::Val::Sval(v) => NodeEnum::String(v),
+                    pg_query::protobuf::a_const::Val::Bsval(v) => NodeEnum::BitString(v),
+                };
 
-                                            );
-                                            content.push_str(
+                nodes.push(NestedNode {
+                    node: value,
+                    depth: current_depth,
+                });
+            }
+        }";
+
+                                    b.with_arm(
+                                        format!("NodeEnum::{}(n)", node.name.to_string()),
+                                        format!("{}", content),
+                                    );
+                                } else {
+                                    let mut field_content: Vec<String> = vec![];
+                                    node.fields.iter().for_each(|field| {
+                                        if field.field_type == FieldType::Node && field.repeated {
+                                            field_content.push(
                                                 format!(
-                                                    "nodes.push(NestedNode {{
-                                                        node: {},
-                                                        depth: current_depth,
+                                                    "n.{}.iter().for_each(|x| {{
+                                                        stack.push((x.node.to_owned().unwrap(), current_depth));
+                                                        nodes.push(NestedNode {{ node: x.node.to_owned().unwrap(), depth: current_depth }});
                                                     }});\n",
-                                                    field.name.to_string()
-                                                ).as_str(),
-                                            );
-                                            content.push_str("}\n");
-                                        } else {
-                                            content.push_str(format!("if n.{}.is_some() {{\n", field.name.to_string()).as_str());
-                                            content.push_str(
-                                                format!(
-                                                    "let {} = NodeEnum::{}(n.{}.as_ref().unwrap().to_owned());\n",
-                                                    field.name.to_string(),
-                                                    field.enum_variant_name.as_ref().unwrap(),
                                                     field.name.to_string()
                                                 )
-                                                .as_str()
                                             );
-                                            content.push_str(
-                                                format!(
-                                                    "nodes.append(&mut get_children(&{}, current_depth));\n",
-                                                    field.name.to_string()
-                                                ).as_str()
-                                            );
-                                            content.push_str(
-                                                format!(
-                                                    "nodes.push(NestedNode {{
-                                                        node: {},
-                                                        depth: current_depth,
-                                                    }});\n",
-                                                    field.name.to_string()
-                                                ).as_str()
-                                            );
-                                            content.push_str("}\n");
+                                        } else if field.field_type == FieldType::Node && field.is_one_of == false {
+                                            if field.node_name == Some("Node".to_owned()) {
+                                                let mut node_content = "".to_string();
+                                                node_content.push_str(format!("if n.{}.is_some() {{\n", field.name.to_string()).as_str());
+                                                node_content.push_str(
+                                                    format!(
+                                                        "let {} = n.{}.to_owned().unwrap().node.unwrap();\n",
+                                                        field.name.to_string(),
+                                                        field.name.to_string(),
+                                                    ).as_str(),
+                                                );
+                                                node_content.push_str(
+                                                    format!(
+                                                        "stack.push(({}.to_owned(), current_depth));\n",
+                                                        field.name.to_string()
+                                                    ).as_str(),
+
+                                                );
+                                                node_content.push_str(
+                                                    format!(
+                                                        "nodes.push(NestedNode {{
+                                                            node: {},
+                                                            depth: current_depth,
+                                                        }});\n",
+                                                        field.name.to_string()
+                                                    ).as_str(),
+                                                );
+                                                node_content.push_str("}\n");
+                                                field_content.push(node_content);
+                                            } else {
+                                                let mut node_content = "".to_string();
+                                                node_content.push_str(format!("if n.{}.is_some() {{\n", field.name.to_string()).as_str());
+                                                node_content.push_str(
+                                                    format!(
+                                                        "let {} = NodeEnum::{}(n.{}.to_owned().unwrap());\n",
+                                                        field.name.to_string(),
+                                                        field.enum_variant_name.as_ref().unwrap(),
+                                                        field.name.to_string()
+                                                    )
+                                                    .as_str()
+                                                );
+                                                node_content.push_str(
+                                                    format!(
+                                                        "stack.push(({}.to_owned(), current_depth));\n",
+                                                        field.name.to_string()
+                                                    ).as_str()
+                                                );
+                                                node_content.push_str(
+                                                    format!(
+                                                        "nodes.push(NestedNode {{
+                                                            node: {},
+                                                            depth: current_depth,
+                                                        }});\n",
+                                                        field.name.to_string()
+                                                    ).as_str()
+                                                );
+                                                node_content.push_str("}\n");
+                                                field_content.push(node_content);
+                                            }
                                         }
-                                    }
-                                    content.push_str("\n");
-                                });
-                                content.push_str("nodes\n}");
-                                b.with_arm(
-                                    format!("NodeEnum::{}(n)", node.name.to_string()),
-                                    format!("{}", content),
-                                );
+                                    });
+
+                                    let content = if field_content.len() > 0 {
+                                        format!("{{\n{}\n}}", field_content.join("\n"))
+                                    } else {
+                                        "()".to_string()
+                                    };
+
+                                    b.with_arm(
+                                        format!("NodeEnum::{}(n)", node.name.to_string()),
+                                        format!("{}", content),
+                                    );
+                                }
                             });
 
                             b
@@ -189,6 +224,18 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                         .finish();
 
                     content.push_str(match_.to_string().as_str());
+                    content.push_str(";\n");
+
+
+
+
+                    content.push_str("}\n");
+                    content.push_str("nodes");
+
+
+
+
+
 
                     b.with_body(content);
 
