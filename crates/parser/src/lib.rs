@@ -20,6 +20,7 @@ mod parser;
 mod pg_query_utils;
 mod pg_query_utils_generated;
 mod pg_query_utils_generated_test;
+mod pg_query_utils_manual;
 mod source_file;
 mod statement;
 mod syntax_error;
