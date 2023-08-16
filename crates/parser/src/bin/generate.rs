@@ -32,6 +32,7 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                     vec!["NodeEnum".to_string()],
                 )
                 .with_import("std::collections".to_string(), vec!["VecDeque".to_string()])
+                .with_import("crate".to_string(), vec!["pg_query_utils_manual::derive_location".to_string()])
                 .finish(),
         )
         .add_block(
@@ -74,10 +75,10 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                 .with_argument("Clone".to_string(), None)
                 .finish()
             )
-            .with_field("node".to_string(), "NodeEnum".to_string())
-            .with_field("depth".to_string(), "i32".to_string())
-            .with_field("location".to_string(), "i32".to_string())
-            .with_field("path".to_string(), "String".to_string())
+            .with_field("node".to_string(), "NodeEnum".to_string(), true)
+            .with_field("depth".to_string(), "i32".to_string(), true)
+            .with_field("location".to_string(), "i32".to_string(), true)
+            .with_field("path".to_string(), "String".to_string(), true)
             .finish()
         )
         .add_block(
@@ -85,15 +86,36 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                 .public()
                 .with_comment("Returns all children of the node, recursively".to_string())
                 .with_parameter("node".to_string(), Some("&NodeEnum".to_string()))
+                .with_parameter("text".to_string(), Some("String".to_string()))
                 .with_parameter("current_depth".to_string(), Some("i32".to_string()))
                 .with_return_type("Vec<NestedNode>".to_string())
                 .with(|b| {
                     let mut content = "let mut nodes: Vec<NestedNode> = vec![];\n".to_string();
-                    content.push_str("// Node, depth, location\n");
-                    content.push_str("let mut stack: VecDeque<(NodeEnum, i32, Option<i32>)> = VecDeque::from(vec![(node.to_owned(), current_depth, Some(0))]);\n");
-                    content.push_str("while stack.len() > 0 {\n");
-                    content.push_str("let (node, depth, parent_location) = stack.pop_front().unwrap();\n");
+                    content.push_str("// Node, depth, path\n");
+                    content.push_str("let mut stack: VecDeque<(NodeEnum, i32, String)> = VecDeque::from(vec![(node.to_owned(), current_depth, \"0\".to_string())]);");
+                    content.push_str("// Node, depth, path\n");
+                    content.push_str("let mut location_stack: VecDeque<(NodeEnum, i32, String)> = VecDeque::new();");
+                    content.push_str("while !stack.is_empty() || !location_stack.is_empty() {\n");
+                    content.push_str("if !stack.is_empty() {");
+                    content.push_str("let (node, depth, path) = stack.pop_front().unwrap();\n");
                     content.push_str("let current_depth = depth + 1;\n");
+                    content.push_str("let mut child_ctr: i32 = 0;\n");
+                    content.push_str("let mut handle_child = |c: NodeEnum| {\n");
+                    content.push_str("let location = get_location(&c);\n");
+                    content.push_str("let path = path.clone() + \".\" + child_ctr.to_string().as_str();\n");
+                    content.push_str("child_ctr = child_ctr + 1;\n");
+                    content.push_str("stack.push_back((c.to_owned(), current_depth, path.clone()));\n");
+                    content.push_str("if location.is_some() {\n");
+                    content.push_str("nodes.push(NestedNode {\n");
+                    content.push_str("node: c,\n");
+                    content.push_str("depth: current_depth,\n");
+                    content.push_str("location: location.unwrap(),\n");
+                    content.push_str("path: path.clone(),\n");
+                    content.push_str("});\n");
+                    content.push_str("} else {\n");
+                    content.push_str("location_stack.push_back((c, current_depth, path));\n");
+                    content.push_str("}\n");
+                    content.push_str("};\n");
 
                     let match_ = Match::new("&node".to_string())
                         .with(|b| {
@@ -103,20 +125,12 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                                     // manually
                                     let content = "{
             if n.val.is_some() {
-                let value = match n.val.to_owned().unwrap() {
+                handle_child(match n.val.to_owned().unwrap() {
                     pg_query::protobuf::a_const::Val::Ival(v) => NodeEnum::Integer(v),
                     pg_query::protobuf::a_const::Val::Fval(v) => NodeEnum::Float(v),
                     pg_query::protobuf::a_const::Val::Boolval(v) => NodeEnum::Boolean(v),
                     pg_query::protobuf::a_const::Val::Sval(v) => NodeEnum::String(v),
                     pg_query::protobuf::a_const::Val::Bsval(v) => NodeEnum::BitString(v),
-                };
-
-                nodes.push(NestedNode {
-                    node: value,
-                    depth: current_depth,
-                    // this is always the parent location
-                    location: parent_location,
-                    parent_location
                 });
             }
         }";
@@ -131,11 +145,7 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                                         if field.field_type == FieldType::Node && field.repeated {
                                             field_content.push(
                                                 format!(
-                                                    "n.{}.iter().for_each(|x| {{
-                                                        let location = get_location(&x.node.as_ref().unwrap());
-                                                        stack.push_back((x.node.to_owned().unwrap(), current_depth, location));
-                                                        nodes.push(NestedNode {{ node: x.node.to_owned().unwrap(), depth: current_depth, location, parent_location }});
-                                                    }});\n",
+                                                    "n.{}.iter().for_each(|x| handle_child(x.node.as_ref().unwrap().to_owned()));\n",
                                                     field.name.to_string()
                                                 )
                                             );
@@ -145,31 +155,7 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                                                 node_content.push_str(format!("if n.{}.is_some() {{\n", field.name.to_string()).as_str());
                                                 node_content.push_str(
                                                     format!(
-                                                        "let {} = n.{}.to_owned().unwrap().node.unwrap();\n",
-                                                        field.name.to_string(),
-                                                        field.name.to_string(),
-                                                    ).as_str(),
-                                                );
-                                                node_content.push_str(
-                                                    format!(
-                                                        "let location = get_location(&{});\n",
-                                                        field.name.to_string()
-                                                    ).as_str(),
-                                                );
-                                                node_content.push_str(
-                                                    format!(
-                                                        "stack.push_back(({}.to_owned(), current_depth, location));\n",
-                                                        field.name.to_string()
-                                                    ).as_str(),
-                                                );
-                                                node_content.push_str(
-                                                    format!(
-                                                        "nodes.push(NestedNode {{
-                                                            node: {},
-                                                            depth: current_depth,
-                                                            location,
-                                                            parent_location
-                                                        }});\n",
+                                                        "handle_child(n.{}.to_owned().unwrap().node.unwrap());\n",
                                                         field.name.to_string()
                                                     ).as_str(),
                                                 );
@@ -180,35 +166,11 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                                                 node_content.push_str(format!("if n.{}.is_some() {{\n", field.name.to_string()).as_str());
                                                 node_content.push_str(
                                                     format!(
-                                                        "let {} = NodeEnum::{}(n.{}.to_owned().unwrap());\n",
-                                                        field.name.to_string(),
+                                                        "handle_child(NodeEnum::{}(n.{}.to_owned().unwrap()));\n",
                                                         field.enum_variant_name.as_ref().unwrap(),
                                                         field.name.to_string()
                                                     )
                                                     .as_str()
-                                                );
-                                                node_content.push_str(
-                                                    format!(
-                                                        "let location = get_location(&{});\n",
-                                                        field.name.to_string()
-                                                    ).as_str(),
-                                                );
-                                                node_content.push_str(
-                                                    format!(
-                                                        "stack.push_back(({}.to_owned(), current_depth, location));\n",
-                                                        field.name.to_string()
-                                                    ).as_str()
-                                                );
-                                                node_content.push_str(
-                                                    format!(
-                                                        "nodes.push(NestedNode {{
-                                                            node: {},
-                                                            depth: current_depth,
-                                                            location,
-                                                            parent_location
-                                                        }});\n",
-                                                        field.name.to_string()
-                                                    ).as_str()
                                                 );
                                                 node_content.push_str("}\n");
                                                 field_content.push(node_content);
@@ -236,7 +198,21 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                     content.push_str(match_.to_string().as_str());
                     content.push_str(";\n");
 
+                    content.push_str("} else if !location_stack.is_empty() {\n");
+                    content.push_str("let (node, depth, path) = location_stack.pop_front().unwrap();\n");
+                    content.push_str("let parent_location = nodes.iter().find(|n| {\n");
+                    content.push_str("let mut path_elements = path.split(\".\").collect::<Vec<&str>>();\n");
+                    content.push_str("path_elements.pop();\n");
+                    content.push_str("let parent_path = path_elements.join(\".\");\n");
+                    content.push_str("n.path == parent_path\n");
+                    content.push_str("}).unwrap().location;\n");
+                    content.push_str("let earliest_child_location = nodes.iter().filter(|n| n.path.starts_with(path.as_str())).min_by(|a, b| a.location.cmp(&b.location)).map(|n| n.location);\n");
+                    content.push_str("let location = derive_location(&node, text.clone(), parent_location, earliest_child_location);\n");
+                    content.push_str("nodes.push(NestedNode { node, depth, location, path: path.clone() });\n");
                     content.push_str("}\n");
+                    content.push_str("}\n");
+
+
                     content.push_str("nodes.sort_by_key(|n| n.location);\n");
                     content.push_str("nodes");
 

@@ -1,7 +1,7 @@
+use std::println;
+
 use pg_query::NodeEnum;
 use regex::Regex;
-
-use crate::pg_query_utils_generated::NestedNode;
 
 fn get_location_via_regexp(
     r: Regex,
@@ -14,42 +14,46 @@ fn get_location_via_regexp(
         distance: i32,
     }
 
-    let l = r
+    let location = r
         .find_iter(text.as_str())
         .filter_map(|x| {
-            if x.start() as i32 > parent_location {
+            if x.start() as i32 >= parent_location {
                 Some({
                     Location {
                         location: x.start() as i32,
-                        distance: earliest_child_location.unwrap() - x.start() as i32,
+                        distance: if earliest_child_location.is_some() {
+                            earliest_child_location.unwrap() - x.start() as i32
+                        } else {
+                            x.start() as i32 - parent_location
+                        },
                     }
                 })
             } else {
                 None
             }
         })
-        .min_by(|a, b| a.distance.cmp(&b.distance));
-    l.unwrap().location
+        .min_by_key(|x| x.distance.abs())
+        .unwrap()
+        .location;
+
+    // Sanity check to ensure that the location is valid
+    if earliest_child_location.is_some() && earliest_child_location.unwrap() < location {
+        panic!("Regex returned invalid location: Node cannot have a location < its children");
+    }
+
+    location
 }
 
 /// This is the only manual implementation required for the parser
 /// The problem this functions is attempting to solve is that not all nodes have a location property
-/// As of now, I have found three different cases:
-/// - The node location is easily derivable from the text, e.g. `delete from`
-/// - The node location is the same as its immediate parent node, e.g. `AStar`
-/// - The node location is the same as their only child, e.g. `AConst`
 ///
-/// Some nodes such as will be more complex `Alias` will require a special implementation
-///
-/// if no location, always append to location stack (no parent location, append to location stack children with no location need to be appended too)
-/// then, work on all other nodes
-/// then, start with the beginning. we now always have a location for a parent, and SHOULD HAVE at least one child location. to get childs, use "starts_with(my_path)".
-/// if no child, pass earliest_child_location = None
-///
-/// NOTE: to get path, just count on children of match arm in get_childen
+/// I suspect for most of the nodes, a simple regular expression will be sufficient
 pub fn derive_location(
+    // The node to derive the location for
     node: &NodeEnum,
+    // The full text of the query
     text: String,
+    // The location of the parent node
     parent_location: i32,
     // not given if node does not have any children
     earliest_child_location: Option<i32>,
@@ -122,7 +126,13 @@ pub fn derive_location(
         ),
         NodeEnum::UpdateStmt(_) => todo!(),
         NodeEnum::MergeStmt(_) => todo!(),
-        NodeEnum::SelectStmt(_) => todo!(),
+        NodeEnum::SelectStmt(_) => get_location_via_regexp(
+            // in "insert into contact (id) values (1)" the "values (1)" is a select statement
+            Regex::new(r"(?mi)select|values").unwrap(),
+            text,
+            parent_location,
+            earliest_child_location,
+        ),
         NodeEnum::ReturnStmt(_) => todo!(),
         NodeEnum::PlassignStmt(_) => panic!("Node has location property."),
         NodeEnum::AlterTableStmt(_) => todo!(),
@@ -239,7 +249,12 @@ pub fn derive_location(
         NodeEnum::ColumnRef(_) => panic!("Node has location property."),
         NodeEnum::ParamRef(_) => panic!("Node has location property."),
         NodeEnum::FuncCall(_) => panic!("Node has location property."),
-        NodeEnum::AStar(_) => todo!(),
+        NodeEnum::AStar(_) => get_location_via_regexp(
+            Regex::new(r"(?mi)\*").unwrap(),
+            text,
+            parent_location,
+            earliest_child_location,
+        ),
         NodeEnum::AIndices(_) => todo!(),
         NodeEnum::AIndirection(_) => todo!(),
         NodeEnum::AArrayExpr(_) => panic!("Node has location property."),
@@ -299,7 +314,12 @@ pub fn derive_location(
         NodeEnum::Boolean(_) => parent_location,
         NodeEnum::String(_) => parent_location,
         NodeEnum::BitString(_) => parent_location,
-        NodeEnum::List(_) => todo!(),
+        NodeEnum::List(_) => get_location_via_regexp(
+            Regex::new(r"(?mi)\((.*?)\)").unwrap(),
+            text,
+            parent_location,
+            earliest_child_location,
+        ),
         NodeEnum::IntList(_) => todo!(),
         NodeEnum::OidList(_) => todo!(),
         NodeEnum::AConst(_) => panic!("Node has location property."),

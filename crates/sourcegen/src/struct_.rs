@@ -4,6 +4,7 @@ use crate::builder::Builder;
 pub struct StructField {
     name: String,
     type_: String,
+    public: bool,
 }
 
 /// A builder for a rust Struct
@@ -31,7 +32,11 @@ impl Builder for Struct {
                 .iter()
                 .map(|field| {
                     let mut result = String::new();
-                    result.push_str("    ");
+                    if field.public {
+                        result.push_str("pub ");
+                    } else {
+                        result.push_str("    ");
+                    }
                     result.push_str(&field.name);
                     result.push_str(": ");
                     result.push_str(&field.type_);
@@ -61,8 +66,12 @@ impl Struct {
         self
     }
 
-    pub fn with_field(&mut self, name: String, type_: String) -> &mut Self {
-        self.fields.push(StructField { name, type_ });
+    pub fn with_field(&mut self, name: String, type_: String, public: bool) -> &mut Self {
+        self.fields.push(StructField {
+            name,
+            type_,
+            public,
+        });
         self
     }
 
