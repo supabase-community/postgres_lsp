@@ -16,7 +16,6 @@ pub enum SyntaxKind {
     Whitespace,
     Newline,
     Tab,
-    Word,
     Stmt,
     Alias,
     RangeVar,
@@ -2066,6 +2065,9 @@ impl SyntaxKind {
             SyntaxKind::ModePlpgsqlAssign2 => Some(SyntaxKindType::Follow),
             SyntaxKind::ModePlpgsqlAssign3 => Some(SyntaxKindType::Follow),
             SyntaxKind::Uminus => Some(SyntaxKindType::Follow),
+            SyntaxKind::Whitespace => Some(SyntaxKindType::Follow),
+            SyntaxKind::Newline => Some(SyntaxKindType::Follow),
+            SyntaxKind::Tab => Some(SyntaxKindType::Follow),
             _ => None,
         }
     }

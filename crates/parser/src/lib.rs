@@ -17,7 +17,6 @@
 
 mod ast_node;
 mod parser;
-mod pg_query_utils;
 mod pg_query_utils_generated;
 mod pg_query_utils_generated_test;
 mod pg_query_utils_manual;

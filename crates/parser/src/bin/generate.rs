@@ -268,7 +268,6 @@ fn generate_syntax_kind(f: &ProtoFile) -> String {
                 "Whitespace".to_string(),
                 "Newline".to_string(),
                 "Tab".to_string(),
-                "Word".to_string(),
                 "Stmt".to_string(),
             ].iter().for_each(|kind| {
                 b.with_value(kind.to_string(), None);
@@ -388,6 +387,18 @@ fn generate_syntax_kind(f: &ProtoFile) -> String {
                            value.to_string(),
                         );
                    });
+
+                    vec![
+                        "Whitespace".to_string(),
+                        "Newline".to_string(),
+                        "Tab".to_string(),
+                    ].iter().for_each(|kind| {
+                        b.with_arm(
+                            format!("SyntaxKind::{}", kind.to_string()),
+                            "Some(SyntaxKindType::Follow)".to_string()
+                        );
+                    });
+
                    b.with_arm(
                        "_".to_string(),
                        "None".to_string(),

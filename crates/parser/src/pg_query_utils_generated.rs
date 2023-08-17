@@ -2804,10 +2804,6 @@ pub fn get_children(node: &NodeEnum, text: String, current_depth: i32) -> Vec<Ne
                 parent_location,
                 earliest_child_location,
             );
-            println!(
-                "node: {:?}, depth: {}, path: {}, location: {}",
-                node, depth, path, location
-            );
             nodes.push(NestedNode {
                 node,
                 depth,
