@@ -200,12 +200,17 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
 
                     content.push_str("} else if !location_stack.is_empty() {\n");
                     content.push_str("let (node, depth, path) = location_stack.pop_front().unwrap();\n");
-                    content.push_str("let parent_location = nodes.iter().find(|n| {\n");
+                    content.push_str("let parent_node = nodes.iter().find(|n| {\n");
                     content.push_str("let mut path_elements = path.split(\".\").collect::<Vec<&str>>();\n");
                     content.push_str("path_elements.pop();\n");
                     content.push_str("let parent_path = path_elements.join(\".\");\n");
                     content.push_str("n.path == parent_path\n");
-                    content.push_str("}).unwrap().location;\n");
+                    content.push_str("});\n");
+                    content.push_str("let parent_location = if parent_node.is_some() {\n");
+                    content.push_str("parent_node.unwrap().location\n");
+                    content.push_str("} else {\n");
+                    content.push_str("0\n");
+                    content.push_str("};\n");
                     content.push_str("let earliest_child_location = nodes.iter().filter(|n| n.path.starts_with(path.as_str())).min_by(|a, b| a.location.cmp(&b.location)).map(|n| n.location);\n");
                     content.push_str("let location = derive_location(&node, text.clone(), parent_location, earliest_child_location);\n");
                     content.push_str("nodes.push(NestedNode { node, depth, location, path: path.clone() });\n");

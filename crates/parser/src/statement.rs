@@ -260,7 +260,8 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
-    use log::info;
+    use log::log_enabled;
+    use log::{debug, info};
     use std::assert_eq;
     use std::fs;
 
@@ -279,9 +280,9 @@ mod tests {
         parser.parse_statement(&input, None);
         let parsed = parser.finish();
 
-        let fail = parsed.cst.text() != input.as_str();
+        debug!("parsed: {}", parsed.cst.text());
 
-        if fail == true {
+        if log_enabled!(log::Level::Debug) {
             dbg!(&parsed.cst);
         }
 
@@ -304,8 +305,6 @@ mod tests {
                 let path = f.unwrap().path();
 
                 let contents = fs::read_to_string(&path).unwrap();
-
-                info!("Testing {}:\n'{}'", path.display(), contents);
 
                 test_valid_stmt(contents);
             });

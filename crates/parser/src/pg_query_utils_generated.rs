@@ -2783,16 +2783,17 @@ pub fn get_children(node: &NodeEnum, text: String, current_depth: i32) -> Vec<Ne
             };
         } else if !location_stack.is_empty() {
             let (node, depth, path) = location_stack.pop_front().unwrap();
-            let parent_location = nodes
-                .iter()
-                .find(|n| {
-                    let mut path_elements = path.split(".").collect::<Vec<&str>>();
-                    path_elements.pop();
-                    let parent_path = path_elements.join(".");
-                    n.path == parent_path
-                })
-                .unwrap()
-                .location;
+            let parent_node = nodes.iter().find(|n| {
+                let mut path_elements = path.split(".").collect::<Vec<&str>>();
+                path_elements.pop();
+                let parent_path = path_elements.join(".");
+                n.path == parent_path
+            });
+            let parent_location = if parent_node.is_some() {
+                parent_node.unwrap().location
+            } else {
+                0
+            };
             let earliest_child_location = nodes
                 .iter()
                 .filter(|n| n.path.starts_with(path.as_str()))
