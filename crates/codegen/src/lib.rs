@@ -10,9 +10,6 @@ pub fn syntax_kind(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
 }
 
 fn syntax_kind_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    // let parser = ProtoParser::new(
-    //     "/Users/raminder.singh/src/rust/postgres_lsp/crates/parser/proto/source.proto",
-    // );
     let parser = ProtoParser::new("./crates/parser/proto/source.proto");
     let proto_file = parser.parse();
 
