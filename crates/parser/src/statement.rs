@@ -6,7 +6,7 @@ use crate::{
     parser::Parser,
     pg_query_utils_generated::{get_children, get_location},
     // pg_query_utils::{get_location, get_nested_nodes},
-    syntax_kind_generated::SyntaxKind,
+    syntax_kind_codegen::SyntaxKind,
 };
 
 /// A super simple lexer for sql statements.

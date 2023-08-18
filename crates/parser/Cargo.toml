@@ -14,6 +14,7 @@ regex = "1.9.1"
 serde = { version = "1.0", features = ["derive"] }
 env_logger = { version = "0.9.1" }
 log = { version = "0.4.20" }
+codegen = { path = "../codegen" }
 
 sourcegen.workspace = true
 pg_query_proto_parser.workspace = true

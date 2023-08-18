@@ -4,7 +4,7 @@ use pg_query::NodeEnum;
 
 use crate::ast_node::RawStmt;
 use crate::syntax_error::SyntaxError;
-use crate::syntax_kind_generated::{SyntaxKind, SyntaxKindType};
+use crate::syntax_kind_codegen::{SyntaxKind, SyntaxKindType};
 use crate::syntax_node::SyntaxNode;
 
 /// Main parser that controls the cst building process, and collects errors and statements
