@@ -1,12 +1,14 @@
 use cstree::text::{TextRange, TextSize};
+use log::{debug, log_enabled};
 use logos::{Logos, Span};
-use regex::Regex;
 
 use crate::{
     parser::Parser,
-    pg_query_utils_generated::{get_children, get_location},
-    // pg_query_utils::{get_location, get_nested_nodes},
+    pg_query_utils_generated::get_children,
     syntax_kind_generated::SyntaxKind,
+    token_type::{
+        get_token_type_from_pg_query_token, get_token_type_from_statement_token, TokenType,
+    },
 };
 
 /// A super simple lexer for sql statements.
@@ -16,45 +18,6 @@ use crate::{
 /// does not know anything about postgres syntax or keywords. For example, all words such as `select` and `from` are put into the `Word` type.
 #[derive(Logos, Debug, PartialEq)]
 pub enum StatementToken {
-    // copied from protobuf::Token. can be generated later
-    #[token("%")]
-    Ascii37,
-    #[token("(")]
-    Ascii40,
-    #[token(")")]
-    Ascii41,
-    #[token("*")]
-    Ascii42,
-    #[token("+")]
-    Ascii43,
-    #[token(",")]
-    Ascii44,
-    #[token("-")]
-    Ascii45,
-    #[token(".")]
-    Ascii46,
-    #[token("/")]
-    Ascii47,
-    #[token(":")]
-    Ascii58,
-    #[token(";")]
-    Ascii59,
-    #[token("<")]
-    Ascii60,
-    #[token("=")]
-    Ascii61,
-    #[token(">")]
-    Ascii62,
-    #[token("?")]
-    Ascii63,
-    #[token("[")]
-    Ascii91,
-    #[token("\\")]
-    Ascii92,
-    #[token("]")]
-    Ascii93,
-    #[token("^")]
-    Ascii94,
     // comments and whitespaces
     #[regex(" +"gm)]
     Whitespace,
@@ -71,25 +34,6 @@ impl StatementToken {
     /// can be generated.
     pub fn syntax_kind(&self) -> SyntaxKind {
         match self {
-            StatementToken::Ascii37 => SyntaxKind::Ascii37,
-            StatementToken::Ascii40 => SyntaxKind::Ascii40,
-            StatementToken::Ascii41 => SyntaxKind::Ascii41,
-            StatementToken::Ascii42 => SyntaxKind::Ascii42,
-            StatementToken::Ascii43 => SyntaxKind::Ascii43,
-            StatementToken::Ascii44 => SyntaxKind::Ascii44,
-            StatementToken::Ascii45 => SyntaxKind::Ascii45,
-            StatementToken::Ascii46 => SyntaxKind::Ascii46,
-            StatementToken::Ascii47 => SyntaxKind::Ascii47,
-            StatementToken::Ascii58 => SyntaxKind::Ascii58,
-            StatementToken::Ascii59 => SyntaxKind::Ascii59,
-            StatementToken::Ascii60 => SyntaxKind::Ascii60,
-            StatementToken::Ascii61 => SyntaxKind::Ascii61,
-            StatementToken::Ascii62 => SyntaxKind::Ascii62,
-            StatementToken::Ascii63 => SyntaxKind::Ascii63,
-            StatementToken::Ascii91 => SyntaxKind::Ascii91,
-            StatementToken::Ascii92 => SyntaxKind::Ascii92,
-            StatementToken::Ascii93 => SyntaxKind::Ascii93,
-            StatementToken::Ascii94 => SyntaxKind::Ascii94,
             StatementToken::Whitespace => SyntaxKind::Whitespace,
             StatementToken::Newline => SyntaxKind::Newline,
             StatementToken::Tab => SyntaxKind::Tab,
@@ -150,6 +94,10 @@ impl Parser {
             }
         };
 
+        if log_enabled!(log::Level::Debug) {
+            debug!("pg_query_root: {:?}", pg_query_root);
+        }
+
         let mut pg_query_nodes = match &pg_query_root {
             Some(root) => get_children(root, text.to_string(), 1)
                 .into_iter()
@@ -157,30 +105,38 @@ impl Parser {
             None => Vec::new().into_iter().peekable(),
         };
 
+        if log_enabled!(log::Level::Debug) {
+            println!("# Children:\n");
+            &pg_query_nodes.to_owned().for_each(|n| {
+                debug!("{:?}\n", n);
+                // let s = text.split_at(n.location as usize);
+                // debug!("Text: {:?}\npg_query_node: {:?}\n", s.1, n)
+            });
+        }
+
         let mut lexer = StatementToken::lexer(&text);
 
         // parse root node if no syntax errors
         if pg_query_root.is_some() {
             let root_node = pg_query_root.unwrap();
             self.stmt(root_node.to_owned(), range);
-            self.start_node_at(SyntaxKind::new_from_pg_query_node(&root_node), Some(1));
+            self.start_node_at(SyntaxKind::new_from_pg_query_node(&root_node), 1);
             // if there is only one node, there are no children, and we do not need to buffer the tokens.
             self.set_checkpoint(pg_query_nodes.len() == 0);
         } else {
             // fallback to generic node as root
-            self.start_node_at(SyntaxKind::Stmt, None);
+            self.start_node_at(SyntaxKind::Stmt, 1);
             self.set_checkpoint(true);
         }
 
-        // todo: change this to manually moving along
         // start at 0, and increment by the length of the token
-
         let mut pointer: i32 = 0;
 
         #[derive(Debug)]
         struct Token {
             syntax_kind: SyntaxKind,
             span: Span,
+            token_type: Option<TokenType>,
         }
 
         while pointer < text.len() as i32 {
@@ -195,6 +151,7 @@ impl Parser {
             {
                 let token = pg_query_tokens.next().unwrap();
                 Token {
+                    token_type: get_token_type_from_pg_query_token(&token),
                     syntax_kind: SyntaxKind::new_from_pg_query_token(&token),
                     span: Span {
                         start: token.start as usize,
@@ -218,6 +175,9 @@ impl Parser {
                     );
                 }
                 Token {
+                    token_type: get_token_type_from_statement_token(
+                        &token.as_ref().unwrap().as_ref().unwrap(),
+                    ),
                     syntax_kind: token.unwrap().unwrap().syntax_kind(),
                     span: lexer.span(),
                 }
@@ -236,7 +196,7 @@ impl Parser {
                     let nested_node = pg_query_nodes.next().unwrap();
                     self.start_node_at(
                         SyntaxKind::new_from_pg_query_node(&nested_node.node),
-                        Some(nested_node.depth),
+                        nested_node.depth,
                     );
                 }
             }
@@ -248,6 +208,7 @@ impl Parser {
                     .take(token.span.end - token.span.start)
                     .collect::<String>()
                     .as_str(),
+                token.token_type,
             );
 
             pointer = pointer + (token.span.end - token.span.start) as i32;
@@ -293,6 +254,18 @@ mod tests {
     fn test_simple_statement() {
         init();
         test_valid_stmt("select 1;".to_string());
+    }
+
+    #[test]
+    fn test_temp() {
+        init();
+        let token = pg_query::scan(
+            "select coalesce(id, two) as id from contact;"
+                .to_string()
+                .as_str(),
+        )
+        .unwrap();
+        dbg!(token);
     }
 
     #[test]

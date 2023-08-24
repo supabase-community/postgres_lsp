@@ -176,7 +176,7 @@ pub fn get_location(node: &NodeEnum) -> Option<i32> {
         NodeEnum::AlterCollationStmt(_) => None,
         NodeEnum::CallStmt(_) => None,
         NodeEnum::AlterStatsStmt(_) => None,
-        NodeEnum::AExpr(n) => Some(n.location),
+        NodeEnum::AExpr(n) => get_location(&n.lexpr.as_ref().unwrap().node.as_ref().unwrap()),
         NodeEnum::ColumnRef(n) => Some(n.location),
         NodeEnum::ParamRef(n) => Some(n.location),
         NodeEnum::FuncCall(n) => Some(n.location),
@@ -2805,12 +2805,14 @@ pub fn get_children(node: &NodeEnum, text: String, current_depth: i32) -> Vec<Ne
                 parent_location,
                 earliest_child_location,
             );
-            nodes.push(NestedNode {
-                node,
-                depth,
-                location,
-                path: path.clone(),
-            });
+            if location.is_some() {
+                nodes.push(NestedNode {
+                    node,
+                    depth,
+                    location: location.unwrap(),
+                    path: path.clone(),
+                });
+            }
         }
     }
     nodes.sort_by_key(|n| n.location);

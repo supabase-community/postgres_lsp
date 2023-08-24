@@ -28,16 +28,16 @@ impl Parser {
     pub fn parse_source_file(&mut self, text: &str) {
         let mut lexer = SourceFileToken::lexer(text);
 
-        self.start_node_at(SyntaxKind::SourceFile, Some(0));
+        self.start_node_at(SyntaxKind::SourceFile, 0);
         while let Some(token) = lexer.next() {
             match token {
                 Ok(token) => {
                     match token {
                         SourceFileToken::Comment => {
-                            self.token(SyntaxKind::Comment, lexer.slice());
+                            self.token(SyntaxKind::Comment, lexer.slice(), None);
                         }
                         SourceFileToken::Newline => {
-                            self.token(SyntaxKind::Newline, lexer.slice());
+                            self.token(SyntaxKind::Newline, lexer.slice(), None);
                         }
                         SourceFileToken::Statement => {
                             self.parse_statement(lexer.slice(), Some(lexer.span().start as u32));

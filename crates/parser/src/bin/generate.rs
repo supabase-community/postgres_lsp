@@ -213,7 +213,9 @@ fn generate_pg_query_utils(f: &ProtoFile) -> String {
                     content.push_str("};\n");
                     content.push_str("let earliest_child_location = nodes.iter().filter(|n| n.path.starts_with(path.as_str())).min_by(|a, b| a.location.cmp(&b.location)).map(|n| n.location);\n");
                     content.push_str("let location = derive_location(&node, text.clone(), parent_location, earliest_child_location);\n");
-                    content.push_str("nodes.push(NestedNode { node, depth, location, path: path.clone() });\n");
+                    content.push_str("if location.is_some() {\n");
+                    content.push_str("nodes.push(NestedNode { node, depth, location: location.unwrap(), path: path.clone() });\n");
+                    content.push_str("}\n");
                     content.push_str("}\n");
                     content.push_str("}\n");
 

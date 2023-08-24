@@ -14,9 +14,15 @@ fn get_location_via_regexp(
         distance: i32,
     }
 
+    println!("regex: {:?}", r);
+    println!("earliest_child_location: {:?}", earliest_child_location);
+    println!("parent_location: {}", parent_location);
+    println!("text: {}", text);
+
     let location = r
         .find_iter(text.as_str())
         .filter_map(|x| {
+            println!("{:?}", x);
             if x.start() as i32 >= parent_location {
                 Some({
                     Location {
@@ -57,7 +63,7 @@ pub fn derive_location(
     parent_location: i32,
     // not given if node does not have any children
     earliest_child_location: Option<i32>,
-) -> i32 {
+) -> Option<i32> {
     match node {
         NodeEnum::Alias(_) => todo!(),
         NodeEnum::RangeVar(_) => panic!("Node has location property."),
@@ -112,31 +118,41 @@ pub fn derive_location(
         NodeEnum::MergeAction(_) => todo!(),
         NodeEnum::RawStmt(_) => todo!(),
         NodeEnum::Query(_) => todo!(),
-        NodeEnum::InsertStmt(_) => get_location_via_regexp(
-            Regex::new(r"(?mi)insert into").unwrap(),
+        NodeEnum::InsertStmt(_) => Some(get_location_via_regexp(
+            Regex::new(r"(?mi)insert\s+into").unwrap(),
             text,
             parent_location,
             earliest_child_location,
-        ),
-        NodeEnum::DeleteStmt(_) => get_location_via_regexp(
-            Regex::new(r"(?mi)delete from").unwrap(),
+        )),
+        NodeEnum::DeleteStmt(_) => Some(get_location_via_regexp(
+            Regex::new(r"(?mi)delete\s+from").unwrap(),
             text,
             parent_location,
             earliest_child_location,
-        ),
+        )),
         NodeEnum::UpdateStmt(_) => todo!(),
         NodeEnum::MergeStmt(_) => todo!(),
-        NodeEnum::SelectStmt(_) => get_location_via_regexp(
+        NodeEnum::SelectStmt(_) => Some(get_location_via_regexp(
             // in "insert into contact (id) values (1)" the "values (1)" is a select statement
             Regex::new(r"(?mi)select|values").unwrap(),
             text,
             parent_location,
             earliest_child_location,
-        ),
+        )),
         NodeEnum::ReturnStmt(_) => todo!(),
         NodeEnum::PlassignStmt(_) => panic!("Node has location property."),
-        NodeEnum::AlterTableStmt(_) => todo!(),
-        NodeEnum::AlterTableCmd(_) => todo!(),
+        NodeEnum::AlterTableStmt(_) => Some(get_location_via_regexp(
+            Regex::new(r"(?mi)alter\s+table").unwrap(),
+            text,
+            parent_location,
+            earliest_child_location,
+        )),
+        NodeEnum::AlterTableCmd(n) => Some(get_location_via_regexp(
+            Regex::new(format!("(?mi)alter.*{}", n.name).as_str()).unwrap(),
+            text,
+            parent_location,
+            earliest_child_location,
+        )),
         NodeEnum::AlterDomainStmt(_) => todo!(),
         NodeEnum::SetOperationStmt(_) => todo!(),
         NodeEnum::GrantStmt(_) => todo!(),
@@ -249,12 +265,12 @@ pub fn derive_location(
         NodeEnum::ColumnRef(_) => panic!("Node has location property."),
         NodeEnum::ParamRef(_) => panic!("Node has location property."),
         NodeEnum::FuncCall(_) => panic!("Node has location property."),
-        NodeEnum::AStar(_) => get_location_via_regexp(
+        NodeEnum::AStar(_) => Some(get_location_via_regexp(
             Regex::new(r"(?mi)\*").unwrap(),
             text,
             parent_location,
             earliest_child_location,
-        ),
+        )),
         NodeEnum::AIndices(_) => todo!(),
         NodeEnum::AIndirection(_) => todo!(),
         NodeEnum::AArrayExpr(_) => panic!("Node has location property."),
@@ -283,7 +299,12 @@ pub fn derive_location(
         NodeEnum::GroupingSet(_) => panic!("Node has location property."),
         NodeEnum::WindowClause(_) => todo!(),
         NodeEnum::ObjectWithArgs(_) => todo!(),
-        NodeEnum::AccessPriv(_) => todo!(),
+        NodeEnum::AccessPriv(n) => Some(get_location_via_regexp(
+            Regex::new(format!("(?mi){}", n.priv_name).as_str()).unwrap(),
+            text,
+            parent_location,
+            earliest_child_location,
+        )),
         NodeEnum::CreateOpClassItem(_) => todo!(),
         NodeEnum::TableLikeClause(_) => todo!(),
         NodeEnum::FunctionParameter(_) => todo!(),
@@ -309,17 +330,17 @@ pub fn derive_location(
         NodeEnum::PublicationTable(_) => todo!(),
         NodeEnum::InlineCodeBlock(_) => todo!(),
         NodeEnum::CallContext(_) => todo!(),
-        NodeEnum::Integer(_) => parent_location,
-        NodeEnum::Float(_) => parent_location,
-        NodeEnum::Boolean(_) => parent_location,
-        NodeEnum::String(_) => parent_location,
-        NodeEnum::BitString(_) => parent_location,
-        NodeEnum::List(_) => get_location_via_regexp(
+        NodeEnum::Integer(_) => None,
+        NodeEnum::Float(_) => None,
+        NodeEnum::Boolean(_) => None,
+        NodeEnum::String(n) => None,
+        NodeEnum::BitString(_) => None,
+        NodeEnum::List(_) => Some(get_location_via_regexp(
             Regex::new(r"(?mi)\((.*?)\)").unwrap(),
             text,
             parent_location,
             earliest_child_location,
-        ),
+        )),
         NodeEnum::IntList(_) => todo!(),
         NodeEnum::OidList(_) => todo!(),
         NodeEnum::AConst(_) => panic!("Node has location property."),
@@ -376,6 +397,6 @@ mod tests {
             Some(23),
         );
 
-        assert_eq!(l, 11);
+        assert_eq!(l, Some(11));
     }
 }

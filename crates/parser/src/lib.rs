@@ -20,11 +20,13 @@ mod parser;
 mod pg_query_utils_generated;
 mod pg_query_utils_generated_test;
 mod pg_query_utils_manual;
+mod sibling_token;
 mod source_file;
 mod statement;
 mod syntax_error;
 mod syntax_kind_generated;
 mod syntax_node;
+mod token_type;
 
 pub use crate::parser::{Parse, Parser};
 pub use crate::syntax_kind_generated::SyntaxKind;
