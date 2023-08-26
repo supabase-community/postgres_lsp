@@ -5,10 +5,7 @@ use proc_macro2::{Ident, Literal};
 use quote::{format_ident, quote};
 
 pub fn syntax_kind_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    // let parser = ProtoParser::new(
-    //     "/Users/raminder.singh/src/rust/postgres_lsp/crates/parser/proto/source.proto",
-    // );
-    let parser = ProtoParser::new("./crates/parser/proto/source.proto");
+    let parser = ProtoParser::new("./libpg_query/protobuf/pg_query.proto");
     let proto_file = parser.parse();
 
     let mut current_enum_names: HashSet<&str> = HashSet::new();
