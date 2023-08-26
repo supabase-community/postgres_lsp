@@ -1,5 +1,4 @@
 use cstree::text::{TextRange, TextSize};
-use log::{debug, log_enabled};
 use logos::{Logos, Span};
 
 use crate::{
@@ -94,25 +93,12 @@ impl Parser {
             }
         };
 
-        if log_enabled!(log::Level::Debug) {
-            debug!("pg_query_root: {:?}", pg_query_root);
-        }
-
         let mut pg_query_nodes = match &pg_query_root {
             Some(root) => get_children(root, text.to_string(), 1)
                 .into_iter()
                 .peekable(),
             None => Vec::new().into_iter().peekable(),
         };
-
-        if log_enabled!(log::Level::Debug) {
-            println!("# Children:\n");
-            &pg_query_nodes.to_owned().for_each(|n| {
-                debug!("{:?}\n", n);
-                // let s = text.split_at(n.location as usize);
-                // debug!("Text: {:?}\npg_query_node: {:?}\n", s.1, n)
-            });
-        }
 
         let mut lexer = StatementToken::lexer(&text);
 
@@ -221,8 +207,8 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
+    use log::info;
     use log::log_enabled;
-    use log::{debug, info};
     use std::assert_eq;
     use std::fs;
 
@@ -234,14 +220,12 @@ mod tests {
         let _ = env_logger::builder().is_test(true).try_init();
     }
 
-    fn test_valid_stmt(input: String) {
-        info!("Testing: {}", input);
+    fn test_valid_stmt(name: String, input: String) {
+        info!("[{}]: {}", name, input);
 
         let mut parser = Parser::new();
         parser.parse_statement(&input, None);
         let parsed = parser.finish();
-
-        debug!("parsed: {}", parsed.cst.text());
 
         if log_enabled!(log::Level::Debug) {
             dbg!(&parsed.cst);
@@ -253,7 +237,7 @@ mod tests {
     #[test]
     fn test_simple_statement() {
         init();
-        test_valid_stmt("select 1;".to_string());
+        test_valid_stmt("simple_statement".to_string(), "select 1;".to_string());
     }
 
     #[test]
@@ -271,16 +255,19 @@ mod tests {
     #[test]
     fn test_valid_statements() {
         init();
-        fs::read_dir(VALID_STATEMENTS_PATH)
+        let mut paths: Vec<_> = fs::read_dir(VALID_STATEMENTS_PATH)
             .unwrap()
-            .into_iter()
-            .for_each(|f| {
-                let path = f.unwrap().path();
+            .map(|r| r.unwrap())
+            .collect();
+        paths.sort_by_key(|dir| dir.path());
 
-                let contents = fs::read_to_string(&path).unwrap();
+        paths.iter().for_each(|f| {
+            let path = f.path();
 
-                test_valid_stmt(contents);
-            });
+            let contents = fs::read_to_string(&path).unwrap();
+
+            test_valid_stmt(path.to_str().unwrap().to_string(), contents);
+        });
     }
 
     #[test]

@@ -1,9 +1,7 @@
-use std::collections::{HashMap, VecDeque};
-use std::ops::RangeBounds;
+use std::collections::VecDeque;
 
 use cstree::syntax::ResolvedNode;
 use cstree::{build::GreenNodeBuilder, text::TextRange};
-use log::debug;
 use pg_query::NodeEnum;
 
 use crate::ast_node::RawStmt;
@@ -65,11 +63,6 @@ impl Parser {
         if self.open_nodes.is_empty() || self.get_current_depth() < depth {
             return;
         }
-        debug!(
-            "close from depth {:?} until {:?}",
-            self.get_current_depth(),
-            depth
-        );
         loop {
             if self.open_nodes.is_empty() || self.get_current_depth() < depth {
                 break;
@@ -112,7 +105,6 @@ impl Parser {
     /// handles closing previous nodes if necessary
     /// and consumes token buffer before starting new node
     pub fn start_node_at(&mut self, kind: SyntaxKind, depth: i32) {
-        debug!("start node {:?} at depth: {:?}", kind, depth);
         // close until target depth
         self.close_until_depth(depth);
 
@@ -130,7 +122,6 @@ impl Parser {
             return;
         }
         let depth = self.get_current_depth();
-        debug!("close open tokens at depth: {:?}", depth);
         loop {
             if self.open_tokens.is_empty() || self.token_buffer.is_empty() {
                 break;
@@ -139,8 +130,6 @@ impl Parser {
             if token_depth != depth {
                 break;
             }
-            println!("token: {:?}", token);
-            println!("token_depth: {:?}", token_depth);
             // find closing token in token buffer
             let closing_token_pos = self
                 .token_buffer
@@ -167,8 +156,6 @@ impl Parser {
             panic!("No node to finish");
         }
 
-        let (node, depth) = n.unwrap();
-        debug!("finish node {:?} at {:?}", node, depth);
         self.inner.finish_node();
     }
 
@@ -181,9 +168,7 @@ impl Parser {
             Some(u) => 0..u as usize,
             None => 0..self.token_buffer.len(),
         };
-        debug!("consume token buffer {:?}", range);
         for (kind, text) in self.token_buffer.drain(range).collect::<VecDeque<_>>() {
-            debug!("consuming token: {:?} {:?}", kind, text);
             self.apply_token(kind, text.as_str());
         }
     }
@@ -194,7 +179,6 @@ impl Parser {
         self.inner.token(kind, text);
         if kind.is_opening_sibling() {
             let depth = self.get_current_depth();
-            debug!("open token {:?} at depth {:?}", kind, depth);
             self.open_tokens.push((kind, text.to_string(), depth));
         }
     }
@@ -219,13 +203,11 @@ impl Parser {
                 self.inner.token(kind, text);
             }
             Some(TokenType::Follow) => {
-                debug!("push to buffer token {:?} {:?}", kind, text);
                 // wait until next node, and apply token at same depth
                 self.token_buffer.push_back((kind, text.to_string()));
             }
             _ => {
                 self.consume_token_buffer(None);
-                debug!("apply token {:?} {:?}", kind, text);
                 self.apply_token(kind, text);
             }
         }

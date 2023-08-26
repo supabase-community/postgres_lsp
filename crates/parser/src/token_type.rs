@@ -1,7 +1,6 @@
-use log::debug;
 use pg_query::protobuf::ScanToken;
 
-use crate::{statement::StatementToken, SyntaxKind};
+use crate::statement::StatementToken;
 
 ///
 ///  Kind of a `SyntaxKind`
@@ -68,24 +67,43 @@ pub fn get_token_type_from_pg_query_token(token: &ScanToken) -> Option<TokenType
             92 => Some(TokenType::Follow),
             93 => Some(TokenType::Follow),
             94 => Some(TokenType::Follow),
+            // NotEquals
+            274 => Some(TokenType::Follow),
             _ => None,
         },
-        pg_query::protobuf::KeywordKind::UnreservedKeyword => None,
+        pg_query::protobuf::KeywordKind::UnreservedKeyword => match token.token {
+            // AddP
+            281 => Some(TokenType::Follow),
+            // Update
+            695 => Some(TokenType::Follow),
+            _ => None,
+        },
         pg_query::protobuf::KeywordKind::ColNameKeyword => None,
         pg_query::protobuf::KeywordKind::TypeFuncNameKeyword => None,
         pg_query::protobuf::KeywordKind::ReservedKeyword => match token.token {
+            // And
+            291 => Some(TokenType::Follow),
+            // Check
+            328 => Some(TokenType::Follow),
             // End
             401 => Some(TokenType::Follow),
+            // For
+            424 => Some(TokenType::Follow),
             // From
             429 => Some(TokenType::Follow),
+            // InP
+            453 => Some(TokenType::Follow),
             543 => Some(TokenType::Follow),
             // Then
             669 => Some(TokenType::Follow),
             673 => Some(TokenType::Follow),
             697 => Some(TokenType::Follow),
+            // Where
+            713 => Some(TokenType::Follow),
+            // With
+            716 => Some(TokenType::Follow),
             _ => None,
         },
     };
-    debug!("token: {:?}, token_type: {:?}", token, r);
     r
 }

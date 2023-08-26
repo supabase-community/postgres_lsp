@@ -95,7 +95,6 @@ select 1;
 ";
 
         let mut parser = Parser::new();
-        println!("input {:?}", input);
         parser.parse_source_file(input);
         let parsed = parser.finish();
 

@@ -5,7 +5,7 @@ use pg_query::NodeEnum;
 use std::collections::VecDeque;
 
 pub fn get_location(node: &NodeEnum) -> Option<i32> {
-    match node {
+    let l = match node {
         NodeEnum::Alias(_) => None,
         NodeEnum::RangeVar(n) => Some(n.location),
         NodeEnum::TableFunc(n) => Some(n.location),
@@ -21,7 +21,14 @@ pub fn get_location(node: &NodeEnum) -> Option<i32> {
         NodeEnum::DistinctExpr(n) => Some(n.location),
         NodeEnum::NullIfExpr(n) => Some(n.location),
         NodeEnum::ScalarArrayOpExpr(n) => Some(n.location),
-        NodeEnum::BoolExpr(n) => Some(n.location),
+        NodeEnum::BoolExpr(n) => {
+            let a = n.args.iter().min_by(|a, b| {
+                let loc_a = get_location(&a.node.as_ref().unwrap());
+                let loc_b = get_location(&b.node.as_ref().unwrap());
+                loc_a.cmp(&loc_b)
+            });
+            get_location(&a.unwrap().node.as_ref().unwrap())
+        }
         NodeEnum::SubLink(n) => Some(n.location),
         NodeEnum::SubPlan(_) => None,
         NodeEnum::AlternativeSubPlan(_) => None,
@@ -244,6 +251,11 @@ pub fn get_location(node: &NodeEnum) -> Option<i32> {
         NodeEnum::IntList(_) => None,
         NodeEnum::OidList(_) => None,
         NodeEnum::AConst(n) => Some(n.location),
+    };
+    if l.is_some() && l.unwrap() < 0 {
+        None
+    } else {
+        l
     }
 }
 
@@ -2794,6 +2806,11 @@ pub fn get_children(node: &NodeEnum, text: String, current_depth: i32) -> Vec<Ne
             } else {
                 0
             };
+            // FISME: we assume that at least one (nested) child location is known.
+            // this is not true for all nodes, e.g.
+            // `DROP TABLE tablename;`, where the location of the `List` node that wraps the String node `tablename` is not known
+            // in this case, we could try to "recover" by putting it back into the stack and trying
+            // again after all children are processed
             let earliest_child_location = nodes
                 .iter()
                 .filter(|n| n.path.starts_with(path.as_str()))
@@ -2812,9 +2829,15 @@ pub fn get_children(node: &NodeEnum, text: String, current_depth: i32) -> Vec<Ne
                     location: location.unwrap(),
                     path: path.clone(),
                 });
+            } else if location_stack
+                .iter()
+                .find(|x| x.2.starts_with(path.as_str()))
+                .is_some()
+            {
+                location_stack.push_back((node, depth, path));
             }
         }
     }
-    nodes.sort_by_key(|n| n.location);
+    nodes.sort_by_key(|n| (n.location, n.depth));
     nodes
 }

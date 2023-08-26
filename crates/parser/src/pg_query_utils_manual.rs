@@ -1,28 +1,20 @@
-use std::println;
-
 use pg_query::NodeEnum;
 use regex::Regex;
 
-fn get_location_via_regexp(
+fn find_location_via_regexp(
     r: Regex,
     text: String,
     parent_location: i32,
     earliest_child_location: Option<i32>,
-) -> i32 {
+) -> Option<i32> {
     struct Location {
         location: i32,
         distance: i32,
     }
 
-    println!("regex: {:?}", r);
-    println!("earliest_child_location: {:?}", earliest_child_location);
-    println!("parent_location: {}", parent_location);
-    println!("text: {}", text);
-
     let location = r
         .find_iter(text.as_str())
         .filter_map(|x| {
-            println!("{:?}", x);
             if x.start() as i32 >= parent_location {
                 Some({
                     Location {
@@ -38,16 +30,29 @@ fn get_location_via_regexp(
                 None
             }
         })
-        .min_by_key(|x| x.distance.abs())
-        .unwrap()
-        .location;
+        .min_by_key(|x| x.distance.abs());
+
+    if location.is_none() {
+        return None;
+    }
+
+    let location = location.unwrap().location;
 
     // Sanity check to ensure that the location is valid
     if earliest_child_location.is_some() && earliest_child_location.unwrap() < location {
         panic!("Regex returned invalid location: Node cannot have a location < its children");
     }
 
-    location
+    Some(location)
+}
+
+fn get_location_via_regexp(
+    r: Regex,
+    text: String,
+    parent_location: i32,
+    earliest_child_location: Option<i32>,
+) -> i32 {
+    return find_location_via_regexp(r, text, parent_location, earliest_child_location).unwrap();
 }
 
 /// This is the only manual implementation required for the parser
@@ -111,7 +116,26 @@ pub fn derive_location(
         NodeEnum::InferenceElem(_) => todo!(),
         NodeEnum::TargetEntry(_) => todo!(),
         NodeEnum::RangeTblRef(_) => todo!(),
-        NodeEnum::JoinExpr(_) => todo!(),
+        NodeEnum::JoinExpr(n) => {
+            let keyword_regexp = match n.jointype() {
+                pg_query::protobuf::JoinType::Undefined => todo!(),
+                pg_query::protobuf::JoinType::JoinInner => "join|inner",
+                pg_query::protobuf::JoinType::JoinLeft => "join",
+                pg_query::protobuf::JoinType::JoinFull => "full",
+                pg_query::protobuf::JoinType::JoinRight => "join",
+                pg_query::protobuf::JoinType::JoinSemi => todo!(),
+                pg_query::protobuf::JoinType::JoinAnti => todo!(),
+                pg_query::protobuf::JoinType::JoinUniqueOuter => todo!(),
+                pg_query::protobuf::JoinType::JoinUniqueInner => todo!(),
+            };
+
+            Some(get_location_via_regexp(
+                Regex::new(format!("(?mi){}", keyword_regexp).as_str()).unwrap(),
+                text,
+                parent_location,
+                earliest_child_location,
+            ))
+        }
         NodeEnum::FromExpr(_) => todo!(),
         NodeEnum::OnConflictExpr(_) => todo!(),
         NodeEnum::IntoClause(_) => todo!(),
@@ -318,7 +342,13 @@ pub fn derive_location(
         NodeEnum::CtecycleClause(_) => panic!("Node has location property."),
         NodeEnum::CommonTableExpr(_) => panic!("Node has location property."),
         NodeEnum::MergeWhenClause(_) => todo!(),
-        NodeEnum::RoleSpec(_) => panic!("Node has location property."),
+        NodeEnum::RoleSpec(n) => {
+            if n.location == -1 {
+                None
+            } else {
+                todo!()
+            }
+        }
         NodeEnum::TriggerTransition(_) => todo!(),
         NodeEnum::PartitionElem(_) => panic!("Node has location property."),
         NodeEnum::PartitionSpec(_) => panic!("Node has location property."),
@@ -333,14 +363,23 @@ pub fn derive_location(
         NodeEnum::Integer(_) => None,
         NodeEnum::Float(_) => None,
         NodeEnum::Boolean(_) => None,
-        NodeEnum::String(n) => None,
+        NodeEnum::String(n) => find_location_via_regexp(
+            Regex::new(format!("(?mi){}", n.sval).as_str()).unwrap(),
+            text,
+            parent_location,
+            earliest_child_location,
+        ),
         NodeEnum::BitString(_) => None,
-        NodeEnum::List(_) => Some(get_location_via_regexp(
+        NodeEnum::List(_) => find_location_via_regexp(
             Regex::new(r"(?mi)\((.*?)\)").unwrap(),
             text,
             parent_location,
             earliest_child_location,
-        )),
+        )
+        // sometimes, a list is not enclosed by parentheses, but starts at the earliest child
+        // location, e.g. `DROP TABLE tablename`, where `tablename` is enclosed by an invisible
+        // `List`
+        .or(earliest_child_location),
         NodeEnum::IntList(_) => todo!(),
         NodeEnum::OidList(_) => todo!(),
         NodeEnum::AConst(_) => panic!("Node has location property."),
