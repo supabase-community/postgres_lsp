@@ -1,4 +1,4 @@
-use crate::SyntaxKind;
+use crate::syntax_kind_codegen::SyntaxKind;
 
 impl SyntaxKind {
     pub fn is_opening_sibling(&self) -> bool {

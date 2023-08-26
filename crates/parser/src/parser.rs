@@ -6,7 +6,7 @@ use pg_query::NodeEnum;
 
 use crate::ast_node::RawStmt;
 use crate::syntax_error::SyntaxError;
-use crate::syntax_kind_generated::SyntaxKind;
+use crate::syntax_kind_codegen::SyntaxKind;
 use crate::syntax_node::SyntaxNode;
 use crate::token_type::TokenType;
 

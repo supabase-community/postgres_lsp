@@ -4,7 +4,7 @@ use logos::{Logos, Span};
 use crate::{
     parser::Parser,
     pg_query_utils_generated::get_children,
-    syntax_kind_generated::SyntaxKind,
+    syntax_kind_codegen::SyntaxKind,
     token_type::{
         get_token_type_from_pg_query_token, get_token_type_from_statement_token, TokenType,
     },

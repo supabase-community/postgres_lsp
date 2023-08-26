@@ -15,5 +15,5 @@ serde = { version = "1.0", features = ["derive"] }
 env_logger = { version = "0.9.1" }
 log = { version = "0.4.20" }
 
-sourcegen.workspace = true
+codegen.workspace = true
 pg_query_proto_parser.workspace = true

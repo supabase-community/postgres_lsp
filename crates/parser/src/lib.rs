@@ -24,10 +24,10 @@ mod sibling_token;
 mod source_file;
 mod statement;
 mod syntax_error;
-mod syntax_kind_generated;
+mod syntax_kind_codegen;
 mod syntax_node;
 mod token_type;
 
 pub use crate::parser::{Parse, Parser};
-pub use crate::syntax_kind_generated::SyntaxKind;
+pub use crate::syntax_kind_codegen::SyntaxKind;
 pub use crate::syntax_node::{SyntaxElement, SyntaxNode, SyntaxToken};

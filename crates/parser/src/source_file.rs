@@ -1,6 +1,6 @@
 use logos::Logos;
 
-use crate::{parser::Parser, syntax_kind_generated::SyntaxKind};
+use crate::{parser::Parser, syntax_kind_codegen::SyntaxKind};
 
 /// A super simple lexer for sql files that splits the input into indivudual statements and
 /// comments.
