@@ -16,6 +16,7 @@
 //! To see how these drawbacks are mitigated, see the `statement.rs` and the `source_file.rs` module.
 
 mod ast_node;
+mod get_location_codegen;
 mod parser;
 mod pg_query_utils_generated;
 mod pg_query_utils_generated_test;
