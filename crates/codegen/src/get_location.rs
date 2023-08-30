@@ -14,7 +14,7 @@ pub fn get_location_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenSt
     quote! {
         use pg_query::NodeEnum;
 
-        //! Returns the location of a node
+        // Returns the location of a node
         pub fn get_location(node: &NodeEnum) -> Option<i32> {
             let location = match node {
                 // for some nodes, the location of the node itself is after their childrens location.
