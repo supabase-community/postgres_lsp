@@ -1,69 +1,101 @@
+//! Implements the `resolve_locations` function, which derives the location of a node if not set on
+//! the node itself.
+
+use crate::get_children_codegen::ChildrenNode;
+use crate::get_location_codegen::get_location;
 use pg_query::NodeEnum;
 use regex::Regex;
+use std::collections::VecDeque;
 
-fn find_location_via_regexp(
-    r: Regex,
-    text: String,
-    parent_location: i32,
-    earliest_child_location: Option<i32>,
-) -> Option<i32> {
-    struct Location {
-        location: i32,
-        distance: i32,
-    }
-
-    let location = r
-        .find_iter(text.as_str())
-        .filter_map(|x| {
-            if x.start() as i32 >= parent_location {
-                Some({
-                    Location {
-                        location: x.start() as i32,
-                        distance: if earliest_child_location.is_some() {
-                            earliest_child_location.unwrap() - x.start() as i32
-                        } else {
-                            x.start() as i32 - parent_location
-                        },
-                    }
-                })
-            } else {
-                None
-            }
-        })
-        .min_by_key(|x| x.distance.abs());
-
-    if location.is_none() {
-        return None;
-    }
-
-    let location = location.unwrap().location;
-
-    // Sanity check to ensure that the location is valid
-    if earliest_child_location.is_some() && earliest_child_location.unwrap() < location {
-        panic!("Regex returned invalid location: Node cannot have a location < its children");
-    }
-
-    Some(location)
+#[derive(Debug, Clone)]
+pub struct NestedNode {
+    pub node: NodeEnum,
+    pub depth: i32,
+    pub location: i32,
+    pub path: String,
 }
 
-fn get_location_via_regexp(
-    r: Regex,
-    text: String,
-    parent_location: i32,
-    earliest_child_location: Option<i32>,
-) -> i32 {
-    return find_location_via_regexp(r, text, parent_location, earliest_child_location).unwrap();
-}
-
-/// This is the only manual implementation required for the parser
-/// The problem this functions is attempting to solve is that not all nodes have a location property
+/// Resolves the location of `ChildrenNode`
 ///
-/// I suspect for most of the nodes, a simple regular expression will be sufficient
-pub fn derive_location(
+/// Uses the `.location` property if available on the node, and otherwise tries to
+/// derive the location manually.
+pub fn resolve_locations(children: Vec<ChildrenNode>, text: &str) -> Vec<NestedNode> {
+    let mut nodes: Vec<NestedNode> = vec![];
+
+    let mut stack: VecDeque<ChildrenNode> = VecDeque::from(children);
+
+    while !stack.is_empty() {
+        let current_node = stack.pop_front().unwrap();
+
+        // if location is set, we can skip the rest
+        let location = get_location(&current_node.node);
+        if location.is_some() {
+            nodes.push(NestedNode {
+                node: current_node.node,
+                depth: current_node.depth,
+                location: location.unwrap(),
+                path: current_node.path.clone(),
+            });
+            continue;
+        }
+
+        // get parent node and its location
+        let parent_node = nodes.iter().find(|n| {
+            let mut path_elements = current_node.path.split(".").collect::<Vec<&str>>();
+            path_elements.pop();
+            let parent_path = path_elements.join(".");
+            n.path == parent_path
+        });
+
+        let parent_location = if parent_node.is_some() {
+            parent_node.unwrap().location
+        } else {
+            // fallback to 0 if no parent node is found
+            0
+        };
+
+        // we cannot assume that for each node, there is at least one child with a location.
+        // e.g. in `DROP TABLE tablename;`, the location of the `List` node that wraps the String node `tablename` is not known
+        let earliest_child_location = nodes
+            .iter()
+            .filter(|n| n.path.starts_with(current_node.path.as_str()))
+            .min_by(|a, b| a.location.cmp(&b.location))
+            .map(|n| n.location);
+
+        let location = derive_location(
+            &current_node.node,
+            text.clone(),
+            parent_location,
+            earliest_child_location,
+        );
+
+        if location.is_some() {
+            nodes.push(NestedNode {
+                node: current_node.node,
+                depth: current_node.depth,
+                location: location.unwrap(),
+                path: current_node.path.clone(),
+            });
+        } else if stack
+            .iter()
+            .find(|x| x.path.starts_with(current_node.path.as_str()))
+            .is_some()
+        {
+            // if there are still children to be processed, we push the node back to the stack and
+            // try again later in the hope that we could find the location for a children node of
+            // the current node
+            stack.push_back(current_node);
+        }
+    }
+
+    nodes
+}
+
+fn derive_location(
     // The node to derive the location for
     node: &NodeEnum,
     // The full text of the query
-    text: String,
+    text: &str,
     // The location of the parent node
     parent_location: i32,
     // not given if node does not have any children
@@ -386,13 +418,67 @@ pub fn derive_location(
     }
 }
 
+fn find_location_via_regexp(
+    r: Regex,
+    text: &str,
+    parent_location: i32,
+    earliest_child_location: Option<i32>,
+) -> Option<i32> {
+    struct Location {
+        location: i32,
+        distance: i32,
+    }
+
+    let location = r
+        .find_iter(text)
+        .filter_map(|x| {
+            if x.start() as i32 >= parent_location {
+                Some({
+                    Location {
+                        location: x.start() as i32,
+                        distance: if earliest_child_location.is_some() {
+                            earliest_child_location.unwrap() - x.start() as i32
+                        } else {
+                            x.start() as i32 - parent_location
+                        },
+                    }
+                })
+            } else {
+                None
+            }
+        })
+        .min_by_key(|x| x.distance.abs());
+
+    if location.is_none() {
+        return None;
+    }
+
+    let location = location.unwrap().location;
+
+    // Sanity check to ensure that the location is valid
+    if earliest_child_location.is_some() && earliest_child_location.unwrap() < location {
+        panic!("Regex returned invalid location: Node cannot have a location < its children");
+    }
+
+    Some(location)
+}
+
+fn get_location_via_regexp(
+    r: Regex,
+    text: &str,
+    parent_location: i32,
+    earliest_child_location: Option<i32>,
+) -> i32 {
+    return find_location_via_regexp(r, text, parent_location, earliest_child_location).unwrap();
+}
+
 #[cfg(test)]
 mod tests {
     use std::assert_eq;
 
     use pg_query::NodeEnum;
 
-    use crate::pg_query_utils_manual::derive_location;
+    use crate::resolve_locations::derive_location;
 
     #[test]
     fn test_derive_location() {
@@ -431,7 +517,7 @@ mod tests {
 
         let l = derive_location(
             &insert_node.unwrap(),
-            input.to_string(),
+            input,
             cte_location.unwrap(),
             Some(23),
         );

@@ -2,8 +2,9 @@ use cstree::text::{TextRange, TextSize};
 use logos::{Logos, Span};
 
 use crate::{
+    get_children_codegen::get_children,
     parser::Parser,
-    pg_query_utils_generated::get_children,
+    resolve_locations::resolve_locations,
     syntax_kind_codegen::SyntaxKind,
     token_type::{
         get_token_type_from_pg_query_token, get_token_type_from_statement_token, TokenType,
@@ -94,7 +95,7 @@ impl Parser {
         };
 
         let mut pg_query_nodes = match &pg_query_root {
-            Some(root) => get_children(root, text.to_string(), 1)
+            Some(root) => resolve_locations(get_children(root, text.to_string(), 1), text)
                 .into_iter()
                 .peekable(),
             None => Vec::new().into_iter().peekable(),

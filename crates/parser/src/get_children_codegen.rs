@@ -1,6 +1,10 @@
+use codegen::get_children;
+
+get_children!();
+
 #[cfg(test)]
 mod tests {
-    use crate::pg_query_utils_generated::get_children;
+    use crate::get_children_codegen::get_children;
 
     #[test]
     fn test_get_children() {

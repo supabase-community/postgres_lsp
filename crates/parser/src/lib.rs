@@ -16,11 +16,10 @@
 //! To see how these drawbacks are mitigated, see the `statement.rs` and the `source_file.rs` module.
 
 mod ast_node;
+mod get_children_codegen;
 mod get_location_codegen;
 mod parser;
-mod pg_query_utils_generated;
-mod pg_query_utils_generated_test;
-mod pg_query_utils_manual;
+mod resolve_locations;
 mod sibling_token;
 mod source_file;
 mod statement;
