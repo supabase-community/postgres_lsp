@@ -94,6 +94,8 @@ impl Parser {
             }
         };
 
+        println!("pg_query_root: {:?}", pg_query_root);
+
         let mut pg_query_nodes = match &pg_query_root {
             Some(root) => resolve_locations(get_children(root, text.to_string(), 1), text)
                 .into_iter()
@@ -228,6 +230,8 @@ mod tests {
         parser.parse_statement(&input, None);
         let parsed = parser.finish();
 
+        let out = format!("{:#?}", parsed.cst);
+
         if log_enabled!(log::Level::Debug) {
             dbg!(&parsed.cst);
         }
@@ -239,36 +243,6 @@ mod tests {
     fn test_simple_statement() {
         init();
         test_valid_stmt("simple_statement".to_string(), "select 1;".to_string());
-    }
-
-    #[test]
-    fn test_temp() {
-        init();
-        let token = pg_query::scan(
-            "select coalesce(id, two) as id from contact;"
-                .to_string()
-                .as_str(),
-        )
-        .unwrap();
-        dbg!(token);
-    }
-
-    #[test]
-    fn test_valid_statements() {
-        init();
-        let mut paths: Vec<_> = fs::read_dir(VALID_STATEMENTS_PATH)
-            .unwrap()
-            .map(|r| r.unwrap())
-            .collect();
-        paths.sort_by_key(|dir| dir.path());
-
-        paths.iter().for_each(|f| {
-            let path = f.path();
-
-            let contents = fs::read_to_string(&path).unwrap();
-
-            test_valid_stmt(path.to_str().unwrap().to_string(), contents);
-        });
     }
 
     #[test]

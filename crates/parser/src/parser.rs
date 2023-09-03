@@ -2,6 +2,7 @@ use std::collections::VecDeque;
 
 use cstree::syntax::ResolvedNode;
 use cstree::{build::GreenNodeBuilder, text::TextRange};
+use log::debug;
 use pg_query::NodeEnum;
 
 use crate::ast_node::RawStmt;
@@ -60,6 +61,7 @@ impl Parser {
 
     /// close all nodes until the specified depth is reached
     pub fn close_until_depth(&mut self, depth: i32) {
+        debug!("close until depth {}", depth);
         if self.open_nodes.is_empty() || self.get_current_depth() < depth {
             return;
         }
@@ -105,19 +107,20 @@ impl Parser {
     /// handles closing previous nodes if necessary
     /// and consumes token buffer before starting new node
     pub fn start_node_at(&mut self, kind: SyntaxKind, depth: i32) {
+        debug!("starting node at depth {} {:?}", depth, kind);
         // close until target depth
         self.close_until_depth(depth);
 
         self.consume_token_buffer(None);
 
         self.open_nodes.push((kind, depth));
+        debug!("start node {:?}", kind);
         self.inner.start_node(kind);
     }
 
     /// Applies closing sibling for open tokens at current depth
-    ///
-    /// FIXME: find closing token in token buffer, instead of just comparing with the first one
     fn consume_open_tokens(&mut self) {
+        debug!("consume open tokens");
         if self.open_tokens.is_empty() || self.token_buffer.is_empty() {
             return;
         }
@@ -149,6 +152,7 @@ impl Parser {
     /// finish current node
     /// applies all open tokens of current depth before
     pub fn finish_node(&mut self) {
+        debug!("finish_node");
         self.consume_open_tokens();
 
         let n = self.open_nodes.pop();
@@ -156,11 +160,13 @@ impl Parser {
             panic!("No node to finish");
         }
 
+        debug!("finish node {:?}", n.unwrap().0);
         self.inner.finish_node();
     }
 
     /// Drains the token buffer and applies all tokens
     pub fn consume_token_buffer(&mut self, until: Option<u32>) {
+        debug!("consume_token_buffer");
         if self.token_buffer.is_empty() {
             return;
         }
@@ -176,6 +182,7 @@ impl Parser {
     /// Applies token immediately
     /// if token is opening sibling, adds it to open tokens
     fn apply_token(&mut self, kind: SyntaxKind, text: &str) {
+        debug!("apply_token {:?} {:?}", kind, text);
         self.inner.token(kind, text);
         if kind.is_opening_sibling() {
             let depth = self.get_current_depth();
@@ -190,7 +197,9 @@ impl Parser {
     ///
     /// if `is_parsing_flat_node` is true, applies token immediately
     pub fn token(&mut self, kind: SyntaxKind, text: &str, token_type: Option<TokenType>) {
+        debug!("token {:?} {:?} {:?}", kind, text, token_type);
         if self.is_parsing_flat_node {
+            debug!("apply token {:?} {:?}", kind, text);
             self.inner.token(kind, text);
             return;
         }
@@ -200,6 +209,7 @@ impl Parser {
                 // move up to depth 2 and consume buffered tokens before applying closing token
                 self.close_until_depth(2);
                 self.consume_token_buffer(None);
+                debug!("apply token {:?} {:?}", kind, text);
                 self.inner.token(kind, text);
             }
             Some(TokenType::Follow) => {

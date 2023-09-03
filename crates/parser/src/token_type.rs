@@ -1,8 +1,8 @@
 use pg_query::protobuf::ScanToken;
 
 use crate::statement::StatementToken;
+use crate::syntax_kind_codegen::SyntaxKind;
 
-///
 ///  Kind of a `SyntaxKind`
 ///  This is the only manual definition required for properly creating a concrete
 /// syntax tree.
@@ -44,66 +44,68 @@ pub fn get_token_type_from_statement_token(token: &StatementToken) -> Option<Tok
     }
 }
 
+// Returns the token type of a `ScanToken` from the `pg_query` crate.
+//
+// converts the token to a `SyntaxKind` for better readability.
 pub fn get_token_type_from_pg_query_token(token: &ScanToken) -> Option<TokenType> {
+    println!("token: {:?}", token);
+
     let r = match token.keyword_kind() {
-        pg_query::protobuf::KeywordKind::NoKeyword => match token.token {
-            37 => Some(TokenType::Follow),
-            40 => Some(TokenType::Follow),
-            41 => Some(TokenType::Follow),
-            42 => Some(TokenType::Follow),
-            43 => Some(TokenType::Follow),
-            44 => Some(TokenType::Follow),
-            45 => Some(TokenType::Follow),
-            46 => Some(TokenType::Follow),
-            47 => Some(TokenType::Follow),
-            58 => Some(TokenType::Follow),
-            // ";"
-            59 => Some(TokenType::Close),
-            60 => Some(TokenType::Follow),
-            61 => Some(TokenType::Follow),
-            62 => Some(TokenType::Follow),
-            63 => Some(TokenType::Follow),
-            // 91 => Some(TokenType::Follow),
-            92 => Some(TokenType::Follow),
-            93 => Some(TokenType::Follow),
-            94 => Some(TokenType::Follow),
-            // NotEquals
-            274 => Some(TokenType::Follow),
-            _ => None,
-        },
-        pg_query::protobuf::KeywordKind::UnreservedKeyword => match token.token {
-            // AddP
-            281 => Some(TokenType::Follow),
-            // Update
-            695 => Some(TokenType::Follow),
-            _ => None,
-        },
+        pg_query::protobuf::KeywordKind::NoKeyword => {
+            match SyntaxKind::new_from_pg_query_token(token) {
+                SyntaxKind::Ascii37 => Some(TokenType::Follow),
+                SyntaxKind::Ascii40 => Some(TokenType::Follow),
+                SyntaxKind::Ascii41 => Some(TokenType::Follow),
+                SyntaxKind::Ascii42 => Some(TokenType::Follow),
+                SyntaxKind::Ascii43 => Some(TokenType::Follow),
+                SyntaxKind::Ascii44 => Some(TokenType::Follow),
+                SyntaxKind::Ascii45 => Some(TokenType::Follow),
+                SyntaxKind::Ascii46 => Some(TokenType::Follow),
+                SyntaxKind::Ascii47 => Some(TokenType::Follow),
+                SyntaxKind::Ascii58 => Some(TokenType::Follow),
+                // ";"
+                SyntaxKind::Ascii59 => Some(TokenType::Close),
+                SyntaxKind::Ascii60 => Some(TokenType::Follow),
+                SyntaxKind::Ascii61 => Some(TokenType::Follow),
+                SyntaxKind::Ascii62 => Some(TokenType::Follow),
+                SyntaxKind::Ascii63 => Some(TokenType::Follow),
+                SyntaxKind::Ascii92 => Some(TokenType::Follow),
+                SyntaxKind::Ascii93 => Some(TokenType::Follow),
+                SyntaxKind::Ascii94 => Some(TokenType::Follow),
+                SyntaxKind::NotEquals => Some(TokenType::Follow),
+                SyntaxKind::Sconst => Some(TokenType::Follow),
+                _ => None,
+            }
+        }
+        pg_query::protobuf::KeywordKind::UnreservedKeyword => {
+            match SyntaxKind::new_from_pg_query_token(token) {
+                SyntaxKind::AddP => Some(TokenType::Follow),
+                SyntaxKind::Update => Some(TokenType::Follow),
+                SyntaxKind::By => Some(TokenType::Follow),
+                _ => None,
+            }
+        }
         pg_query::protobuf::KeywordKind::ColNameKeyword => None,
         pg_query::protobuf::KeywordKind::TypeFuncNameKeyword => None,
-        pg_query::protobuf::KeywordKind::ReservedKeyword => match token.token {
-            // And
-            291 => Some(TokenType::Follow),
-            // Check
-            328 => Some(TokenType::Follow),
-            // End
-            401 => Some(TokenType::Follow),
-            // For
-            424 => Some(TokenType::Follow),
-            // From
-            429 => Some(TokenType::Follow),
-            // InP
-            453 => Some(TokenType::Follow),
-            543 => Some(TokenType::Follow),
-            // Then
-            669 => Some(TokenType::Follow),
-            673 => Some(TokenType::Follow),
-            697 => Some(TokenType::Follow),
-            // Where
-            713 => Some(TokenType::Follow),
-            // With
-            716 => Some(TokenType::Follow),
-            _ => None,
-        },
+        pg_query::protobuf::KeywordKind::ReservedKeyword => {
+            match SyntaxKind::new_from_pg_query_token(token) {
+                SyntaxKind::And => Some(TokenType::Follow),
+                SyntaxKind::Check => Some(TokenType::Follow),
+                SyntaxKind::EndP => Some(TokenType::Follow),
+                SyntaxKind::For => Some(TokenType::Follow),
+                SyntaxKind::From => Some(TokenType::Follow),
+                SyntaxKind::InP => Some(TokenType::Follow),
+                SyntaxKind::On => Some(TokenType::Follow),
+                SyntaxKind::Then => Some(TokenType::Follow),
+                SyntaxKind::To => Some(TokenType::Follow),
+                SyntaxKind::Using => Some(TokenType::Follow),
+                SyntaxKind::Where => Some(TokenType::Follow),
+                SyntaxKind::With => Some(TokenType::Follow),
+                SyntaxKind::GroupP => Some(TokenType::Follow),
+                SyntaxKind::As => Some(TokenType::Follow),
+                _ => None,
+            }
+        }
     };
     r
 }
