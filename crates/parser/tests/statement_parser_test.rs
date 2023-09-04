@@ -1,4 +1,3 @@
-use std::assert_eq;
 use std::fs;
 mod common;
 use insta;
@@ -18,15 +17,14 @@ fn valid_statements() {
 
     paths.iter().for_each(|f| {
         let path = f.path();
+        let file_name = path.file_name().unwrap();
+        let test_name = file_name.to_str().unwrap().replace(".sql", "");
 
         let contents = fs::read_to_string(&path).unwrap();
 
         let mut parser = Parser::new();
         parser.parse_statement(&contents, None);
         let parsed = parser.finish();
-
-        let file_name = path.file_name().unwrap();
-        let test_name = file_name.to_str().unwrap().replace(".sql", "");
 
         let mut settings = insta::Settings::clone_current();
         settings.set_input_file(path);
@@ -38,9 +36,4 @@ fn valid_statements() {
             insta::assert_debug_snapshot!(test_name, &parsed.cst);
         });
     });
-}
-
-#[test]
-fn invalid_statements() {
-    assert_eq!(4, 2);
 }

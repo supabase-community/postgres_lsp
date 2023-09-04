@@ -1,0 +1,32 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE POLICY account_managers ON accounts TO managers\n    USING (manager = current_user);\n"
+---
+CreatePolicyStmt@0..91
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Policy@7..13 "POLICY"
+  Whitespace@13..14 " "
+  Ident@14..30 "account_managers"
+  Whitespace@30..31 " "
+  On@31..33 "ON"
+  Whitespace@33..34 " "
+  Ident@34..42 "accounts"
+  Whitespace@42..43 " "
+  To@43..45 "TO"
+  Whitespace@45..46 " "
+  Ident@46..54 "managers"
+  Newline@54..55 "\n"
+  Whitespace@55..59 "    "
+  Using@59..64 "USING"
+  Whitespace@64..65 " "
+  Ascii40@65..66 "("
+  Ident@66..73 "manager"
+  Whitespace@73..74 " "
+  Ascii61@74..75 "="
+  Whitespace@75..76 " "
+  CurrentUser@76..88 "current_user"
+  Ascii41@88..89 ")"
+  Ascii59@89..90 ";"
+  Newline@90..91 "\n"
+

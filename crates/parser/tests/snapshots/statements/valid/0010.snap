@@ -1,0 +1,31 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "INSERT INTO weather VALUES ('San Francisco', 46, 50, 0.25, '1994-11-27');\n"
+---
+InsertStmt@0..74
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  Ident@12..19 "weather"
+  Whitespace@19..20 " "
+  Values@20..26 "VALUES"
+  Whitespace@26..27 " "
+  Ascii40@27..28 "("
+  Sconst@28..43 "'San Francisco'"
+  Ascii44@43..44 ","
+  Whitespace@44..45 " "
+  Iconst@45..47 "46"
+  Ascii44@47..48 ","
+  Whitespace@48..49 " "
+  Iconst@49..51 "50"
+  Ascii44@51..52 ","
+  Whitespace@52..53 " "
+  Fconst@53..57 "0.25"
+  Ascii44@57..58 ","
+  Whitespace@58..59 " "
+  Sconst@59..71 "'1994-11-27'"
+  Ascii41@71..72 ")"
+  Ascii59@72..73 ";"
+  Newline@73..74 "\n"
+

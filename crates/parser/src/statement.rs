@@ -1,15 +1,7 @@
 use cstree::text::{TextRange, TextSize};
 use logos::{Logos, Span};
 
-use crate::{
-    get_children_codegen::get_children,
-    parser::Parser,
-    resolve_locations::resolve_locations,
-    syntax_kind_codegen::SyntaxKind,
-    token_type::{
-        get_token_type_from_pg_query_token, get_token_type_from_statement_token, TokenType,
-    },
-};
+use crate::{parser::Parser, syntax_kind_codegen::SyntaxKind};
 
 /// A super simple lexer for sql statements.
 ///
@@ -38,7 +30,6 @@ impl StatementToken {
             StatementToken::Newline => SyntaxKind::Newline,
             StatementToken::Tab => SyntaxKind::Tab,
             StatementToken::Comment => SyntaxKind::Comment,
-            _ => panic!("Unknown StatementToken: {:?}", self),
         }
     }
 }
@@ -94,15 +85,6 @@ impl Parser {
             }
         };
 
-        println!("pg_query_root: {:?}", pg_query_root);
-
-        let mut pg_query_nodes = match &pg_query_root {
-            Some(root) => resolve_locations(get_children(root, text.to_string(), 1), text)
-                .into_iter()
-                .peekable(),
-            None => Vec::new().into_iter().peekable(),
-        };
-
         let mut lexer = StatementToken::lexer(&text);
 
         // parse root node if no syntax errors
@@ -110,13 +92,11 @@ impl Parser {
             let root_node = pg_query_root.unwrap();
             self.stmt(root_node.to_owned(), range);
             self.start_node_at(SyntaxKind::new_from_pg_query_node(&root_node), 1);
-            // if there is only one node, there are no children, and we do not need to buffer the tokens.
-            self.set_checkpoint(pg_query_nodes.len() == 0);
         } else {
             // fallback to generic node as root
             self.start_node_at(SyntaxKind::Stmt, 1);
-            self.set_checkpoint(true);
         }
+        self.set_checkpoint();
 
         // start at 0, and increment by the length of the token
         let mut pointer: i32 = 0;
@@ -125,13 +105,9 @@ impl Parser {
         struct Token {
             syntax_kind: SyntaxKind,
             span: Span,
-            token_type: Option<TokenType>,
         }
 
         while pointer < text.len() as i32 {
-            // first get token WITHOUT applying it
-            // then consume pg_query nodes until there is none, or the node is outside of the current tokens' span
-
             // Check if the pointer is within a pg_query token
             let next_pg_query_token = pg_query_tokens.peek();
             let token = if next_pg_query_token.is_some()
@@ -140,7 +116,6 @@ impl Parser {
             {
                 let token = pg_query_tokens.next().unwrap();
                 Token {
-                    token_type: get_token_type_from_pg_query_token(&token),
                     syntax_kind: SyntaxKind::new_from_pg_query_token(&token),
                     span: Span {
                         start: token.start as usize,
@@ -164,31 +139,10 @@ impl Parser {
                     );
                 }
                 Token {
-                    token_type: get_token_type_from_statement_token(
-                        &token.as_ref().unwrap().as_ref().unwrap(),
-                    ),
                     syntax_kind: token.unwrap().unwrap().syntax_kind(),
                     span: lexer.span(),
                 }
             };
-
-            // consume pg_query nodes until there is none, or the node is outside of the current text span
-            while let Some(node) = pg_query_nodes.peek() {
-                if token
-                    .span
-                    .contains(&usize::try_from(node.location).unwrap())
-                    == false
-                {
-                    break;
-                } else {
-                    // node is within span
-                    let nested_node = pg_query_nodes.next().unwrap();
-                    self.start_node_at(
-                        SyntaxKind::new_from_pg_query_node(&nested_node.node),
-                        nested_node.depth,
-                    );
-                }
-            }
 
             self.token(
                 token.syntax_kind,
@@ -197,7 +151,6 @@ impl Parser {
                     .take(token.span.end - token.span.start)
                     .collect::<String>()
                     .as_str(),
-                token.token_type,
             );
 
             pointer = pointer + (token.span.end - token.span.start) as i32;
@@ -210,40 +163,9 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
-    use log::info;
-    use log::log_enabled;
     use std::assert_eq;
-    use std::fs;
 
     use super::*;
-
-    const VALID_STATEMENTS_PATH: &str = "test_data/statements/valid/";
-
-    fn init() {
-        let _ = env_logger::builder().is_test(true).try_init();
-    }
-
-    fn test_valid_stmt(name: String, input: String) {
-        info!("[{}]: {}", name, input);
-
-        let mut parser = Parser::new();
-        parser.parse_statement(&input, None);
-        let parsed = parser.finish();
-
-        let out = format!("{:#?}", parsed.cst);
-
-        if log_enabled!(log::Level::Debug) {
-            dbg!(&parsed.cst);
-        }
-
-        assert_eq!(parsed.cst.text(), input.as_str())
-    }
-
-    #[test]
-    fn test_simple_statement() {
-        init();
-        test_valid_stmt("simple_statement".to_string(), "select 1;".to_string());
-    }
 
     #[test]
     fn test_invalid_statement() {

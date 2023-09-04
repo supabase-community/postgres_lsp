@@ -34,10 +34,10 @@ impl Parser {
                 Ok(token) => {
                     match token {
                         SourceFileToken::Comment => {
-                            self.token(SyntaxKind::Comment, lexer.slice(), None);
+                            self.token(SyntaxKind::Comment, lexer.slice());
                         }
                         SourceFileToken::Newline => {
-                            self.token(SyntaxKind::Newline, lexer.slice(), None);
+                            self.token(SyntaxKind::Newline, lexer.slice());
                         }
                         SourceFileToken::Statement => {
                             self.parse_statement(lexer.slice(), Some(lexer.span().start as u32));

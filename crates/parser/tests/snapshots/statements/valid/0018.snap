@@ -1,0 +1,22 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "SELECT ARRAY[1,2,22.7]::integer[];\n"
+---
+SelectStmt@0..35
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  Array@7..12 "ARRAY"
+  Ascii91@12..13 "["
+  Iconst@13..14 "1"
+  Ascii44@14..15 ","
+  Iconst@15..16 "2"
+  Ascii44@16..17 ","
+  Fconst@17..21 "22.7"
+  Ascii93@21..22 "]"
+  Typecast@22..24 "::"
+  Integer@24..31 "integer"
+  Ascii91@31..32 "["
+  Ascii93@32..33 "]"
+  Ascii59@33..34 ";"
+  Newline@34..35 "\n"
+
