@@ -9,3 +9,6 @@ edition = "2021"
 protobuf-parse = "3.2.0"
 protobuf = "3.2.0"
 convert_case = "0.6.0"
+
+[lib]
+doctest = false

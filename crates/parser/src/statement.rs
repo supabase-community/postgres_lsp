@@ -5,9 +5,8 @@ use crate::{parser::Parser, syntax_kind_codegen::SyntaxKind};
 
 /// A super simple lexer for sql statements.
 ///
-/// One weakness of pg_query.rs is that it does not parse whitespace or newlines. To circumvent
-/// this, we use a very simple lexer that just knows what kind of characters are being used. It
-/// does not know anything about postgres syntax or keywords. For example, all words such as `select` and `from` are put into the `Word` type.
+/// One weakness of pg_query.rs is that it does not parse whitespace or newlines. We use a very
+/// simple lexer to fill the gaps.
 #[derive(Logos, Debug, PartialEq)]
 pub enum StatementToken {
     // comments and whitespaces
@@ -38,18 +37,17 @@ impl Parser {
     /// The main entry point for parsing a statement `text`. `at_offset` is the offset of the statement in the source file.
     ///
     /// On a high level, the algorithm works as follows:
-    /// 1. Parse the statement with pg_query.rs and order nodes by their position. If the
-    ///   statement contains syntax errors, the parser will report the error and continue to work without information
+    /// 1. Parse the statement with pg_query.rs. If the statement contains syntax errors, the parser will report the error and continue to work without information
     ///   about the nodes. The result will be a flat list of tokens under the generic `Stmt` node.
     ///   If successful, the first node in the ordered list will be the main node of the statement,
     ///   and serves as a root node.
     /// 2. Scan the statements for tokens with pg_query.rs. This will never fail, even if the statement contains syntax errors.
-    /// 3. Parse the statement with the `StatementToken` lexer. The lexer will be the main vehicle
-    ///    while walking the statement.
-    /// 4. Walk the statement with the `StatementToken` lexer.
-    ///    - at every token, consume all nodes that are within the token's range.
-    ///    - if there is a pg_query token within the token's range, consume it. if not, fallback to
-    ///    the StatementToken. This is the case for e.g. whitespace.
+    /// 3. Parse the statement with the `StatementToken` lexer. The lexer only contains the tokens
+    ///    that are not parsed by pg_query.rs, such as whitespace.
+    /// 4. Define a pointer that starts at 0 and move it along the statement.
+    ///    - first, check if the current pointer is within a pg_query token. If so, consume the
+    ///    token.
+    ///    - if not, consume the next token from the `StatementToken` lexer.
     /// 5. Close all open nodes for that statement.
     pub fn parse_statement(&mut self, text: &str, at_offset: Option<u32>) {
         let offset = at_offset.unwrap_or(0);

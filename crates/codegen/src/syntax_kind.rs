@@ -1,11 +1,12 @@
 use std::collections::HashSet;
+use std::env::current_dir;
 
 use pg_query_proto_parser::{Node, ProtoParser, Token};
 use proc_macro2::{Ident, Literal};
 use quote::{format_ident, quote};
 
 pub fn syntax_kind_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let parser = ProtoParser::new("./libpg_query/protobuf/pg_query.proto");
+    let parser = ProtoParser::new("libpg_query/protobuf/pg_query.proto");
     let proto_file = parser.parse();
 
     let custom_node_names = custom_node_names();

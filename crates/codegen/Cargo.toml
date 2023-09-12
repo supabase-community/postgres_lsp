@@ -12,3 +12,5 @@ pg_query_proto_parser.workspace = true
 
 [lib]
 proc-macro = true
+doctest = false
+
