@@ -1,0 +1,32 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "SELECT concat_lower_or_upper(a => 'Hello', b => 'World', uppercase => true);\n"
+---
+SelectStmt@0..77
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  Ident@7..28 "concat_lower_or_upper"
+  Ascii40@28..29 "("
+  Ident@29..30 "a"
+  Whitespace@30..31 " "
+  EqualsGreater@31..33 "=>"
+  Whitespace@33..34 " "
+  Sconst@34..41 "'Hello'"
+  Ascii44@41..42 ","
+  Whitespace@42..43 " "
+  Ident@43..44 "b"
+  Whitespace@44..45 " "
+  EqualsGreater@45..47 "=>"
+  Whitespace@47..48 " "
+  Sconst@48..55 "'World'"
+  Ascii44@55..56 ","
+  Whitespace@56..57 " "
+  Ident@57..66 "uppercase"
+  Whitespace@66..67 " "
+  EqualsGreater@67..69 "=>"
+  Whitespace@69..70 " "
+  TrueP@70..74 "true"
+  Ascii41@74..75 ")"
+  Ascii59@75..76 ";"
+  Newline@76..77 "\n"
+

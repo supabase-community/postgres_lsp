@@ -1,0 +1,30 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "GRANT SELECT (col1), UPDATE (col1) ON mytable TO miriam_rw;\n"
+---
+GrantStmt@0..60
+  Grant@0..5 "GRANT"
+  Whitespace@5..6 " "
+  Select@6..12 "SELECT"
+  Whitespace@12..13 " "
+  Ascii40@13..14 "("
+  Ident@14..18 "col1"
+  Ascii41@18..19 ")"
+  Ascii44@19..20 ","
+  Whitespace@20..21 " "
+  Update@21..27 "UPDATE"
+  Whitespace@27..28 " "
+  Ascii40@28..29 "("
+  Ident@29..33 "col1"
+  Ascii41@33..34 ")"
+  Whitespace@34..35 " "
+  On@35..37 "ON"
+  Whitespace@37..38 " "
+  Ident@38..45 "mytable"
+  Whitespace@45..46 " "
+  To@46..48 "TO"
+  Whitespace@48..49 " "
+  Ident@49..58 "miriam_rw"
+  Ascii59@58..59 ";"
+  Newline@59..60 "\n"
+

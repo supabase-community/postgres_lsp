@@ -1,0 +1,1 @@
+REVOKE ALL ON accounts FROM PUBLIC;

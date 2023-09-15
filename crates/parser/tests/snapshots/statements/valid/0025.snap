@@ -1,0 +1,25 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "ALTER TABLE products ADD CHECK (name <> '');\n"
+---
+AlterTableStmt@0..45
+  Alter@0..5 "ALTER"
+  Whitespace@5..6 " "
+  Table@6..11 "TABLE"
+  Whitespace@11..12 " "
+  Ident@12..20 "products"
+  Whitespace@20..21 " "
+  AddP@21..24 "ADD"
+  Whitespace@24..25 " "
+  Check@25..30 "CHECK"
+  Whitespace@30..31 " "
+  Ascii40@31..32 "("
+  NameP@32..36 "name"
+  Whitespace@36..37 " "
+  NotEquals@37..39 "<>"
+  Whitespace@39..40 " "
+  Sconst@40..42 "''"
+  Ascii41@42..43 ")"
+  Ascii59@43..44 ";"
+  Newline@44..45 "\n"
+

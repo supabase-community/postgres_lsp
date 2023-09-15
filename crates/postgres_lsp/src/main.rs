@@ -89,7 +89,6 @@ impl LanguageServer for Backend {
     }
 
     async fn initialized(&self, _: InitializedParams) {
-        debug!("initialized");
         self.client
             .log_message(MessageType::INFO, "initialized!")
             .await;
@@ -193,7 +192,6 @@ impl LanguageServer for Backend {
         &self,
         params: SemanticTokensRangeParams,
     ) -> Result<Option<SemanticTokensRangeResult>> {
-        println!("semantic_tokens_range");
         return Ok(None);
     }
 
@@ -298,8 +296,6 @@ impl Backend {
 async fn main() {
     env_logger::init();
 
-    debug!("starting up");
-
     let stdin = tokio::io::stdin();
     let stdout = tokio::io::stdout();
 
@@ -311,8 +307,6 @@ async fn main() {
         semantic_token_map: DashMap::new(),
     })
     .finish();
-
-    debug!("built service and created backend");
 
     Server::new(stdin, stdout, socket).serve(service).await;
 }

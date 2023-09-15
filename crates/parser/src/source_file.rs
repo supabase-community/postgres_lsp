@@ -1,6 +1,6 @@
 use logos::Logos;
 
-use crate::{parser::Parser, syntax_kind::SyntaxKind};
+use crate::{parser::Parser, syntax_kind_codegen::SyntaxKind};
 
 /// A super simple lexer for sql files that splits the input into indivudual statements and
 /// comments.
@@ -28,7 +28,7 @@ impl Parser {
     pub fn parse_source_file(&mut self, text: &str) {
         let mut lexer = SourceFileToken::lexer(text);
 
-        self.start_node_at(SyntaxKind::SourceFile, Some(0));
+        self.start_node_at(SyntaxKind::SourceFile, 0);
         while let Some(token) = lexer.next() {
             match token {
                 Ok(token) => {
@@ -95,7 +95,6 @@ select 1;
 ";
 
         let mut parser = Parser::new();
-        println!("input {:?}", input);
         parser.parse_source_file(input);
         let parsed = parser.finish();
 

@@ -1,0 +1,28 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "ALTER TABLE products ALTER COLUMN price TYPE numeric(10,2);\n"
+---
+AlterTableStmt@0..60
+  Alter@0..5 "ALTER"
+  Whitespace@5..6 " "
+  Table@6..11 "TABLE"
+  Whitespace@11..12 " "
+  Ident@12..20 "products"
+  Whitespace@20..21 " "
+  Alter@21..26 "ALTER"
+  Whitespace@26..27 " "
+  Column@27..33 "COLUMN"
+  Whitespace@33..34 " "
+  Ident@34..39 "price"
+  Whitespace@39..40 " "
+  TypeP@40..44 "TYPE"
+  Whitespace@44..45 " "
+  Numeric@45..52 "numeric"
+  Ascii40@52..53 "("
+  Iconst@53..55 "10"
+  Ascii44@55..56 ","
+  Iconst@56..57 "2"
+  Ascii41@57..58 ")"
+  Ascii59@58..59 ";"
+  Newline@59..60 "\n"
+
