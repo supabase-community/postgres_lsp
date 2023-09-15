@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: 🏗 Setup repository
         uses: actions/checkout@v3
+        with:
+          submodules: "libpg_query"
 
       - name: 🏗 Setup monorepo
         uses: ./.github/actions/setup-monorepo
