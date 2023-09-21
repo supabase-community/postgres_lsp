@@ -18,8 +18,8 @@
 mod ast_node;
 mod parser;
 mod sibling_token;
-mod source_file;
-mod statement;
+mod source_parser;
+mod statement_parser;
 mod syntax_error;
 mod syntax_kind_codegen;
 mod syntax_node;

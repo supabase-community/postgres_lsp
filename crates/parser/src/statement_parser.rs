@@ -173,8 +173,6 @@ mod tests {
         parser.parse_statement(input, None);
         let parsed = parser.finish();
 
-        dbg!(&parsed.cst);
-
         assert_eq!(parsed.cst.text(), input);
     }
 
@@ -187,8 +185,6 @@ mod tests {
         let mut parser = Parser::new();
         parser.parse_statement(input, None);
         let parsed = parser.finish();
-
-        dbg!(&parsed.cst);
 
         assert_eq!(parsed.cst.text(), input);
     }

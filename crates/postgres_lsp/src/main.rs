@@ -245,7 +245,7 @@ impl Backend {
         let rope = ropey::Rope::from_str(&params.text);
         let mut parser = Parser::new();
 
-        parser.parse_source_file(&params.text);
+        parser.parse_source_at(&params.text, None);
 
         let result = parser.finish();
 
