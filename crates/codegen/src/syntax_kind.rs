@@ -1,5 +1,4 @@
 use std::collections::HashSet;
-use std::env::current_dir;
 
 use pg_query_proto_parser::{Node, ProtoParser, Token};
 use proc_macro2::{Ident, Literal};

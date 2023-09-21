@@ -9,6 +9,8 @@ edition = "2021"
 proc-macro2 = "1.0.66"
 quote = "1.0.33"
 pg_query_proto_parser.workspace = true
+syn = { version = "2.0.35", features = ["full"] }
+regex = "1.9.5"
 
 [lib]
 proc-macro = true
