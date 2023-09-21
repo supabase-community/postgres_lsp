@@ -191,8 +191,6 @@ dependencies = [
  "pg_query_proto_parser",
  "proc-macro2",
  "quote",
- "regex",
- "syn 2.0.35",
 ]
 
 [[package]]
