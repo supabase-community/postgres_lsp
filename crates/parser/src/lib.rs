@@ -16,7 +16,10 @@
 //! To see how these drawbacks are mitigated, see the `statement.rs` and the `source_file.rs` module.
 
 mod ast_node;
+mod get_children_codegen;
+mod get_location_codegen;
 mod parser;
+mod resolve_tokens;
 mod sibling_token;
 mod source_parser;
 mod statement_parser;

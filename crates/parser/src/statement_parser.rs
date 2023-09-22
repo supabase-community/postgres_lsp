@@ -1,7 +1,7 @@
 use cstree::text::{TextRange, TextSize};
 use logos::{Logos, Span};
 
-use crate::{parser::Parser, syntax_kind_codegen::SyntaxKind};
+use crate::{get_children_codegen::get_children, parser::Parser, syntax_kind_codegen::SyntaxKind};
 
 /// A super simple lexer for sql statements.
 ///
@@ -81,6 +81,13 @@ impl Parser {
                 self.error(e.to_string(), range);
                 None
             }
+        };
+
+        let mut pg_query_nodes = match &pg_query_root {
+            Some(root) => get_children(root, text.to_string(), 1)
+                .into_iter()
+                .peekable(),
+            None => Vec::new().into_iter().peekable(),
         };
 
         let mut lexer = StatementToken::lexer(&text);
