@@ -3,18 +3,11 @@ use crate::get_location_codegen::get_location;
 use cstree::text::{TextRange, TextSize};
 use pg_query::{protobuf::ScanToken, NodeEnum};
 
-// all tokens of a node beneath it
-// get estimation for each node location from tokens
-// and also node range
-//
-// how to handle tokens that cannot be put beneath node based on the ast?
-// pass token -> if not beneath current node, apply immediately
-
 #[derive(Debug, Clone)]
 pub struct NestedNode {
-    pub node: NodeEnum,
-    pub depth: i32,
-    pub path: String,
+    pub id: usize,
+    pub inner: ChildrenNode,
+    // .start property of `ScanToken`
     pub tokens: Vec<i32>,
     pub range: TextRange,
 }
@@ -32,7 +25,8 @@ pub fn resolve_tokens(
 ) -> Vec<NestedNode> {
     children
         .iter()
-        .map(|c| {
+        .enumerate()
+        .map(|(idx, c)| {
             let nearest_parent_location = get_nearest_parent_location(&c, children);
             let furthest_child_location = get_furthest_child_location(&c, children);
 
@@ -79,10 +73,9 @@ pub fn resolve_tokens(
             };
 
             NestedNode {
-                node: c.node.to_owned(),
-                depth: c.depth,
-                path: c.path.to_owned(),
-                tokens: child_tokens.iter().map(|t| t.token).collect(),
+                id: idx,
+                inner: c.to_owned(),
+                tokens: child_tokens.iter().map(|t| t.start).collect(),
                 range: TextRange::new(
                     TextSize::from(
                         child_tokens.iter().min_by_key(|t| t.start).unwrap().start as u32,
