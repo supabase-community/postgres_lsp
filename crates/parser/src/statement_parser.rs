@@ -1,10 +1,12 @@
-use std::collections::VecDeque;
+use std::{collections::VecDeque, iter::Peekable};
 
 use cstree::text::{TextRange, TextSize};
 use logos::Logos;
 
 use crate::{
-    get_nodes_codegen::get_nodes, parser::Parser, resolve_tokens::resolve_tokens,
+    estimate_node_range::{estimate_node_range, RangedNode},
+    get_nodes_codegen::get_nodes,
+    parser::Parser,
     syntax_kind_codegen::SyntaxKind,
 };
 
@@ -80,8 +82,8 @@ impl Parser {
         // ranged nodes from pg_query.rs, including the root node
         // the nodes are ordered by starting range, starting with the root node
         let mut pg_query_nodes = match &pg_query_root {
-            Some(root) => resolve_tokens(
-                &get_nodes(root, text.to_string(), 1),
+            Some(root) => estimate_node_range(
+                &mut get_nodes(root, text.to_string(), 1),
                 &pg_query_tokens,
                 &text,
             )
@@ -167,14 +169,14 @@ impl Parser {
 
                 // consume all nodes that start at or before the token ends
                 while pg_query_nodes.peek().is_some()
-                    && pg_query_nodes.peek().unwrap().estimated_range.start()
+                    && pg_query_nodes.peek().unwrap().range.start()
                         <= TextSize::from(token.end as u32)
                 {
                     let node = pg_query_nodes.next().unwrap();
                     self.start_node(SyntaxKind::new_from_pg_query_node(&node.inner.node));
                     open_nodes.push((
                         SyntaxKind::new_from_pg_query_node(&node.inner.node),
-                        node.estimated_range,
+                        node.range,
                         node.inner.depth,
                     ));
                 }
