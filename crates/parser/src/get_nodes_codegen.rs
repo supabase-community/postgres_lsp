@@ -1,13 +1,13 @@
-use codegen::get_children;
+use codegen::get_nodes;
 
-get_children!();
+get_nodes!();
 
 #[cfg(test)]
 mod tests {
-    use crate::get_children_codegen::get_children;
+    use crate::get_nodes_codegen::get_nodes;
 
     #[test]
-    fn test_get_children() {
+    fn test_get_nodes() {
         let input = "with c as (insert into contact (id) values ('id')) select * from c;";
 
         let pg_query_root = match pg_query::parse(input) {
@@ -24,7 +24,7 @@ mod tests {
             Err(_) => None,
         };
 
-        let children = get_children(&pg_query_root.unwrap(), input.to_string(), 1);
-        assert_eq!(children.len(), 13);
+        let nodes = get_nodes(&pg_query_root.unwrap(), input.to_string(), 1);
+        assert_eq!(nodes.len(), 14);
     }
 }

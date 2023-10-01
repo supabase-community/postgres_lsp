@@ -1,14 +1,14 @@
-mod get_children;
 mod get_location;
+mod get_nodes;
 mod syntax_kind;
 
-use get_children::get_children_mod;
 use get_location::get_location_mod;
+use get_nodes::get_nodes_mod;
 use syntax_kind::syntax_kind_mod;
 
 #[proc_macro]
-pub fn get_children(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    get_children_mod(item.into()).into()
+pub fn get_nodes(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    get_nodes_mod(item.into()).into()
 }
 
 #[proc_macro]

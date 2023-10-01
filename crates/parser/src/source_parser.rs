@@ -75,14 +75,15 @@ fn tokens(input: &str) -> Vec<Token> {
 }
 
 impl Parser {
-    /// Parse a source
-    pub fn parse_source_at(&mut self, text: &str, at_offset: Option<u32>) {
+    fn parse_source_at(&mut self, text: &str, at_offset: Option<u32>) {
         let offset = at_offset.unwrap_or(0);
 
         let tokens = tokens(&text);
         let mut tokens_iter = tokens.iter();
 
-        self.start_node_at(SyntaxKind::SourceFile, 0);
+        // open root `SourceFile` node
+        self.start_node(SyntaxKind::SourceFile);
+
         while let Some(token) = tokens_iter.next() {
             match token.kind {
                 SourceFileToken::Comment => {
@@ -92,13 +93,15 @@ impl Parser {
                     self.token(SyntaxKind::Newline, token.text.as_str());
                 }
                 SourceFileToken::Statement => {
-                    self.parse_statement(
-                        token.text.as_str(),
-                        Some(offset + u32::from(token.span.start())),
-                    );
+                    // self.parse_statement(
+                    //     token.text.as_str(),
+                    //     Some(offset + u32::from(token.span.start())),
+                    // );
                 }
             };
         }
+
+        // close root `SourceFile` node
         self.finish_node();
     }
 }

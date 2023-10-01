@@ -2,7 +2,7 @@ use pg_query_proto_parser::{FieldType, Node, ProtoParser};
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
-pub fn get_children_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+pub fn get_nodes_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let parser = ProtoParser::new("./libpg_query/protobuf/pg_query.proto");
     let proto_file = parser.parse();
 
@@ -16,7 +16,7 @@ pub fn get_children_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenSt
         use std::collections::VecDeque;
 
         #[derive(Debug, Clone)]
-        pub struct ChildrenNode {
+        pub struct Node {
             pub node: NodeEnum,
             pub depth: i32,
             pub path: String,
@@ -24,8 +24,10 @@ pub fn get_children_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenSt
 
         /// Returns all children of the node, recursively
         /// location is resolved manually
-        pub fn get_children(node: &NodeEnum, text: String, current_depth: i32) -> Vec<ChildrenNode> {
-            let mut nodes: Vec<ChildrenNode> = vec![];
+        pub fn get_nodes(node: &NodeEnum, text: String, current_depth: i32) -> Vec<Node> {
+            let mut nodes: Vec<Node> = vec![
+                Node { node: node.to_owned(), depth: current_depth, path: "0".to_string() }
+            ];
             // Node, depth, path
             let mut stack: VecDeque<(NodeEnum, i32, String)> =
                 VecDeque::from(vec![(node.to_owned(), current_depth, "0".to_string())]);
@@ -37,7 +39,7 @@ pub fn get_children_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenSt
                     let path = path.clone() + "." + child_ctr.to_string().as_str();
                     child_ctr = child_ctr + 1;
                     stack.push_back((c.to_owned(), current_depth, path.clone()));
-                    nodes.push(ChildrenNode {
+                    nodes.push(Node {
                         node: c,
                         depth: current_depth,
                         path: path.clone(),
