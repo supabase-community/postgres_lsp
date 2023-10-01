@@ -37,33 +37,6 @@ impl StatementToken {
     }
 }
 
-struct TokenBuffer {
-    tokens: VecDeque<(SyntaxKind, String)>,
-}
-
-impl TokenBuffer {
-    fn new() -> Self {
-        Self {
-            tokens: VecDeque::new(),
-        }
-    }
-
-    fn push(&mut self, kind: SyntaxKind, text: String) {
-        self.tokens.push_back((kind, text));
-    }
-
-    fn drain(&mut self, until: Option<u32>) -> Vec<(SyntaxKind, String)> {
-        if self.tokens.is_empty() {
-            return Vec::new();
-        }
-        let range = match until {
-            Some(u) => 0..u as usize,
-            None => 0..self.tokens.len(),
-        };
-        self.tokens.drain(range).collect::<Vec<_>>()
-    }
-}
-
 impl Parser {
     pub fn parse_statement_at(&mut self, text: &str, at_offset: Option<u32>) {
         // 1. Collect as much information as possible from pg_query.rs and `StatementToken` lexer
@@ -123,7 +96,7 @@ impl Parser {
 
         // 2. Setup data structures required for the parsing algorithm
         // A buffer for tokens that are not applied immediately to the cst
-        let mut token_buffer = TokenBuffer::new();
+        let mut token_buffer: VecDeque<(SyntaxKind, String)> = VecDeque::new();
         // Keeps track of currently open nodes. Latest opened is last.
         let mut open_nodes: Vec<(SyntaxKind, TextRange, i32)> = Vec::new();
 
@@ -185,7 +158,7 @@ impl Parser {
                 }
 
                 // drain token buffer
-                for (kind, text) in token_buffer.drain(None) {
+                for (kind, text) in token_buffer.drain(0..token_buffer.len()) {
                     self.token(kind, text.as_str());
                 }
 
@@ -224,7 +197,7 @@ impl Parser {
                     );
                 }
                 let token_text = statement_token_lexer.slice().to_string();
-                token_buffer.push(token.unwrap().unwrap().syntax_kind(), token_text.clone());
+                token_buffer.push_back((token.unwrap().unwrap().syntax_kind(), token_text.clone()));
                 token_text.len() as i32
             };
 
