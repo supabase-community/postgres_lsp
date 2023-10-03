@@ -215,10 +215,15 @@ pub fn estimate_node_range(
             panic!("No child tokens or children ranges found for node {:?}", n);
         };
 
-        ranged_nodes.push(RangedNode {
-            inner: n.to_owned(),
-            range: TextRange::new(TextSize::from(from as u32), TextSize::from(to as u32)),
-        });
+        // TODO: validate that prepending is enough to ensure that `ranged_nodes` is sorted by
+        // range.start
+        ranged_nodes.insert(
+            0,
+            RangedNode {
+                inner: n.to_owned(),
+                range: TextRange::new(TextSize::from(from as u32), TextSize::from(to as u32)),
+            },
+        );
     });
 
     ranged_nodes
