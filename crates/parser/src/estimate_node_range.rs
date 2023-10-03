@@ -1,5 +1,6 @@
 use std::cmp::{max, min};
 
+use crate::get_child_tokens_codegen::get_child_tokens;
 use crate::get_location_codegen::get_location;
 use crate::get_nodes_codegen::Node;
 use cstree::text::{TextRange, TextSize};
@@ -29,114 +30,13 @@ pub fn estimate_node_range(
         let nearest_parent_location = get_nearest_parent_location(&n, nodes);
         let furthest_child_location = get_furthest_child_location(&n, nodes);
 
-        let mut child_tokens = Vec::new();
-
-        #[derive(Debug)]
-        struct TokenProperty {
-            value: Option<String>,
-            token: Option<Token>,
-        }
-
-        impl TokenProperty {
-            fn from_int(value: &i32) -> TokenProperty {
-                TokenProperty {
-                    value: Some(value.to_string()),
-                    token: None,
-                }
-            }
-
-            fn from_string(value: &String) -> TokenProperty {
-                assert!(value.len() > 0, "String property value has length 0");
-                TokenProperty {
-                    value: Some(value.to_owned()),
-                    token: None,
-                }
-            }
-
-            fn from_token(token: Token) -> TokenProperty {
-                TokenProperty {
-                    value: None,
-                    token: Some(token),
-                }
-            }
-        }
-
-        let mut get_token = |property: TokenProperty| {
-            let token = tokens
-                .iter()
-                .filter_map(|t| {
-                    if property.token.is_some() {
-                        // if a token is set, we can safely ignore all tokens that are not of the same type
-                        if t.token() != property.token.unwrap() {
-                            return None;
-                        }
-                    }
-                    // make a string comparison of the text of the token and the property value
-                    if property.value.is_some()
-                        && get_token_text(
-                            usize::try_from(t.start).unwrap(),
-                            usize::try_from(t.end).unwrap(),
-                            text,
-                        )
-                        .to_lowercase()
-                            != property.value.as_ref().unwrap().to_lowercase()
-                    {
-                        return None;
-                    }
-
-                    // if the furthest child location is set, and it is smaller than the start of the token,
-                    // we can safely ignore this token, because it is not a child of the node
-                    if furthest_child_location.is_some()
-                        && furthest_child_location.unwrap() < t.start as i32
-                    {
-                        return None;
-                    }
-
-                    // if the token is before the nearest parent location, we can safely ignore it
-                    // if not, we calculate the distance to the nearest parent location
-                    let distance = t.start - nearest_parent_location;
-                    if distance >= 0 {
-                        Some((distance, t))
-                    } else {
-                        None
-                    }
-                })
-                // and use the token with the smallest distance to the nearest parent location
-                .min_by_key(|(d, _)| d.to_owned())
-                .map(|(_, t)| t);
-
-            if token.is_none() {
-                panic!(
-                    "No matching token found for property {:?} in {:#?}",
-                    property, tokens
-                );
-            }
-
-            child_tokens.push(token.unwrap());
-        };
-
-        match &n.node {
-            NodeEnum::RangeVar(n) => {
-                get_token(TokenProperty::from_string(&n.relname));
-            }
-            NodeEnum::Integer(n) => {
-                get_token(TokenProperty::from_int(&n.ival));
-            }
-            NodeEnum::AConst(n) => {
-                if n.isnull {
-                    get_token(TokenProperty::from_token(Token::NullP));
-                }
-            }
-            NodeEnum::ResTarget(n) => {
-                if n.name.len() > 0 {
-                    get_token(TokenProperty::from_string(&n.name));
-                }
-            }
-            NodeEnum::SelectStmt(_) => {
-                get_token(TokenProperty::from_token(Token::Select));
-            }
-            _ => panic!("Node type not implemented: {:?}", n.node),
-        };
+        let child_tokens = get_child_tokens(
+            &n.node,
+            tokens,
+            text,
+            nearest_parent_location,
+            furthest_child_location,
+        );
 
         // For `from`, the location of the node itself is always correct.
         // If not available, the closest estimation is the smaller value of the start of the first direct child token,
@@ -227,13 +127,6 @@ pub fn estimate_node_range(
     });
 
     ranged_nodes
-}
-
-fn get_token_text(start: usize, end: usize, text: &str) -> String {
-    text.chars()
-        .skip(start)
-        .take(end - start)
-        .collect::<String>()
 }
 
 fn get_furthest_child_location(c: &Node, children: &Vec<Node>) -> Option<i32> {

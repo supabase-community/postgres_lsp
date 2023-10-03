@@ -1,12 +1,10 @@
-use std::{collections::VecDeque, iter::Peekable};
+use std::collections::VecDeque;
 
 use cstree::text::{TextRange, TextSize};
 use logos::Logos;
 
 use crate::{
-    estimate_node_range::{estimate_node_range, RangedNode},
-    get_nodes_codegen::get_nodes,
-    parser::Parser,
+    estimate_node_range::estimate_node_range, get_nodes_codegen::get_nodes, parser::Parser,
     syntax_kind_codegen::SyntaxKind,
 };
 
@@ -224,7 +222,7 @@ mod tests {
 
     #[test]
     fn test_statement() {
-        let input = "select null;";
+        let input = "select 1;";
 
         let mut parser = Parser::new();
         parser.parse_statement_at(input, None);
