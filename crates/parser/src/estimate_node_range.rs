@@ -3,7 +3,7 @@ use std::cmp::{max, min};
 use crate::get_location_codegen::get_location;
 use crate::get_nodes_codegen::Node;
 use cstree::text::{TextRange, TextSize};
-use pg_query::{protobuf::ScanToken, NodeEnum};
+use pg_query::{protobuf::ScanToken, protobuf::Token, NodeEnum};
 
 #[derive(Debug, Clone)]
 pub struct RangedNode {
@@ -31,72 +31,109 @@ pub fn estimate_node_range(
 
         let mut child_tokens = Vec::new();
 
-        let mut find_token = |property: String| {
-            println!("find_token {}", property);
-            child_tokens.push(
-                tokens
-                    .iter()
-                    .filter_map(|t| {
-                        println!("token {:#?}", t);
-                        // make a string comparison of the text of the token and the property value
-                        if get_token_text(
+        #[derive(Debug)]
+        struct TokenProperty {
+            value: Option<String>,
+            token: Option<Token>,
+        }
+
+        impl TokenProperty {
+            fn from_int(value: &i32) -> TokenProperty {
+                TokenProperty {
+                    value: Some(value.to_string()),
+                    token: None,
+                }
+            }
+
+            fn from_string(value: &String) -> TokenProperty {
+                assert!(value.len() > 0, "String property value has length 0");
+                TokenProperty {
+                    value: Some(value.to_owned()),
+                    token: None,
+                }
+            }
+
+            fn from_token(token: Token) -> TokenProperty {
+                TokenProperty {
+                    value: None,
+                    token: Some(token),
+                }
+            }
+        }
+
+        let mut get_token = |property: TokenProperty| {
+            let token = tokens
+                .iter()
+                .filter_map(|t| {
+                    if property.token.is_some() {
+                        // if a token is set, we can safely ignore all tokens that are not of the same type
+                        if t.token() != property.token.unwrap() {
+                            return None;
+                        }
+                    }
+                    // make a string comparison of the text of the token and the property value
+                    if property.value.is_some()
+                        && get_token_text(
                             usize::try_from(t.start).unwrap(),
                             usize::try_from(t.end).unwrap(),
                             text,
                         )
                         .to_lowercase()
-                            != property.to_lowercase()
-                        {
-                            println!("token text does not match property value");
-                            return None;
-                        }
+                            != property.value.as_ref().unwrap().to_lowercase()
+                    {
+                        return None;
+                    }
 
-                        // if the furthest child location is set, and it is smaller than the start of the token,
-                        // we can safely ignore this token, because it is not a child of the node
-                        if furthest_child_location.is_some()
-                            && furthest_child_location.unwrap() < t.start as i32
-                        {
-                            println!("furthest child location is smaller than token start");
-                            return None;
-                        }
+                    // if the furthest child location is set, and it is smaller than the start of the token,
+                    // we can safely ignore this token, because it is not a child of the node
+                    if furthest_child_location.is_some()
+                        && furthest_child_location.unwrap() < t.start as i32
+                    {
+                        return None;
+                    }
 
-                        // if the token is before the nearest parent location, we can safely ignore it
-                        // if not, we calculate the distance to the nearest parent location
-                        let distance = t.start - nearest_parent_location;
-                        if distance >= 0 {
-                            println!("distance {} for token {:#?}", distance, t);
-                            Some((distance, t))
-                        } else {
-                            println!("distance is smaller than 0 for token {:#?}", t);
-                            None
-                        }
-                    })
-                    // and use the token with the smallest distance to the nearest parent location
-                    .min_by_key(|(d, _)| d.to_owned())
-                    .map(|(_, t)| t)
-                    .unwrap(),
-            );
+                    // if the token is before the nearest parent location, we can safely ignore it
+                    // if not, we calculate the distance to the nearest parent location
+                    let distance = t.start - nearest_parent_location;
+                    if distance >= 0 {
+                        Some((distance, t))
+                    } else {
+                        None
+                    }
+                })
+                // and use the token with the smallest distance to the nearest parent location
+                .min_by_key(|(d, _)| d.to_owned())
+                .map(|(_, t)| t);
+
+            if token.is_none() {
+                panic!(
+                    "No matching token found for property {:?} in {:#?}",
+                    property, tokens
+                );
+            }
+
+            child_tokens.push(token.unwrap());
         };
 
         match &n.node {
             NodeEnum::RangeVar(n) => {
-                find_token(n.relname.to_owned());
+                get_token(TokenProperty::from_string(&n.relname));
             }
             NodeEnum::Integer(n) => {
-                find_token(n.ival.to_owned().to_string());
+                get_token(TokenProperty::from_int(&n.ival));
             }
             NodeEnum::AConst(n) => {
                 if n.isnull {
-                    find_token("null".to_string());
+                    get_token(TokenProperty::from_token(Token::NullP));
                 }
             }
             NodeEnum::ResTarget(n) => {
                 if n.name.len() > 0 {
-                    find_token(n.name.to_owned());
+                    get_token(TokenProperty::from_string(&n.name));
                 }
             }
-            NodeEnum::SelectStmt(n) => {
-                find_token("select".to_string());
+            NodeEnum::SelectStmt(_) => {
+                get_token(TokenProperty::from_token(Token::Select));
             }
             _ => panic!("Node type not implemented: {:?}", n.node),
         };
@@ -145,7 +182,6 @@ pub fn estimate_node_range(
         };
 
         // For `to`, it’s the larger value of the end of the last direkt child token, and the end of all children ranges.
-        println!("{}: {:?}", n.path, n.node);
         let end_of_last_child_token = if child_tokens.len() > 0 {
             Some(child_tokens.iter().max_by_key(|t| t.end).unwrap().end)
         } else {
@@ -236,6 +272,9 @@ fn get_nearest_parent_location(n: &Node, children: &Vec<Node>) -> i32 {
 
 #[cfg(test)]
 mod tests {
+    use cstree::text::{TextRange, TextSize};
+    use pg_query::NodeEnum;
+
     use crate::estimate_node_range::estimate_node_range;
     use crate::get_nodes_codegen::get_nodes;
 
@@ -266,6 +305,37 @@ mod tests {
 
         let ranged_nodes = estimate_node_range(&mut nodes, &pg_query_tokens, &input);
 
-        dbg!(&ranged_nodes);
+        assert!(ranged_nodes
+            .iter()
+            .find(
+                |n| n.range == TextRange::new(TextSize::from(0), TextSize::from(11))
+                    && match &n.inner.node {
+                        NodeEnum::SelectStmt(_) => true,
+                        _ => false,
+                    }
+            )
+            .is_some());
+
+        assert!(ranged_nodes
+            .iter()
+            .find(
+                |n| n.range == TextRange::new(TextSize::from(7), TextSize::from(11))
+                    && match &n.inner.node {
+                        NodeEnum::ResTarget(_) => true,
+                        _ => false,
+                    }
+            )
+            .is_some());
+
+        assert!(ranged_nodes
+            .iter()
+            .find(
+                |n| n.range == TextRange::new(TextSize::from(7), TextSize::from(11))
+                    && match &n.inner.node {
+                        NodeEnum::AConst(_) => true,
+                        _ => false,
+                    }
+            )
+            .is_some());
     }
 }
