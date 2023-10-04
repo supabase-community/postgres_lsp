@@ -93,10 +93,10 @@ impl Parser {
                     self.token(SyntaxKind::Newline, token.text.as_str());
                 }
                 SourceFileToken::Statement => {
-                    // self.parse_statement(
-                    //     token.text.as_str(),
-                    //     Some(offset + u32::from(token.span.start())),
-                    // );
+                    self.parse_statement_at(
+                        token.text.as_str(),
+                        Some(offset + u32::from(token.span.start())),
+                    );
                 }
             };
         }
@@ -109,6 +109,10 @@ impl Parser {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn init() {
+        let _ = env_logger::builder().is_test(true).try_init();
+    }
 
     #[test]
     fn test_source_file_lexer() {
@@ -145,6 +149,8 @@ mod tests {
 
     #[test]
     fn test_source_file_parser() {
+        init();
+
         let input = "select id, name from users where id = '1224';
 
 select select;
@@ -166,6 +172,8 @@ select 1;
 
     #[test]
     fn test_lexer_with_nested_statements() {
+        init();
+
         let input = "select * from test;
 
 select 123;

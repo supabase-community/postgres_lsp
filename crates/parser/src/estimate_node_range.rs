@@ -4,6 +4,7 @@ use crate::get_child_tokens_codegen::get_child_tokens;
 use crate::get_location_codegen::get_location;
 use crate::get_nodes_codegen::Node;
 use cstree::text::{TextRange, TextSize};
+use log::debug;
 use pg_query::{protobuf::ScanToken, protobuf::Token, NodeEnum};
 
 #[derive(Debug, Clone)]
@@ -42,20 +43,23 @@ pub fn estimate_node_range(
         // If not available, the closest estimation is the smaller value of the start of the first direct child token,
         // and the start of all children ranges. If neither is available, let’s panic for now.
         // The parent location as a fallback should never be required, because any node must have either children with tokens, or a token itself.
+        let children_ranges = ranged_nodes
+            .iter()
+            .filter(|x| x.inner.path.starts_with(n.path.as_str()))
+            .collect::<Vec<&RangedNode>>();
         let location = get_location(&n.node);
         let from = if location.is_some() {
-            location.unwrap()
+            Some(location.unwrap())
         } else {
             let start_of_first_child_token = if child_tokens.len() > 0 {
                 Some(child_tokens.iter().min_by_key(|t| t.start).unwrap().start)
             } else {
                 None
             };
-            let start_of_all_children_ranges = if ranged_nodes.len() > 0 {
+            let start_of_all_children_ranges = if children_ranges.len() > 0 {
                 Some(
-                    ranged_nodes
+                    children_ranges
                         .iter()
-                        .filter(|x| x.inner.path.starts_with(n.path.as_str()))
                         .min_by_key(|n| n.range.start())
                         .unwrap()
                         .range
@@ -67,17 +71,18 @@ pub fn estimate_node_range(
 
             if start_of_first_child_token.is_some() {
                 if start_of_all_children_ranges.is_some() {
-                    min(
+                    Some(min(
                         start_of_first_child_token.unwrap(),
                         u32::from(start_of_all_children_ranges.unwrap()) as i32,
-                    )
+                    ))
                 } else {
-                    start_of_first_child_token.unwrap()
+                    Some(start_of_first_child_token.unwrap())
                 }
             } else if start_of_all_children_ranges.is_some() {
-                u32::from(start_of_all_children_ranges.unwrap()) as i32
+                Some(u32::from(start_of_all_children_ranges.unwrap()) as i32)
             } else {
-                panic!("No location or child tokens found for node {:?}", n);
+                debug!("No location or child tokens found for node {:?}", n);
+                None
             }
         };
 
@@ -87,11 +92,10 @@ pub fn estimate_node_range(
         } else {
             None
         };
-        let end_of_all_children_ranges = if ranged_nodes.len() > 0 {
+        let end_of_all_children_ranges = if children_ranges.len() > 0 {
             Some(
-                ranged_nodes
+                children_ranges
                     .iter()
-                    .filter(|x| x.inner.path.starts_with(n.path.as_str()))
                     .max_by_key(|n| n.range.end())
                     .unwrap()
                     .range
@@ -102,29 +106,33 @@ pub fn estimate_node_range(
         };
         let to = if end_of_last_child_token.is_some() {
             if end_of_all_children_ranges.is_some() {
-                max(
+                Some(max(
                     end_of_last_child_token.unwrap(),
                     u32::from(end_of_all_children_ranges.unwrap()) as i32,
-                )
+                ))
             } else {
-                end_of_last_child_token.unwrap()
+                Some(end_of_last_child_token.unwrap())
             }
         } else if end_of_all_children_ranges.is_some() {
-            u32::from(end_of_all_children_ranges.unwrap()) as i32
+            Some(u32::from(end_of_all_children_ranges.unwrap()) as i32)
         } else {
-            panic!("No child tokens or children ranges found for node {:?}", n);
+            debug!("No child tokens or children ranges found for node {:?}", n);
+            None
         };
 
-        // TODO: validate that prepending is enough to ensure that `ranged_nodes` is sorted by
-        // range.start
-        ranged_nodes.insert(
-            0,
-            RangedNode {
+        if from.is_some() && to.is_some() {
+            ranged_nodes.push(RangedNode {
                 inner: n.to_owned(),
-                range: TextRange::new(TextSize::from(from as u32), TextSize::from(to as u32)),
-            },
-        );
+                range: TextRange::new(
+                    TextSize::from(from.unwrap() as u32),
+                    TextSize::from(to.unwrap() as u32),
+                ),
+            });
+        }
     });
+
+    // sort by start of range, and then by depth
+    ranged_nodes.sort_by_key(|i| (i.range.start(), i.inner.depth));
 
     ranged_nodes
 }

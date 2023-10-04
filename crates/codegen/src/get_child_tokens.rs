@@ -78,7 +78,7 @@ pub fn get_child_tokens_mod(_item: proc_macro2::TokenStream) -> proc_macro2::Tok
             fn from(value: String) -> TokenProperty {
                 assert!(value.len() > 0, "String property value has length 0");
                 TokenProperty {
-                    value: Some(value),
+                    value: Some(value.to_lowercase()),
                     token: None,
                 }
             }
@@ -115,11 +115,24 @@ pub fn get_child_tokens_mod(_item: proc_macro2::TokenStream) -> proc_macro2::Tok
             }
         }
 
-        fn get_token_text(start: usize, end: usize, text: &str) -> String {
+        fn get_token_text(token: &ScanToken ,text: &str) -> String {
+            let start = usize::try_from(token.start).unwrap();
+            let end = usize::try_from(token.end).unwrap();
             text.chars()
                 .skip(start)
                 .take(end - start)
                 .collect::<String>()
+                .to_lowercase()
+        }
+
+        /// returns a list of aliases for a string. primarily used for data types.
+        ///
+        /// list from https://www.postgresql.org/docs/current/datatype.html
+        fn aliases(text: &str) -> Vec<&str> {
+            match text {
+                "integer" | "int" | "int4" => vec!["integer", "int", "int4"],
+                _ => vec![text],
+            }
         }
 
 
@@ -136,17 +149,19 @@ pub fn get_child_tokens_mod(_item: proc_macro2::TokenStream) -> proc_macro2::Tok
                                 return None;
                             }
                         }
+
                         // make a string comparison of the text of the token and the property value
-                        if property.value.is_some()
-                            && get_token_text(
-                                usize::try_from(t.start).unwrap(),
-                                usize::try_from(t.end).unwrap(),
-                                text,
-                            )
-                            .to_lowercase()
-                                != property.value.as_ref().unwrap().to_lowercase()
-                        {
-                            return None;
+                        if property.value.is_some() {
+                            let mut token_text = get_token_text(t, text);
+                            // if token is Sconst, remove leading and trailing quotes
+                            if t.token() == Token::Sconst {
+                                let string_delimiter: &[char; 2] = &['\'', '$'];
+                                token_text = token_text.trim_start_matches(string_delimiter).trim_end_matches(string_delimiter).to_string();
+                            }
+
+                            if !aliases(property.value.as_ref().unwrap()).contains(&token_text.as_str()) {
+                                return None;
+                            }
                         }
 
                         // if the furthest child location is set, and it is smaller than the start of the token,
@@ -170,14 +185,16 @@ pub fn get_child_tokens_mod(_item: proc_macro2::TokenStream) -> proc_macro2::Tok
                     .min_by_key(|(d, _)| d.to_owned())
                     .map(|(_, t)| t);
 
-                if token.is_none() {
-                    panic!(
-                        "No matching token found for property {:?} in {:#?}",
-                        property, tokens
-                    );
-                }
+                // if token.is_none() {
+                //     panic!(
+                //         "No matching token found for property {:#?} of node {:#?} in {:#?} with tokens {:#?}",
+                //         property, node, text, tokens
+                //     );
+                // }
 
-                child_tokens.push(token.unwrap());
+                if token.is_some() {
+                    child_tokens.push(token.unwrap());
+                }
             };
 
             match node {
@@ -220,6 +237,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "Boolean" => quote! {
             get_token(TokenProperty::from(n));
+        },
+        "AStar" => quote! {
+            get_token(TokenProperty::from(Token::Ascii42));
         },
         "AConst" => quote! {
             if n.isnull {
