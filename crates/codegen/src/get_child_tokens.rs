@@ -11,6 +11,7 @@ pub fn get_child_tokens_mod(_item: proc_macro2::TokenStream) -> proc_macro2::Tok
     let node_handlers = node_handlers(&proto_file.nodes);
 
     quote! {
+        use log::{debug};
         use pg_query::{protobuf::ScanToken, protobuf::Token, NodeEnum};
 
         #[derive(Debug)]
@@ -185,15 +186,13 @@ pub fn get_child_tokens_mod(_item: proc_macro2::TokenStream) -> proc_macro2::Tok
                     .min_by_key(|(d, _)| d.to_owned())
                     .map(|(_, t)| t);
 
-                // if token.is_none() {
-                //     panic!(
-                //         "No matching token found for property {:#?} of node {:#?} in {:#?} with tokens {:#?}",
-                //         property, node, text, tokens
-                //     );
-                // }
-
                 if token.is_some() {
                     child_tokens.push(token.unwrap());
+                } else {
+                    debug!(
+                        "No matching token found for property {:#?} of node {:#?} in {:#?} with tokens {:#?}",
+                        property, node, text, tokens
+                    );
                 }
             };
 
