@@ -1,0 +1,70 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+assertion_line: 36
+description: "SELECT city, count(*) FILTER (WHERE temp_lo < 45), max(temp_lo)\n    FROM weather\n    GROUP BY city;\n"
+---
+SelectStmt@0..102
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      String@7..11
+        Ident@7..11 "city"
+  Ascii44@11..12 ","
+  Whitespace@12..13 " "
+  ResTarget@13..49
+    FuncCall@13..49
+      String@13..18
+        Ident@13..18 "count"
+      Ascii40@18..19 "("
+      Ascii42@19..20 "*"
+      Ascii41@20..21 ")"
+      Whitespace@21..22 " "
+      Filter@22..28 "FILTER"
+      Whitespace@28..29 " "
+      Ascii40@29..30 "("
+      Where@30..35 "WHERE"
+      Whitespace@35..36 " "
+      AExpr@36..48
+        ColumnRef@36..43
+          String@36..43
+            Ident@36..43 "temp_lo"
+        Whitespace@43..44 " "
+        String@44..45
+          Ascii60@44..45 "<"
+        Whitespace@45..46 " "
+        AConst@46..48
+          Integer@46..48
+            Iconst@46..48 "45"
+      Ascii41@48..49 ")"
+  Ascii41@49..50 ")"
+  Ascii44@50..51 ","
+  Whitespace@51..52 " "
+  ResTarget@52..65
+    FuncCall@52..65
+      String@52..55
+        Ident@52..55 "max"
+      ColumnRef@55..64
+        String@55..64
+          Ascii40@55..56 "("
+          Ident@56..63 "temp_lo"
+          Ascii41@63..64 ")"
+      Ascii41@64..65 ")"
+  Ascii41@65..66 ")"
+  Newline@66..67 "\n"
+  Whitespace@67..71 "    "
+  From@71..75 "FROM"
+  Whitespace@75..76 " "
+  RangeVar@76..83
+    Ident@76..83 "weather"
+  Newline@83..84 "\n"
+  Whitespace@84..88 "    "
+  GroupP@88..93 "GROUP"
+  Whitespace@93..94 " "
+  By@94..96 "BY"
+  Whitespace@96..97 " "
+  ColumnRef@97..101
+    String@97..101
+      Ident@97..101 "city"
+  Ascii59@101..102 ";"
+

@@ -1,5 +1,6 @@
 use cstree::syntax::ResolvedNode;
 use cstree::{build::GreenNodeBuilder, text::TextRange};
+use log::debug;
 use pg_query::NodeEnum;
 
 use crate::ast_node::RawStmt;
@@ -40,16 +41,19 @@ impl Parser {
 
     /// start a new node of `SyntaxKind`
     pub fn start_node(&mut self, kind: SyntaxKind) {
+        debug!("start_node: {:?}", kind);
         self.inner.start_node(kind);
     }
 
     /// finish current node
     pub fn finish_node(&mut self) {
+        debug!("finish_node");
         self.inner.finish_node();
     }
 
     /// applies token
     pub fn token(&mut self, kind: SyntaxKind, text: &str) {
+        debug!("token: {:?} {:?}", kind, text);
         self.inner.token(kind, text);
     }
 

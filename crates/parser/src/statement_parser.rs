@@ -99,6 +99,8 @@ impl Parser {
         let mut token_buffer: VecDeque<(SyntaxKind, String)> = VecDeque::new();
         // Keeps track of currently open nodes. Latest opened is last.
         let mut open_nodes: Vec<(SyntaxKind, TextRange, i32)> = Vec::new();
+        // List of (SyntaxKind, depth) to keep track of currently open sibling tokens and their depths. Latest opened is last.
+        let mut open_tokens: Vec<(SyntaxKind, i32)> = Vec::new();
 
         // 3. Parse the statement
 
@@ -140,6 +142,7 @@ impl Parser {
                 && pointer <= next_pg_query_token.unwrap().end
             {
                 let token = pg_query_tokens.next().unwrap();
+                let token_syntax_kind = SyntaxKind::new_from_pg_query_token(token);
 
                 let token_text = text
                     .chars()
@@ -149,9 +152,18 @@ impl Parser {
 
                 // a node can only start and end with a pg_query token, so we can handle them here
 
+                // if closing token, close nodes until depth of opening token before applying it
+                let target_depth = if token_syntax_kind.is_closing_sibling() {
+                    Some(open_tokens.last().unwrap().1)
+                } else {
+                    None
+                };
+
                 // before applying the token, close any node that ends before the token starts
                 while open_nodes.last().is_some()
                     && open_nodes.last().unwrap().1.end() <= TextSize::from(token.start as u32)
+                    && (target_depth.is_none()
+                        || open_nodes.last().unwrap().2 > target_depth.unwrap())
                 {
                     self.finish_node();
                     open_nodes.pop();
@@ -176,11 +188,12 @@ impl Parser {
                     ));
                 }
 
-                // apply the token
-                self.token(
-                    SyntaxKind::new_from_pg_query_token(token),
-                    token_text.as_str(),
-                );
+                // apply the token to the cst
+                self.token(token_syntax_kind, token_text.as_str());
+                // save the token as an opening sibling token, if it is one
+                if token_syntax_kind.is_opening_sibling() {
+                    open_tokens.push((token_syntax_kind, open_nodes.last().unwrap().2));
+                }
 
                 token_text.len() as i32
             } else {
@@ -220,9 +233,28 @@ mod tests {
 
     use super::*;
 
+    fn init() {
+        let _ = env_logger::builder().is_test(true).try_init();
+    }
+
     #[test]
     fn test_statement() {
+        init();
+
         let input = "select 1;";
+
+        let mut parser = Parser::new();
+        parser.parse_statement_at(input, None);
+        let parsed = parser.finish();
+
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_sibling_tokens() {
+        init();
+
+        let input = "SELECT city, count(*) FILTER (WHERE temp_lo < 45), max(temp_lo) FROM weather GROUP BY city;";
 
         let mut parser = Parser::new();
         parser.parse_statement_at(input, None);

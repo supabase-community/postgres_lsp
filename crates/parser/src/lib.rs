@@ -21,6 +21,7 @@ mod get_child_tokens_codegen;
 mod get_location_codegen;
 mod get_nodes_codegen;
 mod parser;
+mod sibling_token;
 mod source_parser;
 mod statement_parser;
 mod syntax_error;
