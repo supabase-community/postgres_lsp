@@ -14,27 +14,36 @@ pub fn get_location_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenSt
     quote! {
         use pg_query::NodeEnum;
 
-        // Returns the location of a node
-        pub fn get_location(node: &NodeEnum) -> Option<i32> {
+        /// Returns the location of a node
+        pub fn get_location(node: &NodeEnum) -> Option<u32> {
+            let loc = get_location_internal(node);
+            if loc.is_some() {
+                u32::try_from(loc.unwrap()).ok()
+            } else {
+                None
+            }
+        }
+
+        fn get_location_internal(node: &NodeEnum) -> Option<i32> {
             let location = match node {
-                // for some nodes, the location of the node itself is after their childrens location.
+                // for some nodes, the location of the node itself is after their children location.
                 // we implement the logic for those nodes manually.
                 // if you add one, make sure to add its name to `manual_node_names()`.
                 NodeEnum::BoolExpr(n) => {
                     let a = n.args.iter().min_by(|a, b| {
-                        let loc_a = get_location(&a.node.as_ref().unwrap());
-                        let loc_b = get_location(&b.node.as_ref().unwrap());
+                        let loc_a = get_location_internal(&a.node.as_ref().unwrap());
+                        let loc_b = get_location_internal(&b.node.as_ref().unwrap());
                         loc_a.cmp(&loc_b)
                     });
-                    get_location(&a.unwrap().node.as_ref().unwrap())
+                    get_location_internal(&a.unwrap().node.as_ref().unwrap())
                 },
-                NodeEnum::AExpr(n) => get_location(&n.lexpr.as_ref().unwrap().node.as_ref().unwrap()),
+                NodeEnum::AExpr(n) => get_location_internal(&n.lexpr.as_ref().unwrap().node.as_ref().unwrap()),
                 #(NodeEnum::#node_identifiers(n) => #location_idents),*
             };
             if location.is_some() && location.unwrap() < 0 {
                 None
             } else {
-                location
+               location
             }
         }
     }

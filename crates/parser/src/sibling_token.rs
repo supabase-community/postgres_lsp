@@ -17,6 +17,13 @@ impl SyntaxKind {
             .find_map(|(open, close)| if *open == self { Some(*close) } else { None })
             .unwrap()
     }
+
+    pub fn get_opening_sibling(self) -> SyntaxKind {
+        SIBLINGS
+            .iter()
+            .find_map(|(open, close)| if *close == self { Some(*open) } else { None })
+            .unwrap()
+    }
 }
 
 #[cfg(test)]

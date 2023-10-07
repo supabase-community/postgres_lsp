@@ -101,8 +101,9 @@ fn property_handlers(node: &Node) -> Vec<TokenStream> {
                 Some(quote! {
                     n.#field_name
                         .iter()
-                        .for_each(|x| handle_child(x.node.as_ref().unwrap().to_owned()));
-
+                        .for_each(|x| if x.node.is_some() {
+                            handle_child(x.node.as_ref().unwrap().to_owned());
+                        });
                 })
             } else if field.field_type == FieldType::Node && field.is_one_of == false {
                 if field.node_name == Some("Node".to_owned()) {

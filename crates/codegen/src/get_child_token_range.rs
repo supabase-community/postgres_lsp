@@ -2,7 +2,7 @@ use pg_query_proto_parser::{FieldType, Node, ProtoParser};
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
-pub fn get_child_tokens_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+pub fn get_child_token_range_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let parser = ProtoParser::new("./libpg_query/protobuf/pg_query.proto");
 
     let proto_file = parser.parse();
@@ -12,7 +12,8 @@ pub fn get_child_tokens_mod(_item: proc_macro2::TokenStream) -> proc_macro2::Tok
 
     quote! {
         use log::{debug};
-        use pg_query::{protobuf::ScanToken, protobuf::Token, NodeEnum};
+        use pg_query::{protobuf::ScanToken, protobuf::Token, NodeEnum, protobuf::SortByDir};
+        use cstree::text::{TextRange, TextSize};
 
         #[derive(Debug)]
         struct TokenProperty {
@@ -126,18 +127,30 @@ pub fn get_child_tokens_mod(_item: proc_macro2::TokenStream) -> proc_macro2::Tok
                 .to_lowercase()
         }
 
+
+        /// list of aliases from https://www.postgresql.org/docs/current/datatype.html
+        const ALIASES: [&[&str]; 2]= [
+            &["integer", "int", "int4"],
+            &["real", "float4"],
+        ];
+
         /// returns a list of aliases for a string. primarily used for data types.
-        ///
-        /// list from https://www.postgresql.org/docs/current/datatype.html
         fn aliases(text: &str) -> Vec<&str> {
-            match text {
-                "integer" | "int" | "int4" => vec!["integer", "int", "int4"],
-                _ => vec![text],
+            for alias in ALIASES {
+                if alias.contains(&text) {
+                    return alias.to_vec();
+                }
             }
+            return vec![text];
         }
 
+        pub struct ChildTokenRange {
+            /// the .start of all child tokens used to estimate the range
+            pub child_token_indices: Vec<i32>,
+            pub range: Option<TextRange>
+        }
 
-        pub fn get_child_tokens<'tokens>(node: &NodeEnum, tokens: &'tokens Vec<ScanToken>, text: &str, nearest_parent_location: i32, furthest_child_location: Option<i32>) -> Vec<&'tokens ScanToken> {
+        pub fn get_child_token_range(node: &NodeEnum, tokens: Vec<&ScanToken>, text: &str, nearest_parent_location: u32) -> ChildTokenRange {
             let mut child_tokens = Vec::new();
 
             let mut get_token = |property: TokenProperty| {
@@ -165,17 +178,9 @@ pub fn get_child_tokens_mod(_item: proc_macro2::TokenStream) -> proc_macro2::Tok
                             }
                         }
 
-                        // if the furthest child location is set, and it is smaller than the start of the token,
-                        // we can safely ignore this token, because it is not a child of the node
-                        if furthest_child_location.is_some()
-                            && furthest_child_location.unwrap() < t.start as i32
-                        {
-                            return None;
-                        }
-
                         // if the token is before the nearest parent location, we can safely ignore it
                         // if not, we calculate the distance to the nearest parent location
-                        let distance = t.start - nearest_parent_location;
+                        let distance = t.start - nearest_parent_location as i32;
                         if distance >= 0 {
                             Some((distance, t))
                         } else {
@@ -200,7 +205,17 @@ pub fn get_child_tokens_mod(_item: proc_macro2::TokenStream) -> proc_macro2::Tok
                 #(NodeEnum::#node_identifiers(n) => {#node_handlers}),*,
             };
 
-            child_tokens
+            ChildTokenRange {
+                child_token_indices: child_tokens.iter().map(|t| t.start).collect(),
+                range: if child_tokens.len() > 0 {
+                    Some(TextRange::new(
+                        TextSize::from(child_tokens.iter().min_by_key(|t| t.start).unwrap().start as u32),
+                        TextSize::from(child_tokens.iter().max_by_key(|t| t.end).unwrap().end as u32),
+                    ))
+                } else {
+                    None
+                }
+            }
         }
     }
 }
@@ -230,6 +245,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
     match node.name.as_str() {
         "SelectStmt" => quote! {
             get_token(TokenProperty::from(Token::Select));
+            if n.distinct_clause.len() > 0 {
+                get_token(TokenProperty::from(Token::Distinct));
+            }
         },
         "Integer" => quote! {
             get_token(TokenProperty::from(n));
@@ -239,6 +257,22 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "AStar" => quote! {
             get_token(TokenProperty::from(Token::Ascii42));
+        },
+        "FuncCall" => quote! {
+            if n.agg_filter.is_some() {
+                get_token(TokenProperty::from(Token::Filter));
+            }
+        },
+        "SortBy" => quote! {
+            get_token(TokenProperty::from(Token::Order));
+            match n.sortby_dir {
+                2 => get_token(TokenProperty::from(Token::Asc)),
+                3 => get_token(TokenProperty::from(Token::Desc)),
+                _ => {}
+            }
+        },
+        "WindowDef" => quote! {
+            get_token(TokenProperty::from(Token::Partition));
         },
         "AConst" => quote! {
             if n.isnull {

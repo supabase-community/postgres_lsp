@@ -1,16 +1,16 @@
-mod get_child_tokens;
+mod get_child_token_range;
 mod get_location;
 mod get_nodes;
 mod syntax_kind;
 
-use get_child_tokens::get_child_tokens_mod;
+use get_child_token_range::get_child_token_range_mod;
 use get_location::get_location_mod;
 use get_nodes::get_nodes_mod;
 use syntax_kind::syntax_kind_mod;
 
 #[proc_macro]
-pub fn get_child_tokens(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    get_child_tokens_mod(item.into()).into()
+pub fn get_child_token_range(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    get_child_token_range_mod(item.into()).into()
 }
 
 #[proc_macro]

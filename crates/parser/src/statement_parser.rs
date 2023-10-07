@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 
 use cstree::text::{TextRange, TextSize};
+use log::debug;
 use logos::Logos;
 
 use crate::{
@@ -76,6 +77,8 @@ impl Parser {
                 None
             }
         };
+
+        debug!("pg_query_root: {:#?}", pg_query_root);
 
         // ranged nodes from pg_query.rs, including the root node
         // the nodes are ordered by starting range, starting with the root node
@@ -154,7 +157,15 @@ impl Parser {
 
                 // if closing token, close nodes until depth of opening token before applying it
                 let target_depth = if token_syntax_kind.is_closing_sibling() {
-                    Some(open_tokens.last().unwrap().1)
+                    let opening_token = open_tokens.pop().unwrap();
+                    assert_eq!(
+                        opening_token.0.get_closing_sibling(),
+                        token_syntax_kind,
+                        "Opening token {:?} does not match closing token {:?}",
+                        opening_token.0,
+                        token_syntax_kind
+                    );
+                    Some(opening_token.1)
                 } else {
                     None
                 };
@@ -174,10 +185,10 @@ impl Parser {
                     self.token(kind, text.as_str());
                 }
 
-                // consume all nodes that start at or before the token ends
+                // consume all nodes that start before the token ends
                 while pg_query_nodes.peek().is_some()
                     && pg_query_nodes.peek().unwrap().range.start()
-                        <= TextSize::from(token.end as u32)
+                        < TextSize::from(token.end as u32)
                 {
                     let node = pg_query_nodes.next().unwrap();
                     self.start_node(SyntaxKind::new_from_pg_query_node(&node.inner.node));
@@ -259,6 +270,94 @@ mod tests {
         let mut parser = Parser::new();
         parser.parse_statement_at(input, None);
         let parsed = parser.finish();
+
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_opening_token() {
+        init();
+
+        let input = "INSERT INTO weather VALUES ('San Francisco', 46, 50, 0.25, '1994-11-27');";
+
+        let mut parser = Parser::new();
+        parser.parse_statement_at(input, None);
+        let parsed = parser.finish();
+
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_closing_token_at_last_position() {
+        init();
+
+        let input = "CREATE TABLE weather (
+        city      varchar(80) references cities(name),
+        temp_lo   int
+);";
+
+        let mut parser = Parser::new();
+        parser.parse_statement_at(input, None);
+        let parsed = parser.finish();
+
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_select_with_alias() {
+        init();
+
+        let input = "SELECT w1.temp_lo AS low, w1.temp_hi AS high FROM weather";
+
+        let mut parser = Parser::new();
+        parser.parse_statement_at(input, None);
+        let parsed = parser.finish();
+
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_select_distinct() {
+        init();
+
+        let input = "SELECT DISTINCT city
+    FROM weather
+    ORDER BY city;";
+
+        let mut parser = Parser::new();
+        parser.parse_statement_at(input, None);
+        let parsed = parser.finish();
+
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_order_by() {
+        init();
+
+        let input = "SELECT sum(salary) OVER w, avg(salary) OVER w
+  FROM empsalary
+  WINDOW w AS (PARTITION BY depname ORDER BY salary DESC);";
+
+        let mut parser = Parser::new();
+        parser.parse_statement_at(input, None);
+        let parsed = parser.finish();
+
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_fn_call() {
+        init();
+
+        let input =
+            "SELECT count(*) FILTER (WHERE i < 5) AS filtered FROM generate_series(1,10) AS s(i);";
+
+        let mut parser = Parser::new();
+        parser.parse_statement_at(input, None);
+        let parsed = parser.finish();
+
+        dbg!(&parsed.cst);
 
         assert_eq!(parsed.cst.text(), input);
     }

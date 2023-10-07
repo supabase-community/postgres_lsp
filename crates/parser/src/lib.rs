@@ -17,7 +17,7 @@
 
 mod ast_node;
 mod estimate_node_range;
-mod get_child_tokens_codegen;
+mod get_child_token_range_codegen;
 mod get_location_codegen;
 mod get_nodes_codegen;
 mod parser;

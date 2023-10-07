@@ -1,6 +1,6 @@
 use std::cmp::{max, min};
 
-use crate::get_child_tokens_codegen::get_child_tokens;
+use crate::get_child_token_range_codegen::get_child_token_range;
 use crate::get_location_codegen::get_location;
 use crate::get_nodes_codegen::Node;
 use cstree::text::{TextRange, TextSize};
@@ -21,6 +21,8 @@ pub fn estimate_node_range(
 ) -> Vec<RangedNode> {
     let mut ranged_nodes: Vec<RangedNode> = Vec::new();
 
+    let mut used_tokens: Vec<i32> = Vec::new();
+
     // ensure that all children of any given node are already processed before processing the node itself
     nodes.sort_by(|a, b| b.path.cmp(&a.path));
 
@@ -29,36 +31,34 @@ pub fn estimate_node_range(
     nodes.iter().for_each(|n| {
         // first, get the estimated boundaries of the node based on the `location` property of a node
         let nearest_parent_location = get_nearest_parent_location(&n, nodes);
-        let furthest_child_location = get_furthest_child_location(&n, nodes);
 
-        let child_tokens = get_child_tokens(
+        let child_token_range = get_child_token_range(
             &n.node,
-            tokens,
+            tokens
+                .iter()
+                .filter(|t| !used_tokens.contains(&t.start))
+                .collect(),
             text,
             nearest_parent_location,
-            furthest_child_location,
         );
+
+        used_tokens.extend(child_token_range.child_token_indices);
 
         // For `from`, the location of the node itself is always correct.
         // If not available, the closest estimation is the smaller value of the start of the first direct child token,
         // and the start of all children ranges. If neither is available, let’s panic for now.
         // The parent location as a fallback should never be required, because any node must have either children with tokens, or a token itself.
-        let children_ranges = ranged_nodes
+        let child_node_ranges = ranged_nodes
             .iter()
             .filter(|x| x.inner.path.starts_with(n.path.as_str()))
             .collect::<Vec<&RangedNode>>();
         let location = get_location(&n.node);
         let from = if location.is_some() {
-            Some(location.unwrap())
+            Some(TextSize::from(location.unwrap()))
         } else {
-            let start_of_first_child_token = if child_tokens.len() > 0 {
-                Some(child_tokens.iter().min_by_key(|t| t.start).unwrap().start)
-            } else {
-                None
-            };
-            let start_of_all_children_ranges = if children_ranges.len() > 0 {
+            let start_of_all_children_ranges = if child_node_ranges.len() > 0 {
                 Some(
-                    children_ranges
+                    child_node_ranges
                         .iter()
                         .min_by_key(|n| n.range.start())
                         .unwrap()
@@ -69,17 +69,18 @@ pub fn estimate_node_range(
                 None
             };
 
-            if start_of_first_child_token.is_some() {
+            if child_token_range.range.is_some() {
+                let start_of_first_child_token = child_token_range.range.unwrap().start();
                 if start_of_all_children_ranges.is_some() {
                     Some(min(
-                        start_of_first_child_token.unwrap(),
-                        u32::from(start_of_all_children_ranges.unwrap()) as i32,
+                        start_of_first_child_token,
+                        start_of_all_children_ranges.unwrap(),
                     ))
                 } else {
-                    Some(start_of_first_child_token.unwrap())
+                    Some(start_of_first_child_token)
                 }
             } else if start_of_all_children_ranges.is_some() {
-                Some(u32::from(start_of_all_children_ranges.unwrap()) as i32)
+                Some(start_of_all_children_ranges.unwrap())
             } else {
                 debug!("No location or child tokens found for node {:?}", n);
                 None
@@ -87,14 +88,9 @@ pub fn estimate_node_range(
         };
 
         // For `to`, it’s the larger value of the end of the last direkt child token, and the end of all children ranges.
-        let end_of_last_child_token = if child_tokens.len() > 0 {
-            Some(child_tokens.iter().max_by_key(|t| t.end).unwrap().end)
-        } else {
-            None
-        };
-        let end_of_all_children_ranges = if children_ranges.len() > 0 {
+        let end_of_all_children_ranges = if child_node_ranges.len() > 0 {
             Some(
-                children_ranges
+                child_node_ranges
                     .iter()
                     .max_by_key(|n| n.range.end())
                     .unwrap()
@@ -104,17 +100,18 @@ pub fn estimate_node_range(
         } else {
             None
         };
-        let to = if end_of_last_child_token.is_some() {
+        let to = if child_token_range.range.is_some() {
+            let end_of_last_child_token = child_token_range.range.unwrap().end();
             if end_of_all_children_ranges.is_some() {
                 Some(max(
-                    end_of_last_child_token.unwrap(),
-                    u32::from(end_of_all_children_ranges.unwrap()) as i32,
+                    end_of_last_child_token,
+                    end_of_all_children_ranges.unwrap(),
                 ))
             } else {
-                Some(end_of_last_child_token.unwrap())
+                Some(end_of_last_child_token)
             }
         } else if end_of_all_children_ranges.is_some() {
-            Some(u32::from(end_of_all_children_ranges.unwrap()) as i32)
+            Some(end_of_all_children_ranges.unwrap())
         } else {
             debug!("No child tokens or children ranges found for node {:?}", n);
             None
@@ -123,10 +120,7 @@ pub fn estimate_node_range(
         if from.is_some() && to.is_some() {
             ranged_nodes.push(RangedNode {
                 inner: n.to_owned(),
-                range: TextRange::new(
-                    TextSize::from(from.unwrap() as u32),
-                    TextSize::from(to.unwrap() as u32),
-                ),
+                range: TextRange::new(from.unwrap(), to.unwrap()),
             });
         }
     });
@@ -137,19 +131,7 @@ pub fn estimate_node_range(
     ranged_nodes
 }
 
-fn get_furthest_child_location(c: &Node, children: &Vec<Node>) -> Option<i32> {
-    children
-        .iter()
-        .filter_map(|n| {
-            if !n.path.starts_with(c.path.as_str()) {
-                return None;
-            }
-            get_location(&n.node)
-        })
-        .max()
-}
-
-fn get_nearest_parent_location(n: &Node, children: &Vec<Node>) -> i32 {
+fn get_nearest_parent_location(n: &Node, children: &Vec<Node>) -> u32 {
     // if location is set, return it
     let location = get_location(&n.node);
     if location.is_some() {
