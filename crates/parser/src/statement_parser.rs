@@ -357,6 +357,48 @@ mod tests {
         parser.parse_statement_at(input, None);
         let parsed = parser.finish();
 
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_window_call() {
+        init();
+
+        let input =
+            "SELECT sum(salary) OVER w FROM empsalary WINDOW w AS (PARTITION BY depname ORDER BY salary DESC);";
+
+        let mut parser = Parser::new();
+        parser.parse_statement_at(input, None);
+        let parsed = parser.finish();
+
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_access_priv() {
+        init();
+
+        let input = "GRANT SELECT (col1), UPDATE (col1) ON mytable TO miriam_rw;";
+
+        let mut parser = Parser::new();
+        parser.parse_statement_at(input, None);
+        let parsed = parser.finish();
+
+        dbg!(&parsed.cst);
+
+        assert_eq!(parsed.cst.text(), input);
+    }
+
+    #[test]
+    fn test_create_policy() {
+        init();
+
+        let input = "CREATE POLICY account_managers ON accounts TO managers USING (manager = current_user);";
+
+        let mut parser = Parser::new();
+        parser.parse_statement_at(input, None);
+        let parsed = parser.finish();
+
         dbg!(&parsed.cst);
 
         assert_eq!(parsed.cst.text(), input);

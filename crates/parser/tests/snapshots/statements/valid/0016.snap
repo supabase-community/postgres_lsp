@@ -2,26 +2,36 @@
 source: crates/parser/tests/statement_parser_test.rs
 description: "SELECT * FROM tbl WHERE a COLLATE \"C\" > 'foo';\n"
 ---
-SelectStmt@0..47
+SelectStmt@0..46
   Select@0..6 "SELECT"
   Whitespace@6..7 " "
-  Ascii42@7..8 "*"
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
   Whitespace@8..9 " "
   From@9..13 "FROM"
   Whitespace@13..14 " "
-  Ident@14..17 "tbl"
+  RangeVar@14..17
+    Ident@14..17 "tbl"
   Whitespace@17..18 " "
   Where@18..23 "WHERE"
   Whitespace@23..24 " "
-  Ident@24..25 "a"
-  Whitespace@25..26 " "
-  Collate@26..33 "COLLATE"
-  Whitespace@33..34 " "
-  Ident@34..37 "\"C\""
-  Whitespace@37..38 " "
-  Ascii62@38..39 ">"
-  Whitespace@39..40 " "
-  Sconst@40..45 "'foo'"
+  AExpr@24..45
+    CollateClause@24..25
+      ColumnRef@24..25
+        String@24..25
+          Ident@24..25 "a"
+    Whitespace@25..26 " "
+    Collate@26..33 "COLLATE"
+    Whitespace@33..34 " "
+    Ident@34..37 "\"C\""
+    Whitespace@37..38 " "
+    String@38..39
+      Ascii62@38..39 ">"
+    Whitespace@39..40 " "
+    AConst@40..45
+      String@40..45
+        Sconst@40..45 "'foo'"
   Ascii59@45..46 ";"
-  Newline@46..47 "\n"
 

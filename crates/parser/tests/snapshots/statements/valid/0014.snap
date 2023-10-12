@@ -5,8 +5,8 @@ description: "SELECT sum(salary) OVER w, avg(salary) OVER w\n  FROM empsalary\n 
 SelectStmt@0..121
   Select@0..6 "SELECT"
   Whitespace@6..7 " "
-  ResTarget@7..120
-    FuncCall@7..120
+  ResTarget@7..25
+    FuncCall@7..25
       String@7..10
         Ident@7..10 "sum"
       Ascii40@10..11 "("
@@ -15,60 +15,60 @@ SelectStmt@0..121
           Ident@11..17 "salary"
       Ascii41@17..18 ")"
       Whitespace@18..19 " "
-      Over@19..23 "OVER"
-      Whitespace@23..24 " "
-      WindowDef@24..120
+      WindowDef@19..25
+        Over@19..23 "OVER"
+        Whitespace@23..24 " "
         Ident@24..25 "w"
-        Ascii44@25..26 ","
-        Whitespace@26..27 " "
-        ResTarget@27..120
-          FuncCall@27..120
-            String@27..30
-              Ident@27..30 "avg"
-            Ascii40@30..31 "("
-            ColumnRef@31..37
-              String@31..37
-                Ident@31..37 "salary"
-            Ascii41@37..38 ")"
-            Whitespace@38..39 " "
-            Over@39..43 "OVER"
-            Whitespace@43..44 " "
-            WindowDef@44..120
-              Ident@44..45 "w"
-              Newline@45..46 "\n"
-              Whitespace@46..48 "  "
-              From@48..52 "FROM"
-              Whitespace@52..53 " "
-              RangeVar@53..62
-                Ident@53..62 "empsalary"
-              Newline@62..63 "\n"
-              Whitespace@63..65 "  "
-              Window@65..71 "WINDOW"
-              Whitespace@71..72 " "
-              Ident@72..73 "w"
-              Whitespace@73..74 " "
-              As@74..76 "AS"
-              Whitespace@76..77 " "
-              WindowDef@77..120
-                Ascii40@77..78 "("
-                Partition@78..87 "PARTITION"
-                Whitespace@87..88 " "
-                By@88..90 "BY"
-                Whitespace@90..91 " "
-                ColumnRef@91..98
-                  String@91..98
-                    Ident@91..98 "depname"
-                Whitespace@98..99 " "
-                SortBy@99..119
-                  Order@99..104 "ORDER"
-                  Whitespace@104..105 " "
-                  By@105..107 "BY"
-                  Whitespace@107..108 " "
-                  ColumnRef@108..114
-                    String@108..114
-                      Ident@108..114 "salary"
-                  Whitespace@114..115 " "
-                  Desc@115..119 "DESC"
-                Ascii41@119..120 ")"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..45
+    FuncCall@27..45
+      String@27..30
+        Ident@27..30 "avg"
+      Ascii40@30..31 "("
+      ColumnRef@31..37
+        String@31..37
+          Ident@31..37 "salary"
+      Ascii41@37..38 ")"
+      Whitespace@38..39 " "
+      WindowDef@39..45
+        Over@39..43 "OVER"
+        Whitespace@43..44 " "
+        Ident@44..45 "w"
+  Newline@45..46 "\n"
+  Whitespace@46..48 "  "
+  From@48..52 "FROM"
+  Whitespace@52..53 " "
+  RangeVar@53..62
+    Ident@53..62 "empsalary"
+  Newline@62..63 "\n"
+  Whitespace@63..65 "  "
+  WindowDef@65..120
+    Window@65..71 "WINDOW"
+    Whitespace@71..72 " "
+    Ident@72..73 "w"
+    Whitespace@73..74 " "
+    As@74..76 "AS"
+    Whitespace@76..77 " "
+    Ascii40@77..78 "("
+    Partition@78..87 "PARTITION"
+    Whitespace@87..88 " "
+    By@88..90 "BY"
+    Whitespace@90..91 " "
+    ColumnRef@91..98
+      String@91..98
+        Ident@91..98 "depname"
+    Whitespace@98..99 " "
+    SortBy@99..119
+      Order@99..104 "ORDER"
+      Whitespace@104..105 " "
+      By@105..107 "BY"
+      Whitespace@107..108 " "
+      ColumnRef@108..114
+        String@108..114
+          Ident@108..114 "salary"
+      Whitespace@114..115 " "
+      Desc@115..119 "DESC"
+    Ascii41@119..120 ")"
   Ascii59@120..121 ";"
 

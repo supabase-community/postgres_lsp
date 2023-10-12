@@ -1,11 +1,10 @@
-use std::cmp::{max, min};
+use std::cmp::max;
 
-use crate::get_child_token_range_codegen::get_child_token_range;
+use crate::get_child_token_range_codegen::{get_child_token_range, ChildTokenRangeResult};
 use crate::get_location_codegen::get_location;
 use crate::get_nodes_codegen::Node;
 use cstree::text::{TextRange, TextSize};
-use log::debug;
-use pg_query::{protobuf::ScanToken, protobuf::Token, NodeEnum};
+use pg_query::protobuf::ScanToken;
 
 #[derive(Debug, Clone)]
 pub struct RangedNode {
@@ -19,73 +18,110 @@ pub fn estimate_node_range(
     tokens: &Vec<ScanToken>,
     text: &str,
 ) -> Vec<RangedNode> {
-    let mut ranged_nodes: Vec<RangedNode> = Vec::new();
-
-    let mut used_tokens: Vec<i32> = Vec::new();
-
     // ensure that all children of any given node are already processed before processing the node itself
     nodes.sort_by(|a, b| b.path.cmp(&a.path));
 
-    // we get an estimated range by searching for tokens that match the node property values
-    // and, if available, the `location` of the node itself
-    nodes.iter().for_each(|n| {
-        // first, get the estimated boundaries of the node based on the `location` property of a node
-        let nearest_parent_location = get_nearest_parent_location(&n, nodes);
+    // first get ranges only from child tokens
+    let mut used_tokens: Vec<i32> = Vec::new();
+    let mut child_token_ranges: Vec<Option<TextRange>> = Vec::new();
+    let mut too_many_tokens_at: Vec<usize> = Vec::new();
 
-        let child_token_range = get_child_token_range(
+    nodes.iter().for_each(|n| {
+        match get_child_token_range(
             &n.node,
             tokens
                 .iter()
                 .filter(|t| !used_tokens.contains(&t.start))
                 .collect(),
             text,
-            nearest_parent_location,
-        );
+            None,
+        ) {
+            ChildTokenRangeResult::TooManyTokens => {
+                too_many_tokens_at.push(nodes.iter().position(|x| x.path == n.path).unwrap());
+                child_token_ranges.push(None);
+            }
+            ChildTokenRangeResult::ChildTokenRange {
+                used_token_indices,
+                range,
+            } => {
+                used_tokens.extend(used_token_indices);
+                child_token_ranges.push(Some(range));
+            }
+            ChildTokenRangeResult::NoTokens => {
+                child_token_ranges.push(None);
+            }
+        };
+    });
 
-        used_tokens.extend(child_token_range.child_token_indices);
+    // second iteration using the nearest parent from the first
+    for idx in too_many_tokens_at {
+        // get the nearest parent location
+        let nearest_parent_start =
+            get_nearest_parent_start(&nodes[idx], &nodes, &child_token_ranges);
+        let nearest_parent_location = get_nearest_parent_location(&nodes[idx], &nodes);
 
-        // For `from`, the location of the node itself is always correct.
-        // If not available, the closest estimation is the smaller value of the start of the first direct child token,
-        // and the start of all children ranges. If neither is available, let’s panic for now.
-        // The parent location as a fallback should never be required, because any node must have either children with tokens, or a token itself.
+        match get_child_token_range(
+            &nodes[idx].node,
+            tokens
+                .iter()
+                .filter(|t| !used_tokens.contains(&t.start))
+                .collect(),
+            text,
+            Some(max(nearest_parent_start, nearest_parent_location)),
+        ) {
+            ChildTokenRangeResult::ChildTokenRange {
+                used_token_indices,
+                range,
+            } => {
+                used_tokens.extend(used_token_indices);
+                child_token_ranges[idx] = Some(range)
+            }
+            _ => {}
+        };
+    }
+
+    let mut ranged_nodes: Vec<RangedNode> = Vec::new();
+
+    // we get an estimated range by searching for tokens that match the node property values
+    // and, if available, the `location` of the node itself
+    nodes.iter().enumerate().for_each(|(idx, n)| {
+        let child_token_range = child_token_ranges[idx];
+
+        println!("node: {:#?}, child_token_range: {:?}", n, child_token_range);
+
         let child_node_ranges = ranged_nodes
             .iter()
             .filter(|x| x.inner.path.starts_with(n.path.as_str()))
             .collect::<Vec<&RangedNode>>();
-        let location = get_location(&n.node);
-        let from = if location.is_some() {
-            Some(TextSize::from(location.unwrap()))
-        } else {
-            let start_of_all_children_ranges = if child_node_ranges.len() > 0 {
-                Some(
-                    child_node_ranges
-                        .iter()
-                        .min_by_key(|n| n.range.start())
-                        .unwrap()
-                        .range
-                        .start(),
-                )
-            } else {
-                None
-            };
 
-            if child_token_range.range.is_some() {
-                let start_of_first_child_token = child_token_range.range.unwrap().start();
-                if start_of_all_children_ranges.is_some() {
-                    Some(min(
-                        start_of_first_child_token,
-                        start_of_all_children_ranges.unwrap(),
-                    ))
-                } else {
-                    Some(start_of_first_child_token)
-                }
-            } else if start_of_all_children_ranges.is_some() {
-                Some(start_of_all_children_ranges.unwrap())
-            } else {
-                debug!("No location or child tokens found for node {:?}", n);
-                None
-            }
+        // get `from` location
+        let node_location = match get_location(&n.node) {
+            Some(l) => Some(TextSize::from(l)),
+            None => None,
         };
+        let start_of_all_children_ranges = if child_node_ranges.len() > 0 {
+            Some(
+                child_node_ranges
+                    .iter()
+                    .min_by_key(|n| n.range.start())
+                    .unwrap()
+                    .range
+                    .start(),
+            )
+        } else {
+            None
+        };
+        let start_of_first_child_token = match child_token_range {
+            Some(r) => Some(r.start()),
+            None => None,
+        };
+
+        let from_locations: [Option<TextSize>; 3] = [
+            node_location,
+            start_of_all_children_ranges,
+            start_of_first_child_token,
+        ];
+        let from = from_locations.iter().filter(|v| v.is_some()).min();
 
         // For `to`, it’s the larger value of the end of the last direkt child token, and the end of all children ranges.
         let end_of_all_children_ranges = if child_node_ranges.len() > 0 {
@@ -100,27 +136,18 @@ pub fn estimate_node_range(
         } else {
             None
         };
-        let to = if child_token_range.range.is_some() {
-            let end_of_last_child_token = child_token_range.range.unwrap().end();
-            if end_of_all_children_ranges.is_some() {
-                Some(max(
-                    end_of_last_child_token,
-                    end_of_all_children_ranges.unwrap(),
-                ))
-            } else {
-                Some(end_of_last_child_token)
-            }
-        } else if end_of_all_children_ranges.is_some() {
-            Some(end_of_all_children_ranges.unwrap())
-        } else {
-            debug!("No child tokens or children ranges found for node {:?}", n);
-            None
+        let end_of_last_child_token = match child_token_range {
+            Some(r) => Some(r.end()),
+            None => None,
         };
+        let to_locations: [Option<TextSize>; 2] =
+            [end_of_all_children_ranges, end_of_last_child_token];
+        let to = to_locations.iter().filter(|v| v.is_some()).max();
 
         if from.is_some() && to.is_some() {
             ranged_nodes.push(RangedNode {
                 inner: n.to_owned(),
-                range: TextRange::new(from.unwrap(), to.unwrap()),
+                range: TextRange::new(from.unwrap().unwrap(), to.unwrap().unwrap()),
             });
         }
     });
@@ -129,6 +156,29 @@ pub fn estimate_node_range(
     ranged_nodes.sort_by_key(|i| (i.range.start(), i.inner.depth));
 
     ranged_nodes
+}
+
+fn get_nearest_parent_start(
+    node: &Node,
+    nodes: &Vec<Node>,
+    child_token_ranges: &Vec<Option<TextRange>>,
+) -> u32 {
+    let mut path_elements = node.path.split(".").collect::<Vec<&str>>();
+    path_elements.pop();
+    while path_elements.len() > 0 {
+        let parent_path = path_elements.join(".");
+        let parent_idx = nodes.iter().position(|c| c.path == parent_path);
+        if parent_idx.is_some() {
+            if child_token_ranges[parent_idx.unwrap()].is_some() {
+                return u32::from(child_token_ranges[parent_idx.unwrap()].unwrap().start());
+            }
+        }
+
+        path_elements.pop();
+    }
+
+    // fallback to 0
+    0
 }
 
 fn get_nearest_parent_location(n: &Node, children: &Vec<Node>) -> u32 {
@@ -155,7 +205,7 @@ fn get_nearest_parent_location(n: &Node, children: &Vec<Node>) -> u32 {
     }
 
     // fallback to 0
-    return 0;
+    0
 }
 
 #[cfg(test)]

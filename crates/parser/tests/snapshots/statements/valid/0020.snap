@@ -2,47 +2,66 @@
 source: crates/parser/tests/statement_parser_test.rs
 description: "CREATE FUNCTION concat_lower_or_upper(a text, b text, uppercase boolean DEFAULT false)\nRETURNS text\nAS\n$$\n SELECT CASE\n        WHEN $3 THEN UPPER($1 || ' ' || $2)\n        ELSE LOWER($1 || ' ' || $2)\n        END;\n$$\nLANGUAGE SQL IMMUTABLE STRICT;\n"
 ---
-CreateFunctionStmt@0..246
+CreateFunctionStmt@0..245
   Create@0..6 "CREATE"
   Whitespace@6..7 " "
   Function@7..15 "FUNCTION"
   Whitespace@15..16 " "
-  Ident@16..37 "concat_lower_or_upper"
+  String@16..37
+    Ident@16..37 "concat_lower_or_upper"
   Ascii40@37..38 "("
-  Ident@38..39 "a"
-  Whitespace@39..40 " "
-  TextP@40..44 "text"
+  FunctionParameter@38..44
+    Ident@38..39 "a"
+    Whitespace@39..40 " "
+    TypeName@40..44
+      String@40..44
+        TextP@40..44 "text"
   Ascii44@44..45 ","
   Whitespace@45..46 " "
-  Ident@46..47 "b"
-  Whitespace@47..48 " "
-  TextP@48..52 "text"
+  FunctionParameter@46..52
+    Ident@46..47 "b"
+    Whitespace@47..48 " "
+    TypeName@48..52
+      String@48..52
+        TextP@48..52 "text"
   Ascii44@52..53 ","
   Whitespace@53..54 " "
-  Ident@54..63 "uppercase"
-  Whitespace@63..64 " "
-  BooleanP@64..71 "boolean"
-  Whitespace@71..72 " "
-  Default@72..79 "DEFAULT"
-  Whitespace@79..80 " "
-  FalseP@80..85 "false"
+  FunctionParameter@54..85
+    Ident@54..63 "uppercase"
+    Whitespace@63..64 " "
+    BooleanP@64..71 "boolean"
+    Whitespace@71..72 " "
+    Default@72..79 "DEFAULT"
+    Whitespace@79..80 " "
+    AConst@80..85
+      Boolean@80..85
+        FalseP@80..85 "false"
   Ascii41@85..86 ")"
   Newline@86..87 "\n"
   Returns@87..94 "RETURNS"
   Whitespace@94..95 " "
-  TextP@95..99 "text"
+  TypeName@95..99
+    String@95..99
+      TextP@95..99 "text"
   Newline@99..100 "\n"
-  As@100..102 "AS"
-  Newline@102..103 "\n"
-  Sconst@103..214 "$$\n SELECT CASE\n      ..."
+  DefElem@100..214
+    As@100..102 "AS"
+    Newline@102..103 "\n"
+    List@103..214
+      String@103..214
+        Sconst@103..214 "$$\n SELECT CASE\n      ..."
   Newline@214..215 "\n"
-  Language@215..223 "LANGUAGE"
-  Whitespace@223..224 " "
-  SqlP@224..227 "SQL"
+  DefElem@215..227
+    Language@215..223 "LANGUAGE"
+    Whitespace@223..224 " "
+    String@224..227
+      SqlP@224..227 "SQL"
   Whitespace@227..228 " "
-  Immutable@228..237 "IMMUTABLE"
+  DefElem@228..237
+    String@228..237
+      Immutable@228..237 "IMMUTABLE"
   Whitespace@237..238 " "
-  StrictP@238..244 "STRICT"
+  DefElem@238..244
+    StrictP@238..244 "STRICT"
   Ascii59@244..245 ";"
-  Newline@245..246 "\n"
 

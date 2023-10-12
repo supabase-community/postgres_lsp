@@ -2,41 +2,61 @@
 source: crates/parser/tests/statement_parser_test.rs
 description: "SELECT name, (SELECT max(pop) FROM cities WHERE cities.state = states.name)\n    FROM states;\n"
 ---
-SelectStmt@0..93
+SelectStmt@0..92
   Select@0..6 "SELECT"
   Whitespace@6..7 " "
-  NameP@7..11 "name"
+  ResTarget@7..11
+    ColumnRef@7..11
+      String@7..11
+        NameP@7..11 "name"
   Ascii44@11..12 ","
   Whitespace@12..13 " "
-  Ascii40@13..14 "("
-  Select@14..20 "SELECT"
-  Whitespace@20..21 " "
-  Ident@21..24 "max"
-  Ascii40@24..25 "("
-  Ident@25..28 "pop"
-  Ascii41@28..29 ")"
-  Whitespace@29..30 " "
-  From@30..34 "FROM"
-  Whitespace@34..35 " "
-  Ident@35..41 "cities"
-  Whitespace@41..42 " "
-  Where@42..47 "WHERE"
-  Whitespace@47..48 " "
-  Ident@48..54 "cities"
-  Ascii46@54..55 "."
-  Ident@55..60 "state"
-  Whitespace@60..61 " "
-  Ascii61@61..62 "="
-  Whitespace@62..63 " "
-  Ident@63..69 "states"
-  Ascii46@69..70 "."
-  NameP@70..74 "name"
-  Ascii41@74..75 ")"
+  ResTarget@13..75
+    SubLink@13..75
+      Ascii40@13..14 "("
+      SelectStmt@14..74
+        Select@14..20 "SELECT"
+        Whitespace@20..21 " "
+        ResTarget@21..29
+          FuncCall@21..29
+            String@21..24
+              Ident@21..24 "max"
+            Ascii40@24..25 "("
+            ColumnRef@25..28
+              String@25..28
+                Ident@25..28 "pop"
+            Ascii41@28..29 ")"
+        Whitespace@29..30 " "
+        From@30..34 "FROM"
+        Whitespace@34..35 " "
+        RangeVar@35..41
+          Ident@35..41 "cities"
+        Whitespace@41..42 " "
+        Where@42..47 "WHERE"
+        Whitespace@47..48 " "
+        AExpr@48..74
+          ColumnRef@48..60
+            String@48..54
+              Ident@48..54 "cities"
+            Ascii46@54..55 "."
+            String@55..60
+              Ident@55..60 "state"
+          Whitespace@60..61 " "
+          String@61..62
+            Ascii61@61..62 "="
+          Whitespace@62..63 " "
+          ColumnRef@63..74
+            String@63..69
+              Ident@63..69 "states"
+            Ascii46@69..70 "."
+            String@70..74
+              NameP@70..74 "name"
+      Ascii41@74..75 ")"
   Newline@75..76 "\n"
   Whitespace@76..80 "    "
   From@80..84 "FROM"
   Whitespace@84..85 " "
-  Ident@85..91 "states"
+  RangeVar@85..91
+    Ident@85..91 "states"
   Ascii59@91..92 ";"
-  Newline@92..93 "\n"
 

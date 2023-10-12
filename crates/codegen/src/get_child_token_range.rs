@@ -144,17 +144,22 @@ pub fn get_child_token_range_mod(_item: proc_macro2::TokenStream) -> proc_macro2
             return vec![text];
         }
 
-        pub struct ChildTokenRange {
-            /// the .start of all child tokens used to estimate the range
-            pub child_token_indices: Vec<i32>,
-            pub range: Option<TextRange>
+        #[derive(Debug)]
+        pub enum ChildTokenRangeResult {
+            TooManyTokens,
+            NoTokens,
+            /// indices are the .start of all child tokens used to estimate the range
+            ChildTokenRange { used_token_indices: Vec<i32>, range: TextRange },
         }
 
-        pub fn get_child_token_range(node: &NodeEnum, tokens: Vec<&ScanToken>, text: &str, nearest_parent_location: u32) -> ChildTokenRange {
-            let mut child_tokens = Vec::new();
+        pub fn get_child_token_range(node: &NodeEnum, tokens: Vec<&ScanToken>, text: &str, nearest_parent_location: Option<u32>) -> ChildTokenRangeResult {
+            let mut child_tokens: Vec<&ScanToken> = Vec::new();
+
+            // if true, we found more than one valid token for at least one property of the node
+            let mut has_too_many_tokens: bool = false;
 
             let mut get_token = |property: TokenProperty| {
-                let token = tokens
+                let possible_tokens = tokens
                     .iter()
                     .filter_map(|t| {
                         if property.token.is_some() {
@@ -178,42 +183,59 @@ pub fn get_child_token_range_mod(_item: proc_macro2::TokenStream) -> proc_macro2
                             }
                         }
 
-                        // if the token is before the nearest parent location, we can safely ignore it
-                        // if not, we calculate the distance to the nearest parent location
-                        let distance = t.start - nearest_parent_location as i32;
-                        if distance >= 0 {
-                            Some((distance, t))
-                        } else {
-                            None
-                        }
+                        Some(t)
                     })
-                    // and use the token with the smallest distance to the nearest parent location
-                    .min_by_key(|(d, _)| d.to_owned())
-                    .map(|(_, t)| t);
+                    .collect::<Vec<&&ScanToken>>();
 
-                if token.is_some() {
-                    child_tokens.push(token.unwrap());
-                } else {
+                if possible_tokens.len() == 0 {
                     debug!(
                         "No matching token found for property {:#?} of node {:#?} in {:#?} with tokens {:#?}",
                         property, node, text, tokens
                     );
+                    return;
                 }
+
+                if possible_tokens.len() == 1 {
+                    debug!(
+                        "Found token {:#?} for property {:#?} of node {:#?}",
+                        possible_tokens[0], property, node
+                    );
+                    child_tokens.push(possible_tokens[0]);
+                    return;
+                }
+
+                if nearest_parent_location.is_none() {
+                    debug!("Found {:#?} for property {:#?} and no nearest_parent_location set", possible_tokens, property);
+                    has_too_many_tokens = true;
+                    return;
+                }
+
+                let token = possible_tokens
+                    .iter().map(|t| ((nearest_parent_location.unwrap() as i32 - t.start), t))
+                    .min_by_key(|(d, _)| d.to_owned())
+                    .map(|(_, t)| t);
+
+                debug!("Selected {:#?} as token closest from parent {:#?} as location {:#?}", token.unwrap(), node, nearest_parent_location);
+
+                child_tokens.push(token.unwrap());
             };
 
             match node {
                 #(NodeEnum::#node_identifiers(n) => {#node_handlers}),*,
             };
 
-            ChildTokenRange {
-                child_token_indices: child_tokens.iter().map(|t| t.start).collect(),
-                range: if child_tokens.len() > 0 {
-                    Some(TextRange::new(
+
+            if has_too_many_tokens == true {
+                ChildTokenRangeResult::TooManyTokens
+            } else if child_tokens.len() == 0 {
+                ChildTokenRangeResult::NoTokens
+            } else {
+                ChildTokenRangeResult::ChildTokenRange {
+                    used_token_indices: child_tokens.iter().map(|t| t.start).collect(),
+                    range: TextRange::new(
                         TextSize::from(child_tokens.iter().min_by_key(|t| t.start).unwrap().start as u32),
                         TextSize::from(child_tokens.iter().max_by_key(|t| t.end).unwrap().end as u32),
-                    ))
-                } else {
-                    None
+                    )
                 }
             }
         }
@@ -252,6 +274,13 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "Integer" => quote! {
             get_token(TokenProperty::from(n));
         },
+        "WindowDef" => quote! {
+            if n.partition_clause.len() > 0 {
+                get_token(TokenProperty::from(Token::Window));
+            } else {
+                get_token(TokenProperty::from(Token::Over));
+            }
+        },
         "Boolean" => quote! {
             get_token(TokenProperty::from(n));
         },
@@ -263,6 +292,28 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 get_token(TokenProperty::from(Token::Filter));
             }
         },
+        "SqlvalueFunction" => quote! {
+            match n.op {
+                // 1 SvfopCurrentDate
+                // 2 SvfopCurrentTime
+                // 3 SvfopCurrentTimeN
+                // 4 SvfopCurrentTimestamp
+                // 5 SvfopCurrentTimestampN
+                // 6 SvfopLocaltime
+                // 7 SvfopLocaltimeN
+                // 8 SvfopLocaltimestamp
+                // 9 SvfopLocaltimestampN
+                // 10 SvfopCurrentRole
+                10 => get_token(TokenProperty::from(Token::CurrentRole)),
+                // 11 SvfopCurrentUser
+                11 => get_token(TokenProperty::from(Token::CurrentUser)),
+                // 12 SvfopUser
+                // 13 SvfopSessionUser
+                // 14 SvfopCurrentCatalog
+                // 15 SvfopCurrentSchema
+                _ => panic!("Unknown SqlvalueFunction {:#?}", n.op),
+            }
+        },
         "SortBy" => quote! {
             get_token(TokenProperty::from(Token::Order));
             match n.sortby_dir {
@@ -270,9 +321,6 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 3 => get_token(TokenProperty::from(Token::Desc)),
                 _ => {}
             }
-        },
-        "WindowDef" => quote! {
-            get_token(TokenProperty::from(Token::Partition));
         },
         "AConst" => quote! {
             if n.isnull {

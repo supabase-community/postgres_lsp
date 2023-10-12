@@ -75,7 +75,7 @@ fn tokens(input: &str) -> Vec<Token> {
 }
 
 impl Parser {
-    fn parse_source_at(&mut self, text: &str, at_offset: Option<u32>) {
+    pub fn parse_source_at(&mut self, text: &str, at_offset: Option<u32>) {
         let offset = at_offset.unwrap_or(0);
 
         let tokens = tokens(&text);
