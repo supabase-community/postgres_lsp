@@ -82,12 +82,8 @@ pub fn estimate_node_range(
 
     let mut ranged_nodes: Vec<RangedNode> = Vec::new();
 
-    // we get an estimated range by searching for tokens that match the node property values
-    // and, if available, the `location` of the node itself
     nodes.iter().enumerate().for_each(|(idx, n)| {
         let child_token_range = child_token_ranges[idx];
-
-        println!("node: {:#?}, child_token_range: {:?}", n, child_token_range);
 
         let child_node_ranges = ranged_nodes
             .iter()
