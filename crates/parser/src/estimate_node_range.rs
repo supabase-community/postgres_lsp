@@ -53,9 +53,9 @@ pub fn estimate_node_range(
         };
     });
 
-    // second iteration using the nearest parent from the first
+    // second iteration using the nearest parent from the first, or the location of the nearest
+    // parent node
     for idx in too_many_tokens_at {
-        // get the nearest parent location
         let nearest_parent_start =
             get_nearest_parent_start(&nodes[idx], &nodes, &child_token_ranges);
         let nearest_parent_location = get_nearest_parent_location(&nodes[idx], &nodes);
@@ -90,7 +90,7 @@ pub fn estimate_node_range(
             .filter(|x| x.inner.path.starts_with(n.path.as_str()))
             .collect::<Vec<&RangedNode>>();
 
-        // get `from` location
+        // get `from` location as the smaller value of the location of the node, the start of all children nodes, and the start of the first child token
         let node_location = match get_location(&n.node) {
             Some(l) => Some(TextSize::from(l)),
             None => None,
@@ -141,6 +141,7 @@ pub fn estimate_node_range(
         let to = to_locations.iter().filter(|v| v.is_some()).max();
 
         if from.is_some() && to.is_some() {
+            // ignore nodes that have no range. They are not relevant for the cst.
             ranged_nodes.push(RangedNode {
                 inner: n.to_owned(),
                 range: TextRange::new(from.unwrap().unwrap(), to.unwrap().unwrap()),
