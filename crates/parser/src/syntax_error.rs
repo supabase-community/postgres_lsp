@@ -2,7 +2,7 @@ use std::fmt;
 
 use cstree::text::{TextRange, TextSize};
 
-/// Represents the result of unsuccessful tokenization, parsing
+/// Represents the result of unsuccessful tokenization, parsing,
 /// or tree validation.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SyntaxError(String, TextRange);

@@ -9,10 +9,7 @@ use crate::{
     syntax_kind_codegen::SyntaxKind,
 };
 
-/// A super simple lexer for sql statements.
-///
-/// One weakness of pg_query.rs is that it does not parse whitespace or newlines. We use a very
-/// simple lexer to fill the gaps.
+/// Super simple lexer that only catches the tokens that libpg_query ignores.
 #[derive(Logos, Debug, PartialEq)]
 pub enum StatementToken {
     // comments and whitespaces
@@ -27,7 +24,7 @@ pub enum StatementToken {
 }
 
 impl StatementToken {
-    /// Creates a `SyntaxKind` from a `StatementToken`.
+    /// Create a `SyntaxKind` from a `StatementToken`.
     pub fn syntax_kind(&self) -> SyntaxKind {
         match self {
             StatementToken::Whitespace => SyntaxKind::Whitespace,
@@ -39,6 +36,13 @@ impl StatementToken {
 }
 
 impl Parser {
+    /// Parse a single statement passed in `text`. If `at_offset` is `Some`, the statement is assumed to be at that offset in the source file.
+    ///
+    /// On a high level, the parser works as follows:
+    /// - 1. Collect all information from pg_query.rs and `StatementToken` lexer
+    /// - 2. Derive as much information as possible from the collected information
+    /// - 3. Collect AST node and errors, if any
+    /// - 3. Walk the statement token by token, and reverse-engineer the concrete syntax tree
     pub fn parse_statement_at(&mut self, text: &str, at_offset: Option<u32>) {
         // 1. Collect as much information as possible from pg_query.rs and `StatementToken` lexer
 
@@ -98,6 +102,7 @@ impl Parser {
         let mut statement_token_lexer = StatementToken::lexer(&text);
 
         // 2. Setup data structures required for the parsing algorithm
+
         // A buffer for tokens that are not applied immediately to the cst
         let mut token_buffer: VecDeque<(SyntaxKind, String)> = VecDeque::new();
         // Keeps track of currently open nodes. Latest opened is last.
