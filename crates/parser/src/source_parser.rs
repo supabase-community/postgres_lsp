@@ -75,14 +75,15 @@ fn tokens(input: &str) -> Vec<Token> {
 }
 
 impl Parser {
-    /// Parse a source
     pub fn parse_source_at(&mut self, text: &str, at_offset: Option<u32>) {
         let offset = at_offset.unwrap_or(0);
 
         let tokens = tokens(&text);
         let mut tokens_iter = tokens.iter();
 
-        self.start_node_at(SyntaxKind::SourceFile, 0);
+        // open root `SourceFile` node
+        self.start_node(SyntaxKind::SourceFile);
+
         while let Some(token) = tokens_iter.next() {
             match token.kind {
                 SourceFileToken::Comment => {
@@ -92,13 +93,15 @@ impl Parser {
                     self.token(SyntaxKind::Newline, token.text.as_str());
                 }
                 SourceFileToken::Statement => {
-                    self.parse_statement(
+                    self.parse_statement_at(
                         token.text.as_str(),
                         Some(offset + u32::from(token.span.start())),
                     );
                 }
             };
         }
+
+        // close root `SourceFile` node
         self.finish_node();
     }
 }
@@ -106,6 +109,10 @@ impl Parser {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn init() {
+        let _ = env_logger::builder().is_test(true).try_init();
+    }
 
     #[test]
     fn test_source_file_lexer() {
@@ -142,6 +149,8 @@ mod tests {
 
     #[test]
     fn test_source_file_parser() {
+        init();
+
         let input = "select id, name from users where id = '1224';
 
 select select;
@@ -163,6 +172,8 @@ select 1;
 
     #[test]
     fn test_lexer_with_nested_statements() {
+        init();
+
         let input = "select * from test;
 
 select 123;

@@ -2,71 +2,104 @@
 source: crates/parser/tests/statement_parser_test.rs
 description: "CREATE TABLE products (\n    product_no integer,\n    name text,\n    price numeric CHECK (price > 0),\n    discounted_price numeric CHECK (discounted_price > 0),\n    CHECK (price > discounted_price)\n);\n"
 ---
-CreateStmt@0..199
+CreateStmt@0..198
   Create@0..6 "CREATE"
   Whitespace@6..7 " "
   Table@7..12 "TABLE"
   Whitespace@12..13 " "
-  Ident@13..21 "products"
+  RangeVar@13..21
+    Ident@13..21 "products"
   Whitespace@21..22 " "
   Ascii40@22..23 "("
   Newline@23..24 "\n"
   Whitespace@24..28 "    "
-  Ident@28..38 "product_no"
-  Whitespace@38..39 " "
-  Integer@39..46 "integer"
+  ColumnDef@28..46
+    Ident@28..38 "product_no"
+    Whitespace@38..39 " "
+    TypeName@39..46
+      String@39..46
+        Integer@39..46 "integer"
   Ascii44@46..47 ","
   Newline@47..48 "\n"
   Whitespace@48..52 "    "
-  NameP@52..56 "name"
-  Whitespace@56..57 " "
-  TextP@57..61 "text"
+  ColumnDef@52..61
+    NameP@52..56 "name"
+    Whitespace@56..57 " "
+    TypeName@57..61
+      String@57..61
+        TextP@57..61 "text"
   Ascii44@61..62 ","
   Newline@62..63 "\n"
   Whitespace@63..67 "    "
-  Ident@67..72 "price"
-  Whitespace@72..73 " "
-  Numeric@73..80 "numeric"
-  Whitespace@80..81 " "
-  Check@81..86 "CHECK"
-  Whitespace@86..87 " "
-  Ascii40@87..88 "("
-  Ident@88..93 "price"
-  Whitespace@93..94 " "
-  Ascii62@94..95 ">"
-  Whitespace@95..96 " "
-  Iconst@96..97 "0"
-  Ascii41@97..98 ")"
+  ColumnDef@67..98
+    Ident@67..72 "price"
+    Whitespace@72..73 " "
+    TypeName@73..80
+      String@73..80
+        Numeric@73..80 "numeric"
+    Whitespace@80..81 " "
+    Constraint@81..98
+      Check@81..86 "CHECK"
+      Whitespace@86..87 " "
+      Ascii40@87..88 "("
+      AExpr@88..97
+        ColumnRef@88..93
+          String@88..93
+            Ident@88..93 "price"
+        Whitespace@93..94 " "
+        String@94..95
+          Ascii62@94..95 ">"
+        Whitespace@95..96 " "
+        AConst@96..97
+          Integer@96..97
+            Iconst@96..97 "0"
+      Ascii41@97..98 ")"
   Ascii44@98..99 ","
   Newline@99..100 "\n"
   Whitespace@100..104 "    "
-  Ident@104..120 "discounted_price"
-  Whitespace@120..121 " "
-  Numeric@121..128 "numeric"
-  Whitespace@128..129 " "
-  Check@129..134 "CHECK"
-  Whitespace@134..135 " "
-  Ascii40@135..136 "("
-  Ident@136..152 "discounted_price"
-  Whitespace@152..153 " "
-  Ascii62@153..154 ">"
-  Whitespace@154..155 " "
-  Iconst@155..156 "0"
-  Ascii41@156..157 ")"
+  ColumnDef@104..157
+    Ident@104..120 "discounted_price"
+    Whitespace@120..121 " "
+    TypeName@121..128
+      String@121..128
+        Numeric@121..128 "numeric"
+    Whitespace@128..129 " "
+    Constraint@129..157
+      Check@129..134 "CHECK"
+      Whitespace@134..135 " "
+      Ascii40@135..136 "("
+      AExpr@136..156
+        ColumnRef@136..152
+          String@136..152
+            Ident@136..152 "discounted_price"
+        Whitespace@152..153 " "
+        String@153..154
+          Ascii62@153..154 ">"
+        Whitespace@154..155 " "
+        AConst@155..156
+          Integer@155..156
+            Iconst@155..156 "0"
+      Ascii41@156..157 ")"
   Ascii44@157..158 ","
   Newline@158..159 "\n"
   Whitespace@159..163 "    "
-  Check@163..168 "CHECK"
-  Whitespace@168..169 " "
-  Ascii40@169..170 "("
-  Ident@170..175 "price"
-  Whitespace@175..176 " "
-  Ascii62@176..177 ">"
-  Whitespace@177..178 " "
-  Ident@178..194 "discounted_price"
-  Ascii41@194..195 ")"
+  Constraint@163..195
+    Check@163..168 "CHECK"
+    Whitespace@168..169 " "
+    Ascii40@169..170 "("
+    AExpr@170..194
+      ColumnRef@170..175
+        String@170..175
+          Ident@170..175 "price"
+      Whitespace@175..176 " "
+      String@176..177
+        Ascii62@176..177 ">"
+      Whitespace@177..178 " "
+      ColumnRef@178..194
+        String@178..194
+          Ident@178..194 "discounted_price"
+    Ascii41@194..195 ")"
   Newline@195..196 "\n"
   Ascii41@196..197 ")"
   Ascii59@197..198 ";"
-  Newline@198..199 "\n"
 

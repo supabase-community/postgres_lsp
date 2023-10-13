@@ -1,6 +1,7 @@
 use std::fs;
 mod common;
 use insta;
+use log::debug;
 use parser::Parser;
 
 const VALID_STATEMENTS_PATH: &str = "tests/data/statements/valid/";
@@ -22,8 +23,10 @@ fn valid_statements() {
 
         let contents = fs::read_to_string(&path).unwrap();
 
+        debug!("Parsing statement: {}", test_name);
+
         let mut parser = Parser::new();
-        parser.parse_statement(&contents, None);
+        parser.parse_statement_at(&contents, None);
         let parsed = parser.finish();
 
         let mut settings = insta::Settings::clone_current();
