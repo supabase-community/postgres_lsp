@@ -19,6 +19,9 @@ pub fn syntax_kind_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStr
     let syntax_kind_impl =
         syntax_kind_impl(&node_identifiers, &token_identifiers, &token_value_literals);
 
+    let syntax_kind_from_impl =
+        syntax_kind_from_impl(&node_identifiers, &token_identifiers, &token_value_literals);
+
     let mut enum_variants = HashSet::new();
     enum_variants.extend(&custom_node_identifiers);
     enum_variants.extend(&node_identifiers);
@@ -38,6 +41,7 @@ pub fn syntax_kind_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStr
             #(#unique_enum_variants),*,
         }
 
+        #syntax_kind_from_impl
         #syntax_kind_impl
     }
 }
@@ -98,9 +102,36 @@ fn syntax_kind_impl(
     }
 }
 
-fn new_from_pg_query_node_fn(node_identifiers: &[Ident]) -> proc_macro2::TokenStream {
+fn syntax_kind_from_impl(
+    node_identifiers: &[Ident],
+    token_identifiers: &[Ident],
+    token_value_literals: &[Literal],
+) -> proc_macro2::TokenStream {
     quote! {
         /// Converts a `pg_query` node to a `SyntaxKind`
+        impl From<&NodeEnum> for SyntaxKind {
+            fn from(node: &NodeEnum) -> SyntaxKind {
+                match node {
+                    #(NodeEnum::#node_identifiers(_) => SyntaxKind::#node_identifiers),*
+                }
+            }
+        }
+
+        impl From<&ScanToken> for SyntaxKind {
+            fn from(token: &ScanToken) -> SyntaxKind {
+                match token.token {
+                    #(#token_value_literals => SyntaxKind::#token_identifiers),*,
+                    _ => panic!("Unknown token: {:?}", token.token),
+                }
+            }
+        }
+    }
+}
+
+fn new_from_pg_query_node_fn(node_identifiers: &[Ident]) -> proc_macro2::TokenStream {
+    quote! {
+
+        /// TODO: drop this
         pub fn new_from_pg_query_node(node: &NodeEnum) -> Self {
             match node {
                 #(NodeEnum::#node_identifiers(_) => SyntaxKind::#node_identifiers),*
@@ -114,6 +145,7 @@ fn new_from_pg_query_token_fn(
     token_value_literals: &[Literal],
 ) -> proc_macro2::TokenStream {
     quote! {
+
         /// Converts a `pg_query` token to a `SyntaxKind`
         pub fn new_from_pg_query_token(token: &ScanToken) -> Self {
             match token.token {
