@@ -54,6 +54,7 @@ fn custom_node_names() -> Vec<&'static str> {
         "Newline",
         "Tab",
         "Stmt",
+        "Eof",
     ]
 }
 

@@ -1,22 +1,20 @@
-use std::collections::VecDeque;
+use std::{collections::VecDeque, sync::LazyLock};
 
 use regex::Regex;
 
 use cstree::text::{TextRange, TextSize};
-use lazy_static::lazy_static;
 
 use crate::syntax_kind_codegen::SyntaxKind;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Token {
-    kind: SyntaxKind,
-    text: String,
-    span: TextRange,
+    pub kind: SyntaxKind,
+    pub text: String,
+    pub span: TextRange,
 }
 
-lazy_static! {
-    static ref PATTERN_LEXER: Regex = Regex::new(r"(?P<whitespace> )|(?P<newline>\n)").unwrap();
-}
+static PATTERN_LEXER: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?P<whitespace> )|(?P<newline>\n)").unwrap());
 
 fn whitespace_tokens(input: &str) -> VecDeque<Token> {
     let mut tokens = VecDeque::new();

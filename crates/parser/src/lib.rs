@@ -15,6 +15,8 @@
 //!
 //! To see how these drawbacks are mitigated, see the `statement_parser.rs` and the `source_parser.rs` module.
 
+#![feature(lazy_cell)]
+
 mod ast_node;
 mod estimate_node_range;
 mod get_child_token_range_codegen;
@@ -22,6 +24,7 @@ mod get_location_codegen;
 mod get_nodes_codegen;
 mod lexer;
 mod parser;
+mod parser_new;
 mod sibling_token;
 mod source_parser;
 mod statement_parser;

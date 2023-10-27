@@ -1,3 +1,4 @@
+use cstree::build::Checkpoint;
 use cstree::syntax::ResolvedNode;
 use cstree::{build::GreenNodeBuilder, text::TextRange};
 use log::debug;
@@ -75,5 +76,19 @@ impl Parser {
             stmts: self.stmts,
             errors: self.errors,
         }
+    }
+
+    /// Prepare for maybe wrapping the next node with a surrounding node.
+    ///
+    /// The way wrapping works is that you first get a checkpoint, then you add nodes and tokens as
+    /// normal, and then you *maybe* call [`start_node_at`](Parser::start_node_at).
+    pub fn checkpoint(self) -> Checkpoint {
+        self.inner.checkpoint()
+    }
+
+    /// Wrap the previous branch marked by [`checkpoint`](Parser::checkpoint) in a new
+    /// branch and make it current.
+    pub fn start_node_at(&mut self, checkpoint: Checkpoint, kind: SyntaxKind) {
+        self.inner.start_node_at(checkpoint, kind);
     }
 }
