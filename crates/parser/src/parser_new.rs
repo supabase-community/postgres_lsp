@@ -21,81 +21,128 @@ static WHITESPACE_TOKENS: &[SyntaxKind] = &[
     SyntaxKind::SqlComment,
 ];
 
-// TODO: complete the hashmap below with all statements:
-// #[prost(message, tag="52")]
-// RawStmt(::prost::alloc::boxed::Box<super::RawStmt>),
-// #[prost(message, tag="53")]
-// Query(::prost::alloc::boxed::Box<super::Query>),
-// #[prost(message, tag="54")]
-// InsertStmt(::prost::alloc::boxed::Box<super::InsertStmt>),
-// #[prost(message, tag="55")]
-// DeleteStmt(::prost::alloc::boxed::Box<super::DeleteStmt>),
-// #[prost(message, tag="56")]
-// UpdateStmt(::prost::alloc::boxed::Box<super::UpdateStmt>),
-// #[prost(message, tag="57")]
-// MergeStmt(::prost::alloc::boxed::Box<super::MergeStmt>),
-// #[prost(message, tag="58")]
-// SelectStmt(::prost::alloc::boxed::Box<super::SelectStmt>),
-// #[prost(message, tag="59")]
-// ReturnStmt(::prost::alloc::boxed::Box<super::ReturnStmt>),
-// #[prost(message, tag="60")]
-// PlassignStmt(::prost::alloc::boxed::Box<super::PlAssignStmt>),
-// #[prost(message, tag="61")]
-// AlterTableStmt(super::AlterTableStmt),
-// #[prost(message, tag="62")]
-// AlterTableCmd(::prost::alloc::boxed::Box<super::AlterTableCmd>),
-// #[prost(message, tag="63")]
-// AlterDomainStmt(::prost::alloc::boxed::Box<super::AlterDomainStmt>),
-// #[prost(message, tag="64")]
-// SetOperationStmt(::prost::alloc::boxed::Box<super::SetOperationStmt>),
-// #[prost(message, tag="65")]
+static STATEMENTS: LazyLock<HashMap<SyntaxKind, &'static [SyntaxKind]>> = LazyLock::new(|| {
+    let mut m: HashMap<SyntaxKind, &'static [SyntaxKind]> = HashMap::new();
+    m.insert(
+        SyntaxKind::InsertStmt,
+        &[SyntaxKind::Insert, SyntaxKind::Into],
+    );
+    m.insert(
+        SyntaxKind::DeleteStmt,
+        &[SyntaxKind::DeleteP, SyntaxKind::From],
+    );
+    m.insert(SyntaxKind::UpdateStmt, &[SyntaxKind::Update]);
+    m.insert(
+        SyntaxKind::MergeStmt,
+        &[SyntaxKind::Merge, SyntaxKind::Into],
+    );
+    m.insert(SyntaxKind::SelectStmt, &[SyntaxKind::Select]);
+    // FIX: alter table vs alter table x rename
+    m.insert(
+        SyntaxKind::AlterTableStmt,
+        &[SyntaxKind::Alter, SyntaxKind::Table],
+    );
+    // FIX: ALTER TABLE x RENAME TO y
+    m.insert(
+        SyntaxKind::RenameStmt,
+        &[SyntaxKind::Alter, SyntaxKind::Table],
+    );
+
+    m.insert(
+        SyntaxKind::AlterDomainStmt,
+        &[SyntaxKind::Alter, SyntaxKind::DomainP],
+    );
+    m.insert(
+        SyntaxKind::AlterDefaultPrivilegesStmt,
+        &[
+            SyntaxKind::Alter,
+            SyntaxKind::Default,
+            SyntaxKind::Privileges,
+        ],
+    );
+    m.insert(SyntaxKind::ClusterStmt, &[SyntaxKind::Cluster]);
+    m.insert(SyntaxKind::CopyStmt, &[SyntaxKind::Copy]);
+    // FIX: CREATE [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } | UNLOGGED ] TABLE
+    // m.insert(
+    //     SyntaxKind::CreateStmt,
+    //     &[SyntaxKind::Create, SyntaxKind::Table],
+    // );
+
+    // FIX: CREATE [ OR REPLACE ] AGGREGATE
+    // FIX: DefineStmt has multiple definitions
+    m.insert(
+        SyntaxKind::DefineStmt,
+        &[SyntaxKind::Create, SyntaxKind::Aggregate],
+    );
+    m.insert(
+        SyntaxKind::DefineStmt,
+        &[SyntaxKind::Create, SyntaxKind::Operator],
+    );
+    m.insert(
+        SyntaxKind::DefineStmt,
+        &[SyntaxKind::Create, SyntaxKind::TypeP],
+    );
+
+    m.insert(SyntaxKind::DropStmt, &[SyntaxKind::Drop]);
+    m.insert(SyntaxKind::TruncateStmt, &[SyntaxKind::Truncate]);
+    m.insert(
+        SyntaxKind::CommentStmt,
+        &[SyntaxKind::Comment, SyntaxKind::On],
+    );
+    m.insert(SyntaxKind::FetchStmt, &[SyntaxKind::Fetch]);
+    // FIX: CREATE [ UNIQUE ] INDEX
+    m.insert(
+        SyntaxKind::IndexStmt,
+        &[SyntaxKind::Create, SyntaxKind::Index],
+    );
+
+    // FIX: CREATE [ OR REPLACE ] FUNCTION
+    m.insert(
+        SyntaxKind::CreateFunctionStmt,
+        &[SyntaxKind::Create, SyntaxKind::Function],
+    );
+    m.insert(
+        SyntaxKind::AlterFunctionStmt,
+        &[SyntaxKind::Alter, SyntaxKind::Function],
+    );
+    m.insert(SyntaxKind::DoStmt, &[SyntaxKind::Do]);
+
+    // FIX: CREATE [ OR REPLACE ] RULE
+    m.insert(
+        SyntaxKind::RuleStmt,
+        &[SyntaxKind::Create, SyntaxKind::Rule],
+    );
+
+    m.insert(SyntaxKind::NotifyStmt, &[SyntaxKind::Notify]);
+    m.insert(SyntaxKind::ListenStmt, &[SyntaxKind::Listen]);
+    m.insert(SyntaxKind::UnlistenStmt, &[SyntaxKind::Unlisten]);
+
+    // FIX: TransactionStmt can be Begin or Commit
+    m.insert(SyntaxKind::TransactionStmt, &[SyntaxKind::BeginP]);
+    m.insert(SyntaxKind::TransactionStmt, &[SyntaxKind::Commit]);
+
+    // FIX: CREATE [ OR REPLACE ] [ TEMP | TEMPORARY ] [ RECURSIVE ] VIEW
+    m.insert(
+        SyntaxKind::ViewStmt,
+        &[SyntaxKind::Create, SyntaxKind::View],
+    );
+
+    m.insert(SyntaxKind::LoadStmt, &[SyntaxKind::Load]);
+
+    m
+});
+
+// TODO: complete the hashmap above with all statements:
+// RETURN statement (inside SQL function body)
+// ReturnStmt,
+// SetOperationStmt,
+//
+// TODO: parsing ambiguity, check docs for solution
 // GrantStmt(super::GrantStmt),
-// #[prost(message, tag="66")]
 // GrantRoleStmt(super::GrantRoleStmt),
-// #[prost(message, tag="67")]
-// AlterDefaultPrivilegesStmt(super::AlterDefaultPrivilegesStmt),
-// #[prost(message, tag="68")]
-// ClosePortalStmt(super::ClosePortalStmt),
-// #[prost(message, tag="69")]
-// ClusterStmt(super::ClusterStmt),
-// #[prost(message, tag="70")]
-// CopyStmt(::prost::alloc::boxed::Box<super::CopyStmt>),
-// #[prost(message, tag="71")]
-// CreateStmt(super::CreateStmt),
-// #[prost(message, tag="72")]
-// DefineStmt(super::DefineStmt),
-// #[prost(message, tag="73")]
-// DropStmt(super::DropStmt),
-// #[prost(message, tag="74")]
-// TruncateStmt(super::TruncateStmt),
-// #[prost(message, tag="75")]
-// CommentStmt(::prost::alloc::boxed::Box<super::CommentStmt>),
-// #[prost(message, tag="76")]
-// FetchStmt(super::FetchStmt),
-// #[prost(message, tag="77")]
-// IndexStmt(::prost::alloc::boxed::Box<super::IndexStmt>),
-// #[prost(message, tag="78")]
-// CreateFunctionStmt(::prost::alloc::boxed::Box<super::CreateFunctionStmt>),
-// #[prost(message, tag="79")]
-// AlterFunctionStmt(super::AlterFunctionStmt),
-// #[prost(message, tag="80")]
-// DoStmt(super::DoStmt),
-// #[prost(message, tag="81")]
-// RenameStmt(::prost::alloc::boxed::Box<super::RenameStmt>),
-// #[prost(message, tag="82")]
-// RuleStmt(::prost::alloc::boxed::Box<super::RuleStmt>),
-// #[prost(message, tag="83")]
-// NotifyStmt(super::NotifyStmt),
-// #[prost(message, tag="84")]
-// ListenStmt(super::ListenStmt),
-// #[prost(message, tag="85")]
-// UnlistenStmt(super::UnlistenStmt),
-// #[prost(message, tag="86")]
-// TransactionStmt(super::TransactionStmt),
-// #[prost(message, tag="87")]
-// ViewStmt(::prost::alloc::boxed::Box<super::ViewStmt>),
-// #[prost(message, tag="88")]
-// LoadStmt(super::LoadStmt),
+//
+// ClosePortalStmt,
+//
 // #[prost(message, tag="89")]
 // CreateDomainStmt(::prost::alloc::boxed::Box<super::CreateDomainStmt>),
 // #[prost(message, tag="90")]
@@ -260,20 +307,6 @@ static WHITESPACE_TOKENS: &[SyntaxKind] = &[
 // CallStmt(::prost::alloc::boxed::Box<super::CallStmt>),
 // #[prost(message, tag="170")]
 // AlterStatsStmt(super::AlterStatsStmt),
-
-static STATEMENTS: LazyLock<HashMap<SyntaxKind, &'static [SyntaxKind]>> = LazyLock::new(|| {
-    let mut m: HashMap<SyntaxKind, &'static [SyntaxKind]> = HashMap::new();
-    m.insert(
-        SyntaxKind::InsertStmt,
-        &[SyntaxKind::Insert, SyntaxKind::Into],
-    );
-    m.insert(SyntaxKind::SelectStmt, &[SyntaxKind::Select]);
-    m.insert(
-        SyntaxKind::AlterTableStmt,
-        &[SyntaxKind::Alter, SyntaxKind::Table],
-    );
-    m
-});
 
 static STATEMENT_FIRSTS: LazyLock<Vec<&[SyntaxKind]>> =
     LazyLock::new(|| STATEMENTS.values().cloned().collect());
@@ -539,6 +572,21 @@ mod tests {
 
     fn init() {
         let _ = env_logger::builder().is_test(true).try_init();
+    }
+
+    #[test]
+    fn test_playground() {
+        init();
+
+        let input = "BEGIN;
+UPDATE accounts SET balance = balance - 100.00
+    WHERE name = 'Alice';
+-- etc etc
+COMMIT;";
+        let parsed = pg_query::parse(input).unwrap();
+        let scanned = pg_query::scan(input).unwrap();
+        println!("{:#?}", parsed.protobuf.nodes());
+        println!("{:#?}", scanned.tokens);
     }
 
     #[test]
