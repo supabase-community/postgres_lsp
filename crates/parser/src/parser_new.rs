@@ -21,116 +21,355 @@ static WHITESPACE_TOKENS: &[SyntaxKind] = &[
     SyntaxKind::SqlComment,
 ];
 
-static STATEMENTS: LazyLock<HashMap<SyntaxKind, &'static [SyntaxKind]>> = LazyLock::new(|| {
-    let mut m: HashMap<SyntaxKind, &'static [SyntaxKind]> = HashMap::new();
-    m.insert(
-        SyntaxKind::InsertStmt,
-        &[SyntaxKind::Insert, SyntaxKind::Into],
-    );
-    m.insert(
-        SyntaxKind::DeleteStmt,
-        &[SyntaxKind::DeleteP, SyntaxKind::From],
-    );
-    m.insert(SyntaxKind::UpdateStmt, &[SyntaxKind::Update]);
-    m.insert(
-        SyntaxKind::MergeStmt,
-        &[SyntaxKind::Merge, SyntaxKind::Into],
-    );
-    m.insert(SyntaxKind::SelectStmt, &[SyntaxKind::Select]);
-    // FIX: alter table vs alter table x rename
-    m.insert(
-        SyntaxKind::AlterTableStmt,
-        &[SyntaxKind::Alter, SyntaxKind::Table],
-    );
-    // FIX: ALTER TABLE x RENAME TO y
-    m.insert(
-        SyntaxKind::RenameStmt,
-        &[SyntaxKind::Alter, SyntaxKind::Table],
-    );
+enum SyntaxToken {
+    Required(SyntaxKind),
+    Optional(SyntaxKind),
+}
 
-    m.insert(
-        SyntaxKind::AlterDomainStmt,
-        &[SyntaxKind::Alter, SyntaxKind::DomainP],
-    );
-    m.insert(
-        SyntaxKind::AlterDefaultPrivilegesStmt,
-        &[
-            SyntaxKind::Alter,
-            SyntaxKind::Default,
-            SyntaxKind::Privileges,
-        ],
-    );
-    m.insert(SyntaxKind::ClusterStmt, &[SyntaxKind::Cluster]);
-    m.insert(SyntaxKind::CopyStmt, &[SyntaxKind::Copy]);
-    // FIX: CREATE [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } | UNLOGGED ] TABLE
-    // m.insert(
-    //     SyntaxKind::CreateStmt,
-    //     &[SyntaxKind::Create, SyntaxKind::Table],
-    // );
+#[derive(Debug, Clone, Hash)]
+enum TokenStatement {
+    // The respective token is the last token of the statement
+    EoS(SyntaxKind),
+    Any(SyntaxKind),
+}
 
-    // FIX: CREATE [ OR REPLACE ] AGGREGATE
-    // FIX: DefineStmt has multiple definitions
-    m.insert(
-        SyntaxKind::DefineStmt,
-        &[SyntaxKind::Create, SyntaxKind::Aggregate],
-    );
-    m.insert(
-        SyntaxKind::DefineStmt,
-        &[SyntaxKind::Create, SyntaxKind::Operator],
-    );
-    m.insert(
-        SyntaxKind::DefineStmt,
-        &[SyntaxKind::Create, SyntaxKind::TypeP],
-    );
+impl PartialEq for TokenStatement {
+    fn eq(&self, other: &Self) -> bool {
+        let a = match self {
+            TokenStatement::EoS(s) => s,
+            TokenStatement::Any(s) => s,
+        };
 
-    m.insert(SyntaxKind::DropStmt, &[SyntaxKind::Drop]);
-    m.insert(SyntaxKind::TruncateStmt, &[SyntaxKind::Truncate]);
-    m.insert(
-        SyntaxKind::CommentStmt,
-        &[SyntaxKind::Comment, SyntaxKind::On],
-    );
-    m.insert(SyntaxKind::FetchStmt, &[SyntaxKind::Fetch]);
-    // FIX: CREATE [ UNIQUE ] INDEX
-    m.insert(
-        SyntaxKind::IndexStmt,
-        &[SyntaxKind::Create, SyntaxKind::Index],
-    );
+        let b = match other {
+            TokenStatement::EoS(s) => s,
+            TokenStatement::Any(s) => s,
+        };
 
-    // FIX: CREATE [ OR REPLACE ] FUNCTION
-    m.insert(
-        SyntaxKind::CreateFunctionStmt,
-        &[SyntaxKind::Create, SyntaxKind::Function],
-    );
-    m.insert(
-        SyntaxKind::AlterFunctionStmt,
-        &[SyntaxKind::Alter, SyntaxKind::Function],
-    );
-    m.insert(SyntaxKind::DoStmt, &[SyntaxKind::Do]);
+        return a == b;
+    }
+}
 
-    // FIX: CREATE [ OR REPLACE ] RULE
-    m.insert(
-        SyntaxKind::RuleStmt,
-        &[SyntaxKind::Create, SyntaxKind::Rule],
-    );
+// vector of hashmaps, where each hashmap returns the list of possible statements for a token at
+// the respective index.
+//
+// For example, at idx 0, the hashmap contains a superset of
+// ```
+//{
+//     Create: [
+//         IndexStmt,
+//         CreateFunctionStmt,
+//         CreateStmt,
+//         ViewStmt,
+//     ],
+//     Select: [
+//         SelectStmt,
+//     ],
+// },
+// ```
+//
+// the idea is to trim down the possible options for each token, until only one statement is left.
+//
+// The vector is lazily constructed out of another vector of tuples, where each tuple contains a
+// statement, and a list of `SyntaxToken`s that are to be found at the start of the statement.
+static STATEMENT_START_TOKEN_MAPS: LazyLock<Vec<HashMap<SyntaxKind, Vec<TokenStatement>>>> =
+    LazyLock::new(|| {
+        let mut m: Vec<(SyntaxKind, &'static [SyntaxToken])> = Vec::new();
 
-    m.insert(SyntaxKind::NotifyStmt, &[SyntaxKind::Notify]);
-    m.insert(SyntaxKind::ListenStmt, &[SyntaxKind::Listen]);
-    m.insert(SyntaxKind::UnlistenStmt, &[SyntaxKind::Unlisten]);
+        m.push((
+            SyntaxKind::InsertStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Insert),
+                SyntaxToken::Required(SyntaxKind::Into),
+            ],
+        ));
 
-    // FIX: TransactionStmt can be Begin or Commit
-    m.insert(SyntaxKind::TransactionStmt, &[SyntaxKind::BeginP]);
-    m.insert(SyntaxKind::TransactionStmt, &[SyntaxKind::Commit]);
+        m.push((
+            SyntaxKind::DeleteStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::DeleteP),
+                SyntaxToken::Required(SyntaxKind::From),
+            ],
+        ));
 
-    // FIX: CREATE [ OR REPLACE ] [ TEMP | TEMPORARY ] [ RECURSIVE ] VIEW
-    m.insert(
-        SyntaxKind::ViewStmt,
-        &[SyntaxKind::Create, SyntaxKind::View],
-    );
+        m.push((
+            SyntaxKind::UpdateStmt,
+            &[SyntaxToken::Required(SyntaxKind::Update)],
+        ));
 
-    m.insert(SyntaxKind::LoadStmt, &[SyntaxKind::Load]);
+        m.push((
+            SyntaxKind::MergeStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Merge),
+                SyntaxToken::Required(SyntaxKind::Into),
+            ],
+        ));
 
-    m
-});
+        m.push((
+            SyntaxKind::SelectStmt,
+            &[SyntaxToken::Required(SyntaxKind::Select)],
+        ));
+
+        m.push((
+            SyntaxKind::AlterTableStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Table),
+                SyntaxToken::Optional(SyntaxKind::IfP),
+                SyntaxToken::Optional(SyntaxKind::Exists),
+                SyntaxToken::Optional(SyntaxKind::Only),
+                SyntaxToken::Required(SyntaxKind::Ident),
+            ],
+        ));
+
+        // ALTER TABLE x RENAME ... is different to e.g. alter table alter column...
+        m.push((
+            SyntaxKind::RenameStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Table),
+                SyntaxToken::Optional(SyntaxKind::IfP),
+                SyntaxToken::Optional(SyntaxKind::Exists),
+                SyntaxToken::Optional(SyntaxKind::Only),
+                SyntaxToken::Required(SyntaxKind::Ident),
+                SyntaxToken::Required(SyntaxKind::Rename),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterDomainStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::DomainP),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterDefaultPrivilegesStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Default),
+                SyntaxToken::Required(SyntaxKind::Privileges),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::ClusterStmt,
+            &[SyntaxToken::Required(SyntaxKind::Cluster)],
+        ));
+
+        m.push((
+            SyntaxKind::CopyStmt,
+            &[SyntaxToken::Required(SyntaxKind::Copy)],
+        ));
+
+        // CREATE [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } | UNLOGGED ] TABLE
+        // this is overly simplified, but it should be good enough for now
+        m.push((
+            SyntaxKind::CreateStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Global),
+                SyntaxToken::Optional(SyntaxKind::Local),
+                SyntaxToken::Optional(SyntaxKind::Temporary),
+                SyntaxToken::Optional(SyntaxKind::Temp),
+                SyntaxToken::Optional(SyntaxKind::Unlogged),
+                SyntaxToken::Required(SyntaxKind::Table),
+            ],
+        ));
+
+        // CREATE [ OR REPLACE ] AGGREGATE
+        m.push((
+            SyntaxKind::DefineStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Or),
+                SyntaxToken::Optional(SyntaxKind::Replace),
+                SyntaxToken::Required(SyntaxKind::Aggregate),
+            ],
+        ));
+
+        // CREATE [ OR REPLACE ] OPERATOR
+        m.push((
+            SyntaxKind::DefineStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Or),
+                SyntaxToken::Optional(SyntaxKind::Replace),
+                SyntaxToken::Required(SyntaxKind::Operator),
+            ],
+        ));
+
+        // CREATE [ OR REPLACE ] TYPE
+        m.push((
+            SyntaxKind::DefineStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Or),
+                SyntaxToken::Optional(SyntaxKind::Replace),
+                SyntaxToken::Required(SyntaxKind::TypeP),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::DropStmt,
+            &[SyntaxToken::Required(SyntaxKind::Drop)],
+        ));
+
+        m.push((
+            SyntaxKind::TruncateStmt,
+            &[SyntaxToken::Required(SyntaxKind::Truncate)],
+        ));
+
+        m.push((
+            SyntaxKind::CommentStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Comment),
+                SyntaxToken::Required(SyntaxKind::On),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::FetchStmt,
+            &[SyntaxToken::Required(SyntaxKind::Fetch)],
+        ));
+
+        // CREATE [ UNIQUE ] INDEX
+        m.push((
+            SyntaxKind::IndexStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Unique),
+                SyntaxToken::Required(SyntaxKind::Index),
+            ],
+        ));
+
+        // CREATE [ OR REPLACE ] FUNCTION
+        m.push((
+            SyntaxKind::CreateFunctionStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Or),
+                SyntaxToken::Optional(SyntaxKind::Replace),
+                SyntaxToken::Required(SyntaxKind::Function),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterFunctionStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Function),
+            ],
+        ));
+
+        m.push((SyntaxKind::DoStmt, &[SyntaxToken::Required(SyntaxKind::Do)]));
+
+        // CREATE [ OR REPLACE ] RULE
+        m.push((
+            SyntaxKind::RuleStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Or),
+                SyntaxToken::Optional(SyntaxKind::Replace),
+                SyntaxToken::Required(SyntaxKind::Rule),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::NotifyStmt,
+            &[SyntaxToken::Required(SyntaxKind::Notify)],
+        ));
+        m.push((
+            SyntaxKind::ListenStmt,
+            &[SyntaxToken::Required(SyntaxKind::Listen)],
+        ));
+        m.push((
+            SyntaxKind::UnlistenStmt,
+            &[SyntaxToken::Required(SyntaxKind::Unlisten)],
+        ));
+
+        // TransactionStmt can be Begin or Commit
+        m.push((
+            SyntaxKind::TransactionStmt,
+            &[SyntaxToken::Required(SyntaxKind::BeginP)],
+        ));
+        m.push((
+            SyntaxKind::TransactionStmt,
+            &[SyntaxToken::Required(SyntaxKind::Commit)],
+        ));
+
+        // CREATE [ OR REPLACE ] [ TEMP | TEMPORARY ] [ RECURSIVE ] VIEW
+        // this is overly simplified, but it should be good enough for now
+        m.push((
+            SyntaxKind::ViewStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Or),
+                SyntaxToken::Optional(SyntaxKind::Replace),
+                SyntaxToken::Optional(SyntaxKind::Temporary),
+                SyntaxToken::Optional(SyntaxKind::Temp),
+                SyntaxToken::Optional(SyntaxKind::Recursive),
+                SyntaxToken::Required(SyntaxKind::View),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::LoadStmt,
+            &[SyntaxToken::Required(SyntaxKind::Load)],
+        ));
+
+        let mut vec: Vec<HashMap<SyntaxKind, Vec<TokenStatement>>> = Vec::new();
+
+        m.iter().for_each(|(statement, tokens)| {
+            let mut left_pull: usize = 0;
+            tokens.iter().enumerate().for_each(|(idx, token)| {
+                if vec.len() <= idx {
+                    vec.push(HashMap::new());
+                }
+
+                let is_last = idx == tokens.len() - 1;
+
+                match token {
+                    SyntaxToken::Required(t) => {
+                        for i in (idx - left_pull)..(idx + 1) {
+                            let list_entry = vec[i].entry(t.to_owned());
+                            list_entry
+                                .and_modify(|list| {
+                                    list.push(if is_last {
+                                        TokenStatement::EoS(statement.to_owned())
+                                    } else {
+                                        TokenStatement::Any(statement.to_owned())
+                                    });
+                                })
+                                .or_insert(vec![if is_last {
+                                    TokenStatement::EoS(statement.to_owned())
+                                } else {
+                                    TokenStatement::Any(statement.to_owned())
+                                }]);
+                        }
+                    }
+                    SyntaxToken::Optional(t) => {
+                        if is_last {
+                            panic!("Optional token cannot be last token");
+                        }
+                        for i in (idx - left_pull)..(idx + 1) {
+                            let list_entry = vec[i].entry(t.to_owned());
+                            list_entry
+                                .and_modify(|list| {
+                                    list.push(TokenStatement::Any(statement.to_owned()));
+                                })
+                                .or_insert(vec![TokenStatement::Any(statement.to_owned())]);
+                        }
+                        left_pull += 1;
+                    }
+                }
+            });
+        });
+
+        println!("{:#?}", vec);
+
+        vec
+    });
 
 // TODO: complete the hashmap above with all statements:
 // RETURN statement (inside SQL function body)
@@ -308,9 +547,6 @@ static STATEMENTS: LazyLock<HashMap<SyntaxKind, &'static [SyntaxKind]>> = LazyLo
 // #[prost(message, tag="170")]
 // AlterStatsStmt(super::AlterStatsStmt),
 
-static STATEMENT_FIRSTS: LazyLock<Vec<&[SyntaxKind]>> =
-    LazyLock::new(|| STATEMENTS.values().cloned().collect());
-
 /// Main parser that exposes the `cstree` api, and collects errors and statements
 #[derive(Debug)]
 pub struct Parser {
@@ -318,7 +554,7 @@ pub struct Parser {
     inner: GreenNodeBuilder<'static, 'static, SyntaxKind>,
     /// The syntax errors accumulated during parsing
     errors: Vec<SyntaxError>,
-    /// The pg_query statements representing the abtract syntax tree
+    /// The pg_query statements representing the abstract syntax tree
     stmts: Vec<RawStmt>,
     /// The tokens to parse
     tokens: Vec<Token>,
@@ -419,7 +655,7 @@ impl Parser {
     /// applies token and advances
     fn advance(&mut self) {
         assert!(!self.eof());
-        if WHITESPACE_TOKENS.contains(&self.nth(0)) {
+        if WHITESPACE_TOKENS.contains(&self.nth(0, false)) {
             if self.whitespace_token_buffer.is_none() {
                 self.whitespace_token_buffer = Some(self.pos);
             }
@@ -456,14 +692,44 @@ impl Parser {
         }
     }
 
+    fn eat_whitespace(&mut self) {
+        while WHITESPACE_TOKENS.contains(&self.nth(0, false)) {
+            self.advance();
+        }
+    }
+
     fn eof(&self) -> bool {
         self.pos == self.tokens.len()
     }
 
-    fn nth(&self, lookahead: usize) -> SyntaxKind {
-        self.tokens
-            .get(self.pos + lookahead)
-            .map_or(SyntaxKind::Eof, |it| it.kind)
+    /// lookahead method
+    ///
+    /// if `ignore_whitespace` is true, it will skip all whitespace tokens
+    fn nth(&self, lookahead: usize, ignore_whitespace: bool) -> SyntaxKind {
+        if ignore_whitespace {
+            let mut idx = 0;
+            let mut non_whitespace_token_ctr = 0;
+            loop {
+                match self.tokens.get(self.pos + idx) {
+                    Some(token) => {
+                        if !WHITESPACE_TOKENS.contains(&token.kind) {
+                            if non_whitespace_token_ctr == lookahead {
+                                return token.kind;
+                            }
+                            non_whitespace_token_ctr += 1;
+                        }
+                        idx += 1;
+                    }
+                    None => {
+                        return SyntaxKind::Eof;
+                    }
+                }
+            }
+        } else {
+            self.tokens
+                .get(self.pos + lookahead)
+                .map_or(SyntaxKind::Eof, |it| it.kind)
+        }
     }
 
     /// checks if the current token is any of `kinds`
@@ -473,7 +739,7 @@ impl Parser {
 
     /// checks if the current token is of `kind`
     fn at(&self, kind: SyntaxKind) -> bool {
-        self.nth(0) == kind
+        self.nth(0, false) == kind
     }
 
     /// like at, but for multiple consecutive tokens
@@ -481,12 +747,53 @@ impl Parser {
         kinds
             .iter()
             .enumerate()
-            .all(|(idx, &it)| self.nth(idx) == it)
+            .all(|(idx, &it)| self.nth(idx, false) == it)
     }
 
     /// like at_any, but for multiple consecutive tokens
     fn at_any_all(&self, kinds: &Vec<&[SyntaxKind]>) -> bool {
         kinds.iter().any(|&it| self.at_all(it))
+    }
+
+    /// Returns the statement at which the parser is currently at, if any
+    fn at_stmt_start(&self) -> Option<SyntaxKind> {
+        let mut options = Vec::new();
+        for i in 0..STATEMENT_START_TOKEN_MAPS.len() {
+            // important, else infinite loop: only ignore whitespaces after first token
+            let token = self.nth(i, i != 0);
+            if let Some(result) = STATEMENT_START_TOKEN_MAPS[i].get(&token) {
+                if i == 0 {
+                    options = result.clone();
+                } else {
+                    options = result
+                        .iter()
+                        .filter(|o| options.contains(o))
+                        .cloned()
+                        .collect();
+                }
+            } else if options.len() > 1 {
+                // no result is found, and there is currently more than one option
+                // filter the options for all statements that are complete at this point
+                options.retain(|o| match o {
+                    TokenStatement::Any(_) => false,
+                    TokenStatement::EoS(_) => true,
+                });
+            }
+
+            if options.len() <= 1 {
+                break;
+            }
+        }
+        if options.len() == 0 {
+            None
+        } else if options.len() == 1 {
+            match options[0] {
+                TokenStatement::Any(s) => Some(s),
+                TokenStatement::EoS(s) => Some(s),
+            }
+        } else {
+            panic!("Ambiguous statement");
+        }
     }
 
     fn expect(&mut self, kind: SyntaxKind) {
@@ -504,8 +811,8 @@ impl Parser {
             );
         } else {
             self.error_at_pos(
-                format!("Expected {:#?}, found {:#?}", kind, self.nth(0)),
-                self.pos,
+                format!("Expected {:#?}, found {:#?}", kind, self.nth(0, false)),
+                self.pos + 1,
             );
         }
     }
@@ -514,29 +821,45 @@ impl Parser {
         self.start_node(SyntaxKind::SourceFile);
 
         while !self.eof() {
-            let stm_pos = STATEMENT_FIRSTS.iter().position(|&it| self.at_all(it));
-            match stm_pos {
-                Some(pos) => {
-                    self.any_stmt(*STATEMENTS.keys().nth(pos).unwrap());
+            match self.at_stmt_start() {
+                Some(stmt) => {
+                    self.any_stmt(stmt);
                 }
-                None => self.advance(),
+                None => {
+                    self.advance();
+                }
             }
         }
-
         self.finish_node();
     }
 
     fn any_stmt(&mut self, kind: SyntaxKind) {
-        let starts = STATEMENTS.get(&kind).unwrap();
-        assert!(self.at_all(starts));
         self.start_node(kind);
 
-        // somehow buffer the tokens
-        starts.iter().for_each(|&it| self.expect(it));
+        // advance with all start tokens of statement
+        for i in 0..STATEMENT_START_TOKEN_MAPS.len() {
+            self.eat_whitespace();
+            let token = self.nth(0, false);
+            if let Some(result) = STATEMENT_START_TOKEN_MAPS[i].get(&token) {
+                let is_in_results = result
+                    .iter()
+                    .find(|x| match x {
+                        TokenStatement::EoS(y) | TokenStatement::Any(y) => y == &kind,
+                    })
+                    .is_some();
+                if i == 0 && !is_in_results {
+                    panic!("Expected statement start");
+                } else if is_in_results {
+                    self.expect(token);
+                } else {
+                    break;
+                }
+            }
+        }
 
         let mut is_parsing_sub_stmt = false;
         while !self.at(SyntaxKind::Ascii59) && !self.eof() {
-            match self.nth(0) {
+            match self.nth(0, false) {
                 // opening brackets "(", consume until closing bracket ")"
                 SyntaxKind::Ascii40 => {
                     is_parsing_sub_stmt = true;
@@ -548,7 +871,7 @@ impl Parser {
                 }
                 _ => {
                     // if another stmt FIRST is encountered, break ignore if parsing sub stmt
-                    if is_parsing_sub_stmt == false && self.at_any_all(&STATEMENT_FIRSTS) {
+                    if is_parsing_sub_stmt == false && self.at_stmt_start().is_some() {
                         break;
                     } else {
                         self.advance();
@@ -566,6 +889,8 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
+    use std::{sync::mpsc, thread, time::Duration};
+
     use crate::lexer::lex;
 
     use super::*;
@@ -578,13 +903,13 @@ mod tests {
     fn test_playground() {
         init();
 
-        let input = "BEGIN;
-UPDATE accounts SET balance = balance - 100.00
-    WHERE name = 'Alice';
--- etc etc
-COMMIT;";
+        let input = "alter table test rename column x to y; alter table test rename to test2";
         let parsed = pg_query::parse(input).unwrap();
         let scanned = pg_query::scan(input).unwrap();
+
+        STATEMENT_START_TOKEN_MAPS.iter().for_each(|it| {
+            //
+        });
         println!("{:#?}", parsed.protobuf.nodes());
         println!("{:#?}", scanned.tokens);
     }
@@ -593,13 +918,35 @@ COMMIT;";
     fn test_parser_simple() {
         init();
 
-        let input = "select 1 \n -- some comment \n select 2";
+        panic_after(Duration::from_millis(100), || {
+            let input = "alter table x rename to y \n alter table x alter column z set default 1";
+            // let input = "select 1; \n -- some comment \n select 2;";
 
-        let mut p = Parser::new(lex(input));
-        p.source();
-        let result = p.finish();
+            let mut p = Parser::new(lex(input));
+            p.source();
+            let result = p.finish();
 
-        dbg!(&result.cst);
-        println!("{:#?}", result.errors);
+            dbg!(&result.cst);
+            println!("{:#?}", result.errors);
+        })
+    }
+
+    fn panic_after<T, F>(d: Duration, f: F) -> T
+    where
+        T: Send + 'static,
+        F: FnOnce() -> T,
+        F: Send + 'static,
+    {
+        let (done_tx, done_rx) = mpsc::channel();
+        let handle = thread::spawn(move || {
+            let val = f();
+            done_tx.send(()).expect("Unable to send completion signal");
+            val
+        });
+
+        match done_rx.recv_timeout(d) {
+            Ok(_) => handle.join().expect("Thread panicked"),
+            Err(_) => panic!("Thread took too long"),
+        }
     }
 }
