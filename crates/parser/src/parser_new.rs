@@ -318,6 +318,349 @@ static STATEMENT_START_TOKEN_MAPS: LazyLock<Vec<HashMap<SyntaxKind, Vec<TokenSta
             &[SyntaxToken::Required(SyntaxKind::Load)],
         ));
 
+        m.push((
+            SyntaxKind::CreateDomainStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::DomainP),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreatedbStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Database),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::DropdbStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Drop),
+                SyntaxToken::Required(SyntaxKind::Database),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::VacuumStmt,
+            &[SyntaxToken::Required(SyntaxKind::Vacuum)],
+        ));
+
+        m.push((
+            SyntaxKind::ExplainStmt,
+            &[SyntaxToken::Required(SyntaxKind::Explain)],
+        ));
+
+        // CREATE [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } ] TABLE AS
+        // this is overly simplified, but it should be good enough for now
+        m.push((
+            SyntaxKind::CreateTableAsStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Global),
+                SyntaxToken::Optional(SyntaxKind::Local),
+                SyntaxToken::Optional(SyntaxKind::Temporary),
+                SyntaxToken::Optional(SyntaxKind::Temp),
+                SyntaxToken::Required(SyntaxKind::Table),
+                SyntaxToken::Required(SyntaxKind::Ident),
+                SyntaxToken::Required(SyntaxKind::As),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateSeqStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Temporary),
+                SyntaxToken::Optional(SyntaxKind::Temp),
+                SyntaxToken::Optional(SyntaxKind::Unlogged),
+                SyntaxToken::Required(SyntaxKind::Sequence),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterSeqStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Sequence),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::VariableSetStmt,
+            &[SyntaxToken::Required(SyntaxKind::Set)],
+        ));
+
+        m.push((
+            SyntaxKind::VariableShowStmt,
+            &[SyntaxToken::Required(SyntaxKind::Show)],
+        ));
+
+        m.push((
+            SyntaxKind::DiscardStmt,
+            &[SyntaxToken::Required(SyntaxKind::Discard)],
+        ));
+
+        // CREATE [ OR REPLACE ] [ CONSTRAINT ] TRIGGER
+        m.push((
+            SyntaxKind::CreateTrigStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Or),
+                SyntaxToken::Optional(SyntaxKind::Replace),
+                SyntaxToken::Optional(SyntaxKind::Constraint),
+                SyntaxToken::Required(SyntaxKind::Trigger),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateRoleStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Role),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterRoleStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Role),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::DropRoleStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Drop),
+                SyntaxToken::Required(SyntaxKind::Role),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::LockStmt,
+            &[SyntaxToken::Required(SyntaxKind::LockP)],
+        ));
+
+        m.push((
+            SyntaxKind::ConstraintsSetStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Set),
+                SyntaxToken::Required(SyntaxKind::Constraints),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::ReindexStmt,
+            &[SyntaxToken::Required(SyntaxKind::Reindex)],
+        ));
+
+        m.push((
+            SyntaxKind::CheckPointStmt,
+            &[SyntaxToken::Required(SyntaxKind::Checkpoint)],
+        ));
+
+        m.push((
+            SyntaxKind::CreateSchemaStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Schema),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterDatabaseStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Database),
+                SyntaxToken::Required(SyntaxKind::Ident),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterDatabaseRefreshCollStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Database),
+                SyntaxToken::Required(SyntaxKind::Ident),
+                SyntaxToken::Required(SyntaxKind::Refresh),
+                SyntaxToken::Required(SyntaxKind::Collation),
+                SyntaxToken::Required(SyntaxKind::VersionP),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterDatabaseSetStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Database),
+                SyntaxToken::Required(SyntaxKind::Ident),
+                SyntaxToken::Required(SyntaxKind::Set),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterDatabaseSetStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Database),
+                SyntaxToken::Required(SyntaxKind::Ident),
+                SyntaxToken::Required(SyntaxKind::Reset),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateConversionStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Default),
+                SyntaxToken::Required(SyntaxKind::ConversionP),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateCastStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Cast),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateOpClassStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Operator),
+                SyntaxToken::Required(SyntaxKind::Class),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateOpFamilyStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Operator),
+                SyntaxToken::Required(SyntaxKind::Family),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterOpFamilyStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Operator),
+                SyntaxToken::Required(SyntaxKind::Family),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::PrepareStmt,
+            &[SyntaxToken::Required(SyntaxKind::Prepare)],
+        ));
+
+        m.push((
+            SyntaxKind::ExecuteStmt,
+            &[SyntaxToken::Required(SyntaxKind::Execute)],
+        ));
+
+        m.push((
+            SyntaxKind::DeallocateStmt,
+            &[SyntaxToken::Required(SyntaxKind::Deallocate)],
+        ));
+
+        m.push((
+            SyntaxKind::CreateTableSpaceStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Tablespace),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::DropTableSpaceStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Drop),
+                SyntaxToken::Required(SyntaxKind::Tablespace),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterOperatorStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Operator),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterTypeStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::TypeP),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::DropOwnedStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Drop),
+                SyntaxToken::Required(SyntaxKind::Owned),
+                SyntaxToken::Required(SyntaxKind::By),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::ReassignOwnedStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Reassign),
+                SyntaxToken::Required(SyntaxKind::Owned),
+                SyntaxToken::Required(SyntaxKind::By),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateEnumStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::TypeP),
+                SyntaxToken::Required(SyntaxKind::Ident),
+                SyntaxToken::Required(SyntaxKind::As),
+                SyntaxToken::Required(SyntaxKind::EnumP),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateRangeStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::TypeP),
+                SyntaxToken::Required(SyntaxKind::Ident),
+                SyntaxToken::Required(SyntaxKind::As),
+                SyntaxToken::Required(SyntaxKind::Range),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateFdwStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Foreign),
+                SyntaxToken::Required(SyntaxKind::DataP),
+                SyntaxToken::Required(SyntaxKind::Wrapper),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterFdwStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Foreign),
+                SyntaxToken::Required(SyntaxKind::DataP),
+                SyntaxToken::Required(SyntaxKind::Wrapper),
+            ],
+        ));
+
         let mut vec: Vec<HashMap<SyntaxKind, Vec<TokenStatement>>> = Vec::new();
 
         m.iter().for_each(|(statement, tokens)| {
@@ -381,109 +724,17 @@ static STATEMENT_START_TOKEN_MAPS: LazyLock<Vec<HashMap<SyntaxKind, Vec<TokenSta
 // GrantRoleStmt(super::GrantRoleStmt),
 //
 // ClosePortalStmt,
+// CreatePlangStmt,
+// AlterRoleSetStmt,
+// DeclareCursorStmt,
+// AlterObjectDependsStmt,
+// AlterObjectSchemaStmt,
+// AlterOwnerStmt,
+// CompositeTypeStmt,
+// AlterEnumStmt,
+// AlterTsdictionaryStmt,
+// AlterTsconfigurationStmt,
 //
-// #[prost(message, tag="89")]
-// CreateDomainStmt(::prost::alloc::boxed::Box<super::CreateDomainStmt>),
-// #[prost(message, tag="90")]
-// CreatedbStmt(super::CreatedbStmt),
-// #[prost(message, tag="91")]
-// DropdbStmt(super::DropdbStmt),
-// #[prost(message, tag="92")]
-// VacuumStmt(super::VacuumStmt),
-// #[prost(message, tag="93")]
-// ExplainStmt(::prost::alloc::boxed::Box<super::ExplainStmt>),
-// #[prost(message, tag="94")]
-// CreateTableAsStmt(::prost::alloc::boxed::Box<super::CreateTableAsStmt>),
-// #[prost(message, tag="95")]
-// CreateSeqStmt(super::CreateSeqStmt),
-// #[prost(message, tag="96")]
-// AlterSeqStmt(super::AlterSeqStmt),
-// #[prost(message, tag="97")]
-// VariableSetStmt(super::VariableSetStmt),
-// #[prost(message, tag="98")]
-// VariableShowStmt(super::VariableShowStmt),
-// #[prost(message, tag="99")]
-// DiscardStmt(super::DiscardStmt),
-// #[prost(message, tag="100")]
-// CreateTrigStmt(::prost::alloc::boxed::Box<super::CreateTrigStmt>),
-// #[prost(message, tag="101")]
-// CreatePlangStmt(super::CreatePLangStmt),
-// #[prost(message, tag="102")]
-// CreateRoleStmt(super::CreateRoleStmt),
-// #[prost(message, tag="103")]
-// AlterRoleStmt(super::AlterRoleStmt),
-// #[prost(message, tag="104")]
-// DropRoleStmt(super::DropRoleStmt),
-// #[prost(message, tag="105")]
-// LockStmt(super::LockStmt),
-// #[prost(message, tag="106")]
-// ConstraintsSetStmt(super::ConstraintsSetStmt),
-// #[prost(message, tag="107")]
-// ReindexStmt(super::ReindexStmt),
-// #[prost(message, tag="108")]
-// CheckPointStmt(super::CheckPointStmt),
-// #[prost(message, tag="109")]
-// CreateSchemaStmt(super::CreateSchemaStmt),
-// #[prost(message, tag="110")]
-// AlterDatabaseStmt(super::AlterDatabaseStmt),
-// #[prost(message, tag="111")]
-// AlterDatabaseRefreshCollStmt(super::AlterDatabaseRefreshCollStmt),
-// #[prost(message, tag="112")]
-// AlterDatabaseSetStmt(super::AlterDatabaseSetStmt),
-// #[prost(message, tag="113")]
-// AlterRoleSetStmt(super::AlterRoleSetStmt),
-// #[prost(message, tag="114")]
-// CreateConversionStmt(super::CreateConversionStmt),
-// #[prost(message, tag="115")]
-// CreateCastStmt(super::CreateCastStmt),
-// #[prost(message, tag="116")]
-// CreateOpClassStmt(super::CreateOpClassStmt),
-// #[prost(message, tag="117")]
-// CreateOpFamilyStmt(super::CreateOpFamilyStmt),
-// #[prost(message, tag="118")]
-// AlterOpFamilyStmt(super::AlterOpFamilyStmt),
-// #[prost(message, tag="119")]
-// PrepareStmt(::prost::alloc::boxed::Box<super::PrepareStmt>),
-// #[prost(message, tag="120")]
-// ExecuteStmt(super::ExecuteStmt),
-// #[prost(message, tag="121")]
-// DeallocateStmt(super::DeallocateStmt),
-// #[prost(message, tag="122")]
-// DeclareCursorStmt(::prost::alloc::boxed::Box<super::DeclareCursorStmt>),
-// #[prost(message, tag="123")]
-// CreateTableSpaceStmt(super::CreateTableSpaceStmt),
-// #[prost(message, tag="124")]
-// DropTableSpaceStmt(super::DropTableSpaceStmt),
-// #[prost(message, tag="125")]
-// AlterObjectDependsStmt(::prost::alloc::boxed::Box<super::AlterObjectDependsStmt>),
-// #[prost(message, tag="126")]
-// AlterObjectSchemaStmt(::prost::alloc::boxed::Box<super::AlterObjectSchemaStmt>),
-// #[prost(message, tag="127")]
-// AlterOwnerStmt(::prost::alloc::boxed::Box<super::AlterOwnerStmt>),
-// #[prost(message, tag="128")]
-// AlterOperatorStmt(super::AlterOperatorStmt),
-// #[prost(message, tag="129")]
-// AlterTypeStmt(super::AlterTypeStmt),
-// #[prost(message, tag="130")]
-// DropOwnedStmt(super::DropOwnedStmt),
-// #[prost(message, tag="131")]
-// ReassignOwnedStmt(super::ReassignOwnedStmt),
-// #[prost(message, tag="132")]
-// CompositeTypeStmt(super::CompositeTypeStmt),
-// #[prost(message, tag="133")]
-// CreateEnumStmt(super::CreateEnumStmt),
-// #[prost(message, tag="134")]
-// CreateRangeStmt(super::CreateRangeStmt),
-// #[prost(message, tag="135")]
-// AlterEnumStmt(super::AlterEnumStmt),
-// #[prost(message, tag="136")]
-// AlterTsdictionaryStmt(super::AlterTsDictionaryStmt),
-// #[prost(message, tag="137")]
-// AlterTsconfigurationStmt(super::AlterTsConfigurationStmt),
-// #[prost(message, tag="138")]
-// CreateFdwStmt(super::CreateFdwStmt),
-// #[prost(message, tag="139")]
-// AlterFdwStmt(super::AlterFdwStmt),
 // #[prost(message, tag="140")]
 // CreateForeignServerStmt(super::CreateForeignServerStmt),
 // #[prost(message, tag="141")]
@@ -702,7 +953,7 @@ impl Parser {
         self.pos == self.tokens.len()
     }
 
-    /// lookahead method
+    /// lookahead method.
     ///
     /// if `ignore_whitespace` is true, it will skip all whitespace tokens
     fn nth(&self, lookahead: usize, ignore_whitespace: bool) -> SyntaxKind {
@@ -903,7 +1154,7 @@ mod tests {
     fn test_playground() {
         init();
 
-        let input = "alter table test rename column x to y; alter table test rename to test2";
+        let input = "SHOW all;";
         let parsed = pg_query::parse(input).unwrap();
         let scanned = pg_query::scan(input).unwrap();
 
