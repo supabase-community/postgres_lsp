@@ -661,6 +661,232 @@ static STATEMENT_START_TOKEN_MAPS: LazyLock<Vec<HashMap<SyntaxKind, Vec<TokenSta
             ],
         ));
 
+        m.push((
+            SyntaxKind::CreateForeignServerStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Server),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterForeignServerStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Server),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateUserMappingStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::User),
+                SyntaxToken::Required(SyntaxKind::Mapping),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterUserMappingStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::User),
+                SyntaxToken::Required(SyntaxKind::Mapping),
+                SyntaxToken::Required(SyntaxKind::For),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::DropUserMappingStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Drop),
+                SyntaxToken::Required(SyntaxKind::User),
+                SyntaxToken::Required(SyntaxKind::Mapping),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::SecLabelStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Security),
+                SyntaxToken::Required(SyntaxKind::Label),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateForeignTableStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Foreign),
+                SyntaxToken::Required(SyntaxKind::Table),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::ImportForeignSchemaStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::ImportP),
+                SyntaxToken::Required(SyntaxKind::Foreign),
+                SyntaxToken::Required(SyntaxKind::Schema),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateExtensionStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Extension),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterExtensionStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Extension),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateEventTrigStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Event),
+                SyntaxToken::Required(SyntaxKind::Trigger),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterEventTrigStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Event),
+                SyntaxToken::Required(SyntaxKind::Trigger),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::RefreshMatViewStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Refresh),
+                SyntaxToken::Required(SyntaxKind::Materialized),
+                SyntaxToken::Required(SyntaxKind::View),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterSystemStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::SystemP),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreatePolicyStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Policy),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterPolicyStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Policy),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateTransformStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Optional(SyntaxKind::Or),
+                SyntaxToken::Optional(SyntaxKind::Replace),
+                SyntaxToken::Required(SyntaxKind::Transform),
+                SyntaxToken::Required(SyntaxKind::For),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateAmStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Access),
+                SyntaxToken::Required(SyntaxKind::Method),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreatePublicationStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Publication),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterPublicationStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Publication),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateSubscriptionStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Subscription),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterSubscriptionStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Subscription),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::DropSubscriptionStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Drop),
+                SyntaxToken::Required(SyntaxKind::Subscription),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CreateStatsStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::Statistics),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::AlterCollationStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Collation),
+            ],
+        ));
+
+        m.push((
+            SyntaxKind::CallStmt,
+            &[SyntaxToken::Required(SyntaxKind::Call)],
+        ));
+
+        m.push((
+            SyntaxKind::AlterStatsStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Alter),
+                SyntaxToken::Required(SyntaxKind::Statistics),
+            ],
+        ));
+
         let mut vec: Vec<HashMap<SyntaxKind, Vec<TokenStatement>>> = Vec::new();
 
         m.iter().for_each(|(statement, tokens)| {
@@ -722,7 +948,6 @@ static STATEMENT_START_TOKEN_MAPS: LazyLock<Vec<HashMap<SyntaxKind, Vec<TokenSta
 // TODO: parsing ambiguity, check docs for solution
 // GrantStmt(super::GrantStmt),
 // GrantRoleStmt(super::GrantRoleStmt),
-//
 // ClosePortalStmt,
 // CreatePlangStmt,
 // AlterRoleSetStmt,
@@ -734,69 +959,11 @@ static STATEMENT_START_TOKEN_MAPS: LazyLock<Vec<HashMap<SyntaxKind, Vec<TokenSta
 // AlterEnumStmt,
 // AlterTsdictionaryStmt,
 // AlterTsconfigurationStmt,
+// AlterTableSpaceOptionsStmt,
+// AlterTableMoveAllStmt,
+// AlterExtensionContentsStmt,
+// ReplicaIdentityStmt,
 //
-// #[prost(message, tag="140")]
-// CreateForeignServerStmt(super::CreateForeignServerStmt),
-// #[prost(message, tag="141")]
-// AlterForeignServerStmt(super::AlterForeignServerStmt),
-// #[prost(message, tag="142")]
-// CreateUserMappingStmt(super::CreateUserMappingStmt),
-// #[prost(message, tag="143")]
-// AlterUserMappingStmt(super::AlterUserMappingStmt),
-// #[prost(message, tag="144")]
-// DropUserMappingStmt(super::DropUserMappingStmt),
-// #[prost(message, tag="145")]
-// AlterTableSpaceOptionsStmt(super::AlterTableSpaceOptionsStmt),
-// #[prost(message, tag="146")]
-// AlterTableMoveAllStmt(super::AlterTableMoveAllStmt),
-// #[prost(message, tag="147")]
-// SecLabelStmt(::prost::alloc::boxed::Box<super::SecLabelStmt>),
-// #[prost(message, tag="148")]
-// CreateForeignTableStmt(super::CreateForeignTableStmt),
-// #[prost(message, tag="149")]
-// ImportForeignSchemaStmt(super::ImportForeignSchemaStmt),
-// #[prost(message, tag="150")]
-// CreateExtensionStmt(super::CreateExtensionStmt),
-// #[prost(message, tag="151")]
-// AlterExtensionStmt(super::AlterExtensionStmt),
-// #[prost(message, tag="152")]
-// AlterExtensionContentsStmt(::prost::alloc::boxed::Box<super::AlterExtensionContentsStmt>),
-// #[prost(message, tag="153")]
-// CreateEventTrigStmt(super::CreateEventTrigStmt),
-// #[prost(message, tag="154")]
-// AlterEventTrigStmt(super::AlterEventTrigStmt),
-// #[prost(message, tag="155")]
-// RefreshMatViewStmt(super::RefreshMatViewStmt),
-// #[prost(message, tag="156")]
-// ReplicaIdentityStmt(super::ReplicaIdentityStmt),
-// #[prost(message, tag="157")]
-// AlterSystemStmt(super::AlterSystemStmt),
-// #[prost(message, tag="158")]
-// CreatePolicyStmt(::prost::alloc::boxed::Box<super::CreatePolicyStmt>),
-// #[prost(message, tag="159")]
-// AlterPolicyStmt(::prost::alloc::boxed::Box<super::AlterPolicyStmt>),
-// #[prost(message, tag="160")]
-// CreateTransformStmt(super::CreateTransformStmt),
-// #[prost(message, tag="161")]
-// CreateAmStmt(super::CreateAmStmt),
-// #[prost(message, tag="162")]
-// CreatePublicationStmt(super::CreatePublicationStmt),
-// #[prost(message, tag="163")]
-// AlterPublicationStmt(super::AlterPublicationStmt),
-// #[prost(message, tag="164")]
-// CreateSubscriptionStmt(super::CreateSubscriptionStmt),
-// #[prost(message, tag="165")]
-// AlterSubscriptionStmt(super::AlterSubscriptionStmt),
-// #[prost(message, tag="166")]
-// DropSubscriptionStmt(super::DropSubscriptionStmt),
-// #[prost(message, tag="167")]
-// CreateStatsStmt(super::CreateStatsStmt),
-// #[prost(message, tag="168")]
-// AlterCollationStmt(super::AlterCollationStmt),
-// #[prost(message, tag="169")]
-// CallStmt(::prost::alloc::boxed::Box<super::CallStmt>),
-// #[prost(message, tag="170")]
-// AlterStatsStmt(super::AlterStatsStmt),
 
 /// Main parser that exposes the `cstree` api, and collects errors and statements
 #[derive(Debug)]
