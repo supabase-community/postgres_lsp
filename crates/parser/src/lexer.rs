@@ -1,5 +1,6 @@
 use std::{collections::VecDeque, sync::LazyLock};
 
+use pg_query::protobuf::KeywordKind;
 use regex::Regex;
 
 use cstree::text::{TextRange, TextSize};
@@ -7,10 +8,33 @@ use cstree::text::{TextRange, TextSize};
 use crate::syntax_kind_codegen::SyntaxKind;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TokenType {
+    Whitespace,
+    NoKeyword,
+    UnreservedKeyword,
+    ColNameKeyword,
+    TypeFuncNameKeyword,
+    ReservedKeyword,
+}
+
+impl From<KeywordKind> for TokenType {
+    fn from(kind: KeywordKind) -> TokenType {
+        match kind {
+            KeywordKind::NoKeyword => TokenType::NoKeyword,
+            KeywordKind::UnreservedKeyword => TokenType::UnreservedKeyword,
+            KeywordKind::ColNameKeyword => TokenType::ColNameKeyword,
+            KeywordKind::TypeFuncNameKeyword => TokenType::TypeFuncNameKeyword,
+            KeywordKind::ReservedKeyword => TokenType::ReservedKeyword,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Token {
     pub kind: SyntaxKind,
     pub text: String,
     pub span: TextRange,
+    pub token_type: TokenType,
 }
 
 static PATTERN_LEXER: LazyLock<Regex> =
@@ -22,6 +46,7 @@ fn whitespace_tokens(input: &str) -> VecDeque<Token> {
     for cap in PATTERN_LEXER.captures_iter(&input) {
         if let Some(whitespace) = cap.name("whitespace") {
             tokens.push_back(Token {
+                token_type: TokenType::Whitespace,
                 kind: SyntaxKind::Whitespace,
                 text: whitespace.as_str().to_string(),
                 span: TextRange::new(
@@ -31,6 +56,7 @@ fn whitespace_tokens(input: &str) -> VecDeque<Token> {
             });
         } else if let Some(newline) = cap.name("newline") {
             tokens.push_back(Token {
+                token_type: TokenType::Whitespace,
                 kind: SyntaxKind::Newline,
                 text: newline.as_str().to_string(),
                 span: TextRange::new(
@@ -77,6 +103,7 @@ pub fn lex(text: &str) -> Vec<Token> {
             let len = token_text.len();
             let has_whitespace = token_text.contains(" ") || token_text.contains("\n");
             tokens.push(Token {
+                token_type: TokenType::from(pg_query_token.keyword_kind),
                 kind: SyntaxKind::from(&pg_query_token),
                 text: token_text,
                 span: TextRange::new(
