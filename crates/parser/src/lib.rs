@@ -18,20 +18,21 @@
 #![feature(lazy_cell)]
 
 mod ast_node;
-mod estimate_node_range;
-mod get_child_token_range_codegen;
-mod get_location_codegen;
-mod get_nodes_codegen;
+mod codegen;
 mod lexer;
 mod parser;
-mod parser_new;
 mod sibling_token;
-mod source_parser;
-mod statement_parser;
 mod syntax_error;
-mod syntax_kind_codegen;
 mod syntax_node;
 
+use lexer::lex;
+
+pub use crate::codegen::SyntaxKind;
 pub use crate::parser::{Parse, Parser};
-pub use crate::syntax_kind_codegen::SyntaxKind;
 pub use crate::syntax_node::{SyntaxElement, SyntaxNode, SyntaxToken};
+
+pub fn parse_source(text: &str) -> Parse {
+    let mut p = Parser::new(lex(text));
+    p.source();
+    p.finish()
+}

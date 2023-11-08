@@ -1,4 +1,4 @@
-use crate::syntax_kind_codegen::SyntaxKind;
+use crate::codegen::SyntaxKind;
 
 const SIBLINGS: [(SyntaxKind, SyntaxKind); 1] = [(SyntaxKind::Ascii40, SyntaxKind::Ascii41)];
 

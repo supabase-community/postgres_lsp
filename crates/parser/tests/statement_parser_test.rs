@@ -2,7 +2,7 @@ use std::fs;
 mod common;
 use insta;
 use log::debug;
-use parser::Parser;
+use parser::parse_source;
 
 const VALID_STATEMENTS_PATH: &str = "tests/data/statements/valid/";
 
@@ -25,9 +25,7 @@ fn valid_statements() {
 
         debug!("Parsing statement: {}", test_name);
 
-        let mut parser = Parser::new();
-        parser.parse_statement_at(&contents, None);
-        let parsed = parser.finish();
+        let parsed = parse_source(&contents);
 
         let mut settings = insta::Settings::clone_current();
         settings.set_input_file(path);

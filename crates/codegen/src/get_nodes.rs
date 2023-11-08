@@ -1,36 +1,31 @@
-use pg_query_proto_parser::{FieldType, Node, ProtoParser};
+use pg_query_proto_parser::{FieldType, Node, ProtoFile};
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
-pub fn get_nodes_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let parser = ProtoParser::new("./libpg_query/protobuf/pg_query.proto");
-    let proto_file = parser.parse();
-
+pub fn get_nodes_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
     let manual_node_names = manual_node_names();
 
     let node_identifiers = node_identifiers(&proto_file.nodes, &manual_node_names);
     let node_handlers = node_handlers(&proto_file.nodes, &manual_node_names);
 
     quote! {
-        use pg_query::NodeEnum;
-        use std::collections::VecDeque;
-
         #[derive(Debug, Clone)]
         pub struct Node {
-            pub node: NodeEnum,
+            pub kind: SyntaxKind,
             pub depth: i32,
             pub path: String,
+            pub properties: Vec<TokenProperty>
         }
 
         /// Returns all children of the node, recursively
         /// location is resolved manually
-        pub fn get_nodes(node: &NodeEnum, text: String, current_depth: i32) -> Vec<Node> {
+        pub fn get_nodes(node: &NodeEnum) -> Vec<Node> {
             let mut nodes: Vec<Node> = vec![
-                Node { node: node.to_owned(), depth: current_depth, path: "0".to_string() }
+                Node { kind: SyntaxKind::from(node), depth: 0, path: "0".to_string(), properties: get_node_properties(node) }
             ];
             // Node, depth, path
             let mut stack: VecDeque<(NodeEnum, i32, String)> =
-                VecDeque::from(vec![(node.to_owned(), current_depth, "0".to_string())]);
+                VecDeque::from(vec![(node.to_owned(), 0, "0".to_string())]);
             while !stack.is_empty() {
                 let (node, depth, path) = stack.pop_front().unwrap();
                 let current_depth = depth + 1;
@@ -40,9 +35,10 @@ pub fn get_nodes_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStrea
                     child_ctr = child_ctr + 1;
                     stack.push_back((c.to_owned(), current_depth, path.clone()));
                     nodes.push(Node {
-                        node: c,
+                        kind: SyntaxKind::from(&c),
                         depth: current_depth,
                         path: path.clone(),
+                        properties: get_node_properties(&c)
                     });
                 };
                 match &node {

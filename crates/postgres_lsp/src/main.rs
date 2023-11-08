@@ -2,8 +2,7 @@ mod semantic_token;
 mod utils;
 
 use dashmap::DashMap;
-use log::debug;
-use parser::{Parse, Parser};
+use parser::{parse_source, Parse};
 use ropey::Rope;
 use semantic_token::{ImCompleteSemanticToken, LEGEND_TYPE};
 use serde_json::Value;
@@ -243,11 +242,8 @@ impl Backend {
             .insert(params.uri.to_string(), rope.clone());
 
         let rope = ropey::Rope::from_str(&params.text);
-        let mut parser = Parser::new();
 
-        parser.parse_source_at(&params.text, None);
-
-        let result = parser.finish();
+        let result = parse_source(&params.text);
 
         dbg!(&result.cst);
 

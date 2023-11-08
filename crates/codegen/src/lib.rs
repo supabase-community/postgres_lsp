@@ -1,29 +1,11 @@
-mod get_child_token_range;
-mod get_location;
+mod get_node_properties;
 mod get_nodes;
+mod parser;
 mod syntax_kind;
 
-use get_child_token_range::get_child_token_range_mod;
-use get_location::get_location_mod;
-use get_nodes::get_nodes_mod;
-use syntax_kind::syntax_kind_mod;
+use parser::parser_mod;
 
 #[proc_macro]
-pub fn get_child_token_range(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    get_child_token_range_mod(item.into()).into()
-}
-
-#[proc_macro]
-pub fn get_nodes(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    get_nodes_mod(item.into()).into()
-}
-
-#[proc_macro]
-pub fn syntax_kind(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    syntax_kind_mod(item.into()).into()
-}
-
-#[proc_macro]
-pub fn get_location(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    get_location_mod(item.into()).into()
+pub fn parser_codegen(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    parser_mod(item.into()).into()
 }

@@ -1,10 +1,10 @@
-use codegen::get_nodes;
+use codegen::parser_codegen;
 
-get_nodes!();
+parser_codegen!();
 
 #[cfg(test)]
 mod tests {
-    use crate::get_nodes_codegen::get_nodes;
+    use crate::codegen::get_nodes;
 
     #[test]
     fn test_get_nodes() {
@@ -24,7 +24,7 @@ mod tests {
             Err(_) => None,
         };
 
-        let nodes = get_nodes(&pg_query_root.unwrap(), input.to_string(), 1);
-        assert_eq!(nodes.len(), 14);
+        let nodes = get_nodes(&pg_query_root.unwrap());
+        assert_eq!(nodes.len(), 13);
     }
 }

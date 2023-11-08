@@ -5,7 +5,7 @@ use regex::Regex;
 
 use cstree::text::{TextRange, TextSize};
 
-use crate::syntax_kind_codegen::SyntaxKind;
+use crate::codegen::SyntaxKind;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TokenType {
@@ -103,7 +103,9 @@ pub fn lex(text: &str) -> Vec<Token> {
             let len = token_text.len();
             let has_whitespace = token_text.contains(" ") || token_text.contains("\n");
             tokens.push(Token {
-                token_type: TokenType::from(pg_query_token.keyword_kind),
+                token_type: TokenType::from(
+                    KeywordKind::from_i32(pg_query_token.keyword_kind).unwrap(),
+                ),
                 kind: SyntaxKind::from(&pg_query_token),
                 text: token_text,
                 span: TextRange::new(
