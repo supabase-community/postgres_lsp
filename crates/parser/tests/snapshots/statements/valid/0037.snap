@@ -1,0 +1,19 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "BEGIN;\n\nSELECT 1;\n\nROLLBACK;\n\nCOMMIT;"
+---
+Stmt@0..37
+  BeginP@0..5 "BEGIN"
+  Ascii59@5..6 ";"
+  Newline@6..8 "\n\n"
+  Select@8..14 "SELECT"
+  Whitespace@14..15 " "
+  Iconst@15..16 "1"
+  Ascii59@16..17 ";"
+  Newline@17..19 "\n\n"
+  Rollback@19..27 "ROLLBACK"
+  Ascii59@27..28 ";"
+  Newline@28..30 "\n\n"
+  Commit@30..36 "COMMIT"
+  Ascii59@36..37 ";"
+
