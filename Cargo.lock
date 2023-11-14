@@ -781,6 +781,7 @@ dependencies = [
  "lazy_static",
  "log",
  "logos",
+ "petgraph",
  "pg_query",
  "pg_query_proto_parser",
  "regex",

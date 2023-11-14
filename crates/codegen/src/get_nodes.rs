@@ -9,37 +9,122 @@ pub fn get_nodes_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
     let node_handlers = node_handlers(&proto_file.nodes, &manual_node_names);
 
     quote! {
+
+        #[derive(Debug, Clone)]
+        pub struct Path {
+            pub elements: Vec<usize>,
+        }
+
+        impl PartialEq for Path {
+            fn eq(&self, other: &Self) -> bool {
+                self.elements == other.elements
+            }
+        }
+
+        impl Display for Path {
+            fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+                write!(
+                    f,
+                    "{}",
+                    self.elements
+                        .iter()
+                        .map(usize::to_string)
+                        .collect::<Vec<_>>()
+                        .join(".")
+                )
+            }
+        }
+
+        impl Path {
+            pub fn new(elements: Vec<usize>) -> Self {
+                Self { elements }
+            }
+
+            pub fn from_parent(parent: Path, child: usize) -> Self {
+                let mut elements = parent.elements;
+                elements.push(child);
+                Self { elements }
+            }
+
+            pub fn is_child_of(&self, other: &Self) -> bool {
+                other
+                    .elements
+                    .iter()
+                    .eq(self.elements.iter().take(other.elements.len()))
+            }
+
+            pub fn is_direct_child_of(&self, other: &Self) -> bool {
+                self.elements.len() == other.elements.len() + 1
+                    && other.elements.iter().eq(self.elements.iter().take(other.elements.len()))
+            }
+
+            pub fn is_sibling_of(&self, other: &Self) -> bool {
+                self.elements.len() == other.elements.len()
+                    && self.elements[..self.elements.len() - 1]
+                        == other.elements[..other.elements.len() - 1]
+            }
+
+            pub fn parent(&self) -> Path {
+                if self == &Path::new(vec![0]) {
+                     Path::new(vec![0])
+                } else {
+                    Path::new(self.elements[..self.elements.len() - 1].to_vec())
+                }
+            }
+        }
+
+        impl PartialOrd for Path {
+            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+                self.elements
+                    .iter()
+                    .zip(other.elements.iter())
+                    .find(|(a, b)| a != b)
+                    .map(|(a, b)| a.cmp(b))
+                    .or_else(|| {
+                        if self.elements.len() > other.elements.len() {
+                            Some(Ordering::Greater)
+                        } else if self.elements.len() < other.elements.len() {
+                            Some(Ordering::Less)
+                        } else {
+                            None
+                        }
+                    })
+            }
+        }
+
+
         #[derive(Debug, Clone)]
         pub struct Node {
             pub kind: SyntaxKind,
-            pub depth: i32,
-            pub path: String,
+            pub depth: usize,
             pub properties: Vec<TokenProperty>
         }
 
         /// Returns all children of the node, recursively
         /// location is resolved manually
-        pub fn get_nodes(node: &NodeEnum) -> Vec<Node> {
-            let mut nodes: Vec<Node> = vec![
-                Node { kind: SyntaxKind::from(node), depth: 0, path: "0".to_string(), properties: get_node_properties(node) }
-            ];
-            // Node, depth, path
-            let mut stack: VecDeque<(NodeEnum, i32, String)> =
-                VecDeque::from(vec![(node.to_owned(), 0, "0".to_string())]);
+        pub fn get_nodes(node: &NodeEnum, at_depth: usize) -> Graph<Node, ()> {
+            let mut g = Graph::<Node, ()>::new();
+
+            let root_node_idx = g.add_node(Node {
+                kind: SyntaxKind::from(node),
+                depth: at_depth,
+                properties: get_node_properties(node)
+            });
+
+            // Parent node idx, Node, depth
+            let mut stack: VecDeque<(NodeIndex, NodeEnum, usize)> =
+                VecDeque::from(vec![(root_node_idx, node.to_owned(), at_depth)]);
             while !stack.is_empty() {
-                let (node, depth, path) = stack.pop_front().unwrap();
+                let (parent_idx, node, depth) = stack.pop_front().unwrap();
                 let current_depth = depth + 1;
-                let mut child_ctr: i32 = 0;
                 let mut handle_child = |c: NodeEnum| {
-                    let path = path.clone() + "." + child_ctr.to_string().as_str();
-                    child_ctr = child_ctr + 1;
-                    stack.push_back((c.to_owned(), current_depth, path.clone()));
-                    nodes.push(Node {
+                    let node_idx = g.add_node(Node {
                         kind: SyntaxKind::from(&c),
                         depth: current_depth,
-                        path: path.clone(),
                         properties: get_node_properties(&c)
                     });
+                    g.add_edge(parent_idx, node_idx, ());
+                    stack.push_back((node_idx, c.to_owned(), current_depth));
                 };
                 match &node {
                     // `AConst` is the only node with a `one of` property, so we handle it manually
@@ -58,7 +143,7 @@ pub fn get_nodes_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
                     #(NodeEnum::#node_identifiers(n) => {#node_handlers}),*,
                 };
             }
-            nodes
+            g
         }
     }
 }

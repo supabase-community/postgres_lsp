@@ -20,6 +20,10 @@ pub fn parser_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
         use pg_query::{protobuf::ScanToken, protobuf::Token, NodeEnum, protobuf::SortByDir, NodeRef};
         use cstree::text::{TextRange, TextSize};
         use cstree::Syntax;
+        use std::cmp::{min, Ordering};
+        use std::fmt::{Display, Formatter};
+        use petgraph::{Graph};
+        use petgraph::graph::{NodeIndex};
 
         #syntax_kind
         #get_node_properties

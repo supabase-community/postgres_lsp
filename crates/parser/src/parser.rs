@@ -3,15 +3,19 @@ use cstree::syntax::ResolvedNode;
 use cstree::text::TextSize;
 use cstree::{build::GreenNodeBuilder, text::TextRange};
 use log::debug;
-use pg_query::{Node, NodeEnum};
+use petgraph::algo::astar;
+use petgraph::graph::{DefaultIx, Graph, NodeIndex};
+use petgraph::visit::{Bfs, Dfs};
+use petgraph::Direction;
+use pg_query::NodeEnum;
 use std::cmp::min;
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::ops::Range;
 use std::sync::LazyLock;
 
 use crate::ast_node::RawStmt;
-use crate::codegen::{get_nodes, SyntaxKind};
-use crate::lexer::Token;
+use crate::codegen::{get_nodes, Path, SyntaxKind};
+use crate::lexer::{Token, TokenType};
 use crate::syntax_error::SyntaxError;
 use crate::syntax_node::SyntaxNode;
 
@@ -982,6 +986,8 @@ pub struct Parser {
 
     /// index from which tokens are buffered
     token_buffer: Option<usize>,
+
+    depth: usize,
 }
 
 /// Result of Building
@@ -1005,6 +1011,7 @@ impl Parser {
             pos: 0,
             whitespace_token_buffer: None,
             token_buffer: None,
+            depth: 0,
         }
     }
 
@@ -1013,12 +1020,14 @@ impl Parser {
         debug!("start_node: {:?}", kind);
         self.flush_token_buffer();
         self.inner.start_node(kind);
+        self.depth += 1;
     }
 
     /// finish current node
     fn finish_node(&mut self) {
         debug!("finish_node");
         self.inner.finish_node();
+        self.depth -= 1;
     }
 
     /// collects an SyntaxError with an `error` message at `range`
@@ -1369,22 +1378,209 @@ impl Parser {
     }
 
     fn libpg_query_node(&mut self, node: NodeEnum, until: usize) {
-        let nodes = get_nodes(&node);
-        // maybe put the nodes into a struct that tracks stuff
-        println!("nodes: {:?}", nodes);
+        let mut node_graph = get_nodes(&node, self.depth);
 
-        // while self.pos <= until {
-        // get current token
-        // find token in possible node
-        // possible nodes are nodes that
-        // - were not used yet (used meaning that they are already closed)
-        // - are on the correct path
-        // }
+        // I do not know if this is safe, but I could not find a way to get the index of the root
+        // node
+        let mut current_node = NodeIndex::<DefaultIx>::new(0);
+        let mut open_nodes = Vec::<NodeIndex<DefaultIx>>::new();
+
+        while self.pos < until {
+            let current_token = self.tokens.get(self.pos).unwrap();
+            if current_token.token_type == TokenType::Whitespace {
+                self.advance();
+                continue;
+            }
+
+            // breadth-first search of token in node properties
+            let mut bfs = Bfs::new(&node_graph, current_node);
+            let mut skipped_nodes = Vec::<NodeIndex<DefaultIx>>::new();
+            let start_pos = self.pos;
+            while let Some(nx) = bfs.next(&node_graph) {
+                // if the current node has an edge to any node that is being skipped, skip the current
+                // this will ensure that we skip invalid branches entirely
+                if skipped_nodes
+                    .iter()
+                    .any(|n| node_graph.contains_edge(nx, *n))
+                {
+                    skipped_nodes.push(nx);
+                    continue;
+                }
+
+                let current_token = self.tokens.get(self.pos).unwrap();
+                let prop_idx = node_graph[nx]
+                    .properties
+                    .iter()
+                    .position(|p| cmp_tokens(p, current_token));
+                if prop_idx.is_some() {
+                    if open_nodes.iter().any(|n| *n == nx) {
+                        // if the node is already open, advance and continue with the next token
+                        self.advance();
+                        break;
+                    }
+
+                    // if the current node has the current token as property
+
+                    // close all nodes until the target depth is reached
+                    while self.depth > node_graph[nx].depth {
+                        node_graph.remove_node(open_nodes.pop().unwrap());
+                        self.finish_node();
+                    }
+
+                    // open all nodes until the target node is reached
+                    let mut target_node = current_node;
+                    while target_node != nx {
+                        let child = node_graph
+                            .neighbors_directed(target_node, Direction::Outgoing)
+                            .next()
+                            .unwrap();
+                        self.start_node(node_graph[child].kind);
+                        open_nodes.push(child);
+                        target_node = child;
+                    }
+
+                    // set the current node to the deepest node (looking up from the current node) that has at least one children
+                    // has_children is true if there are outgoing neighbors
+                    let mut parent_with_children = nx;
+                    while node_graph
+                        .neighbors_directed(parent_with_children, Direction::Outgoing)
+                        .count()
+                        == 0
+                    {
+                        if let Some(parent) = node_graph
+                            .neighbors_directed(parent_with_children, Direction::Incoming)
+                            .next()
+                        {
+                            parent_with_children = parent;
+                        } else {
+                            // root node reached
+                            break;
+                        }
+                    }
+                    current_node = parent_with_children;
+
+                    // remove the property from the node
+                    node_graph[nx].properties.remove(prop_idx.unwrap());
+
+                    self.advance();
+                    break;
+                } else if node_graph[nx].properties.len() > 0 {
+                    // if the current node has properties and the token does not match any of them, add it
+                    // to the list of skipped nodes and continue
+                    skipped_nodes.push(nx);
+                    continue;
+                }
+            }
+            if self.pos == start_pos {
+                // did not advance --> panic
+                panic!("Could not find token in node graph");
+            }
+        }
+        // close all remaining nodes
+        open_nodes.drain(..).for_each(|_| {
+            self.finish_node();
+        });
     }
+}
+
+// struct NodeFinder {
+//     nodes: Vec<crate::codegen::Node>,
+//     curr_idx: usize,
+// }
+//
+// impl NodeFinder {
+//     fn new(nodes: Vec<crate::codegen::Node>) -> Self {
+//         // sort the nodes so that we always go down to leaf first
+//         assert!(nodes.is_sorted_by_key(|n| &n.path));
+//         Self { nodes, curr_idx: 0 }
+//     }
+//
+//     fn pick(&mut self, idx: usize) -> crate::codegen::Node {
+//         // TODO: assert that the picked node is valid
+//         self.nodes.remove(idx)
+//     }
+//
+//     // two modes: searching and moving
+//     //
+//     // # Searching
+//     // - start at current node, do a depth-first preoder search
+//     // - if a node has properties but the current token does not match any of them, skip the branch
+//     // entirely
+//     // - if then node is not a child of the last opened node, panic (will never happen since we
+//     // start at the last opened node)
+//     //
+//     // # Moving
+//     // - if a leaf is reached, reset the current node to the deepest node that has at least one children
+//     // - remove a node from the tree if its closed
+//     //
+//     //
+//     // NodeId is hashable:
+//     // - build tree, safe data for node in hashmap with NodeId as key
+//
+//     /// lookup token by searching for it in the nodes' properties
+//     fn lookup(&mut self, token: &Token) {
+//         // Depth-First Preorder Search
+//         // we have to do two things:
+//         // - find next node --> do a depth-first preorder search. optimise by jumping.
+//         // -
+//         //
+//         // kill node if all children until the leaves are used
+//         // if node is closed, remove it from tree.
+//
+//         // the nodes are not strictly ordered on sibling-level.
+//         // hence a node at path 0.2 is not necessarily after a node at 0.1
+//         // so we have to start our lookup at the parent node of the current one
+//         for i in self
+//             .nodes
+//             .iter()
+//             .position(|n| n.path == self.nodes[self.curr_idx].path.parent())
+//             .unwrap()..self.nodes.len()
+//         {
+//             if self.nodes[i]
+//                 .path
+//                 .is_sibling_of(&self.nodes[self.curr_idx].path)
+//             {
+//                 panic!("Sibling reached");
+//             }
+//
+//             if self.nodes[i]
+//                 .properties
+//                 .iter()
+//                 .any(|p| cmp_tokens(p, token))
+//             {
+//                 self.curr_idx = i;
+//                 break;
+//             }
+//         }
+//
+//         // search for node that has the token
+//         // if any of the following conditions apply, panic
+//         // - we are at a leaf node and the token has not been found yet
+//         // - we are skipping a node that has properties
+//         // - the node is a sibling of the current node (because then we should have found it already)
+//         //
+//         // we most likely have to search all possible nodes (children of the current node) in case of ambiguity
+//
+//         // can only be within
+//         if self.nodes[self.curr_node]
+//             .properties
+//             .iter()
+//             .any(|p| cmp_tokens(p, token))
+//         {}
+//         // remove node from list when all properties are consumed
+//     }
+//
+//     // fn is_valid_node(&self ) -> bool {}
+// }
+//
+fn cmp_tokens(p: &crate::codegen::TokenProperty, token: &Token) -> bool {
+    (!p.value.is_some() || p.value.as_ref().unwrap() == &token.text)
+        && (!p.kind.is_some() || p.kind.unwrap() == token.kind)
 }
 
 #[cfg(test)]
 mod tests {
+    use petgraph::Graph;
     use std::{sync::mpsc, thread, time::Duration};
 
     use crate::lexer::lex;
@@ -1411,6 +1607,22 @@ mod tests {
     }
 
     #[test]
+    fn test_parser_very_simple() {
+        init();
+
+        panic_after(Duration::from_millis(100), || {
+            let input = "select 1";
+
+            let mut p = Parser::new(lex(input));
+            p.source();
+            let result = p.finish();
+
+            dbg!(&result.cst);
+            println!("{:#?}", result.errors);
+        })
+    }
+
+    #[test]
     fn test_parser_simple() {
         init();
 
@@ -1425,6 +1637,21 @@ mod tests {
             dbg!(&result.cst);
             println!("{:#?}", result.errors);
         })
+    }
+
+    #[test]
+    fn test_graph_crate() {
+        init();
+
+        struct N {
+            kind: SyntaxKind,
+        }
+
+        let mut g = Graph::<N, ()>::new();
+        let idx = g.add_node(N {
+            kind: SyntaxKind::SourceFile,
+        });
+        println!("{:#?}", idx);
     }
 
     fn panic_after<T, F>(d: Duration, f: F) -> T

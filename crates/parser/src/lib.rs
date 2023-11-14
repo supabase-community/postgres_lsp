@@ -15,7 +15,7 @@
 //!
 //! To see how these drawbacks are mitigated, see the `statement_parser.rs` and the `source_parser.rs` module.
 
-#![feature(lazy_cell)]
+#![feature(lazy_cell, is_sorted)]
 
 mod ast_node;
 mod codegen;
