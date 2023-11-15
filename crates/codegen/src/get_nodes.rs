@@ -102,8 +102,8 @@ pub fn get_nodes_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
 
         /// Returns all children of the node, recursively
         /// location is resolved manually
-        pub fn get_nodes(node: &NodeEnum, at_depth: usize) -> Graph<Node, ()> {
-            let mut g = Graph::<Node, ()>::new();
+        pub fn get_nodes(node: &NodeEnum, at_depth: usize) -> StableGraph<Node, ()> {
+            let mut g = StableGraph::<Node, ()>::new();
 
             let root_node_idx = g.add_node(Node {
                 kind: SyntaxKind::from(node),

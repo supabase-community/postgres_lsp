@@ -21,6 +21,7 @@ mod ast_node;
 mod codegen;
 mod lexer;
 mod parser;
+mod parsers;
 mod sibling_token;
 mod syntax_error;
 mod syntax_node;

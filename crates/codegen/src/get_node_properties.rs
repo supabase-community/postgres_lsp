@@ -150,6 +150,12 @@ fn custom_handlers(node: &Node) -> TokenStream {
             if n.distinct_clause.len() > 0 {
                 tokens.push(TokenProperty::from(Token::Distinct));
             }
+            if n.from_clause.len() > 0 {
+                tokens.push(TokenProperty::from(Token::From));
+            }
+            if n.where_clause.is_some() {
+                tokens.push(TokenProperty::from(Token::Where));
+            }
         },
         "Integer" => quote! {
             tokens.push(TokenProperty::from(n));
@@ -210,6 +216,18 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "AlterTableStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Alter));
             tokens.push(TokenProperty::from(Token::Table));
+        },
+        "AlterTableCmd" => quote! {
+            println!("AlterTableCmd {:#?}", n);
+            tokens.push(TokenProperty::from(Token::Alter));
+            match n.subtype {
+                4 => {
+                    tokens.push(TokenProperty::from(Token::Column));
+                    tokens.push(TokenProperty::from(Token::Set));
+                    tokens.push(TokenProperty::from(Token::Default));
+                },
+                _ => panic!("Unknown AlterTableCmd {:#?}", n.subtype),
+            }
         },
         "RenameStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Alter));
