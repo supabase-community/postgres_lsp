@@ -18,10 +18,11 @@
 #![feature(lazy_cell, is_sorted)]
 
 mod ast_node;
+mod builder;
 mod codegen;
 mod lexer;
+mod parse;
 mod parser;
-mod parsers;
 mod sibling_token;
 mod syntax_error;
 mod syntax_node;
