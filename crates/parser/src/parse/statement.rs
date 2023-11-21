@@ -1,13 +1,11 @@
-use std::collections::HashMap;
 use std::ops::Range;
-use std::sync::LazyLock;
 
 use cstree::text::{TextRange, TextSize};
 
 use super::statement_start::{is_at_stmt_start, TokenStatement, STATEMENT_START_TOKEN_MAPS};
 use crate::codegen::SyntaxKind;
-use crate::parser::WHITESPACE_TOKENS;
-use crate::{lexer, Parser};
+use crate::parse::libpg_query_node::libpg_query_node;
+use crate::Parser;
 
 pub fn statement(parser: &mut Parser, kind: SyntaxKind) {
     let token_range = collect_statement_token_range(parser, kind);
@@ -20,8 +18,8 @@ pub fn statement(parser: &mut Parser, kind: SyntaxKind) {
             .as_str(),
     ) {
         Ok(result) => {
-            // TODO: return syntax kind and use it in checkpoint
-            self.libpg_query_node(
+            libpg_query_node(
+                parser,
                 result
                     .protobuf
                     .nodes()
@@ -34,7 +32,6 @@ pub fn statement(parser: &mut Parser, kind: SyntaxKind) {
             );
         }
         Err(err) => {
-            println!("error: {}", err);
             parser.error(
                 err.to_string(),
                 TextRange::new(
@@ -109,5 +106,3 @@ fn advance_over_start_tokens(parser: &mut Parser, kind: SyntaxKind) {
         }
     }
 }
-
-

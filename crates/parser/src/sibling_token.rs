@@ -3,25 +3,25 @@ use crate::codegen::SyntaxKind;
 const SIBLINGS: [(SyntaxKind, SyntaxKind); 1] = [(SyntaxKind::Ascii40, SyntaxKind::Ascii41)];
 
 impl SyntaxKind {
-    pub fn is_closing_sibling(self) -> bool {
-        SIBLINGS.iter().any(|(_, close)| *close == self)
+    pub fn is_closing_sibling(&self) -> bool {
+        SIBLINGS.iter().any(|(_, close)| close == self)
     }
 
-    pub fn is_opening_sibling(self) -> bool {
-        SIBLINGS.iter().any(|(open, _)| *open == self)
+    pub fn is_opening_sibling(&self) -> bool {
+        SIBLINGS.iter().any(|(open, _)| open == self)
     }
 
-    pub fn get_closing_sibling(self) -> SyntaxKind {
+    pub fn get_closing_sibling(&self) -> SyntaxKind {
         SIBLINGS
             .iter()
-            .find_map(|(open, close)| if *open == self { Some(*close) } else { None })
+            .find_map(|(open, close)| if open == self { Some(*close) } else { None })
             .unwrap()
     }
 
-    pub fn get_opening_sibling(self) -> SyntaxKind {
+    pub fn get_opening_sibling(&self) -> SyntaxKind {
         SIBLINGS
             .iter()
-            .find_map(|(open, close)| if *close == self { Some(*open) } else { None })
+            .find_map(|(open, close)| if close == self { Some(*open) } else { None })
             .unwrap()
     }
 }

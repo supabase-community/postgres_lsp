@@ -102,6 +102,10 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 );
             }
         }
+        // close all remaining nodes
+        for _ in 0..self.open_nodes.len() {
+            self.finish_node();
+        }
     }
 
     fn search_parent_properties(&self) -> Option<(NodeIndex<DefaultIx>, usize)> {
@@ -120,7 +124,7 @@ impl<'p> LibpgQueryNodeParser<'p> {
 
     /// breadth-first search (`Bfs`) for the node that has the current token as its property
     ///
-    /// Returns index of node and property if found
+    /// Returns indices of both node and property if found
     ///
     /// Skips visited branches
     fn search_children_properties(&self) -> Option<(NodeIndex<DefaultIx>, usize)> {

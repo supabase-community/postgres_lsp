@@ -1,4 +1,4 @@
-mod libpg_query_node;
-mod source;
-mod statement;
-mod statement_start;
+pub mod libpg_query_node;
+pub mod source;
+pub mod statement;
+pub mod statement_start;

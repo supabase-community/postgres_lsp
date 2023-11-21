@@ -18,7 +18,6 @@
 #![feature(lazy_cell, is_sorted)]
 
 mod ast_node;
-mod builder;
 mod codegen;
 mod lexer;
 mod parse;
@@ -28,13 +27,18 @@ mod syntax_error;
 mod syntax_node;
 
 use lexer::lex;
+use parse::source::source;
 
 pub use crate::codegen::SyntaxKind;
 pub use crate::parser::{Parse, Parser};
 pub use crate::syntax_node::{SyntaxElement, SyntaxNode, SyntaxToken};
 
+pub enum EntryPoint {
+    Source,
+}
+
 pub fn parse_source(text: &str) -> Parse {
     let mut p = Parser::new(lex(text));
-    p.source();
+    source(&mut p);
     p.finish()
 }
