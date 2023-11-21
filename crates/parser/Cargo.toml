@@ -9,13 +9,10 @@ edition = "2021"
 petgraph = "0.6.4"
 cstree = { version = "0.12.0", features = ["derive"] }
 pg_query = "0.8"
-logos = "0.13.0"
 serde_json = "1.0"
 regex = "1.9.1"
-serde = { version = "1.0", features = ["derive"] }
 env_logger = { version = "0.9.1" }
 log = { version = "0.4.20" }
-lazy_static = "1.4.0"
 
 codegen.workspace = true
 pg_query_proto_parser.workspace = true
