@@ -281,7 +281,7 @@ mod tests {
     use petgraph::Graph;
     use std::{sync::mpsc, thread, time::Duration};
 
-    use crate::lexer::lex;
+    use crate::{lexer::lex, parse::source::source};
 
     use super::*;
 
@@ -394,7 +394,7 @@ group by
   pk.primary_keys";
 
             let mut p = Parser::new(lex(input));
-            p.source();
+            source(&mut p);
             let result = p.finish();
 
             dbg!(&result.cst);
@@ -410,7 +410,7 @@ group by
             let input = "select * from public.contact where x = 1;";
 
             let mut p = Parser::new(lex(input));
-            p.source();
+            source(&mut p);
             let result = p.finish();
 
             dbg!(&result.cst);
@@ -424,30 +424,14 @@ group by
 
         panic_after(Duration::from_millis(100), || {
             let input = "alter table x rename to y \n alter table x alter column z set default 1";
-            // let input = "select 1; \n -- some comment \n select 2;";
 
             let mut p = Parser::new(lex(input));
-            p.source();
+            source(&mut p);
             let result = p.finish();
 
             dbg!(&result.cst);
             println!("{:#?}", result.errors);
         })
-    }
-
-    #[test]
-    fn test_graph_crate() {
-        init();
-
-        struct N {
-            kind: SyntaxKind,
-        }
-
-        let mut g = Graph::<N, ()>::new();
-        let idx = g.add_node(N {
-            kind: SyntaxKind::SourceFile,
-        });
-        println!("{:#?}", idx);
     }
 
     fn panic_after<T, F>(d: Duration, f: F) -> T

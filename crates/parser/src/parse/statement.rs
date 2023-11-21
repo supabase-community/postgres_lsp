@@ -28,7 +28,7 @@ pub fn statement(parser: &mut Parser, kind: SyntaxKind) {
                     .unwrap()
                     .0
                     .to_enum(),
-                token_range.end,
+                &token_range,
             );
         }
         Err(err) => {

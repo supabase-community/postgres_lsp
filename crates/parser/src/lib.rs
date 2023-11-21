@@ -33,10 +33,8 @@ pub use crate::codegen::SyntaxKind;
 pub use crate::parser::{Parse, Parser};
 pub use crate::syntax_node::{SyntaxElement, SyntaxNode, SyntaxToken};
 
-pub enum EntryPoint {
-    Source,
-}
-
+// TODO: I think we should add some kind of `EntryPoint` enum and make the api more flexible
+// maybe have an intermediate struct that takes &str inputs, lexes the input and then calls the parser
 pub fn parse_source(text: &str) -> Parse {
     let mut p = Parser::new(lex(text));
     source(&mut p);

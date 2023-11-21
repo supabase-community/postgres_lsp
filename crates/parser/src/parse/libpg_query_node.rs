@@ -1,5 +1,7 @@
+use std::{ops::Range, println};
+
 use crate::{
-    codegen::{get_nodes, Node},
+    codegen::{get_nodes, Node, SyntaxKind},
     lexer::TokenType,
 };
 use petgraph::{
@@ -11,36 +13,56 @@ use pg_query::NodeEnum;
 
 use crate::Parser;
 
-pub fn libpg_query_node(parser: &mut Parser, node: NodeEnum, until: usize) {
-    LibpgQueryNodeParser::new(parser, node, until).parse();
+pub fn libpg_query_node(parser: &mut Parser, node: NodeEnum, token_range: &Range<usize>) {
+    LibpgQueryNodeParser::new(parser, node, token_range).parse();
 }
+
+pub static SKIPPABLE_TOKENS: &[SyntaxKind] = &[
+    // "."
+    SyntaxKind::Ascii46,
+    // ";"
+    SyntaxKind::Ascii59,
+];
 
 struct LibpgQueryNodeParser<'p> {
     parser: &'p mut Parser,
-    until: usize,
+    token_range: &'p Range<usize>,
     node_graph: StableGraph<Node, ()>,
     current_node: NodeIndex<DefaultIx>,
     open_nodes: Vec<NodeIndex<DefaultIx>>,
 }
 
 impl<'p> LibpgQueryNodeParser<'p> {
-    pub fn new(parser: &mut Parser, node: NodeEnum, until: usize) -> LibpgQueryNodeParser {
+    pub fn new(
+        parser: &'p mut Parser,
+        node: NodeEnum,
+        token_range: &'p Range<usize>,
+    ) -> LibpgQueryNodeParser<'p> {
+        println!("creating libpg_query_node_parser for node {:#?}", node);
+        let current_depth = parser.depth.clone();
         Self {
             parser,
-            until,
-            node_graph: get_nodes(&node, parser.depth),
+            token_range,
+            node_graph: get_nodes(&node, current_depth),
             current_node: NodeIndex::<DefaultIx>::new(0),
             open_nodes: Vec::new(),
         }
     }
 
     pub fn parse(&mut self) {
-        while self.parser.pos < self.until {
-            if self.at_whitespace() {
+        while self.parser.pos < self.token_range.end {
+            dbg!(&self.node_graph);
+            println!("current node: {:?}", self.current_node);
+            println!("current token: {:?}", self.current_token());
+            if self.at_whitespace() || self.at_skippable() {
+                println!(
+                    "skipping token because whitespace {:?} or skippable {:?}",
+                    self.at_whitespace(),
+                    self.at_skippable()
+                );
                 self.parser.advance();
-                continue;
-            }
-            if let Some(idx) = self.node_properties_position(self.current_node) {
+            } else if let Some(idx) = self.node_properties_position(self.current_node) {
+                println!("found in current node {:?}", self.current_node);
                 // token is in current node. remove and advance.
                 // open if not opened yet.
                 if !self.node_is_open(&self.current_node) {
@@ -49,47 +71,62 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 self.remove_property(self.current_node, idx);
                 self.parser.advance();
             } else if let Some((node_idx, prop_idx)) = self.search_children_properties() {
+                println!("found in properties of {:?}", node_idx);
+                self.remove_property(node_idx, prop_idx);
+
                 // close all nodes until the target depth is reached
                 self.finish_nodes_until_depth(self.node_graph[node_idx].depth + 1);
 
-                if self.node_is_open(&node_idx) {
-                    // if the node is already open, advance and continue with the next token
-                    self.parser.advance();
-                    continue;
-                }
-
-                // open all nodes from `self.current_node` to the node in whichs property the current token found (`node_idx`)
-                let mut ancestors = self.ancestors(Some(node_idx));
-                let mut nodes_to_open = Vec::<NodeIndex<DefaultIx>>::new();
-                nodes_to_open.push(node_idx);
-                while let Some(nx) = ancestors.next() {
-                    if nx == self.current_node {
-                        break;
+                if !self.node_is_open(&node_idx) {
+                    // open all nodes from `self.current_node` to the node in whichs property the current token found (`node_idx`)
+                    let mut ancestors = self.ancestors(Some(node_idx));
+                    let mut nodes_to_open = Vec::<NodeIndex<DefaultIx>>::new();
+                    // including the target node
+                    nodes_to_open.push(node_idx);
+                    while let Some(nx) = ancestors.next() {
+                        if nx == self.current_node {
+                            break;
+                        }
+                        nodes_to_open.push(nx);
                     }
-                    nodes_to_open.push(nx);
+                    nodes_to_open.iter().rev().for_each(|n| {
+                        self.start_node(*n);
+                    });
                 }
-                nodes_to_open.iter().rev().for_each(|n| {
-                    self.start_node(*n);
-                });
 
                 self.parser.advance();
 
                 self.current_node = node_idx;
+                println!("setting current node to: {:?}", node_idx);
 
                 self.finish_open_leaf_nodes();
             } else if let Some((node_idx, prop_idx)) = self.search_parent_properties() {
+                println!("found in properties of parent {:?}", node_idx);
                 self.remove_property(node_idx, prop_idx);
 
                 self.finish_nodes_until_depth(self.node_graph[node_idx].depth + 1);
 
                 // do not open any new nodes because the node is already open
 
+                self.current_node = node_idx;
+
                 // set the current node to the deepest node (looking up from the current node) that has at least one children
                 // has_children is true if there are outgoing neighbors
-                for a in self.ancestors(Some(node_idx)) {
-                    if self.has_children(&a) {
-                        self.current_node = a;
-                        break;
+                println!("setting current node deepest node with at least one children starting from: {:?}", node_idx);
+                if self.has_children(&node_idx) {
+                    println!(
+                        "node {:?} has children, setting it as current node",
+                        node_idx
+                    );
+                    self.current_node = node_idx;
+                } else {
+                    for a in self.ancestors(Some(node_idx)) {
+                        println!("checking node {:?}", a);
+                        if self.has_children(&a) {
+                            println!("node {:?} has children, breaking", a);
+                            self.current_node = a;
+                            break;
+                        }
                     }
                 }
 
@@ -103,6 +140,7 @@ impl<'p> LibpgQueryNodeParser<'p> {
             }
         }
         // close all remaining nodes
+        println!("closing remaining nodes");
         for _ in 0..self.open_nodes.len() {
             self.finish_node();
         }
@@ -173,18 +211,38 @@ impl<'p> LibpgQueryNodeParser<'p> {
 
     /// finish current node while it is an open leaf node with no properties
     fn finish_open_leaf_nodes(&mut self) {
+        let tokens = self
+            .parser
+            .tokens
+            .get(self.token_range.clone())
+            .unwrap()
+            .to_vec();
         while self
             .node_graph
             .neighbors_directed(self.current_node, Direction::Outgoing)
             .count()
             == 0
-            && self.node_graph[self.current_node].properties.len() == 0
         {
+            // check if the node contains properties that are not at all in the token stream and remove them
+            if self.node_graph[self.current_node].properties.len() > 0 {
+                self.node_graph[self.current_node]
+                    .properties
+                    .retain(|p| tokens.iter().any(|t| cmp_tokens(p, t)));
+            }
+
+            if self.node_graph[self.current_node].properties.len() > 0 {
+                break;
+            }
+
             self.finish_node();
             if self.open_nodes.len() == 0 {
                 break;
             }
             self.current_node = self.open_nodes.last().unwrap().clone();
+            println!(
+                "finish open leafes: set current node to: {:?}",
+                self.current_node
+            );
         }
     }
 
@@ -213,6 +271,7 @@ impl<'p> LibpgQueryNodeParser<'p> {
     }
 
     fn finish_node(&mut self) {
+        println!("finishing node {:?}", self.open_nodes.last());
         self.node_graph.remove_node(self.open_nodes.pop().unwrap());
         self.parser.finish_node();
     }
@@ -230,9 +289,13 @@ impl<'p> LibpgQueryNodeParser<'p> {
         self.parser.tokens.get(self.parser.pos).unwrap()
     }
 
+    fn at_skippable(&self) -> bool {
+        SKIPPABLE_TOKENS.contains(&self.current_token().kind)
+    }
+
     fn at_whitespace(&self) -> bool {
         // TODO: merge whitespace token def with whitespace def in parser
-        self.parser.tokens.get(self.parser.pos).unwrap().token_type == TokenType::Whitespace
+        self.current_token().token_type == TokenType::Whitespace
     }
 
     fn node_properties_position(&self, idx: NodeIndex<DefaultIx>) -> Option<usize> {
@@ -248,6 +311,7 @@ fn cmp_tokens(p: &crate::codegen::TokenProperty, token: &crate::lexer::Token) ->
         && (!p.kind.is_some() || p.kind.unwrap() == token.kind)
 }
 
+/// Custom iterator for walking ancestors of a node until the root of the tree is reached
 struct Ancestors<'a> {
     graph: &'a StableGraph<Node, ()>,
     current_node: NodeIndex<DefaultIx>,

@@ -233,6 +233,7 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::Alter));
             tokens.push(TokenProperty::from(Token::Table));
             tokens.push(TokenProperty::from(Token::Rename));
+            tokens.push(TokenProperty::from(Token::To));
         },
         _ => quote! {},
     }
