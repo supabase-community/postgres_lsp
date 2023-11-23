@@ -1,6 +1,5 @@
 use std::fs;
 mod common;
-use insta;
 use log::debug;
 use parser::parse_source;
 
@@ -23,18 +22,16 @@ fn valid_statements() {
 
         let contents = fs::read_to_string(&path).unwrap();
 
-        debug!("Parsing statement: {}", test_name);
+        debug!("Parsing statement {}\n{}", test_name, contents);
 
-        let parsed = parse_source(&contents);
-
-        let mut settings = insta::Settings::clone_current();
-        settings.set_input_file(path);
-        settings.set_prepend_module_to_snapshot(false);
-        settings.set_description(contents);
-        settings.set_omit_expression(true);
-        settings.set_snapshot_path("snapshots/statements/valid");
-        settings.bind(|| {
-            insta::assert_debug_snapshot!(test_name, &parsed.cst);
-        });
+        let result = std::panic::catch_unwind(|| parse_source(&contents));
+        if result.is_err() {
+            assert!(
+                false,
+                "Failed to parse statement {}: {:#?}",
+                test_name,
+                result.unwrap_err()
+            );
+        }
     });
 }

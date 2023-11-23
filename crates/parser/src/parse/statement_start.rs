@@ -172,7 +172,11 @@ pub static STATEMENT_START_TOKEN_MAPS: LazyLock<Vec<HashMap<SyntaxKind, Vec<Toke
                 SyntaxToken::Optional(SyntaxKind::Temporary),
                 SyntaxToken::Optional(SyntaxKind::Temp),
                 SyntaxToken::Optional(SyntaxKind::Unlogged),
+                SyntaxToken::Optional(SyntaxKind::IfP),
+                SyntaxToken::Optional(SyntaxKind::Not),
+                SyntaxToken::Optional(SyntaxKind::Exists),
                 SyntaxToken::Required(SyntaxKind::Table),
+                SyntaxToken::Required(SyntaxKind::Ident),
             ],
         ));
 

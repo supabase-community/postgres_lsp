@@ -278,7 +278,6 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
-    use petgraph::Graph;
     use std::{sync::mpsc, thread, time::Duration};
 
     use crate::{lexer::lex, parse::source::source};
@@ -295,7 +294,7 @@ mod tests {
 
         panic_after(Duration::from_millis(1000), || {
             let input = "SELECT
-  c.oid :: int8 AS id,
+  c.oid::int8 AS id,
   nc.nspname AS schema,
   c.relname AS name,
   c.relrowsecurity AS rls_enabled,
@@ -432,6 +431,25 @@ group by
             dbg!(&result.cst);
             println!("{:#?}", result.errors);
         })
+    }
+
+    #[test]
+    fn test_parser_playground() {
+        init();
+
+        let res = pg_query::parse(
+            " CREATE TABLE weather (
+            city      varchar(80) references cities(name),
+            temp_lo   int,
+            temp_hi   int,
+            prcp      real,
+            date      date
+    );",
+        )
+        .unwrap();
+        res.protobuf.nodes().iter().for_each(|node| {
+            println!("{:#?}", node);
+        });
     }
 
     fn panic_after<T, F>(d: Duration, f: F) -> T

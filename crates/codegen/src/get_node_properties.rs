@@ -156,6 +156,10 @@ fn custom_handlers(node: &Node) -> TokenStream {
             if n.where_clause.is_some() {
                 tokens.push(TokenProperty::from(Token::Where));
             }
+            if n.group_clause.len() > 0 {
+                tokens.push(TokenProperty::from(Token::GroupP));
+                tokens.push(TokenProperty::from(Token::By));
+            }
         },
         "Integer" => quote! {
             tokens.push(TokenProperty::from(n));
@@ -174,8 +178,19 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::Ascii42));
         },
         "FuncCall" => quote! {
+            if n.funcname.len() == 1 && n.args.len() == 0 {
+                // check if count(*)
+                if let Some(node) = &n.funcname[0].node {
+                    if let NodeEnum::String(n) = node {
+                        if n.sval == "count" {
+                            tokens.push(TokenProperty::from(Token::Ascii42));
+                        }
+                    }
+                }
+            }
             if n.agg_filter.is_some() {
                 tokens.push(TokenProperty::from(Token::Filter));
+                tokens.push(TokenProperty::from(Token::Where));
             }
         },
         "SqlvalueFunction" => quote! {
@@ -218,7 +233,6 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::Table));
         },
         "AlterTableCmd" => quote! {
-            println!("AlterTableCmd {:#?}", n);
             tokens.push(TokenProperty::from(Token::Alter));
             match n.subtype {
                 4 => {
@@ -229,11 +243,33 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 _ => panic!("Unknown AlterTableCmd {:#?}", n.subtype),
             }
         },
+        "CopyStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Copy));
+            tokens.push(TokenProperty::from(Token::From));
+        },
         "RenameStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Alter));
             tokens.push(TokenProperty::from(Token::Table));
             tokens.push(TokenProperty::from(Token::Rename));
             tokens.push(TokenProperty::from(Token::To));
+        },
+        "Constraint" => quote! {
+            match n.contype {
+                10 => {
+                    // ConstrForeign
+                    tokens.push(TokenProperty::from(Token::References));
+                },
+                _ => panic!("Unknown Constraint {:#?}", n.contype),
+            }
+        },
+        "CreateStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::Table));
+            if n.if_not_exists {
+                tokens.push(TokenProperty::from(Token::IfP));
+                tokens.push(TokenProperty::from(Token::Not));
+                tokens.push(TokenProperty::from(Token::Exists));
+            }
         },
         _ => quote! {},
     }

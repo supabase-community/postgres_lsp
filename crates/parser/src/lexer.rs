@@ -1,6 +1,6 @@
 use std::{collections::VecDeque, sync::LazyLock};
 
-use pg_query::protobuf::KeywordKind;
+use pg_query::protobuf::{KeywordKind, ScanToken};
 use regex::Regex;
 
 use cstree::text::{TextRange, TextSize};
@@ -17,14 +17,18 @@ pub enum TokenType {
     ReservedKeyword,
 }
 
-impl From<KeywordKind> for TokenType {
-    fn from(kind: KeywordKind) -> TokenType {
-        match kind {
-            KeywordKind::NoKeyword => TokenType::NoKeyword,
-            KeywordKind::UnreservedKeyword => TokenType::UnreservedKeyword,
-            KeywordKind::ColNameKeyword => TokenType::ColNameKeyword,
-            KeywordKind::TypeFuncNameKeyword => TokenType::TypeFuncNameKeyword,
-            KeywordKind::ReservedKeyword => TokenType::ReservedKeyword,
+impl From<&ScanToken> for TokenType {
+    fn from(token: &ScanToken) -> TokenType {
+        match token.token {
+            // SqlComment
+            275 => TokenType::Whitespace,
+            _ => match token.keyword_kind() {
+                KeywordKind::NoKeyword => TokenType::NoKeyword,
+                KeywordKind::UnreservedKeyword => TokenType::UnreservedKeyword,
+                KeywordKind::ColNameKeyword => TokenType::ColNameKeyword,
+                KeywordKind::TypeFuncNameKeyword => TokenType::TypeFuncNameKeyword,
+                KeywordKind::ReservedKeyword => TokenType::ReservedKeyword,
+            },
         }
     }
 }
@@ -38,7 +42,7 @@ pub struct Token {
 }
 
 static PATTERN_LEXER: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?P<whitespace> )|(?P<newline>\n)").unwrap());
+    LazyLock::new(|| Regex::new(r"(?P<whitespace> )|(?P<newline>\n)|(?P<tab>\t)").unwrap());
 
 fn whitespace_tokens(input: &str) -> VecDeque<Token> {
     let mut tokens = VecDeque::new();
@@ -62,6 +66,16 @@ fn whitespace_tokens(input: &str) -> VecDeque<Token> {
                 span: TextRange::new(
                     TextSize::from(u32::try_from(newline.start()).unwrap()),
                     TextSize::from(u32::try_from(newline.end()).unwrap()),
+                ),
+            });
+        } else if let Some(tab) = cap.name("tab") {
+            tokens.push_back(Token {
+                token_type: TokenType::Whitespace,
+                kind: SyntaxKind::Newline,
+                text: tab.as_str().to_string(),
+                span: TextRange::new(
+                    TextSize::from(u32::try_from(tab.start()).unwrap()),
+                    TextSize::from(u32::try_from(tab.end()).unwrap()),
                 ),
             });
         } else {
@@ -103,9 +117,7 @@ pub fn lex(text: &str) -> Vec<Token> {
             let len = token_text.len();
             let has_whitespace = token_text.contains(" ") || token_text.contains("\n");
             tokens.push(Token {
-                token_type: TokenType::from(
-                    KeywordKind::from_i32(pg_query_token.keyword_kind).unwrap(),
-                ),
+                token_type: TokenType::from(&pg_query_token),
                 kind: SyntaxKind::from(&pg_query_token),
                 text: token_text,
                 span: TextRange::new(

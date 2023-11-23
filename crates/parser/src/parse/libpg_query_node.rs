@@ -1,9 +1,10 @@
-use std::{ops::Range, println};
+use std::ops::Range;
 
 use crate::{
     codegen::{get_nodes, Node, SyntaxKind},
     lexer::TokenType,
 };
+use log::debug;
 use petgraph::{
     stable_graph::{DefaultIx, NodeIndex, StableGraph},
     visit::Bfs,
@@ -18,6 +19,12 @@ pub fn libpg_query_node(parser: &mut Parser, node: NodeEnum, token_range: &Range
 }
 
 pub static SKIPPABLE_TOKENS: &[SyntaxKind] = &[
+    // "("
+    SyntaxKind::Ascii40,
+    // ")"
+    SyntaxKind::Ascii41,
+    // ","
+    SyntaxKind::Ascii44,
     // "."
     SyntaxKind::Ascii46,
     // ";"
@@ -38,8 +45,8 @@ impl<'p> LibpgQueryNodeParser<'p> {
         node: NodeEnum,
         token_range: &'p Range<usize>,
     ) -> LibpgQueryNodeParser<'p> {
-        println!("creating libpg_query_node_parser for node {:#?}", node);
         let current_depth = parser.depth.clone();
+        debug!("Parsing node {:#?}", node);
         Self {
             parser,
             token_range,
@@ -52,17 +59,12 @@ impl<'p> LibpgQueryNodeParser<'p> {
     pub fn parse(&mut self) {
         while self.parser.pos < self.token_range.end {
             dbg!(&self.node_graph);
-            println!("current node: {:?}", self.current_node);
-            println!("current token: {:?}", self.current_token());
+            debug!("current node: {:#?}", self.current_node);
+            debug!("current token: {:#?}", self.current_token());
             if self.at_whitespace() || self.at_skippable() {
-                println!(
-                    "skipping token because whitespace {:?} or skippable {:?}",
-                    self.at_whitespace(),
-                    self.at_skippable()
-                );
                 self.parser.advance();
             } else if let Some(idx) = self.node_properties_position(self.current_node) {
-                println!("found in current node {:?}", self.current_node);
+                println!("found property at current node {:?}", self.current_node);
                 // token is in current node. remove and advance.
                 // open if not opened yet.
                 if !self.node_is_open(&self.current_node) {
@@ -71,7 +73,7 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 self.remove_property(self.current_node, idx);
                 self.parser.advance();
             } else if let Some((node_idx, prop_idx)) = self.search_children_properties() {
-                println!("found in properties of {:?}", node_idx);
+                println!("found property within children node {:?}", node_idx);
                 self.remove_property(node_idx, prop_idx);
 
                 // close all nodes until the target depth is reached
@@ -97,11 +99,10 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 self.parser.advance();
 
                 self.current_node = node_idx;
-                println!("setting current node to: {:?}", node_idx);
 
                 self.finish_open_leaf_nodes();
             } else if let Some((node_idx, prop_idx)) = self.search_parent_properties() {
-                println!("found in properties of parent {:?}", node_idx);
+                println!("found property within parent node {:?}", node_idx);
                 self.remove_property(node_idx, prop_idx);
 
                 self.finish_nodes_until_depth(self.node_graph[node_idx].depth + 1);
@@ -112,18 +113,11 @@ impl<'p> LibpgQueryNodeParser<'p> {
 
                 // set the current node to the deepest node (looking up from the current node) that has at least one children
                 // has_children is true if there are outgoing neighbors
-                println!("setting current node deepest node with at least one children starting from: {:?}", node_idx);
                 if self.has_children(&node_idx) {
-                    println!(
-                        "node {:?} has children, setting it as current node",
-                        node_idx
-                    );
                     self.current_node = node_idx;
                 } else {
                     for a in self.ancestors(Some(node_idx)) {
-                        println!("checking node {:?}", a);
                         if self.has_children(&a) {
-                            println!("node {:?} has children, breaking", a);
                             self.current_node = a;
                             break;
                         }
@@ -133,14 +127,14 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 self.parser.advance();
             } else {
                 panic!(
-                    "could not find node for token {:?} at depth {}",
+                    "could not find node for token {:?} at depth {} in {:#?}",
                     self.current_token(),
-                    self.parser.depth
+                    self.parser.depth,
+                    self.node_graph
                 );
             }
         }
         // close all remaining nodes
-        println!("closing remaining nodes");
         for _ in 0..self.open_nodes.len() {
             self.finish_node();
         }
@@ -209,22 +203,34 @@ impl<'p> LibpgQueryNodeParser<'p> {
         None
     }
 
+    /// check if the current node has children that have properties that are in the part of the token stream that is not yet consumed
+    fn has_children_with_relevant_properties(&self) -> bool {
+        let tokens = &self.parser.tokens[self.parser.pos..self.token_range.end];
+        let mut b = Bfs::new(&self.node_graph, self.current_node);
+        while let Some(nx) = b.next(&self.node_graph) {
+            if self.node_graph[nx]
+                .properties
+                .iter()
+                .any(|p| tokens.iter().any(|t| cmp_tokens(p, t)))
+            {
+                return true;
+            }
+        }
+        false
+    }
+
     /// finish current node while it is an open leaf node with no properties
     fn finish_open_leaf_nodes(&mut self) {
-        let tokens = self
-            .parser
-            .tokens
-            .get(self.token_range.clone())
-            .unwrap()
-            .to_vec();
         while self
             .node_graph
             .neighbors_directed(self.current_node, Direction::Outgoing)
             .count()
             == 0
+            || !self.has_children_with_relevant_properties()
         {
-            // check if the node contains properties that are not at all in the token stream and remove them
+            // check if the node contains properties that are not at all in the part of the token stream that is not yet consumed and remove them
             if self.node_graph[self.current_node].properties.len() > 0 {
+                let tokens = &self.parser.tokens[self.parser.pos..self.token_range.end];
                 self.node_graph[self.current_node]
                     .properties
                     .retain(|p| tokens.iter().any(|t| cmp_tokens(p, t)));
@@ -239,10 +245,6 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 break;
             }
             self.current_node = self.open_nodes.last().unwrap().clone();
-            println!(
-                "finish open leafes: set current node to: {:?}",
-                self.current_node
-            );
         }
     }
 
@@ -271,7 +273,6 @@ impl<'p> LibpgQueryNodeParser<'p> {
     }
 
     fn finish_node(&mut self) {
-        println!("finishing node {:?}", self.open_nodes.last());
         self.node_graph.remove_node(self.open_nodes.pop().unwrap());
         self.parser.finish_node();
     }
@@ -306,9 +307,36 @@ impl<'p> LibpgQueryNodeParser<'p> {
     }
 }
 
+/// list of aliases from https://www.postgresql.org/docs/current/datatype.html
+const ALIASES: [&[&str]; 2] = [&["integer", "int", "int4"], &["real", "float4"]];
+
 fn cmp_tokens(p: &crate::codegen::TokenProperty, token: &crate::lexer::Token) -> bool {
-    (!p.value.is_some() || p.value.as_ref().unwrap() == &token.text)
-        && (!p.kind.is_some() || p.kind.unwrap() == token.kind)
+    // TokenProperty has always either value or kind set
+    assert!(p.value.is_some() || p.kind.is_some());
+
+    // TODO: move this to lexer
+
+    // remove enclosing ' quotes from token text
+    let string_delimiter: &[char; 2] = &['\'', '$'];
+    let token_text = token
+        .text
+        .trim_start_matches(string_delimiter)
+        .trim_end_matches(string_delimiter)
+        .to_string();
+    let token_text_values = aliases(&token_text);
+
+    (p.value.is_none() || token_text_values.contains(&p.value.as_ref().unwrap().as_str()))
+        && (p.kind.is_none() || p.kind.unwrap() == token.kind)
+}
+
+/// returns a list of aliases for a string. primarily used for data types.
+fn aliases(text: &str) -> Vec<&str> {
+    for alias in ALIASES {
+        if alias.contains(&text) {
+            return alias.to_vec();
+        }
+    }
+    return vec![text];
 }
 
 /// Custom iterator for walking ancestors of a node until the root of the tree is reached
