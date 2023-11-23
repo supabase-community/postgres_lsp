@@ -1,4 +1,5 @@
 use std::ops::Range;
+use std::println;
 
 use cstree::text::{TextRange, TextSize};
 
@@ -10,6 +11,7 @@ use crate::Parser;
 pub fn statement(parser: &mut Parser, kind: SyntaxKind) {
     let token_range = collect_statement_token_range(parser, kind);
     let tokens = parser.tokens.get(token_range.clone()).unwrap().to_vec();
+    println!("tokens: {:?}", tokens);
     match pg_query::parse(
         tokens
             .iter()
@@ -55,6 +57,7 @@ fn collect_statement_token_range(parser: &mut Parser, kind: SyntaxKind) -> Range
     advance_over_start_tokens(parser, kind);
 
     let mut is_parsing_sub_stmt = false;
+    let mut ignore_next_non_whitespace = false;
     while !parser.at(SyntaxKind::Ascii59) && !parser.eof() {
         match parser.nth(0, false) {
             // opening brackets "(", consume until closing bracket ")"
@@ -66,12 +69,23 @@ fn collect_statement_token_range(parser: &mut Parser, kind: SyntaxKind) -> Range
                 is_parsing_sub_stmt = false;
                 parser.advance();
             }
+            SyntaxKind::As => {
+                // ignore the next non-whitespace token
+                ignore_next_non_whitespace = true;
+                parser.advance();
+            }
             _ => {
                 // if another stmt FIRST is encountered, break
                 // ignore if parsing sub stmt
-                if is_parsing_sub_stmt == false && is_at_stmt_start(parser).is_some() {
+                if ignore_next_non_whitespace == false
+                    && is_parsing_sub_stmt == false
+                    && is_at_stmt_start(parser).is_some()
+                {
                     break;
                 } else {
+                    if ignore_next_non_whitespace == true && !parser.at_whitespace() {
+                        ignore_next_non_whitespace = false;
+                    }
                     parser.advance();
                 }
             }

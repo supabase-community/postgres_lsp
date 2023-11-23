@@ -57,10 +57,13 @@ impl<'p> LibpgQueryNodeParser<'p> {
     }
 
     pub fn parse(&mut self) {
+        // IDEA: do not use String tokens and add their properties to their parents
+        dbg!(&self.node_graph);
         while self.parser.pos < self.token_range.end {
-            dbg!(&self.node_graph);
-            debug!("current node: {:#?}", self.current_node);
-            debug!("current token: {:#?}", self.current_token());
+            if !self.at_whitespace() && !self.at_skippable() {
+                debug!("current node: {:#?}", self.current_node);
+                debug!("current token: {:#?}", self.current_token());
+            }
             if self.at_whitespace() || self.at_skippable() {
                 self.parser.advance();
             } else if let Some(idx) = self.node_properties_position(self.current_node) {
@@ -72,6 +75,7 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 }
                 self.remove_property(self.current_node, idx);
                 self.parser.advance();
+                self.finish_open_leaf_nodes();
             } else if let Some((node_idx, prop_idx)) = self.search_children_properties() {
                 println!("found property within children node {:?}", node_idx);
                 self.remove_property(node_idx, prop_idx);
@@ -165,42 +169,61 @@ impl<'p> LibpgQueryNodeParser<'p> {
             .node_graph
             .neighbors_directed(self.current_node, Direction::Outgoing)
             .collect::<Vec<NodeIndex<DefaultIx>>>();
-        let mut skipped_nodes = Vec::<NodeIndex<DefaultIx>>::new();
+        // let mut skipped_nodes = Vec::<NodeIndex<DefaultIx>>::new();
 
+        // (node index, property index)
+        // always check all nodes on the same depth of the first node that is found
+        let mut possible_nodes: Vec<(NodeIndex<DefaultIx>, usize)> = Vec::new();
+        let mut target_depth: Option<usize> = None;
         while let Some(nx) = bfs.next(&self.node_graph) {
-            // if all direct children of the current node are being skipped, break
-            if current_node_children
-                .iter()
-                .all(|n| skipped_nodes.contains(&n))
-            {
+            if target_depth.is_some() && self.node_graph[nx].depth != target_depth.unwrap() {
                 break;
             }
 
+            // if all direct children of the current node are being skipped, break
+            // if current_node_children
+            //     .iter()
+            //     .all(|n| skipped_nodes.contains(&n))
+            // {
+            //     break;
+            // }
+
             // if the current node has an edge to any node that is being skipped, skip the current
             // this will ensure that we skip invalid branches entirely
-            if skipped_nodes
-                .iter()
-                .any(|n| self.node_graph.contains_edge(nx, *n))
-            {
-                skipped_nodes.push(nx);
-                continue;
-            }
+            // if skipped_nodes
+            //     .iter()
+            //     .any(|n| self.node_graph.contains_edge(nx, *n))
+            // {
+            //     skipped_nodes.push(nx);
+            //     continue;
+            // }
 
             let prop_idx = self.node_properties_position(nx);
 
-            if prop_idx.is_none() && self.node_graph[nx].properties.len() > 0 {
-                // if the current node has properties and the token does not match any of them, add it
-                // to the list of skipped nodes and continue
-                skipped_nodes.push(nx);
-                continue;
-            }
+            // if prop_idx.is_none() && self.node_graph[nx].properties.len() > 0 {
+            // if the current node has properties and the token does not match any of them, add it
+            // to the list of skipped nodes and continue
+            // skipped_nodes.push(nx);
+            //     continue;
+            // }
 
             if prop_idx.is_some() {
-                return Some((nx, prop_idx.unwrap()));
+                possible_nodes.push((nx, prop_idx.unwrap()));
+                target_depth = Some(self.node_graph[nx].depth);
             }
         }
 
-        None
+        if possible_nodes.len() == 1 {
+            Some((possible_nodes[0].0, possible_nodes[0].1))
+        } else if possible_nodes.len() > 1 {
+            // FIXME: I dont think that just using the one with the smallest index will always work
+            //       because the order of the nodes in the graph is not deterministic
+            //       we should instead figure out which one is the correct node based on future
+            //       tokens
+            possible_nodes.into_iter().min_by_key(|x| x.0)
+        } else {
+            None
+        }
     }
 
     /// check if the current node has children that have properties that are in the part of the token stream that is not yet consumed
@@ -221,12 +244,13 @@ impl<'p> LibpgQueryNodeParser<'p> {
 
     /// finish current node while it is an open leaf node with no properties
     fn finish_open_leaf_nodes(&mut self) {
-        while self
-            .node_graph
-            .neighbors_directed(self.current_node, Direction::Outgoing)
-            .count()
-            == 0
-            || !self.has_children_with_relevant_properties()
+        while self.open_nodes.len() > 1
+            && (self
+                .node_graph
+                .neighbors_directed(self.current_node, Direction::Outgoing)
+                .count()
+                == 0
+                || !self.has_children_with_relevant_properties())
         {
             // check if the node contains properties that are not at all in the part of the token stream that is not yet consumed and remove them
             if self.node_graph[self.current_node].properties.len() > 0 {
@@ -322,7 +346,8 @@ fn cmp_tokens(p: &crate::codegen::TokenProperty, token: &crate::lexer::Token) ->
         .text
         .trim_start_matches(string_delimiter)
         .trim_end_matches(string_delimiter)
-        .to_string();
+        .to_string()
+        .to_lowercase();
     let token_text_values = aliases(&token_text);
 
     (p.value.is_none() || token_text_values.contains(&p.value.as_ref().unwrap().as_str()))

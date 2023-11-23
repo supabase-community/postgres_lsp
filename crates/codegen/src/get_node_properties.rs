@@ -150,6 +150,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
             if n.distinct_clause.len() > 0 {
                 tokens.push(TokenProperty::from(Token::Distinct));
             }
+            if n.values_lists.len() > 0 {
+                tokens.push(TokenProperty::from(Token::Values));
+            }
             if n.from_clause.len() > 0 {
                 tokens.push(TokenProperty::from(Token::From));
             }
@@ -159,6 +162,22 @@ fn custom_handlers(node: &Node) -> TokenStream {
             if n.group_clause.len() > 0 {
                 tokens.push(TokenProperty::from(Token::GroupP));
                 tokens.push(TokenProperty::from(Token::By));
+            }
+        },
+        "BoolExpr" => quote! {
+            match n.boolop {
+                1 => tokens.push(TokenProperty::from(Token::And)),
+                2 => tokens.push(TokenProperty::from(Token::Or)),
+                _ => panic!("Unknown BoolExpr {:#?}", n.boolop),
+            }
+        },
+        "JoinExpr" => quote! {
+            tokens.push(TokenProperty::from(Token::Join));
+            tokens.push(TokenProperty::from(Token::On));
+        },
+        "ResTarget" => quote! {
+            if n.name.len() > 0 {
+                tokens.push(TokenProperty::from(Token::As));
             }
         },
         "Integer" => quote! {
@@ -217,6 +236,7 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "SortBy" => quote! {
             tokens.push(TokenProperty::from(Token::Order));
+            tokens.push(TokenProperty::from(Token::By));
             match n.sortby_dir {
                 2 => tokens.push(TokenProperty::from(Token::Asc)),
                 3 => tokens.push(TokenProperty::from(Token::Desc)),
@@ -260,6 +280,31 @@ fn custom_handlers(node: &Node) -> TokenStream {
                     tokens.push(TokenProperty::from(Token::References));
                 },
                 _ => panic!("Unknown Constraint {:#?}", n.contype),
+            }
+        },
+        "InsertStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Insert));
+            tokens.push(TokenProperty::from(Token::Into));
+        },
+        "DeleteStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::DeleteP));
+            tokens.push(TokenProperty::from(Token::From));
+            if n.where_clause.is_some() {
+                tokens.push(TokenProperty::from(Token::Where));
+            }
+            if n.using_clause.len() > 0 {
+                tokens.push(TokenProperty::from(Token::Using));
+            }
+        },
+        "ViewStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::View));
+            if n.query.is_some() {
+                tokens.push(TokenProperty::from(Token::As));
+            }
+            if n.replace {
+                tokens.push(TokenProperty::from(Token::Or));
+                tokens.push(TokenProperty::from(Token::Replace));
             }
         },
         "CreateStmt" => quote! {

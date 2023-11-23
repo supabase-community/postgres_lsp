@@ -197,6 +197,10 @@ impl Parser {
         }
     }
 
+    pub fn at_whitespace(&self) -> bool {
+        WHITESPACE_TOKENS.contains(&self.nth(0, false))
+    }
+
     pub fn eof(&self) -> bool {
         self.pos == self.tokens.len()
     }
