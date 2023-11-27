@@ -1,4 +1,4 @@
-use std::ops::Range;
+use std::{assert_eq, ops::Range};
 
 use crate::{
     codegen::{get_nodes, Node, SyntaxKind},
@@ -58,6 +58,14 @@ impl<'p> LibpgQueryNodeParser<'p> {
 
     pub fn parse(&mut self) {
         // IDEA: do not use String tokens and add their properties to their parents
+        //
+        // enhance using location:
+        // - problem: handling of tokens that are not at the start of the node with a location
+        // property
+        // - if we assume that all nodes have either all token properties or a location, we can
+        // apply all tokens until either we are at the location of a new node or a token is found
+        // in properties. stop searching if current location < node location
+        // - compare depth of node with current depth and panic if wrong
         dbg!(&self.node_graph);
         while self.parser.pos < self.token_range.end {
             if !self.at_whitespace() && !self.at_skippable() {
@@ -297,7 +305,15 @@ impl<'p> LibpgQueryNodeParser<'p> {
     }
 
     fn finish_node(&mut self) {
-        self.node_graph.remove_node(self.open_nodes.pop().unwrap());
+        let node_to_remove = self.open_nodes.pop().unwrap();
+        assert_eq!(
+            self.node_graph[node_to_remove].depth,
+            self.parser.depth - 1,
+            "Tried to finish node with depth {} but parser depth is {}",
+            self.node_graph[node_to_remove].depth,
+            self.parser.depth
+        );
+        self.node_graph.remove_node(node_to_remove);
         self.parser.finish_node();
     }
 
@@ -306,8 +322,17 @@ impl<'p> LibpgQueryNodeParser<'p> {
     }
 
     fn start_node(&mut self, idx: NodeIndex<DefaultIx>) {
+        assert_eq!(
+            self.node_graph[idx].depth, self.parser.depth,
+            "Tried to start node with depth {} but parser depth is {}",
+            self.node_graph[idx].depth, self.parser.depth
+        );
         self.parser.start_node(self.node_graph[idx].kind);
         self.open_nodes.push(idx);
+    }
+
+    fn current_location(&self) -> usize {
+        usize::from(self.current_token().span.start())
     }
 
     fn current_token(&self) -> &crate::lexer::Token {

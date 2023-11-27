@@ -13,7 +13,8 @@ pub fn get_nodes_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
         pub struct Node {
             pub kind: SyntaxKind,
             pub depth: usize,
-            pub properties: Vec<TokenProperty>
+            pub properties: Vec<TokenProperty>,
+            pub location: Option<usize>,
         }
 
         /// Returns all children of the node, recursively
@@ -24,7 +25,8 @@ pub fn get_nodes_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
             let root_node_idx = g.add_node(Node {
                 kind: SyntaxKind::from(node),
                 depth: at_depth,
-                properties: get_node_properties(node)
+                properties: get_node_properties(node),
+                location: get_location(node),
             });
 
             // Parent node idx, Node, depth
@@ -37,7 +39,8 @@ pub fn get_nodes_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
                     let node_idx = g.add_node(Node {
                         kind: SyntaxKind::from(&c),
                         depth: current_depth,
-                        properties: get_node_properties(&c)
+                        properties: get_node_properties(&c),
+                        location: get_location(&c),
                     });
                     g.add_edge(parent_idx, node_idx, ());
                     stack.push_back((node_idx, c.to_owned(), current_depth));

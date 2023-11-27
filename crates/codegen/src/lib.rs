@@ -1,3 +1,4 @@
+mod get_location;
 mod get_node_properties;
 mod get_nodes;
 mod parser;

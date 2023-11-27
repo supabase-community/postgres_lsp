@@ -183,9 +183,16 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "Integer" => quote! {
             tokens.push(TokenProperty::from(n));
         },
+        "DefElem" => quote! {
+            match n.defaction {
+                1 => tokens.push(TokenProperty::from(Token::Ascii61)),
+                _ => panic!("Unknown DefElem {:#?}", n.defaction),
+            }
+        },
         "WindowDef" => quote! {
             if n.partition_clause.len() > 0 {
                 tokens.push(TokenProperty::from(Token::Window));
+                tokens.push(TokenProperty::from(Token::As));
             } else {
                 tokens.push(TokenProperty::from(Token::Over));
             }
@@ -195,6 +202,12 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "AStar" => quote! {
             tokens.push(TokenProperty::from(Token::Ascii42));
+        },
+        "PartitionBoundSpec" => quote! {
+            tokens.push(TokenProperty::from(Token::For));
+            tokens.push(TokenProperty::from(Token::Values));
+            tokens.push(TokenProperty::from(Token::From));
+            tokens.push(TokenProperty::from(Token::To));
         },
         "FuncCall" => quote! {
             if n.funcname.len() == 1 && n.args.len() == 0 {
@@ -310,10 +323,20 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "CreateStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
             tokens.push(TokenProperty::from(Token::Table));
+            if n.tablespacename.len() > 0 {
+                tokens.push(TokenProperty::from(Token::Tablespace));
+            }
+            if n.options.len() > 0 {
+                tokens.push(TokenProperty::from(Token::With));
+            }
             if n.if_not_exists {
                 tokens.push(TokenProperty::from(Token::IfP));
                 tokens.push(TokenProperty::from(Token::Not));
                 tokens.push(TokenProperty::from(Token::Exists));
+            }
+            if n.partbound.is_some() {
+                tokens.push(TokenProperty::from(Token::Partition));
+                tokens.push(TokenProperty::from(Token::Of));
             }
         },
         _ => quote! {},

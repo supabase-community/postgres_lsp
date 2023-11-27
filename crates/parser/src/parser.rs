@@ -438,6 +438,22 @@ group by
     }
 
     #[test]
+    fn test_parser_temp() {
+        init();
+
+        let res = pg_query::parse("select 1;").unwrap();
+        res.protobuf.nodes().iter().for_each(|node| {
+            println!("{:#?}", node);
+        });
+        let mut p = Parser::new(lex("select 1;"));
+        source(&mut p);
+        let result = p.finish();
+
+        dbg!(&result.cst);
+        println!("{:#?}", result.errors);
+    }
+
+    #[test]
     fn test_parser_playground() {
         init();
 
