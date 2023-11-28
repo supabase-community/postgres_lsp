@@ -45,6 +45,11 @@ pub fn get_location_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
                 },
                 NodeEnum::CollateClause(n) => get_location_internal(&n.arg.as_ref().unwrap().node.as_ref().unwrap()),
                 NodeEnum::TypeCast(n) => get_location_internal(&n.arg.as_ref().unwrap().node.as_ref().unwrap()),
+                NodeEnum::ColumnDef(n) => if n.colname.len() > 0 {
+                    Some(n.location)
+                } else {
+                    None
+                },
                 #(NodeEnum::#node_identifiers(n) => #location_idents),*
             };
             if location.is_some() && location.unwrap() < 0 {
@@ -63,6 +68,7 @@ fn manual_node_names() -> Vec<&'static str> {
         "WindowDef",
         "CollateClause",
         "TypeCast",
+        "ColumnDef",
     ]
 }
 

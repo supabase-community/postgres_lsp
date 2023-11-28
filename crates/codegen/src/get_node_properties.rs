@@ -278,7 +278,44 @@ fn custom_handlers(node: &Node) -> TokenStream {
                     tokens.push(TokenProperty::from(Token::Set));
                     tokens.push(TokenProperty::from(Token::Default));
                 },
+                // AtAddConstraint
+                19 => tokens.push(TokenProperty::from(Token::AddP)),
+                // AtAlterColumnType
+                30 => {
+                    tokens.push(TokenProperty::from(Token::Alter));
+                    tokens.push(TokenProperty::from(Token::Column));
+                    tokens.push(TokenProperty::from(Token::TypeP));
+                },
                 _ => panic!("Unknown AlterTableCmd {:#?}", n.subtype),
+            }
+        },
+        "VariableSetStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Set));
+            match n.kind {
+                // Undefined = 0,
+                // VarSetValue = 1,
+                1 => tokens.push(TokenProperty::from(Token::To)),
+                // VarSetDefault = 2,
+                // VarSetCurrent = 3,
+                // VarSetMulti = 4,
+                // VarReset = 5,
+                // VarResetAll = 6,
+                _ => panic!("Unknown VariableSetStmt {:#?}", n.kind),
+            }
+        },
+        "CreatePolicyStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::Policy));
+            tokens.push(TokenProperty::from(Token::On));
+            if n.roles.len() > 0 {
+                tokens.push(TokenProperty::from(Token::To));
+            }
+            if n.qual.is_some() {
+                tokens.push(TokenProperty::from(Token::Using));
+            }
+            if n.with_check.is_some() {
+                tokens.push(TokenProperty::from(Token::With));
+                tokens.push(TokenProperty::from(Token::Check));
             }
         },
         "CopyStmt" => quote! {
@@ -293,12 +330,28 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "Constraint" => quote! {
             match n.contype {
-                10 => {
-                    // ConstrForeign
-                    tokens.push(TokenProperty::from(Token::References));
+                // ConstrNotnull
+                2 => {
+                    tokens.push(TokenProperty::from(Token::Not));
+                    tokens.push(TokenProperty::from(Token::NullP));
                 },
+                // ConstrDefault
+                3 => tokens.push(TokenProperty::from(Token::Default)),
+                // ConstrCheck
+                6 => tokens.push(TokenProperty::from(Token::Check)),
+                // ConstrPrimary
+                7 => {
+                    tokens.push(TokenProperty::from(Token::Primary));
+                    tokens.push(TokenProperty::from(Token::Key));
+                },
+                // ConstrForeign
+                10 => tokens.push(TokenProperty::from(Token::References)),
                 _ => panic!("Unknown Constraint {:#?}", n.contype),
             }
+        },
+        "PartitionSpec" => quote! {
+            tokens.push(TokenProperty::from(Token::Partition));
+            tokens.push(TokenProperty::from(Token::By));
         },
         "InsertStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Insert));
