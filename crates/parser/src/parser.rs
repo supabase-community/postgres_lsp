@@ -441,9 +441,7 @@ group by
     fn test_parser_temp() {
         init();
 
-        let mut p = Parser::new(lex(
-            "select contact.test from contact where id = 1 or id = 2;",
-        ));
+        let mut p = Parser::new(lex("select 1;"));
         source(&mut p);
         let result = p.finish();
 

@@ -350,6 +350,51 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::From));
             tokens.push(TokenProperty::from(Token::To));
         },
+        "CaseExpr" => quote! {
+            tokens.push(TokenProperty::from(Token::Case));
+            tokens.push(TokenProperty::from(Token::EndP));
+        },
+        "CreateFunctionStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::Function));
+            if n.replace {
+                tokens.push(TokenProperty::from(Token::Or));
+                tokens.push(TokenProperty::from(Token::Replace));
+            }
+            if n.return_type.is_some() {
+                tokens.push(TokenProperty::from(Token::Returns));
+            }
+        },
+        "FunctionParameter" => quote! {
+            match n.mode {
+                // FuncParamIn = 1,
+                1 => tokens.push(TokenProperty::from(Token::InP)),
+                // FuncParamOut = 2,
+                2 => tokens.push(TokenProperty::from(Token::OutP)),
+                // FuncParamInout = 3,
+                3 => tokens.push(TokenProperty::from(Token::Inout)),
+                // FuncParamVariadic = 4,
+                4 => tokens.push(TokenProperty::from(Token::Variadic)),
+                // FuncParamTable = 5,
+                // 5 => tokens.push(TokenProperty::from(Token::Table)),
+                // FuncParamDefault = 6,
+                6 => {
+                    // do nothing
+                },
+                _ => panic!("Unknown FunctionParameter {:#?}", n.mode),
+            };
+            if n.defexpr.is_some() {
+                tokens.push(TokenProperty::from(Token::Default));
+            }
+        },
+        "NamedArgExpr" => quote! {
+            // =>
+            tokens.push(TokenProperty::from(Token::EqualsGreater));
+        },
+        "CaseWhen" => quote! {
+            tokens.push(TokenProperty::from(Token::When));
+            tokens.push(TokenProperty::from(Token::Then));
+        },
         "TypeCast" => quote! {
             tokens.push(TokenProperty::from(Token::Typecast));
         },
