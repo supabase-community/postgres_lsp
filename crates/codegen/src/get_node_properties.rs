@@ -189,12 +189,20 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 _ => panic!("Unknown DefElem {:#?}", n.defaction),
             }
         },
+        "Alias" => quote! {
+            tokens.push(TokenProperty::from(Token::As));
+        },
+        "CollateClause" => quote! {
+            tokens.push(TokenProperty::from(Token::Collate));
+        },
         "WindowDef" => quote! {
-            if n.partition_clause.len() > 0 {
+            if n.partition_clause.len() > 0 || n.order_clause.len() > 0 {
                 tokens.push(TokenProperty::from(Token::Window));
                 tokens.push(TokenProperty::from(Token::As));
-            } else {
-                tokens.push(TokenProperty::from(Token::Over));
+            }
+            if n.partition_clause.len() > 0 {
+                tokens.push(TokenProperty::from(Token::Partition));
+                tokens.push(TokenProperty::from(Token::By));
             }
         },
         "Boolean" => quote! {
@@ -202,12 +210,6 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "AStar" => quote! {
             tokens.push(TokenProperty::from(Token::Ascii42));
-        },
-        "PartitionBoundSpec" => quote! {
-            tokens.push(TokenProperty::from(Token::For));
-            tokens.push(TokenProperty::from(Token::Values));
-            tokens.push(TokenProperty::from(Token::From));
-            tokens.push(TokenProperty::from(Token::To));
         },
         "FuncCall" => quote! {
             if n.funcname.len() == 1 && n.args.len() == 0 {
@@ -223,6 +225,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
             if n.agg_filter.is_some() {
                 tokens.push(TokenProperty::from(Token::Filter));
                 tokens.push(TokenProperty::from(Token::Where));
+            }
+            if n.over.is_some() {
+                tokens.push(TokenProperty::from(Token::Over));
             }
         },
         "SqlvalueFunction" => quote! {
@@ -337,7 +342,16 @@ fn custom_handlers(node: &Node) -> TokenStream {
             if n.partbound.is_some() {
                 tokens.push(TokenProperty::from(Token::Partition));
                 tokens.push(TokenProperty::from(Token::Of));
+                tokens.push(TokenProperty::from(Token::For));
+                tokens.push(TokenProperty::from(Token::Values));
             }
+        },
+        "PartitionBoundSpec" => quote! {
+            tokens.push(TokenProperty::from(Token::From));
+            tokens.push(TokenProperty::from(Token::To));
+        },
+        "TypeCast" => quote! {
+            tokens.push(TokenProperty::from(Token::Typecast));
         },
         _ => quote! {},
     }

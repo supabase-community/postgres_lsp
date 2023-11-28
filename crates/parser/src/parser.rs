@@ -441,11 +441,9 @@ group by
     fn test_parser_temp() {
         init();
 
-        let res = pg_query::parse("select 1;").unwrap();
-        res.protobuf.nodes().iter().for_each(|node| {
-            println!("{:#?}", node);
-        });
-        let mut p = Parser::new(lex("select 1;"));
+        let mut p = Parser::new(lex(
+            "select contact.test from contact where id = 1 or id = 2;",
+        ));
         source(&mut p);
         let result = p.finish();
 

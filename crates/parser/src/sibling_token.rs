@@ -1,6 +1,9 @@
 use crate::codegen::SyntaxKind;
 
-const SIBLINGS: [(SyntaxKind, SyntaxKind); 1] = [(SyntaxKind::Ascii40, SyntaxKind::Ascii41)];
+const SIBLINGS: [(SyntaxKind, SyntaxKind); 2] = [
+    (SyntaxKind::Ascii40, SyntaxKind::Ascii41),
+    (SyntaxKind::Ascii91, SyntaxKind::Ascii93),
+];
 
 impl SyntaxKind {
     pub fn is_closing_sibling(&self) -> bool {

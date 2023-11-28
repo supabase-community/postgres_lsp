@@ -33,6 +33,18 @@ pub fn get_location_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
                     get_location_internal(&a.unwrap().node.as_ref().unwrap())
                 },
                 NodeEnum::AExpr(n) => get_location_internal(&n.lexpr.as_ref().unwrap().node.as_ref().unwrap()),
+                NodeEnum::WindowDef(n) => {
+                    if n.partition_clause.len() > 0 || n.order_clause.len() > 0 {
+                        // the location is not correct if its the definition clause, e.g. for
+                        // window w as (partition by a order by b)
+                        // the location is the start of the `partition` token
+                        None
+                    } else  {
+                        Some(n.location)
+                    }
+                },
+                NodeEnum::CollateClause(n) => get_location_internal(&n.arg.as_ref().unwrap().node.as_ref().unwrap()),
+                NodeEnum::TypeCast(n) => get_location_internal(&n.arg.as_ref().unwrap().node.as_ref().unwrap()),
                 #(NodeEnum::#node_identifiers(n) => #location_idents),*
             };
             if location.is_some() && location.unwrap() < 0 {
@@ -45,7 +57,13 @@ pub fn get_location_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
 }
 
 fn manual_node_names() -> Vec<&'static str> {
-    vec!["BoolExpr", "AExpr"]
+    vec![
+        "BoolExpr",
+        "AExpr",
+        "WindowDef",
+        "CollateClause",
+        "TypeCast",
+    ]
 }
 
 fn location_idents(nodes: &[Node], exclude_nodes: &[&str]) -> Vec<TokenStream> {

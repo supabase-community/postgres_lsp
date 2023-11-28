@@ -7,7 +7,7 @@ use crate::{
 use log::debug;
 use petgraph::{
     stable_graph::{DefaultIx, NodeIndex, StableGraph},
-    visit::Bfs,
+    visit::{Bfs, Dfs},
     Direction,
 };
 use pg_query::NodeEnum;
@@ -18,7 +18,12 @@ pub fn libpg_query_node(parser: &mut Parser, node: NodeEnum, token_range: &Range
     LibpgQueryNodeParser::new(parser, node, token_range).parse();
 }
 
+// TODO: implement sibling token handling
 pub static SKIPPABLE_TOKENS: &[SyntaxKind] = &[
+    // "["
+    SyntaxKind::Ascii91,
+    // "]"
+    SyntaxKind::Ascii93,
     // "("
     SyntaxKind::Ascii40,
     // ")"
@@ -57,25 +62,16 @@ impl<'p> LibpgQueryNodeParser<'p> {
     }
 
     pub fn parse(&mut self) {
-        // IDEA: do not use String tokens and add their properties to their parents
-        //
-        // enhance using location:
-        // - problem: handling of tokens that are not at the start of the node with a location
-        // property
-        // - if we assume that all nodes have either all token properties or a location, we can
-        // apply all tokens until either we are at the location of a new node or a token is found
-        // in properties. stop searching if current location < node location
-        // - compare depth of node with current depth and panic if wrong
         dbg!(&self.node_graph);
         while self.parser.pos < self.token_range.end {
-            if !self.at_whitespace() && !self.at_skippable() {
-                debug!("current node: {:#?}", self.current_node);
-                debug!("current token: {:#?}", self.current_token());
-            }
-            if self.at_whitespace() || self.at_skippable() {
+            debug!("current node: {:#?}", self.current_node);
+            debug!("current token: {:#?}", self.current_token());
+            debug!("current location: {:#?}", self.current_location());
+            if self.at_whitespace() {
+                debug!("skipping whitespace");
                 self.parser.advance();
             } else if let Some(idx) = self.node_properties_position(self.current_node) {
-                println!("found property at current node {:?}", self.current_node);
+                debug!("found property at current node {:?}", self.current_node);
                 // token is in current node. remove and advance.
                 // open if not opened yet.
                 if !self.node_is_open(&self.current_node) {
@@ -84,18 +80,20 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 self.remove_property(self.current_node, idx);
                 self.parser.advance();
                 self.finish_open_leaf_nodes();
-            } else if let Some((node_idx, prop_idx)) = self.search_children_properties() {
-                println!("found property within children node {:?}", node_idx);
-                self.remove_property(node_idx, prop_idx);
+            } else if let Some((node_idx, prop_idx)) = self.search_children() {
+                debug!("found node in children {:?}", node_idx);
+                if prop_idx.is_some() {
+                    self.remove_property(node_idx, prop_idx.unwrap());
+                }
 
                 // close all nodes until the target depth is reached
                 self.finish_nodes_until_depth(self.node_graph[node_idx].depth + 1);
 
                 if !self.node_is_open(&node_idx) {
-                    // open all nodes from `self.current_node` to the node in whichs property the current token found (`node_idx`)
+                    // open all nodes from `self.current_node` to the target node `node_idx`
                     let mut ancestors = self.ancestors(Some(node_idx));
                     let mut nodes_to_open = Vec::<NodeIndex<DefaultIx>>::new();
-                    // including the target node
+                    // including the target node itself
                     nodes_to_open.push(node_idx);
                     while let Some(nx) = ancestors.next() {
                         if nx == self.current_node {
@@ -113,8 +111,11 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 self.current_node = node_idx;
 
                 self.finish_open_leaf_nodes();
+            } else if self.at_skippable() {
+                debug!("skipping token {:?}", self.current_token());
+                self.parser.advance();
             } else if let Some((node_idx, prop_idx)) = self.search_parent_properties() {
-                println!("found property within parent node {:?}", node_idx);
+                debug!("found property within parent node {:?}", node_idx);
                 self.remove_property(node_idx, prop_idx);
 
                 self.finish_nodes_until_depth(self.node_graph[node_idx].depth + 1);
@@ -166,22 +167,22 @@ impl<'p> LibpgQueryNodeParser<'p> {
         })
     }
 
-    /// breadth-first search (`Bfs`) for the node that has the current token as its property
+    /// breadth-first search (`Bfs`) for the node that is at the current location or has the current token as its property
     ///
     /// Returns indices of both node and property if found
     ///
     /// Skips visited branches
-    fn search_children_properties(&self) -> Option<(NodeIndex<DefaultIx>, usize)> {
+    fn search_children(&self) -> Option<(NodeIndex<DefaultIx>, Option<usize>)> {
         let mut bfs = Bfs::new(&self.node_graph, self.current_node);
         let current_node_children = self
             .node_graph
             .neighbors_directed(self.current_node, Direction::Outgoing)
             .collect::<Vec<NodeIndex<DefaultIx>>>();
-        // let mut skipped_nodes = Vec::<NodeIndex<DefaultIx>>::new();
+        let mut skipped_nodes = Vec::<NodeIndex<DefaultIx>>::new();
 
         // (node index, property index)
         // always check all nodes on the same depth of the first node that is found
-        let mut possible_nodes: Vec<(NodeIndex<DefaultIx>, usize)> = Vec::new();
+        let mut possible_nodes: Vec<(NodeIndex<DefaultIx>, Option<usize>)> = Vec::new();
         let mut target_depth: Option<usize> = None;
         while let Some(nx) = bfs.next(&self.node_graph) {
             if target_depth.is_some() && self.node_graph[nx].depth != target_depth.unwrap() {
@@ -189,40 +190,69 @@ impl<'p> LibpgQueryNodeParser<'p> {
             }
 
             // if all direct children of the current node are being skipped, break
-            // if current_node_children
-            //     .iter()
-            //     .all(|n| skipped_nodes.contains(&n))
-            // {
-            //     break;
-            // }
+            if current_node_children
+                .iter()
+                .all(|n| skipped_nodes.contains(&n))
+            {
+                break;
+            }
 
             // if the current node has an edge to any node that is being skipped, skip the current
             // this will ensure that we skip invalid branches entirely
-            // if skipped_nodes
-            //     .iter()
-            //     .any(|n| self.node_graph.contains_edge(nx, *n))
-            // {
-            //     skipped_nodes.push(nx);
-            //     continue;
-            // }
+            // note: order of nodes in contains_edge is important since we are using a directed
+            // graph
+            if skipped_nodes
+                .iter()
+                .any(|n| self.node_graph.contains_edge(*n, nx))
+            {
+                skipped_nodes.push(nx);
+                continue;
+            }
 
+            if self.node_graph[nx].location.is_some()
+                && self.node_graph[nx].location.unwrap() > self.current_location()
+            {
+                // if the node has a location and it is after the current location, add it to the list of skipped nodes and continue
+                skipped_nodes.push(nx);
+                continue;
+            }
+
+            // check if the node has a property that is the current token
             let prop_idx = self.node_properties_position(nx);
 
-            // if prop_idx.is_none() && self.node_graph[nx].properties.len() > 0 {
-            // if the current node has properties and the token does not match any of them, add it
-            // to the list of skipped nodes and continue
-            // skipped_nodes.push(nx);
-            //     continue;
-            // }
-
             if prop_idx.is_some() {
-                possible_nodes.push((nx, prop_idx.unwrap()));
-                target_depth = Some(self.node_graph[nx].depth);
+                possible_nodes.push((nx, prop_idx));
+                if target_depth.is_none() {
+                    target_depth = Some(self.node_graph[nx].depth);
+                }
+            } else if self.node_graph[nx].location.is_some()
+                && self.node_graph[nx].location.unwrap() == self.current_location()
+            {
+                debug!("found node with location at current location");
+                // check if the location of the node is the current location
+                // do a depth-first search to find the first node that either has a location that
+                // is not the current one, or has properties that are not the current token
+                let mut dfs = Dfs::new(&self.node_graph, nx);
+                let mut target_nx = nx;
+                while let Some(node_idx) = dfs.next(&self.node_graph) {
+                    if self.node_graph[node_idx].location.is_some()
+                        && self.node_graph[node_idx].location.unwrap() != self.current_location()
+                    {
+                        break;
+                    }
+
+                    target_nx = node_idx;
+
+                    if self.node_properties_position(node_idx).is_some() {
+                        break;
+                    }
+                }
+                return Some((target_nx, self.node_properties_position(target_nx)));
             }
         }
 
         if possible_nodes.len() == 1 {
-            Some((possible_nodes[0].0, possible_nodes[0].1))
+            Some(possible_nodes[0])
         } else if possible_nodes.len() > 1 {
             // FIXME: I dont think that just using the one with the smallest index will always work
             //       because the order of the nodes in the graph is not deterministic
@@ -234,15 +264,17 @@ impl<'p> LibpgQueryNodeParser<'p> {
         }
     }
 
-    /// check if the current node has children that have properties that are in the part of the token stream that is not yet consumed
-    fn has_children_with_relevant_properties(&self) -> bool {
+    /// check if the current node has children either with properties that are in the part of the token stream that is not yet consumed, or with a location that is after the current location
+    fn has_relevant_children(&self) -> bool {
         let tokens = &self.parser.tokens[self.parser.pos..self.token_range.end];
         let mut b = Bfs::new(&self.node_graph, self.current_node);
         while let Some(nx) = b.next(&self.node_graph) {
-            if self.node_graph[nx]
-                .properties
-                .iter()
-                .any(|p| tokens.iter().any(|t| cmp_tokens(p, t)))
+            if (self.node_graph[nx].location.is_some()
+                && self.node_graph[nx].location.unwrap() > self.current_location())
+                || self.node_graph[nx]
+                    .properties
+                    .iter()
+                    .any(|p| tokens.iter().any(|t| cmp_tokens(p, t)))
             {
                 return true;
             }
@@ -250,7 +282,8 @@ impl<'p> LibpgQueryNodeParser<'p> {
         false
     }
 
-    /// finish current node while it is an open leaf node with no properties
+    /// finish current node while it is an open leaf node with no properties and either no location
+    /// or a location that is before the current location
     fn finish_open_leaf_nodes(&mut self) {
         while self.open_nodes.len() > 1
             && (self
@@ -258,7 +291,7 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 .neighbors_directed(self.current_node, Direction::Outgoing)
                 .count()
                 == 0
-                || !self.has_children_with_relevant_properties())
+                || !self.has_relevant_children())
         {
             // check if the node contains properties that are not at all in the part of the token stream that is not yet consumed and remove them
             if self.node_graph[self.current_node].properties.len() > 0 {
@@ -313,6 +346,7 @@ impl<'p> LibpgQueryNodeParser<'p> {
             self.node_graph[node_to_remove].depth,
             self.parser.depth
         );
+        debug!("finishing node {:?}", self.node_graph[node_to_remove]);
         self.node_graph.remove_node(node_to_remove);
         self.parser.finish_node();
     }
@@ -327,6 +361,17 @@ impl<'p> LibpgQueryNodeParser<'p> {
             "Tried to start node with depth {} but parser depth is {}",
             self.node_graph[idx].depth, self.parser.depth
         );
+        if self.node_graph[idx].location.is_some() {
+            assert_eq!(
+                self.node_graph[idx].location.unwrap(),
+                self.current_location(),
+                "Tried to start node {:#?} with location {} but current location is {}",
+                self.node_graph[idx],
+                self.node_graph[idx].location.unwrap(),
+                self.current_location()
+            );
+        }
+        debug!("starting node {:?}", self.node_graph[idx]);
         self.parser.start_node(self.node_graph[idx].kind);
         self.open_nodes.push(idx);
     }
@@ -366,7 +411,7 @@ fn cmp_tokens(p: &crate::codegen::TokenProperty, token: &crate::lexer::Token) ->
     // TODO: move this to lexer
 
     // remove enclosing ' quotes from token text
-    let string_delimiter: &[char; 2] = &['\'', '$'];
+    let string_delimiter: &[char; 3] = &['\'', '$', '\"'];
     let token_text = token
         .text
         .trim_start_matches(string_delimiter)
