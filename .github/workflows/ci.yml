@@ -27,8 +27,8 @@ jobs:
 
       - name: 📦 Build
         id: build
-        run: cargo build
+        run: cargo +nightly build
 
       - name: 🦺 Test
         id: test
-        run: cargo test
+        run: cargo +nightly test
