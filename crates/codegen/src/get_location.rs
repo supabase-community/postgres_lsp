@@ -50,6 +50,11 @@ pub fn get_location_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
                 } else {
                     None
                 },
+                NodeEnum::NullTest(n) => if n.arg.is_some()  {
+                    get_location_internal(&n.arg.as_ref().unwrap().node.as_ref().unwrap())
+                } else {
+                    Some(n.location)
+                },
                 #(NodeEnum::#node_identifiers(n) => #location_idents),*
             };
             if location.is_some() && location.unwrap() < 0 {

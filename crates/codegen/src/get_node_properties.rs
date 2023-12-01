@@ -166,14 +166,34 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "BoolExpr" => quote! {
             match n.boolop {
+                // AndExpr = 1
                 1 => tokens.push(TokenProperty::from(Token::And)),
+                // OrExpr = 2
                 2 => tokens.push(TokenProperty::from(Token::Or)),
+                // NotExpr = 3
+                3 => tokens.push(TokenProperty::from(Token::Not)),
                 _ => panic!("Unknown BoolExpr {:#?}", n.boolop),
             }
         },
         "JoinExpr" => quote! {
             tokens.push(TokenProperty::from(Token::Join));
             tokens.push(TokenProperty::from(Token::On));
+            match n.jointype {
+                // JoinInner = 1
+                1 => tokens.push(TokenProperty::from(Token::InnerP)),
+                // JoinLeft = 2
+                2 => tokens.push(TokenProperty::from(Token::Left)),
+                // JoinFull = 3
+                3 => tokens.push(TokenProperty::from(Token::Full)),
+                // JoinRight = 4
+                4 => tokens.push(TokenProperty::from(Token::Right)),
+                // JoinSemi = 5
+                // JoinAnti = 6
+                // JoinUniqueOuter = 7
+                // JoinUniqueInner = 8
+                _ => panic!("Unknown JoinExpr jointype {:#?}", n.jointype),
+            }
+
         },
         "ResTarget" => quote! {
             if n.name.len() > 0 {
@@ -194,6 +214,30 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "CollateClause" => quote! {
             tokens.push(TokenProperty::from(Token::Collate));
+        },
+        "AExpr" => quote! {
+            match n.kind {
+                // AexprOp = 1,
+                1 => {
+                    // do nothing
+                },
+                // AexprOpAny = 2,
+                2 => tokens.push(TokenProperty::from(Token::Any)),
+                // AexprOpAll = 3,
+                // AexprDistinct = 4,
+                // AexprNotDistinct = 5,
+                // AexprNullif = 6,
+                // AexprIn = 7,
+                7 => tokens.push(TokenProperty::from(Token::InP)),
+                // AexprLike = 8,
+                // AexprIlike = 9,
+                // AexprSimilar = 10,
+                // AexprBetween = 11,
+                // AexprNotBetween = 12,
+                // AexprBetweenSym = 13,
+                // AexprNotBetweenSym = 14,
+                _ => panic!("Unknown AExpr kind {:#?}", n.kind),
+            }
         },
         "WindowDef" => quote! {
             if n.partition_clause.len() > 0 || n.order_clause.len() > 0 {
@@ -406,6 +450,22 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "CaseExpr" => quote! {
             tokens.push(TokenProperty::from(Token::Case));
             tokens.push(TokenProperty::from(Token::EndP));
+            if n.defresult.is_some() {
+                tokens.push(TokenProperty::from(Token::Else));
+            }
+        },
+        "NullTest" => quote! {
+            match n.nulltesttype {
+                // IsNull
+                1 => tokens.push(TokenProperty::from(Token::Is)),
+                // IsNotNull
+                2 => {
+                    tokens.push(TokenProperty::from(Token::Is));
+                    tokens.push(TokenProperty::from(Token::Not));
+                },
+                _ => panic!("Unknown NullTest {:#?}", n.nulltesttype),
+            }
+            tokens.push(TokenProperty::from(Token::NullP));
         },
         "CreateFunctionStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));

@@ -25,6 +25,6 @@ mod tests {
         };
 
         let node_graph = get_nodes(&pg_query_root.unwrap(), 0);
-        assert_eq!(node_graph.node_count(), 13);
+        assert_eq!(node_graph.node_count(), 14);
     }
 }

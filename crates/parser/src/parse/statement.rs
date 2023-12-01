@@ -11,7 +11,6 @@ use crate::Parser;
 pub fn statement(parser: &mut Parser, kind: SyntaxKind) {
     let token_range = collect_statement_token_range(parser, kind);
     let tokens = parser.tokens.get(token_range.clone()).unwrap().to_vec();
-    println!("tokens: {:?}", tokens);
     match pg_query::parse(
         tokens
             .iter()

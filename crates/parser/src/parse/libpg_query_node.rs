@@ -4,7 +4,7 @@ use crate::{
     codegen::{get_nodes, Node, SyntaxKind},
     lexer::TokenType,
 };
-use log::debug;
+use log::{debug, log_enabled};
 use petgraph::{
     stable_graph::{DefaultIx, NodeIndex, StableGraph},
     visit::{Bfs, Dfs},
@@ -67,6 +67,9 @@ impl<'p> LibpgQueryNodeParser<'p> {
             debug!("current node: {:#?}", self.current_node);
             debug!("current token: {:#?}", self.current_token());
             debug!("current location: {:#?}", self.current_location());
+            if log_enabled!(log::Level::Debug) {
+                debug!("node graph: {:#?}", self.node_graph);
+            }
             if self.at_whitespace() {
                 debug!("skipping whitespace");
                 self.parser.advance();
@@ -140,10 +143,9 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 self.parser.advance();
             } else {
                 panic!(
-                    "could not find node for token {:?} at depth {} in {:#?}",
+                    "could not find node for token {:?} at depth {}",
                     self.current_token(),
                     self.parser.depth,
-                    self.node_graph
                 );
             }
         }
@@ -231,7 +233,7 @@ impl<'p> LibpgQueryNodeParser<'p> {
                 debug!("found node with location at current location");
                 // check if the location of the node is the current location
                 // do a depth-first search to find the first node that either has a location that
-                // is not the current one, or has properties that are not the current token
+                // is not the current one, or has the current token as a property
                 let mut dfs = Dfs::new(&self.node_graph, nx);
                 let mut target_nx = nx;
                 while let Some(node_idx) = dfs.next(&self.node_graph) {
@@ -377,7 +379,10 @@ impl<'p> LibpgQueryNodeParser<'p> {
     }
 
     fn current_location(&self) -> usize {
-        usize::from(self.current_token().span.start())
+        usize::from(
+            self.current_token().span.start()
+                - self.parser.tokens[self.token_range.start].span.start(),
+        )
     }
 
     fn current_token(&self) -> &crate::lexer::Token {
@@ -389,7 +394,6 @@ impl<'p> LibpgQueryNodeParser<'p> {
     }
 
     fn at_whitespace(&self) -> bool {
-        // TODO: merge whitespace token def with whitespace def in parser
         self.current_token().token_type == TokenType::Whitespace
     }
 
