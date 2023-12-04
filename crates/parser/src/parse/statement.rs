@@ -1,5 +1,4 @@
 use std::ops::Range;
-use std::println;
 
 use cstree::text::{TextRange, TextSize};
 
@@ -58,7 +57,7 @@ fn collect_statement_token_range(parser: &mut Parser, kind: SyntaxKind) -> Range
     let mut is_parsing_sub_stmt = false;
     let mut ignore_next_non_whitespace = false;
     while !parser.at(SyntaxKind::Ascii59) && !parser.eof() {
-        match parser.nth(0, false) {
+        match parser.nth(0, false).kind {
             // opening brackets "(", consume until closing bracket ")"
             SyntaxKind::Ascii40 => {
                 is_parsing_sub_stmt = true;
@@ -102,7 +101,7 @@ fn advance_over_start_tokens(parser: &mut Parser, kind: SyntaxKind) {
     for i in 0..STATEMENT_START_TOKEN_MAPS.len() {
         parser.eat_whitespace();
         let token = parser.nth(0, false);
-        if let Some(result) = STATEMENT_START_TOKEN_MAPS[i].get(&token) {
+        if let Some(result) = STATEMENT_START_TOKEN_MAPS[i].get(&token.kind) {
             let is_in_results = result
                 .iter()
                 .find(|x| match x {
@@ -112,7 +111,7 @@ fn advance_over_start_tokens(parser: &mut Parser, kind: SyntaxKind) {
             if i == 0 && !is_in_results {
                 panic!("Expected statement start");
             } else if is_in_results {
-                parser.expect(token);
+                parser.expect(token.kind);
             } else {
                 break;
             }

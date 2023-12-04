@@ -266,41 +266,44 @@ impl<'p> LibpgQueryNodeParser<'p> {
         }
     }
 
-    /// check if the current node has children either with properties that are in the part of the token stream that is not yet consumed, or with a location that is after the current location
-    fn has_relevant_children(&self) -> bool {
-        let tokens = &self.parser.tokens[self.parser.pos..self.token_range.end];
-        let mut b = Bfs::new(&self.node_graph, self.current_node);
-        while let Some(nx) = b.next(&self.node_graph) {
-            if (self.node_graph[nx].location.is_some()
-                && self.node_graph[nx].location.unwrap() > self.current_location())
-                || self.node_graph[nx]
-                    .properties
-                    .iter()
-                    .any(|p| tokens.iter().any(|t| cmp_tokens(p, t)))
-            {
-                return true;
-            }
-        }
-        false
-    }
-
     /// finish current node while it is an open leaf node with no properties and either no location
     /// or a location that is before the current location
     fn finish_open_leaf_nodes(&mut self) {
         while self.open_nodes.len() > 1
-            && (self
+            && self
                 .node_graph
                 .neighbors_directed(self.current_node, Direction::Outgoing)
                 .count()
                 == 0
-                || !self.has_relevant_children())
         {
             // check if the node contains properties that are not at all in the part of the token stream that is not yet consumed and remove them
             if self.node_graph[self.current_node].properties.len() > 0 {
-                let tokens = &self.parser.tokens[self.parser.pos..self.token_range.end];
-                self.node_graph[self.current_node]
-                    .properties
-                    .retain(|p| tokens.iter().any(|t| cmp_tokens(p, t)));
+                // if there is any property left it must be next in the token stream because we are at a
+                // leaf node. We can thereby reduce the search space to the next n non-whitespace token
+                // where n is the number of remaining properties of the current node
+                let num_of_properties = self.node_graph[self.current_node].properties.len();
+                self.node_graph[self.current_node].properties.retain(|p| {
+                    let mut idx = 0;
+                    let mut left_pull = 0;
+                    while idx < num_of_properties + left_pull {
+                        let token = self.parser.nth(idx, true);
+                        if token.kind == SyntaxKind::Eof {
+                            break;
+                        }
+                        if cmp_tokens(&p, token) {
+                            return true;
+                        }
+                        // FIXME: we also need to skip non-whitespace tokens such as "(" or ")", but
+                        // not all (e.g. Ident is also a non-whitespace token with type NoKeyword)
+                        // for now, we just do one more iteration if the token has a length == 1
+                        // can be improved by comparing against a list
+                        if token.text.len() == 1 {
+                            left_pull += 1;
+                        }
+                        idx += 1;
+                    }
+                    false
+                });
             }
 
             if self.node_graph[self.current_node].properties.len() > 0 {

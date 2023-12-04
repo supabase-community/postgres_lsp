@@ -41,8 +41,19 @@ pub struct Token {
     pub token_type: TokenType,
 }
 
+impl Token {
+    pub fn eof(pos: usize) -> Token {
+        Token {
+            kind: SyntaxKind::Eof,
+            text: "".to_string(),
+            span: TextRange::at(TextSize::try_from(pos).unwrap(), TextSize::from(0)),
+            token_type: TokenType::Whitespace,
+        }
+    }
+}
+
 static PATTERN_LEXER: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?P<whitespace> )|(?P<newline>\n)|(?P<tab>\t)").unwrap());
+    LazyLock::new(|| Regex::new(r"(?P<whitespace> +)|(?P<newline>\n+)|(?P<tab>\t+)").unwrap());
 
 fn whitespace_tokens(input: &str) -> VecDeque<Token> {
     let mut tokens = VecDeque::new();

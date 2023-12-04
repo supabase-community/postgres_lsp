@@ -971,7 +971,7 @@ pub fn is_at_stmt_start(parser: &mut Parser) -> Option<SyntaxKind> {
     let mut options = Vec::new();
     for i in 0..STATEMENT_START_TOKEN_MAPS.len() {
         // important, else infinite loop: only ignore whitespaces after first token
-        let token = parser.nth(i, i != 0);
+        let token = parser.nth(i, i != 0).kind;
         if let Some(result) = STATEMENT_START_TOKEN_MAPS[i].get(&token) {
             if i == 0 {
                 options = result.clone();

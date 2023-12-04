@@ -36,14 +36,26 @@ pub fn get_nodes_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
                 let (parent_idx, node, depth) = stack.pop_front().unwrap();
                 let current_depth = depth + 1;
                 let mut handle_child = |c: NodeEnum| {
-                    let node_idx = g.add_node(Node {
-                        kind: SyntaxKind::from(&c),
-                        depth: current_depth,
-                        properties: get_node_properties(&c),
-                        location: get_location(&c),
-                    });
-                    g.add_edge(parent_idx, node_idx, ());
-                    stack.push_back((node_idx, c.to_owned(), current_depth));
+                    if match &c {
+                        // all "simple nodes" are not handled individually but merged with their parent
+                        NodeEnum::String(n) => true,
+                        NodeEnum::Integer(n) => true,
+                        NodeEnum::Float(n) => true,
+                        NodeEnum::Boolean(n) => true,
+                        NodeEnum::BitString(n) => true,
+                        _ => false
+                    } {
+                        g[parent_idx].properties.extend(get_node_properties(&c));
+                    } else {
+                        let node_idx = g.add_node(Node {
+                            kind: SyntaxKind::from(&c),
+                            depth: current_depth,
+                            properties: get_node_properties(&c),
+                            location: get_location(&c),
+                        });
+                        g.add_edge(parent_idx, node_idx, ());
+                        stack.push_back((node_idx, c.to_owned(), current_depth));
+                    }
                 };
                 match &node {
                     // `AConst` is the only node with a `one of` property, so we handle it manually

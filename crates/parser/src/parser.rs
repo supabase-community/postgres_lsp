@@ -9,7 +9,7 @@ use std::ops::Range;
 
 use crate::ast_node::RawStmt;
 use crate::codegen::SyntaxKind;
-use crate::lexer::Token;
+use crate::lexer::{Token, TokenType};
 use crate::syntax_error::SyntaxError;
 use crate::syntax_node::SyntaxNode;
 
@@ -39,6 +39,8 @@ pub struct Parser {
     token_buffer: Option<usize>,
 
     pub depth: usize,
+
+    eof_token: Token,
 }
 
 /// Result of Building
@@ -55,6 +57,7 @@ pub struct Parse {
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {
         Self {
+            eof_token: Token::eof(usize::from(tokens.last().unwrap().span.end())),
             inner: GreenNodeBuilder::new(),
             errors: Vec::new(),
             stmts: Vec::new(),
@@ -73,7 +76,6 @@ impl Parser {
         self.inner.start_node(kind);
         self.depth += 1;
     }
-
     /// finish current node
     pub fn finish_node(&mut self) {
         debug!("finish_node");
@@ -150,7 +152,7 @@ impl Parser {
     /// applies token and advances
     pub fn advance(&mut self) {
         assert!(!self.eof());
-        if WHITESPACE_TOKENS.contains(&self.nth(0, false)) {
+        if self.nth(0, false).kind == SyntaxKind::Whitespace {
             if self.whitespace_token_buffer.is_none() {
                 self.whitespace_token_buffer = Some(self.pos);
             }
@@ -191,14 +193,14 @@ impl Parser {
         }
     }
 
-    pub fn eat_whitespace(&mut self) {
-        while WHITESPACE_TOKENS.contains(&self.nth(0, false)) {
-            self.advance();
-        }
+    pub fn at_whitespace(&self) -> bool {
+        self.nth(0, false).kind == SyntaxKind::Whitespace
     }
 
-    pub fn at_whitespace(&self) -> bool {
-        WHITESPACE_TOKENS.contains(&self.nth(0, false))
+    pub fn eat_whitespace(&mut self) {
+        while self.nth(0, false).token_type == TokenType::Whitespace {
+            self.advance();
+        }
     }
 
     pub fn eof(&self) -> bool {
@@ -208,7 +210,7 @@ impl Parser {
     /// lookahead method.
     ///
     /// if `ignore_whitespace` is true, it will skip all whitespace tokens
-    pub fn nth(&self, lookahead: usize, ignore_whitespace: bool) -> SyntaxKind {
+    pub fn nth(&self, lookahead: usize, ignore_whitespace: bool) -> &Token {
         if ignore_whitespace {
             let mut idx = 0;
             let mut non_whitespace_token_ctr = 0;
@@ -217,21 +219,22 @@ impl Parser {
                     Some(token) => {
                         if !WHITESPACE_TOKENS.contains(&token.kind) {
                             if non_whitespace_token_ctr == lookahead {
-                                return token.kind;
+                                return token;
                             }
                             non_whitespace_token_ctr += 1;
                         }
                         idx += 1;
                     }
                     None => {
-                        return SyntaxKind::Eof;
+                        return &self.eof_token;
                     }
                 }
             }
         } else {
-            self.tokens
-                .get(self.pos + lookahead)
-                .map_or(SyntaxKind::Eof, |it| it.kind)
+            match self.tokens.get(self.pos + lookahead) {
+                Some(token) => token,
+                None => &self.eof_token,
+            }
         }
     }
 
@@ -242,7 +245,7 @@ impl Parser {
 
     /// checks if the current token is of `kind`
     pub fn at(&self, kind: SyntaxKind) -> bool {
-        self.nth(0, false) == kind
+        self.nth(0, false).kind == kind
     }
 
     /// like at, but for multiple consecutive tokens
@@ -250,7 +253,7 @@ impl Parser {
         kinds
             .iter()
             .enumerate()
-            .all(|(idx, &it)| self.nth(idx, false) == it)
+            .all(|(idx, &it)| self.nth(idx, false).kind == it)
     }
 
     /// like at_any, but for multiple consecutive tokens
@@ -293,7 +296,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parser_anonther() {
+    fn test_parser_another() {
         init();
 
         let input = "SELECT 1 from contact c
@@ -305,10 +308,8 @@ mod tests {
             from (
                 select 1
                 from
-                pg_index i,
                 pg_class c,
-                pg_attribute a,
-                pg_namespace n
+                pg_attribute a
                 where
                 i.indrelid = c.oid
                 and c.relnamespace = n.oid
