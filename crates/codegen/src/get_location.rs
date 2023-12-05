@@ -1,24 +1,19 @@
-use pg_query_proto_parser::{FieldType, Node, ProtoParser};
+use pg_query_proto_parser::{FieldType, Node, ProtoFile};
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
-pub fn get_location_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let parser = ProtoParser::new("./libpg_query/protobuf/pg_query.proto");
-    let proto_file = parser.parse();
-
+pub fn get_location_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
     let manual_node_names = manual_node_names();
 
     let node_identifiers = node_identifiers(&proto_file.nodes, &manual_node_names);
     let location_idents = location_idents(&proto_file.nodes, &manual_node_names);
 
     quote! {
-        use pg_query::NodeEnum;
-
         /// Returns the location of a node
-        pub fn get_location(node: &NodeEnum) -> Option<u32> {
+        pub fn get_location(node: &NodeEnum) -> Option<usize> {
             let loc = get_location_internal(node);
             if loc.is_some() {
-                u32::try_from(loc.unwrap()).ok()
+                usize::try_from(loc.unwrap()).ok()
             } else {
                 None
             }
@@ -38,6 +33,28 @@ pub fn get_location_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenSt
                     get_location_internal(&a.unwrap().node.as_ref().unwrap())
                 },
                 NodeEnum::AExpr(n) => get_location_internal(&n.lexpr.as_ref().unwrap().node.as_ref().unwrap()),
+                NodeEnum::WindowDef(n) => {
+                    if n.partition_clause.len() > 0 || n.order_clause.len() > 0 {
+                        // the location is not correct if its the definition clause, e.g. for
+                        // window w as (partition by a order by b)
+                        // the location is the start of the `partition` token
+                        None
+                    } else  {
+                        Some(n.location)
+                    }
+                },
+                NodeEnum::CollateClause(n) => get_location_internal(&n.arg.as_ref().unwrap().node.as_ref().unwrap()),
+                NodeEnum::TypeCast(n) => get_location_internal(&n.arg.as_ref().unwrap().node.as_ref().unwrap()),
+                NodeEnum::ColumnDef(n) => if n.colname.len() > 0 {
+                    Some(n.location)
+                } else {
+                    None
+                },
+                NodeEnum::NullTest(n) => if n.arg.is_some()  {
+                    get_location_internal(&n.arg.as_ref().unwrap().node.as_ref().unwrap())
+                } else {
+                    Some(n.location)
+                },
                 #(NodeEnum::#node_identifiers(n) => #location_idents),*
             };
             if location.is_some() && location.unwrap() < 0 {
@@ -50,7 +67,14 @@ pub fn get_location_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenSt
 }
 
 fn manual_node_names() -> Vec<&'static str> {
-    vec!["BoolExpr", "AExpr"]
+    vec![
+        "BoolExpr",
+        "AExpr",
+        "WindowDef",
+        "CollateClause",
+        "TypeCast",
+        "ColumnDef",
+    ]
 }
 
 fn location_idents(nodes: &[Node], exclude_nodes: &[&str]) -> Vec<TokenStream> {

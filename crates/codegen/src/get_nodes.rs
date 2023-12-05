@@ -1,49 +1,61 @@
-use pg_query_proto_parser::{FieldType, Node, ProtoParser};
+use pg_query_proto_parser::{FieldType, Node, ProtoFile};
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
-pub fn get_nodes_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let parser = ProtoParser::new("./libpg_query/protobuf/pg_query.proto");
-    let proto_file = parser.parse();
-
+pub fn get_nodes_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
     let manual_node_names = manual_node_names();
 
     let node_identifiers = node_identifiers(&proto_file.nodes, &manual_node_names);
     let node_handlers = node_handlers(&proto_file.nodes, &manual_node_names);
 
     quote! {
-        use pg_query::NodeEnum;
-        use std::collections::VecDeque;
-
         #[derive(Debug, Clone)]
         pub struct Node {
-            pub node: NodeEnum,
-            pub depth: i32,
-            pub path: String,
+            pub kind: SyntaxKind,
+            pub depth: usize,
+            pub properties: Vec<TokenProperty>,
+            pub location: Option<usize>,
         }
 
         /// Returns all children of the node, recursively
         /// location is resolved manually
-        pub fn get_nodes(node: &NodeEnum, text: String, current_depth: i32) -> Vec<Node> {
-            let mut nodes: Vec<Node> = vec![
-                Node { node: node.to_owned(), depth: current_depth, path: "0".to_string() }
-            ];
-            // Node, depth, path
-            let mut stack: VecDeque<(NodeEnum, i32, String)> =
-                VecDeque::from(vec![(node.to_owned(), current_depth, "0".to_string())]);
+        pub fn get_nodes(node: &NodeEnum, at_depth: usize) -> StableGraph<Node, ()> {
+            let mut g = StableGraph::<Node, ()>::new();
+
+            let root_node_idx = g.add_node(Node {
+                kind: SyntaxKind::from(node),
+                depth: at_depth,
+                properties: get_node_properties(node),
+                location: get_location(node),
+            });
+
+            // Parent node idx, Node, depth
+            let mut stack: VecDeque<(NodeIndex, NodeEnum, usize)> =
+                VecDeque::from(vec![(root_node_idx, node.to_owned(), at_depth)]);
             while !stack.is_empty() {
-                let (node, depth, path) = stack.pop_front().unwrap();
+                let (parent_idx, node, depth) = stack.pop_front().unwrap();
                 let current_depth = depth + 1;
-                let mut child_ctr: i32 = 0;
                 let mut handle_child = |c: NodeEnum| {
-                    let path = path.clone() + "." + child_ctr.to_string().as_str();
-                    child_ctr = child_ctr + 1;
-                    stack.push_back((c.to_owned(), current_depth, path.clone()));
-                    nodes.push(Node {
-                        node: c,
-                        depth: current_depth,
-                        path: path.clone(),
-                    });
+                    if match &c {
+                        // all "simple nodes" are not handled individually but merged with their parent
+                        NodeEnum::String(n) => true,
+                        NodeEnum::Integer(n) => true,
+                        NodeEnum::Float(n) => true,
+                        NodeEnum::Boolean(n) => true,
+                        NodeEnum::BitString(n) => true,
+                        _ => false
+                    } {
+                        g[parent_idx].properties.extend(get_node_properties(&c));
+                    } else {
+                        let node_idx = g.add_node(Node {
+                            kind: SyntaxKind::from(&c),
+                            depth: current_depth,
+                            properties: get_node_properties(&c),
+                            location: get_location(&c),
+                        });
+                        g.add_edge(parent_idx, node_idx, ());
+                        stack.push_back((node_idx, c.to_owned(), current_depth));
+                    }
                 };
                 match &node {
                     // `AConst` is the only node with a `one of` property, so we handle it manually
@@ -62,7 +74,7 @@ pub fn get_nodes_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStrea
                     #(NodeEnum::#node_identifiers(n) => {#node_handlers}),*,
                 };
             }
-            nodes
+            g
         }
     }
 }

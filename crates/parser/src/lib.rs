@@ -15,19 +15,28 @@
 //!
 //! To see how these drawbacks are mitigated, see the `statement_parser.rs` and the `source_parser.rs` module.
 
+#![feature(lazy_cell, is_sorted)]
+
 mod ast_node;
-mod estimate_node_range;
-mod get_child_token_range_codegen;
-mod get_location_codegen;
-mod get_nodes_codegen;
+mod codegen;
+mod lexer;
+mod parse;
 mod parser;
 mod sibling_token;
-mod source_parser;
-mod statement_parser;
 mod syntax_error;
-mod syntax_kind_codegen;
 mod syntax_node;
 
+use lexer::lex;
+use parse::source::source;
+
+pub use crate::codegen::SyntaxKind;
 pub use crate::parser::{Parse, Parser};
-pub use crate::syntax_kind_codegen::SyntaxKind;
 pub use crate::syntax_node::{SyntaxElement, SyntaxNode, SyntaxToken};
+
+// TODO: I think we should add some kind of `EntryPoint` enum and make the api more flexible
+// maybe have an intermediate struct that takes &str inputs, lexes the input and then calls the parser
+pub fn parse_source(text: &str) -> Parse {
+    let mut p = Parser::new(lex(text));
+    source(&mut p);
+    p.finish()
+}

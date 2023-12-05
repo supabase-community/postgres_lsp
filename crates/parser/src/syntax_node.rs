@@ -6,7 +6,7 @@
 //! The *real* implementation is in the (language-agnostic) `cstree` crate, this
 //! module just wraps its API.
 
-use crate::syntax_kind_codegen::SyntaxKind;
+use crate::codegen::SyntaxKind;
 
 pub type SyntaxNode = cstree::syntax::SyntaxNode<SyntaxKind>;
 pub type SyntaxToken = cstree::syntax::SyntaxToken<SyntaxKind>;
