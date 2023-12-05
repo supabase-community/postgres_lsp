@@ -7,10 +7,16 @@ pub fn get_node_properties_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStre
     let node_handlers = node_handlers(&proto_file.nodes);
 
     quote! {
-        #[derive(Debug, Clone)]
+        #[derive(Debug, Clone, PartialEq)]
         pub struct TokenProperty {
             pub value: Option<String>,
             pub kind: Option<SyntaxKind>,
+        }
+
+        impl TokenProperty {
+            pub fn new(value: Option<String>, kind: Option<SyntaxKind>) -> TokenProperty {
+                TokenProperty { value, kind }
+            }
         }
 
         impl From<i32> for TokenProperty {
@@ -97,6 +103,15 @@ pub fn get_node_properties_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStre
                             false => Some(SyntaxKind::FalseP),
                         }
                     }
+            }
+        }
+
+        impl From<SyntaxKind> for TokenProperty {
+            fn from(kind: SyntaxKind) -> TokenProperty {
+                TokenProperty {
+                    value: None,
+                    kind: Some(kind),
+                }
             }
         }
 
