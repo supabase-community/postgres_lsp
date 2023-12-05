@@ -1,6 +1,5 @@
 use std::fs;
 mod common;
-mod get_node_properties_test;
 use log::debug;
 use parser::parse_source;
 
