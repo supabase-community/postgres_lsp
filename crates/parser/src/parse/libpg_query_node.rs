@@ -62,7 +62,9 @@ impl<'p> LibpgQueryNodeParser<'p> {
     }
 
     pub fn parse(&mut self) {
-        dbg!(&self.node_graph);
+        if log_enabled!(log::Level::Debug) {
+            dbg!(&self.node_graph);
+        }
         while self.parser.pos < self.token_range.end {
             debug!("current node: {:#?}", self.current_node);
             debug!("current token: {:#?}", self.current_token());

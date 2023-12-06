@@ -1,6 +1,6 @@
 use std::fs;
 mod common;
-use log::debug;
+use log::{debug, info};
 use parser::parse_source;
 
 const VALID_STATEMENTS_PATH: &str = "tests/data/statements/valid/";
@@ -31,6 +31,13 @@ fn valid_statements() {
                 "Failed to parse statement {}: {:#?}",
                 test_name,
                 result.unwrap_err()
+            );
+        } else {
+            info!(
+                "Successfully parsed statement {}\n'{}'\n{:#?}",
+                test_name,
+                contents,
+                result.unwrap().cst
             );
         }
     });
