@@ -15,6 +15,9 @@ pub fn get_node_properties_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStre
 
         impl TokenProperty {
             pub fn new(value: Option<String>, kind: Option<SyntaxKind>) -> TokenProperty {
+                if value.is_none() && kind.is_none() {
+                    panic!("TokenProperty must have either value or kind");
+                }
                 TokenProperty { value, kind }
             }
         }
