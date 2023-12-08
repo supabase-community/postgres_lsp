@@ -33,7 +33,7 @@ Once the parser is stable, and a robust and scalable data model is implemented, 
 This is a proof of concept for building both a concrete syntax tree and an abstract syntax tree from a potentially malformed PostgreSQL source code. The `postgres_lsp` crate was created to prove that it works end-to-end, and is just a very basic language server with semantic highlighting and error diagnostics. Before further feature development, we have to complete a bit of groundwork:
 
 1. _Finish the parser_
-   - ✅ The core parser algorithm is implemented.
+   - ✅ The core parser algorithm is implemented. Check out [this blog post](https://supabase.com/blog/postgres-language-server-implementing-parser) for details.
    - 🚧 But we need help from the community to finalize it: https://github.com/supabase/postgres_lsp/issues/51.
 2. _Implement a robust and scalable data model_
    - This is still in a research phase
