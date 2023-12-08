@@ -86,6 +86,12 @@ lsp.configure("postgres_lsp", {force_setup = true})
 
 You'll need Cargo, Node, and npm installed.
 
+Install the `libpg_query` submodule by running:
+
+```sh
+git submodule update --init --recursive
+```
+
 If you are using VS Code, you can install both the server and the client extension by running:
 
 ```sh
