@@ -535,9 +535,6 @@ fn custom_handlers(node: &Node) -> TokenStream {
             if n.type_name.is_some() {
                 tokens.push(TokenProperty::from(Token::As));
             }
-            if n.constraints.len() > 0 {
-                tokens.push(TokenProperty::from(Token::Check));
-            }
         },
         _ => quote! {},
     }

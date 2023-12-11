@@ -101,7 +101,6 @@ mod tests {
                 TokenProperty::from(SyntaxKind::Create),
                 TokenProperty::from(SyntaxKind::DomainP),
                 TokenProperty::from(SyntaxKind::As),
-                TokenProperty::from(SyntaxKind::Check),
                 TokenProperty::from("us_postal_code".to_string()),
             ],
         )
