@@ -64,7 +64,11 @@ mod tests {
 
         debug!("selected node: {:#?}", node_graph[node_index]);
 
-        assert_eq!(node_graph[node_index].properties, expected);
+        assert!(node_graph[node_index]
+            .properties
+            .iter()
+            .all(|p| { expected.contains(p) }));
+        assert_eq!(node_graph[node_index].properties.len(), expected.len());
     }
 
     #[test]
