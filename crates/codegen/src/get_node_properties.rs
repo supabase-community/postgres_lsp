@@ -439,6 +439,17 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::Or));
                 tokens.push(TokenProperty::from(Token::Replace));
             }
+            if let Some(n) = &n.view {
+                match n.relpersistence.as_str() {
+                    // Permanent
+                    "p" => {},
+                    // Unlogged
+                    "u" => tokens.push(TokenProperty::from(Token::Unlogged)),
+                    // Temporary
+                    "t" => tokens.push(TokenProperty::from(Token::Temporary)),
+                    _ => panic!("Unknown ViewStmt {:#?}", n),
+                }
+            }
         },
         "CreateStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
