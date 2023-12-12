@@ -1,5 +1,6 @@
 use pg_query_proto_parser::ProtoParser;
 use quote::quote;
+use std::{env, path, path::Path};
 
 use crate::{
     get_location::get_location_mod, get_node_properties::get_node_properties_mod,
@@ -7,7 +8,7 @@ use crate::{
 };
 
 pub fn parser_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let parser = ProtoParser::new("libpg_query/protobuf/pg_query.proto");
+    let parser = ProtoParser::new(&proto_file_path());
     let proto_file = parser.parse();
 
     let syntax_kind = syntax_kind_mod(&proto_file);
@@ -31,4 +32,13 @@ pub fn parser_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
         #get_node_properties
         #get_nodes
     }
+}
+
+fn proto_file_path() -> path::PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .ancestors()
+        .nth(2)
+        .unwrap()
+        .join("libpg_query/protobuf/pg_query.proto")
+        .to_path_buf()
 }
