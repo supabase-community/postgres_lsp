@@ -28,9 +28,8 @@ fn valid_statements() {
         if result.is_err() {
             assert!(
                 false,
-                "Failed to parse statement {}: {:#?}",
-                test_name,
-                result.unwrap_err()
+                "Failed to parse statement {}:\n{}",
+                test_name, contents
             );
         } else {
             info!(
