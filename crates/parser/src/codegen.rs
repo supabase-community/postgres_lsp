@@ -53,6 +53,8 @@ mod tests {
             Err(_) => None,
         };
 
+        debug!("pg_query_root: {:#?}", pg_query_root);
+
         let node_graph = get_nodes(&pg_query_root.unwrap(), 0);
 
         debug!("node graph: {:#?}", node_graph);
