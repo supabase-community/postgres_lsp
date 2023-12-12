@@ -91,4 +91,18 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_domain() {
+        test_get_node_properties(
+            "create domain us_postal_code as text check (value is not null);",
+            SyntaxKind::CreateDomainStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::DomainP),
+                TokenProperty::from(SyntaxKind::As),
+                TokenProperty::from("us_postal_code".to_string()),
+            ],
+        )
+    }
 }

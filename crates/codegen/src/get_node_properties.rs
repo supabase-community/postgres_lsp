@@ -529,6 +529,13 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "TypeCast" => quote! {
             tokens.push(TokenProperty::from(Token::Typecast));
         },
+        "CreateDomainStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::DomainP));
+            if n.type_name.is_some() {
+                tokens.push(TokenProperty::from(Token::As));
+            }
+        },
         _ => quote! {},
     }
 }
