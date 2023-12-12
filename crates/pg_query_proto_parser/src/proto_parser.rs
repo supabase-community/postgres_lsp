@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use protobuf::descriptor::{field_descriptor_proto::Label, FileDescriptorProto};
 use protobuf_parse::Parser;
-use std::path::Path;
+use std::{ffi::OsStr, path::Path};
 
 use crate::proto_file::{Field, FieldType, Node, ProtoFile, Token};
 
@@ -11,7 +11,7 @@ pub struct ProtoParser {
 }
 
 impl ProtoParser {
-    pub fn new(file_path: &str) -> Self {
+    pub fn new(file_path: &impl AsRef<OsStr>) -> Self {
         let proto_file = Path::new(file_path);
         let proto_dir = proto_file.parent().unwrap();
 

@@ -189,7 +189,7 @@ impl LanguageServer for Backend {
 
     async fn semantic_tokens_range(
         &self,
-        params: SemanticTokensRangeParams,
+        _: SemanticTokensRangeParams,
     ) -> Result<Option<SemanticTokensRangeResult>> {
         return Ok(None);
     }
