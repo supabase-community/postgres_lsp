@@ -536,6 +536,18 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::As));
             }
         },
+        "CreateSchemaStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::Schema));
+            if n.if_not_exists {
+                tokens.push(TokenProperty::from(Token::IfP));
+                tokens.push(TokenProperty::from(Token::Not));
+                tokens.push(TokenProperty::from(Token::Exists));
+            }
+            if n.authrole.is_some() {
+                tokens.push(TokenProperty::from(Token::Authorization));
+            }
+        },
         _ => quote! {},
     }
 }

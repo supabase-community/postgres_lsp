@@ -107,4 +107,21 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_schema() {
+        test_get_node_properties(
+            "create schema if not exists test authorization joe;",
+            SyntaxKind::CreateSchemaStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Schema),
+                TokenProperty::from(SyntaxKind::IfP),
+                TokenProperty::from(SyntaxKind::Not),
+                TokenProperty::from(SyntaxKind::Exists),
+                TokenProperty::from(SyntaxKind::Authorization),
+                TokenProperty::from("test".to_string()),
+            ],
+        )
+    }
 }
