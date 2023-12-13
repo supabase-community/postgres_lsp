@@ -124,4 +124,20 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_view() {
+        test_get_node_properties(
+            "create or replace temporary view comedies as select * from films;",
+            SyntaxKind::ViewStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::View),
+                TokenProperty::from(SyntaxKind::As),
+                TokenProperty::from(SyntaxKind::Or),
+                TokenProperty::from(SyntaxKind::Replace),
+                TokenProperty::from(SyntaxKind::Temporary),
+            ],
+        )
+    }
 }
