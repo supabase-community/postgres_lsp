@@ -385,14 +385,18 @@ fn custom_handlers(node: &Node) -> TokenStream {
             }
             if let Some(n) = &n.view {
                 match n.relpersistence.as_str() {
-                    // Permanent
-                    "p" => {},
-                    // Unlogged
-                    "u" => tokens.push(TokenProperty::from(Token::Unlogged)),
                     // Temporary
                     "t" => tokens.push(TokenProperty::from(Token::Temporary)),
-                    _ => panic!("Unknown ViewStmt {:#?}", n.relpersistence),
+                    _ => {},
                 }
+            }
+            match n.with_check_option() {
+                protobuf::ViewCheckOption::CascadedCheckOption => {
+                    tokens.push(TokenProperty::from(Token::With));
+                    tokens.push(TokenProperty::from(Token::Check));
+                    tokens.push(TokenProperty::from(Token::Option));
+                },
+                _ => {}
             }
         },
         "CreateStmt" => quote! {
