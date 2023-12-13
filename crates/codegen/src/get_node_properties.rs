@@ -565,6 +565,39 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::As));
             tokens.push(TokenProperty::from(Token::EnumP));
         },
+        "CreateCastStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::Cast));
+            tokens.push(TokenProperty::from(Token::As));
+            if n.inout {
+                tokens.push(TokenProperty::from(Token::With));
+                tokens.push(TokenProperty::from(Token::Inout));
+            }
+            else if n.func.is_some() {
+                tokens.push(TokenProperty::from(Token::With));
+                tokens.push(TokenProperty::from(Token::Function));
+            } else {
+                tokens.push(TokenProperty::from(Token::Without));
+                tokens.push(TokenProperty::from(Token::Function));
+            }
+            match n.context {
+                // Implicit
+                1 => {
+                    tokens.push(TokenProperty::from(Token::As));
+                    tokens.push(TokenProperty::from(Token::ImplicitP));
+                },
+                // Assignment
+                2 => {
+                    tokens.push(TokenProperty::from(Token::As));
+                    tokens.push(TokenProperty::from(Token::Assignment));
+                },
+                // Plpgsql
+                3 => {},
+                // Explicit
+                4 => {},
+                _ => panic!("Unknown CreateCastStmt {:#?}", n.context)
+            }
+        },
         _ => quote! {},
     }
 }
