@@ -346,13 +346,18 @@ mod tests {
     fn test_parser_simple() {
         init();
 
-        let input = "alter table x rename to y \n alter table x alter column z set default 1";
+        let input = "alter table x rename to y \n\n alter table x alter column z set default 1";
 
         let mut p = Parser::new(lex(input));
         source(&mut p);
         let result = p.finish();
 
         dbg!(&result.cst);
+        assert_eq!(result.stmts.len(), 2);
+        result.stmts.iter().for_each(|x| {
+            dbg!(&x.range);
+            dbg!(&x.stmt);
+        });
         println!("{:#?}", result.errors);
     }
 
