@@ -1,4 +1,3 @@
-use std::cmp::max;
 use std::ops::Range;
 
 use cstree::text::{TextRange, TextSize};
@@ -10,20 +9,6 @@ use crate::Parser;
 
 pub fn statement(parser: &mut Parser, kind: SyntaxKind) {
     let token_range = collect_statement_token_range(parser, kind);
-    let start = if parser.tokens[token_range.start].span.start() == TextSize::from(0) {
-        TextSize::from(0)
-    } else {
-        parser.tokens[token_range.start].span.start() - TextSize::from(1)
-    };
-    let end = if token_range.end == parser.tokens.len() {
-        parser.tokens[token_range.end - 1].span.end() - TextSize::from(1)
-    } else {
-        parser.tokens[token_range.end - 1].span.end()
-    };
-    let text_range = TextRange::new(
-        TextSize::from(u32::try_from(start).unwrap()),
-        TextSize::from(u32::try_from(end).unwrap()),
-    );
     let tokens = parser.tokens.get(token_range.clone()).unwrap().to_vec();
     match pg_query::parse(
         tokens
@@ -41,6 +26,23 @@ pub fn statement(parser: &mut Parser, kind: SyntaxKind) {
                 .unwrap()
                 .0
                 .to_enum();
+
+            // FIXME: if have no idea why the subtraction is needed
+            let start = if parser.tokens[token_range.start].span.start() == TextSize::from(0) {
+                TextSize::from(0)
+            } else {
+                parser.tokens[token_range.start].span.start() - TextSize::from(1)
+            };
+            let end = if token_range.end == parser.tokens.len() {
+                parser.tokens[token_range.end - 1].span.end() - TextSize::from(1)
+            } else {
+                parser.tokens[token_range.end - 1].span.end()
+            };
+            let text_range = TextRange::new(
+                TextSize::from(u32::try_from(start).unwrap()),
+                TextSize::from(u32::try_from(end).unwrap()),
+            );
+
             parser.stmt(root.clone(), text_range);
             libpg_query_node(parser, root, &token_range);
         }
