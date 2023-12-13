@@ -183,33 +183,22 @@ fn custom_handlers(node: &Node) -> TokenStream {
             }
         },
         "BoolExpr" => quote! {
-            match n.boolop {
-                // AndExpr = 1
-                1 => tokens.push(TokenProperty::from(Token::And)),
-                // OrExpr = 2
-                2 => tokens.push(TokenProperty::from(Token::Or)),
-                // NotExpr = 3
-                3 => tokens.push(TokenProperty::from(Token::Not)),
-                _ => panic!("Unknown BoolExpr {:#?}", n.boolop),
+            match n.boolop() {
+                BoolExprType::AndExpr => tokens.push(TokenProperty::from(Token::And)),
+                BoolExprType::OrExpr => tokens.push(TokenProperty::from(Token::Or)),
+                BoolExprType::NotExpr => tokens.push(TokenProperty::from(Token::Not)),
+                _ => panic!("Unknown BoolExpr {:#?}", n.boolop()),
             }
         },
         "JoinExpr" => quote! {
             tokens.push(TokenProperty::from(Token::Join));
             tokens.push(TokenProperty::from(Token::On));
-            match n.jointype {
-                // JoinInner = 1
-                1 => tokens.push(TokenProperty::from(Token::InnerP)),
-                // JoinLeft = 2
-                2 => tokens.push(TokenProperty::from(Token::Left)),
-                // JoinFull = 3
-                3 => tokens.push(TokenProperty::from(Token::Full)),
-                // JoinRight = 4
-                4 => tokens.push(TokenProperty::from(Token::Right)),
-                // JoinSemi = 5
-                // JoinAnti = 6
-                // JoinUniqueOuter = 7
-                // JoinUniqueInner = 8
-                _ => panic!("Unknown JoinExpr jointype {:#?}", n.jointype),
+            match n.jointype() {
+                JoinType::JoinInner => tokens.push(TokenProperty::from(Token::InnerP)),
+                JoinType::JoinLeft => tokens.push(TokenProperty::from(Token::Left)),
+                JoinType::JoinFull => tokens.push(TokenProperty::from(Token::Full)),
+                JoinType::JoinRight => tokens.push(TokenProperty::from(Token::Right)),
+                _ => panic!("Unknown JoinExpr jointype {:#?}", n.jointype()),
             }
 
         },
@@ -222,9 +211,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(n));
         },
         "DefElem" => quote! {
-            match n.defaction {
-                1 => tokens.push(TokenProperty::from(Token::Ascii61)),
-                _ => panic!("Unknown DefElem {:#?}", n.defaction),
+            match n.defaction() {
+                DefElemAction::DefelemUnspec => tokens.push(TokenProperty::from(Token::Ascii61)),
+                _ => panic!("Unknown DefElem {:#?}", n.defaction()),
             }
         },
         "Alias" => quote! {
@@ -234,27 +223,11 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::Collate));
         },
         "AExpr" => quote! {
-            match n.kind {
-                // AexprOp = 1,
-                1 => {
-                    // do nothing
-                },
-                // AexprOpAny = 2,
-                2 => tokens.push(TokenProperty::from(Token::Any)),
-                // AexprOpAll = 3,
-                // AexprDistinct = 4,
-                // AexprNotDistinct = 5,
-                // AexprNullif = 6,
-                // AexprIn = 7,
-                7 => tokens.push(TokenProperty::from(Token::InP)),
-                // AexprLike = 8,
-                // AexprIlike = 9,
-                // AexprSimilar = 10,
-                // AexprBetween = 11,
-                // AexprNotBetween = 12,
-                // AexprBetweenSym = 13,
-                // AexprNotBetweenSym = 14,
-                _ => panic!("Unknown AExpr kind {:#?}", n.kind),
+            match n.kind() {
+                AExprKind::AexprOp => {}, // do nothing
+                AExprKind::AexprOpAny => tokens.push(TokenProperty::from(Token::Any)),
+                AExprKind::AexprIn => tokens.push(TokenProperty::from(Token::InP)),
+                _ => panic!("Unknown AExpr kind {:#?}", n.kind()),
             }
         },
         "WindowDef" => quote! {
@@ -293,33 +266,18 @@ fn custom_handlers(node: &Node) -> TokenStream {
             }
         },
         "SqlvalueFunction" => quote! {
-            match n.op {
-                // 1 SvfopCurrentDate
-                // 2 SvfopCurrentTime
-                // 3 SvfopCurrentTimeN
-                // 4 SvfopCurrentTimestamp
-                // 5 SvfopCurrentTimestampN
-                // 6 SvfopLocaltime
-                // 7 SvfopLocaltimeN
-                // 8 SvfopLocaltimestamp
-                // 9 SvfopLocaltimestampN
-                // 10 SvfopCurrentRole
-                10 => tokens.push(TokenProperty::from(Token::CurrentRole)),
-                // 11 SvfopCurrentUser
-                11 => tokens.push(TokenProperty::from(Token::CurrentUser)),
-                // 12 SvfopUser
-                // 13 SvfopSessionUser
-                // 14 SvfopCurrentCatalog
-                // 15 SvfopCurrentSchema
-                _ => panic!("Unknown SqlvalueFunction {:#?}", n.op),
+            match n.op() {
+                SqlValueFunctionOp::SvfopCurrentRole => tokens.push(TokenProperty::from(Token::CurrentRole)),
+                SqlValueFunctionOp::SvfopCurrentUser => tokens.push(TokenProperty::from(Token::CurrentUser)),
+                _ => panic!("Unknown SqlvalueFunction {:#?}", n.op()),
             }
         },
         "SortBy" => quote! {
             tokens.push(TokenProperty::from(Token::Order));
             tokens.push(TokenProperty::from(Token::By));
-            match n.sortby_dir {
-                2 => tokens.push(TokenProperty::from(Token::Asc)),
-                3 => tokens.push(TokenProperty::from(Token::Desc)),
+            match n.sortby_dir() {
+                SortByDir::SortbyAsc => tokens.push(TokenProperty::from(Token::Asc)),
+                SortByDir::SortbyDesc => tokens.push(TokenProperty::from(Token::Desc)),
                 _ => {}
             }
         },
@@ -334,35 +292,26 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "AlterTableCmd" => quote! {
             tokens.push(TokenProperty::from(Token::Alter));
-            match n.subtype {
-                4 => {
+            match n.subtype() {
+                AlterTableType::AtColumnDefault => {
                     tokens.push(TokenProperty::from(Token::Column));
                     tokens.push(TokenProperty::from(Token::Set));
                     tokens.push(TokenProperty::from(Token::Default));
                 },
-                // AtAddConstraint
-                19 => tokens.push(TokenProperty::from(Token::AddP)),
-                // AtAlterColumnType
-                30 => {
+                AlterTableType::AtAddConstraint => tokens.push(TokenProperty::from(Token::AddP)),
+                AlterTableType::AtAlterColumnType => {
                     tokens.push(TokenProperty::from(Token::Alter));
                     tokens.push(TokenProperty::from(Token::Column));
                     tokens.push(TokenProperty::from(Token::TypeP));
                 },
-                _ => panic!("Unknown AlterTableCmd {:#?}", n.subtype),
+                _ => panic!("Unknown AlterTableCmd {:#?}", n.subtype()),
             }
         },
         "VariableSetStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Set));
-            match n.kind {
-                // Undefined = 0,
-                // VarSetValue = 1,
-                1 => tokens.push(TokenProperty::from(Token::To)),
-                // VarSetDefault = 2,
-                // VarSetCurrent = 3,
-                // VarSetMulti = 4,
-                // VarReset = 5,
-                // VarResetAll = 6,
-                _ => panic!("Unknown VariableSetStmt {:#?}", n.kind),
+            match n.kind() {
+                VariableSetKind::VarSetValue => tokens.push(TokenProperty::from(Token::To)),
+                _ => panic!("Unknown VariableSetStmt {:#?}", n.kind()),
             }
         },
         "CreatePolicyStmt" => quote! {
@@ -391,24 +340,19 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::To));
         },
         "Constraint" => quote! {
-            match n.contype {
-                // ConstrNotnull
-                2 => {
+            match n.contype() {
+                ConstrType::ConstrNotnull => {
                     tokens.push(TokenProperty::from(Token::Not));
                     tokens.push(TokenProperty::from(Token::NullP));
                 },
-                // ConstrDefault
-                3 => tokens.push(TokenProperty::from(Token::Default)),
-                // ConstrCheck
-                6 => tokens.push(TokenProperty::from(Token::Check)),
-                // ConstrPrimary
-                7 => {
+                ConstrType::ConstrDefault => tokens.push(TokenProperty::from(Token::Default)),
+                ConstrType::ConstrCheck => tokens.push(TokenProperty::from(Token::Check)),
+                ConstrType::ConstrPrimary => {
                     tokens.push(TokenProperty::from(Token::Primary));
                     tokens.push(TokenProperty::from(Token::Key));
                 },
-                // ConstrForeign
-                10 => tokens.push(TokenProperty::from(Token::References)),
-                _ => panic!("Unknown Constraint {:#?}", n.contype),
+                ConstrType::ConstrForeign => tokens.push(TokenProperty::from(Token::References)),
+                _ => panic!("Unknown Constraint {:#?}", n.contype()),
             }
         },
         "PartitionSpec" => quote! {
@@ -447,7 +391,7 @@ fn custom_handlers(node: &Node) -> TokenStream {
                     "u" => tokens.push(TokenProperty::from(Token::Unlogged)),
                     // Temporary
                     "t" => tokens.push(TokenProperty::from(Token::Temporary)),
-                    _ => panic!("Unknown ViewStmt {:#?}", n),
+                    _ => panic!("Unknown ViewStmt {:#?}", n.relpersistence),
                 }
             }
         },
@@ -484,15 +428,13 @@ fn custom_handlers(node: &Node) -> TokenStream {
             }
         },
         "NullTest" => quote! {
-            match n.nulltesttype {
-                // IsNull
-                1 => tokens.push(TokenProperty::from(Token::Is)),
-                // IsNotNull
-                2 => {
+            match n.nulltesttype() {
+                NullTestType::IsNull => tokens.push(TokenProperty::from(Token::Is)),
+                NullTestType::IsNotNull => {
                     tokens.push(TokenProperty::from(Token::Is));
                     tokens.push(TokenProperty::from(Token::Not));
                 },
-                _ => panic!("Unknown NullTest {:#?}", n.nulltesttype),
+                _ => panic!("Unknown NullTest {:#?}", n.nulltesttype()),
             }
             tokens.push(TokenProperty::from(Token::NullP));
         },
@@ -508,22 +450,14 @@ fn custom_handlers(node: &Node) -> TokenStream {
             }
         },
         "FunctionParameter" => quote! {
-            match n.mode {
-                // FuncParamIn = 1,
-                1 => tokens.push(TokenProperty::from(Token::InP)),
-                // FuncParamOut = 2,
-                2 => tokens.push(TokenProperty::from(Token::OutP)),
-                // FuncParamInout = 3,
-                3 => tokens.push(TokenProperty::from(Token::Inout)),
-                // FuncParamVariadic = 4,
-                4 => tokens.push(TokenProperty::from(Token::Variadic)),
-                // FuncParamTable = 5,
-                // 5 => tokens.push(TokenProperty::from(Token::Table)),
-                // FuncParamDefault = 6,
-                6 => {
-                    // do nothing
-                },
-                _ => panic!("Unknown FunctionParameter {:#?}", n.mode),
+            match n.mode() {
+                FunctionParameterMode::FuncParamIn => tokens.push(TokenProperty::from(Token::InP)),
+                FunctionParameterMode::FuncParamOut => tokens.push(TokenProperty::from(Token::OutP)),
+                FunctionParameterMode::FuncParamInout => tokens.push(TokenProperty::from(Token::Inout)),
+                FunctionParameterMode::FuncParamVariadic => tokens.push(TokenProperty::from(Token::Variadic)),
+                // FunctionParameterMode::FuncParamTable => tokens.push(TokenProperty::from(Token::Table)),
+                FunctionParameterMode::FuncParamDefault => {}, // do nothing
+                _ => panic!("Unknown FunctionParameter {:#?}", n.mode()),
             };
             if n.defexpr.is_some() {
                 tokens.push(TokenProperty::from(Token::Default));
@@ -572,30 +506,25 @@ fn custom_handlers(node: &Node) -> TokenStream {
             if n.inout {
                 tokens.push(TokenProperty::from(Token::With));
                 tokens.push(TokenProperty::from(Token::Inout));
-            }
-            else if n.func.is_some() {
+            } else if n.func.is_some() {
                 tokens.push(TokenProperty::from(Token::With));
                 tokens.push(TokenProperty::from(Token::Function));
             } else {
                 tokens.push(TokenProperty::from(Token::Without));
                 tokens.push(TokenProperty::from(Token::Function));
             }
-            match n.context {
-                // Implicit
-                1 => {
+            match n.context() {
+                CoercionContext::CoercionImplicit => {
                     tokens.push(TokenProperty::from(Token::As));
                     tokens.push(TokenProperty::from(Token::ImplicitP));
                 },
-                // Assignment
-                2 => {
+                CoercionContext::CoercionAssignment => {
                     tokens.push(TokenProperty::from(Token::As));
                     tokens.push(TokenProperty::from(Token::Assignment));
                 },
-                // Plpgsql
-                3 => {},
-                // Explicit
-                4 => {},
-                _ => panic!("Unknown CreateCastStmt {:#?}", n.context)
+                CoercionContext::CoercionPlpgsql => {},
+                CoercionContext::CoercionExplicit => {},
+                _ => panic!("Unknown CreateCastStmt {:#?}", n.context())
             }
         },
         _ => quote! {},
