@@ -173,4 +173,28 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_aggregate() {
+        test_get_node_properties(
+            "create or replace aggregate percentile_disc (float8 order by anyelement) (
+                sfunc = ordered_set_transition,
+                stype = internal,
+                finalfunc = percentile_disc_final,
+                finalfunc_extra
+            );",
+            SyntaxKind::DefineStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Aggregate),
+                TokenProperty::from(SyntaxKind::Order),
+                TokenProperty::from(SyntaxKind::By),
+                TokenProperty::from(SyntaxKind::Ident), // anyelement
+                TokenProperty::from(SyntaxKind::Ident), // anyelement
+                TokenProperty::from(SyntaxKind::Ident), // sfunc
+                TokenProperty::from("percentile_disc".to_string()),
+                TokenProperty::new(Some("1".to_string()), Some(SyntaxKind::Iconst)),
+            ],
+        )
+    }
 }
