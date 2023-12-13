@@ -156,4 +156,21 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_cast() {
+        test_get_node_properties(
+            "create cast (bigint as int4) with inout as assignment;",
+            SyntaxKind::CreateCastStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Cast),
+                TokenProperty::from(SyntaxKind::As),
+                TokenProperty::from(SyntaxKind::With),
+                TokenProperty::from(SyntaxKind::Inout),
+                TokenProperty::from(SyntaxKind::As),
+                TokenProperty::from(SyntaxKind::Assignment),
+            ],
+        )
+    }
 }
