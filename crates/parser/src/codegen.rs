@@ -66,6 +66,8 @@ mod tests {
 
         debug!("selected node: {:#?}", node_graph[node_index]);
 
+        // note: even though we test for strict equality of the two vectors the order
+        // of the properties does not have to match the order of the tokens in the string
         assert_eq!(node_graph[node_index].properties, expected);
         assert_eq!(node_graph[node_index].properties.len(), expected.len());
     }
