@@ -184,9 +184,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "BoolExpr" => quote! {
             match n.boolop() {
-                BoolExprType::AndExpr => tokens.push(TokenProperty::from(Token::And)),
-                BoolExprType::OrExpr => tokens.push(TokenProperty::from(Token::Or)),
-                BoolExprType::NotExpr => tokens.push(TokenProperty::from(Token::Not)),
+                protobuf::BoolExprType::AndExpr => tokens.push(TokenProperty::from(Token::And)),
+                protobuf::BoolExprType::OrExpr => tokens.push(TokenProperty::from(Token::Or)),
+                protobuf::BoolExprType::NotExpr => tokens.push(TokenProperty::from(Token::Not)),
                 _ => panic!("Unknown BoolExpr {:#?}", n.boolop()),
             }
         },
@@ -194,10 +194,10 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::Join));
             tokens.push(TokenProperty::from(Token::On));
             match n.jointype() {
-                JoinType::JoinInner => tokens.push(TokenProperty::from(Token::InnerP)),
-                JoinType::JoinLeft => tokens.push(TokenProperty::from(Token::Left)),
-                JoinType::JoinFull => tokens.push(TokenProperty::from(Token::Full)),
-                JoinType::JoinRight => tokens.push(TokenProperty::from(Token::Right)),
+                protobuf::JoinType::JoinInner => tokens.push(TokenProperty::from(Token::InnerP)),
+                protobuf::JoinType::JoinLeft => tokens.push(TokenProperty::from(Token::Left)),
+                protobuf::JoinType::JoinFull => tokens.push(TokenProperty::from(Token::Full)),
+                protobuf::JoinType::JoinRight => tokens.push(TokenProperty::from(Token::Right)),
                 _ => panic!("Unknown JoinExpr jointype {:#?}", n.jointype()),
             }
 
@@ -212,7 +212,7 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "DefElem" => quote! {
             match n.defaction() {
-                DefElemAction::DefelemUnspec => tokens.push(TokenProperty::from(Token::Ascii61)),
+                protobuf::DefElemAction::DefelemUnspec => tokens.push(TokenProperty::from(Token::Ascii61)),
                 _ => panic!("Unknown DefElem {:#?}", n.defaction()),
             }
         },
@@ -224,9 +224,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "AExpr" => quote! {
             match n.kind() {
-                AExprKind::AexprOp => {}, // do nothing
-                AExprKind::AexprOpAny => tokens.push(TokenProperty::from(Token::Any)),
-                AExprKind::AexprIn => tokens.push(TokenProperty::from(Token::InP)),
+                protobuf::AExprKind::AexprOp => {}, // do nothing
+                protobuf::AExprKind::AexprOpAny => tokens.push(TokenProperty::from(Token::Any)),
+                protobuf::AExprKind::AexprIn => tokens.push(TokenProperty::from(Token::InP)),
                 _ => panic!("Unknown AExpr kind {:#?}", n.kind()),
             }
         },
@@ -267,8 +267,8 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "SqlvalueFunction" => quote! {
             match n.op() {
-                SqlValueFunctionOp::SvfopCurrentRole => tokens.push(TokenProperty::from(Token::CurrentRole)),
-                SqlValueFunctionOp::SvfopCurrentUser => tokens.push(TokenProperty::from(Token::CurrentUser)),
+                protobuf::SqlValueFunctionOp::SvfopCurrentRole => tokens.push(TokenProperty::from(Token::CurrentRole)),
+                protobuf::SqlValueFunctionOp::SvfopCurrentUser => tokens.push(TokenProperty::from(Token::CurrentUser)),
                 _ => panic!("Unknown SqlvalueFunction {:#?}", n.op()),
             }
         },
@@ -276,8 +276,8 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::Order));
             tokens.push(TokenProperty::from(Token::By));
             match n.sortby_dir() {
-                SortByDir::SortbyAsc => tokens.push(TokenProperty::from(Token::Asc)),
-                SortByDir::SortbyDesc => tokens.push(TokenProperty::from(Token::Desc)),
+                protobuf::SortByDir::SortbyAsc => tokens.push(TokenProperty::from(Token::Asc)),
+                protobuf::SortByDir::SortbyDesc => tokens.push(TokenProperty::from(Token::Desc)),
                 _ => {}
             }
         },
@@ -293,13 +293,13 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "AlterTableCmd" => quote! {
             tokens.push(TokenProperty::from(Token::Alter));
             match n.subtype() {
-                AlterTableType::AtColumnDefault => {
+                protobuf::AlterTableType::AtColumnDefault => {
                     tokens.push(TokenProperty::from(Token::Column));
                     tokens.push(TokenProperty::from(Token::Set));
                     tokens.push(TokenProperty::from(Token::Default));
                 },
-                AlterTableType::AtAddConstraint => tokens.push(TokenProperty::from(Token::AddP)),
-                AlterTableType::AtAlterColumnType => {
+                protobuf::AlterTableType::AtAddConstraint => tokens.push(TokenProperty::from(Token::AddP)),
+                protobuf::AlterTableType::AtAlterColumnType => {
                     tokens.push(TokenProperty::from(Token::Alter));
                     tokens.push(TokenProperty::from(Token::Column));
                     tokens.push(TokenProperty::from(Token::TypeP));
@@ -310,7 +310,7 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "VariableSetStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Set));
             match n.kind() {
-                VariableSetKind::VarSetValue => tokens.push(TokenProperty::from(Token::To)),
+                protobuf::VariableSetKind::VarSetValue => tokens.push(TokenProperty::from(Token::To)),
                 _ => panic!("Unknown VariableSetStmt {:#?}", n.kind()),
             }
         },
@@ -341,17 +341,17 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "Constraint" => quote! {
             match n.contype() {
-                ConstrType::ConstrNotnull => {
+                protobuf::ConstrType::ConstrNotnull => {
                     tokens.push(TokenProperty::from(Token::Not));
                     tokens.push(TokenProperty::from(Token::NullP));
                 },
-                ConstrType::ConstrDefault => tokens.push(TokenProperty::from(Token::Default)),
-                ConstrType::ConstrCheck => tokens.push(TokenProperty::from(Token::Check)),
-                ConstrType::ConstrPrimary => {
+                protobuf::ConstrType::ConstrDefault => tokens.push(TokenProperty::from(Token::Default)),
+                protobuf::ConstrType::ConstrCheck => tokens.push(TokenProperty::from(Token::Check)),
+                protobuf::ConstrType::ConstrPrimary => {
                     tokens.push(TokenProperty::from(Token::Primary));
                     tokens.push(TokenProperty::from(Token::Key));
                 },
-                ConstrType::ConstrForeign => tokens.push(TokenProperty::from(Token::References)),
+                protobuf::ConstrType::ConstrForeign => tokens.push(TokenProperty::from(Token::References)),
                 _ => panic!("Unknown Constraint {:#?}", n.contype()),
             }
         },
@@ -429,8 +429,8 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "NullTest" => quote! {
             match n.nulltesttype() {
-                NullTestType::IsNull => tokens.push(TokenProperty::from(Token::Is)),
-                NullTestType::IsNotNull => {
+                protobuf::NullTestType::IsNull => tokens.push(TokenProperty::from(Token::Is)),
+                protobuf::NullTestType::IsNotNull => {
                     tokens.push(TokenProperty::from(Token::Is));
                     tokens.push(TokenProperty::from(Token::Not));
                 },
@@ -451,12 +451,12 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "FunctionParameter" => quote! {
             match n.mode() {
-                FunctionParameterMode::FuncParamIn => tokens.push(TokenProperty::from(Token::InP)),
-                FunctionParameterMode::FuncParamOut => tokens.push(TokenProperty::from(Token::OutP)),
-                FunctionParameterMode::FuncParamInout => tokens.push(TokenProperty::from(Token::Inout)),
-                FunctionParameterMode::FuncParamVariadic => tokens.push(TokenProperty::from(Token::Variadic)),
-                // FunctionParameterMode::FuncParamTable => tokens.push(TokenProperty::from(Token::Table)),
-                FunctionParameterMode::FuncParamDefault => {}, // do nothing
+                protobuf::FunctionParameterMode::FuncParamIn => tokens.push(TokenProperty::from(Token::InP)),
+                protobuf::FunctionParameterMode::FuncParamOut => tokens.push(TokenProperty::from(Token::OutP)),
+                protobuf::FunctionParameterMode::FuncParamInout => tokens.push(TokenProperty::from(Token::Inout)),
+                protobuf::FunctionParameterMode::FuncParamVariadic => tokens.push(TokenProperty::from(Token::Variadic)),
+                // protobuf::FunctionParameterMode::FuncParamTable => tokens.push(TokenProperty::from(Token::Table)),
+                protobuf::FunctionParameterMode::FuncParamDefault => {}, // do nothing
                 _ => panic!("Unknown FunctionParameter {:#?}", n.mode()),
             };
             if n.defexpr.is_some() {
@@ -514,16 +514,16 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::Function));
             }
             match n.context() {
-                CoercionContext::CoercionImplicit => {
+                protobuf::CoercionContext::CoercionImplicit => {
                     tokens.push(TokenProperty::from(Token::As));
                     tokens.push(TokenProperty::from(Token::ImplicitP));
                 },
-                CoercionContext::CoercionAssignment => {
+                protobuf::CoercionContext::CoercionAssignment => {
                     tokens.push(TokenProperty::from(Token::As));
                     tokens.push(TokenProperty::from(Token::Assignment));
                 },
-                CoercionContext::CoercionPlpgsql => {},
-                CoercionContext::CoercionExplicit => {},
+                protobuf::CoercionContext::CoercionPlpgsql => {},
+                protobuf::CoercionContext::CoercionExplicit => {},
                 _ => panic!("Unknown CreateCastStmt {:#?}", n.context())
             }
         },

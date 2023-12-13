@@ -19,24 +19,7 @@ pub fn parser_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     quote! {
         use std::collections::VecDeque;
         use log::{debug};
-        use pg_query::{
-            NodeEnum,
-            NodeRef,
-            protobuf::ScanToken,
-            protobuf::Token,
-            protobuf::SortByDir,
-            protobuf::BoolExprType,
-            protobuf::JoinType,
-            protobuf::DefElemAction,
-            protobuf::AExprKind,
-            protobuf::SqlValueFunctionOp,
-            protobuf::AlterTableType,
-            protobuf::VariableSetKind,
-            protobuf::ConstrType,
-            protobuf::NullTestType,
-            protobuf::FunctionParameterMode,
-            protobuf::CoercionContext,
-        };
+        use pg_query::{protobuf, protobuf::ScanToken, protobuf::Token, NodeEnum, NodeRef};
         use cstree::text::{TextRange, TextSize};
         use cstree::Syntax;
         use std::cmp::{min, Ordering};
