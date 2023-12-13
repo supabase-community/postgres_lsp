@@ -534,23 +534,25 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::Replace));
             }
             match n.kind() {
-                protobuf::ObjectType::ObjectAggregate => tokens.push(TokenProperty::from(Token::Aggregate)),
-                _ => todo!("Unknown DefineStmt {:#?}", n.kind())
-            }
-            if let Some(node) = &n.args[0].node {
-                if let NodeEnum::List(n) = node {
-                    if n.items.len() == 2 {
-                        tokens.push(TokenProperty::from(Token::Order));
-                        tokens.push(TokenProperty::from(Token::By));
-                        tokens.push(TokenProperty::from(Token::Ident));
+                protobuf::ObjectType::ObjectAggregate => {
+                    tokens.push(TokenProperty::from(Token::Aggregate));
+                    if let Some(node) = &n.args[0].node {
+                        if let NodeEnum::List(n) = node {
+                            if n.items.len() == 2 {
+                                tokens.push(TokenProperty::from(Token::Order));
+                                tokens.push(TokenProperty::from(Token::By));
+                                tokens.push(TokenProperty::from(Token::Ident));
+                                tokens.push(TokenProperty::from(Token::Ident));
+                            }
+                        }
+                    } else {
+                        tokens.push(TokenProperty::from(Token::Ascii42));
+                    }
+                    if n.definition.len() > 0 {
                         tokens.push(TokenProperty::from(Token::Ident));
                     }
-                }
-            } else {
-                tokens.push(TokenProperty::from(Token::Ascii42));
-            }
-            if n.definition.len() > 0 {
-                tokens.push(TokenProperty::from(Token::Ident));
+                },
+                _ => todo!("Unknown DefineStmt {:#?}", n.kind())
             }
         },
         _ => quote! {},
