@@ -186,6 +186,8 @@ mod tests {
             SyntaxKind::DefineStmt,
             vec![
                 TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Or),
+                TokenProperty::from(SyntaxKind::Replace),
                 TokenProperty::from(SyntaxKind::Aggregate),
                 TokenProperty::from(SyntaxKind::Order),
                 TokenProperty::from(SyntaxKind::By),

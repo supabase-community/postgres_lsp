@@ -529,6 +529,10 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "DefineStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
+            if n.replace {
+                tokens.push(TokenProperty::from(Token::Or));
+                tokens.push(TokenProperty::from(Token::Replace));
+            }
             match n.kind() {
                 protobuf::ObjectType::ObjectAggregate => tokens.push(TokenProperty::from(Token::Aggregate)),
                 _ => todo!("Unknown DefineStmt {:#?}", n.kind())
