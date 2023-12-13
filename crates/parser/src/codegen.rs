@@ -66,10 +66,9 @@ mod tests {
 
         debug!("selected node: {:#?}", node_graph[node_index]);
 
-        assert!(node_graph[node_index]
-            .properties
-            .iter()
-            .all(|p| { expected.contains(p) }));
+        // note: even though we test for strict equality of the two vectors the order
+        // of the properties does not have to match the order of the tokens in the string
+        assert_eq!(node_graph[node_index].properties, expected);
         assert_eq!(node_graph[node_index].properties.len(), expected.len());
     }
 
@@ -137,6 +136,23 @@ mod tests {
                 TokenProperty::from(SyntaxKind::Or),
                 TokenProperty::from(SyntaxKind::Replace),
                 TokenProperty::from(SyntaxKind::Temporary),
+            ],
+        )
+    }
+
+    #[test]
+    fn test_create_enum() {
+        test_get_node_properties(
+            "create type status as enum ('open', 'closed');",
+            SyntaxKind::CreateEnumStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::TypeP),
+                TokenProperty::from(SyntaxKind::As),
+                TokenProperty::from(SyntaxKind::EnumP),
+                TokenProperty::from("status".to_string()),
+                TokenProperty::from("open".to_string()),
+                TokenProperty::from("closed".to_string()),
             ],
         )
     }

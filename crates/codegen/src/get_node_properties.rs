@@ -559,6 +559,12 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::Authorization));
             }
         },
+        "CreateEnumStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::TypeP));
+            tokens.push(TokenProperty::from(Token::As));
+            tokens.push(TokenProperty::from(Token::EnumP));
+        },
         _ => quote! {},
     }
 }
