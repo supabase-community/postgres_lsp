@@ -700,6 +700,10 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::Create));
             tokens.push(TokenProperty::from(Token::Database));
         },
+        "CreateExtensionStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::Extension));
+        },
         _ => quote! {},
     }
 }
