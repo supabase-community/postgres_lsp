@@ -224,4 +224,19 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_procedure() {
+        test_get_node_properties(
+            "create procedure insert_data(a integer)
+                language sql
+                as $$insert into tbl values (a);$$;",
+            SyntaxKind::CreateFunctionStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Procedure),
+                TokenProperty::from("insert_data".to_string()),
+            ],
+        )
+    }
 }
