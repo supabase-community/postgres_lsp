@@ -703,10 +703,27 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "CreatePublicationStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
             tokens.push(TokenProperty::from(Token::Publication));
-            tokens.push(TokenProperty::from(Token::For));
-            tokens.push(TokenProperty::from(Token::Tables));
-            tokens.push(TokenProperty::from(Token::InP));
-            tokens.push(TokenProperty::from(Token::Schema));
+            if n.for_all_tables {
+                tokens.push(TokenProperty::from(Token::For));
+                tokens.push(TokenProperty::from(Token::All));
+                tokens.push(TokenProperty::from(Token::Tables));
+            }
+            if let Some(n) = n.pubobjects.first() {
+                tokens.push(TokenProperty::from(Token::For));
+                if let Some(NodeEnum::PublicationObjSpec(n)) = &n.node {
+                    match n.pubobjtype() {
+                        protobuf::PublicationObjSpecType::PublicationobjTable => {
+                            tokens.push(TokenProperty::from(Token::Table));
+                        },
+                        protobuf::PublicationObjSpecType::PublicationobjTablesInSchema => {
+                            tokens.push(TokenProperty::from(Token::Tables));
+                            tokens.push(TokenProperty::from(Token::InP));
+                            tokens.push(TokenProperty::from(Token::Schema));
+                        },
+                        _ => panic!("Unknown CreatePublicationStmt {:#?}", n.pubobjtype())
+                    }
+                }
+            }
         },
         _ => quote! {},
     }
