@@ -668,6 +668,17 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 _ => panic!("Unknown IndexElem {:#?}", n.nulls_ordering()),
             }
         },
+        "CreateTableSpaceStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::Tablespace));
+            tokens.push(TokenProperty::from(Token::Location));
+            if n.owner.is_some() {
+                tokens.push(TokenProperty::from(Token::Owner));
+            }
+            if n.options.len() > 0 {
+                tokens.push(TokenProperty::from(Token::With));
+            }
+        },
         _ => quote! {},
     }
 }

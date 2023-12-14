@@ -239,4 +239,21 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_tablespace() {
+        test_get_node_properties(
+            "create tablespace x owner a location 'b' with (seq_page_cost=3);",
+            SyntaxKind::CreateTableSpaceStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Tablespace),
+                TokenProperty::from(SyntaxKind::Location),
+                TokenProperty::from(SyntaxKind::Owner),
+                TokenProperty::from(SyntaxKind::With),
+                TokenProperty::from("x".to_string()),
+                TokenProperty::from("b".to_string()),
+            ],
+        )
+    }
 }
