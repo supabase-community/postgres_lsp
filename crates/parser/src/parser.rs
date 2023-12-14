@@ -343,6 +343,21 @@ mod tests {
     }
 
     #[test]
+    fn test_nested_substatements() {
+        init();
+
+        let input = "select is ((select true), true);\nselect isnt ((select false), true);";
+
+        let mut p = Parser::new(lex(input));
+        source(&mut p);
+        let result = p.finish();
+
+        dbg!(&result.cst);
+        assert_eq!(result.stmts.len(), 2);
+        println!("{:#?}", result.errors);
+    }
+
+    #[test]
     fn test_parser_simple() {
         init();
 
