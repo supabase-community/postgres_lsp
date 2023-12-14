@@ -94,6 +94,21 @@ mod tests {
         }
     }
 
+    proptest! {
+        #[test]
+        fn test_select_with_where(table_name in "ab?c?d?", condition in "<|>|=|<>|!=", n in 0..100i32) {
+            test_get_node_properties(
+                &format!("select * from {} where id {} {};", table_name, condition, n),
+                SyntaxKind::SelectStmt,
+                vec![
+                    TokenProperty::from(SyntaxKind::Select),
+                    TokenProperty::from(SyntaxKind::From),
+                    TokenProperty::from(SyntaxKind::Where),
+                ],
+            )
+        }
+    }
+
     #[test]
     fn test_create_domain() {
         test_get_node_properties(
