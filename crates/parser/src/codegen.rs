@@ -173,4 +173,19 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_range() {
+        test_get_node_properties(
+            "create type type1 as range (subtype = int4);",
+            SyntaxKind::CreateRangeStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::TypeP),
+                TokenProperty::from(SyntaxKind::As),
+                TokenProperty::from(SyntaxKind::Range),
+                TokenProperty::from("type1".to_string()),
+            ],
+        )
+    }
 }
