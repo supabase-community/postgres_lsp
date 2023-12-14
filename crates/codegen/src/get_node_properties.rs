@@ -391,8 +391,15 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 }
             }
             match n.with_check_option() {
+                protobuf::ViewCheckOption::LocalCheckOption => {
+                    tokens.push(TokenProperty::from(Token::With));
+                    tokens.push(TokenProperty::from(Token::Local));
+                    tokens.push(TokenProperty::from(Token::Check));
+                    tokens.push(TokenProperty::from(Token::Option));
+                },
                 protobuf::ViewCheckOption::CascadedCheckOption => {
                     tokens.push(TokenProperty::from(Token::With));
+                    tokens.push(TokenProperty::from(Token::Cascaded));
                     tokens.push(TokenProperty::from(Token::Check));
                     tokens.push(TokenProperty::from(Token::Option));
                 },
