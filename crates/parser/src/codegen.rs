@@ -281,4 +281,21 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_publication() {
+        test_get_node_properties(
+            "create publication sales_publication for tables in schema marketing;",
+            SyntaxKind::CreatePublicationStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Publication),
+                TokenProperty::from(SyntaxKind::For),
+                TokenProperty::from(SyntaxKind::Tables),
+                TokenProperty::from(SyntaxKind::InP),
+                TokenProperty::from(SyntaxKind::Schema),
+                TokenProperty::from("sales_publication".to_string()),
+            ],
+        )
+    }
 }
