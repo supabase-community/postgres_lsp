@@ -188,4 +188,20 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_index() {
+        test_get_node_properties(
+            "create unique index title_idx on films (title);",
+            SyntaxKind::IndexStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Unique),
+                TokenProperty::from(SyntaxKind::Index),
+                TokenProperty::from(SyntaxKind::On),
+                TokenProperty::from("title_idx".to_string()),
+                TokenProperty::from("btree".to_string()),
+            ],
+        )
+    }
 }
