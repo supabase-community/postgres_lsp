@@ -188,4 +188,23 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_function() {
+        test_get_node_properties(
+            r#"create function getfoo(int)
+                returns setof users
+                language sql
+                as $$select * from "users" where users.id = $1;$$;
+            "#,
+            SyntaxKind::CreateFunctionStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Function),
+                TokenProperty::from(SyntaxKind::Returns),
+                TokenProperty::from(SyntaxKind::Setof),
+                TokenProperty::from("getfoo".to_string()),
+            ],
+        )
+    }
 }
