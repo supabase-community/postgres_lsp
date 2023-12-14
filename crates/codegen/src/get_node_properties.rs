@@ -527,6 +527,12 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 _ => panic!("Unknown CreateCastStmt {:#?}", n.context())
             }
         },
+        "CreateRangeStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::TypeP));
+            tokens.push(TokenProperty::from(Token::As));
+            tokens.push(TokenProperty::from(Token::Range));
+        },
         _ => quote! {},
     }
 }
