@@ -52,6 +52,7 @@ impl<'p> LibpgQueryNodeParser<'p> {
     ) -> LibpgQueryNodeParser<'p> {
         let current_depth = parser.depth.clone();
         debug!("Parsing node {:#?}", node);
+        println!("Parsing node {:#?}", node);
         Self {
             parser,
             token_range,

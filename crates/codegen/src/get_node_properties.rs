@@ -481,6 +481,48 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::As));
             }
         },
+        "DefineStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            if n.replace {
+                tokens.push(TokenProperty::from(Token::Or));
+                tokens.push(TokenProperty::from(Token::Replace));
+            }
+            match n.kind() {
+                protobuf::ObjectType::ObjectAggregate => {
+                    tokens.push(TokenProperty::from(Token::Aggregate));
+
+                    // n.args is always an array with two nodes
+                    assert_eq!(n.args.len(), 2, "DefineStmt of type ObjectAggregate does not have exactly 2 args");
+                    // the first is either a List or a Node { node: None }
+
+                    if let Some(node) = &n.args.first() {
+                        if node.node.is_none() {
+                            // if first element is a Node { node: None }, then it's "*"
+                            tokens.push(TokenProperty::from(Token::Ascii42));
+                        } else if let Some(node) = &node.node {
+                            if let NodeEnum::List(_) = node {
+                                // there *seems* to be an integer node in the last position of args that
+                                // defines whether the list contains an order by statement
+                                let integer = n.args.last()
+                                    .and_then(|node| node.node.as_ref())
+                                    .and_then(|node| if let NodeEnum::Integer(n) = node { Some(n.ival) } else { None });
+                                if integer.is_none() {
+                                    panic!("DefineStmt of type ObjectAggregate has no integer node in last position of args");
+                                }
+                                // if the integer is 1, then there is an order by statement
+                                // BUT: the order by tokens should be part of the List or maybe
+                                // even the last FunctionParameter node in the list
+                                if integer.unwrap() == 1 {
+                                    tokens.push(TokenProperty::from(Token::Order));
+                                    tokens.push(TokenProperty::from(Token::By));
+                                }
+                            }
+                        }
+                    }
+                },
+                _ => panic!("Unknown DefineStmt {:#?}", n.kind()),
+            }
+        },
         "CreateSchemaStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
             tokens.push(TokenProperty::from(Token::Schema));
