@@ -199,6 +199,7 @@ mod tests {
                 TokenProperty::from(SyntaxKind::Unique),
                 TokenProperty::from(SyntaxKind::Index),
                 TokenProperty::from(SyntaxKind::On),
+                TokenProperty::from(SyntaxKind::Using),
                 TokenProperty::from("title_idx".to_string()),
                 TokenProperty::from("btree".to_string()),
             ],

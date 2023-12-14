@@ -560,7 +560,7 @@ fn custom_handlers(node: &Node) -> TokenStream {
             }
             tokens.push(TokenProperty::from(Token::On));
             // access_method is btree by default
-            if n.access_method != "btree" {
+            if n.access_method.len() > 0 {
                 tokens.push(TokenProperty::from(Token::Using));
             }
             if n.index_including_params.len() > 0 {
@@ -570,7 +570,7 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::With));
             }
             // table_space is an empty string by default
-            if !n.table_space.is_empty() {
+            if n.table_space.len() > 0 {
                 tokens.push(TokenProperty::from(Token::Tablespace));
             }
         },
