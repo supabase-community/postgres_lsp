@@ -544,6 +544,53 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::As));
             tokens.push(TokenProperty::from(Token::Range));
         },
+        "IndexStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            if n.unique {
+                tokens.push(TokenProperty::from(Token::Unique));
+            }
+            tokens.push(TokenProperty::from(Token::Index));
+            if n.concurrent {
+                tokens.push(TokenProperty::from(Token::Concurrently));
+            }
+            if n.if_not_exists {
+                tokens.push(TokenProperty::from(Token::IfP));
+                tokens.push(TokenProperty::from(Token::Not));
+                tokens.push(TokenProperty::from(Token::Exists));
+            }
+            tokens.push(TokenProperty::from(Token::On));
+            // access_method is btree by default
+            if n.access_method.len() > 0 {
+                tokens.push(TokenProperty::from(Token::Using));
+            }
+            if n.index_including_params.len() > 0 {
+                tokens.push(TokenProperty::from(Token::Include));
+            }
+            if n.options.len() > 0 {
+                tokens.push(TokenProperty::from(Token::With));
+            }
+            // table_space is an empty string by default
+            if n.table_space.len() > 0 {
+                tokens.push(TokenProperty::from(Token::Tablespace));
+            }
+        },
+        "IndexElem" => quote! {
+            if n.collation.len() > 0 {
+                tokens.push(TokenProperty::from(Token::Collate));
+            }
+            match n.nulls_ordering() {
+                protobuf::SortByNulls::SortbyNullsDefault => {},
+                protobuf::SortByNulls::SortbyNullsFirst => {
+                    tokens.push(TokenProperty::from(Token::NullsP));
+                    tokens.push(TokenProperty::from(Token::FirstP));
+                },
+                protobuf::SortByNulls::SortbyNullsLast => {
+                    tokens.push(TokenProperty::from(Token::NullsP));
+                    tokens.push(TokenProperty::from(Token::LastP));
+                },
+                _ => panic!("Unknown IndexElem {:#?}", n.nulls_ordering()),
+            }
+        },
         _ => quote! {},
     }
 }
