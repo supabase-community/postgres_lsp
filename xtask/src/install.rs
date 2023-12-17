@@ -27,7 +27,13 @@ pub(crate) struct ClientOpt {
     pub(crate) code_bin: Option<String>,
 }
 
-const VS_CODES: &[&str] = &["code", "code-exploration", "code-insiders", "codium", "code-oss"];
+const VS_CODES: &[&str] = &[
+    "code",
+    "code-exploration",
+    "code-insiders",
+    "codium",
+    "code-oss",
+];
 
 fn fix_path_for_mac(sh: &Shell) -> anyhow::Result<()> {
     let mut vscode_path: Vec<PathBuf> = {
@@ -47,7 +53,9 @@ fn fix_path_for_mac(sh: &Shell) -> anyhow::Result<()> {
     };
 
     if !vscode_path.is_empty() {
-        let vars = sh.var_os("PATH").context("Could not get PATH variable from env.")?;
+        let vars = sh
+            .var_os("PATH")
+            .context("Could not get PATH variable from env.")?;
 
         let mut paths = env::split_paths(&vars).collect::<Vec<_>>();
         paths.append(&mut vscode_path);
@@ -63,7 +71,9 @@ fn install_client(sh: &Shell, client_opt: ClientOpt) -> anyhow::Result<()> {
 
     // Package extension.
     if cfg!(unix) {
-        cmd!(sh, "npm --version").run().context("`npm` is required to build the VS Code plugin")?;
+        cmd!(sh, "npm --version")
+            .run()
+            .context("`npm` is required to build the VS Code plugin")?;
         cmd!(sh, "npm ci").run()?;
 
         cmd!(sh, "npm run package --scripts-prepend-node-path").run()?;
@@ -96,7 +106,10 @@ fn install_client(sh: &Shell, client_opt: ClientOpt) -> anyhow::Result<()> {
             }
         })
         .ok_or_else(|| {
-            format_err!("Can't execute `{} --version`. Perhaps it is not in $PATH?", candidates[0])
+            format_err!(
+                "Can't execute `{} --version`. Perhaps it is not in $PATH?",
+                candidates[0]
+            )
         })?;
 
     // Install & verify.
@@ -104,7 +117,11 @@ fn install_client(sh: &Shell, client_opt: ClientOpt) -> anyhow::Result<()> {
         cmd!(sh, "{code} --install-extension postgres_lsp.vsix --force").run()?;
         cmd!(sh, "{code} --list-extensions").read()?
     } else {
-        cmd!(sh, "cmd.exe /c {code}.cmd --install-extension postgres_lsp.vsix --force").run()?;
+        cmd!(
+            sh,
+            "cmd.exe /c {code}.cmd --install-extension postgres_lsp.vsix --force"
+        )
+        .run()?;
         cmd!(sh, "cmd.exe /c {code}.cmd --list-extensions").read()?
     };
 
@@ -120,7 +137,10 @@ fn install_client(sh: &Shell, client_opt: ClientOpt) -> anyhow::Result<()> {
 }
 
 fn install_server(sh: &Shell) -> anyhow::Result<()> {
-    let cmd = cmd!(sh, "cargo install --path crates/postgres_lsp --locked --force");
+    let cmd = cmd!(
+        sh,
+        "cargo install --path crates/postgres_lsp --locked --force"
+    );
     cmd.run()?;
     Ok(())
 }

@@ -13,6 +13,9 @@ runs:
   using: composite
   steps:
     - name: 🏗 Setup Toolchain
-      uses: actions-rs/toolchain@v1
+      uses: dtolnay/rust-toolchain@master
       with:
         toolchain: ${{ inputs.toolchain }}
+
+    - name: 🔒 Cache
+      uses: swatinem/rust-cache@v2

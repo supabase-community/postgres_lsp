@@ -70,6 +70,8 @@ impl Install {
         if !self.client && self.server {
             return None;
         }
-        Some(ClientOpt { code_bin: self.code_bin.clone() })
+        Some(ClientOpt {
+            code_bin: self.code_bin.clone(),
+        })
     }
 }

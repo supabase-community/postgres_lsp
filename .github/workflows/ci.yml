@@ -8,6 +8,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  RUSTFLAGS: --deny warnings
+
 jobs:
   ci:
     name: CI
@@ -27,8 +30,12 @@ jobs:
 
       - name: 📦 Build
         id: build
-        run: cargo +nightly build
+        run: cargo build
+
+      - name: ⚡️ Check
+        id: check
+        run: cargo check
 
       - name: 🦺 Test
         id: test
-        run: cargo +nightly test
+        run: cargo test
