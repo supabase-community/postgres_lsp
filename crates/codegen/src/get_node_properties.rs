@@ -456,8 +456,31 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::Or));
                 tokens.push(TokenProperty::from(Token::Replace));
             }
-            if n.return_type.is_some() {
+            if let Some(return_type) = &n.return_type {
                 tokens.push(TokenProperty::from(Token::Returns));
+                if return_type.setof {
+                    tokens.push(TokenProperty::from(Token::Setof));
+                }
+            }
+            for option in &n.options {
+                if let Some(NodeEnum::DefElem(node)) = &option.node {
+                    if node.defname == "strict" {
+                        if let Some(NodeEnum::Boolean(node)) =
+                            node.arg.as_ref().and_then(|arg| arg.node.as_ref())
+                        {
+                            if node.boolval {
+                                tokens.push(TokenProperty::from(Token::NullP));
+                                tokens.push(TokenProperty::from(Token::On));
+                                tokens.push(TokenProperty::from(Token::NullP));
+                                tokens.push(TokenProperty::from(Token::InputP));
+                            } else {
+                                tokens.push(TokenProperty::from(Token::On));
+                                tokens.push(TokenProperty::from(Token::NullP));
+                                tokens.push(TokenProperty::from(Token::InputP));
+                            }
+                        }
+                    }
+                }
             }
         },
         "FunctionParameter" => quote! {
