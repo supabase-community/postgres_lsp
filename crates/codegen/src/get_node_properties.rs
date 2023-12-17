@@ -127,7 +127,7 @@ pub fn get_node_properties_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStre
             }
         }
 
-        pub fn get_node_properties(node: &NodeEnum) -> Vec<TokenProperty> {
+        pub fn get_node_properties(node: &NodeEnum, parent: Option<&NodeEnum>) -> Vec<TokenProperty> {
             let mut tokens: Vec<TokenProperty> = Vec::new();
 
             match node {
@@ -513,6 +513,56 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::DomainP));
             if n.type_name.is_some() {
                 tokens.push(TokenProperty::from(Token::As));
+            }
+        },
+        "List" => quote! {
+            if parent.is_some() {
+                // if parent is `DefineStmt`, we need to check whether an ORDER BY needs to be added
+                if let NodeEnum::DefineStmt(define_stmt) = parent.unwrap() {
+                    // there *seems* to be an integer node in the last position of the DefineStmt args that
+                    // defines whether the list contains an order by statement
+                    let integer = define_stmt.args.last()
+                        .and_then(|node| node.node.as_ref())
+                        .and_then(|node| if let NodeEnum::Integer(n) = node { Some(n.ival) } else { None });
+                    if integer.is_none() {
+                        panic!("DefineStmt of type ObjectAggregate has no integer node in last position of args");
+                    }
+                    // if the integer is 1, then there is an order by statement
+                    // we add it to the `List` node because that seems to make most sense based off the grammar definition
+                    // ref: https://github.com/postgres/postgres/blob/REL_15_STABLE/src/backend/parser/gram.y#L8355
+                    // ```
+                    //  aggr_args:
+                    //    | '(' aggr_args_list ORDER BY aggr_args_list ')'
+                    // ```
+                    if integer.unwrap() == 1 {
+                        tokens.push(TokenProperty::from(Token::Order));
+                        tokens.push(TokenProperty::from(Token::By));
+                    }
+                }
+            }
+        },
+        "DefineStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            if n.replace {
+                tokens.push(TokenProperty::from(Token::Or));
+                tokens.push(TokenProperty::from(Token::Replace));
+            }
+            match n.kind() {
+                protobuf::ObjectType::ObjectAggregate => {
+                    tokens.push(TokenProperty::from(Token::Aggregate));
+
+                    // n.args is always an array with two nodes
+                    assert_eq!(n.args.len(), 2, "DefineStmt of type ObjectAggregate does not have exactly 2 args");
+                    // the first is either a List or a Node { node: None }
+
+                    if let Some(node) = &n.args.first() {
+                        if node.node.is_none() {
+                            // if first element is a Node { node: None }, then it's "*"
+                            tokens.push(TokenProperty::from(Token::Ascii42));
+                        }                     }
+                        // if its a list, we handle it in the handler for `List`
+                },
+                _ => panic!("Unknown DefineStmt {:#?}", n.kind()),
             }
         },
         "CreateSchemaStmt" => quote! {

@@ -25,7 +25,7 @@ pub fn get_nodes_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
             let root_node_idx = g.add_node(Node {
                 kind: SyntaxKind::from(node),
                 depth: at_depth,
-                properties: get_node_properties(node),
+                properties: get_node_properties(node, None),
                 location: get_location(node),
             });
 
@@ -45,12 +45,12 @@ pub fn get_nodes_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
                         NodeEnum::BitString(n) => true,
                         _ => false
                     } {
-                        g[parent_idx].properties.extend(get_node_properties(&c));
+                        g[parent_idx].properties.extend(get_node_properties(&c, Some(&node)));
                     } else {
                         let node_idx = g.add_node(Node {
                             kind: SyntaxKind::from(&c),
                             depth: current_depth,
-                            properties: get_node_properties(&c),
+                            properties: get_node_properties(&c, Some(&node)),
                             location: get_location(&c),
                         });
                         g.add_edge(parent_idx, node_idx, ());
