@@ -84,7 +84,7 @@ lsp.configure("postgres_lsp", {force_setup = true})
 
 ### Building from source
 
-You'll need Cargo, Node, and npm installed.
+You'll need *nightly* Cargo, Node, and npm installed.
 
 Install the `libpg_query` submodule by running:
 
