@@ -1,0 +1,248 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE PROCEDURE insert_data(a integer, b integer) LANGUAGE SQL BEGIN ATOMIC INSERT INTO tbl VALUES (a); INSERT INTO tbl VALUES (b); END;"
+---
+Parse {
+    cst: SourceFile@0..135
+      Newline@0..1 "\n"
+      Create@1..7 "CREATE"
+      Whitespace@7..8 " "
+      Procedure@8..17 "PROCEDURE"
+      Whitespace@17..18 " "
+      Ident@18..29 "insert_data"
+      Ascii40@29..30 "("
+      Ident@30..31 "a"
+      Whitespace@31..32 " "
+      Integer@32..39 "integer"
+      Ascii44@39..40 ","
+      Whitespace@40..41 " "
+      Ident@41..42 "b"
+      Whitespace@42..43 " "
+      Integer@43..50 "integer"
+      Ascii41@50..51 ")"
+      Whitespace@51..52 " "
+      Language@52..60 "LANGUAGE"
+      Whitespace@60..61 " "
+      SqlP@61..64 "SQL"
+      BeginP@64..69 "BEGIN"
+      Whitespace@69..70 " "
+      Atomic@70..76 "ATOMIC"
+      InsertStmt@76..103
+        Insert@76..82 "INSERT"
+        Whitespace@82..83 " "
+        Into@83..87 "INTO"
+        Whitespace@87..88 " "
+        RangeVar@88..91
+          Ident@88..91 "tbl"
+        Whitespace@91..92 " "
+        SelectStmt@92..101
+          Values@92..98 "VALUES"
+          Whitespace@98..99 " "
+          Ascii40@99..100 "("
+          List@100..101
+            ColumnRef@100..101
+              Ident@100..101 "a"
+        Ascii41@101..102 ")"
+        Ascii59@102..103 ";"
+      InsertStmt@103..130
+        Insert@103..109 "INSERT"
+        Whitespace@109..110 " "
+        Into@110..114 "INTO"
+        Whitespace@114..115 " "
+        RangeVar@115..118
+          Ident@115..118 "tbl"
+        Whitespace@118..119 " "
+        SelectStmt@119..128
+          Values@119..125 "VALUES"
+          Whitespace@125..126 " "
+          Ascii40@126..127 "("
+          List@127..128
+            ColumnRef@127..128
+              Ident@127..128 "b"
+        Ascii41@128..129 ")"
+        Ascii59@129..130 ";"
+      Whitespace@130..131 " "
+      EndP@131..134 "END"
+      Ascii59@134..135 ";"
+    ,
+    errors: [
+        SyntaxError(
+            "Expected Ascii59, found Whitespace",
+            77..77,
+        ),
+        SyntaxError(
+            "Invalid statement: syntax error at or near \"ATOMIC\"",
+            21..24,
+        ),
+    ],
+    stmts: [
+        RawStmt {
+            stmt: InsertStmt(
+                InsertStmt {
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "tbl",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 12,
+                        },
+                    ),
+                    cols: [],
+                    select_stmt: Some(
+                        Node {
+                            node: Some(
+                                SelectStmt(
+                                    SelectStmt {
+                                        distinct_clause: [],
+                                        into_clause: None,
+                                        target_list: [],
+                                        from_clause: [],
+                                        where_clause: None,
+                                        group_clause: [],
+                                        group_distinct: false,
+                                        having_clause: None,
+                                        window_clause: [],
+                                        values_lists: [
+                                            Node {
+                                                node: Some(
+                                                    List(
+                                                        List {
+                                                            items: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        ColumnRef(
+                                                                            ColumnRef {
+                                                                                fields: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            String(
+                                                                                                String {
+                                                                                                    sval: "a",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                location: 24,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        sort_clause: [],
+                                        limit_offset: None,
+                                        limit_count: None,
+                                        limit_option: Default,
+                                        locking_clause: [],
+                                        with_clause: None,
+                                        op: SetopNone,
+                                        all: false,
+                                        larg: None,
+                                        rarg: None,
+                                    },
+                                ),
+                            ),
+                        },
+                    ),
+                    on_conflict_clause: None,
+                    returning_list: [],
+                    with_clause: None,
+                    r#override: OverridingNotSet,
+                },
+            ),
+            range: 77..105,
+        },
+        RawStmt {
+            stmt: InsertStmt(
+                InsertStmt {
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "tbl",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 12,
+                        },
+                    ),
+                    cols: [],
+                    select_stmt: Some(
+                        Node {
+                            node: Some(
+                                SelectStmt(
+                                    SelectStmt {
+                                        distinct_clause: [],
+                                        into_clause: None,
+                                        target_list: [],
+                                        from_clause: [],
+                                        where_clause: None,
+                                        group_clause: [],
+                                        group_distinct: false,
+                                        having_clause: None,
+                                        window_clause: [],
+                                        values_lists: [
+                                            Node {
+                                                node: Some(
+                                                    List(
+                                                        List {
+                                                            items: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        ColumnRef(
+                                                                            ColumnRef {
+                                                                                fields: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            String(
+                                                                                                String {
+                                                                                                    sval: "b",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                location: 24,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        sort_clause: [],
+                                        limit_offset: None,
+                                        limit_count: None,
+                                        limit_option: Default,
+                                        locking_clause: [],
+                                        with_clause: None,
+                                        op: SetopNone,
+                                        all: false,
+                                        larg: None,
+                                        rarg: None,
+                                    },
+                                ),
+                            ),
+                        },
+                    ),
+                    on_conflict_clause: None,
+                    returning_list: [],
+                    with_clause: None,
+                    r#override: OverridingNotSet,
+                },
+            ),
+            range: 105..133,
+        },
+    ],
+}

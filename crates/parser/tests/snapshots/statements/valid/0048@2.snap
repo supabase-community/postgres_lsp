@@ -1,0 +1,107 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE TABLESPACE x OWNER a LOCATION 'b' WITH (random_page_cost=42, seq_page_cost=3);"
+---
+Parse {
+    cst: SourceFile@0..86
+      Newline@0..1 "\n"
+      CreateTableSpaceStmt@1..86
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Tablespace@8..18 "TABLESPACE"
+        Whitespace@18..19 " "
+        Ident@19..20 "x"
+        Whitespace@20..21 " "
+        Owner@21..26 "OWNER"
+        Whitespace@26..27 " "
+        RoleSpec@27..28
+          Ident@27..28 "a"
+        Whitespace@28..29 " "
+        Location@29..37 "LOCATION"
+        Whitespace@37..38 " "
+        Sconst@38..41 "'b'"
+        Whitespace@41..42 " "
+        With@42..46 "WITH"
+        Whitespace@46..47 " "
+        Ascii40@47..48 "("
+        DefElem@48..67
+          Ident@48..64 "random_page_cost"
+          Ascii61@64..65 "="
+          Iconst@65..67 "42"
+        Ascii44@67..68 ","
+        Whitespace@68..69 " "
+        DefElem@69..84
+          Ident@69..82 "seq_page_cost"
+          Ascii61@82..83 "="
+          Iconst@83..84 "3"
+        Ascii41@84..85 ")"
+        Ascii59@85..86 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateTableSpaceStmt(
+                CreateTableSpaceStmt {
+                    tablespacename: "x",
+                    owner: Some(
+                        RoleSpec {
+                            roletype: RolespecCstring,
+                            rolename: "a",
+                            location: 26,
+                        },
+                    ),
+                    location: "b",
+                    options: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "random_page_cost",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    Integer(
+                                                        Integer {
+                                                            ival: 42,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 47,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "seq_page_cost",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    Integer(
+                                                        Integer {
+                                                            ival: 3,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 68,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                },
+            ),
+            range: 0..85,
+        },
+    ],
+}
