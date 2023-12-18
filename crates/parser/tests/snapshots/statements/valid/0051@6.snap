@@ -1,0 +1,91 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE INDEX title_idx_nulls_low ON films (title NULLS FIRST);"
+---
+Parse {
+    cst: SourceFile@0..63
+      Newline@0..1 "\n"
+      IndexStmt@1..63
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Index@8..13 "INDEX"
+        Whitespace@13..14 " "
+        Ident@14..33 "title_idx_nulls_low"
+        Whitespace@33..34 " "
+        On@34..36 "ON"
+        Whitespace@36..37 " "
+        RangeVar@37..42
+          Ident@37..42 "films"
+        Whitespace@42..43 " "
+        Ascii40@43..44 "("
+        IndexElem@44..61
+          Ident@44..49 "title"
+          Whitespace@49..50 " "
+          NullsP@50..55 "NULLS"
+          Whitespace@55..56 " "
+          FirstP@56..61 "FIRST"
+        Ascii41@61..62 ")"
+        Ascii59@62..63 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: IndexStmt(
+                IndexStmt {
+                    idxname: "title_idx_nulls_low",
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "films",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 36,
+                        },
+                    ),
+                    access_method: "btree",
+                    table_space: "",
+                    index_params: [
+                        Node {
+                            node: Some(
+                                IndexElem(
+                                    IndexElem {
+                                        name: "title",
+                                        expr: None,
+                                        indexcolname: "",
+                                        collation: [],
+                                        opclass: [],
+                                        opclassopts: [],
+                                        ordering: SortbyDefault,
+                                        nulls_ordering: SortbyNullsFirst,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    index_including_params: [],
+                    options: [],
+                    where_clause: None,
+                    exclude_op_names: [],
+                    idxcomment: "",
+                    index_oid: 0,
+                    old_node: 0,
+                    old_create_subid: 0,
+                    old_first_relfilenode_subid: 0,
+                    unique: false,
+                    nulls_not_distinct: false,
+                    primary: false,
+                    isconstraint: false,
+                    deferrable: false,
+                    initdeferred: false,
+                    transformed: false,
+                    concurrent: false,
+                    if_not_exists: false,
+                    reset_default_tblspc: false,
+                },
+            ),
+            range: 0..62,
+        },
+    ],
+}

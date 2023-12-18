@@ -1,0 +1,44 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "GRANT SELECT (col1), UPDATE (col1) ON mytable TO miriam_rw;"
+---
+Parse {
+    cst: SourceFile@0..57
+      Grant@0..5 "GRANT"
+      Select@5..11 "SELECT"
+      Whitespace@11..12 " "
+      Ascii40@12..13 "("
+      Ident@13..17 "col1"
+      Ascii41@17..18 ")"
+      Ascii44@18..19 ","
+      Update@19..25 "UPDATE"
+      Whitespace@25..26 " "
+      Ascii40@26..27 "("
+      Ident@27..31 "col1"
+      Ascii41@31..32 ")"
+      Whitespace@32..33 " "
+      On@33..35 "ON"
+      Whitespace@35..36 " "
+      Ident@36..43 "mytable"
+      Whitespace@43..44 " "
+      To@44..46 "TO"
+      Whitespace@46..47 " "
+      Ident@47..56 "miriam_rw"
+      Ascii59@56..57 ";"
+    ,
+    errors: [
+        SyntaxError(
+            "Expected Ascii59, found Whitespace",
+            20..20,
+        ),
+        SyntaxError(
+            "Invalid statement: syntax error at end of input",
+            2..8,
+        ),
+        SyntaxError(
+            "Invalid statement: syntax error at or near \"(\"",
+            9..23,
+        ),
+    ],
+    stmts: [],
+}

@@ -1,0 +1,642 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "SELECT w1.city, w1.temp_lo AS low, w1.temp_hi AS high,\n       w2.city, w2.temp_lo AS low, w2.temp_hi AS high\n    FROM weather w1 JOIN weather w2\n        ON w1.temp_lo < w2.temp_lo AND w1.temp_hi > w2.temp_hi;"
+---
+Parse {
+    cst: SourceFile@0..208
+      SelectStmt@0..208
+        Select@0..6 "SELECT"
+        Whitespace@6..7 " "
+        ResTarget@7..14
+          ColumnRef@7..14
+            Ident@7..9 "w1"
+            Ascii46@9..10 "."
+            Ident@10..14 "city"
+        Ascii44@14..15 ","
+        Whitespace@15..16 " "
+        ResTarget@16..33
+          ColumnRef@16..26
+            Ident@16..18 "w1"
+            Ascii46@18..19 "."
+            Ident@19..26 "temp_lo"
+          Whitespace@26..27 " "
+          As@27..29 "AS"
+          Whitespace@29..30 " "
+          Ident@30..33 "low"
+        Ascii44@33..34 ","
+        Whitespace@34..35 " "
+        ResTarget@35..53
+          ColumnRef@35..45
+            Ident@35..37 "w1"
+            Ascii46@37..38 "."
+            Ident@38..45 "temp_hi"
+          Whitespace@45..46 " "
+          As@46..48 "AS"
+          Whitespace@48..49 " "
+          Ident@49..53 "high"
+        Ascii44@53..54 ","
+        Newline@54..55 "\n"
+        Whitespace@55..62 "       "
+        ResTarget@62..69
+          ColumnRef@62..69
+            Ident@62..64 "w2"
+            Ascii46@64..65 "."
+            Ident@65..69 "city"
+        Ascii44@69..70 ","
+        Whitespace@70..71 " "
+        ResTarget@71..88
+          ColumnRef@71..81
+            Ident@71..73 "w2"
+            Ascii46@73..74 "."
+            Ident@74..81 "temp_lo"
+          Whitespace@81..82 " "
+          As@82..84 "AS"
+          Whitespace@84..85 " "
+          Ident@85..88 "low"
+        Ascii44@88..89 ","
+        Whitespace@89..90 " "
+        ResTarget@90..108
+          ColumnRef@90..100
+            Ident@90..92 "w2"
+            Ascii46@92..93 "."
+            Ident@93..100 "temp_hi"
+          Whitespace@100..101 " "
+          As@101..103 "AS"
+          Whitespace@103..104 " "
+          Ident@104..108 "high"
+        Newline@108..109 "\n"
+        Whitespace@109..113 "    "
+        From@113..117 "FROM"
+        Whitespace@117..118 " "
+        JoinExpr@118..207
+          RangeVar@118..128
+            Ident@118..125 "weather"
+            Whitespace@125..126 " "
+            Alias@126..128
+              Ident@126..128 "w1"
+          Whitespace@128..129 " "
+          Join@129..133 "JOIN"
+          Whitespace@133..134 " "
+          RangeVar@134..144
+            Ident@134..141 "weather"
+            Whitespace@141..142 " "
+            Alias@142..144
+              Ident@142..144 "w2"
+          Newline@144..145 "\n"
+          Whitespace@145..153 "        "
+          On@153..155 "ON"
+          Whitespace@155..156 " "
+          BoolExpr@156..207
+            AExpr@156..179
+              ColumnRef@156..166
+                Ident@156..158 "w1"
+                Ascii46@158..159 "."
+                Ident@159..166 "temp_lo"
+              Whitespace@166..167 " "
+              Ascii60@167..168 "<"
+              Whitespace@168..169 " "
+              ColumnRef@169..179
+                Ident@169..171 "w2"
+                Ascii46@171..172 "."
+                Ident@172..179 "temp_lo"
+            Whitespace@179..180 " "
+            And@180..183 "AND"
+            Whitespace@183..184 " "
+            AExpr@184..207
+              ColumnRef@184..194
+                Ident@184..186 "w1"
+                Ascii46@186..187 "."
+                Ident@187..194 "temp_hi"
+              Whitespace@194..195 " "
+              Ascii62@195..196 ">"
+              Whitespace@196..197 " "
+              ColumnRef@197..207
+                Ident@197..199 "w2"
+                Ascii46@199..200 "."
+                Ident@200..207 "temp_hi"
+        Ascii59@207..208 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: SelectStmt(
+                SelectStmt {
+                    distinct_clause: [],
+                    into_clause: None,
+                    target_list: [
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "w1",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "city",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 7,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 7,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "low",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "w1",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "temp_lo",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 16,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 16,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "high",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "w1",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "temp_hi",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 35,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 35,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "w2",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "city",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 62,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 62,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "low",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "w2",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "temp_lo",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 71,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 71,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "high",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "w2",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "temp_hi",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 90,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 90,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    from_clause: [
+                        Node {
+                            node: Some(
+                                JoinExpr(
+                                    JoinExpr {
+                                        jointype: JoinInner,
+                                        is_natural: false,
+                                        larg: Some(
+                                            Node {
+                                                node: Some(
+                                                    RangeVar(
+                                                        RangeVar {
+                                                            catalogname: "",
+                                                            schemaname: "",
+                                                            relname: "weather",
+                                                            inh: true,
+                                                            relpersistence: "p",
+                                                            alias: Some(
+                                                                Alias {
+                                                                    aliasname: "w1",
+                                                                    colnames: [],
+                                                                },
+                                                            ),
+                                                            location: 118,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        rarg: Some(
+                                            Node {
+                                                node: Some(
+                                                    RangeVar(
+                                                        RangeVar {
+                                                            catalogname: "",
+                                                            schemaname: "",
+                                                            relname: "weather",
+                                                            inh: true,
+                                                            relpersistence: "p",
+                                                            alias: Some(
+                                                                Alias {
+                                                                    aliasname: "w2",
+                                                                    colnames: [],
+                                                                },
+                                                            ),
+                                                            location: 134,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        using_clause: [],
+                                        join_using_alias: None,
+                                        quals: Some(
+                                            Node {
+                                                node: Some(
+                                                    BoolExpr(
+                                                        BoolExpr {
+                                                            xpr: None,
+                                                            boolop: AndExpr,
+                                                            args: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        AExpr(
+                                                                            AExpr {
+                                                                                kind: AexprOp,
+                                                                                name: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            String(
+                                                                                                String {
+                                                                                                    sval: "<",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                lexpr: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            ColumnRef(
+                                                                                                ColumnRef {
+                                                                                                    fields: [
+                                                                                                        Node {
+                                                                                                            node: Some(
+                                                                                                                String(
+                                                                                                                    String {
+                                                                                                                        sval: "w1",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                        Node {
+                                                                                                            node: Some(
+                                                                                                                String(
+                                                                                                                    String {
+                                                                                                                        sval: "temp_lo",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                    ],
+                                                                                                    location: 156,
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                rexpr: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            ColumnRef(
+                                                                                                ColumnRef {
+                                                                                                    fields: [
+                                                                                                        Node {
+                                                                                                            node: Some(
+                                                                                                                String(
+                                                                                                                    String {
+                                                                                                                        sval: "w2",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                        Node {
+                                                                                                            node: Some(
+                                                                                                                String(
+                                                                                                                    String {
+                                                                                                                        sval: "temp_lo",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                    ],
+                                                                                                    location: 169,
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                location: 167,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        AExpr(
+                                                                            AExpr {
+                                                                                kind: AexprOp,
+                                                                                name: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            String(
+                                                                                                String {
+                                                                                                    sval: ">",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                lexpr: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            ColumnRef(
+                                                                                                ColumnRef {
+                                                                                                    fields: [
+                                                                                                        Node {
+                                                                                                            node: Some(
+                                                                                                                String(
+                                                                                                                    String {
+                                                                                                                        sval: "w1",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                        Node {
+                                                                                                            node: Some(
+                                                                                                                String(
+                                                                                                                    String {
+                                                                                                                        sval: "temp_hi",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                    ],
+                                                                                                    location: 184,
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                rexpr: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            ColumnRef(
+                                                                                                ColumnRef {
+                                                                                                    fields: [
+                                                                                                        Node {
+                                                                                                            node: Some(
+                                                                                                                String(
+                                                                                                                    String {
+                                                                                                                        sval: "w2",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                        Node {
+                                                                                                            node: Some(
+                                                                                                                String(
+                                                                                                                    String {
+                                                                                                                        sval: "temp_hi",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                    ],
+                                                                                                    location: 197,
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                location: 195,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 180,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        alias: None,
+                                        rtindex: 0,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    where_clause: None,
+                    group_clause: [],
+                    group_distinct: false,
+                    having_clause: None,
+                    window_clause: [],
+                    values_lists: [],
+                    sort_clause: [],
+                    limit_offset: None,
+                    limit_count: None,
+                    limit_option: Default,
+                    locking_clause: [],
+                    with_clause: None,
+                    op: SetopNone,
+                    all: false,
+                    larg: None,
+                    rarg: None,
+                },
+            ),
+            range: 0..207,
+        },
+    ],
+}

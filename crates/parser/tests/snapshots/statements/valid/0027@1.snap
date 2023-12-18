@@ -1,0 +1,26 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: GRANT UPDATE ON accounts TO joe;
+---
+Parse {
+    cst: SourceFile@0..31
+      Grant@0..5 "GRANT"
+      Update@5..11 "UPDATE"
+      Whitespace@11..12 " "
+      On@12..14 "ON"
+      Whitespace@14..15 " "
+      Ident@15..23 "accounts"
+      Whitespace@23..24 " "
+      To@24..26 "TO"
+      Whitespace@26..27 " "
+      Ident@27..30 "joe"
+      Ascii59@30..31 ";"
+    ,
+    errors: [
+        SyntaxError(
+            "Invalid statement: syntax error at or near \"ON\"",
+            2..12,
+        ),
+    ],
+    stmts: [],
+}

@@ -1,0 +1,39 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE SCHEMA AUTHORIZATION joe;"
+---
+Parse {
+    cst: SourceFile@0..33
+      Newline@0..1 "\n"
+      CreateSchemaStmt@1..33
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Schema@8..14 "SCHEMA"
+        Whitespace@14..15 " "
+        Authorization@15..28 "AUTHORIZATION"
+        Whitespace@28..29 " "
+        RoleSpec@29..32
+          Ident@29..32 "joe"
+        Ascii59@32..33 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateSchemaStmt(
+                CreateSchemaStmt {
+                    schemaname: "",
+                    authrole: Some(
+                        RoleSpec {
+                            roletype: RolespecCstring,
+                            rolename: "joe",
+                            location: 28,
+                        },
+                    ),
+                    schema_elts: [],
+                    if_not_exists: false,
+                },
+            ),
+            range: 0..32,
+        },
+    ],
+}

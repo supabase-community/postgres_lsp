@@ -26,6 +26,8 @@ fn valid_statements() {
         let cases = split_with_parser(&contents).unwrap();
 
         for (i, case) in cases.iter().enumerate() {
+            let case = format!("{};", case);
+
             debug!("Parsing statement {}\n{}", test_name, case);
 
             let result = panic::catch_unwind(|| parse_source(&case));

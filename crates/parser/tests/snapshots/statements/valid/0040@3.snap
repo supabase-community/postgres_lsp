@@ -1,0 +1,217 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE OR REPLACE FUNCTION getfoo(int) RETURNS SETOF users AS $$SELECT * FROM \\\"users\\\" WHERE users.id = $1;$$ LANGUAGE sql IMMUTABLE;"
+---
+Parse {
+    cst: SourceFile@0..135
+      Newline@0..1 "\n"
+      CreateFunctionStmt@1..135
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Or@8..10 "OR"
+        Whitespace@10..11 " "
+        Replace@11..18 "REPLACE"
+        Whitespace@18..19 " "
+        Function@19..27 "FUNCTION"
+        Whitespace@27..28 " "
+        Ident@28..34 "getfoo"
+        Ascii40@34..35 "("
+        FunctionParameter@35..38
+          TypeName@35..38
+            IntP@35..38 "int"
+        Ascii41@38..39 ")"
+        Whitespace@39..40 " "
+        Returns@40..47 "RETURNS"
+        Whitespace@47..48 " "
+        Setof@48..53 "SETOF"
+        Whitespace@53..54 " "
+        TypeName@54..59
+          Ident@54..59 "users"
+        Whitespace@59..60 " "
+        DefElem@60..111
+          As@60..62 "AS"
+          Whitespace@62..63 " "
+          List@63..111
+            Sconst@63..111 "$$SELECT * FROM \\\"use ..."
+        Whitespace@111..112 " "
+        DefElem@112..124
+          Language@112..120 "LANGUAGE"
+          Whitespace@120..121 " "
+          SqlP@121..124 "sql"
+        Whitespace@124..125 " "
+        DefElem@125..134
+          Immutable@125..134 "IMMUTABLE"
+        Ascii59@134..135 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateFunctionStmt(
+                CreateFunctionStmt {
+                    is_procedure: false,
+                    replace: true,
+                    funcname: [
+                        Node {
+                            node: Some(
+                                String(
+                                    String {
+                                        sval: "getfoo",
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    parameters: [
+                        Node {
+                            node: Some(
+                                FunctionParameter(
+                                    FunctionParameter {
+                                        name: "",
+                                        arg_type: Some(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "pg_catalog",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "int4",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 34,
+                                            },
+                                        ),
+                                        mode: FuncParamDefault,
+                                        defexpr: None,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    return_type: Some(
+                        TypeName {
+                            names: [
+                                Node {
+                                    node: Some(
+                                        String(
+                                            String {
+                                                sval: "users",
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ],
+                            type_oid: 0,
+                            setof: true,
+                            pct_type: false,
+                            typmods: [],
+                            typemod: -1,
+                            array_bounds: [],
+                            location: 53,
+                        },
+                    ),
+                    options: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "as",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    List(
+                                                        List {
+                                                            items: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "SELECT * FROM \\\"users\\\" WHERE users.id = $1;",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 59,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "language",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "sql",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 111,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "volatility",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "immutable",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 124,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    sql_body: None,
+                },
+            ),
+            range: 0..134,
+        },
+    ],
+}

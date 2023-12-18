@@ -1,0 +1,70 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "SET search_path TO myschema,public;"
+---
+Parse {
+    cst: SourceFile@0..35
+      VariableSetStmt@0..35
+        Set@0..3 "SET"
+        Whitespace@3..4 " "
+        Ident@4..15 "search_path"
+        Whitespace@15..16 " "
+        To@16..18 "TO"
+        Whitespace@18..19 " "
+        AConst@19..27
+          Ident@19..27 "myschema"
+        Ascii44@27..28 ","
+        AConst@28..34
+          Ident@28..34 "public"
+        Ascii59@34..35 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: VariableSetStmt(
+                VariableSetStmt {
+                    kind: VarSetValue,
+                    name: "search_path",
+                    args: [
+                        Node {
+                            node: Some(
+                                AConst(
+                                    AConst {
+                                        isnull: false,
+                                        location: 19,
+                                        val: Some(
+                                            Sval(
+                                                String {
+                                                    sval: "myschema",
+                                                },
+                                            ),
+                                        ),
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                AConst(
+                                    AConst {
+                                        isnull: false,
+                                        location: 28,
+                                        val: Some(
+                                            Sval(
+                                                String {
+                                                    sval: "public",
+                                                },
+                                            ),
+                                        ),
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    is_local: false,
+                },
+            ),
+            range: 0..34,
+        },
+    ],
+}

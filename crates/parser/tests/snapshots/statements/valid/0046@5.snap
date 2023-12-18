@@ -1,0 +1,93 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE TYPE type1 AS RANGE (subtype = int4);"
+---
+Parse {
+    cst: SourceFile@0..45
+      Newline@0..1 "\n"
+      CreateRangeStmt@1..45
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        TypeP@8..12 "TYPE"
+        Whitespace@12..13 " "
+        Ident@13..18 "type1"
+        Whitespace@18..19 " "
+        As@19..21 "AS"
+        Whitespace@21..22 " "
+        Range@22..27 "RANGE"
+        Whitespace@27..28 " "
+        Ascii40@28..29 "("
+        DefElem@29..43
+          Ident@29..36 "subtype"
+          Whitespace@36..37 " "
+          Ascii61@37..38 "="
+          Whitespace@38..39 " "
+          TypeName@39..43
+            Ident@39..43 "int4"
+        Ascii41@43..44 ")"
+        Ascii59@44..45 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateRangeStmt(
+                CreateRangeStmt {
+                    type_name: [
+                        Node {
+                            node: Some(
+                                String(
+                                    String {
+                                        sval: "type1",
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    params: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "subtype",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    TypeName(
+                                                        TypeName {
+                                                            names: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "int4",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            type_oid: 0,
+                                                            setof: false,
+                                                            pct_type: false,
+                                                            typmods: [],
+                                                            typemod: -1,
+                                                            array_bounds: [],
+                                                            location: 38,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 28,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                },
+            ),
+            range: 0..44,
+        },
+    ],
+}

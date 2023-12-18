@@ -1,0 +1,101 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE INDEX title_idx_german ON films (title COLLATE \"de_DE\");"
+---
+Parse {
+    cst: SourceFile@0..64
+      Newline@0..1 "\n"
+      IndexStmt@1..64
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Index@8..13 "INDEX"
+        Whitespace@13..14 " "
+        Ident@14..30 "title_idx_german"
+        Whitespace@30..31 " "
+        On@31..33 "ON"
+        Whitespace@33..34 " "
+        RangeVar@34..39
+          Ident@34..39 "films"
+        Whitespace@39..40 " "
+        Ascii40@40..41 "("
+        IndexElem@41..62
+          Ident@41..46 "title"
+          Whitespace@46..47 " "
+          Collate@47..54 "COLLATE"
+          Whitespace@54..55 " "
+          Ident@55..62 "\"de_DE\""
+        Ascii41@62..63 ")"
+        Ascii59@63..64 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: IndexStmt(
+                IndexStmt {
+                    idxname: "title_idx_german",
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "films",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 33,
+                        },
+                    ),
+                    access_method: "btree",
+                    table_space: "",
+                    index_params: [
+                        Node {
+                            node: Some(
+                                IndexElem(
+                                    IndexElem {
+                                        name: "title",
+                                        expr: None,
+                                        indexcolname: "",
+                                        collation: [
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "de_DE",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        opclass: [],
+                                        opclassopts: [],
+                                        ordering: SortbyDefault,
+                                        nulls_ordering: SortbyNullsDefault,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    index_including_params: [],
+                    options: [],
+                    where_clause: None,
+                    exclude_op_names: [],
+                    idxcomment: "",
+                    index_oid: 0,
+                    old_node: 0,
+                    old_create_subid: 0,
+                    old_first_relfilenode_subid: 0,
+                    unique: false,
+                    nulls_not_distinct: false,
+                    primary: false,
+                    isconstraint: false,
+                    deferrable: false,
+                    initdeferred: false,
+                    transformed: false,
+                    concurrent: false,
+                    if_not_exists: false,
+                    reset_default_tblspc: false,
+                },
+            ),
+            range: 0..63,
+        },
+    ],
+}

@@ -1,0 +1,98 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE CAST (bigint AS int4) WITH INOUT AS ASSIGNMENT;"
+---
+Parse {
+    cst: SourceFile@0..55
+      Newline@0..1 "\n"
+      CreateCastStmt@1..55
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Cast@8..12 "CAST"
+        Whitespace@12..13 " "
+        Ascii40@13..14 "("
+        TypeName@14..20
+          Bigint@14..20 "bigint"
+        Whitespace@20..21 " "
+        As@21..23 "AS"
+        Whitespace@23..24 " "
+        TypeName@24..28
+          Ident@24..28 "int4"
+        Ascii41@28..29 ")"
+        Whitespace@29..30 " "
+        With@30..34 "WITH"
+        Whitespace@34..35 " "
+        Inout@35..40 "INOUT"
+        Whitespace@40..41 " "
+        As@41..43 "AS"
+        Whitespace@43..44 " "
+        Assignment@44..54 "ASSIGNMENT"
+        Ascii59@54..55 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateCastStmt(
+                CreateCastStmt {
+                    sourcetype: Some(
+                        TypeName {
+                            names: [
+                                Node {
+                                    node: Some(
+                                        String(
+                                            String {
+                                                sval: "pg_catalog",
+                                            },
+                                        ),
+                                    ),
+                                },
+                                Node {
+                                    node: Some(
+                                        String(
+                                            String {
+                                                sval: "int8",
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ],
+                            type_oid: 0,
+                            setof: false,
+                            pct_type: false,
+                            typmods: [],
+                            typemod: -1,
+                            array_bounds: [],
+                            location: 13,
+                        },
+                    ),
+                    targettype: Some(
+                        TypeName {
+                            names: [
+                                Node {
+                                    node: Some(
+                                        String(
+                                            String {
+                                                sval: "int4",
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ],
+                            type_oid: 0,
+                            setof: false,
+                            pct_type: false,
+                            typmods: [],
+                            typemod: -1,
+                            array_bounds: [],
+                            location: 23,
+                        },
+                    ),
+                    func: None,
+                    context: CoercionAssignment,
+                    inout: true,
+                },
+            ),
+            range: 0..54,
+        },
+    ],
+}

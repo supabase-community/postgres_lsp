@@ -1,0 +1,310 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE AGGREGATE percentile_disc (float8 ORDER BY anyelement) (sfunc = ordered_set_transition, stype = internal, finalfunc = percentile_disc_final, finalfunc_extra);"
+---
+Parse {
+    cst: SourceFile@0..166
+      Newline@0..1 "\n"
+      DefineStmt@1..166
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Aggregate@8..17 "AGGREGATE"
+        Whitespace@17..18 " "
+        Ident@18..33 "percentile_disc"
+        Whitespace@33..34 " "
+        Ascii40@34..35 "("
+        List@35..61
+          FunctionParameter@35..41
+            TypeName@35..41
+              Ident@35..41 "float8"
+          Whitespace@41..42 " "
+          Order@42..47 "ORDER"
+          Whitespace@47..48 " "
+          By@48..50 "BY"
+          Whitespace@50..51 " "
+          FunctionParameter@51..61
+            TypeName@51..61
+              Ident@51..61 "anyelement"
+        Ascii41@61..62 ")"
+        Whitespace@62..63 " "
+        Ascii40@63..64 "("
+        DefElem@64..94
+          Ident@64..69 "sfunc"
+          Whitespace@69..70 " "
+          Ascii61@70..71 "="
+          Whitespace@71..72 " "
+          TypeName@72..94
+            Ident@72..94 "ordered_set_transition"
+        Ascii44@94..95 ","
+        Whitespace@95..96 " "
+        DefElem@96..112
+          Ident@96..101 "stype"
+          Whitespace@101..102 " "
+          Ascii61@102..103 "="
+          Whitespace@103..104 " "
+          TypeName@104..112
+            Ident@104..112 "internal"
+        Ascii44@112..113 ","
+        Whitespace@113..114 " "
+        DefElem@114..147
+          Ident@114..123 "finalfunc"
+          Whitespace@123..124 " "
+          Ascii61@124..125 "="
+          Whitespace@125..126 " "
+          TypeName@126..147
+            Ident@126..147 "percentile_disc_final"
+        Ascii44@147..148 ","
+        Whitespace@148..149 " "
+        DefElem@149..164
+          Ident@149..164 "finalfunc_extra"
+        Ascii41@164..165 ")"
+        Ascii59@165..166 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: DefineStmt(
+                DefineStmt {
+                    kind: ObjectAggregate,
+                    oldstyle: false,
+                    defnames: [
+                        Node {
+                            node: Some(
+                                String(
+                                    String {
+                                        sval: "percentile_disc",
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    args: [
+                        Node {
+                            node: Some(
+                                List(
+                                    List {
+                                        items: [
+                                            Node {
+                                                node: Some(
+                                                    FunctionParameter(
+                                                        FunctionParameter {
+                                                            name: "",
+                                                            arg_type: Some(
+                                                                TypeName {
+                                                                    names: [
+                                                                        Node {
+                                                                            node: Some(
+                                                                                String(
+                                                                                    String {
+                                                                                        sval: "float8",
+                                                                                    },
+                                                                                ),
+                                                                            ),
+                                                                        },
+                                                                    ],
+                                                                    type_oid: 0,
+                                                                    setof: false,
+                                                                    pct_type: false,
+                                                                    typmods: [],
+                                                                    typemod: -1,
+                                                                    array_bounds: [],
+                                                                    location: 34,
+                                                                },
+                                                            ),
+                                                            mode: FuncParamDefault,
+                                                            defexpr: None,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                            Node {
+                                                node: Some(
+                                                    FunctionParameter(
+                                                        FunctionParameter {
+                                                            name: "",
+                                                            arg_type: Some(
+                                                                TypeName {
+                                                                    names: [
+                                                                        Node {
+                                                                            node: Some(
+                                                                                String(
+                                                                                    String {
+                                                                                        sval: "anyelement",
+                                                                                    },
+                                                                                ),
+                                                                            ),
+                                                                        },
+                                                                    ],
+                                                                    type_oid: 0,
+                                                                    setof: false,
+                                                                    pct_type: false,
+                                                                    typmods: [],
+                                                                    typemod: -1,
+                                                                    array_bounds: [],
+                                                                    location: 50,
+                                                                },
+                                                            ),
+                                                            mode: FuncParamDefault,
+                                                            defexpr: None,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                Integer(
+                                    Integer {
+                                        ival: 1,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    definition: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "sfunc",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    TypeName(
+                                                        TypeName {
+                                                            names: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "ordered_set_transition",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            type_oid: 0,
+                                                            setof: false,
+                                                            pct_type: false,
+                                                            typmods: [],
+                                                            typemod: -1,
+                                                            array_bounds: [],
+                                                            location: 71,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 63,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "stype",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    TypeName(
+                                                        TypeName {
+                                                            names: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "internal",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            type_oid: 0,
+                                                            setof: false,
+                                                            pct_type: false,
+                                                            typmods: [],
+                                                            typemod: -1,
+                                                            array_bounds: [],
+                                                            location: 103,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 95,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "finalfunc",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    TypeName(
+                                                        TypeName {
+                                                            names: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "percentile_disc_final",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            type_oid: 0,
+                                                            setof: false,
+                                                            pct_type: false,
+                                                            typmods: [],
+                                                            typemod: -1,
+                                                            array_bounds: [],
+                                                            location: 125,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 113,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "finalfunc_extra",
+                                        arg: None,
+                                        defaction: DefelemUnspec,
+                                        location: 148,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    if_not_exists: false,
+                    replace: false,
+                },
+            ),
+            range: 0..165,
+        },
+    ],
+}

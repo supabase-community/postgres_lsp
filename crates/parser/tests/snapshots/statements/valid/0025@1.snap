@@ -1,0 +1,176 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "ALTER TABLE products ADD CHECK (name <> '');"
+---
+Parse {
+    cst: SourceFile@0..44
+      AlterTableStmt@0..44
+        Alter@0..5 "ALTER"
+        Whitespace@5..6 " "
+        Table@6..11 "TABLE"
+        Whitespace@11..12 " "
+        RangeVar@12..20
+          Ident@12..20 "products"
+        Whitespace@20..21 " "
+        AlterTableCmd@21..42
+          AddP@21..24 "ADD"
+          Whitespace@24..25 " "
+          Constraint@25..42
+            Check@25..30 "CHECK"
+            Whitespace@30..31 " "
+            Ascii40@31..32 "("
+            AExpr@32..42
+              ColumnRef@32..36
+                NameP@32..36 "name"
+              Whitespace@36..37 " "
+              NotEquals@37..39 "<>"
+              Whitespace@39..40 " "
+              AConst@40..42
+                Sconst@40..42 "''"
+        Ascii41@42..43 ")"
+        Ascii59@43..44 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: AlterTableStmt(
+                AlterTableStmt {
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "products",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 12,
+                        },
+                    ),
+                    cmds: [
+                        Node {
+                            node: Some(
+                                AlterTableCmd(
+                                    AlterTableCmd {
+                                        subtype: AtAddConstraint,
+                                        name: "",
+                                        num: 0,
+                                        newowner: None,
+                                        def: Some(
+                                            Node {
+                                                node: Some(
+                                                    Constraint(
+                                                        Constraint {
+                                                            contype: ConstrCheck,
+                                                            conname: "",
+                                                            deferrable: false,
+                                                            initdeferred: false,
+                                                            location: 25,
+                                                            is_no_inherit: false,
+                                                            raw_expr: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        AExpr(
+                                                                            AExpr {
+                                                                                kind: AexprOp,
+                                                                                name: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            String(
+                                                                                                String {
+                                                                                                    sval: "<>",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                lexpr: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            ColumnRef(
+                                                                                                ColumnRef {
+                                                                                                    fields: [
+                                                                                                        Node {
+                                                                                                            node: Some(
+                                                                                                                String(
+                                                                                                                    String {
+                                                                                                                        sval: "name",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                    ],
+                                                                                                    location: 32,
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                rexpr: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            AConst(
+                                                                                                AConst {
+                                                                                                    isnull: false,
+                                                                                                    location: 40,
+                                                                                                    val: Some(
+                                                                                                        Sval(
+                                                                                                            String {
+                                                                                                                sval: "",
+                                                                                                            },
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                location: 37,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            cooked_expr: "",
+                                                            generated_when: "",
+                                                            nulls_not_distinct: false,
+                                                            keys: [],
+                                                            including: [],
+                                                            exclusions: [],
+                                                            options: [],
+                                                            indexname: "",
+                                                            indexspace: "",
+                                                            reset_default_tblspc: false,
+                                                            access_method: "",
+                                                            where_clause: None,
+                                                            pktable: None,
+                                                            fk_attrs: [],
+                                                            pk_attrs: [],
+                                                            fk_matchtype: "",
+                                                            fk_upd_action: "",
+                                                            fk_del_action: "",
+                                                            fk_del_set_cols: [],
+                                                            old_conpfeqop: [],
+                                                            old_pktable_oid: 0,
+                                                            skip_validation: false,
+                                                            initially_valid: true,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        behavior: DropRestrict,
+                                        missing_ok: false,
+                                        recurse: false,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    objtype: ObjectTable,
+                    missing_ok: false,
+                },
+            ),
+            range: 0..43,
+        },
+    ],
+}

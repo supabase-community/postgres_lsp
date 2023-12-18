@@ -1,0 +1,46 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "COPY weather FROM '/home/user/weather.txt';"
+---
+Parse {
+    cst: SourceFile@0..43
+      CopyStmt@0..43
+        Copy@0..4 "COPY"
+        Whitespace@4..5 " "
+        RangeVar@5..12
+          Ident@5..12 "weather"
+        Whitespace@12..13 " "
+        From@13..17 "FROM"
+        Whitespace@17..18 " "
+        Sconst@18..42 "'/home/user/weather.txt'"
+        Ascii59@42..43 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CopyStmt(
+                CopyStmt {
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "weather",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 5,
+                        },
+                    ),
+                    query: None,
+                    attlist: [],
+                    is_from: true,
+                    is_program: false,
+                    filename: "/home/user/weather.txt",
+                    options: [],
+                    where_clause: None,
+                },
+            ),
+            range: 0..42,
+        },
+    ],
+}

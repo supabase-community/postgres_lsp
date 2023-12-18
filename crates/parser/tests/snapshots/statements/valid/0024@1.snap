@@ -1,0 +1,425 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE TABLE order_items (\n    product_no integer REFERENCES products,\n    order_id integer REFERENCES orders,\n    quantity integer,\n    PRIMARY KEY (product_no, order_id)\n);"
+---
+Parse {
+    cst: SourceFile@0..174
+      CreateStmt@0..174
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Table@7..12 "TABLE"
+        Whitespace@12..13 " "
+        RangeVar@13..24
+          Ident@13..24 "order_items"
+        Whitespace@24..25 " "
+        Ascii40@25..26 "("
+        Newline@26..27 "\n"
+        Whitespace@27..31 "    "
+        ColumnDef@31..69
+          Ident@31..41 "product_no"
+          Whitespace@41..42 " "
+          TypeName@42..49
+            Integer@42..49 "integer"
+          Whitespace@49..50 " "
+          Constraint@50..69
+            References@50..60 "REFERENCES"
+            Whitespace@60..61 " "
+            RangeVar@61..69
+              Ident@61..69 "products"
+        Ascii44@69..70 ","
+        Newline@70..71 "\n"
+        Whitespace@71..75 "    "
+        ColumnDef@75..109
+          Ident@75..83 "order_id"
+          Whitespace@83..84 " "
+          TypeName@84..91
+            Integer@84..91 "integer"
+          Whitespace@91..92 " "
+          Constraint@92..109
+            References@92..102 "REFERENCES"
+            Whitespace@102..103 " "
+            RangeVar@103..109
+              Ident@103..109 "orders"
+        Ascii44@109..110 ","
+        Newline@110..111 "\n"
+        Whitespace@111..115 "    "
+        ColumnDef@115..131
+          Ident@115..123 "quantity"
+          Whitespace@123..124 " "
+          TypeName@124..131
+            Integer@124..131 "integer"
+        Ascii44@131..132 ","
+        Newline@132..133 "\n"
+        Whitespace@133..137 "    "
+        Constraint@137..170
+          Primary@137..144 "PRIMARY"
+          Whitespace@144..145 " "
+          Key@145..148 "KEY"
+          Whitespace@148..149 " "
+          Ascii40@149..150 "("
+          Ident@150..160 "product_no"
+          Ascii44@160..161 ","
+          Whitespace@161..162 " "
+          Ident@162..170 "order_id"
+        Ascii41@170..171 ")"
+        Newline@171..172 "\n"
+        Ascii41@172..173 ")"
+        Ascii59@173..174 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateStmt(
+                CreateStmt {
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "order_items",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 13,
+                        },
+                    ),
+                    table_elts: [
+                        Node {
+                            node: Some(
+                                ColumnDef(
+                                    ColumnDef {
+                                        colname: "product_no",
+                                        type_name: Some(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "pg_catalog",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "int4",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 42,
+                                            },
+                                        ),
+                                        compression: "",
+                                        inhcount: 0,
+                                        is_local: true,
+                                        is_not_null: false,
+                                        is_from_type: false,
+                                        storage: "",
+                                        raw_default: None,
+                                        cooked_default: None,
+                                        identity: "",
+                                        identity_sequence: None,
+                                        generated: "",
+                                        coll_clause: None,
+                                        coll_oid: 0,
+                                        constraints: [
+                                            Node {
+                                                node: Some(
+                                                    Constraint(
+                                                        Constraint {
+                                                            contype: ConstrForeign,
+                                                            conname: "",
+                                                            deferrable: false,
+                                                            initdeferred: false,
+                                                            location: 50,
+                                                            is_no_inherit: false,
+                                                            raw_expr: None,
+                                                            cooked_expr: "",
+                                                            generated_when: "",
+                                                            nulls_not_distinct: false,
+                                                            keys: [],
+                                                            including: [],
+                                                            exclusions: [],
+                                                            options: [],
+                                                            indexname: "",
+                                                            indexspace: "",
+                                                            reset_default_tblspc: false,
+                                                            access_method: "",
+                                                            where_clause: None,
+                                                            pktable: Some(
+                                                                RangeVar {
+                                                                    catalogname: "",
+                                                                    schemaname: "",
+                                                                    relname: "products",
+                                                                    inh: true,
+                                                                    relpersistence: "p",
+                                                                    alias: None,
+                                                                    location: 61,
+                                                                },
+                                                            ),
+                                                            fk_attrs: [],
+                                                            pk_attrs: [],
+                                                            fk_matchtype: "s",
+                                                            fk_upd_action: "a",
+                                                            fk_del_action: "a",
+                                                            fk_del_set_cols: [],
+                                                            old_conpfeqop: [],
+                                                            old_pktable_oid: 0,
+                                                            skip_validation: false,
+                                                            initially_valid: true,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        fdwoptions: [],
+                                        location: 31,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ColumnDef(
+                                    ColumnDef {
+                                        colname: "order_id",
+                                        type_name: Some(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "pg_catalog",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "int4",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 84,
+                                            },
+                                        ),
+                                        compression: "",
+                                        inhcount: 0,
+                                        is_local: true,
+                                        is_not_null: false,
+                                        is_from_type: false,
+                                        storage: "",
+                                        raw_default: None,
+                                        cooked_default: None,
+                                        identity: "",
+                                        identity_sequence: None,
+                                        generated: "",
+                                        coll_clause: None,
+                                        coll_oid: 0,
+                                        constraints: [
+                                            Node {
+                                                node: Some(
+                                                    Constraint(
+                                                        Constraint {
+                                                            contype: ConstrForeign,
+                                                            conname: "",
+                                                            deferrable: false,
+                                                            initdeferred: false,
+                                                            location: 92,
+                                                            is_no_inherit: false,
+                                                            raw_expr: None,
+                                                            cooked_expr: "",
+                                                            generated_when: "",
+                                                            nulls_not_distinct: false,
+                                                            keys: [],
+                                                            including: [],
+                                                            exclusions: [],
+                                                            options: [],
+                                                            indexname: "",
+                                                            indexspace: "",
+                                                            reset_default_tblspc: false,
+                                                            access_method: "",
+                                                            where_clause: None,
+                                                            pktable: Some(
+                                                                RangeVar {
+                                                                    catalogname: "",
+                                                                    schemaname: "",
+                                                                    relname: "orders",
+                                                                    inh: true,
+                                                                    relpersistence: "p",
+                                                                    alias: None,
+                                                                    location: 103,
+                                                                },
+                                                            ),
+                                                            fk_attrs: [],
+                                                            pk_attrs: [],
+                                                            fk_matchtype: "s",
+                                                            fk_upd_action: "a",
+                                                            fk_del_action: "a",
+                                                            fk_del_set_cols: [],
+                                                            old_conpfeqop: [],
+                                                            old_pktable_oid: 0,
+                                                            skip_validation: false,
+                                                            initially_valid: true,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        fdwoptions: [],
+                                        location: 75,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ColumnDef(
+                                    ColumnDef {
+                                        colname: "quantity",
+                                        type_name: Some(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "pg_catalog",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "int4",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 124,
+                                            },
+                                        ),
+                                        compression: "",
+                                        inhcount: 0,
+                                        is_local: true,
+                                        is_not_null: false,
+                                        is_from_type: false,
+                                        storage: "",
+                                        raw_default: None,
+                                        cooked_default: None,
+                                        identity: "",
+                                        identity_sequence: None,
+                                        generated: "",
+                                        coll_clause: None,
+                                        coll_oid: 0,
+                                        constraints: [],
+                                        fdwoptions: [],
+                                        location: 115,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                Constraint(
+                                    Constraint {
+                                        contype: ConstrPrimary,
+                                        conname: "",
+                                        deferrable: false,
+                                        initdeferred: false,
+                                        location: 137,
+                                        is_no_inherit: false,
+                                        raw_expr: None,
+                                        cooked_expr: "",
+                                        generated_when: "",
+                                        nulls_not_distinct: false,
+                                        keys: [
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "product_no",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "order_id",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        including: [],
+                                        exclusions: [],
+                                        options: [],
+                                        indexname: "",
+                                        indexspace: "",
+                                        reset_default_tblspc: false,
+                                        access_method: "",
+                                        where_clause: None,
+                                        pktable: None,
+                                        fk_attrs: [],
+                                        pk_attrs: [],
+                                        fk_matchtype: "",
+                                        fk_upd_action: "",
+                                        fk_del_action: "",
+                                        fk_del_set_cols: [],
+                                        old_conpfeqop: [],
+                                        old_pktable_oid: 0,
+                                        skip_validation: false,
+                                        initially_valid: false,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    inh_relations: [],
+                    partbound: None,
+                    partspec: None,
+                    of_typename: None,
+                    constraints: [],
+                    options: [],
+                    oncommit: OncommitNoop,
+                    tablespacename: "",
+                    access_method: "",
+                    if_not_exists: false,
+                },
+            ),
+            range: 0..173,
+        },
+    ],
+}

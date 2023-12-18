@@ -1,0 +1,217 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE VIEW pg_comedies AS SELECT * FROM comedies WHERE classification = 'PG' WITH CASCADED CHECK OPTION;"
+---
+Parse {
+    cst: SourceFile@0..106
+      Newline@0..1 "\n"
+      ViewStmt@1..106
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        View@8..12 "VIEW"
+        Whitespace@12..13 " "
+        RangeVar@13..24
+          Ident@13..24 "pg_comedies"
+        Whitespace@24..25 " "
+        As@25..27 "AS"
+        Whitespace@27..28 " "
+        SelectStmt@28..78
+          Select@28..34 "SELECT"
+          Whitespace@34..35 " "
+          ResTarget@35..36
+            ColumnRef@35..36
+              AStar@35..36
+                Ascii42@35..36 "*"
+          Whitespace@36..37 " "
+          From@37..41 "FROM"
+          Whitespace@41..42 " "
+          RangeVar@42..50
+            Ident@42..50 "comedies"
+          Whitespace@50..51 " "
+          Where@51..56 "WHERE"
+          Whitespace@56..57 " "
+          AExpr@57..78
+            ColumnRef@57..71
+              Ident@57..71 "classification"
+            Whitespace@71..72 " "
+            Ascii61@72..73 "="
+            Whitespace@73..74 " "
+            AConst@74..78
+              Sconst@74..78 "'PG'"
+        Whitespace@78..79 " "
+        With@79..83 "WITH"
+        Whitespace@83..84 " "
+        Cascaded@84..92 "CASCADED"
+        Whitespace@92..93 " "
+        Check@93..98 "CHECK"
+        Whitespace@98..99 " "
+        Option@99..105 "OPTION"
+        Ascii59@105..106 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: ViewStmt(
+                ViewStmt {
+                    view: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "pg_comedies",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 12,
+                        },
+                    ),
+                    aliases: [],
+                    query: Some(
+                        Node {
+                            node: Some(
+                                SelectStmt(
+                                    SelectStmt {
+                                        distinct_clause: [],
+                                        into_clause: None,
+                                        target_list: [
+                                            Node {
+                                                node: Some(
+                                                    ResTarget(
+                                                        ResTarget {
+                                                            name: "",
+                                                            indirection: [],
+                                                            val: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        ColumnRef(
+                                                                            ColumnRef {
+                                                                                fields: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            AStar(
+                                                                                                AStar,
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                location: 34,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            location: 34,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        from_clause: [
+                                            Node {
+                                                node: Some(
+                                                    RangeVar(
+                                                        RangeVar {
+                                                            catalogname: "",
+                                                            schemaname: "",
+                                                            relname: "comedies",
+                                                            inh: true,
+                                                            relpersistence: "p",
+                                                            alias: None,
+                                                            location: 41,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        where_clause: Some(
+                                            Node {
+                                                node: Some(
+                                                    AExpr(
+                                                        AExpr {
+                                                            kind: AexprOp,
+                                                            name: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "=",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            lexpr: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        ColumnRef(
+                                                                            ColumnRef {
+                                                                                fields: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            String(
+                                                                                                String {
+                                                                                                    sval: "classification",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                location: 56,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            rexpr: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 73,
+                                                                                val: Some(
+                                                                                    Sval(
+                                                                                        String {
+                                                                                            sval: "PG",
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            location: 71,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        group_clause: [],
+                                        group_distinct: false,
+                                        having_clause: None,
+                                        window_clause: [],
+                                        values_lists: [],
+                                        sort_clause: [],
+                                        limit_offset: None,
+                                        limit_count: None,
+                                        limit_option: Default,
+                                        locking_clause: [],
+                                        with_clause: None,
+                                        op: SetopNone,
+                                        all: false,
+                                        larg: None,
+                                        rarg: None,
+                                    },
+                                ),
+                            ),
+                        },
+                    ),
+                    replace: false,
+                    options: [],
+                    with_check_option: CascadedCheckOption,
+                },
+            ),
+            range: 0..105,
+        },
+    ],
+}

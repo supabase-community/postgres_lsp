@@ -1,0 +1,151 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "SELECT DISTINCT city\n    FROM weather\n    ORDER BY city;"
+---
+Parse {
+    cst: SourceFile@0..56
+      SelectStmt@0..56
+        Select@0..6 "SELECT"
+        Whitespace@6..7 " "
+        Distinct@7..15 "DISTINCT"
+        Whitespace@15..16 " "
+        ResTarget@16..20
+          ColumnRef@16..20
+            Ident@16..20 "city"
+        Newline@20..21 "\n"
+        Whitespace@21..25 "    "
+        From@25..29 "FROM"
+        Whitespace@29..30 " "
+        RangeVar@30..37
+          Ident@30..37 "weather"
+        Newline@37..38 "\n"
+        Whitespace@38..42 "    "
+        SortBy@42..55
+          Order@42..47 "ORDER"
+          Whitespace@47..48 " "
+          By@48..50 "BY"
+          Whitespace@50..51 " "
+          ColumnRef@51..55
+            Ident@51..55 "city"
+        Ascii59@55..56 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: SelectStmt(
+                SelectStmt {
+                    distinct_clause: [
+                        Node {
+                            node: None,
+                        },
+                    ],
+                    into_clause: None,
+                    target_list: [
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "city",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 16,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 16,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    from_clause: [
+                        Node {
+                            node: Some(
+                                RangeVar(
+                                    RangeVar {
+                                        catalogname: "",
+                                        schemaname: "",
+                                        relname: "weather",
+                                        inh: true,
+                                        relpersistence: "p",
+                                        alias: None,
+                                        location: 30,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    where_clause: None,
+                    group_clause: [],
+                    group_distinct: false,
+                    having_clause: None,
+                    window_clause: [],
+                    values_lists: [],
+                    sort_clause: [
+                        Node {
+                            node: Some(
+                                SortBy(
+                                    SortBy {
+                                        node: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "city",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 51,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        sortby_dir: SortbyDefault,
+                                        sortby_nulls: SortbyNullsDefault,
+                                        use_op: [],
+                                        location: -1,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    limit_offset: None,
+                    limit_count: None,
+                    limit_option: Default,
+                    locking_clause: [],
+                    with_clause: None,
+                    op: SetopNone,
+                    all: false,
+                    larg: None,
+                    rarg: None,
+                },
+            ),
+            range: 0..55,
+        },
+    ],
+}

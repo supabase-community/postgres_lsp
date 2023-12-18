@@ -1,0 +1,80 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE TYPE type1 AS ENUM ('value1', 'value2', 'value3');"
+---
+Parse {
+    cst: SourceFile@0..58
+      Newline@0..1 "\n"
+      CreateEnumStmt@1..58
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        TypeP@8..12 "TYPE"
+        Whitespace@12..13 " "
+        Ident@13..18 "type1"
+        Whitespace@18..19 " "
+        As@19..21 "AS"
+        Whitespace@21..22 " "
+        EnumP@22..26 "ENUM"
+        Whitespace@26..27 " "
+        Ascii40@27..28 "("
+        Sconst@28..36 "'value1'"
+        Ascii44@36..37 ","
+        Whitespace@37..38 " "
+        Sconst@38..46 "'value2'"
+        Ascii44@46..47 ","
+        Whitespace@47..48 " "
+        Sconst@48..56 "'value3'"
+        Ascii41@56..57 ")"
+        Ascii59@57..58 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateEnumStmt(
+                CreateEnumStmt {
+                    type_name: [
+                        Node {
+                            node: Some(
+                                String(
+                                    String {
+                                        sval: "type1",
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    vals: [
+                        Node {
+                            node: Some(
+                                String(
+                                    String {
+                                        sval: "value1",
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                String(
+                                    String {
+                                        sval: "value2",
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                String(
+                                    String {
+                                        sval: "value3",
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                },
+            ),
+            range: 0..57,
+        },
+    ],
+}
