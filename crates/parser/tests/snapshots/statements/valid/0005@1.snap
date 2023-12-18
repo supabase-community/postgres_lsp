@@ -1,0 +1,115 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "DELETE FROM weather WHERE city = 'Hayward';"
+---
+Parse {
+    cst: SourceFile@0..43
+      DeleteStmt@0..43
+        DeleteP@0..6 "DELETE"
+        Whitespace@6..7 " "
+        From@7..11 "FROM"
+        Whitespace@11..12 " "
+        RangeVar@12..19
+          Ident@12..19 "weather"
+        Whitespace@19..20 " "
+        Where@20..25 "WHERE"
+        Whitespace@25..26 " "
+        AExpr@26..42
+          ColumnRef@26..30
+            Ident@26..30 "city"
+          Whitespace@30..31 " "
+          Ascii61@31..32 "="
+          Whitespace@32..33 " "
+          AConst@33..42
+            Sconst@33..42 "'Hayward'"
+        Ascii59@42..43 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: DeleteStmt(
+                DeleteStmt {
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "weather",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 12,
+                        },
+                    ),
+                    using_clause: [],
+                    where_clause: Some(
+                        Node {
+                            node: Some(
+                                AExpr(
+                                    AExpr {
+                                        kind: AexprOp,
+                                        name: [
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "=",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        lexpr: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "city",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 26,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        rexpr: Some(
+                                            Node {
+                                                node: Some(
+                                                    AConst(
+                                                        AConst {
+                                                            isnull: false,
+                                                            location: 33,
+                                                            val: Some(
+                                                                Sval(
+                                                                    String {
+                                                                        sval: "Hayward",
+                                                                    },
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 31,
+                                    },
+                                ),
+                            ),
+                        },
+                    ),
+                    returning_list: [],
+                    with_clause: None,
+                },
+            ),
+            range: 0..42,
+        },
+    ],
+}

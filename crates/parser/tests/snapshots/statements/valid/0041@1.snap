@@ -1,0 +1,29 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: CREATE SCHEMA myschema;
+---
+Parse {
+    cst: SourceFile@0..23
+      CreateSchemaStmt@0..23
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Schema@7..13 "SCHEMA"
+        Whitespace@13..14 " "
+        Ident@14..22 "myschema"
+        Ascii59@22..23 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateSchemaStmt(
+                CreateSchemaStmt {
+                    schemaname: "myschema",
+                    authrole: None,
+                    schema_elts: [],
+                    if_not_exists: false,
+                },
+            ),
+            range: 0..22,
+        },
+    ],
+}

@@ -1,0 +1,253 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE VIEW myview AS\n    SELECT name, location\n        FROM weather, cities\n        WHERE city = name;"
+---
+Parse {
+    cst: SourceFile@0..99
+      Create@0..6 "CREATE"
+      Whitespace@6..7 " "
+      View@7..11 "VIEW"
+      Whitespace@11..12 " "
+      Ident@12..18 "myview"
+      Whitespace@18..19 " "
+      As@19..21 "AS"
+      Newline@21..22 "\n"
+      SelectStmt@22..99
+        Select@22..28 "SELECT"
+        Whitespace@28..29 " "
+        ResTarget@29..33
+          ColumnRef@29..33
+            NameP@29..33 "name"
+        Ascii44@33..34 ","
+        Whitespace@34..35 " "
+        ResTarget@35..43
+          ColumnRef@35..43
+            Location@35..43 "location"
+        Newline@43..44 "\n"
+        Whitespace@44..52 "        "
+        From@52..56 "FROM"
+        Whitespace@56..57 " "
+        RangeVar@57..64
+          Ident@57..64 "weather"
+        Ascii44@64..65 ","
+        Whitespace@65..66 " "
+        RangeVar@66..72
+          Ident@66..72 "cities"
+        Newline@72..73 "\n"
+        Whitespace@73..81 "        "
+        Where@81..86 "WHERE"
+        Whitespace@86..87 " "
+        AExpr@87..98
+          ColumnRef@87..91
+            Ident@87..91 "city"
+          Whitespace@91..92 " "
+          Ascii61@92..93 "="
+          Whitespace@93..94 " "
+          ColumnRef@94..98
+            NameP@94..98 "name"
+        Ascii59@98..99 ";"
+    ,
+    errors: [
+        SyntaxError(
+            "Expected Ascii59, found Whitespace",
+            22..22,
+        ),
+        SyntaxError(
+            "Invalid statement: syntax error at end of input",
+            0..8,
+        ),
+    ],
+    stmts: [
+        RawStmt {
+            stmt: SelectStmt(
+                SelectStmt {
+                    distinct_clause: [],
+                    into_clause: None,
+                    target_list: [
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "name",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 7,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 7,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "location",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 13,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 13,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    from_clause: [
+                        Node {
+                            node: Some(
+                                RangeVar(
+                                    RangeVar {
+                                        catalogname: "",
+                                        schemaname: "",
+                                        relname: "weather",
+                                        inh: true,
+                                        relpersistence: "p",
+                                        alias: None,
+                                        location: 35,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                RangeVar(
+                                    RangeVar {
+                                        catalogname: "",
+                                        schemaname: "",
+                                        relname: "cities",
+                                        inh: true,
+                                        relpersistence: "p",
+                                        alias: None,
+                                        location: 44,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    where_clause: Some(
+                        Node {
+                            node: Some(
+                                AExpr(
+                                    AExpr {
+                                        kind: AexprOp,
+                                        name: [
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "=",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        lexpr: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "city",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 65,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        rexpr: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "name",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 72,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 70,
+                                    },
+                                ),
+                            ),
+                        },
+                    ),
+                    group_clause: [],
+                    group_distinct: false,
+                    having_clause: None,
+                    window_clause: [],
+                    values_lists: [],
+                    sort_clause: [],
+                    limit_offset: None,
+                    limit_count: None,
+                    limit_option: Default,
+                    locking_clause: [],
+                    with_clause: None,
+                    op: SetopNone,
+                    all: false,
+                    larg: None,
+                    rarg: None,
+                },
+            ),
+            range: 25..102,
+        },
+    ],
+}

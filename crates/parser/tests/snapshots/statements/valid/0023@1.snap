@@ -1,0 +1,651 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE TABLE products (\n    product_no integer,\n    name text,\n    price numeric CHECK (price > 0),\n    discounted_price numeric CHECK (discounted_price > 0),\n    CHECK (price > discounted_price)\n);"
+---
+Parse {
+    cst: SourceFile@0..198
+      CreateStmt@0..198
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Table@7..12 "TABLE"
+        Whitespace@12..13 " "
+        RangeVar@13..21
+          Ident@13..21 "products"
+        Whitespace@21..22 " "
+        Ascii40@22..23 "("
+        Newline@23..24 "\n"
+        Whitespace@24..28 "    "
+        ColumnDef@28..46
+          Ident@28..38 "product_no"
+          Whitespace@38..39 " "
+          TypeName@39..46
+            Integer@39..46 "integer"
+        Ascii44@46..47 ","
+        Newline@47..48 "\n"
+        Whitespace@48..52 "    "
+        ColumnDef@52..61
+          NameP@52..56 "name"
+          Whitespace@56..57 " "
+          TypeName@57..61
+            TextP@57..61 "text"
+        Ascii44@61..62 ","
+        Newline@62..63 "\n"
+        Whitespace@63..67 "    "
+        ColumnDef@67..97
+          Ident@67..72 "price"
+          Whitespace@72..73 " "
+          TypeName@73..80
+            Numeric@73..80 "numeric"
+          Whitespace@80..81 " "
+          Constraint@81..97
+            Check@81..86 "CHECK"
+            Whitespace@86..87 " "
+            Ascii40@87..88 "("
+            AExpr@88..97
+              ColumnRef@88..93
+                Ident@88..93 "price"
+              Whitespace@93..94 " "
+              Ascii62@94..95 ">"
+              Whitespace@95..96 " "
+              AConst@96..97
+                Iconst@96..97 "0"
+        Ascii41@97..98 ")"
+        Ascii44@98..99 ","
+        Newline@99..100 "\n"
+        Whitespace@100..104 "    "
+        ColumnDef@104..156
+          Ident@104..120 "discounted_price"
+          Whitespace@120..121 " "
+          TypeName@121..128
+            Numeric@121..128 "numeric"
+          Whitespace@128..129 " "
+          Constraint@129..156
+            Check@129..134 "CHECK"
+            Whitespace@134..135 " "
+            Ascii40@135..136 "("
+            AExpr@136..156
+              ColumnRef@136..152
+                Ident@136..152 "discounted_price"
+              Whitespace@152..153 " "
+              Ascii62@153..154 ">"
+              Whitespace@154..155 " "
+              AConst@155..156
+                Iconst@155..156 "0"
+        Ascii41@156..157 ")"
+        Ascii44@157..158 ","
+        Newline@158..159 "\n"
+        Whitespace@159..163 "    "
+        Constraint@163..194
+          Check@163..168 "CHECK"
+          Whitespace@168..169 " "
+          Ascii40@169..170 "("
+          AExpr@170..194
+            ColumnRef@170..175
+              Ident@170..175 "price"
+            Whitespace@175..176 " "
+            Ascii62@176..177 ">"
+            Whitespace@177..178 " "
+            ColumnRef@178..194
+              Ident@178..194 "discounted_price"
+        Ascii41@194..195 ")"
+        Newline@195..196 "\n"
+        Ascii41@196..197 ")"
+        Ascii59@197..198 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateStmt(
+                CreateStmt {
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "products",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 13,
+                        },
+                    ),
+                    table_elts: [
+                        Node {
+                            node: Some(
+                                ColumnDef(
+                                    ColumnDef {
+                                        colname: "product_no",
+                                        type_name: Some(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "pg_catalog",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "int4",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 39,
+                                            },
+                                        ),
+                                        compression: "",
+                                        inhcount: 0,
+                                        is_local: true,
+                                        is_not_null: false,
+                                        is_from_type: false,
+                                        storage: "",
+                                        raw_default: None,
+                                        cooked_default: None,
+                                        identity: "",
+                                        identity_sequence: None,
+                                        generated: "",
+                                        coll_clause: None,
+                                        coll_oid: 0,
+                                        constraints: [],
+                                        fdwoptions: [],
+                                        location: 28,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ColumnDef(
+                                    ColumnDef {
+                                        colname: "name",
+                                        type_name: Some(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "text",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 57,
+                                            },
+                                        ),
+                                        compression: "",
+                                        inhcount: 0,
+                                        is_local: true,
+                                        is_not_null: false,
+                                        is_from_type: false,
+                                        storage: "",
+                                        raw_default: None,
+                                        cooked_default: None,
+                                        identity: "",
+                                        identity_sequence: None,
+                                        generated: "",
+                                        coll_clause: None,
+                                        coll_oid: 0,
+                                        constraints: [],
+                                        fdwoptions: [],
+                                        location: 52,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ColumnDef(
+                                    ColumnDef {
+                                        colname: "price",
+                                        type_name: Some(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "pg_catalog",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "numeric",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 73,
+                                            },
+                                        ),
+                                        compression: "",
+                                        inhcount: 0,
+                                        is_local: true,
+                                        is_not_null: false,
+                                        is_from_type: false,
+                                        storage: "",
+                                        raw_default: None,
+                                        cooked_default: None,
+                                        identity: "",
+                                        identity_sequence: None,
+                                        generated: "",
+                                        coll_clause: None,
+                                        coll_oid: 0,
+                                        constraints: [
+                                            Node {
+                                                node: Some(
+                                                    Constraint(
+                                                        Constraint {
+                                                            contype: ConstrCheck,
+                                                            conname: "",
+                                                            deferrable: false,
+                                                            initdeferred: false,
+                                                            location: 81,
+                                                            is_no_inherit: false,
+                                                            raw_expr: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        AExpr(
+                                                                            AExpr {
+                                                                                kind: AexprOp,
+                                                                                name: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            String(
+                                                                                                String {
+                                                                                                    sval: ">",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                lexpr: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            ColumnRef(
+                                                                                                ColumnRef {
+                                                                                                    fields: [
+                                                                                                        Node {
+                                                                                                            node: Some(
+                                                                                                                String(
+                                                                                                                    String {
+                                                                                                                        sval: "price",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                    ],
+                                                                                                    location: 88,
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                rexpr: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            AConst(
+                                                                                                AConst {
+                                                                                                    isnull: false,
+                                                                                                    location: 96,
+                                                                                                    val: Some(
+                                                                                                        Ival(
+                                                                                                            Integer {
+                                                                                                                ival: 0,
+                                                                                                            },
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                location: 94,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            cooked_expr: "",
+                                                            generated_when: "",
+                                                            nulls_not_distinct: false,
+                                                            keys: [],
+                                                            including: [],
+                                                            exclusions: [],
+                                                            options: [],
+                                                            indexname: "",
+                                                            indexspace: "",
+                                                            reset_default_tblspc: false,
+                                                            access_method: "",
+                                                            where_clause: None,
+                                                            pktable: None,
+                                                            fk_attrs: [],
+                                                            pk_attrs: [],
+                                                            fk_matchtype: "",
+                                                            fk_upd_action: "",
+                                                            fk_del_action: "",
+                                                            fk_del_set_cols: [],
+                                                            old_conpfeqop: [],
+                                                            old_pktable_oid: 0,
+                                                            skip_validation: false,
+                                                            initially_valid: true,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        fdwoptions: [],
+                                        location: 67,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ColumnDef(
+                                    ColumnDef {
+                                        colname: "discounted_price",
+                                        type_name: Some(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "pg_catalog",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "numeric",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 121,
+                                            },
+                                        ),
+                                        compression: "",
+                                        inhcount: 0,
+                                        is_local: true,
+                                        is_not_null: false,
+                                        is_from_type: false,
+                                        storage: "",
+                                        raw_default: None,
+                                        cooked_default: None,
+                                        identity: "",
+                                        identity_sequence: None,
+                                        generated: "",
+                                        coll_clause: None,
+                                        coll_oid: 0,
+                                        constraints: [
+                                            Node {
+                                                node: Some(
+                                                    Constraint(
+                                                        Constraint {
+                                                            contype: ConstrCheck,
+                                                            conname: "",
+                                                            deferrable: false,
+                                                            initdeferred: false,
+                                                            location: 129,
+                                                            is_no_inherit: false,
+                                                            raw_expr: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        AExpr(
+                                                                            AExpr {
+                                                                                kind: AexprOp,
+                                                                                name: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            String(
+                                                                                                String {
+                                                                                                    sval: ">",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                lexpr: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            ColumnRef(
+                                                                                                ColumnRef {
+                                                                                                    fields: [
+                                                                                                        Node {
+                                                                                                            node: Some(
+                                                                                                                String(
+                                                                                                                    String {
+                                                                                                                        sval: "discounted_price",
+                                                                                                                    },
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                    ],
+                                                                                                    location: 136,
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                rexpr: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            AConst(
+                                                                                                AConst {
+                                                                                                    isnull: false,
+                                                                                                    location: 155,
+                                                                                                    val: Some(
+                                                                                                        Ival(
+                                                                                                            Integer {
+                                                                                                                ival: 0,
+                                                                                                            },
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                location: 153,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            cooked_expr: "",
+                                                            generated_when: "",
+                                                            nulls_not_distinct: false,
+                                                            keys: [],
+                                                            including: [],
+                                                            exclusions: [],
+                                                            options: [],
+                                                            indexname: "",
+                                                            indexspace: "",
+                                                            reset_default_tblspc: false,
+                                                            access_method: "",
+                                                            where_clause: None,
+                                                            pktable: None,
+                                                            fk_attrs: [],
+                                                            pk_attrs: [],
+                                                            fk_matchtype: "",
+                                                            fk_upd_action: "",
+                                                            fk_del_action: "",
+                                                            fk_del_set_cols: [],
+                                                            old_conpfeqop: [],
+                                                            old_pktable_oid: 0,
+                                                            skip_validation: false,
+                                                            initially_valid: true,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        fdwoptions: [],
+                                        location: 104,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                Constraint(
+                                    Constraint {
+                                        contype: ConstrCheck,
+                                        conname: "",
+                                        deferrable: false,
+                                        initdeferred: false,
+                                        location: 163,
+                                        is_no_inherit: false,
+                                        raw_expr: Some(
+                                            Node {
+                                                node: Some(
+                                                    AExpr(
+                                                        AExpr {
+                                                            kind: AexprOp,
+                                                            name: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: ">",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            lexpr: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        ColumnRef(
+                                                                            ColumnRef {
+                                                                                fields: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            String(
+                                                                                                String {
+                                                                                                    sval: "price",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                location: 170,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            rexpr: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        ColumnRef(
+                                                                            ColumnRef {
+                                                                                fields: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            String(
+                                                                                                String {
+                                                                                                    sval: "discounted_price",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                location: 178,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            location: 176,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        cooked_expr: "",
+                                        generated_when: "",
+                                        nulls_not_distinct: false,
+                                        keys: [],
+                                        including: [],
+                                        exclusions: [],
+                                        options: [],
+                                        indexname: "",
+                                        indexspace: "",
+                                        reset_default_tblspc: false,
+                                        access_method: "",
+                                        where_clause: None,
+                                        pktable: None,
+                                        fk_attrs: [],
+                                        pk_attrs: [],
+                                        fk_matchtype: "",
+                                        fk_upd_action: "",
+                                        fk_del_action: "",
+                                        fk_del_set_cols: [],
+                                        old_conpfeqop: [],
+                                        old_pktable_oid: 0,
+                                        skip_validation: false,
+                                        initially_valid: true,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    inh_relations: [],
+                    partbound: None,
+                    partspec: None,
+                    of_typename: None,
+                    constraints: [],
+                    options: [],
+                    oncommit: OncommitNoop,
+                    tablespacename: "",
+                    access_method: "",
+                    if_not_exists: false,
+                },
+            ),
+            range: 0..197,
+        },
+    ],
+}

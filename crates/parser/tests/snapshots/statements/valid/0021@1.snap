@@ -1,0 +1,209 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "SELECT concat_lower_or_upper(a => 'Hello', b => 'World', uppercase => true);"
+---
+Parse {
+    cst: SourceFile@0..76
+      SelectStmt@0..76
+        Select@0..6 "SELECT"
+        Whitespace@6..7 " "
+        ResTarget@7..74
+          FuncCall@7..74
+            Ident@7..28 "concat_lower_or_upper"
+            Ascii40@28..29 "("
+            NamedArgExpr@29..41
+              Ident@29..30 "a"
+              Whitespace@30..31 " "
+              EqualsGreater@31..33 "=>"
+              Whitespace@33..34 " "
+              AConst@34..41
+                Sconst@34..41 "'Hello'"
+            Ascii44@41..42 ","
+            Whitespace@42..43 " "
+            NamedArgExpr@43..55
+              Ident@43..44 "b"
+              Whitespace@44..45 " "
+              EqualsGreater@45..47 "=>"
+              Whitespace@47..48 " "
+              AConst@48..55
+                Sconst@48..55 "'World'"
+            Ascii44@55..56 ","
+            Whitespace@56..57 " "
+            NamedArgExpr@57..74
+              Ident@57..66 "uppercase"
+              Whitespace@66..67 " "
+              EqualsGreater@67..69 "=>"
+              Whitespace@69..70 " "
+              AConst@70..74
+                TrueP@70..74 "true"
+        Ascii41@74..75 ")"
+        Ascii59@75..76 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: SelectStmt(
+                SelectStmt {
+                    distinct_clause: [],
+                    into_clause: None,
+                    target_list: [
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    FuncCall(
+                                                        FuncCall {
+                                                            funcname: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "concat_lower_or_upper",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            args: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        NamedArgExpr(
+                                                                            NamedArgExpr {
+                                                                                xpr: None,
+                                                                                arg: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            AConst(
+                                                                                                AConst {
+                                                                                                    isnull: false,
+                                                                                                    location: 34,
+                                                                                                    val: Some(
+                                                                                                        Sval(
+                                                                                                            String {
+                                                                                                                sval: "Hello",
+                                                                                                            },
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                name: "a",
+                                                                                argnumber: -1,
+                                                                                location: 29,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        NamedArgExpr(
+                                                                            NamedArgExpr {
+                                                                                xpr: None,
+                                                                                arg: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            AConst(
+                                                                                                AConst {
+                                                                                                    isnull: false,
+                                                                                                    location: 48,
+                                                                                                    val: Some(
+                                                                                                        Sval(
+                                                                                                            String {
+                                                                                                                sval: "World",
+                                                                                                            },
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                name: "b",
+                                                                                argnumber: -1,
+                                                                                location: 43,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        NamedArgExpr(
+                                                                            NamedArgExpr {
+                                                                                xpr: None,
+                                                                                arg: Some(
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            AConst(
+                                                                                                AConst {
+                                                                                                    isnull: false,
+                                                                                                    location: 70,
+                                                                                                    val: Some(
+                                                                                                        Boolval(
+                                                                                                            Boolean {
+                                                                                                                boolval: true,
+                                                                                                            },
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                                name: "uppercase",
+                                                                                argnumber: -1,
+                                                                                location: 57,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            agg_order: [],
+                                                            agg_filter: None,
+                                                            over: None,
+                                                            agg_within_group: false,
+                                                            agg_star: false,
+                                                            agg_distinct: false,
+                                                            func_variadic: false,
+                                                            funcformat: CoerceExplicitCall,
+                                                            location: 7,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 7,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    from_clause: [],
+                    where_clause: None,
+                    group_clause: [],
+                    group_distinct: false,
+                    having_clause: None,
+                    window_clause: [],
+                    values_lists: [],
+                    sort_clause: [],
+                    limit_offset: None,
+                    limit_count: None,
+                    limit_option: Default,
+                    locking_clause: [],
+                    with_clause: None,
+                    op: SetopNone,
+                    all: false,
+                    larg: None,
+                    rarg: None,
+                },
+            ),
+            range: 0..75,
+        },
+    ],
+}

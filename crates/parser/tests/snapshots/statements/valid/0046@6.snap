@@ -1,0 +1,159 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE TYPE type1 AS RANGE (subtype = int4, receive = receive_func, passedbyvalue);"
+---
+Parse {
+    cst: SourceFile@0..84
+      Newline@0..1 "\n"
+      CreateRangeStmt@1..84
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        TypeP@8..12 "TYPE"
+        Whitespace@12..13 " "
+        Ident@13..18 "type1"
+        Whitespace@18..19 " "
+        As@19..21 "AS"
+        Whitespace@21..22 " "
+        Range@22..27 "RANGE"
+        Whitespace@27..28 " "
+        Ascii40@28..29 "("
+        DefElem@29..43
+          Ident@29..36 "subtype"
+          Whitespace@36..37 " "
+          Ascii61@37..38 "="
+          Whitespace@38..39 " "
+          TypeName@39..43
+            Ident@39..43 "int4"
+        Ascii44@43..44 ","
+        Whitespace@44..45 " "
+        DefElem@45..67
+          Ident@45..52 "receive"
+          Whitespace@52..53 " "
+          Ascii61@53..54 "="
+          Whitespace@54..55 " "
+          TypeName@55..67
+            Ident@55..67 "receive_func"
+        Ascii44@67..68 ","
+        Whitespace@68..69 " "
+        DefElem@69..82
+          Ident@69..82 "passedbyvalue"
+        Ascii41@82..83 ")"
+        Ascii59@83..84 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateRangeStmt(
+                CreateRangeStmt {
+                    type_name: [
+                        Node {
+                            node: Some(
+                                String(
+                                    String {
+                                        sval: "type1",
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    params: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "subtype",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    TypeName(
+                                                        TypeName {
+                                                            names: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "int4",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            type_oid: 0,
+                                                            setof: false,
+                                                            pct_type: false,
+                                                            typmods: [],
+                                                            typemod: -1,
+                                                            array_bounds: [],
+                                                            location: 38,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 28,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "receive",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    TypeName(
+                                                        TypeName {
+                                                            names: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "receive_func",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            type_oid: 0,
+                                                            setof: false,
+                                                            pct_type: false,
+                                                            typmods: [],
+                                                            typemod: -1,
+                                                            array_bounds: [],
+                                                            location: 54,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 44,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "passedbyvalue",
+                                        arg: None,
+                                        defaction: DefelemUnspec,
+                                        location: 68,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                },
+            ),
+            range: 0..83,
+        },
+    ],
+}

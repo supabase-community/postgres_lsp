@@ -1,0 +1,16 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: CREATE TYPE type1;
+---
+Parse {
+    cst: SourceFile@0..18
+      Create@0..6 "CREATE"
+      Whitespace@6..7 " "
+      TypeP@7..11 "TYPE"
+      Whitespace@11..12 " "
+      Ident@12..17 "type1"
+      Ascii59@17..18 ";"
+    ,
+    errors: [],
+    stmts: [],
+}

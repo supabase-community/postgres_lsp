@@ -1,0 +1,30 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE TYPE type1 AS (attr1 int4, attr2 bool);"
+---
+Parse {
+    cst: SourceFile@0..47
+      Newline@0..1 "\n"
+      Create@1..7 "CREATE"
+      Whitespace@7..8 " "
+      TypeP@8..12 "TYPE"
+      Whitespace@12..13 " "
+      Ident@13..18 "type1"
+      Whitespace@18..19 " "
+      As@19..21 "AS"
+      Whitespace@21..22 " "
+      Ascii40@22..23 "("
+      Ident@23..28 "attr1"
+      Whitespace@28..29 " "
+      Ident@29..33 "int4"
+      Ascii44@33..34 ","
+      Whitespace@34..35 " "
+      Ident@35..40 "attr2"
+      Whitespace@40..41 " "
+      Ident@41..45 "bool"
+      Ascii41@45..46 ")"
+      Ascii59@46..47 ";"
+    ,
+    errors: [],
+    stmts: [],
+}

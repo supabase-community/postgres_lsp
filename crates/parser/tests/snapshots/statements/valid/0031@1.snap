@@ -1,0 +1,83 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE POLICY user_mod ON passwd FOR UPDATE\n  USING (current_user = user_name)\n  WITH CHECK (\n    current_user = user_name AND\n    shell IN ('/bin/bash','/bin/sh','/bin/dash','/bin/zsh','/bin/tcsh')\n  );"
+---
+Parse {
+    cst: SourceFile@0..202
+      Create@0..6 "CREATE"
+      Whitespace@6..7 " "
+      Policy@7..13 "POLICY"
+      Whitespace@13..14 " "
+      Ident@14..22 "user_mod"
+      Whitespace@22..23 " "
+      On@23..25 "ON"
+      Whitespace@25..26 " "
+      Ident@26..32 "passwd"
+      Whitespace@32..33 " "
+      For@33..36 "FOR"
+      Update@36..42 "UPDATE"
+      Newline@42..43 "\n"
+      Whitespace@43..45 "  "
+      Using@45..50 "USING"
+      Whitespace@50..51 " "
+      Ascii40@51..52 "("
+      CurrentUser@52..64 "current_user"
+      Whitespace@64..65 " "
+      Ascii61@65..66 "="
+      Whitespace@66..67 " "
+      Ident@67..76 "user_name"
+      Ascii41@76..77 ")"
+      Newline@77..78 "\n"
+      Whitespace@78..80 "  "
+      With@80..84 "WITH"
+      Whitespace@84..85 " "
+      Check@85..90 "CHECK"
+      Whitespace@90..91 " "
+      Ascii40@91..92 "("
+      Newline@92..93 "\n"
+      Whitespace@93..97 "    "
+      CurrentUser@97..109 "current_user"
+      Whitespace@109..110 " "
+      Ascii61@110..111 "="
+      Whitespace@111..112 " "
+      Ident@112..121 "user_name"
+      Whitespace@121..122 " "
+      And@122..125 "AND"
+      Newline@125..126 "\n"
+      Whitespace@126..130 "    "
+      Ident@130..135 "shell"
+      Whitespace@135..136 " "
+      InP@136..138 "IN"
+      Whitespace@138..139 " "
+      Ascii40@139..140 "("
+      Sconst@140..151 "'/bin/bash'"
+      Ascii44@151..152 ","
+      Sconst@152..161 "'/bin/sh'"
+      Ascii44@161..162 ","
+      Sconst@162..173 "'/bin/dash'"
+      Ascii44@173..174 ","
+      Sconst@174..184 "'/bin/zsh'"
+      Ascii44@184..185 ","
+      Sconst@185..196 "'/bin/tcsh'"
+      Ascii41@196..197 ")"
+      Newline@197..198 "\n"
+      Whitespace@198..200 "  "
+      Ascii41@200..201 ")"
+      Ascii59@201..202 ";"
+    ,
+    errors: [
+        SyntaxError(
+            "Expected Ascii59, found Whitespace",
+            36..36,
+        ),
+        SyntaxError(
+            "Invalid statement: syntax error at end of input",
+            0..11,
+        ),
+        SyntaxError(
+            "Invalid statement: syntax error at or near \"USING\"",
+            12..61,
+        ),
+    ],
+    stmts: [],
+}

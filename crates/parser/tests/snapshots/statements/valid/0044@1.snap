@@ -1,0 +1,208 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE VIEW comedies AS SELECT * FROM films WHERE kind = 'Comedy';"
+---
+Parse {
+    cst: SourceFile@0..66
+      ViewStmt@0..66
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        View@7..11 "VIEW"
+        Whitespace@11..12 " "
+        RangeVar@12..20
+          Ident@12..20 "comedies"
+        Whitespace@20..21 " "
+        As@21..23 "AS"
+        Whitespace@23..24 " "
+        SelectStmt@24..65
+          Select@24..30 "SELECT"
+          Whitespace@30..31 " "
+          ResTarget@31..32
+            ColumnRef@31..32
+              AStar@31..32
+                Ascii42@31..32 "*"
+          Whitespace@32..33 " "
+          From@33..37 "FROM"
+          Whitespace@37..38 " "
+          RangeVar@38..43
+            Ident@38..43 "films"
+          Whitespace@43..44 " "
+          Where@44..49 "WHERE"
+          Whitespace@49..50 " "
+          AExpr@50..65
+            ColumnRef@50..54
+              Ident@50..54 "kind"
+            Whitespace@54..55 " "
+            Ascii61@55..56 "="
+            Whitespace@56..57 " "
+            AConst@57..65
+              Sconst@57..65 "'Comedy'"
+        Ascii59@65..66 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: ViewStmt(
+                ViewStmt {
+                    view: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "comedies",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 12,
+                        },
+                    ),
+                    aliases: [],
+                    query: Some(
+                        Node {
+                            node: Some(
+                                SelectStmt(
+                                    SelectStmt {
+                                        distinct_clause: [],
+                                        into_clause: None,
+                                        target_list: [
+                                            Node {
+                                                node: Some(
+                                                    ResTarget(
+                                                        ResTarget {
+                                                            name: "",
+                                                            indirection: [],
+                                                            val: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        ColumnRef(
+                                                                            ColumnRef {
+                                                                                fields: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            AStar(
+                                                                                                AStar,
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                location: 31,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            location: 31,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        from_clause: [
+                                            Node {
+                                                node: Some(
+                                                    RangeVar(
+                                                        RangeVar {
+                                                            catalogname: "",
+                                                            schemaname: "",
+                                                            relname: "films",
+                                                            inh: true,
+                                                            relpersistence: "p",
+                                                            alias: None,
+                                                            location: 38,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        where_clause: Some(
+                                            Node {
+                                                node: Some(
+                                                    AExpr(
+                                                        AExpr {
+                                                            kind: AexprOp,
+                                                            name: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "=",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            lexpr: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        ColumnRef(
+                                                                            ColumnRef {
+                                                                                fields: [
+                                                                                    Node {
+                                                                                        node: Some(
+                                                                                            String(
+                                                                                                String {
+                                                                                                    sval: "kind",
+                                                                                                },
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                ],
+                                                                                location: 50,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            rexpr: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 57,
+                                                                                val: Some(
+                                                                                    Sval(
+                                                                                        String {
+                                                                                            sval: "Comedy",
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            location: 55,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        group_clause: [],
+                                        group_distinct: false,
+                                        having_clause: None,
+                                        window_clause: [],
+                                        values_lists: [],
+                                        sort_clause: [],
+                                        limit_offset: None,
+                                        limit_count: None,
+                                        limit_option: Default,
+                                        locking_clause: [],
+                                        with_clause: None,
+                                        op: SetopNone,
+                                        all: false,
+                                        larg: None,
+                                        rarg: None,
+                                    },
+                                ),
+                            ),
+                        },
+                    ),
+                    replace: false,
+                    options: [],
+                    with_check_option: NoCheckOption,
+                },
+            ),
+            range: 0..65,
+        },
+    ],
+}

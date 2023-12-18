@@ -1,0 +1,137 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE POLICY account_managers ON accounts TO managers\n    USING (manager = current_user);"
+---
+Parse {
+    cst: SourceFile@0..90
+      CreatePolicyStmt@0..90
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Policy@7..13 "POLICY"
+        Whitespace@13..14 " "
+        Ident@14..30 "account_managers"
+        Whitespace@30..31 " "
+        On@31..33 "ON"
+        Whitespace@33..34 " "
+        RangeVar@34..42
+          Ident@34..42 "accounts"
+        Whitespace@42..43 " "
+        To@43..45 "TO"
+        Whitespace@45..46 " "
+        RoleSpec@46..54
+          Ident@46..54 "managers"
+        Newline@54..55 "\n"
+        Whitespace@55..59 "    "
+        Using@59..64 "USING"
+        Whitespace@64..65 " "
+        Ascii40@65..66 "("
+        AExpr@66..88
+          ColumnRef@66..73
+            Ident@66..73 "manager"
+          Whitespace@73..74 " "
+          Ascii61@74..75 "="
+          Whitespace@75..76 " "
+          SqlvalueFunction@76..88
+            CurrentUser@76..88 "current_user"
+        Ascii41@88..89 ")"
+        Ascii59@89..90 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreatePolicyStmt(
+                CreatePolicyStmt {
+                    policy_name: "account_managers",
+                    table: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "accounts",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 34,
+                        },
+                    ),
+                    cmd_name: "all",
+                    permissive: true,
+                    roles: [
+                        Node {
+                            node: Some(
+                                RoleSpec(
+                                    RoleSpec {
+                                        roletype: RolespecCstring,
+                                        rolename: "managers",
+                                        location: 46,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    qual: Some(
+                        Node {
+                            node: Some(
+                                AExpr(
+                                    AExpr {
+                                        kind: AexprOp,
+                                        name: [
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "=",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        lexpr: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "manager",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 66,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        rexpr: Some(
+                                            Node {
+                                                node: Some(
+                                                    SqlvalueFunction(
+                                                        SqlValueFunction {
+                                                            xpr: None,
+                                                            op: SvfopCurrentUser,
+                                                            r#type: 0,
+                                                            typmod: -1,
+                                                            location: 76,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 74,
+                                    },
+                                ),
+                            ),
+                        },
+                    ),
+                    with_check: None,
+                },
+            ),
+            range: 0..89,
+        },
+    ],
+}

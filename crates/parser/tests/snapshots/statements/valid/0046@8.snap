@@ -1,0 +1,35 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE TYPE type1 (input = input1, output = output1, passedbyvalue);"
+---
+Parse {
+    cst: SourceFile@0..69
+      Newline@0..1 "\n"
+      Create@1..7 "CREATE"
+      Whitespace@7..8 " "
+      TypeP@8..12 "TYPE"
+      Whitespace@12..13 " "
+      Ident@13..18 "type1"
+      Whitespace@18..19 " "
+      Ascii40@19..20 "("
+      InputP@20..25 "input"
+      Whitespace@25..26 " "
+      Ascii61@26..27 "="
+      Whitespace@27..28 " "
+      Ident@28..34 "input1"
+      Ascii44@34..35 ","
+      Whitespace@35..36 " "
+      Ident@36..42 "output"
+      Whitespace@42..43 " "
+      Ascii61@43..44 "="
+      Whitespace@44..45 " "
+      Ident@45..52 "output1"
+      Ascii44@52..53 ","
+      Whitespace@53..54 " "
+      Ident@54..67 "passedbyvalue"
+      Ascii41@67..68 ")"
+      Ascii59@68..69 ";"
+    ,
+    errors: [],
+    stmts: [],
+}

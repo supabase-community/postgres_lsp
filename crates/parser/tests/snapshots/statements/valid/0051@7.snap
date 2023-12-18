@@ -1,0 +1,124 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE UNIQUE INDEX title_idx ON films (title) WITH (fillfactor = 70);"
+---
+Parse {
+    cst: SourceFile@0..71
+      Newline@0..1 "\n"
+      IndexStmt@1..71
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Unique@8..14 "UNIQUE"
+        Whitespace@14..15 " "
+        Index@15..20 "INDEX"
+        Whitespace@20..21 " "
+        Ident@21..30 "title_idx"
+        Whitespace@30..31 " "
+        On@31..33 "ON"
+        Whitespace@33..34 " "
+        RangeVar@34..39
+          Ident@34..39 "films"
+        Whitespace@39..40 " "
+        Ascii40@40..41 "("
+        IndexElem@41..46
+          Ident@41..46 "title"
+        Ascii41@46..47 ")"
+        Whitespace@47..48 " "
+        With@48..52 "WITH"
+        Whitespace@52..53 " "
+        Ascii40@53..54 "("
+        DefElem@54..69
+          Ident@54..64 "fillfactor"
+          Whitespace@64..65 " "
+          Ascii61@65..66 "="
+          Whitespace@66..67 " "
+          Iconst@67..69 "70"
+        Ascii41@69..70 ")"
+        Ascii59@70..71 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: IndexStmt(
+                IndexStmt {
+                    idxname: "title_idx",
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "films",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 33,
+                        },
+                    ),
+                    access_method: "btree",
+                    table_space: "",
+                    index_params: [
+                        Node {
+                            node: Some(
+                                IndexElem(
+                                    IndexElem {
+                                        name: "title",
+                                        expr: None,
+                                        indexcolname: "",
+                                        collation: [],
+                                        opclass: [],
+                                        opclassopts: [],
+                                        ordering: SortbyDefault,
+                                        nulls_ordering: SortbyNullsDefault,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    index_including_params: [],
+                    options: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "fillfactor",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    Integer(
+                                                        Integer {
+                                                            ival: 70,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 53,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    where_clause: None,
+                    exclude_op_names: [],
+                    idxcomment: "",
+                    index_oid: 0,
+                    old_node: 0,
+                    old_create_subid: 0,
+                    old_first_relfilenode_subid: 0,
+                    unique: true,
+                    nulls_not_distinct: false,
+                    primary: false,
+                    isconstraint: false,
+                    deferrable: false,
+                    initdeferred: false,
+                    transformed: false,
+                    concurrent: false,
+                    if_not_exists: false,
+                    reset_default_tblspc: false,
+                },
+            ),
+            range: 0..70,
+        },
+    ],
+}

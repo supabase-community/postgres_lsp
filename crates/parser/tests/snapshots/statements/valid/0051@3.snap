@@ -1,0 +1,140 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE INDEX title_idx ON films (title) WITH (deduplicate_items = off);"
+---
+Parse {
+    cst: SourceFile@0..72
+      Newline@0..1 "\n"
+      IndexStmt@1..72
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Index@8..13 "INDEX"
+        Whitespace@13..14 " "
+        Ident@14..23 "title_idx"
+        Whitespace@23..24 " "
+        On@24..26 "ON"
+        Whitespace@26..27 " "
+        RangeVar@27..32
+          Ident@27..32 "films"
+        Whitespace@32..33 " "
+        Ascii40@33..34 "("
+        IndexElem@34..39
+          Ident@34..39 "title"
+        Ascii41@39..40 ")"
+        Whitespace@40..41 " "
+        With@41..45 "WITH"
+        Whitespace@45..46 " "
+        Ascii40@46..47 "("
+        DefElem@47..70
+          Ident@47..64 "deduplicate_items"
+          Whitespace@64..65 " "
+          Ascii61@65..66 "="
+          Whitespace@66..67 " "
+          TypeName@67..70
+            Off@67..70 "off"
+        Ascii41@70..71 ")"
+        Ascii59@71..72 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: IndexStmt(
+                IndexStmt {
+                    idxname: "title_idx",
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "films",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 26,
+                        },
+                    ),
+                    access_method: "btree",
+                    table_space: "",
+                    index_params: [
+                        Node {
+                            node: Some(
+                                IndexElem(
+                                    IndexElem {
+                                        name: "title",
+                                        expr: None,
+                                        indexcolname: "",
+                                        collation: [],
+                                        opclass: [],
+                                        opclassopts: [],
+                                        ordering: SortbyDefault,
+                                        nulls_ordering: SortbyNullsDefault,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    index_including_params: [],
+                    options: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "deduplicate_items",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    TypeName(
+                                                        TypeName {
+                                                            names: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "off",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            type_oid: 0,
+                                                            setof: false,
+                                                            pct_type: false,
+                                                            typmods: [],
+                                                            typemod: -1,
+                                                            array_bounds: [],
+                                                            location: 66,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 46,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    where_clause: None,
+                    exclude_op_names: [],
+                    idxcomment: "",
+                    index_oid: 0,
+                    old_node: 0,
+                    old_create_subid: 0,
+                    old_first_relfilenode_subid: 0,
+                    unique: false,
+                    nulls_not_distinct: false,
+                    primary: false,
+                    isconstraint: false,
+                    deferrable: false,
+                    initdeferred: false,
+                    transformed: false,
+                    concurrent: false,
+                    if_not_exists: false,
+                    reset_default_tblspc: false,
+                },
+            ),
+            range: 0..71,
+        },
+    ],
+}

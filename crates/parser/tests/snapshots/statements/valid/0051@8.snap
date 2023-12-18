@@ -1,0 +1,144 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE INDEX gin_idx ON documents_table USING GIN (locations) WITH (fastupdate = off);"
+---
+Parse {
+    cst: SourceFile@0..87
+      Newline@0..1 "\n"
+      IndexStmt@1..87
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Index@8..13 "INDEX"
+        Whitespace@13..14 " "
+        Ident@14..21 "gin_idx"
+        Whitespace@21..22 " "
+        On@22..24 "ON"
+        Whitespace@24..25 " "
+        RangeVar@25..40
+          Ident@25..40 "documents_table"
+        Whitespace@40..41 " "
+        Using@41..46 "USING"
+        Whitespace@46..47 " "
+        Ident@47..50 "GIN"
+        Whitespace@50..51 " "
+        Ascii40@51..52 "("
+        IndexElem@52..61
+          Ident@52..61 "locations"
+        Ascii41@61..62 ")"
+        Whitespace@62..63 " "
+        With@63..67 "WITH"
+        Whitespace@67..68 " "
+        Ascii40@68..69 "("
+        DefElem@69..85
+          Ident@69..79 "fastupdate"
+          Whitespace@79..80 " "
+          Ascii61@80..81 "="
+          Whitespace@81..82 " "
+          TypeName@82..85
+            Off@82..85 "off"
+        Ascii41@85..86 ")"
+        Ascii59@86..87 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: IndexStmt(
+                IndexStmt {
+                    idxname: "gin_idx",
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "documents_table",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 24,
+                        },
+                    ),
+                    access_method: "gin",
+                    table_space: "",
+                    index_params: [
+                        Node {
+                            node: Some(
+                                IndexElem(
+                                    IndexElem {
+                                        name: "locations",
+                                        expr: None,
+                                        indexcolname: "",
+                                        collation: [],
+                                        opclass: [],
+                                        opclassopts: [],
+                                        ordering: SortbyDefault,
+                                        nulls_ordering: SortbyNullsDefault,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    index_including_params: [],
+                    options: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "fastupdate",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    TypeName(
+                                                        TypeName {
+                                                            names: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "off",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            type_oid: 0,
+                                                            setof: false,
+                                                            pct_type: false,
+                                                            typmods: [],
+                                                            typemod: -1,
+                                                            array_bounds: [],
+                                                            location: 81,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 68,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    where_clause: None,
+                    exclude_op_names: [],
+                    idxcomment: "",
+                    index_oid: 0,
+                    old_node: 0,
+                    old_create_subid: 0,
+                    old_first_relfilenode_subid: 0,
+                    unique: false,
+                    nulls_not_distinct: false,
+                    primary: false,
+                    isconstraint: false,
+                    deferrable: false,
+                    initdeferred: false,
+                    transformed: false,
+                    concurrent: false,
+                    if_not_exists: false,
+                    reset_default_tblspc: false,
+                },
+            ),
+            range: 0..86,
+        },
+    ],
+}

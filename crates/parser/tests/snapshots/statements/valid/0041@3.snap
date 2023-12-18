@@ -1,0 +1,47 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE SCHEMA IF NOT EXISTS test AUTHORIZATION joe;"
+---
+Parse {
+    cst: SourceFile@0..52
+      Newline@0..1 "\n"
+      CreateSchemaStmt@1..52
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Schema@8..14 "SCHEMA"
+        Whitespace@14..15 " "
+        IfP@15..17 "IF"
+        Whitespace@17..18 " "
+        Not@18..21 "NOT"
+        Whitespace@21..22 " "
+        Exists@22..28 "EXISTS"
+        Whitespace@28..29 " "
+        Ident@29..33 "test"
+        Whitespace@33..34 " "
+        Authorization@34..47 "AUTHORIZATION"
+        Whitespace@47..48 " "
+        RoleSpec@48..51
+          Ident@48..51 "joe"
+        Ascii59@51..52 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateSchemaStmt(
+                CreateSchemaStmt {
+                    schemaname: "test",
+                    authrole: Some(
+                        RoleSpec {
+                            roletype: RolespecCstring,
+                            rolename: "joe",
+                            location: 47,
+                        },
+                    ),
+                    schema_elts: [],
+                    if_not_exists: true,
+                },
+            ),
+            range: 0..51,
+        },
+    ],
+}
