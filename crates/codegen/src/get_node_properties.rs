@@ -451,7 +451,11 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "CreateFunctionStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
-            tokens.push(TokenProperty::from(Token::Function));
+            if n.is_procedure {
+                tokens.push(TokenProperty::from(Token::Procedure));
+            } else {
+                tokens.push(TokenProperty::from(Token::Function));
+            }
             if n.replace {
                 tokens.push(TokenProperty::from(Token::Or));
                 tokens.push(TokenProperty::from(Token::Replace));
