@@ -358,6 +358,21 @@ mod tests {
     }
 
     #[test]
+    fn test_nested_trx() {
+        init();
+
+        let input = "CREATE PROCEDURE insert_data(a integer, b integer) LANGUAGE SQL BEGIN ATOMIC INSERT INTO tbl VALUES (a); INSERT INTO tbl VALUES (b); END;";
+
+        let mut p = Parser::new(lex(input));
+        source(&mut p);
+        let result = p.finish();
+
+        dbg!(&result.cst);
+        assert_eq!(result.stmts.len(), 2);
+        println!("{:#?}", result.errors);
+    }
+
+    #[test]
     fn test_parser_simple() {
         init();
 
