@@ -173,4 +173,21 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_operator() {
+        test_get_node_properties(
+            "create operator + (
+                procedure = plusfunc,
+                leftarg = int4,
+                rightarg = int4
+            );",
+            SyntaxKind::DefineStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Operator),
+                TokenProperty::from("+".to_string()),
+            ],
+        )
+    }
 }

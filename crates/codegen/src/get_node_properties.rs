@@ -528,6 +528,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
                         }                     }
                         // if its a list, we handle it in the handler for `List`
                 },
+                protobuf::ObjectType::ObjectOperator => {
+                    tokens.push(TokenProperty::from(Token::Operator));
+                },
                 _ => panic!("Unknown DefineStmt {:#?}", n.kind()),
             }
         },
