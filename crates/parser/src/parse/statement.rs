@@ -70,9 +70,19 @@ fn collect_statement_token_range(parser: &mut Parser, kind: SyntaxKind) -> Range
     advance_over_start_tokens(parser, kind);
 
     let mut is_sub_stmt = 0;
+    let mut is_sub_trx = 0;
     let mut ignore_next_non_whitespace = false;
     while !parser.at(SyntaxKind::Ascii59) && !parser.eof() {
         match parser.nth(0, false).kind {
+            SyntaxKind::BeginP => {
+                // BEGIN, consume until END
+                is_sub_trx += 1;
+                parser.advance();
+            }
+            SyntaxKind::EndP => {
+                is_sub_trx -= 1;
+                parser.advance();
+            }
             // opening brackets "(", consume until closing bracket ")"
             SyntaxKind::Ascii40 => {
                 is_sub_stmt += 1;
@@ -92,6 +102,7 @@ fn collect_statement_token_range(parser: &mut Parser, kind: SyntaxKind) -> Range
                 // ignore if parsing sub stmt
                 if ignore_next_non_whitespace == false
                     && is_sub_stmt == 0
+                    && is_sub_trx == 0
                     && is_at_stmt_start(parser).is_some()
                 {
                     break;
