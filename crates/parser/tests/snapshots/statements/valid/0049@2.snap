@@ -1,0 +1,118 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE EXTENSION IF NOT EXISTS x CASCADE VERSION \"1.2\" SCHEMA a;"
+---
+Parse {
+    cst: SourceFile@0..65
+      Newline@0..1 "\n"
+      CreateExtensionStmt@1..65
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Extension@8..17 "EXTENSION"
+        Whitespace@17..18 " "
+        IfP@18..20 "IF"
+        Whitespace@20..21 " "
+        Not@21..24 "NOT"
+        Whitespace@24..25 " "
+        Exists@25..31 "EXISTS"
+        Whitespace@31..32 " "
+        Ident@32..33 "x"
+        Whitespace@33..34 " "
+        DefElem@34..41
+          Cascade@34..41 "CASCADE"
+        Whitespace@41..42 " "
+        DefElem@42..55
+          VersionP@42..49 "VERSION"
+          Whitespace@49..50 " "
+          Ident@50..55 "\"1.2\""
+        Whitespace@55..56 " "
+        DefElem@56..64
+          Schema@56..62 "SCHEMA"
+          Whitespace@62..63 " "
+          Ident@63..64 "a"
+        Ascii59@64..65 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateExtensionStmt(
+                CreateExtensionStmt {
+                    extname: "x",
+                    if_not_exists: true,
+                    options: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "cascade",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    Boolean(
+                                                        Boolean {
+                                                            boolval: true,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 33,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "new_version",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "1.2",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 41,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "schema",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "a",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 55,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                },
+            ),
+            range: 0..64,
+        },
+    ],
+}

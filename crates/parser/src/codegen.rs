@@ -290,6 +290,9 @@ mod tests {
             vec![
                 TokenProperty::from(SyntaxKind::Create),
                 TokenProperty::from(SyntaxKind::Extension),
+                TokenProperty::from(SyntaxKind::IfP),
+                TokenProperty::from(SyntaxKind::Not),
+                TokenProperty::from(SyntaxKind::Exists),
                 TokenProperty::from("x".to_string()),
             ],
         )

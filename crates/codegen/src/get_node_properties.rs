@@ -703,6 +703,11 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "CreateExtensionStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
             tokens.push(TokenProperty::from(Token::Extension));
+            if n.if_not_exists {
+                tokens.push(TokenProperty::from(Token::IfP));
+                tokens.push(TokenProperty::from(Token::Not));
+                tokens.push(TokenProperty::from(Token::Exists));
+            }
         },
         _ => quote! {},
     }
