@@ -211,6 +211,19 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(n));
         },
         "DefElem" => quote! {
+            match n.defname.as_str() {
+                "location" => {
+                    tokens.push(TokenProperty::from(Token::Default));
+                },
+                "connection_limit" => {
+                    tokens.push(TokenProperty::from(Token::Limit));
+                    tokens.push(TokenProperty::from(Token::Iconst));
+                },
+                "owner" => {
+                    tokens.push(TokenProperty::from(Token::Owner));
+                }
+                _ => {}
+            }
             match n.defaction() {
                 protobuf::DefElemAction::DefelemUnspec => tokens.push(TokenProperty::from(Token::Ascii61)),
                 _ => panic!("Unknown DefElem {:#?}", n.defaction()),
@@ -679,9 +692,13 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::With));
             }
         },
-        "CompositeTypeStmt" =>  quote! {
+        "CompositeTypeStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
             tokens.push(TokenProperty::from(Token::TypeP));
+        },
+        "CreatedbStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::Database));
         },
         _ => quote! {},
     }

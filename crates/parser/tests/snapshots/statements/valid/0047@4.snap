@@ -1,0 +1,47 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE DATABASE x LOCATION DEFAULT;"
+---
+Parse {
+    cst: SourceFile@0..36
+      Newline@0..1 "\n"
+      CreatedbStmt@1..36
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Database@8..16 "DATABASE"
+        Whitespace@16..17 " "
+        Ident@17..18 "x"
+        Whitespace@18..19 " "
+        DefElem@19..35
+          Location@19..27 "LOCATION"
+          Whitespace@27..28 " "
+          Default@28..35 "DEFAULT"
+        Ascii59@35..36 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreatedbStmt(
+                CreatedbStmt {
+                    dbname: "x",
+                    options: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "location",
+                                        arg: None,
+                                        defaction: DefelemUnspec,
+                                        location: 18,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                },
+            ),
+            range: 0..35,
+        },
+    ],
+}

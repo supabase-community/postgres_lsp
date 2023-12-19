@@ -268,4 +268,17 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_database() {
+        test_get_node_properties(
+            "create database x owner abc connection limit 5;",
+            SyntaxKind::CreatedbStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Database),
+                TokenProperty::from("x".to_string()),
+            ],
+        )
+    }
 }

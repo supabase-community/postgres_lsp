@@ -1,0 +1,57 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE DATABASE x TABLESPACE abc;"
+---
+Parse {
+    cst: SourceFile@0..34
+      Newline@0..1 "\n"
+      CreatedbStmt@1..34
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Database@8..16 "DATABASE"
+        Whitespace@16..17 " "
+        Ident@17..18 "x"
+        Whitespace@18..19 " "
+        DefElem@19..33
+          Tablespace@19..29 "TABLESPACE"
+          Whitespace@29..30 " "
+          Ident@30..33 "abc"
+        Ascii59@33..34 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreatedbStmt(
+                CreatedbStmt {
+                    dbname: "x",
+                    options: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "tablespace",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "abc",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 18,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                },
+            ),
+            range: 0..33,
+        },
+    ],
+}

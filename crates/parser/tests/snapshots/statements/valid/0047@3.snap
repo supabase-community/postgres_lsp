@@ -1,0 +1,57 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\nCREATE DATABASE x LC_COLLATE \"en_US.UTF-8\";"
+---
+Parse {
+    cst: SourceFile@0..44
+      Newline@0..1 "\n"
+      CreatedbStmt@1..44
+        Create@1..7 "CREATE"
+        Whitespace@7..8 " "
+        Database@8..16 "DATABASE"
+        Whitespace@16..17 " "
+        Ident@17..18 "x"
+        Whitespace@18..19 " "
+        DefElem@19..43
+          Ident@19..29 "LC_COLLATE"
+          Whitespace@29..30 " "
+          Ident@30..43 "\"en_US.UTF-8\""
+        Ascii59@43..44 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreatedbStmt(
+                CreatedbStmt {
+                    dbname: "x",
+                    options: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "lc_collate",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "en_US.UTF-8",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 18,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                },
+            ),
+            range: 0..43,
+        },
+    ],
+}
