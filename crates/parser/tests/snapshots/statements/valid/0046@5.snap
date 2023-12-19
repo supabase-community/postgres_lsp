@@ -1,31 +1,30 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE TYPE type1 AS RANGE (subtype = int4);"
+description: CREATE TYPE type1 AS RANGE (subtype = int4);
 ---
 Parse {
-    cst: SourceFile@0..45
-      Newline@0..1 "\n"
-      CreateRangeStmt@1..45
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        TypeP@8..12 "TYPE"
-        Whitespace@12..13 " "
-        Ident@13..18 "type1"
-        Whitespace@18..19 " "
-        As@19..21 "AS"
-        Whitespace@21..22 " "
-        Range@22..27 "RANGE"
-        Whitespace@27..28 " "
-        Ascii40@28..29 "("
-        DefElem@29..43
-          Ident@29..36 "subtype"
-          Whitespace@36..37 " "
-          Ascii61@37..38 "="
-          Whitespace@38..39 " "
-          TypeName@39..43
-            Ident@39..43 "int4"
-        Ascii41@43..44 ")"
-        Ascii59@44..45 ";"
+    cst: SourceFile@0..44
+      CreateRangeStmt@0..44
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        TypeP@7..11 "TYPE"
+        Whitespace@11..12 " "
+        Ident@12..17 "type1"
+        Whitespace@17..18 " "
+        As@18..20 "AS"
+        Whitespace@20..21 " "
+        Range@21..26 "RANGE"
+        Whitespace@26..27 " "
+        Ascii40@27..28 "("
+        DefElem@28..42
+          Ident@28..35 "subtype"
+          Whitespace@35..36 " "
+          Ascii61@36..37 "="
+          Whitespace@37..38 " "
+          TypeName@38..42
+            Ident@38..42 "int4"
+        Ascii41@42..43 ")"
+        Ascii59@43..44 ";"
     ,
     errors: [],
     stmts: [
@@ -87,7 +86,7 @@ Parse {
                     ],
                 },
             ),
-            range: 0..44,
+            range: 0..43,
         },
     ],
 }

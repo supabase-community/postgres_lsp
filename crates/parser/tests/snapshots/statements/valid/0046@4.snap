@@ -1,31 +1,30 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE TYPE type1 AS ENUM ('value1', 'value2', 'value3');"
+description: "CREATE TYPE type1 AS ENUM ('value1', 'value2', 'value3');"
 ---
 Parse {
-    cst: SourceFile@0..58
-      Newline@0..1 "\n"
-      CreateEnumStmt@1..58
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        TypeP@8..12 "TYPE"
-        Whitespace@12..13 " "
-        Ident@13..18 "type1"
-        Whitespace@18..19 " "
-        As@19..21 "AS"
-        Whitespace@21..22 " "
-        EnumP@22..26 "ENUM"
-        Whitespace@26..27 " "
-        Ascii40@27..28 "("
-        Sconst@28..36 "'value1'"
-        Ascii44@36..37 ","
-        Whitespace@37..38 " "
-        Sconst@38..46 "'value2'"
-        Ascii44@46..47 ","
-        Whitespace@47..48 " "
-        Sconst@48..56 "'value3'"
-        Ascii41@56..57 ")"
-        Ascii59@57..58 ";"
+    cst: SourceFile@0..57
+      CreateEnumStmt@0..57
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        TypeP@7..11 "TYPE"
+        Whitespace@11..12 " "
+        Ident@12..17 "type1"
+        Whitespace@17..18 " "
+        As@18..20 "AS"
+        Whitespace@20..21 " "
+        EnumP@21..25 "ENUM"
+        Whitespace@25..26 " "
+        Ascii40@26..27 "("
+        Sconst@27..35 "'value1'"
+        Ascii44@35..36 ","
+        Whitespace@36..37 " "
+        Sconst@37..45 "'value2'"
+        Ascii44@45..46 ","
+        Whitespace@46..47 " "
+        Sconst@47..55 "'value3'"
+        Ascii41@55..56 ")"
+        Ascii59@56..57 ";"
     ,
     errors: [],
     stmts: [
@@ -74,7 +73,7 @@ Parse {
                     ],
                 },
             ),
-            range: 0..57,
+            range: 0..56,
         },
     ],
 }

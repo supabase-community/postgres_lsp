@@ -1,48 +1,47 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE AGGREGATE aggregate1 (int4, bool) (sfunc = sfunc1, stype = stype1);"
+description: "CREATE AGGREGATE aggregate1 (int4, bool) (sfunc = sfunc1, stype = stype1);"
 ---
 Parse {
-    cst: SourceFile@0..75
-      Newline@0..1 "\n"
-      DefineStmt@1..75
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Aggregate@8..17 "AGGREGATE"
-        Whitespace@17..18 " "
-        Ident@18..28 "aggregate1"
-        Whitespace@28..29 " "
-        Ascii40@29..30 "("
-        List@30..40
-          FunctionParameter@30..34
-            TypeName@30..34
-              Ident@30..34 "int4"
-          Ascii44@34..35 ","
-          Whitespace@35..36 " "
-          FunctionParameter@36..40
-            TypeName@36..40
-              Ident@36..40 "bool"
-        Ascii41@40..41 ")"
-        Whitespace@41..42 " "
-        Ascii40@42..43 "("
-        DefElem@43..57
-          Ident@43..48 "sfunc"
-          Whitespace@48..49 " "
-          Ascii61@49..50 "="
-          Whitespace@50..51 " "
-          TypeName@51..57
-            Ident@51..57 "sfunc1"
-        Ascii44@57..58 ","
-        Whitespace@58..59 " "
-        DefElem@59..73
-          Ident@59..64 "stype"
-          Whitespace@64..65 " "
-          Ascii61@65..66 "="
-          Whitespace@66..67 " "
-          TypeName@67..73
-            Ident@67..73 "stype1"
-        Ascii41@73..74 ")"
-        Ascii59@74..75 ";"
+    cst: SourceFile@0..74
+      DefineStmt@0..74
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Aggregate@7..16 "AGGREGATE"
+        Whitespace@16..17 " "
+        Ident@17..27 "aggregate1"
+        Whitespace@27..28 " "
+        Ascii40@28..29 "("
+        List@29..39
+          FunctionParameter@29..33
+            TypeName@29..33
+              Ident@29..33 "int4"
+          Ascii44@33..34 ","
+          Whitespace@34..35 " "
+          FunctionParameter@35..39
+            TypeName@35..39
+              Ident@35..39 "bool"
+        Ascii41@39..40 ")"
+        Whitespace@40..41 " "
+        Ascii40@41..42 "("
+        DefElem@42..56
+          Ident@42..47 "sfunc"
+          Whitespace@47..48 " "
+          Ascii61@48..49 "="
+          Whitespace@49..50 " "
+          TypeName@50..56
+            Ident@50..56 "sfunc1"
+        Ascii44@56..57 ","
+        Whitespace@57..58 " "
+        DefElem@58..72
+          Ident@58..63 "stype"
+          Whitespace@63..64 " "
+          Ascii61@64..65 "="
+          Whitespace@65..66 " "
+          TypeName@66..72
+            Ident@66..72 "stype1"
+        Ascii41@72..73 ")"
+        Ascii59@73..74 ";"
     ,
     errors: [],
     stmts: [
@@ -235,7 +234,7 @@ Parse {
                     replace: false,
                 },
             ),
-            range: 0..74,
+            range: 0..73,
         },
     ],
 }

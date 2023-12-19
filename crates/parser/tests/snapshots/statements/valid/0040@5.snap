@@ -1,58 +1,57 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE OR REPLACE FUNCTION getfoo(int) RETURNS SETOF users AS $$SELECT * FROM \\\"users\\\" WHERE users.id = $1;$$ LANGUAGE sql IMMUTABLE RETURNS NULL ON NULL INPUT;"
+description: "CREATE OR REPLACE FUNCTION getfoo(int) RETURNS SETOF users AS $$SELECT * FROM \\\"users\\\" WHERE users.id = $1;$$ LANGUAGE sql IMMUTABLE RETURNS NULL ON NULL INPUT;"
 ---
 Parse {
-    cst: SourceFile@0..162
-      Newline@0..1 "\n"
-      CreateFunctionStmt@1..162
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Or@8..10 "OR"
-        Whitespace@10..11 " "
-        Replace@11..18 "REPLACE"
-        Whitespace@18..19 " "
-        Function@19..27 "FUNCTION"
-        Whitespace@27..28 " "
-        Ident@28..34 "getfoo"
-        Ascii40@34..35 "("
-        FunctionParameter@35..38
-          TypeName@35..38
-            IntP@35..38 "int"
-        Ascii41@38..39 ")"
-        Whitespace@39..40 " "
-        Returns@40..47 "RETURNS"
-        Whitespace@47..48 " "
-        Setof@48..53 "SETOF"
-        Whitespace@53..54 " "
-        TypeName@54..59
-          Ident@54..59 "users"
-        Whitespace@59..60 " "
-        DefElem@60..111
-          As@60..62 "AS"
-          Whitespace@62..63 " "
-          List@63..111
-            Sconst@63..111 "$$SELECT * FROM \\\"use ..."
-        Whitespace@111..112 " "
-        DefElem@112..124
-          Language@112..120 "LANGUAGE"
-          Whitespace@120..121 " "
-          SqlP@121..124 "sql"
-        Whitespace@124..125 " "
-        DefElem@125..134
-          Immutable@125..134 "IMMUTABLE"
-        Whitespace@134..135 " "
-        DefElem@135..142
-          Returns@135..142 "RETURNS"
-        Whitespace@142..143 " "
-        NullP@143..147 "NULL"
-        Whitespace@147..148 " "
-        On@148..150 "ON"
-        Whitespace@150..151 " "
-        NullP@151..155 "NULL"
-        Whitespace@155..156 " "
-        InputP@156..161 "INPUT"
-        Ascii59@161..162 ";"
+    cst: SourceFile@0..161
+      CreateFunctionStmt@0..161
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Or@7..9 "OR"
+        Whitespace@9..10 " "
+        Replace@10..17 "REPLACE"
+        Whitespace@17..18 " "
+        Function@18..26 "FUNCTION"
+        Whitespace@26..27 " "
+        Ident@27..33 "getfoo"
+        Ascii40@33..34 "("
+        FunctionParameter@34..37
+          TypeName@34..37
+            IntP@34..37 "int"
+        Ascii41@37..38 ")"
+        Whitespace@38..39 " "
+        Returns@39..46 "RETURNS"
+        Whitespace@46..47 " "
+        Setof@47..52 "SETOF"
+        Whitespace@52..53 " "
+        TypeName@53..58
+          Ident@53..58 "users"
+        Whitespace@58..59 " "
+        DefElem@59..110
+          As@59..61 "AS"
+          Whitespace@61..62 " "
+          List@62..110
+            Sconst@62..110 "$$SELECT * FROM \\\"use ..."
+        Whitespace@110..111 " "
+        DefElem@111..123
+          Language@111..119 "LANGUAGE"
+          Whitespace@119..120 " "
+          SqlP@120..123 "sql"
+        Whitespace@123..124 " "
+        DefElem@124..133
+          Immutable@124..133 "IMMUTABLE"
+        Whitespace@133..134 " "
+        DefElem@134..141
+          Returns@134..141 "RETURNS"
+        Whitespace@141..142 " "
+        NullP@142..146 "NULL"
+        Whitespace@146..147 " "
+        On@147..149 "ON"
+        Whitespace@149..150 " "
+        NullP@150..154 "NULL"
+        Whitespace@154..155 " "
+        InputP@155..160 "INPUT"
+        Ascii59@160..161 ";"
     ,
     errors: [],
     stmts: [
@@ -245,7 +244,7 @@ Parse {
                     sql_body: None,
                 },
             ),
-            range: 0..161,
+            range: 0..160,
         },
     ],
 }

@@ -1,40 +1,39 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE UNIQUE INDEX title_idx ON films (title) INCLUDE (director, rating);"
+description: "CREATE UNIQUE INDEX title_idx ON films (title) INCLUDE (director, rating);"
 ---
 Parse {
-    cst: SourceFile@0..75
-      Newline@0..1 "\n"
-      IndexStmt@1..75
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Unique@8..14 "UNIQUE"
-        Whitespace@14..15 " "
-        Index@15..20 "INDEX"
-        Whitespace@20..21 " "
-        Ident@21..30 "title_idx"
-        Whitespace@30..31 " "
-        On@31..33 "ON"
-        Whitespace@33..34 " "
-        RangeVar@34..39
-          Ident@34..39 "films"
-        Whitespace@39..40 " "
-        Ascii40@40..41 "("
-        IndexElem@41..46
-          Ident@41..46 "title"
-        Ascii41@46..47 ")"
-        Whitespace@47..48 " "
-        Include@48..55 "INCLUDE"
-        Whitespace@55..56 " "
-        Ascii40@56..57 "("
-        IndexElem@57..65
-          Ident@57..65 "director"
-        Ascii44@65..66 ","
-        Whitespace@66..67 " "
-        IndexElem@67..73
-          Ident@67..73 "rating"
-        Ascii41@73..74 ")"
-        Ascii59@74..75 ";"
+    cst: SourceFile@0..74
+      IndexStmt@0..74
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Unique@7..13 "UNIQUE"
+        Whitespace@13..14 " "
+        Index@14..19 "INDEX"
+        Whitespace@19..20 " "
+        Ident@20..29 "title_idx"
+        Whitespace@29..30 " "
+        On@30..32 "ON"
+        Whitespace@32..33 " "
+        RangeVar@33..38
+          Ident@33..38 "films"
+        Whitespace@38..39 " "
+        Ascii40@39..40 "("
+        IndexElem@40..45
+          Ident@40..45 "title"
+        Ascii41@45..46 ")"
+        Whitespace@46..47 " "
+        Include@47..54 "INCLUDE"
+        Whitespace@54..55 " "
+        Ascii40@55..56 "("
+        IndexElem@56..64
+          Ident@56..64 "director"
+        Ascii44@64..65 ","
+        Whitespace@65..66 " "
+        IndexElem@66..72
+          Ident@66..72 "rating"
+        Ascii41@72..73 ")"
+        Ascii59@73..74 ";"
     ,
     errors: [],
     stmts: [
@@ -127,7 +126,7 @@ Parse {
                     reset_default_tblspc: false,
                 },
             ),
-            range: 0..74,
+            range: 0..73,
         },
     ],
 }

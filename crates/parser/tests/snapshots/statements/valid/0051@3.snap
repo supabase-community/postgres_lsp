@@ -1,39 +1,38 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE INDEX title_idx ON films (title) WITH (deduplicate_items = off);"
+description: CREATE INDEX title_idx ON films (title) WITH (deduplicate_items = off);
 ---
 Parse {
-    cst: SourceFile@0..72
-      Newline@0..1 "\n"
-      IndexStmt@1..72
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Index@8..13 "INDEX"
-        Whitespace@13..14 " "
-        Ident@14..23 "title_idx"
-        Whitespace@23..24 " "
-        On@24..26 "ON"
-        Whitespace@26..27 " "
-        RangeVar@27..32
-          Ident@27..32 "films"
-        Whitespace@32..33 " "
-        Ascii40@33..34 "("
-        IndexElem@34..39
-          Ident@34..39 "title"
-        Ascii41@39..40 ")"
-        Whitespace@40..41 " "
-        With@41..45 "WITH"
-        Whitespace@45..46 " "
-        Ascii40@46..47 "("
-        DefElem@47..70
-          Ident@47..64 "deduplicate_items"
-          Whitespace@64..65 " "
-          Ascii61@65..66 "="
-          Whitespace@66..67 " "
-          TypeName@67..70
-            Off@67..70 "off"
-        Ascii41@70..71 ")"
-        Ascii59@71..72 ";"
+    cst: SourceFile@0..71
+      IndexStmt@0..71
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Index@7..12 "INDEX"
+        Whitespace@12..13 " "
+        Ident@13..22 "title_idx"
+        Whitespace@22..23 " "
+        On@23..25 "ON"
+        Whitespace@25..26 " "
+        RangeVar@26..31
+          Ident@26..31 "films"
+        Whitespace@31..32 " "
+        Ascii40@32..33 "("
+        IndexElem@33..38
+          Ident@33..38 "title"
+        Ascii41@38..39 ")"
+        Whitespace@39..40 " "
+        With@40..44 "WITH"
+        Whitespace@44..45 " "
+        Ascii40@45..46 "("
+        DefElem@46..69
+          Ident@46..63 "deduplicate_items"
+          Whitespace@63..64 " "
+          Ascii61@64..65 "="
+          Whitespace@65..66 " "
+          TypeName@66..69
+            Off@66..69 "off"
+        Ascii41@69..70 ")"
+        Ascii59@70..71 ";"
     ,
     errors: [],
     stmts: [
@@ -134,7 +133,7 @@ Parse {
                     reset_default_tblspc: false,
                 },
             ),
-            range: 0..71,
+            range: 0..70,
         },
     ],
 }

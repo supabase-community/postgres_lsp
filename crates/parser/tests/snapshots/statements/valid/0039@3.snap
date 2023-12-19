@@ -1,40 +1,39 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE AGGREGATE aggregate1 (*) (sfunc = sfunc1, stype = stype1);"
+description: "CREATE AGGREGATE aggregate1 (*) (sfunc = sfunc1, stype = stype1);"
 ---
 Parse {
-    cst: SourceFile@0..66
-      Newline@0..1 "\n"
-      DefineStmt@1..66
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Aggregate@8..17 "AGGREGATE"
-        Whitespace@17..18 " "
-        Ident@18..28 "aggregate1"
-        Whitespace@28..29 " "
-        Ascii40@29..30 "("
-        Ascii42@30..31 "*"
-        Ascii41@31..32 ")"
-        Whitespace@32..33 " "
-        Ascii40@33..34 "("
-        DefElem@34..48
-          Ident@34..39 "sfunc"
-          Whitespace@39..40 " "
-          Ascii61@40..41 "="
-          Whitespace@41..42 " "
-          TypeName@42..48
-            Ident@42..48 "sfunc1"
-        Ascii44@48..49 ","
-        Whitespace@49..50 " "
-        DefElem@50..64
-          Ident@50..55 "stype"
-          Whitespace@55..56 " "
-          Ascii61@56..57 "="
-          Whitespace@57..58 " "
-          TypeName@58..64
-            Ident@58..64 "stype1"
-        Ascii41@64..65 ")"
-        Ascii59@65..66 ";"
+    cst: SourceFile@0..65
+      DefineStmt@0..65
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Aggregate@7..16 "AGGREGATE"
+        Whitespace@16..17 " "
+        Ident@17..27 "aggregate1"
+        Whitespace@27..28 " "
+        Ascii40@28..29 "("
+        Ascii42@29..30 "*"
+        Ascii41@30..31 ")"
+        Whitespace@31..32 " "
+        Ascii40@32..33 "("
+        DefElem@33..47
+          Ident@33..38 "sfunc"
+          Whitespace@38..39 " "
+          Ascii61@39..40 "="
+          Whitespace@40..41 " "
+          TypeName@41..47
+            Ident@41..47 "sfunc1"
+        Ascii44@47..48 ","
+        Whitespace@48..49 " "
+        DefElem@49..63
+          Ident@49..54 "stype"
+          Whitespace@54..55 " "
+          Ascii61@55..56 "="
+          Whitespace@56..57 " "
+          TypeName@57..63
+            Ident@57..63 "stype1"
+        Ascii41@63..64 ")"
+        Ascii59@64..65 ";"
     ,
     errors: [],
     stmts: [
@@ -154,7 +153,7 @@ Parse {
                     replace: false,
                 },
             ),
-            range: 0..65,
+            range: 0..64,
         },
     ],
 }

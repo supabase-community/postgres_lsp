@@ -1,29 +1,28 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE INDEX CONCURRENTLY sales_quantity_index ON sales_table (quantity);"
+description: CREATE INDEX CONCURRENTLY sales_quantity_index ON sales_table (quantity);
 ---
 Parse {
-    cst: SourceFile@0..74
-      Newline@0..1 "\n"
-      IndexStmt@1..74
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Index@8..13 "INDEX"
-        Whitespace@13..14 " "
-        Concurrently@14..26 "CONCURRENTLY"
-        Whitespace@26..27 " "
-        Ident@27..47 "sales_quantity_index"
-        Whitespace@47..48 " "
-        On@48..50 "ON"
-        Whitespace@50..51 " "
-        RangeVar@51..62
-          Ident@51..62 "sales_table"
-        Whitespace@62..63 " "
-        Ascii40@63..64 "("
-        IndexElem@64..72
-          Ident@64..72 "quantity"
-        Ascii41@72..73 ")"
-        Ascii59@73..74 ";"
+    cst: SourceFile@0..73
+      IndexStmt@0..73
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Index@7..12 "INDEX"
+        Whitespace@12..13 " "
+        Concurrently@13..25 "CONCURRENTLY"
+        Whitespace@25..26 " "
+        Ident@26..46 "sales_quantity_index"
+        Whitespace@46..47 " "
+        On@47..49 "ON"
+        Whitespace@49..50 " "
+        RangeVar@50..61
+          Ident@50..61 "sales_table"
+        Whitespace@61..62 " "
+        Ascii40@62..63 "("
+        IndexElem@63..71
+          Ident@63..71 "quantity"
+        Ascii41@71..72 ")"
+        Ascii59@72..73 ";"
     ,
     errors: [],
     stmts: [
@@ -83,7 +82,7 @@ Parse {
                     reset_default_tblspc: false,
                 },
             ),
-            range: 0..73,
+            range: 0..72,
         },
     ],
 }

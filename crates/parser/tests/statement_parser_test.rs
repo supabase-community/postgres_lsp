@@ -26,7 +26,7 @@ fn valid_statements() {
         let cases = split_with_parser(&contents).unwrap();
 
         for (i, case) in cases.iter().enumerate() {
-            let case = format!("{};", case);
+            let case = format!("{};", case.trim());
 
             debug!("Parsing statement {}\n{}", test_name, case);
 

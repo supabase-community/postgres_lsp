@@ -1,51 +1,50 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE OR REPLACE FUNCTION getfoo() RETURNS text AS $$SELECT name FROM \\\"users\\\" LIMIT 1$$ LANGUAGE sql IMMUTABLE CALLED ON NULL INPUT;"
+description: "CREATE OR REPLACE FUNCTION getfoo() RETURNS text AS $$SELECT name FROM \\\"users\\\" LIMIT 1$$ LANGUAGE sql IMMUTABLE CALLED ON NULL INPUT;"
 ---
 Parse {
-    cst: SourceFile@0..136
-      Newline@0..1 "\n"
-      CreateFunctionStmt@1..136
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Or@8..10 "OR"
-        Whitespace@10..11 " "
-        Replace@11..18 "REPLACE"
-        Whitespace@18..19 " "
-        Function@19..27 "FUNCTION"
-        Whitespace@27..28 " "
-        Ident@28..34 "getfoo"
-        Ascii40@34..35 "("
-        Ascii41@35..36 ")"
-        Whitespace@36..37 " "
-        Returns@37..44 "RETURNS"
-        Whitespace@44..45 " "
-        TypeName@45..49
-          TextP@45..49 "text"
-        Whitespace@49..50 " "
-        DefElem@50..91
-          As@50..52 "AS"
-          Whitespace@52..53 " "
-          List@53..91
-            Sconst@53..91 "$$SELECT name FROM \\\" ..."
-        Whitespace@91..92 " "
-        DefElem@92..104
-          Language@92..100 "LANGUAGE"
-          Whitespace@100..101 " "
-          SqlP@101..104 "sql"
-        Whitespace@104..105 " "
-        DefElem@105..114
-          Immutable@105..114 "IMMUTABLE"
-        Whitespace@114..115 " "
-        DefElem@115..121
-          Called@115..121 "CALLED"
-        Whitespace@121..122 " "
-        On@122..124 "ON"
-        Whitespace@124..125 " "
-        NullP@125..129 "NULL"
-        Whitespace@129..130 " "
-        InputP@130..135 "INPUT"
-        Ascii59@135..136 ";"
+    cst: SourceFile@0..135
+      CreateFunctionStmt@0..135
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Or@7..9 "OR"
+        Whitespace@9..10 " "
+        Replace@10..17 "REPLACE"
+        Whitespace@17..18 " "
+        Function@18..26 "FUNCTION"
+        Whitespace@26..27 " "
+        Ident@27..33 "getfoo"
+        Ascii40@33..34 "("
+        Ascii41@34..35 ")"
+        Whitespace@35..36 " "
+        Returns@36..43 "RETURNS"
+        Whitespace@43..44 " "
+        TypeName@44..48
+          TextP@44..48 "text"
+        Whitespace@48..49 " "
+        DefElem@49..90
+          As@49..51 "AS"
+          Whitespace@51..52 " "
+          List@52..90
+            Sconst@52..90 "$$SELECT name FROM \\\" ..."
+        Whitespace@90..91 " "
+        DefElem@91..103
+          Language@91..99 "LANGUAGE"
+          Whitespace@99..100 " "
+          SqlP@100..103 "sql"
+        Whitespace@103..104 " "
+        DefElem@104..113
+          Immutable@104..113 "IMMUTABLE"
+        Whitespace@113..114 " "
+        DefElem@114..120
+          Called@114..120 "CALLED"
+        Whitespace@120..121 " "
+        On@121..123 "ON"
+        Whitespace@123..124 " "
+        NullP@124..128 "NULL"
+        Whitespace@128..129 " "
+        InputP@129..134 "INPUT"
+        Ascii59@134..135 ";"
     ,
     errors: [],
     stmts: [
@@ -195,7 +194,7 @@ Parse {
                     sql_body: None,
                 },
             ),
-            range: 0..135,
+            range: 0..134,
         },
     ],
 }

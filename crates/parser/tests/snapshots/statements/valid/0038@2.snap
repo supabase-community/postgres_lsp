@@ -1,33 +1,32 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE CAST (bigint AS int4) WITHOUT FUNCTION AS IMPLICIT;"
+description: CREATE CAST (bigint AS int4) WITHOUT FUNCTION AS IMPLICIT;
 ---
 Parse {
-    cst: SourceFile@0..59
-      Newline@0..1 "\n"
-      CreateCastStmt@1..59
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Cast@8..12 "CAST"
-        Whitespace@12..13 " "
-        Ascii40@13..14 "("
-        TypeName@14..20
-          Bigint@14..20 "bigint"
-        Whitespace@20..21 " "
-        As@21..23 "AS"
-        Whitespace@23..24 " "
-        TypeName@24..28
-          Ident@24..28 "int4"
-        Ascii41@28..29 ")"
-        Whitespace@29..30 " "
-        Without@30..37 "WITHOUT"
-        Whitespace@37..38 " "
-        Function@38..46 "FUNCTION"
-        Whitespace@46..47 " "
-        As@47..49 "AS"
-        Whitespace@49..50 " "
-        ImplicitP@50..58 "IMPLICIT"
-        Ascii59@58..59 ";"
+    cst: SourceFile@0..58
+      CreateCastStmt@0..58
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Cast@7..11 "CAST"
+        Whitespace@11..12 " "
+        Ascii40@12..13 "("
+        TypeName@13..19
+          Bigint@13..19 "bigint"
+        Whitespace@19..20 " "
+        As@20..22 "AS"
+        Whitespace@22..23 " "
+        TypeName@23..27
+          Ident@23..27 "int4"
+        Ascii41@27..28 ")"
+        Whitespace@28..29 " "
+        Without@29..36 "WITHOUT"
+        Whitespace@36..37 " "
+        Function@37..45 "FUNCTION"
+        Whitespace@45..46 " "
+        As@46..48 "AS"
+        Whitespace@48..49 " "
+        ImplicitP@49..57 "IMPLICIT"
+        Ascii59@57..58 ";"
     ,
     errors: [],
     stmts: [
@@ -92,7 +91,7 @@ Parse {
                     inout: false,
                 },
             ),
-            range: 0..58,
+            range: 0..57,
         },
     ],
 }

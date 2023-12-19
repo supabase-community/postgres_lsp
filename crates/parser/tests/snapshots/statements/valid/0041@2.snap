@@ -1,20 +1,19 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE SCHEMA AUTHORIZATION joe;"
+description: CREATE SCHEMA AUTHORIZATION joe;
 ---
 Parse {
-    cst: SourceFile@0..33
-      Newline@0..1 "\n"
-      CreateSchemaStmt@1..33
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Schema@8..14 "SCHEMA"
-        Whitespace@14..15 " "
-        Authorization@15..28 "AUTHORIZATION"
-        Whitespace@28..29 " "
-        RoleSpec@29..32
-          Ident@29..32 "joe"
-        Ascii59@32..33 ";"
+    cst: SourceFile@0..32
+      CreateSchemaStmt@0..32
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Schema@7..13 "SCHEMA"
+        Whitespace@13..14 " "
+        Authorization@14..27 "AUTHORIZATION"
+        Whitespace@27..28 " "
+        RoleSpec@28..31
+          Ident@28..31 "joe"
+        Ascii59@31..32 ";"
     ,
     errors: [],
     stmts: [
@@ -33,7 +32,7 @@ Parse {
                     if_not_exists: false,
                 },
             ),
-            range: 0..32,
+            range: 0..31,
         },
     ],
 }

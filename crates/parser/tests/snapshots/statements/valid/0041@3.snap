@@ -1,28 +1,27 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE SCHEMA IF NOT EXISTS test AUTHORIZATION joe;"
+description: CREATE SCHEMA IF NOT EXISTS test AUTHORIZATION joe;
 ---
 Parse {
-    cst: SourceFile@0..52
-      Newline@0..1 "\n"
-      CreateSchemaStmt@1..52
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Schema@8..14 "SCHEMA"
-        Whitespace@14..15 " "
-        IfP@15..17 "IF"
-        Whitespace@17..18 " "
-        Not@18..21 "NOT"
-        Whitespace@21..22 " "
-        Exists@22..28 "EXISTS"
-        Whitespace@28..29 " "
-        Ident@29..33 "test"
-        Whitespace@33..34 " "
-        Authorization@34..47 "AUTHORIZATION"
-        Whitespace@47..48 " "
-        RoleSpec@48..51
-          Ident@48..51 "joe"
-        Ascii59@51..52 ";"
+    cst: SourceFile@0..51
+      CreateSchemaStmt@0..51
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Schema@7..13 "SCHEMA"
+        Whitespace@13..14 " "
+        IfP@14..16 "IF"
+        Whitespace@16..17 " "
+        Not@17..20 "NOT"
+        Whitespace@20..21 " "
+        Exists@21..27 "EXISTS"
+        Whitespace@27..28 " "
+        Ident@28..32 "test"
+        Whitespace@32..33 " "
+        Authorization@33..46 "AUTHORIZATION"
+        Whitespace@46..47 " "
+        RoleSpec@47..50
+          Ident@47..50 "joe"
+        Ascii59@50..51 ";"
     ,
     errors: [],
     stmts: [
@@ -41,7 +40,7 @@ Parse {
                     if_not_exists: true,
                 },
             ),
-            range: 0..51,
+            range: 0..50,
         },
     ],
 }

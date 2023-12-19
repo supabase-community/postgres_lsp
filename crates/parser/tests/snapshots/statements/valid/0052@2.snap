@@ -1,78 +1,77 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE PROCEDURE insert_data(a integer, b integer) LANGUAGE SQL BEGIN ATOMIC INSERT INTO tbl VALUES (a); INSERT INTO tbl VALUES (b); END;"
+description: "CREATE PROCEDURE insert_data(a integer, b integer) LANGUAGE SQL BEGIN ATOMIC INSERT INTO tbl VALUES (a); INSERT INTO tbl VALUES (b); END;"
 ---
 Parse {
-    cst: SourceFile@0..135
-      Newline@0..1 "\n"
-      Create@1..7 "CREATE"
-      Whitespace@7..8 " "
-      Procedure@8..17 "PROCEDURE"
-      Whitespace@17..18 " "
-      Ident@18..29 "insert_data"
-      Ascii40@29..30 "("
-      Ident@30..31 "a"
-      Whitespace@31..32 " "
-      Integer@32..39 "integer"
-      Ascii44@39..40 ","
-      Whitespace@40..41 " "
-      Ident@41..42 "b"
-      Whitespace@42..43 " "
-      Integer@43..50 "integer"
-      Ascii41@50..51 ")"
-      Whitespace@51..52 " "
-      Language@52..60 "LANGUAGE"
-      Whitespace@60..61 " "
-      SqlP@61..64 "SQL"
-      BeginP@64..69 "BEGIN"
-      Whitespace@69..70 " "
-      Atomic@70..76 "ATOMIC"
-      InsertStmt@76..103
-        Insert@76..82 "INSERT"
-        Whitespace@82..83 " "
-        Into@83..87 "INTO"
-        Whitespace@87..88 " "
-        RangeVar@88..91
-          Ident@88..91 "tbl"
-        Whitespace@91..92 " "
-        SelectStmt@92..101
-          Values@92..98 "VALUES"
-          Whitespace@98..99 " "
-          Ascii40@99..100 "("
-          List@100..101
-            ColumnRef@100..101
-              Ident@100..101 "a"
-        Ascii41@101..102 ")"
-        Ascii59@102..103 ";"
-      InsertStmt@103..130
-        Insert@103..109 "INSERT"
-        Whitespace@109..110 " "
-        Into@110..114 "INTO"
-        Whitespace@114..115 " "
-        RangeVar@115..118
-          Ident@115..118 "tbl"
-        Whitespace@118..119 " "
-        SelectStmt@119..128
-          Values@119..125 "VALUES"
-          Whitespace@125..126 " "
-          Ascii40@126..127 "("
-          List@127..128
-            ColumnRef@127..128
-              Ident@127..128 "b"
-        Ascii41@128..129 ")"
-        Ascii59@129..130 ";"
-      Whitespace@130..131 " "
-      EndP@131..134 "END"
-      Ascii59@134..135 ";"
+    cst: SourceFile@0..134
+      Create@0..6 "CREATE"
+      Whitespace@6..7 " "
+      Procedure@7..16 "PROCEDURE"
+      Whitespace@16..17 " "
+      Ident@17..28 "insert_data"
+      Ascii40@28..29 "("
+      Ident@29..30 "a"
+      Whitespace@30..31 " "
+      Integer@31..38 "integer"
+      Ascii44@38..39 ","
+      Whitespace@39..40 " "
+      Ident@40..41 "b"
+      Whitespace@41..42 " "
+      Integer@42..49 "integer"
+      Ascii41@49..50 ")"
+      Whitespace@50..51 " "
+      Language@51..59 "LANGUAGE"
+      Whitespace@59..60 " "
+      SqlP@60..63 "SQL"
+      BeginP@63..68 "BEGIN"
+      Whitespace@68..69 " "
+      Atomic@69..75 "ATOMIC"
+      InsertStmt@75..102
+        Insert@75..81 "INSERT"
+        Whitespace@81..82 " "
+        Into@82..86 "INTO"
+        Whitespace@86..87 " "
+        RangeVar@87..90
+          Ident@87..90 "tbl"
+        Whitespace@90..91 " "
+        SelectStmt@91..100
+          Values@91..97 "VALUES"
+          Whitespace@97..98 " "
+          Ascii40@98..99 "("
+          List@99..100
+            ColumnRef@99..100
+              Ident@99..100 "a"
+        Ascii41@100..101 ")"
+        Ascii59@101..102 ";"
+      InsertStmt@102..129
+        Insert@102..108 "INSERT"
+        Whitespace@108..109 " "
+        Into@109..113 "INTO"
+        Whitespace@113..114 " "
+        RangeVar@114..117
+          Ident@114..117 "tbl"
+        Whitespace@117..118 " "
+        SelectStmt@118..127
+          Values@118..124 "VALUES"
+          Whitespace@124..125 " "
+          Ascii40@125..126 "("
+          List@126..127
+            ColumnRef@126..127
+              Ident@126..127 "b"
+        Ascii41@127..128 ")"
+        Ascii59@128..129 ";"
+      Whitespace@129..130 " "
+      EndP@130..133 "END"
+      Ascii59@133..134 ";"
     ,
     errors: [
         SyntaxError(
             "Expected Ascii59, found Whitespace",
-            77..77,
+            76..76,
         ),
         SyntaxError(
             "Invalid statement: syntax error at or near \"ATOMIC\"",
-            21..24,
+            20..23,
         ),
     ],
     stmts: [
@@ -158,7 +157,7 @@ Parse {
                     r#override: OverridingNotSet,
                 },
             ),
-            range: 77..105,
+            range: 76..104,
         },
         RawStmt {
             stmt: InsertStmt(
@@ -242,7 +241,7 @@ Parse {
                     r#override: OverridingNotSet,
                 },
             ),
-            range: 105..133,
+            range: 104..132,
         },
     ],
 }
