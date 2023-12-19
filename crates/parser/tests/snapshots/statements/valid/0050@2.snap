@@ -1,0 +1,74 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "\n-- CREATE PUBLICATION insert_only FOR TABLE mydata WITH (publish = 'insert');\n-- CREATE PUBLICATION production_publication FOR TABLE users, departments, TABLES IN SCHEMA production;\nCREATE PUBLICATION sales_publication FOR TABLES IN SCHEMA marketing, sales;"
+---
+Parse {
+    cst: SourceFile@0..258
+      Newline@0..1 "\n"
+      SqlComment@1..78 "-- CREATE PUBLICATION ..."
+      Newline@78..79 "\n"
+      SqlComment@79..182 "-- CREATE PUBLICATION ..."
+      Newline@182..183 "\n"
+      CreatePublicationStmt@183..258
+        Create@183..189 "CREATE"
+        Whitespace@189..190 " "
+        Publication@190..201 "PUBLICATION"
+        Whitespace@201..202 " "
+        Ident@202..219 "sales_publication"
+        Whitespace@219..220 " "
+        For@220..223 "FOR"
+        Whitespace@223..224 " "
+        Tables@224..230 "TABLES"
+        Whitespace@230..231 " "
+        InP@231..233 "IN"
+        Whitespace@233..234 " "
+        Schema@234..240 "SCHEMA"
+        Whitespace@240..241 " "
+        PublicationObjSpec@241..250
+          Ident@241..250 "marketing"
+        Ascii44@250..251 ","
+        Whitespace@251..252 " "
+        PublicationObjSpec@252..257
+          Ident@252..257 "sales"
+        Ascii59@257..258 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreatePublicationStmt(
+                CreatePublicationStmt {
+                    pubname: "sales_publication",
+                    options: [],
+                    pubobjects: [
+                        Node {
+                            node: Some(
+                                PublicationObjSpec(
+                                    PublicationObjSpec {
+                                        pubobjtype: PublicationobjTablesInSchema,
+                                        name: "marketing",
+                                        pubtable: None,
+                                        location: 58,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                PublicationObjSpec(
+                                    PublicationObjSpec {
+                                        pubobjtype: PublicationobjTablesInSchema,
+                                        name: "sales",
+                                        pubtable: None,
+                                        location: 69,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    for_all_tables: false,
+                },
+            ),
+            range: 182..257,
+        },
+    ],
+}

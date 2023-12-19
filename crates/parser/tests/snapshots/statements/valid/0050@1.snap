@@ -1,0 +1,39 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "-- CREATE PUBLICATION mypublication FOR TABLE users, departments;\n-- CREATE PUBLICATION active_departments FOR TABLE departments WHERE (active IS TRUE);\nCREATE PUBLICATION alltables FOR ALL TABLES;"
+---
+Parse {
+    cst: SourceFile@0..197
+      SqlComment@0..65 "-- CREATE PUBLICATION ..."
+      Newline@65..66 "\n"
+      SqlComment@66..152 "-- CREATE PUBLICATION ..."
+      Newline@152..153 "\n"
+      CreatePublicationStmt@153..197
+        Create@153..159 "CREATE"
+        Whitespace@159..160 " "
+        Publication@160..171 "PUBLICATION"
+        Whitespace@171..172 " "
+        Ident@172..181 "alltables"
+        Whitespace@181..182 " "
+        For@182..185 "FOR"
+        Whitespace@185..186 " "
+        All@186..189 "ALL"
+        Whitespace@189..190 " "
+        Tables@190..196 "TABLES"
+        Ascii59@196..197 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreatePublicationStmt(
+                CreatePublicationStmt {
+                    pubname: "alltables",
+                    options: [],
+                    pubobjects: [],
+                    for_all_tables: true,
+                },
+            ),
+            range: 152..196,
+        },
+    ],
+}
