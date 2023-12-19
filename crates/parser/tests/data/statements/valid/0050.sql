@@ -1,4 +1,4 @@
--- CREATE PUBLICATION mypublication FOR TABLE users, departments;
+CREATE PUBLICATION mypublication FOR TABLE users, departments;
 -- CREATE PUBLICATION active_departments FOR TABLE departments WHERE (active IS TRUE);
 CREATE PUBLICATION alltables FOR ALL TABLES;
 -- CREATE PUBLICATION insert_only FOR TABLE mydata WITH (publish = 'insert');
