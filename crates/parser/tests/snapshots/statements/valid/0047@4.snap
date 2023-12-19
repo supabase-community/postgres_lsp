@@ -12,10 +12,10 @@ Parse {
         Whitespace@16..17 " "
         Ident@17..18 "x"
         Whitespace@18..19 " "
-        DefElem@19..27
+        DefElem@19..35
           Location@19..27 "LOCATION"
-        Whitespace@27..28 " "
-        Default@28..35 "DEFAULT"
+          Whitespace@27..28 " "
+          Default@28..35 "DEFAULT"
         Ascii59@35..36 ";"
     ,
     errors: [],

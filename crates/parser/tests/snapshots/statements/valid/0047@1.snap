@@ -16,12 +16,12 @@ Parse {
           Whitespace@23..24 " "
           Ident@24..27 "abc"
         Whitespace@27..28 " "
-        DefElem@28..38
+        DefElem@28..46
           Connection@28..38 "CONNECTION"
-        Whitespace@38..39 " "
-        Limit@39..44 "LIMIT"
-        Whitespace@44..45 " "
-        Iconst@45..46 "5"
+          Whitespace@38..39 " "
+          Limit@39..44 "LIMIT"
+          Whitespace@44..45 " "
+          Iconst@45..46 "5"
         Ascii59@46..47 ";"
     ,
     errors: [],

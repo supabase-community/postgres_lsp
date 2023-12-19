@@ -277,8 +277,6 @@ mod tests {
             vec![
                 TokenProperty::from(SyntaxKind::Create),
                 TokenProperty::from(SyntaxKind::Database),
-                TokenProperty::from(SyntaxKind::Limit),
-                TokenProperty::from(SyntaxKind::Iconst),
                 TokenProperty::from("x".to_string()),
             ],
         )
