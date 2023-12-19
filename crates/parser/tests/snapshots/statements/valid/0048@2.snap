@@ -1,41 +1,40 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE TABLESPACE x OWNER a LOCATION 'b' WITH (random_page_cost=42, seq_page_cost=3);"
+description: "CREATE TABLESPACE x OWNER a LOCATION 'b' WITH (random_page_cost=42, seq_page_cost=3);"
 ---
 Parse {
-    cst: SourceFile@0..86
-      Newline@0..1 "\n"
-      CreateTableSpaceStmt@1..86
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Tablespace@8..18 "TABLESPACE"
-        Whitespace@18..19 " "
-        Ident@19..20 "x"
-        Whitespace@20..21 " "
-        Owner@21..26 "OWNER"
-        Whitespace@26..27 " "
-        RoleSpec@27..28
-          Ident@27..28 "a"
-        Whitespace@28..29 " "
-        Location@29..37 "LOCATION"
-        Whitespace@37..38 " "
-        Sconst@38..41 "'b'"
-        Whitespace@41..42 " "
-        With@42..46 "WITH"
-        Whitespace@46..47 " "
-        Ascii40@47..48 "("
-        DefElem@48..67
-          Ident@48..64 "random_page_cost"
-          Ascii61@64..65 "="
-          Iconst@65..67 "42"
-        Ascii44@67..68 ","
-        Whitespace@68..69 " "
-        DefElem@69..84
-          Ident@69..82 "seq_page_cost"
-          Ascii61@82..83 "="
-          Iconst@83..84 "3"
-        Ascii41@84..85 ")"
-        Ascii59@85..86 ";"
+    cst: SourceFile@0..85
+      CreateTableSpaceStmt@0..85
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Tablespace@7..17 "TABLESPACE"
+        Whitespace@17..18 " "
+        Ident@18..19 "x"
+        Whitespace@19..20 " "
+        Owner@20..25 "OWNER"
+        Whitespace@25..26 " "
+        RoleSpec@26..27
+          Ident@26..27 "a"
+        Whitespace@27..28 " "
+        Location@28..36 "LOCATION"
+        Whitespace@36..37 " "
+        Sconst@37..40 "'b'"
+        Whitespace@40..41 " "
+        With@41..45 "WITH"
+        Whitespace@45..46 " "
+        Ascii40@46..47 "("
+        DefElem@47..66
+          Ident@47..63 "random_page_cost"
+          Ascii61@63..64 "="
+          Iconst@64..66 "42"
+        Ascii44@66..67 ","
+        Whitespace@67..68 " "
+        DefElem@68..83
+          Ident@68..81 "seq_page_cost"
+          Ascii61@81..82 "="
+          Iconst@82..83 "3"
+        Ascii41@83..84 ")"
+        Ascii59@84..85 ";"
     ,
     errors: [],
     stmts: [
@@ -101,7 +100,7 @@ Parse {
                     ],
                 },
             ),
-            range: 0..85,
+            range: 0..84,
         },
     ],
 }

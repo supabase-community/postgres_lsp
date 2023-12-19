@@ -1,61 +1,60 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE AGGREGATE aggregate1 (int4) (sfunc = sfunc1, stype = stype1, finalfunc_modify = read_only, parallel = restricted);"
+description: "CREATE AGGREGATE aggregate1 (int4) (sfunc = sfunc1, stype = stype1, finalfunc_modify = read_only, parallel = restricted);"
 ---
 Parse {
-    cst: SourceFile@0..122
-      Newline@0..1 "\n"
-      DefineStmt@1..122
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Aggregate@8..17 "AGGREGATE"
-        Whitespace@17..18 " "
-        Ident@18..28 "aggregate1"
-        Whitespace@28..29 " "
-        Ascii40@29..30 "("
-        List@30..34
-          FunctionParameter@30..34
-            TypeName@30..34
-              Ident@30..34 "int4"
-        Ascii41@34..35 ")"
-        Whitespace@35..36 " "
-        Ascii40@36..37 "("
-        DefElem@37..51
-          Ident@37..42 "sfunc"
-          Whitespace@42..43 " "
-          Ascii61@43..44 "="
-          Whitespace@44..45 " "
-          TypeName@45..51
-            Ident@45..51 "sfunc1"
-        Ascii44@51..52 ","
-        Whitespace@52..53 " "
-        DefElem@53..67
-          Ident@53..58 "stype"
-          Whitespace@58..59 " "
-          Ascii61@59..60 "="
-          Whitespace@60..61 " "
-          TypeName@61..67
-            Ident@61..67 "stype1"
-        Ascii44@67..68 ","
-        Whitespace@68..69 " "
-        DefElem@69..97
-          Ident@69..85 "finalfunc_modify"
-          Whitespace@85..86 " "
-          Ascii61@86..87 "="
-          Whitespace@87..88 " "
-          TypeName@88..97
-            Ident@88..97 "read_only"
-        Ascii44@97..98 ","
-        Whitespace@98..99 " "
-        DefElem@99..120
-          Parallel@99..107 "parallel"
-          Whitespace@107..108 " "
-          Ascii61@108..109 "="
-          Whitespace@109..110 " "
-          TypeName@110..120
-            Ident@110..120 "restricted"
-        Ascii41@120..121 ")"
-        Ascii59@121..122 ";"
+    cst: SourceFile@0..121
+      DefineStmt@0..121
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Aggregate@7..16 "AGGREGATE"
+        Whitespace@16..17 " "
+        Ident@17..27 "aggregate1"
+        Whitespace@27..28 " "
+        Ascii40@28..29 "("
+        List@29..33
+          FunctionParameter@29..33
+            TypeName@29..33
+              Ident@29..33 "int4"
+        Ascii41@33..34 ")"
+        Whitespace@34..35 " "
+        Ascii40@35..36 "("
+        DefElem@36..50
+          Ident@36..41 "sfunc"
+          Whitespace@41..42 " "
+          Ascii61@42..43 "="
+          Whitespace@43..44 " "
+          TypeName@44..50
+            Ident@44..50 "sfunc1"
+        Ascii44@50..51 ","
+        Whitespace@51..52 " "
+        DefElem@52..66
+          Ident@52..57 "stype"
+          Whitespace@57..58 " "
+          Ascii61@58..59 "="
+          Whitespace@59..60 " "
+          TypeName@60..66
+            Ident@60..66 "stype1"
+        Ascii44@66..67 ","
+        Whitespace@67..68 " "
+        DefElem@68..96
+          Ident@68..84 "finalfunc_modify"
+          Whitespace@84..85 " "
+          Ascii61@85..86 "="
+          Whitespace@86..87 " "
+          TypeName@87..96
+            Ident@87..96 "read_only"
+        Ascii44@96..97 ","
+        Whitespace@97..98 " "
+        DefElem@98..119
+          Parallel@98..106 "parallel"
+          Whitespace@106..107 " "
+          Ascii61@107..108 "="
+          Whitespace@108..109 " "
+          TypeName@109..119
+            Ident@109..119 "restricted"
+        Ascii41@119..120 ")"
+        Ascii59@120..121 ";"
     ,
     errors: [],
     stmts: [
@@ -295,7 +294,7 @@ Parse {
                     replace: false,
                 },
             ),
-            range: 0..121,
+            range: 0..120,
         },
     ],
 }

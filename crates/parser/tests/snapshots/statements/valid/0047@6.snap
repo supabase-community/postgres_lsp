@@ -1,22 +1,21 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE DATABASE x TEMPLATE TRUE;"
+description: CREATE DATABASE x TEMPLATE TRUE;
 ---
 Parse {
-    cst: SourceFile@0..33
-      Newline@0..1 "\n"
-      CreatedbStmt@1..33
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Database@8..16 "DATABASE"
-        Whitespace@16..17 " "
-        Ident@17..18 "x"
-        Whitespace@18..19 " "
-        DefElem@19..32
-          Template@19..27 "TEMPLATE"
-          Whitespace@27..28 " "
-          TrueP@28..32 "TRUE"
-        Ascii59@32..33 ";"
+    cst: SourceFile@0..32
+      CreatedbStmt@0..32
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Database@7..15 "DATABASE"
+        Whitespace@15..16 " "
+        Ident@16..17 "x"
+        Whitespace@17..18 " "
+        DefElem@18..31
+          Template@18..26 "TEMPLATE"
+          Whitespace@26..27 " "
+          TrueP@27..31 "TRUE"
+        Ascii59@31..32 ";"
     ,
     errors: [],
     stmts: [
@@ -51,7 +50,7 @@ Parse {
                     ],
                 },
             ),
-            range: 0..32,
+            range: 0..31,
         },
     ],
 }

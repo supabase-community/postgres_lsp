@@ -1,71 +1,70 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE RECURSIVE VIEW public.nums_1_100 (n) AS VALUES (1) UNION ALL SELECT n+1 FROM nums_1_100 WHERE n < 100;"
+description: CREATE RECURSIVE VIEW public.nums_1_100 (n) AS VALUES (1) UNION ALL SELECT n+1 FROM nums_1_100 WHERE n < 100;
 ---
 Parse {
-    cst: SourceFile@0..109
-      Newline@0..1 "\n"
-      Create@1..7 "CREATE"
-      Whitespace@7..8 " "
-      Recursive@8..17 "RECURSIVE"
-      Whitespace@17..18 " "
-      View@18..22 "VIEW"
-      Whitespace@22..23 " "
-      Ident@23..29 "public"
-      Ascii46@29..30 "."
-      Ident@30..40 "nums_1_100"
-      Whitespace@40..41 " "
-      Ascii40@41..42 "("
-      Ident@42..43 "n"
-      Ascii41@43..44 ")"
-      Whitespace@44..45 " "
-      As@45..47 "AS"
-      Whitespace@47..48 " "
-      Values@48..54 "VALUES"
-      Whitespace@54..55 " "
-      Ascii40@55..56 "("
-      Iconst@56..57 "1"
-      Ascii41@57..58 ")"
-      Whitespace@58..59 " "
-      Union@59..64 "UNION"
-      Whitespace@64..65 " "
-      All@65..68 "ALL"
-      SelectStmt@68..109
-        Select@68..74 "SELECT"
-        Whitespace@74..75 " "
-        ResTarget@75..78
-          AExpr@75..78
-            ColumnRef@75..76
-              Ident@75..76 "n"
-            Ascii43@76..77 "+"
-            AConst@77..78
-              Iconst@77..78 "1"
-        Whitespace@78..79 " "
-        From@79..83 "FROM"
-        Whitespace@83..84 " "
-        RangeVar@84..94
-          Ident@84..94 "nums_1_100"
-        Whitespace@94..95 " "
-        Where@95..100 "WHERE"
-        Whitespace@100..101 " "
-        AExpr@101..108
-          ColumnRef@101..102
-            Ident@101..102 "n"
-          Whitespace@102..103 " "
-          Ascii60@103..104 "<"
-          Whitespace@104..105 " "
-          AConst@105..108
-            Iconst@105..108 "100"
-        Ascii59@108..109 ";"
+    cst: SourceFile@0..108
+      Create@0..6 "CREATE"
+      Whitespace@6..7 " "
+      Recursive@7..16 "RECURSIVE"
+      Whitespace@16..17 " "
+      View@17..21 "VIEW"
+      Whitespace@21..22 " "
+      Ident@22..28 "public"
+      Ascii46@28..29 "."
+      Ident@29..39 "nums_1_100"
+      Whitespace@39..40 " "
+      Ascii40@40..41 "("
+      Ident@41..42 "n"
+      Ascii41@42..43 ")"
+      Whitespace@43..44 " "
+      As@44..46 "AS"
+      Whitespace@46..47 " "
+      Values@47..53 "VALUES"
+      Whitespace@53..54 " "
+      Ascii40@54..55 "("
+      Iconst@55..56 "1"
+      Ascii41@56..57 ")"
+      Whitespace@57..58 " "
+      Union@58..63 "UNION"
+      Whitespace@63..64 " "
+      All@64..67 "ALL"
+      SelectStmt@67..108
+        Select@67..73 "SELECT"
+        Whitespace@73..74 " "
+        ResTarget@74..77
+          AExpr@74..77
+            ColumnRef@74..75
+              Ident@74..75 "n"
+            Ascii43@75..76 "+"
+            AConst@76..77
+              Iconst@76..77 "1"
+        Whitespace@77..78 " "
+        From@78..82 "FROM"
+        Whitespace@82..83 " "
+        RangeVar@83..93
+          Ident@83..93 "nums_1_100"
+        Whitespace@93..94 " "
+        Where@94..99 "WHERE"
+        Whitespace@99..100 " "
+        AExpr@100..107
+          ColumnRef@100..101
+            Ident@100..101 "n"
+          Whitespace@101..102 " "
+          Ascii60@102..103 "<"
+          Whitespace@103..104 " "
+          AConst@104..107
+            Iconst@104..107 "100"
+        Ascii59@107..108 ";"
     ,
     errors: [
         SyntaxError(
             "Expected Ascii59, found Whitespace",
-            68..68,
+            67..67,
         ),
         SyntaxError(
             "Invalid statement: syntax error at end of input",
-            1..26,
+            0..25,
         ),
     ],
     stmts: [
@@ -249,7 +248,7 @@ Parse {
                     rarg: None,
                 },
             ),
-            range: 68..109,
+            range: 67..108,
         },
     ],
 }

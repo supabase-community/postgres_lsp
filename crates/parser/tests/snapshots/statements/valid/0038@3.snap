@@ -1,33 +1,32 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE CAST (bigint AS int4) WITH INOUT AS ASSIGNMENT;"
+description: CREATE CAST (bigint AS int4) WITH INOUT AS ASSIGNMENT;
 ---
 Parse {
-    cst: SourceFile@0..55
-      Newline@0..1 "\n"
-      CreateCastStmt@1..55
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Cast@8..12 "CAST"
-        Whitespace@12..13 " "
-        Ascii40@13..14 "("
-        TypeName@14..20
-          Bigint@14..20 "bigint"
-        Whitespace@20..21 " "
-        As@21..23 "AS"
-        Whitespace@23..24 " "
-        TypeName@24..28
-          Ident@24..28 "int4"
-        Ascii41@28..29 ")"
-        Whitespace@29..30 " "
-        With@30..34 "WITH"
-        Whitespace@34..35 " "
-        Inout@35..40 "INOUT"
-        Whitespace@40..41 " "
-        As@41..43 "AS"
-        Whitespace@43..44 " "
-        Assignment@44..54 "ASSIGNMENT"
-        Ascii59@54..55 ";"
+    cst: SourceFile@0..54
+      CreateCastStmt@0..54
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Cast@7..11 "CAST"
+        Whitespace@11..12 " "
+        Ascii40@12..13 "("
+        TypeName@13..19
+          Bigint@13..19 "bigint"
+        Whitespace@19..20 " "
+        As@20..22 "AS"
+        Whitespace@22..23 " "
+        TypeName@23..27
+          Ident@23..27 "int4"
+        Ascii41@27..28 ")"
+        Whitespace@28..29 " "
+        With@29..33 "WITH"
+        Whitespace@33..34 " "
+        Inout@34..39 "INOUT"
+        Whitespace@39..40 " "
+        As@40..42 "AS"
+        Whitespace@42..43 " "
+        Assignment@43..53 "ASSIGNMENT"
+        Ascii59@53..54 ";"
     ,
     errors: [],
     stmts: [
@@ -92,7 +91,7 @@ Parse {
                     inout: true,
                 },
             ),
-            range: 0..54,
+            range: 0..53,
         },
     ],
 }

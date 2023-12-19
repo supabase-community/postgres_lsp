@@ -1,52 +1,51 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE VIEW pg_comedies AS SELECT * FROM comedies WHERE classification = 'PG' WITH CASCADED CHECK OPTION;"
+description: "CREATE VIEW pg_comedies AS SELECT * FROM comedies WHERE classification = 'PG' WITH CASCADED CHECK OPTION;"
 ---
 Parse {
-    cst: SourceFile@0..106
-      Newline@0..1 "\n"
-      ViewStmt@1..106
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        View@8..12 "VIEW"
-        Whitespace@12..13 " "
-        RangeVar@13..24
-          Ident@13..24 "pg_comedies"
-        Whitespace@24..25 " "
-        As@25..27 "AS"
-        Whitespace@27..28 " "
-        SelectStmt@28..78
-          Select@28..34 "SELECT"
-          Whitespace@34..35 " "
-          ResTarget@35..36
-            ColumnRef@35..36
-              AStar@35..36
-                Ascii42@35..36 "*"
-          Whitespace@36..37 " "
-          From@37..41 "FROM"
-          Whitespace@41..42 " "
-          RangeVar@42..50
-            Ident@42..50 "comedies"
-          Whitespace@50..51 " "
-          Where@51..56 "WHERE"
-          Whitespace@56..57 " "
-          AExpr@57..78
-            ColumnRef@57..71
-              Ident@57..71 "classification"
-            Whitespace@71..72 " "
-            Ascii61@72..73 "="
-            Whitespace@73..74 " "
-            AConst@74..78
-              Sconst@74..78 "'PG'"
-        Whitespace@78..79 " "
-        With@79..83 "WITH"
-        Whitespace@83..84 " "
-        Cascaded@84..92 "CASCADED"
-        Whitespace@92..93 " "
-        Check@93..98 "CHECK"
-        Whitespace@98..99 " "
-        Option@99..105 "OPTION"
-        Ascii59@105..106 ";"
+    cst: SourceFile@0..105
+      ViewStmt@0..105
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        View@7..11 "VIEW"
+        Whitespace@11..12 " "
+        RangeVar@12..23
+          Ident@12..23 "pg_comedies"
+        Whitespace@23..24 " "
+        As@24..26 "AS"
+        Whitespace@26..27 " "
+        SelectStmt@27..77
+          Select@27..33 "SELECT"
+          Whitespace@33..34 " "
+          ResTarget@34..35
+            ColumnRef@34..35
+              AStar@34..35
+                Ascii42@34..35 "*"
+          Whitespace@35..36 " "
+          From@36..40 "FROM"
+          Whitespace@40..41 " "
+          RangeVar@41..49
+            Ident@41..49 "comedies"
+          Whitespace@49..50 " "
+          Where@50..55 "WHERE"
+          Whitespace@55..56 " "
+          AExpr@56..77
+            ColumnRef@56..70
+              Ident@56..70 "classification"
+            Whitespace@70..71 " "
+            Ascii61@71..72 "="
+            Whitespace@72..73 " "
+            AConst@73..77
+              Sconst@73..77 "'PG'"
+        Whitespace@77..78 " "
+        With@78..82 "WITH"
+        Whitespace@82..83 " "
+        Cascaded@83..91 "CASCADED"
+        Whitespace@91..92 " "
+        Check@92..97 "CHECK"
+        Whitespace@97..98 " "
+        Option@98..104 "OPTION"
+        Ascii59@104..105 ";"
     ,
     errors: [],
     stmts: [
@@ -211,7 +210,7 @@ Parse {
                     with_check_option: CascadedCheckOption,
                 },
             ),
-            range: 0..105,
+            range: 0..104,
         },
     ],
 }

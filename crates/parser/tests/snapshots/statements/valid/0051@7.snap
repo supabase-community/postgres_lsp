@@ -1,40 +1,39 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE UNIQUE INDEX title_idx ON films (title) WITH (fillfactor = 70);"
+description: CREATE UNIQUE INDEX title_idx ON films (title) WITH (fillfactor = 70);
 ---
 Parse {
-    cst: SourceFile@0..71
-      Newline@0..1 "\n"
-      IndexStmt@1..71
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Unique@8..14 "UNIQUE"
-        Whitespace@14..15 " "
-        Index@15..20 "INDEX"
-        Whitespace@20..21 " "
-        Ident@21..30 "title_idx"
-        Whitespace@30..31 " "
-        On@31..33 "ON"
-        Whitespace@33..34 " "
-        RangeVar@34..39
-          Ident@34..39 "films"
-        Whitespace@39..40 " "
-        Ascii40@40..41 "("
-        IndexElem@41..46
-          Ident@41..46 "title"
-        Ascii41@46..47 ")"
-        Whitespace@47..48 " "
-        With@48..52 "WITH"
-        Whitespace@52..53 " "
-        Ascii40@53..54 "("
-        DefElem@54..69
-          Ident@54..64 "fillfactor"
-          Whitespace@64..65 " "
-          Ascii61@65..66 "="
-          Whitespace@66..67 " "
-          Iconst@67..69 "70"
-        Ascii41@69..70 ")"
-        Ascii59@70..71 ";"
+    cst: SourceFile@0..70
+      IndexStmt@0..70
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Unique@7..13 "UNIQUE"
+        Whitespace@13..14 " "
+        Index@14..19 "INDEX"
+        Whitespace@19..20 " "
+        Ident@20..29 "title_idx"
+        Whitespace@29..30 " "
+        On@30..32 "ON"
+        Whitespace@32..33 " "
+        RangeVar@33..38
+          Ident@33..38 "films"
+        Whitespace@38..39 " "
+        Ascii40@39..40 "("
+        IndexElem@40..45
+          Ident@40..45 "title"
+        Ascii41@45..46 ")"
+        Whitespace@46..47 " "
+        With@47..51 "WITH"
+        Whitespace@51..52 " "
+        Ascii40@52..53 "("
+        DefElem@53..68
+          Ident@53..63 "fillfactor"
+          Whitespace@63..64 " "
+          Ascii61@64..65 "="
+          Whitespace@65..66 " "
+          Iconst@66..68 "70"
+        Ascii41@68..69 ")"
+        Ascii59@69..70 ";"
     ,
     errors: [],
     stmts: [
@@ -118,7 +117,7 @@ Parse {
                     reset_default_tblspc: false,
                 },
             ),
-            range: 0..70,
+            range: 0..69,
         },
     ],
 }

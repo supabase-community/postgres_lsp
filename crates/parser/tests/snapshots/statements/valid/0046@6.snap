@@ -1,44 +1,43 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE TYPE type1 AS RANGE (subtype = int4, receive = receive_func, passedbyvalue);"
+description: "CREATE TYPE type1 AS RANGE (subtype = int4, receive = receive_func, passedbyvalue);"
 ---
 Parse {
-    cst: SourceFile@0..84
-      Newline@0..1 "\n"
-      CreateRangeStmt@1..84
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        TypeP@8..12 "TYPE"
-        Whitespace@12..13 " "
-        Ident@13..18 "type1"
-        Whitespace@18..19 " "
-        As@19..21 "AS"
-        Whitespace@21..22 " "
-        Range@22..27 "RANGE"
-        Whitespace@27..28 " "
-        Ascii40@28..29 "("
-        DefElem@29..43
-          Ident@29..36 "subtype"
-          Whitespace@36..37 " "
-          Ascii61@37..38 "="
-          Whitespace@38..39 " "
-          TypeName@39..43
-            Ident@39..43 "int4"
-        Ascii44@43..44 ","
-        Whitespace@44..45 " "
-        DefElem@45..67
-          Ident@45..52 "receive"
-          Whitespace@52..53 " "
-          Ascii61@53..54 "="
-          Whitespace@54..55 " "
-          TypeName@55..67
-            Ident@55..67 "receive_func"
-        Ascii44@67..68 ","
-        Whitespace@68..69 " "
-        DefElem@69..82
-          Ident@69..82 "passedbyvalue"
-        Ascii41@82..83 ")"
-        Ascii59@83..84 ";"
+    cst: SourceFile@0..83
+      CreateRangeStmt@0..83
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        TypeP@7..11 "TYPE"
+        Whitespace@11..12 " "
+        Ident@12..17 "type1"
+        Whitespace@17..18 " "
+        As@18..20 "AS"
+        Whitespace@20..21 " "
+        Range@21..26 "RANGE"
+        Whitespace@26..27 " "
+        Ascii40@27..28 "("
+        DefElem@28..42
+          Ident@28..35 "subtype"
+          Whitespace@35..36 " "
+          Ascii61@36..37 "="
+          Whitespace@37..38 " "
+          TypeName@38..42
+            Ident@38..42 "int4"
+        Ascii44@42..43 ","
+        Whitespace@43..44 " "
+        DefElem@44..66
+          Ident@44..51 "receive"
+          Whitespace@51..52 " "
+          Ascii61@52..53 "="
+          Whitespace@53..54 " "
+          TypeName@54..66
+            Ident@54..66 "receive_func"
+        Ascii44@66..67 ","
+        Whitespace@67..68 " "
+        DefElem@68..81
+          Ident@68..81 "passedbyvalue"
+        Ascii41@81..82 ")"
+        Ascii59@82..83 ";"
     ,
     errors: [],
     stmts: [
@@ -153,7 +152,7 @@ Parse {
                     ],
                 },
             ),
-            range: 0..83,
+            range: 0..82,
         },
     ],
 }

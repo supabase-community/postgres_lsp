@@ -1,64 +1,63 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE AGGREGATE percentile_disc (float8 ORDER BY anyelement) (sfunc = ordered_set_transition, stype = internal, finalfunc = percentile_disc_final, finalfunc_extra);"
+description: "CREATE AGGREGATE percentile_disc (float8 ORDER BY anyelement) (sfunc = ordered_set_transition, stype = internal, finalfunc = percentile_disc_final, finalfunc_extra);"
 ---
 Parse {
-    cst: SourceFile@0..166
-      Newline@0..1 "\n"
-      DefineStmt@1..166
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Aggregate@8..17 "AGGREGATE"
-        Whitespace@17..18 " "
-        Ident@18..33 "percentile_disc"
-        Whitespace@33..34 " "
-        Ascii40@34..35 "("
-        List@35..61
-          FunctionParameter@35..41
-            TypeName@35..41
-              Ident@35..41 "float8"
-          Whitespace@41..42 " "
-          Order@42..47 "ORDER"
-          Whitespace@47..48 " "
-          By@48..50 "BY"
-          Whitespace@50..51 " "
-          FunctionParameter@51..61
-            TypeName@51..61
-              Ident@51..61 "anyelement"
-        Ascii41@61..62 ")"
-        Whitespace@62..63 " "
-        Ascii40@63..64 "("
-        DefElem@64..94
-          Ident@64..69 "sfunc"
-          Whitespace@69..70 " "
-          Ascii61@70..71 "="
-          Whitespace@71..72 " "
-          TypeName@72..94
-            Ident@72..94 "ordered_set_transition"
-        Ascii44@94..95 ","
-        Whitespace@95..96 " "
-        DefElem@96..112
-          Ident@96..101 "stype"
-          Whitespace@101..102 " "
-          Ascii61@102..103 "="
-          Whitespace@103..104 " "
-          TypeName@104..112
-            Ident@104..112 "internal"
-        Ascii44@112..113 ","
-        Whitespace@113..114 " "
-        DefElem@114..147
-          Ident@114..123 "finalfunc"
-          Whitespace@123..124 " "
-          Ascii61@124..125 "="
-          Whitespace@125..126 " "
-          TypeName@126..147
-            Ident@126..147 "percentile_disc_final"
-        Ascii44@147..148 ","
-        Whitespace@148..149 " "
-        DefElem@149..164
-          Ident@149..164 "finalfunc_extra"
-        Ascii41@164..165 ")"
-        Ascii59@165..166 ";"
+    cst: SourceFile@0..165
+      DefineStmt@0..165
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Aggregate@7..16 "AGGREGATE"
+        Whitespace@16..17 " "
+        Ident@17..32 "percentile_disc"
+        Whitespace@32..33 " "
+        Ascii40@33..34 "("
+        List@34..60
+          FunctionParameter@34..40
+            TypeName@34..40
+              Ident@34..40 "float8"
+          Whitespace@40..41 " "
+          Order@41..46 "ORDER"
+          Whitespace@46..47 " "
+          By@47..49 "BY"
+          Whitespace@49..50 " "
+          FunctionParameter@50..60
+            TypeName@50..60
+              Ident@50..60 "anyelement"
+        Ascii41@60..61 ")"
+        Whitespace@61..62 " "
+        Ascii40@62..63 "("
+        DefElem@63..93
+          Ident@63..68 "sfunc"
+          Whitespace@68..69 " "
+          Ascii61@69..70 "="
+          Whitespace@70..71 " "
+          TypeName@71..93
+            Ident@71..93 "ordered_set_transition"
+        Ascii44@93..94 ","
+        Whitespace@94..95 " "
+        DefElem@95..111
+          Ident@95..100 "stype"
+          Whitespace@100..101 " "
+          Ascii61@101..102 "="
+          Whitespace@102..103 " "
+          TypeName@103..111
+            Ident@103..111 "internal"
+        Ascii44@111..112 ","
+        Whitespace@112..113 " "
+        DefElem@113..146
+          Ident@113..122 "finalfunc"
+          Whitespace@122..123 " "
+          Ascii61@123..124 "="
+          Whitespace@124..125 " "
+          TypeName@125..146
+            Ident@125..146 "percentile_disc_final"
+        Ascii44@146..147 ","
+        Whitespace@147..148 " "
+        DefElem@148..163
+          Ident@148..163 "finalfunc_extra"
+        Ascii41@163..164 ")"
+        Ascii59@164..165 ";"
     ,
     errors: [],
     stmts: [
@@ -304,7 +303,7 @@ Parse {
                     replace: false,
                 },
             ),
-            range: 0..165,
+            range: 0..164,
         },
     ],
 }

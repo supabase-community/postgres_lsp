@@ -1,31 +1,30 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE INDEX title_idx_german ON films (title COLLATE \"de_DE\");"
+description: "CREATE INDEX title_idx_german ON films (title COLLATE \"de_DE\");"
 ---
 Parse {
-    cst: SourceFile@0..64
-      Newline@0..1 "\n"
-      IndexStmt@1..64
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Index@8..13 "INDEX"
-        Whitespace@13..14 " "
-        Ident@14..30 "title_idx_german"
-        Whitespace@30..31 " "
-        On@31..33 "ON"
-        Whitespace@33..34 " "
-        RangeVar@34..39
-          Ident@34..39 "films"
-        Whitespace@39..40 " "
-        Ascii40@40..41 "("
-        IndexElem@41..62
-          Ident@41..46 "title"
-          Whitespace@46..47 " "
-          Collate@47..54 "COLLATE"
-          Whitespace@54..55 " "
-          Ident@55..62 "\"de_DE\""
-        Ascii41@62..63 ")"
-        Ascii59@63..64 ";"
+    cst: SourceFile@0..63
+      IndexStmt@0..63
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Index@7..12 "INDEX"
+        Whitespace@12..13 " "
+        Ident@13..29 "title_idx_german"
+        Whitespace@29..30 " "
+        On@30..32 "ON"
+        Whitespace@32..33 " "
+        RangeVar@33..38
+          Ident@33..38 "films"
+        Whitespace@38..39 " "
+        Ascii40@39..40 "("
+        IndexElem@40..61
+          Ident@40..45 "title"
+          Whitespace@45..46 " "
+          Collate@46..53 "COLLATE"
+          Whitespace@53..54 " "
+          Ident@54..61 "\"de_DE\""
+        Ascii41@61..62 ")"
+        Ascii59@62..63 ";"
     ,
     errors: [],
     stmts: [
@@ -95,7 +94,7 @@ Parse {
                     reset_default_tblspc: false,
                 },
             ),
-            range: 0..63,
+            range: 0..62,
         },
     ],
 }

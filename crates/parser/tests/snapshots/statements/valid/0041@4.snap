@@ -1,95 +1,94 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE SCHEMA hollywood CREATE TABLE films (title text, release date, awards text[]) CREATE VIEW winners AS SELECT title, release FROM films WHERE awards IS NOT NULL;"
+description: "CREATE SCHEMA hollywood CREATE TABLE films (title text, release date, awards text[]) CREATE VIEW winners AS SELECT title, release FROM films WHERE awards IS NOT NULL;"
 ---
 Parse {
-    cst: SourceFile@0..165
-      Newline@0..1 "\n"
-      CreateSchemaStmt@1..24
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Schema@8..14 "SCHEMA"
-        Whitespace@14..15 " "
-        Ident@15..24 "hollywood"
-      CreateStmt@24..84
-        Create@24..30 "CREATE"
-        Whitespace@30..31 " "
-        Table@31..36 "TABLE"
-        Whitespace@36..37 " "
-        RangeVar@37..42
-          Ident@37..42 "films"
-        Whitespace@42..43 " "
-        Ascii40@43..44 "("
-        ColumnDef@44..54
-          Ident@44..49 "title"
-          Whitespace@49..50 " "
-          TypeName@50..54
-            TextP@50..54 "text"
-        Ascii44@54..55 ","
-        Whitespace@55..56 " "
-        ColumnDef@56..68
-          Release@56..63 "release"
-          Whitespace@63..64 " "
-          TypeName@64..68
-            Ident@64..68 "date"
-        Ascii44@68..69 ","
-        Whitespace@69..70 " "
-        ColumnDef@70..81
-          Ident@70..76 "awards"
-          Whitespace@76..77 " "
-          TypeName@77..81
-            TextP@77..81 "text"
-        Ascii91@81..82 "["
-        Ascii93@82..83 "]"
-        Ascii41@83..84 ")"
-      ViewStmt@84..165
-        Create@84..90 "CREATE"
-        Whitespace@90..91 " "
-        View@91..95 "VIEW"
-        Whitespace@95..96 " "
-        RangeVar@96..103
-          Ident@96..103 "winners"
-        Whitespace@103..104 " "
-        As@104..106 "AS"
-        Whitespace@106..107 " "
-        SelectStmt@107..164
-          Select@107..113 "SELECT"
-          Whitespace@113..114 " "
-          ResTarget@114..119
-            ColumnRef@114..119
-              Ident@114..119 "title"
-          Ascii44@119..120 ","
-          Whitespace@120..121 " "
-          ResTarget@121..128
-            ColumnRef@121..128
-              Release@121..128 "release"
-          Whitespace@128..129 " "
-          From@129..133 "FROM"
-          Whitespace@133..134 " "
-          RangeVar@134..139
-            Ident@134..139 "films"
-          Whitespace@139..140 " "
-          Where@140..145 "WHERE"
-          Whitespace@145..146 " "
-          NullTest@146..164
-            ColumnRef@146..152
-              Ident@146..152 "awards"
-            Whitespace@152..153 " "
-            Is@153..155 "IS"
-            Whitespace@155..156 " "
-            Not@156..159 "NOT"
-            Whitespace@159..160 " "
-            NullP@160..164 "NULL"
-        Ascii59@164..165 ";"
+    cst: SourceFile@0..164
+      CreateSchemaStmt@0..23
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Schema@7..13 "SCHEMA"
+        Whitespace@13..14 " "
+        Ident@14..23 "hollywood"
+      CreateStmt@23..83
+        Create@23..29 "CREATE"
+        Whitespace@29..30 " "
+        Table@30..35 "TABLE"
+        Whitespace@35..36 " "
+        RangeVar@36..41
+          Ident@36..41 "films"
+        Whitespace@41..42 " "
+        Ascii40@42..43 "("
+        ColumnDef@43..53
+          Ident@43..48 "title"
+          Whitespace@48..49 " "
+          TypeName@49..53
+            TextP@49..53 "text"
+        Ascii44@53..54 ","
+        Whitespace@54..55 " "
+        ColumnDef@55..67
+          Release@55..62 "release"
+          Whitespace@62..63 " "
+          TypeName@63..67
+            Ident@63..67 "date"
+        Ascii44@67..68 ","
+        Whitespace@68..69 " "
+        ColumnDef@69..80
+          Ident@69..75 "awards"
+          Whitespace@75..76 " "
+          TypeName@76..80
+            TextP@76..80 "text"
+        Ascii91@80..81 "["
+        Ascii93@81..82 "]"
+        Ascii41@82..83 ")"
+      ViewStmt@83..164
+        Create@83..89 "CREATE"
+        Whitespace@89..90 " "
+        View@90..94 "VIEW"
+        Whitespace@94..95 " "
+        RangeVar@95..102
+          Ident@95..102 "winners"
+        Whitespace@102..103 " "
+        As@103..105 "AS"
+        Whitespace@105..106 " "
+        SelectStmt@106..163
+          Select@106..112 "SELECT"
+          Whitespace@112..113 " "
+          ResTarget@113..118
+            ColumnRef@113..118
+              Ident@113..118 "title"
+          Ascii44@118..119 ","
+          Whitespace@119..120 " "
+          ResTarget@120..127
+            ColumnRef@120..127
+              Release@120..127 "release"
+          Whitespace@127..128 " "
+          From@128..132 "FROM"
+          Whitespace@132..133 " "
+          RangeVar@133..138
+            Ident@133..138 "films"
+          Whitespace@138..139 " "
+          Where@139..144 "WHERE"
+          Whitespace@144..145 " "
+          NullTest@145..163
+            ColumnRef@145..151
+              Ident@145..151 "awards"
+            Whitespace@151..152 " "
+            Is@152..154 "IS"
+            Whitespace@154..155 " "
+            Not@155..158 "NOT"
+            Whitespace@158..159 " "
+            NullP@159..163 "NULL"
+        Ascii59@163..164 ";"
     ,
     errors: [
         SyntaxError(
             "Expected Ascii59, found Whitespace",
-            24..24,
+            23..23,
         ),
         SyntaxError(
             "Expected Ascii59, found Whitespace",
-            85..85,
+            84..84,
         ),
     ],
     stmts: [
@@ -102,7 +101,7 @@ Parse {
                     if_not_exists: false,
                 },
             ),
-            range: 0..24,
+            range: 0..23,
         },
         RawStmt {
             stmt: CreateStmt(
@@ -283,7 +282,7 @@ Parse {
                     if_not_exists: false,
                 },
             ),
-            range: 24..85,
+            range: 23..84,
         },
         RawStmt {
             stmt: ViewStmt(
@@ -453,7 +452,7 @@ Parse {
                     with_check_option: NoCheckOption,
                 },
             ),
-            range: 85..166,
+            range: 84..165,
         },
     ],
 }

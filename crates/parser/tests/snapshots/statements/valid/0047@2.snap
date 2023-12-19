@@ -1,22 +1,21 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE DATABASE x ENCODING \"SQL_ASCII\";"
+description: "CREATE DATABASE x ENCODING \"SQL_ASCII\";"
 ---
 Parse {
-    cst: SourceFile@0..40
-      Newline@0..1 "\n"
-      CreatedbStmt@1..40
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Database@8..16 "DATABASE"
-        Whitespace@16..17 " "
-        Ident@17..18 "x"
-        Whitespace@18..19 " "
-        DefElem@19..39
-          Encoding@19..27 "ENCODING"
-          Whitespace@27..28 " "
-          Ident@28..39 "\"SQL_ASCII\""
-        Ascii59@39..40 ";"
+    cst: SourceFile@0..39
+      CreatedbStmt@0..39
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Database@7..15 "DATABASE"
+        Whitespace@15..16 " "
+        Ident@16..17 "x"
+        Whitespace@17..18 " "
+        DefElem@18..38
+          Encoding@18..26 "ENCODING"
+          Whitespace@26..27 " "
+          Ident@27..38 "\"SQL_ASCII\""
+        Ascii59@38..39 ";"
     ,
     errors: [],
     stmts: [
@@ -51,7 +50,7 @@ Parse {
                     ],
                 },
             ),
-            range: 0..39,
+            range: 0..38,
         },
     ],
 }

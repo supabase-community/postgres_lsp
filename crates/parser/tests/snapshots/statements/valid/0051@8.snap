@@ -1,43 +1,42 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "\nCREATE INDEX gin_idx ON documents_table USING GIN (locations) WITH (fastupdate = off);"
+description: CREATE INDEX gin_idx ON documents_table USING GIN (locations) WITH (fastupdate = off);
 ---
 Parse {
-    cst: SourceFile@0..87
-      Newline@0..1 "\n"
-      IndexStmt@1..87
-        Create@1..7 "CREATE"
-        Whitespace@7..8 " "
-        Index@8..13 "INDEX"
-        Whitespace@13..14 " "
-        Ident@14..21 "gin_idx"
-        Whitespace@21..22 " "
-        On@22..24 "ON"
-        Whitespace@24..25 " "
-        RangeVar@25..40
-          Ident@25..40 "documents_table"
-        Whitespace@40..41 " "
-        Using@41..46 "USING"
-        Whitespace@46..47 " "
-        Ident@47..50 "GIN"
-        Whitespace@50..51 " "
-        Ascii40@51..52 "("
-        IndexElem@52..61
-          Ident@52..61 "locations"
-        Ascii41@61..62 ")"
-        Whitespace@62..63 " "
-        With@63..67 "WITH"
-        Whitespace@67..68 " "
-        Ascii40@68..69 "("
-        DefElem@69..85
-          Ident@69..79 "fastupdate"
-          Whitespace@79..80 " "
-          Ascii61@80..81 "="
-          Whitespace@81..82 " "
-          TypeName@82..85
-            Off@82..85 "off"
-        Ascii41@85..86 ")"
-        Ascii59@86..87 ";"
+    cst: SourceFile@0..86
+      IndexStmt@0..86
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Index@7..12 "INDEX"
+        Whitespace@12..13 " "
+        Ident@13..20 "gin_idx"
+        Whitespace@20..21 " "
+        On@21..23 "ON"
+        Whitespace@23..24 " "
+        RangeVar@24..39
+          Ident@24..39 "documents_table"
+        Whitespace@39..40 " "
+        Using@40..45 "USING"
+        Whitespace@45..46 " "
+        Ident@46..49 "GIN"
+        Whitespace@49..50 " "
+        Ascii40@50..51 "("
+        IndexElem@51..60
+          Ident@51..60 "locations"
+        Ascii41@60..61 ")"
+        Whitespace@61..62 " "
+        With@62..66 "WITH"
+        Whitespace@66..67 " "
+        Ascii40@67..68 "("
+        DefElem@68..84
+          Ident@68..78 "fastupdate"
+          Whitespace@78..79 " "
+          Ascii61@79..80 "="
+          Whitespace@80..81 " "
+          TypeName@81..84
+            Off@81..84 "off"
+        Ascii41@84..85 ")"
+        Ascii59@85..86 ";"
     ,
     errors: [],
     stmts: [
@@ -138,7 +137,7 @@ Parse {
                     reset_default_tblspc: false,
                 },
             ),
-            range: 0..86,
+            range: 0..85,
         },
     ],
 }
