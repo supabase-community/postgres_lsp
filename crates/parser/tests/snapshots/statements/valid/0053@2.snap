@@ -1,0 +1,113 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: CREATE PUBLICATION active_departments FOR TABLE departments WHERE (active IS TRUE);
+---
+Parse {
+    cst: SourceFile@0..83
+      CreatePublicationStmt@0..83
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Publication@7..18 "PUBLICATION"
+        Whitespace@18..19 " "
+        Ident@19..37 "active_departments"
+        Whitespace@37..38 " "
+        For@38..41 "FOR"
+        Whitespace@41..42 " "
+        Table@42..47 "TABLE"
+        Whitespace@47..48 " "
+        PublicationObjSpec@48..81
+          PublicationTable@48..81
+            RangeVar@48..59
+              Ident@48..59 "departments"
+            Whitespace@59..60 " "
+            Where@60..65 "WHERE"
+            Whitespace@65..66 " "
+            Ascii40@66..67 "("
+            BooleanTest@67..81
+              ColumnRef@67..73
+                Ident@67..73 "active"
+              Whitespace@73..74 " "
+              Is@74..76 "IS"
+              Whitespace@76..77 " "
+              TrueP@77..81 "TRUE"
+        Ascii41@81..82 ")"
+        Ascii59@82..83 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreatePublicationStmt(
+                CreatePublicationStmt {
+                    pubname: "active_departments",
+                    options: [],
+                    pubobjects: [
+                        Node {
+                            node: Some(
+                                PublicationObjSpec(
+                                    PublicationObjSpec {
+                                        pubobjtype: PublicationobjTable,
+                                        name: "",
+                                        pubtable: Some(
+                                            PublicationTable {
+                                                relation: Some(
+                                                    RangeVar {
+                                                        catalogname: "",
+                                                        schemaname: "",
+                                                        relname: "departments",
+                                                        inh: true,
+                                                        relpersistence: "p",
+                                                        alias: None,
+                                                        location: 48,
+                                                    },
+                                                ),
+                                                where_clause: Some(
+                                                    Node {
+                                                        node: Some(
+                                                            BooleanTest(
+                                                                BooleanTest {
+                                                                    xpr: None,
+                                                                    arg: Some(
+                                                                        Node {
+                                                                            node: Some(
+                                                                                ColumnRef(
+                                                                                    ColumnRef {
+                                                                                        fields: [
+                                                                                            Node {
+                                                                                                node: Some(
+                                                                                                    String(
+                                                                                                        String {
+                                                                                                            sval: "active",
+                                                                                                        },
+                                                                                                    ),
+                                                                                                ),
+                                                                                            },
+                                                                                        ],
+                                                                                        location: 67,
+                                                                                    },
+                                                                                ),
+                                                                            ),
+                                                                        },
+                                                                    ),
+                                                                    booltesttype: IsTrue,
+                                                                    location: 74,
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ),
+                                                columns: [],
+                                            },
+                                        ),
+                                        location: 0,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    for_all_tables: false,
+                },
+            ),
+            range: 0..82,
+        },
+    ],
+}

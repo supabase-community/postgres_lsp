@@ -1,0 +1,69 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE PUBLICATION sales_publication FOR TABLES IN SCHEMA marketing, sales;"
+---
+Parse {
+    cst: SourceFile@0..75
+      CreatePublicationStmt@0..75
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Publication@7..18 "PUBLICATION"
+        Whitespace@18..19 " "
+        Ident@19..36 "sales_publication"
+        Whitespace@36..37 " "
+        For@37..40 "FOR"
+        Whitespace@40..41 " "
+        Tables@41..47 "TABLES"
+        Whitespace@47..48 " "
+        InP@48..50 "IN"
+        Whitespace@50..51 " "
+        Schema@51..57 "SCHEMA"
+        Whitespace@57..58 " "
+        PublicationObjSpec@58..67
+          Ident@58..67 "marketing"
+        Ascii44@67..68 ","
+        Whitespace@68..69 " "
+        PublicationObjSpec@69..74
+          Ident@69..74 "sales"
+        Ascii59@74..75 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreatePublicationStmt(
+                CreatePublicationStmt {
+                    pubname: "sales_publication",
+                    options: [],
+                    pubobjects: [
+                        Node {
+                            node: Some(
+                                PublicationObjSpec(
+                                    PublicationObjSpec {
+                                        pubobjtype: PublicationobjTablesInSchema,
+                                        name: "marketing",
+                                        pubtable: None,
+                                        location: 58,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                PublicationObjSpec(
+                                    PublicationObjSpec {
+                                        pubobjtype: PublicationobjTablesInSchema,
+                                        name: "sales",
+                                        pubtable: None,
+                                        location: 69,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    for_all_tables: false,
+                },
+            ),
+            range: 0..74,
+        },
+    ],
+}

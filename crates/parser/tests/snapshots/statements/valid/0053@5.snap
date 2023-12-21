@@ -1,0 +1,123 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE PUBLICATION production_publication FOR TABLE users, departments, TABLES IN SCHEMA production;"
+---
+Parse {
+    cst: SourceFile@0..100
+      CreatePublicationStmt@0..100
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Publication@7..18 "PUBLICATION"
+        Whitespace@18..19 " "
+        Ident@19..41 "production_publication"
+        Whitespace@41..42 " "
+        For@42..45 "FOR"
+        Whitespace@45..46 " "
+        Table@46..51 "TABLE"
+        Whitespace@51..52 " "
+        PublicationObjSpec@52..57
+          PublicationTable@52..57
+            RangeVar@52..57
+              Ident@52..57 "users"
+        Ascii44@57..58 ","
+        Whitespace@58..59 " "
+        PublicationObjSpec@59..70
+          PublicationTable@59..70
+            RangeVar@59..70
+              Ident@59..70 "departments"
+        Ascii44@70..71 ","
+        Whitespace@71..72 " "
+        Tables@72..78 "TABLES"
+        Whitespace@78..79 " "
+        InP@79..81 "IN"
+        Whitespace@81..82 " "
+        Schema@82..88 "SCHEMA"
+        Whitespace@88..89 " "
+        PublicationObjSpec@89..99
+          Ident@89..99 "production"
+        Ascii59@99..100 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreatePublicationStmt(
+                CreatePublicationStmt {
+                    pubname: "production_publication",
+                    options: [],
+                    pubobjects: [
+                        Node {
+                            node: Some(
+                                PublicationObjSpec(
+                                    PublicationObjSpec {
+                                        pubobjtype: PublicationobjTable,
+                                        name: "",
+                                        pubtable: Some(
+                                            PublicationTable {
+                                                relation: Some(
+                                                    RangeVar {
+                                                        catalogname: "",
+                                                        schemaname: "",
+                                                        relname: "users",
+                                                        inh: true,
+                                                        relpersistence: "p",
+                                                        alias: None,
+                                                        location: 52,
+                                                    },
+                                                ),
+                                                where_clause: None,
+                                                columns: [],
+                                            },
+                                        ),
+                                        location: 0,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                PublicationObjSpec(
+                                    PublicationObjSpec {
+                                        pubobjtype: PublicationobjTable,
+                                        name: "",
+                                        pubtable: Some(
+                                            PublicationTable {
+                                                relation: Some(
+                                                    RangeVar {
+                                                        catalogname: "",
+                                                        schemaname: "",
+                                                        relname: "departments",
+                                                        inh: true,
+                                                        relpersistence: "p",
+                                                        alias: None,
+                                                        location: 59,
+                                                    },
+                                                ),
+                                                where_clause: None,
+                                                columns: [],
+                                            },
+                                        ),
+                                        location: 59,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                PublicationObjSpec(
+                                    PublicationObjSpec {
+                                        pubobjtype: PublicationobjTablesInSchema,
+                                        name: "production",
+                                        pubtable: None,
+                                        location: 89,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    for_all_tables: false,
+                },
+            ),
+            range: 0..99,
+        },
+    ],
+}
