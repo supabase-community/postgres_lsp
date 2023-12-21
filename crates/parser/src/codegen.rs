@@ -281,4 +281,20 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_extension() {
+        test_get_node_properties(
+            r#"create extension if not exists x cascade version "1.2" schema a;"#,
+            SyntaxKind::CreateExtensionStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Extension),
+                TokenProperty::from(SyntaxKind::IfP),
+                TokenProperty::from(SyntaxKind::Not),
+                TokenProperty::from(SyntaxKind::Exists),
+                TokenProperty::from("x".to_string()),
+            ],
+        )
+    }
 }
