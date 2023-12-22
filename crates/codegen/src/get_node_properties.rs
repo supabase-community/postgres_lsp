@@ -869,6 +869,37 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::Function));
             }
         },
+        "TypeName" => quote! {
+            let names = n.names
+                .iter()
+                .filter_map(|n| if let Some(NodeEnum::String(s)) = &n.node { Some(s.sval.clone()) } else { None })
+                .collect::<Vec<_>>();
+
+            if names.len() == 2 && names[0] == "pg_catalog" {
+                match names[1].as_str() {
+                    "interval" => {
+                        tokens.push(TokenProperty::from(Token::To)); //
+                        tokens.push(TokenProperty::from(Token::SecondP)); //
+                    },
+                    "timestamptz" => {
+                        tokens.push(TokenProperty::from(Token::With));
+                        tokens.push(TokenProperty::from(Token::Time));
+                        tokens.push(TokenProperty::from(Token::Zone));
+                    }
+                    "time" => {
+                        tokens.push(TokenProperty::from(Token::Time));
+                    },
+                    "timetz" => {
+                        tokens.push(TokenProperty::from(Token::Time));
+                        tokens.push(TokenProperty::from(Token::With));
+                        tokens.push(TokenProperty::from(Token::Time));
+                        tokens.push(TokenProperty::from(Token::Zone));
+                        tokens.push(TokenProperty::from(Token::Not)); //
+                    }
+                    _ => {}
+                }
+            }
+        },
         _ => quote! {},
     }
 }
