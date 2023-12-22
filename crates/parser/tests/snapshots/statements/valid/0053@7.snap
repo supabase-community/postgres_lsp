@@ -1,0 +1,93 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE PUBLICATION users_filtered FOR TABLE users (user_id, firstname);"
+---
+Parse {
+    cst: SourceFile@0..71
+      CreatePublicationStmt@0..71
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Publication@7..18 "PUBLICATION"
+        Whitespace@18..19 " "
+        Ident@19..33 "users_filtered"
+        Whitespace@33..34 " "
+        For@34..37 "FOR"
+        Whitespace@37..38 " "
+        Table@38..43 "TABLE"
+        Whitespace@43..44 " "
+        PublicationObjSpec@44..69
+          PublicationTable@44..69
+            RangeVar@44..49
+              Ident@44..49 "users"
+            Whitespace@49..50 " "
+            Ascii40@50..51 "("
+            Ident@51..58 "user_id"
+            Ascii44@58..59 ","
+            Whitespace@59..60 " "
+            Ident@60..69 "firstname"
+        Ascii41@69..70 ")"
+        Ascii59@70..71 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreatePublicationStmt(
+                CreatePublicationStmt {
+                    pubname: "users_filtered",
+                    options: [],
+                    pubobjects: [
+                        Node {
+                            node: Some(
+                                PublicationObjSpec(
+                                    PublicationObjSpec {
+                                        pubobjtype: PublicationobjTable,
+                                        name: "",
+                                        pubtable: Some(
+                                            PublicationTable {
+                                                relation: Some(
+                                                    RangeVar {
+                                                        catalogname: "",
+                                                        schemaname: "",
+                                                        relname: "users",
+                                                        inh: true,
+                                                        relpersistence: "p",
+                                                        alias: None,
+                                                        location: 44,
+                                                    },
+                                                ),
+                                                where_clause: None,
+                                                columns: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "user_id",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "firstname",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                        ),
+                                        location: 0,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    for_all_tables: false,
+                },
+            ),
+            range: 0..70,
+        },
+    ],
+}

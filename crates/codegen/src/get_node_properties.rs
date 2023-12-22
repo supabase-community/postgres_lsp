@@ -692,6 +692,74 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::With));
             }
         },
+        "CreatePublicationStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            tokens.push(TokenProperty::from(Token::Publication));
+            if n.for_all_tables {
+                tokens.push(TokenProperty::from(Token::For));
+                tokens.push(TokenProperty::from(Token::All));
+                tokens.push(TokenProperty::from(Token::Tables));
+            }
+            if let Some(n) = n.options.first() {
+                tokens.push(TokenProperty::from(Token::With));
+            }
+            if let Some(n) = n.pubobjects.first() {
+                tokens.push(TokenProperty::from(Token::For));
+                if let Some(NodeEnum::PublicationObjSpec(n)) = &n.node {
+                    match n.pubobjtype() {
+                        protobuf::PublicationObjSpecType::PublicationobjTable => {
+                            tokens.push(TokenProperty::from(Token::Table));
+                        },
+                        protobuf::PublicationObjSpecType::PublicationobjTablesInSchema => {
+                            tokens.push(TokenProperty::from(Token::Tables));
+                            tokens.push(TokenProperty::from(Token::InP));
+                            tokens.push(TokenProperty::from(Token::Schema));
+                        },
+                        _ => panic!("Unknown CreatePublicationStmt {:#?}", n.pubobjtype())
+                    }
+                }
+            }
+            if let Some(n) = n.pubobjects.last() {
+                if let Some(NodeEnum::PublicationObjSpec(n)) = &n.node {
+                    match n.pubobjtype() {
+                        protobuf::PublicationObjSpecType::PublicationobjTablesInSchema => {
+                            tokens.push(TokenProperty::from(Token::Tables));
+                            tokens.push(TokenProperty::from(Token::InP));
+                            tokens.push(TokenProperty::from(Token::Schema));
+                        },
+                        _ => {}
+                    }
+                }
+            }
+        },
+        "PublicationTable" => quote! {
+            if n.where_clause.is_some() {
+                tokens.push(TokenProperty::from(Token::Where));
+            }
+        },
+        "BooleanTest" => quote! {
+            match n.booltesttype() {
+                protobuf::BoolTestType::IsTrue => {
+                    tokens.push(TokenProperty::from(Token::Is));
+                    tokens.push(TokenProperty::from(Token::TrueP));
+                },
+                protobuf::BoolTestType::IsNotTrue => {
+                    tokens.push(TokenProperty::from(Token::Is));
+                    tokens.push(TokenProperty::from(Token::Not));
+                    tokens.push(TokenProperty::from(Token::TrueP));
+                },
+                protobuf::BoolTestType::IsFalse => {
+                    tokens.push(TokenProperty::from(Token::Is));
+                    tokens.push(TokenProperty::from(Token::FalseP));
+                },
+                protobuf::BoolTestType::IsNotFalse => {
+                    tokens.push(TokenProperty::from(Token::Is));
+                    tokens.push(TokenProperty::from(Token::Not));
+                    tokens.push(TokenProperty::from(Token::FalseP));
+                },
+                _ => panic!("Unknown BooleanTest {:#?}", n.booltesttype()),
+            }
+        },
         "CompositeTypeStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
             tokens.push(TokenProperty::from(Token::TypeP));

@@ -55,6 +55,22 @@ pub fn get_location_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
                 } else {
                     Some(n.location)
                 },
+                NodeEnum::PublicationObjSpec(n) => {
+                    match &n.pubtable {
+                        Some(pubtable) => match &pubtable.relation {
+                            Some(range_var) => Some(range_var.location),
+                            None => Some(n.location),
+                        },
+                        None => Some(n.location),
+                    }
+                },
+                NodeEnum::BooleanTest(n) => {
+                    if n.arg.is_some() {
+                        get_location_internal(&n.arg.as_ref().unwrap().node.as_ref().unwrap())
+                    } else {
+                        Some(n.location)
+                    }
+                },
                 #(NodeEnum::#node_identifiers(n) => #location_idents),*
             };
             if location.is_some() && location.unwrap() < 0 {
@@ -74,6 +90,8 @@ fn manual_node_names() -> Vec<&'static str> {
         "CollateClause",
         "TypeCast",
         "ColumnDef",
+        "NullTest",
+        "PublicationObjSpec",
     ]
 }
 
