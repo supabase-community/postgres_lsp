@@ -1,77 +1,29 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "/* TODO: CREATE TABLE types (a geometry(point) NOT NULL); */ SELECT 1;"
+description: CREATE TABLE types (a geometry(point) NOT NULL);
 ---
 Parse {
-    cst: SourceFile@0..69
-      CComment@0..60 "/* TODO: CREATE TABLE ..."
-      SelectStmt@60..69
-        Select@60..66 "SELECT"
-        Whitespace@66..67 " "
-        ResTarget@67..68
-          AConst@67..68
-            Iconst@67..68 "1"
-        Ascii59@68..69 ";"
+    cst: SourceFile@0..48
+      Create@0..6 "CREATE"
+      Whitespace@6..7 " "
+      Table@7..12 "TABLE"
+      Whitespace@12..13 " "
+      TypesP@13..18 "types"
+      Whitespace@18..19 " "
+      Ascii40@19..20 "("
+      Ident@20..21 "a"
+      Whitespace@21..22 " "
+      Ident@22..30 "geometry"
+      Ascii40@30..31 "("
+      Ident@31..36 "point"
+      Ascii41@36..37 ")"
+      Whitespace@37..38 " "
+      Not@38..41 "NOT"
+      Whitespace@41..42 " "
+      NullP@42..46 "NULL"
+      Ascii41@46..47 ")"
+      Ascii59@47..48 ";"
     ,
     errors: [],
-    stmts: [
-        RawStmt {
-            stmt: SelectStmt(
-                SelectStmt {
-                    distinct_clause: [],
-                    into_clause: None,
-                    target_list: [
-                        Node {
-                            node: Some(
-                                ResTarget(
-                                    ResTarget {
-                                        name: "",
-                                        indirection: [],
-                                        val: Some(
-                                            Node {
-                                                node: Some(
-                                                    AConst(
-                                                        AConst {
-                                                            isnull: false,
-                                                            location: 7,
-                                                            val: Some(
-                                                                Ival(
-                                                                    Integer {
-                                                                        ival: 1,
-                                                                    },
-                                                                ),
-                                                            ),
-                                                        },
-                                                    ),
-                                                ),
-                                            },
-                                        ),
-                                        location: 7,
-                                    },
-                                ),
-                            ),
-                        },
-                    ],
-                    from_clause: [],
-                    where_clause: None,
-                    group_clause: [],
-                    group_distinct: false,
-                    having_clause: None,
-                    window_clause: [],
-                    values_lists: [],
-                    sort_clause: [],
-                    limit_offset: None,
-                    limit_count: None,
-                    limit_option: Default,
-                    locking_clause: [],
-                    with_clause: None,
-                    op: SetopNone,
-                    all: false,
-                    larg: None,
-                    rarg: None,
-                },
-            ),
-            range: 60..69,
-        },
-    ],
+    stmts: [],
 }

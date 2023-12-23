@@ -1,77 +1,72 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "/* TODO: CREATE TABLE types (a real, b double precision, c numeric(2, 3), d char(4), e char(5), f varchar(6), g varchar(7)); */ SELECT 1;"
+description: "CREATE TABLE types (a real, b double precision, c numeric(2, 3), d char(4), e char(5), f varchar(6), g varchar(7));"
 ---
 Parse {
-    cst: SourceFile@0..136
-      CComment@0..127 "/* TODO: CREATE TABLE ..."
-      SelectStmt@127..136
-        Select@127..133 "SELECT"
-        Whitespace@133..134 " "
-        ResTarget@134..135
-          AConst@134..135
-            Iconst@134..135 "1"
-        Ascii59@135..136 ";"
+    cst: SourceFile@0..115
+      Create@0..6 "CREATE"
+      Whitespace@6..7 " "
+      Table@7..12 "TABLE"
+      Whitespace@12..13 " "
+      TypesP@13..18 "types"
+      Whitespace@18..19 " "
+      Ascii40@19..20 "("
+      Ident@20..21 "a"
+      Whitespace@21..22 " "
+      Real@22..26 "real"
+      Ascii44@26..27 ","
+      Whitespace@27..28 " "
+      Ident@28..29 "b"
+      Whitespace@29..30 " "
+      DoubleP@30..36 "double"
+      Whitespace@36..37 " "
+      Precision@37..46 "precision"
+      Ascii44@46..47 ","
+      Whitespace@47..48 " "
+      Ident@48..49 "c"
+      Whitespace@49..50 " "
+      Numeric@50..57 "numeric"
+      Ascii40@57..58 "("
+      Iconst@58..59 "2"
+      Ascii44@59..60 ","
+      Whitespace@60..61 " "
+      Iconst@61..62 "3"
+      Ascii41@62..63 ")"
+      Ascii44@63..64 ","
+      Whitespace@64..65 " "
+      Ident@65..66 "d"
+      Whitespace@66..67 " "
+      CharP@67..71 "char"
+      Ascii40@71..72 "("
+      Iconst@72..73 "4"
+      Ascii41@73..74 ")"
+      Ascii44@74..75 ","
+      Whitespace@75..76 " "
+      Ident@76..77 "e"
+      Whitespace@77..78 " "
+      CharP@78..82 "char"
+      Ascii40@82..83 "("
+      Iconst@83..84 "5"
+      Ascii41@84..85 ")"
+      Ascii44@85..86 ","
+      Whitespace@86..87 " "
+      Ident@87..88 "f"
+      Whitespace@88..89 " "
+      Varchar@89..96 "varchar"
+      Ascii40@96..97 "("
+      Iconst@97..98 "6"
+      Ascii41@98..99 ")"
+      Ascii44@99..100 ","
+      Whitespace@100..101 " "
+      Ident@101..102 "g"
+      Whitespace@102..103 " "
+      Varchar@103..110 "varchar"
+      Ascii40@110..111 "("
+      Iconst@111..112 "7"
+      Ascii41@112..113 ")"
+      Ascii41@113..114 ")"
+      Ascii59@114..115 ";"
     ,
     errors: [],
-    stmts: [
-        RawStmt {
-            stmt: SelectStmt(
-                SelectStmt {
-                    distinct_clause: [],
-                    into_clause: None,
-                    target_list: [
-                        Node {
-                            node: Some(
-                                ResTarget(
-                                    ResTarget {
-                                        name: "",
-                                        indirection: [],
-                                        val: Some(
-                                            Node {
-                                                node: Some(
-                                                    AConst(
-                                                        AConst {
-                                                            isnull: false,
-                                                            location: 7,
-                                                            val: Some(
-                                                                Ival(
-                                                                    Integer {
-                                                                        ival: 1,
-                                                                    },
-                                                                ),
-                                                            ),
-                                                        },
-                                                    ),
-                                                ),
-                                            },
-                                        ),
-                                        location: 7,
-                                    },
-                                ),
-                            ),
-                        },
-                    ],
-                    from_clause: [],
-                    where_clause: None,
-                    group_clause: [],
-                    group_distinct: false,
-                    having_clause: None,
-                    window_clause: [],
-                    values_lists: [],
-                    sort_clause: [],
-                    limit_offset: None,
-                    limit_count: None,
-                    limit_option: Default,
-                    locking_clause: [],
-                    with_clause: None,
-                    op: SetopNone,
-                    all: false,
-                    larg: None,
-                    rarg: None,
-                },
-            ),
-            range: 127..136,
-        },
-    ],
+    stmts: [],
 }
