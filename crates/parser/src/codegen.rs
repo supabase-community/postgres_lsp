@@ -297,4 +297,24 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_conversion() {
+        test_get_node_properties(
+            "CREATE DEFAULT CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM myfunc;",
+            SyntaxKind::CreateConversionStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Default),
+                TokenProperty::from(SyntaxKind::ConversionP),
+                TokenProperty::from(SyntaxKind::For),
+                TokenProperty::from(SyntaxKind::To),
+                TokenProperty::from(SyntaxKind::From),
+                TokenProperty::from("utf8".to_string()),
+                TokenProperty::from("latin1".to_string()),
+                TokenProperty::from("myconv".to_string()),
+                TokenProperty::from("myfunc".to_string()),
+            ],
+        )
+    }
 }
