@@ -777,6 +777,24 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::Exists));
             }
         },
+        "CreateConversionStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            if n.def {
+                tokens.push(TokenProperty::from(Token::Default));
+            }
+            tokens.push(TokenProperty::from(Token::ConversionP));
+            if n.for_encoding_name.len() > 0 {
+                tokens.push(TokenProperty::from(Token::For));
+            }
+            if n.to_encoding_name.len() > 0 {
+                tokens.push(TokenProperty::from(Token::To));
+            }
+            if n.func_name.len() == 1 {
+                tokens.push(TokenProperty::from(Token::From));
+            } else if n.func_name.len() > 1 {
+                panic!("Encountered multiple defined func_name elements in CreateConversionStmt");
+            }
+        },
         _ => quote! {},
     }
 }
