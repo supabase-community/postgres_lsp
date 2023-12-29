@@ -3,101 +3,112 @@ source: crates/parser/tests/statement_parser_test.rs
 description: CREATE RECURSIVE VIEW public.nums_1_100 (n) AS VALUES (1) UNION ALL SELECT n+1 FROM nums_1_100 WHERE n < 100;
 ---
 Parse {
-    cst: SourceFile@0..108
-      Create@0..6 "CREATE"
-      Whitespace@6..7 " "
-      Recursive@7..16 "RECURSIVE"
-      Whitespace@16..17 " "
-      View@17..21 "VIEW"
-      Whitespace@21..22 " "
-      Ident@22..28 "public"
-      Ascii46@28..29 "."
-      Ident@29..39 "nums_1_100"
-      Whitespace@39..40 " "
-      Ascii40@40..41 "("
-      Ident@41..42 "n"
-      Ascii41@42..43 ")"
-      Whitespace@43..44 " "
-      As@44..46 "AS"
-      Whitespace@46..47 " "
-      Values@47..53 "VALUES"
-      Whitespace@53..54 " "
-      Ascii40@54..55 "("
-      Iconst@55..56 "1"
-      Ascii41@56..57 ")"
-      Whitespace@57..58 " "
-      Union@58..63 "UNION"
-      Whitespace@63..64 " "
-      All@64..67 "ALL"
-      SelectStmt@67..108
-        Select@67..73 "SELECT"
-        Whitespace@73..74 " "
-        ResTarget@74..77
-          AExpr@74..77
-            ColumnRef@74..75
-              Ident@74..75 "n"
-            Ascii43@75..76 "+"
-            AConst@76..77
-              Iconst@76..77 "1"
-        Whitespace@77..78 " "
-        From@78..82 "FROM"
-        Whitespace@82..83 " "
-        RangeVar@83..93
-          Ident@83..93 "nums_1_100"
-        Whitespace@93..94 " "
-        Where@94..99 "WHERE"
-        Whitespace@99..100 " "
-        AExpr@100..107
-          ColumnRef@100..101
-            Ident@100..101 "n"
-          Whitespace@101..102 " "
-          Ascii60@102..103 "<"
-          Whitespace@103..104 " "
-          AConst@104..107
-            Iconst@104..107 "100"
-        Ascii59@107..108 ";"
+    cst: SourceFile@0..109
+      ViewStmt@0..109
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Recursive@7..16 "RECURSIVE"
+        Whitespace@16..17 " "
+        View@17..21 "VIEW"
+        Whitespace@21..22 " "
+        RangeVar@22..39
+          Ident@22..28 "public"
+          Ascii46@28..29 "."
+          Ident@29..39 "nums_1_100"
+        Whitespace@39..40 " "
+        Ascii40@40..41 "("
+        Ident@41..42 "n"
+        Ascii41@42..43 ")"
+        Whitespace@43..44 " "
+        As@44..46 "AS"
+        Whitespace@46..47 " "
+        SelectStmt@47..109
+          WithClause@47..108
+            CommonTableExpr@47..108
+              SelectStmt@47..108
+                SelectStmt@47..56
+                  Values@47..53 "VALUES"
+                  Whitespace@53..54 " "
+                  Ascii40@54..55 "("
+                  List@55..56
+                    AConst@55..56
+                      Iconst@55..56 "1"
+                Ascii41@56..57 ")"
+                Whitespace@57..58 " "
+                Union@58..63 "UNION"
+                Whitespace@63..64 " "
+                All@64..67 "ALL"
+                Whitespace@67..68 " "
+                Select@68..74 "SELECT"
+                Whitespace@74..75 " "
+                SelectStmt@75..108
+                  ResTarget@75..78
+                    AExpr@75..78
+                      ColumnRef@75..76
+                        Ident@75..76 "n"
+                      Ascii43@76..77 "+"
+                      AConst@77..78
+                        Iconst@77..78 "1"
+                  Whitespace@78..79 " "
+                  From@79..83 "FROM"
+                  Whitespace@83..84 " "
+                  RangeVar@84..94
+                    Ident@84..94 "nums_1_100"
+                  Whitespace@94..95 " "
+                  Where@95..100 "WHERE"
+                  Whitespace@100..101 " "
+                  AExpr@101..108
+                    ColumnRef@101..102
+                      Ident@101..102 "n"
+                    Whitespace@102..103 " "
+                    Ascii60@103..104 "<"
+                    Whitespace@104..105 " "
+                    AConst@105..108
+                      Iconst@105..108 "100"
+          Ascii59@108..109 ";"
     ,
-    errors: [
-        SyntaxError(
-            "Expected Ascii59, found Whitespace",
-            67..67,
-        ),
-        SyntaxError(
-            "Invalid statement: syntax error at end of input",
-            0..25,
-        ),
-    ],
+    errors: [],
     stmts: [
         RawStmt {
-            stmt: SelectStmt(
-                SelectStmt {
-                    distinct_clause: [],
-                    into_clause: None,
-                    target_list: [
+            stmt: ViewStmt(
+                ViewStmt {
+                    view: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "public",
+                            relname: "nums_1_100",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 22,
+                        },
+                    ),
+                    aliases: [
                         Node {
                             node: Some(
-                                ResTarget(
-                                    ResTarget {
-                                        name: "",
-                                        indirection: [],
-                                        val: Some(
+                                String(
+                                    String {
+                                        sval: "n",
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    query: Some(
+                        Node {
+                            node: Some(
+                                SelectStmt(
+                                    SelectStmt {
+                                        distinct_clause: [],
+                                        into_clause: None,
+                                        target_list: [
                                             Node {
                                                 node: Some(
-                                                    AExpr(
-                                                        AExpr {
-                                                            kind: AexprOp,
-                                                            name: [
-                                                                Node {
-                                                                    node: Some(
-                                                                        String(
-                                                                            String {
-                                                                                sval: "+",
-                                                                            },
-                                                                        ),
-                                                                    ),
-                                                                },
-                                                            ],
-                                                            lexpr: Some(
+                                                    ResTarget(
+                                                        ResTarget {
+                                                            name: "",
+                                                            indirection: [],
+                                                            val: Some(
                                                                 Node {
                                                                     node: Some(
                                                                         ColumnRef(
@@ -113,142 +124,358 @@ Parse {
                                                                                         ),
                                                                                     },
                                                                                 ],
-                                                                                location: 7,
+                                                                                location: -1,
                                                                             },
                                                                         ),
                                                                     ),
                                                                 },
                                                             ),
-                                                            rexpr: Some(
-                                                                Node {
-                                                                    node: Some(
-                                                                        AConst(
-                                                                            AConst {
-                                                                                isnull: false,
-                                                                                location: 9,
-                                                                                val: Some(
-                                                                                    Ival(
-                                                                                        Integer {
-                                                                                            ival: 1,
-                                                                                        },
-                                                                                    ),
-                                                                                ),
-                                                                            },
-                                                                        ),
-                                                                    ),
-                                                                },
-                                                            ),
-                                                            location: 8,
-                                                        },
-                                                    ),
-                                                ),
-                                            },
-                                        ),
-                                        location: 7,
-                                    },
-                                ),
-                            ),
-                        },
-                    ],
-                    from_clause: [
-                        Node {
-                            node: Some(
-                                RangeVar(
-                                    RangeVar {
-                                        catalogname: "",
-                                        schemaname: "",
-                                        relname: "nums_1_100",
-                                        inh: true,
-                                        relpersistence: "p",
-                                        alias: None,
-                                        location: 16,
-                                    },
-                                ),
-                            ),
-                        },
-                    ],
-                    where_clause: Some(
-                        Node {
-                            node: Some(
-                                AExpr(
-                                    AExpr {
-                                        kind: AexprOp,
-                                        name: [
-                                            Node {
-                                                node: Some(
-                                                    String(
-                                                        String {
-                                                            sval: "<",
+                                                            location: -1,
                                                         },
                                                     ),
                                                 ),
                                             },
                                         ],
-                                        lexpr: Some(
+                                        from_clause: [
                                             Node {
                                                 node: Some(
-                                                    ColumnRef(
-                                                        ColumnRef {
-                                                            fields: [
-                                                                Node {
-                                                                    node: Some(
-                                                                        String(
-                                                                            String {
-                                                                                sval: "n",
-                                                                            },
-                                                                        ),
+                                                    RangeVar(
+                                                        RangeVar {
+                                                            catalogname: "",
+                                                            schemaname: "",
+                                                            relname: "nums_1_100",
+                                                            inh: true,
+                                                            relpersistence: "p",
+                                                            alias: None,
+                                                            location: -1,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        where_clause: None,
+                                        group_clause: [],
+                                        group_distinct: false,
+                                        having_clause: None,
+                                        window_clause: [],
+                                        values_lists: [],
+                                        sort_clause: [],
+                                        limit_offset: None,
+                                        limit_count: None,
+                                        limit_option: Default,
+                                        locking_clause: [],
+                                        with_clause: Some(
+                                            WithClause {
+                                                ctes: [
+                                                    Node {
+                                                        node: Some(
+                                                            CommonTableExpr(
+                                                                CommonTableExpr {
+                                                                    ctename: "nums_1_100",
+                                                                    aliascolnames: [
+                                                                        Node {
+                                                                            node: Some(
+                                                                                String(
+                                                                                    String {
+                                                                                        sval: "n",
+                                                                                    },
+                                                                                ),
+                                                                            ),
+                                                                        },
+                                                                    ],
+                                                                    ctematerialized: Default,
+                                                                    ctequery: Some(
+                                                                        Node {
+                                                                            node: Some(
+                                                                                SelectStmt(
+                                                                                    SelectStmt {
+                                                                                        distinct_clause: [],
+                                                                                        into_clause: None,
+                                                                                        target_list: [],
+                                                                                        from_clause: [],
+                                                                                        where_clause: None,
+                                                                                        group_clause: [],
+                                                                                        group_distinct: false,
+                                                                                        having_clause: None,
+                                                                                        window_clause: [],
+                                                                                        values_lists: [],
+                                                                                        sort_clause: [],
+                                                                                        limit_offset: None,
+                                                                                        limit_count: None,
+                                                                                        limit_option: Default,
+                                                                                        locking_clause: [],
+                                                                                        with_clause: None,
+                                                                                        op: SetopUnion,
+                                                                                        all: true,
+                                                                                        larg: Some(
+                                                                                            SelectStmt {
+                                                                                                distinct_clause: [],
+                                                                                                into_clause: None,
+                                                                                                target_list: [],
+                                                                                                from_clause: [],
+                                                                                                where_clause: None,
+                                                                                                group_clause: [],
+                                                                                                group_distinct: false,
+                                                                                                having_clause: None,
+                                                                                                window_clause: [],
+                                                                                                values_lists: [
+                                                                                                    Node {
+                                                                                                        node: Some(
+                                                                                                            List(
+                                                                                                                List {
+                                                                                                                    items: [
+                                                                                                                        Node {
+                                                                                                                            node: Some(
+                                                                                                                                AConst(
+                                                                                                                                    AConst {
+                                                                                                                                        isnull: false,
+                                                                                                                                        location: 55,
+                                                                                                                                        val: Some(
+                                                                                                                                            Ival(
+                                                                                                                                                Integer {
+                                                                                                                                                    ival: 1,
+                                                                                                                                                },
+                                                                                                                                            ),
+                                                                                                                                        ),
+                                                                                                                                    },
+                                                                                                                                ),
+                                                                                                                            ),
+                                                                                                                        },
+                                                                                                                    ],
+                                                                                                                },
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                    },
+                                                                                                ],
+                                                                                                sort_clause: [],
+                                                                                                limit_offset: None,
+                                                                                                limit_count: None,
+                                                                                                limit_option: Default,
+                                                                                                locking_clause: [],
+                                                                                                with_clause: None,
+                                                                                                op: SetopNone,
+                                                                                                all: false,
+                                                                                                larg: None,
+                                                                                                rarg: None,
+                                                                                            },
+                                                                                        ),
+                                                                                        rarg: Some(
+                                                                                            SelectStmt {
+                                                                                                distinct_clause: [],
+                                                                                                into_clause: None,
+                                                                                                target_list: [
+                                                                                                    Node {
+                                                                                                        node: Some(
+                                                                                                            ResTarget(
+                                                                                                                ResTarget {
+                                                                                                                    name: "",
+                                                                                                                    indirection: [],
+                                                                                                                    val: Some(
+                                                                                                                        Node {
+                                                                                                                            node: Some(
+                                                                                                                                AExpr(
+                                                                                                                                    AExpr {
+                                                                                                                                        kind: AexprOp,
+                                                                                                                                        name: [
+                                                                                                                                            Node {
+                                                                                                                                                node: Some(
+                                                                                                                                                    String(
+                                                                                                                                                        String {
+                                                                                                                                                            sval: "+",
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                ),
+                                                                                                                                            },
+                                                                                                                                        ],
+                                                                                                                                        lexpr: Some(
+                                                                                                                                            Node {
+                                                                                                                                                node: Some(
+                                                                                                                                                    ColumnRef(
+                                                                                                                                                        ColumnRef {
+                                                                                                                                                            fields: [
+                                                                                                                                                                Node {
+                                                                                                                                                                    node: Some(
+                                                                                                                                                                        String(
+                                                                                                                                                                            String {
+                                                                                                                                                                                sval: "n",
+                                                                                                                                                                            },
+                                                                                                                                                                        ),
+                                                                                                                                                                    ),
+                                                                                                                                                                },
+                                                                                                                                                            ],
+                                                                                                                                                            location: 75,
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                ),
+                                                                                                                                            },
+                                                                                                                                        ),
+                                                                                                                                        rexpr: Some(
+                                                                                                                                            Node {
+                                                                                                                                                node: Some(
+                                                                                                                                                    AConst(
+                                                                                                                                                        AConst {
+                                                                                                                                                            isnull: false,
+                                                                                                                                                            location: 77,
+                                                                                                                                                            val: Some(
+                                                                                                                                                                Ival(
+                                                                                                                                                                    Integer {
+                                                                                                                                                                        ival: 1,
+                                                                                                                                                                    },
+                                                                                                                                                                ),
+                                                                                                                                                            ),
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                ),
+                                                                                                                                            },
+                                                                                                                                        ),
+                                                                                                                                        location: 76,
+                                                                                                                                    },
+                                                                                                                                ),
+                                                                                                                            ),
+                                                                                                                        },
+                                                                                                                    ),
+                                                                                                                    location: 75,
+                                                                                                                },
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                    },
+                                                                                                ],
+                                                                                                from_clause: [
+                                                                                                    Node {
+                                                                                                        node: Some(
+                                                                                                            RangeVar(
+                                                                                                                RangeVar {
+                                                                                                                    catalogname: "",
+                                                                                                                    schemaname: "",
+                                                                                                                    relname: "nums_1_100",
+                                                                                                                    inh: true,
+                                                                                                                    relpersistence: "p",
+                                                                                                                    alias: None,
+                                                                                                                    location: 84,
+                                                                                                                },
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                    },
+                                                                                                ],
+                                                                                                where_clause: Some(
+                                                                                                    Node {
+                                                                                                        node: Some(
+                                                                                                            AExpr(
+                                                                                                                AExpr {
+                                                                                                                    kind: AexprOp,
+                                                                                                                    name: [
+                                                                                                                        Node {
+                                                                                                                            node: Some(
+                                                                                                                                String(
+                                                                                                                                    String {
+                                                                                                                                        sval: "<",
+                                                                                                                                    },
+                                                                                                                                ),
+                                                                                                                            ),
+                                                                                                                        },
+                                                                                                                    ],
+                                                                                                                    lexpr: Some(
+                                                                                                                        Node {
+                                                                                                                            node: Some(
+                                                                                                                                ColumnRef(
+                                                                                                                                    ColumnRef {
+                                                                                                                                        fields: [
+                                                                                                                                            Node {
+                                                                                                                                                node: Some(
+                                                                                                                                                    String(
+                                                                                                                                                        String {
+                                                                                                                                                            sval: "n",
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                ),
+                                                                                                                                            },
+                                                                                                                                        ],
+                                                                                                                                        location: 101,
+                                                                                                                                    },
+                                                                                                                                ),
+                                                                                                                            ),
+                                                                                                                        },
+                                                                                                                    ),
+                                                                                                                    rexpr: Some(
+                                                                                                                        Node {
+                                                                                                                            node: Some(
+                                                                                                                                AConst(
+                                                                                                                                    AConst {
+                                                                                                                                        isnull: false,
+                                                                                                                                        location: 105,
+                                                                                                                                        val: Some(
+                                                                                                                                            Ival(
+                                                                                                                                                Integer {
+                                                                                                                                                    ival: 100,
+                                                                                                                                                },
+                                                                                                                                            ),
+                                                                                                                                        ),
+                                                                                                                                    },
+                                                                                                                                ),
+                                                                                                                            ),
+                                                                                                                        },
+                                                                                                                    ),
+                                                                                                                    location: 103,
+                                                                                                                },
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                    },
+                                                                                                ),
+                                                                                                group_clause: [],
+                                                                                                group_distinct: false,
+                                                                                                having_clause: None,
+                                                                                                window_clause: [],
+                                                                                                values_lists: [],
+                                                                                                sort_clause: [],
+                                                                                                limit_offset: None,
+                                                                                                limit_count: None,
+                                                                                                limit_option: Default,
+                                                                                                locking_clause: [],
+                                                                                                with_clause: None,
+                                                                                                op: SetopNone,
+                                                                                                all: false,
+                                                                                                larg: None,
+                                                                                                rarg: None,
+                                                                                            },
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                            ),
+                                                                        },
                                                                     ),
+                                                                    search_clause: None,
+                                                                    cycle_clause: None,
+                                                                    location: -1,
+                                                                    cterecursive: false,
+                                                                    cterefcount: 0,
+                                                                    ctecolnames: [],
+                                                                    ctecoltypes: [],
+                                                                    ctecoltypmods: [],
+                                                                    ctecolcollations: [],
                                                                 },
-                                                            ],
-                                                            location: 33,
-                                                        },
-                                                    ),
-                                                ),
-                                            },
-                                        ),
-                                        rexpr: Some(
-                                            Node {
-                                                node: Some(
-                                                    AConst(
-                                                        AConst {
-                                                            isnull: false,
-                                                            location: 37,
-                                                            val: Some(
-                                                                Ival(
-                                                                    Integer {
-                                                                        ival: 100,
-                                                                    },
-                                                                ),
                                                             ),
-                                                        },
-                                                    ),
-                                                ),
+                                                        ),
+                                                    },
+                                                ],
+                                                recursive: true,
+                                                location: -1,
                                             },
                                         ),
-                                        location: 35,
+                                        op: SetopNone,
+                                        all: false,
+                                        larg: None,
+                                        rarg: None,
                                     },
                                 ),
                             ),
                         },
                     ),
-                    group_clause: [],
-                    group_distinct: false,
-                    having_clause: None,
-                    window_clause: [],
-                    values_lists: [],
-                    sort_clause: [],
-                    limit_offset: None,
-                    limit_count: None,
-                    limit_option: Default,
-                    locking_clause: [],
-                    with_clause: None,
-                    op: SetopNone,
-                    all: false,
-                    larg: None,
-                    rarg: None,
+                    replace: false,
+                    options: [],
+                    with_check_option: NoCheckOption,
                 },
             ),
-            range: 67..108,
+            range: 0..108,
         },
     ],
 }
