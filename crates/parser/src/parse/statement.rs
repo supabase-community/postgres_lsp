@@ -74,6 +74,11 @@ fn collect_statement_token_range(parser: &mut Parser, kind: SyntaxKind) -> Range
     let mut ignore_next_non_whitespace = false;
     while !parser.at(SyntaxKind::Ascii59) && !parser.eof() {
         match parser.nth(0, false).kind {
+            SyntaxKind::All => {
+                // ALL is never a statement start, but needs to be skipped when combining queries
+                // (e.g. UNION ALL)
+                parser.advance();
+            }
             SyntaxKind::BeginP => {
                 // BEGIN, consume until END
                 is_sub_trx += 1;
@@ -92,7 +97,7 @@ fn collect_statement_token_range(parser: &mut Parser, kind: SyntaxKind) -> Range
                 is_sub_stmt -= 1;
                 parser.advance();
             }
-            SyntaxKind::As => {
+            SyntaxKind::As | SyntaxKind::Union | SyntaxKind::Intersect | SyntaxKind::Except => {
                 // ignore the next non-whitespace token
                 ignore_next_non_whitespace = true;
                 parser.advance();

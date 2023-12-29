@@ -181,6 +181,17 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::GroupP));
                 tokens.push(TokenProperty::from(Token::By));
             }
+            match n.op() {
+                protobuf::SetOperation::Undefined => {},
+                protobuf::SetOperation::SetopNone => {},
+                protobuf::SetOperation::SetopUnion => tokens.push(TokenProperty::from(Token::Union)),
+                protobuf::SetOperation::SetopIntersect => tokens.push(TokenProperty::from(Token::Intersect)),
+                protobuf::SetOperation::SetopExcept => tokens.push(TokenProperty::from(Token::Except)),
+                _ => panic!("Unknown SelectStmt op {:#?}", n.op()),
+            }
+            if n.all {
+                tokens.push(TokenProperty::from(Token::All));
+            }
         },
         "BoolExpr" => quote! {
             match n.boolop() {
@@ -391,6 +402,12 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::View));
             if n.query.is_some() {
                 tokens.push(TokenProperty::from(Token::As));
+                // check if SelectStmt with WithClause with recursive set to true
+                if let Some(NodeEnum::SelectStmt(select_stmt)) = n.query.as_ref().and_then(|query| query.node.as_ref()) {
+                    if select_stmt.with_clause.is_some() && select_stmt.with_clause.as_ref().unwrap().recursive {
+                        tokens.push(TokenProperty::from(Token::Recursive));
+                    }
+                }
             }
             if n.replace {
                 tokens.push(TokenProperty::from(Token::Or));
