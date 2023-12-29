@@ -1,0 +1,251 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE TRANSFORM FOR hstore LANGUAGE plpython3u (\n    FROM SQL WITH FUNCTION hstore_to_plpython(internal),\n    TO SQL WITH FUNCTION plpython_to_hstore(internal)\n);"
+---
+Parse {
+    cst: SourceFile@0..163
+      CreateTransformStmt@0..163
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Transform@7..16 "TRANSFORM"
+        Whitespace@16..17 " "
+        For@17..20 "FOR"
+        Whitespace@20..21 " "
+        TypeName@21..27
+          Ident@21..27 "hstore"
+        Whitespace@27..28 " "
+        Language@28..36 "LANGUAGE"
+        Whitespace@36..37 " "
+        Ident@37..47 "plpython3u"
+        Whitespace@47..48 " "
+        Ascii40@48..49 "("
+        Newline@49..50 "\n"
+        Whitespace@50..54 "    "
+        From@54..58 "FROM"
+        Whitespace@58..59 " "
+        SqlP@59..62 "SQL"
+        Whitespace@62..63 " "
+        With@63..67 "WITH"
+        Whitespace@67..68 " "
+        Function@68..76 "FUNCTION"
+        Whitespace@76..77 " "
+        ObjectWithArgs@77..107
+          Ident@77..95 "hstore_to_plpython"
+          Ascii40@95..96 "("
+          TypeName@96..104
+            Ident@96..104 "internal"
+          Ascii41@104..105 ")"
+          Ascii44@105..106 ","
+          Newline@106..107 "\n"
+        Whitespace@107..111 "    "
+        To@111..113 "TO"
+        Whitespace@113..114 " "
+        SqlP@114..117 "SQL"
+        Whitespace@117..118 " "
+        With@118..122 "WITH"
+        Whitespace@122..123 " "
+        Function@123..131 "FUNCTION"
+        Whitespace@131..132 " "
+        ObjectWithArgs@132..163
+          Ident@132..150 "plpython_to_hstore"
+          Ascii40@150..151 "("
+          TypeName@151..159
+            Ident@151..159 "internal"
+          Ascii41@159..160 ")"
+          Newline@160..161 "\n"
+          Ascii41@161..162 ")"
+          Ascii59@162..163 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateTransformStmt(
+                CreateTransformStmt {
+                    replace: false,
+                    type_name: Some(
+                        TypeName {
+                            names: [
+                                Node {
+                                    node: Some(
+                                        String(
+                                            String {
+                                                sval: "hstore",
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ],
+                            type_oid: 0,
+                            setof: false,
+                            pct_type: false,
+                            typmods: [],
+                            typemod: -1,
+                            array_bounds: [],
+                            location: 21,
+                        },
+                    ),
+                    lang: "plpython3u",
+                    fromsql: Some(
+                        ObjectWithArgs {
+                            objname: [
+                                Node {
+                                    node: Some(
+                                        String(
+                                            String {
+                                                sval: "hstore_to_plpython",
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ],
+                            objargs: [
+                                Node {
+                                    node: Some(
+                                        TypeName(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "internal",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 96,
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ],
+                            objfuncargs: [
+                                Node {
+                                    node: Some(
+                                        FunctionParameter(
+                                            FunctionParameter {
+                                                name: "",
+                                                arg_type: Some(
+                                                    TypeName {
+                                                        names: [
+                                                            Node {
+                                                                node: Some(
+                                                                    String(
+                                                                        String {
+                                                                            sval: "internal",
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            },
+                                                        ],
+                                                        type_oid: 0,
+                                                        setof: false,
+                                                        pct_type: false,
+                                                        typmods: [],
+                                                        typemod: -1,
+                                                        array_bounds: [],
+                                                        location: 96,
+                                                    },
+                                                ),
+                                                mode: FuncParamDefault,
+                                                defexpr: None,
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ],
+                            args_unspecified: false,
+                        },
+                    ),
+                    tosql: Some(
+                        ObjectWithArgs {
+                            objname: [
+                                Node {
+                                    node: Some(
+                                        String(
+                                            String {
+                                                sval: "plpython_to_hstore",
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ],
+                            objargs: [
+                                Node {
+                                    node: Some(
+                                        TypeName(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "internal",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 151,
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ],
+                            objfuncargs: [
+                                Node {
+                                    node: Some(
+                                        FunctionParameter(
+                                            FunctionParameter {
+                                                name: "",
+                                                arg_type: Some(
+                                                    TypeName {
+                                                        names: [
+                                                            Node {
+                                                                node: Some(
+                                                                    String(
+                                                                        String {
+                                                                            sval: "internal",
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            },
+                                                        ],
+                                                        type_oid: 0,
+                                                        setof: false,
+                                                        pct_type: false,
+                                                        typmods: [],
+                                                        typemod: -1,
+                                                        array_bounds: [],
+                                                        location: 151,
+                                                    },
+                                                ),
+                                                mode: FuncParamDefault,
+                                                defexpr: None,
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ],
+                            args_unspecified: false,
+                        },
+                    ),
+                },
+            ),
+            range: 0..162,
+        },
+    ],
+}

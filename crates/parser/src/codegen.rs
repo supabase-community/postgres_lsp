@@ -317,4 +317,32 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_create_transform() {
+        test_get_node_properties(
+            "CREATE OR REPLACE TRANSFORM FOR hstore LANGUAGE plpython3u (
+                FROM SQL WITH FUNCTION hstore_to_plpython(internal),
+                TO SQL WITH FUNCTION plpython_to_hstore(internal)
+            );",
+            SyntaxKind::CreateTransformStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::Or),
+                TokenProperty::from(SyntaxKind::Replace),
+                TokenProperty::from(SyntaxKind::Transform),
+                TokenProperty::from(SyntaxKind::For),
+                TokenProperty::from(SyntaxKind::Language),
+                TokenProperty::from(SyntaxKind::From),
+                TokenProperty::from(SyntaxKind::SqlP),
+                TokenProperty::from(SyntaxKind::With),
+                TokenProperty::from(SyntaxKind::Function),
+                TokenProperty::from(SyntaxKind::To),
+                TokenProperty::from(SyntaxKind::SqlP),
+                TokenProperty::from(SyntaxKind::With),
+                TokenProperty::from(SyntaxKind::Function),
+                TokenProperty::from("plpython3u".to_string()),
+            ],
+        )
+    }
 }

@@ -812,6 +812,30 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 panic!("Encountered multiple defined func_name elements in CreateConversionStmt");
             }
         },
+        "CreateTransformStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Create));
+            if n.replace {
+                tokens.push(TokenProperty::from(Token::Or));
+                tokens.push(TokenProperty::from(Token::Replace));
+            }
+            tokens.push(TokenProperty::from(Token::Transform));
+            if n.type_name.is_some() {
+                tokens.push(TokenProperty::from(Token::For));
+            }
+            tokens.push(TokenProperty::from(Token::Language));
+            if n.fromsql.is_some() {
+                tokens.push(TokenProperty::from(Token::From));
+                tokens.push(TokenProperty::from(Token::SqlP));
+                tokens.push(TokenProperty::from(Token::With));
+                tokens.push(TokenProperty::from(Token::Function));
+            }
+            if n.tosql.is_some() {
+                tokens.push(TokenProperty::from(Token::To));
+                tokens.push(TokenProperty::from(Token::SqlP));
+                tokens.push(TokenProperty::from(Token::With));
+                tokens.push(TokenProperty::from(Token::Function));
+            }
+        },
         _ => quote! {},
     }
 }
