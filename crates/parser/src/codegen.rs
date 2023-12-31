@@ -94,6 +94,19 @@ mod tests {
     }
 
     #[test]
+    fn test_select_with_where() {
+        test_get_node_properties(
+            "select 1 from contact where id = 1;",
+            SyntaxKind::SelectStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Select),
+                TokenProperty::from(SyntaxKind::From),
+                TokenProperty::from(SyntaxKind::Where),
+            ],
+        )
+    }
+
+    #[test]
     fn test_create_domain() {
         test_get_node_properties(
             "create domain us_postal_code as text check (value is not null);",
