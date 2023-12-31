@@ -1,0 +1,320 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "CREATE TABLE distributors (did int, name varchar(40), UNIQUE (name) WITH (fillfactor=70)) WITH (fillfactor=70);"
+---
+Parse {
+    cst: SourceFile@0..111
+      CreateStmt@0..111
+        Create@0..6 "CREATE"
+        Whitespace@6..7 " "
+        Table@7..12 "TABLE"
+        Whitespace@12..13 " "
+        RangeVar@13..25
+          Ident@13..25 "distributors"
+        Whitespace@25..26 " "
+        Ascii40@26..27 "("
+        ColumnDef@27..34
+          Ident@27..30 "did"
+          Whitespace@30..31 " "
+          TypeName@31..34
+            IntP@31..34 "int"
+        Ascii44@34..35 ","
+        Whitespace@35..36 " "
+        ColumnDef@36..51
+          NameP@36..40 "name"
+          Whitespace@40..41 " "
+          TypeName@41..51
+            Varchar@41..48 "varchar"
+            Ascii40@48..49 "("
+            AConst@49..51
+              Iconst@49..51 "40"
+        Ascii41@51..52 ")"
+        Ascii44@52..53 ","
+        Whitespace@53..54 " "
+        Constraint@54..87
+          Unique@54..60 "UNIQUE"
+          Whitespace@60..61 " "
+          Ascii40@61..62 "("
+          NameP@62..66 "name"
+          Ascii41@66..67 ")"
+          Whitespace@67..68 " "
+          With@68..72 "WITH"
+          Whitespace@72..73 " "
+          Ascii40@73..74 "("
+          DefElem@74..87
+            Ident@74..84 "fillfactor"
+            Ascii61@84..85 "="
+            Iconst@85..87 "70"
+        Ascii41@87..88 ")"
+        Ascii41@88..89 ")"
+        Whitespace@89..90 " "
+        With@90..94 "WITH"
+        Whitespace@94..95 " "
+        Ascii40@95..96 "("
+        DefElem@96..109
+          Ident@96..106 "fillfactor"
+          Ascii61@106..107 "="
+          Iconst@107..109 "70"
+        Ascii41@109..110 ")"
+        Ascii59@110..111 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateStmt(
+                CreateStmt {
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "distributors",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 13,
+                        },
+                    ),
+                    table_elts: [
+                        Node {
+                            node: Some(
+                                ColumnDef(
+                                    ColumnDef {
+                                        colname: "did",
+                                        type_name: Some(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "pg_catalog",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "int4",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 31,
+                                            },
+                                        ),
+                                        compression: "",
+                                        inhcount: 0,
+                                        is_local: true,
+                                        is_not_null: false,
+                                        is_from_type: false,
+                                        storage: "",
+                                        raw_default: None,
+                                        cooked_default: None,
+                                        identity: "",
+                                        identity_sequence: None,
+                                        generated: "",
+                                        coll_clause: None,
+                                        coll_oid: 0,
+                                        constraints: [],
+                                        fdwoptions: [],
+                                        location: 27,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ColumnDef(
+                                    ColumnDef {
+                                        colname: "name",
+                                        type_name: Some(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "pg_catalog",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "varchar",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [
+                                                    Node {
+                                                        node: Some(
+                                                            AConst(
+                                                                AConst {
+                                                                    isnull: false,
+                                                                    location: 49,
+                                                                    val: Some(
+                                                                        Ival(
+                                                                            Integer {
+                                                                                ival: 40,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 41,
+                                            },
+                                        ),
+                                        compression: "",
+                                        inhcount: 0,
+                                        is_local: true,
+                                        is_not_null: false,
+                                        is_from_type: false,
+                                        storage: "",
+                                        raw_default: None,
+                                        cooked_default: None,
+                                        identity: "",
+                                        identity_sequence: None,
+                                        generated: "",
+                                        coll_clause: None,
+                                        coll_oid: 0,
+                                        constraints: [],
+                                        fdwoptions: [],
+                                        location: 36,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                Constraint(
+                                    Constraint {
+                                        contype: ConstrUnique,
+                                        conname: "",
+                                        deferrable: false,
+                                        initdeferred: false,
+                                        location: 54,
+                                        is_no_inherit: false,
+                                        raw_expr: None,
+                                        cooked_expr: "",
+                                        generated_when: "",
+                                        nulls_not_distinct: false,
+                                        keys: [
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "name",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        including: [],
+                                        exclusions: [],
+                                        options: [
+                                            Node {
+                                                node: Some(
+                                                    DefElem(
+                                                        DefElem {
+                                                            defnamespace: "",
+                                                            defname: "fillfactor",
+                                                            arg: Some(
+                                                                Node {
+                                                                    node: Some(
+                                                                        Integer(
+                                                                            Integer {
+                                                                                ival: 70,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ),
+                                                            defaction: DefelemUnspec,
+                                                            location: 74,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        indexname: "",
+                                        indexspace: "",
+                                        reset_default_tblspc: false,
+                                        access_method: "",
+                                        where_clause: None,
+                                        pktable: None,
+                                        fk_attrs: [],
+                                        pk_attrs: [],
+                                        fk_matchtype: "",
+                                        fk_upd_action: "",
+                                        fk_del_action: "",
+                                        fk_del_set_cols: [],
+                                        old_conpfeqop: [],
+                                        old_pktable_oid: 0,
+                                        skip_validation: false,
+                                        initially_valid: false,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    inh_relations: [],
+                    partbound: None,
+                    partspec: None,
+                    of_typename: None,
+                    constraints: [],
+                    options: [
+                        Node {
+                            node: Some(
+                                DefElem(
+                                    DefElem {
+                                        defnamespace: "",
+                                        defname: "fillfactor",
+                                        arg: Some(
+                                            Node {
+                                                node: Some(
+                                                    Integer(
+                                                        Integer {
+                                                            ival: 70,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        defaction: DefelemUnspec,
+                                        location: 96,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    oncommit: OncommitNoop,
+                    tablespacename: "",
+                    access_method: "",
+                    if_not_exists: false,
+                },
+            ),
+            range: 0..110,
+        },
+    ],
+}

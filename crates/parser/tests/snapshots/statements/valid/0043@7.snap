@@ -1,0 +1,77 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "/* TODO: CREATE TEMPORARY TABLE temp AS SELECT c FROM t; */ SELECT 1;"
+---
+Parse {
+    cst: SourceFile@0..68
+      CComment@0..59 "/* TODO: CREATE TEMPO ..."
+      SelectStmt@59..68
+        Select@59..65 "SELECT"
+        Whitespace@65..66 " "
+        ResTarget@66..67
+          AConst@66..67
+            Iconst@66..67 "1"
+        Ascii59@67..68 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: SelectStmt(
+                SelectStmt {
+                    distinct_clause: [],
+                    into_clause: None,
+                    target_list: [
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    AConst(
+                                                        AConst {
+                                                            isnull: false,
+                                                            location: 7,
+                                                            val: Some(
+                                                                Ival(
+                                                                    Integer {
+                                                                        ival: 1,
+                                                                    },
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 7,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    from_clause: [],
+                    where_clause: None,
+                    group_clause: [],
+                    group_distinct: false,
+                    having_clause: None,
+                    window_clause: [],
+                    values_lists: [],
+                    sort_clause: [],
+                    limit_offset: None,
+                    limit_count: None,
+                    limit_option: Default,
+                    locking_clause: [],
+                    with_clause: None,
+                    op: SetopNone,
+                    all: false,
+                    larg: None,
+                    rarg: None,
+                },
+            ),
+            range: 59..68,
+        },
+    ],
+}

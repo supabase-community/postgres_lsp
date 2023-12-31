@@ -376,7 +376,11 @@ fn custom_handlers(node: &Node) -> TokenStream {
                     tokens.push(TokenProperty::from(Token::Key));
                 },
                 protobuf::ConstrType::ConstrForeign => tokens.push(TokenProperty::from(Token::References)),
+                protobuf::ConstrType::ConstrUnique => tokens.push(TokenProperty::from(Token::Unique)),
                 _ => panic!("Unknown Constraint {:#?}", n.contype()),
+            };
+            if n.options.len() > 0 {
+                tokens.push(TokenProperty::from(Token::With));
             }
         },
         "PartitionSpec" => quote! {
@@ -455,6 +459,29 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::Of));
                 tokens.push(TokenProperty::from(Token::For));
                 tokens.push(TokenProperty::from(Token::Values));
+            }
+            if let Some(n) = &n.relation {
+                match n.relpersistence.as_str() {
+                    // Unlogged
+                    "u" => tokens.push(TokenProperty::from(Token::Unlogged)),
+                    // Temporary
+                    "t" => tokens.push(TokenProperty::from(Token::Temporary)),
+                    _ => {},
+                }
+                if n.inh {
+                    tokens.push(TokenProperty::from(Token::Inherits));
+                }
+            }
+        },
+        "TableLikeClause" => quote! {
+            tokens.push(TokenProperty::from(Token::Like));
+            // CREATE_TABLE_LIKE_ALL
+            if n.options == 0x7FFFFFFF {
+                tokens.push(TokenProperty::from(Token::Including));
+                tokens.push(TokenProperty::from(Token::All));
+            } else {
+                tokens.push(TokenProperty::from(Token::Excluding));
+                tokens.push(TokenProperty::from(Token::All));
             }
         },
         "PartitionBoundSpec" => quote! {
