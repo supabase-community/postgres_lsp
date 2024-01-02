@@ -181,6 +181,10 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::GroupP));
                 tokens.push(TokenProperty::from(Token::By));
             }
+            if n.sort_clause.len() > 0 {
+                tokens.push(TokenProperty::from(Token::Order));
+                tokens.push(TokenProperty::from(Token::By));
+            }
             match n.op() {
                 protobuf::SetOperation::Undefined => {},
                 protobuf::SetOperation::SetopNone => {},
