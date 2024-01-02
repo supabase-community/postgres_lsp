@@ -6,6 +6,6 @@ CREATE TABLE tablename (colname int NOT NULL DEFAULT nextval('tablename_colname_
 CREATE TABLE capitals (state char(2)) INHERITS (cities);
 /* TODO: CREATE TEMPORARY TABLE temp AS SELECT c FROM t; */ SELECT 1;
 /* TODO: CREATE TABLE films2 AS SELECT * FROM films; */ SELECT 1;
-/* TODO: CREATE TEMPORARY TABLE films_recent ON COMMIT DROP AS SELECT * FROM films WHERE date_prod > $1; */ SELECT 1;
+CREATE TEMPORARY TABLE films_recent ON COMMIT DROP AS SELECT * FROM films WHERE date_prod > $1;
 CREATE TABLE like_constraint_rename_cache (LIKE constraint_rename_cache INCLUDING ALL);
 CREATE TABLE distributors (did int, name varchar(40), UNIQUE (name) WITH (fillfactor=70)) WITH (fillfactor=70);
