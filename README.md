@@ -104,7 +104,18 @@ If you're not using VS Code, you can install the server by running:
 cargo xtask install --server
 ```
 
+
 The server binary will be installed in `.cargo/bin`. Make sure that `.cargo/bin` is in `$PATH`.
+
+### Github CodeSpaces
+Currently, Windows does not support `libpg_query`. You can setup your development environment
+on [CodeSpaces](https://github.com/features/codespaces).
+
+After your codespace boots up, run the following command in the shell to install Rust:
+```shell
+curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+```
+Proceed with the rest of the installation as usual.
 
 ## Contributors
 
