@@ -36,10 +36,7 @@ This is a proof of concept for building both a concrete syntax tree and an abstr
    - ✅ The core parser algorithm is implemented. Check out [this blog post](https://supabase.com/blog/postgres-language-server-implementing-parser) for details.
    - 🚧 But we need help from the community to finalize it: https://github.com/supabase/postgres_lsp/issues/51.
 2. _Implement a robust and scalable data model_
-   - This is still in a research phase
-   - A great rationale on the importance of the data model in a language server can be found [here](https://matklad.github.io/2023/05/06/zig-language-server-and-cancellation.html)
-   - `rust-analyzer`s [`base-db` crate](https://github.com/rust-lang/rust-analyzer/tree/master/crates/base-db) will serve as a role model
-   - The [`salsa`](https://github.com/salsa-rs/salsa) crate will most likely be the underlying data structure
+   - RFC posted here https://github.com/supabase/postgres_lsp/discussions/107
 3. _Setup the language server properly_
    - This is still in a research phase
    - Once again `rust-analyzer` will serve as a role model, and we will most likely implement the same queueing and cancellation approach
