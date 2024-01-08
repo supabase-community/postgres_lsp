@@ -883,6 +883,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
                     },
                     "interval" => {
                         // Adapted from https://github.com/postgres/postgres/blob/REL_15_STABLE/src/backend/utils/adt/timestamp.c#L1103
+                        const MONTH: i32 = 1;
+                        const YEAR: i32 = 2;
+                        const DAY: i32 = 3;
                         const HOUR: i32 = 10;
                         const MINUTE: i32 = 11;
                         const SECOND: i32 = 12;
@@ -894,7 +897,38 @@ fn custom_handlers(node: &Node) -> TokenStream {
 
                         if let Some(fields) = fields {
                             match fields.clone() {
+                                // YEAR TO MONTH
+                                i if i == 1 << YEAR | 1 << MONTH => {
+                                    tokens.push(TokenProperty::from(Token::To));
+                                    tokens.push(TokenProperty::from(Token::MonthP));
+                                },
+                                // DAY TO HOUR
+                                i if i == 1 << DAY | 1 << HOUR => {
+                                    tokens.push(TokenProperty::from(Token::To));
+                                    tokens.push(TokenProperty::from(Token::HourP));
+                                },
+                                // DAY TO MINUTE
+                                i if i == 1 << DAY | 1 << HOUR | 1 << MINUTE => {
+                                    tokens.push(TokenProperty::from(Token::To));
+                                    tokens.push(TokenProperty::from(Token::MinuteP));
+                                },
+                                // DAY TO SECOND
+                                i if i == 1 << DAY | 1 << HOUR | 1 << MINUTE | 1 << SECOND => {
+                                    tokens.push(TokenProperty::from(Token::To));
+                                    tokens.push(TokenProperty::from(Token::SecondP));
+                                },
+                                // HOUR TO MINUTE
+                                i if i == 1 << HOUR | 1 << MINUTE => {
+                                    tokens.push(TokenProperty::from(Token::To));
+                                    tokens.push(TokenProperty::from(Token::MinuteP));
+                                },
+                                // HOUR TO SECOND
                                 i if i == 1 << HOUR | 1 << MINUTE | 1 << SECOND => {
+                                    tokens.push(TokenProperty::from(Token::To));
+                                    tokens.push(TokenProperty::from(Token::SecondP));
+                                },
+                                // MINUTE TO SECOND
+                                i if i == 1 << MINUTE | 1 << SECOND => {
                                     tokens.push(TokenProperty::from(Token::To));
                                     tokens.push(TokenProperty::from(Token::SecondP));
                                 },
