@@ -4,8 +4,8 @@ CREATE TABLE types (a real, b double precision, c numeric(2, 3), d char(4), e ch
 CREATE TABLE types (a geometry(point) NOT NULL);
 CREATE TABLE tablename (colname int NOT NULL DEFAULT nextval('tablename_colname_seq'));
 CREATE TABLE capitals (state char(2)) INHERITS (cities);
-/* TODO: CREATE TEMPORARY TABLE temp AS SELECT c FROM t; */ SELECT 1;
-/* TODO: CREATE TABLE films2 AS SELECT * FROM films; */ SELECT 1;
+CREATE TEMPORARY TABLE temp AS SELECT c FROM t;
+CREATE TABLE films2 AS SELECT * FROM films;
 CREATE TEMPORARY TABLE films_recent ON COMMIT DROP AS SELECT * FROM films WHERE date_prod > $1;
 CREATE TABLE like_constraint_rename_cache (LIKE constraint_rename_cache INCLUDING ALL);
 CREATE TABLE distributors (did int, name varchar(40), UNIQUE (name) WITH (fillfactor=70)) WITH (fillfactor=70);

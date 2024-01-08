@@ -1,19 +1,41 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "/* TODO: CREATE TEMPORARY TABLE temp AS SELECT c FROM t; */ SELECT 1;"
+description: CREATE TEMPORARY TABLE temp AS SELECT c FROM t;
 ---
 Parse {
-    cst: SourceFile@0..68
-      CComment@0..59 "/* TODO: CREATE TEMPO ..."
-      SelectStmt@59..68
-        Select@59..65 "SELECT"
-        Whitespace@65..66 " "
-        ResTarget@66..67
-          AConst@66..67
-            Iconst@66..67 "1"
-        Ascii59@67..68 ";"
+    cst: SourceFile@0..46
+      Create@0..6 "CREATE"
+      Whitespace@6..7 " "
+      Temporary@7..16 "TEMPORARY"
+      Whitespace@16..17 " "
+      Table@17..22 "TABLE"
+      Whitespace@22..23 " "
+      Temp@23..27 "temp"
+      Whitespace@27..28 " "
+      As@28..30 "AS"
+      SelectStmt@30..46
+        Select@30..36 "SELECT"
+        Whitespace@36..37 " "
+        ResTarget@37..38
+          ColumnRef@37..38
+            Ident@37..38 "c"
+        Whitespace@38..39 " "
+        From@39..43 "FROM"
+        Whitespace@43..44 " "
+        RangeVar@44..45
+          Ident@44..45 "t"
+        Ascii59@45..46 ";"
     ,
-    errors: [],
+    errors: [
+        SyntaxError(
+            "Expected Ascii59, found Whitespace",
+            30..30,
+        ),
+        SyntaxError(
+            "Invalid statement: syntax error at end of input",
+            0..9,
+        ),
+    ],
     stmts: [
         RawStmt {
             stmt: SelectStmt(
@@ -30,17 +52,20 @@ Parse {
                                         val: Some(
                                             Node {
                                                 node: Some(
-                                                    AConst(
-                                                        AConst {
-                                                            isnull: false,
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "c",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
                                                             location: 7,
-                                                            val: Some(
-                                                                Ival(
-                                                                    Integer {
-                                                                        ival: 1,
-                                                                    },
-                                                                ),
-                                                            ),
                                                         },
                                                     ),
                                                 ),
@@ -52,7 +77,23 @@ Parse {
                             ),
                         },
                     ],
-                    from_clause: [],
+                    from_clause: [
+                        Node {
+                            node: Some(
+                                RangeVar(
+                                    RangeVar {
+                                        catalogname: "",
+                                        schemaname: "",
+                                        relname: "t",
+                                        inh: true,
+                                        relpersistence: "p",
+                                        alias: None,
+                                        location: 14,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
                     where_clause: None,
                     group_clause: [],
                     group_distinct: false,
@@ -71,7 +112,7 @@ Parse {
                     rarg: None,
                 },
             ),
-            range: 59..68,
+            range: 30..46,
         },
     ],
 }

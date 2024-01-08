@@ -877,6 +877,10 @@ fn custom_handlers(node: &Node) -> TokenStream {
 
             if names.len() == 2 && names[0] == "pg_catalog" {
                 match names[1].as_str() {
+                    "float8" => {
+                        tokens.push(TokenProperty::from(Token::DoubleP));
+                        tokens.push(TokenProperty::from(Token::Precision));
+                    },
                     "interval" => {
                         // Adapted from https://github.com/postgres/postgres/blob/REL_15_STABLE/src/backend/utils/adt/timestamp.c#L1103
                         const HOUR: i32 = 10;
