@@ -22,7 +22,11 @@ fn valid_statements() {
             let path = f.path();
             let test_name = path.file_stem().unwrap().to_str().unwrap();
 
-            if SKIPPED_REGRESS_TESTS.contains(&test_name) {
+            if SKIPPED_REGRESS_TESTS
+                .lines()
+                .collect::<Vec<_>>()
+                .contains(&test_name)
+            {
                 continue;
             }
 

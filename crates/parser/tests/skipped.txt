@@ -102,7 +102,6 @@ largeobject
 limit
 line
 lock
-lseg
 macaddr
 macaddr8
 matview

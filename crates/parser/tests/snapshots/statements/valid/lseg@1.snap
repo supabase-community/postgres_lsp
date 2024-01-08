@@ -1,0 +1,114 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "--\n-- LSEG\n-- Line segments\n--\n\n--DROP TABLE LSEG_TBL;\nCREATE TABLE LSEG_TBL (s lseg);"
+---
+Parse {
+    cst: SourceFile@0..86
+      SqlComment@0..2 "--"
+      Newline@2..3 "\n"
+      SqlComment@3..10 "-- LSEG"
+      Newline@10..11 "\n"
+      SqlComment@11..27 "-- Line segments"
+      Newline@27..28 "\n"
+      SqlComment@28..30 "--"
+      Newline@30..32 "\n\n"
+      SqlComment@32..54 "--DROP TABLE LSEG_TBL;"
+      Newline@54..55 "\n"
+      CreateStmt@55..86
+        Create@55..61 "CREATE"
+        Whitespace@61..62 " "
+        Table@62..67 "TABLE"
+        Whitespace@67..68 " "
+        RangeVar@68..76
+          Ident@68..76 "LSEG_TBL"
+        Whitespace@76..77 " "
+        Ascii40@77..78 "("
+        ColumnDef@78..84
+          Ident@78..79 "s"
+          Whitespace@79..80 " "
+          TypeName@80..84
+            Ident@80..84 "lseg"
+        Ascii41@84..85 ")"
+        Ascii59@85..86 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: CreateStmt(
+                CreateStmt {
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "lseg_tbl",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 13,
+                        },
+                    ),
+                    table_elts: [
+                        Node {
+                            node: Some(
+                                ColumnDef(
+                                    ColumnDef {
+                                        colname: "s",
+                                        type_name: Some(
+                                            TypeName {
+                                                names: [
+                                                    Node {
+                                                        node: Some(
+                                                            String(
+                                                                String {
+                                                                    sval: "lseg",
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                                type_oid: 0,
+                                                setof: false,
+                                                pct_type: false,
+                                                typmods: [],
+                                                typemod: -1,
+                                                array_bounds: [],
+                                                location: 25,
+                                            },
+                                        ),
+                                        compression: "",
+                                        inhcount: 0,
+                                        is_local: true,
+                                        is_not_null: false,
+                                        is_from_type: false,
+                                        storage: "",
+                                        raw_default: None,
+                                        cooked_default: None,
+                                        identity: "",
+                                        identity_sequence: None,
+                                        generated: "",
+                                        coll_clause: None,
+                                        coll_oid: 0,
+                                        constraints: [],
+                                        fdwoptions: [],
+                                        location: 23,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    inh_relations: [],
+                    partbound: None,
+                    partspec: None,
+                    of_typename: None,
+                    constraints: [],
+                    options: [],
+                    oncommit: OncommitNoop,
+                    tablespacename: "",
+                    access_method: "",
+                    if_not_exists: false,
+                },
+            ),
+            range: 54..85,
+        },
+    ],
+}

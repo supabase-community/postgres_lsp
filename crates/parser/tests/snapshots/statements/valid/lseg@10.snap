@@ -1,0 +1,113 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "-- NaN\n\n-- bad values for parser testing\nINSERT INTO LSEG_TBL VALUES ('(3asdf,2 ,3,4r2)');"
+---
+Parse {
+    cst: SourceFile@0..90
+      SqlComment@0..6 "-- NaN"
+      Newline@6..8 "\n\n"
+      SqlComment@8..40 "-- bad values for par ..."
+      Newline@40..41 "\n"
+      InsertStmt@41..90
+        Insert@41..47 "INSERT"
+        Whitespace@47..48 " "
+        Into@48..52 "INTO"
+        Whitespace@52..53 " "
+        RangeVar@53..61
+          Ident@53..61 "LSEG_TBL"
+        Whitespace@61..62 " "
+        SelectStmt@62..88
+          Values@62..68 "VALUES"
+          Whitespace@68..69 " "
+          Ascii40@69..70 "("
+          List@70..88
+            AConst@70..88
+              Sconst@70..88 "'(3asdf,2 ,3,4r2)'"
+        Ascii41@88..89 ")"
+        Ascii59@89..90 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: InsertStmt(
+                InsertStmt {
+                    relation: Some(
+                        RangeVar {
+                            catalogname: "",
+                            schemaname: "",
+                            relname: "lseg_tbl",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 12,
+                        },
+                    ),
+                    cols: [],
+                    select_stmt: Some(
+                        Node {
+                            node: Some(
+                                SelectStmt(
+                                    SelectStmt {
+                                        distinct_clause: [],
+                                        into_clause: None,
+                                        target_list: [],
+                                        from_clause: [],
+                                        where_clause: None,
+                                        group_clause: [],
+                                        group_distinct: false,
+                                        having_clause: None,
+                                        window_clause: [],
+                                        values_lists: [
+                                            Node {
+                                                node: Some(
+                                                    List(
+                                                        List {
+                                                            items: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 29,
+                                                                                val: Some(
+                                                                                    Sval(
+                                                                                        String {
+                                                                                            sval: "(3asdf,2 ,3,4r2)",
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        sort_clause: [],
+                                        limit_offset: None,
+                                        limit_count: None,
+                                        limit_option: Default,
+                                        locking_clause: [],
+                                        with_clause: None,
+                                        op: SetopNone,
+                                        all: false,
+                                        larg: None,
+                                        rarg: None,
+                                    },
+                                ),
+                            ),
+                        },
+                    ),
+                    on_conflict_clause: None,
+                    returning_list: [],
+                    with_clause: None,
+                    r#override: OverridingNotSet,
+                },
+            ),
+            range: 40..89,
+        },
+    ],
+}
