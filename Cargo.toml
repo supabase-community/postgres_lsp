@@ -16,6 +16,7 @@ vfs = { path = "./crates/vfs", version = "0.0.0" }
 base_db = { path = "./crates/base_db/", version = "0.0.0" }
 codegen = { path = "./crates/codegen", version = "0.0.0" }
 sourcegen = { path = "./crates/sourcegen", version = "0.0.0" }
+schema_cache = { path = "./crates/schema_cache", version = "0.0.0" }
 pg_query_proto_parser = { path = "./crates/pg_query_proto_parser", version = "0.0.0" }
 
 indexmap = "2.1.0"

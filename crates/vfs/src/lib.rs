@@ -1,3 +1,4 @@
+mod anchored_path;
 pub mod file_set;
 pub mod loader;
 mod path_interner;
@@ -6,7 +7,10 @@ use std::{fmt, mem};
 
 use crate::path_interner::PathInterner;
 
-pub use crate::vfs_path::VfsPath;
+pub use crate::{
+    anchored_path::{AnchoredPath, AnchoredPathBuf},
+    vfs_path::VfsPath,
+};
 pub use paths::{AbsPath, AbsPathBuf};
 
 /// Handle to a file in [`Vfs`]

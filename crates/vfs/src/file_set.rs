@@ -8,7 +8,7 @@ use fst::{IntoStreamer, Streamer};
 use nohash_hasher::IntMap;
 use rustc_hash::FxHashMap;
 
-use crate::{FileId, Vfs, VfsPath};
+use crate::{AnchoredPath, FileId, Vfs, VfsPath};
 
 /// A set of [`VfsPath`]s identified by [`FileId`]s.
 #[derive(Default, Clone, Eq, PartialEq)]
@@ -21,6 +21,17 @@ impl FileSet {
     /// Returns the number of stored paths.
     pub fn len(&self) -> usize {
         self.files.len()
+    }
+
+    /// Get the id of the file corresponding to `path`.
+    ///
+    /// If either `path`'s [`anchor`](AnchoredPath::anchor) or the resolved path is not in
+    /// the set, returns [`None`].
+    pub fn resolve_path(&self, path: AnchoredPath<'_>) -> Option<FileId> {
+        let mut base = self.paths[&path.anchor].clone();
+        base.pop();
+        let path = base.join(path.path)?;
+        self.files.get(&path).copied()
     }
 
     /// Get the id corresponding to `path` if it exists in the set.
