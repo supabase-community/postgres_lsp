@@ -869,6 +869,51 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 tokens.push(TokenProperty::from(Token::Function));
             }
         },
+        "TypeName" => quote! {
+            let names = n.names
+                .iter()
+                .filter_map(|n| if let Some(NodeEnum::String(s)) = &n.node { Some(s.sval.clone()) } else { None })
+                .collect::<Vec<_>>();
+
+            if names.len() == 2 && names[0] == "pg_catalog" {
+                match names[1].as_str() {
+                    "interval" => {
+                        // Adapted from https://github.com/postgres/postgres/blob/REL_15_STABLE/src/backend/utils/adt/timestamp.c#L1103
+                        const HOUR: i32 = 10;
+                        const MINUTE: i32 = 11;
+                        const SECOND: i32 = 12;
+
+                        let fields = &n.typmods.first()
+                            .and_then(|node| node.node.as_ref())
+                            .and_then(|node| if let NodeEnum::AConst(n) = node { n.val.clone() } else { None })
+                            .and_then(|node| if let protobuf::a_const::Val::Ival(n) = node { Some(n.ival) } else { None });
+
+                        if let Some(fields) = fields {
+                            match fields.clone() {
+                                i if i == 1 << HOUR | 1 << MINUTE | 1 << SECOND => {
+                                    tokens.push(TokenProperty::from(Token::To));
+                                    tokens.push(TokenProperty::from(Token::SecondP));
+                                },
+                                _ => panic!("Unknown Interval fields {:#?}", fields),
+                            }
+                        }
+                    },
+                    "timestamptz" => {
+                        tokens.push(TokenProperty::from(Token::Timestamp));
+                        tokens.push(TokenProperty::from(Token::With));
+                        tokens.push(TokenProperty::from(Token::Time));
+                        tokens.push(TokenProperty::from(Token::Zone));
+                    }
+                    "timetz" => {
+                        tokens.push(TokenProperty::from(Token::Time));
+                        tokens.push(TokenProperty::from(Token::With));
+                        tokens.push(TokenProperty::from(Token::Time));
+                        tokens.push(TokenProperty::from(Token::Zone));
+                    }
+                    _ => {}
+                }
+            }
+        },
         _ => quote! {},
     }
 }
