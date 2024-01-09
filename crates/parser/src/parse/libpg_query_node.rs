@@ -412,7 +412,19 @@ impl<'p> LibpgQueryNodeParser<'p> {
 }
 
 /// list of aliases from https://www.postgresql.org/docs/current/datatype.html
-const ALIASES: [&[&str]; 2] = [&["integer", "int", "int4"], &["real", "float4"]];
+/// NOTE: support for multi-word alias (e.g. time with time zone) requires parser change
+const ALIASES: [&[&str]; 10] = [
+    &["bigint", "int8"],
+    &["bigserial", "serial8"],
+    &["boolean", "bool"],
+    &["character", "char"],
+    &["integer", "int", "int4"],
+    &["numeric", "decimal"],
+    &["real", "float4"],
+    &["smallint", "int2"],
+    &["smallserial", "serial2"],
+    &["serial", "serial4"],
+];
 
 fn cmp_tokens(p: &crate::codegen::TokenProperty, token: &crate::lexer::Token) -> bool {
     // TokenProperty has always either value or kind set
