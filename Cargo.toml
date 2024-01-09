@@ -10,10 +10,10 @@ rust-version = "1.71"
 edition = "2021"
 
 [workspace.dependencies]
+user_config = { path = "./crates/user_config", version = "0.0.0" }
 parser = { path = "./crates/parser", version = "0.0.0" }
 paths = { path = "./crates/paths", version = "0.0.0" }
 vfs = { path = "./crates/vfs", version = "0.0.0" }
-base_db = { path = "./crates/base_db/", version = "0.0.0" }
 codegen = { path = "./crates/codegen", version = "0.0.0" }
 sourcegen = { path = "./crates/sourcegen", version = "0.0.0" }
 schema_cache = { path = "./crates/schema_cache", version = "0.0.0" }

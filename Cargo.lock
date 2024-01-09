@@ -88,10 +88,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "base_db"
-version = "0.0.0"
-
-[[package]]
 name = "bindgen"
 version = "0.66.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1086,6 +1082,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f98d2aa92eebf49b69786be48e4477826b256916e84a57ff2a4f21923b48eb4c"
 
 [[package]]
+name = "schema_cache"
+version = "0.0.0"
+
+[[package]]
 name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1482,6 +1482,10 @@ dependencies = [
  "percent-encoding",
  "serde",
 ]
+
+[[package]]
+name = "user_config"
+version = "0.0.0"
 
 [[package]]
 name = "version_check"

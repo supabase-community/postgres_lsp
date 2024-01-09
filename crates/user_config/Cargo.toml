@@ -1,13 +1,11 @@
 [package]
-name = "base_db"
+name = "user_config"
 version = "0.0.0"
 
 edition.workspace = true
 
 [dependencies]
 
-[dev-dependencies]
-
 [lib]
+doctest = false
 
-[features]
