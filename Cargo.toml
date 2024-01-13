@@ -11,6 +11,7 @@ edition = "2021"
 
 [workspace.dependencies]
 user_config = { path = "./crates/user_config", version = "0.0.0" }
+stdx = { path = "./crates/stdx", version = "0.0.0" }
 parser = { path = "./crates/parser", version = "0.0.0" }
 paths = { path = "./crates/paths", version = "0.0.0" }
 vfs = { path = "./crates/vfs", version = "0.0.0" }
@@ -18,6 +19,13 @@ codegen = { path = "./crates/codegen", version = "0.0.0" }
 sourcegen = { path = "./crates/sourcegen", version = "0.0.0" }
 schema_cache = { path = "./crates/schema_cache", version = "0.0.0" }
 pg_query_proto_parser = { path = "./crates/pg_query_proto_parser", version = "0.0.0" }
+
+anyhow = "1.0.75"
+libc = "0.2.150"
+tracing = "0.1.40"
+serde = { version = "1.0.192", features = ["derive"] }
+serde_json = "1.0.108"
+itertools = "0.12.0"
 
 indexmap = "2.1.0"
 rustc-hash = "1.1.0"
