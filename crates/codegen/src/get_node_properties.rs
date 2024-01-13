@@ -952,6 +952,23 @@ fn custom_handlers(node: &Node) -> TokenStream {
                 }
             }
         },
+        "TruncateStmt" => quote! {
+            tokens.push(TokenProperty::from(Token::Truncate));
+            if n.restart_seqs {
+                tokens.push(TokenProperty::from(Token::Restart));
+                tokens.push(TokenProperty::from(Token::IdentityP));
+            } else {
+                tokens.push(TokenProperty::from(Token::ContinueP));
+                tokens.push(TokenProperty::from(Token::IdentityP));
+            }
+            match n.behavior {
+                // DropRestrict
+                1 => tokens.push(TokenProperty::from(Token::Restrict)),
+                // DropCascade
+                2 => tokens.push(TokenProperty::from(Token::Cascade)),
+                _ => {}
+            }
+        },
         _ => quote! {},
     }
 }
