@@ -1,0 +1,26 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: COMMIT;
+---
+Parse {
+    cst: SourceFile@0..7
+      TransactionStmt@0..7
+        Commit@0..6 "COMMIT"
+        Ascii59@6..7 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: TransactionStmt(
+                TransactionStmt {
+                    kind: TransStmtCommit,
+                    options: [],
+                    savepoint_name: "",
+                    gid: "",
+                    chain: false,
+                },
+            ),
+            range: 0..6,
+        },
+    ],
+}

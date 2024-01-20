@@ -1,0 +1,28 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "-- automatically release xact locks at commit\nCOMMIT;"
+---
+Parse {
+    cst: SourceFile@0..53
+      SqlComment@0..45 "-- automatically rele ..."
+      Newline@45..46 "\n"
+      TransactionStmt@46..53
+        Commit@46..52 "COMMIT"
+        Ascii59@52..53 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: TransactionStmt(
+                TransactionStmt {
+                    kind: TransStmtCommit,
+                    options: [],
+                    savepoint_name: "",
+                    gid: "",
+                    chain: false,
+                },
+            ),
+            range: 45..52,
+        },
+    ],
+}

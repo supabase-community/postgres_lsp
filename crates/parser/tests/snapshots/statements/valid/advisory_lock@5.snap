@@ -1,0 +1,186 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "SELECT count(*) FROM pg_locks WHERE locktype = 'advisory';"
+---
+Parse {
+    cst: SourceFile@0..58
+      SelectStmt@0..58
+        Select@0..6 "SELECT"
+        Whitespace@6..7 " "
+        ResTarget@7..14
+          FuncCall@7..14
+            Ident@7..12 "count"
+            Ascii40@12..13 "("
+            Ascii42@13..14 "*"
+        Ascii41@14..15 ")"
+        Whitespace@15..16 " "
+        From@16..20 "FROM"
+        Whitespace@20..21 " "
+        RangeVar@21..29
+          Ident@21..29 "pg_locks"
+        Whitespace@29..30 " "
+        Where@30..35 "WHERE"
+        Whitespace@35..36 " "
+        AExpr@36..57
+          ColumnRef@36..44
+            Ident@36..44 "locktype"
+          Whitespace@44..45 " "
+          Ascii61@45..46 "="
+          Whitespace@46..47 " "
+          AConst@47..57
+            Sconst@47..57 "'advisory'"
+        Ascii59@57..58 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: SelectStmt(
+                SelectStmt {
+                    distinct_clause: [],
+                    into_clause: None,
+                    target_list: [
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    FuncCall(
+                                                        FuncCall {
+                                                            funcname: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "count",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            args: [],
+                                                            agg_order: [],
+                                                            agg_filter: None,
+                                                            over: None,
+                                                            agg_within_group: false,
+                                                            agg_star: true,
+                                                            agg_distinct: false,
+                                                            func_variadic: false,
+                                                            funcformat: CoerceExplicitCall,
+                                                            location: 7,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 7,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    from_clause: [
+                        Node {
+                            node: Some(
+                                RangeVar(
+                                    RangeVar {
+                                        catalogname: "",
+                                        schemaname: "",
+                                        relname: "pg_locks",
+                                        inh: true,
+                                        relpersistence: "p",
+                                        alias: None,
+                                        location: 21,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    where_clause: Some(
+                        Node {
+                            node: Some(
+                                AExpr(
+                                    AExpr {
+                                        kind: AexprOp,
+                                        name: [
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "=",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        lexpr: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "locktype",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 36,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        rexpr: Some(
+                                            Node {
+                                                node: Some(
+                                                    AConst(
+                                                        AConst {
+                                                            isnull: false,
+                                                            location: 47,
+                                                            val: Some(
+                                                                Sval(
+                                                                    String {
+                                                                        sval: "advisory",
+                                                                    },
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 45,
+                                    },
+                                ),
+                            ),
+                        },
+                    ),
+                    group_clause: [],
+                    group_distinct: false,
+                    having_clause: None,
+                    window_clause: [],
+                    values_lists: [],
+                    sort_clause: [],
+                    limit_offset: None,
+                    limit_count: None,
+                    limit_option: Default,
+                    locking_clause: [],
+                    with_clause: None,
+                    op: SetopNone,
+                    all: false,
+                    larg: None,
+                    rarg: None,
+                },
+            ),
+            range: 0..57,
+        },
+    ],
+}

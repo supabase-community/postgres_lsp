@@ -486,6 +486,7 @@ fn custom_handlers(node: &Node) -> TokenStream {
         },
         "TransactionStmt" => quote! {
             match n.kind() {
+                protobuf::TransactionStmtKind::TransStmtBegin => tokens.push(TokenProperty::from(Token::BeginP)),
                 protobuf::TransactionStmtKind::TransStmtCommit => tokens.push(TokenProperty::from(Token::Commit)),
                 _ => panic!("Unknown TransactionStmt {:#?}", n.kind())
             }

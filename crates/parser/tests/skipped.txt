@@ -1,4 +1,3 @@
-advisory_lock
 aggregates
 alter_generic
 alter_operator

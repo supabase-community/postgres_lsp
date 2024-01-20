@@ -1,0 +1,26 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: BEGIN;
+---
+Parse {
+    cst: SourceFile@0..6
+      TransactionStmt@0..6
+        BeginP@0..5 "BEGIN"
+        Ascii59@5..6 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: TransactionStmt(
+                TransactionStmt {
+                    kind: TransStmtBegin,
+                    options: [],
+                    savepoint_name: "",
+                    gid: "",
+                    chain: false,
+                },
+            ),
+            range: 0..5,
+        },
+    ],
+}

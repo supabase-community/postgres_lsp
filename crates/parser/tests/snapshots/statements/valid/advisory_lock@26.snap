@@ -1,0 +1,683 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "-- grabbing txn locks multiple times\n\nSELECT\n\tpg_advisory_xact_lock(1), pg_advisory_xact_lock(1),\n\tpg_advisory_xact_lock_shared(2), pg_advisory_xact_lock_shared(2),\n\tpg_advisory_xact_lock(1, 1), pg_advisory_xact_lock(1, 1),\n\tpg_advisory_xact_lock_shared(2, 2), pg_advisory_xact_lock_shared(2, 2);"
+---
+Parse {
+    cst: SourceFile@0..296
+      SqlComment@0..36 "-- grabbing txn locks ..."
+      Newline@36..38 "\n\n"
+      SelectStmt@38..296
+        Select@38..44 "SELECT"
+        Newline@44..45 "\n"
+        Newline@45..46 "\t"
+        ResTarget@46..69
+          FuncCall@46..69
+            Ident@46..67 "pg_advisory_xact_lock"
+            Ascii40@67..68 "("
+            AConst@68..69
+              Iconst@68..69 "1"
+        Ascii41@69..70 ")"
+        Ascii44@70..71 ","
+        Whitespace@71..72 " "
+        ResTarget@72..95
+          FuncCall@72..95
+            Ident@72..93 "pg_advisory_xact_lock"
+            Ascii40@93..94 "("
+            AConst@94..95
+              Iconst@94..95 "1"
+        Ascii41@95..96 ")"
+        Ascii44@96..97 ","
+        Newline@97..98 "\n"
+        Newline@98..99 "\t"
+        ResTarget@99..129
+          FuncCall@99..129
+            Ident@99..127 "pg_advisory_xact_lock ..."
+            Ascii40@127..128 "("
+            AConst@128..129
+              Iconst@128..129 "2"
+        Ascii41@129..130 ")"
+        Ascii44@130..131 ","
+        Whitespace@131..132 " "
+        ResTarget@132..162
+          FuncCall@132..162
+            Ident@132..160 "pg_advisory_xact_lock ..."
+            Ascii40@160..161 "("
+            AConst@161..162
+              Iconst@161..162 "2"
+        Ascii41@162..163 ")"
+        Ascii44@163..164 ","
+        Newline@164..165 "\n"
+        Newline@165..166 "\t"
+        ResTarget@166..192
+          FuncCall@166..192
+            Ident@166..187 "pg_advisory_xact_lock"
+            Ascii40@187..188 "("
+            AConst@188..189
+              Iconst@188..189 "1"
+            Ascii44@189..190 ","
+            Whitespace@190..191 " "
+            AConst@191..192
+              Iconst@191..192 "1"
+        Ascii41@192..193 ")"
+        Ascii44@193..194 ","
+        Whitespace@194..195 " "
+        ResTarget@195..221
+          FuncCall@195..221
+            Ident@195..216 "pg_advisory_xact_lock"
+            Ascii40@216..217 "("
+            AConst@217..218
+              Iconst@217..218 "1"
+            Ascii44@218..219 ","
+            Whitespace@219..220 " "
+            AConst@220..221
+              Iconst@220..221 "1"
+        Ascii41@221..222 ")"
+        Ascii44@222..223 ","
+        Newline@223..224 "\n"
+        Newline@224..225 "\t"
+        ResTarget@225..258
+          FuncCall@225..258
+            Ident@225..253 "pg_advisory_xact_lock ..."
+            Ascii40@253..254 "("
+            AConst@254..255
+              Iconst@254..255 "2"
+            Ascii44@255..256 ","
+            Whitespace@256..257 " "
+            AConst@257..258
+              Iconst@257..258 "2"
+        Ascii41@258..259 ")"
+        Ascii44@259..260 ","
+        Whitespace@260..261 " "
+        ResTarget@261..294
+          FuncCall@261..294
+            Ident@261..289 "pg_advisory_xact_lock ..."
+            Ascii40@289..290 "("
+            AConst@290..291
+              Iconst@290..291 "2"
+            Ascii44@291..292 ","
+            Whitespace@292..293 " "
+            AConst@293..294
+              Iconst@293..294 "2"
+        Ascii41@294..295 ")"
+        Ascii59@295..296 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: SelectStmt(
+                SelectStmt {
+                    distinct_clause: [],
+                    into_clause: None,
+                    target_list: [
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    FuncCall(
+                                                        FuncCall {
+                                                            funcname: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "pg_advisory_xact_lock",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            args: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 30,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 1,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            agg_order: [],
+                                                            agg_filter: None,
+                                                            over: None,
+                                                            agg_within_group: false,
+                                                            agg_star: false,
+                                                            agg_distinct: false,
+                                                            func_variadic: false,
+                                                            funcformat: CoerceExplicitCall,
+                                                            location: 8,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 8,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    FuncCall(
+                                                        FuncCall {
+                                                            funcname: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "pg_advisory_xact_lock",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            args: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 56,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 1,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            agg_order: [],
+                                                            agg_filter: None,
+                                                            over: None,
+                                                            agg_within_group: false,
+                                                            agg_star: false,
+                                                            agg_distinct: false,
+                                                            func_variadic: false,
+                                                            funcformat: CoerceExplicitCall,
+                                                            location: 34,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 34,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    FuncCall(
+                                                        FuncCall {
+                                                            funcname: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "pg_advisory_xact_lock_shared",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            args: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 90,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 2,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            agg_order: [],
+                                                            agg_filter: None,
+                                                            over: None,
+                                                            agg_within_group: false,
+                                                            agg_star: false,
+                                                            agg_distinct: false,
+                                                            func_variadic: false,
+                                                            funcformat: CoerceExplicitCall,
+                                                            location: 61,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 61,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    FuncCall(
+                                                        FuncCall {
+                                                            funcname: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "pg_advisory_xact_lock_shared",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            args: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 123,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 2,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            agg_order: [],
+                                                            agg_filter: None,
+                                                            over: None,
+                                                            agg_within_group: false,
+                                                            agg_star: false,
+                                                            agg_distinct: false,
+                                                            func_variadic: false,
+                                                            funcformat: CoerceExplicitCall,
+                                                            location: 94,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 94,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    FuncCall(
+                                                        FuncCall {
+                                                            funcname: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "pg_advisory_xact_lock",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            args: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 150,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 1,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 153,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 1,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            agg_order: [],
+                                                            agg_filter: None,
+                                                            over: None,
+                                                            agg_within_group: false,
+                                                            agg_star: false,
+                                                            agg_distinct: false,
+                                                            func_variadic: false,
+                                                            funcformat: CoerceExplicitCall,
+                                                            location: 128,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 128,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    FuncCall(
+                                                        FuncCall {
+                                                            funcname: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "pg_advisory_xact_lock",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            args: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 179,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 1,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 182,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 1,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            agg_order: [],
+                                                            agg_filter: None,
+                                                            over: None,
+                                                            agg_within_group: false,
+                                                            agg_star: false,
+                                                            agg_distinct: false,
+                                                            func_variadic: false,
+                                                            funcformat: CoerceExplicitCall,
+                                                            location: 157,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 157,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    FuncCall(
+                                                        FuncCall {
+                                                            funcname: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "pg_advisory_xact_lock_shared",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            args: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 216,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 2,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 219,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 2,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            agg_order: [],
+                                                            agg_filter: None,
+                                                            over: None,
+                                                            agg_within_group: false,
+                                                            agg_star: false,
+                                                            agg_distinct: false,
+                                                            func_variadic: false,
+                                                            funcformat: CoerceExplicitCall,
+                                                            location: 187,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 187,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    FuncCall(
+                                                        FuncCall {
+                                                            funcname: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "pg_advisory_xact_lock_shared",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            args: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 252,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 2,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Node {
+                                                                    node: Some(
+                                                                        AConst(
+                                                                            AConst {
+                                                                                isnull: false,
+                                                                                location: 255,
+                                                                                val: Some(
+                                                                                    Ival(
+                                                                                        Integer {
+                                                                                            ival: 2,
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            agg_order: [],
+                                                            agg_filter: None,
+                                                            over: None,
+                                                            agg_within_group: false,
+                                                            agg_star: false,
+                                                            agg_distinct: false,
+                                                            func_variadic: false,
+                                                            funcformat: CoerceExplicitCall,
+                                                            location: 223,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 223,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    from_clause: [],
+                    where_clause: None,
+                    group_clause: [],
+                    group_distinct: false,
+                    having_clause: None,
+                    window_clause: [],
+                    values_lists: [],
+                    sort_clause: [],
+                    limit_offset: None,
+                    limit_count: None,
+                    limit_option: Default,
+                    locking_clause: [],
+                    with_clause: None,
+                    op: SetopNone,
+                    all: false,
+                    larg: None,
+                    rarg: None,
+                },
+            ),
+            range: 37..295,
+        },
+    ],
+}

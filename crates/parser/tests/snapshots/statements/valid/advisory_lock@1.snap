@@ -1,0 +1,32 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "--\n-- ADVISORY LOCKS\n--\n\nBEGIN;"
+---
+Parse {
+    cst: SourceFile@0..31
+      SqlComment@0..2 "--"
+      Newline@2..3 "\n"
+      SqlComment@3..20 "-- ADVISORY LOCKS"
+      Newline@20..21 "\n"
+      SqlComment@21..23 "--"
+      Newline@23..25 "\n\n"
+      TransactionStmt@25..31
+        BeginP@25..30 "BEGIN"
+        Ascii59@30..31 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: TransactionStmt(
+                TransactionStmt {
+                    kind: TransStmtBegin,
+                    options: [],
+                    savepoint_name: "",
+                    gid: "",
+                    chain: false,
+                },
+            ),
+            range: 24..30,
+        },
+    ],
+}
