@@ -1,0 +1,487 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+description: "SELECT locktype, classid, objid, objsubid, mode, granted\n\tFROM pg_locks WHERE locktype = 'advisory'\n\tORDER BY classid, objid, objsubid;"
+---
+Parse {
+    cst: SourceFile@0..135
+      SelectStmt@0..135
+        Select@0..6 "SELECT"
+        Whitespace@6..7 " "
+        ResTarget@7..15
+          ColumnRef@7..15
+            Ident@7..15 "locktype"
+        Ascii44@15..16 ","
+        Whitespace@16..17 " "
+        ResTarget@17..24
+          ColumnRef@17..24
+            Ident@17..24 "classid"
+        Ascii44@24..25 ","
+        Whitespace@25..26 " "
+        ResTarget@26..31
+          ColumnRef@26..31
+            Ident@26..31 "objid"
+        Ascii44@31..32 ","
+        Whitespace@32..33 " "
+        ResTarget@33..41
+          ColumnRef@33..41
+            Ident@33..41 "objsubid"
+        Ascii44@41..42 ","
+        Whitespace@42..43 " "
+        ResTarget@43..47
+          ColumnRef@43..47
+            Mode@43..47 "mode"
+        Ascii44@47..48 ","
+        Whitespace@48..49 " "
+        ResTarget@49..56
+          ColumnRef@49..56
+            Granted@49..56 "granted"
+        Newline@56..57 "\n"
+        Newline@57..58 "\t"
+        From@58..62 "FROM"
+        Whitespace@62..63 " "
+        RangeVar@63..71
+          Ident@63..71 "pg_locks"
+        Whitespace@71..72 " "
+        Where@72..77 "WHERE"
+        Whitespace@77..78 " "
+        AExpr@78..99
+          ColumnRef@78..86
+            Ident@78..86 "locktype"
+          Whitespace@86..87 " "
+          Ascii61@87..88 "="
+          Whitespace@88..89 " "
+          AConst@89..99
+            Sconst@89..99 "'advisory'"
+        Newline@99..100 "\n"
+        Newline@100..101 "\t"
+        SortBy@101..117
+          Order@101..106 "ORDER"
+          Whitespace@106..107 " "
+          By@107..109 "BY"
+          Whitespace@109..110 " "
+          ColumnRef@110..117
+            Ident@110..117 "classid"
+        Ascii44@117..118 ","
+        Whitespace@118..119 " "
+        SortBy@119..124
+          ColumnRef@119..124
+            Ident@119..124 "objid"
+        Ascii44@124..125 ","
+        Whitespace@125..126 " "
+        SortBy@126..134
+          ColumnRef@126..134
+            Ident@126..134 "objsubid"
+        Ascii59@134..135 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: SelectStmt(
+                SelectStmt {
+                    distinct_clause: [],
+                    into_clause: None,
+                    target_list: [
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "locktype",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 7,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 7,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "classid",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 17,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 17,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "objid",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 26,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 26,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "objsubid",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 33,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 33,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "mode",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 43,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 43,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "granted",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 49,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 49,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    from_clause: [
+                        Node {
+                            node: Some(
+                                RangeVar(
+                                    RangeVar {
+                                        catalogname: "",
+                                        schemaname: "",
+                                        relname: "pg_locks",
+                                        inh: true,
+                                        relpersistence: "p",
+                                        alias: None,
+                                        location: 63,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    where_clause: Some(
+                        Node {
+                            node: Some(
+                                AExpr(
+                                    AExpr {
+                                        kind: AexprOp,
+                                        name: [
+                                            Node {
+                                                node: Some(
+                                                    String(
+                                                        String {
+                                                            sval: "=",
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                        lexpr: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "locktype",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 78,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        rexpr: Some(
+                                            Node {
+                                                node: Some(
+                                                    AConst(
+                                                        AConst {
+                                                            isnull: false,
+                                                            location: 89,
+                                                            val: Some(
+                                                                Sval(
+                                                                    String {
+                                                                        sval: "advisory",
+                                                                    },
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 87,
+                                    },
+                                ),
+                            ),
+                        },
+                    ),
+                    group_clause: [],
+                    group_distinct: false,
+                    having_clause: None,
+                    window_clause: [],
+                    values_lists: [],
+                    sort_clause: [
+                        Node {
+                            node: Some(
+                                SortBy(
+                                    SortBy {
+                                        node: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "classid",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 110,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        sortby_dir: SortbyDefault,
+                                        sortby_nulls: SortbyNullsDefault,
+                                        use_op: [],
+                                        location: -1,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                SortBy(
+                                    SortBy {
+                                        node: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "objid",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 119,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        sortby_dir: SortbyDefault,
+                                        sortby_nulls: SortbyNullsDefault,
+                                        use_op: [],
+                                        location: -1,
+                                    },
+                                ),
+                            ),
+                        },
+                        Node {
+                            node: Some(
+                                SortBy(
+                                    SortBy {
+                                        node: Some(
+                                            Node {
+                                                node: Some(
+                                                    ColumnRef(
+                                                        ColumnRef {
+                                                            fields: [
+                                                                Node {
+                                                                    node: Some(
+                                                                        String(
+                                                                            String {
+                                                                                sval: "objsubid",
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                            ],
+                                                            location: 126,
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        sortby_dir: SortbyDefault,
+                                        sortby_nulls: SortbyNullsDefault,
+                                        use_op: [],
+                                        location: -1,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    limit_offset: None,
+                    limit_count: None,
+                    limit_option: Default,
+                    locking_clause: [],
+                    with_clause: None,
+                    op: SetopNone,
+                    all: false,
+                    larg: None,
+                    rarg: None,
+                },
+            ),
+            range: 0..134,
+        },
+    ],
+}
