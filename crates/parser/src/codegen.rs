@@ -366,6 +366,7 @@ mod tests {
             SyntaxKind::TruncateStmt,
             vec![
                 TokenProperty::from(SyntaxKind::Truncate),
+                TokenProperty::from(SyntaxKind::Table),
                 TokenProperty::from(SyntaxKind::ContinueP),
                 TokenProperty::from(SyntaxKind::IdentityP),
                 TokenProperty::from(SyntaxKind::Restrict),

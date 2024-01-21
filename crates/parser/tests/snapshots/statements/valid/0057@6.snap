@@ -1,0 +1,46 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+assertion_line: 62
+description: TRUNCATE TABLE users;
+---
+Parse {
+    cst: SourceFile@0..21
+      TruncateStmt@0..21
+        Truncate@0..8 "TRUNCATE"
+        Whitespace@8..9 " "
+        Table@9..14 "TABLE"
+        Whitespace@14..15 " "
+        RangeVar@15..20
+          Ident@15..20 "users"
+        Ascii59@20..21 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: TruncateStmt(
+                TruncateStmt {
+                    relations: [
+                        Node {
+                            node: Some(
+                                RangeVar(
+                                    RangeVar {
+                                        catalogname: "",
+                                        schemaname: "",
+                                        relname: "users",
+                                        inh: true,
+                                        relpersistence: "p",
+                                        alias: None,
+                                        location: 15,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    restart_seqs: false,
+                    behavior: DropRestrict,
+                },
+            ),
+            range: 0..20,
+        },
+    ],
+}
