@@ -358,4 +358,19 @@ mod tests {
             ],
         )
     }
+
+    #[test]
+    fn test_truncate() {
+        test_get_node_properties(
+            "TRUNCATE TABLE users CONTINUE IDENTITY RESTRICT",
+            SyntaxKind::TruncateStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Truncate),
+                TokenProperty::from(SyntaxKind::Table),
+                TokenProperty::from(SyntaxKind::ContinueP),
+                TokenProperty::from(SyntaxKind::IdentityP),
+                TokenProperty::from(SyntaxKind::Restrict),
+            ],
+        )
+    }
 }

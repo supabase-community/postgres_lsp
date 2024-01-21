@@ -1,0 +1,52 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+assertion_line: 62
+description: TRUNCATE TABLE users RESTART IDENTITY CASCADE;
+---
+Parse {
+    cst: SourceFile@0..46
+      TruncateStmt@0..46
+        Truncate@0..8 "TRUNCATE"
+        Whitespace@8..9 " "
+        Table@9..14 "TABLE"
+        Whitespace@14..15 " "
+        RangeVar@15..20
+          Ident@15..20 "users"
+        Whitespace@20..21 " "
+        Restart@21..28 "RESTART"
+        Whitespace@28..29 " "
+        IdentityP@29..37 "IDENTITY"
+        Whitespace@37..38 " "
+        Cascade@38..45 "CASCADE"
+        Ascii59@45..46 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: TruncateStmt(
+                TruncateStmt {
+                    relations: [
+                        Node {
+                            node: Some(
+                                RangeVar(
+                                    RangeVar {
+                                        catalogname: "",
+                                        schemaname: "",
+                                        relname: "users",
+                                        inh: true,
+                                        relpersistence: "p",
+                                        alias: None,
+                                        location: 15,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    restart_seqs: true,
+                    behavior: DropCascade,
+                },
+            ),
+            range: 0..45,
+        },
+    ],
+}

@@ -1,0 +1,50 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+assertion_line: 62
+description: TRUNCATE users CONTINUE IDENTITY RESTRICT;
+---
+Parse {
+    cst: SourceFile@0..42
+      TruncateStmt@0..42
+        Truncate@0..8 "TRUNCATE"
+        Whitespace@8..9 " "
+        RangeVar@9..14
+          Ident@9..14 "users"
+        Whitespace@14..15 " "
+        ContinueP@15..23 "CONTINUE"
+        Whitespace@23..24 " "
+        IdentityP@24..32 "IDENTITY"
+        Whitespace@32..33 " "
+        Restrict@33..41 "RESTRICT"
+        Ascii59@41..42 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: TruncateStmt(
+                TruncateStmt {
+                    relations: [
+                        Node {
+                            node: Some(
+                                RangeVar(
+                                    RangeVar {
+                                        catalogname: "",
+                                        schemaname: "",
+                                        relname: "users",
+                                        inh: true,
+                                        relpersistence: "p",
+                                        alias: None,
+                                        location: 9,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    restart_seqs: false,
+                    behavior: DropRestrict,
+                },
+            ),
+            range: 0..41,
+        },
+    ],
+}

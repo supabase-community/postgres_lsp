@@ -1,0 +1,46 @@
+---
+source: crates/parser/tests/statement_parser_test.rs
+assertion_line: 62
+description: TRUNCATE accounts RESTRICT;
+---
+Parse {
+    cst: SourceFile@0..27
+      TruncateStmt@0..27
+        Truncate@0..8 "TRUNCATE"
+        Whitespace@8..9 " "
+        RangeVar@9..17
+          Ident@9..17 "accounts"
+        Whitespace@17..18 " "
+        Restrict@18..26 "RESTRICT"
+        Ascii59@26..27 ";"
+    ,
+    errors: [],
+    stmts: [
+        RawStmt {
+            stmt: TruncateStmt(
+                TruncateStmt {
+                    relations: [
+                        Node {
+                            node: Some(
+                                RangeVar(
+                                    RangeVar {
+                                        catalogname: "",
+                                        schemaname: "",
+                                        relname: "accounts",
+                                        inh: true,
+                                        relpersistence: "p",
+                                        alias: None,
+                                        location: 9,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    restart_seqs: false,
+                    behavior: DropRestrict,
+                },
+            ),
+            range: 0..26,
+        },
+    ],
+}
