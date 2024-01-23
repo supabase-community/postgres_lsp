@@ -630,6 +630,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
                         }                     }
                         // if its a list, we handle it in the handler for `List`
                 },
+                protobuf::ObjectType::ObjectType => {
+                    tokens.push(TokenProperty::from(Token::TypeP));
+                },
                 _ => panic!("Unknown DefineStmt {:#?}", n.kind()),
             }
         },

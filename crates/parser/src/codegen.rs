@@ -273,6 +273,19 @@ mod tests {
     #[test]
     fn test_create_type() {
         test_get_node_properties(
+            "create type type1",
+            SyntaxKind::DefineStmt,
+            vec![
+                TokenProperty::from(SyntaxKind::Create),
+                TokenProperty::from(SyntaxKind::TypeP),
+                TokenProperty::from("type1".to_string()),
+            ],
+        )
+    }
+
+    #[test]
+    fn test_create_composite_type() {
+        test_get_node_properties(
             "create type type1 as (attr1 int4, attr2 bool);",
             SyntaxKind::CompositeTypeStmt,
             vec![
