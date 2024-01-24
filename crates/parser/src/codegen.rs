@@ -110,10 +110,8 @@ mod tests {
     fn test_select_with_order_by() {
         test_get_node_properties(
             "SELECT a, b, c FROM table1 ORDER BY c;",
-            SyntaxKind::SelectStmt,
+            SyntaxKind::SortBy,
             vec![
-                TokenProperty::from(SyntaxKind::Select),
-                TokenProperty::from(SyntaxKind::From),
                 TokenProperty::from(SyntaxKind::Order),
                 TokenProperty::from(SyntaxKind::By),
             ],
