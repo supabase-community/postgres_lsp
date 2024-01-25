@@ -107,6 +107,18 @@ mod tests {
     }
 
     #[test]
+    fn test_select_with_order_by() {
+        test_get_node_properties(
+            "SELECT a, b, c FROM table1 ORDER BY c;",
+            SyntaxKind::SortBy,
+            vec![
+                TokenProperty::from(SyntaxKind::Order),
+                TokenProperty::from(SyntaxKind::By),
+            ],
+        )
+    }
+
+    #[test]
     fn test_create_domain() {
         test_get_node_properties(
             "create domain us_postal_code as text check (value is not null);",
