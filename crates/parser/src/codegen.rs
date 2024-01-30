@@ -291,6 +291,7 @@ mod tests {
             vec![
                 TokenProperty::from(SyntaxKind::Create),
                 TokenProperty::from(SyntaxKind::TypeP),
+                TokenProperty::from(SyntaxKind::As),
             ],
         )
     }

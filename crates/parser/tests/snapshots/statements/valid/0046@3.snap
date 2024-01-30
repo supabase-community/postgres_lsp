@@ -1,33 +1,77 @@
 ---
 source: crates/parser/tests/statement_parser_test.rs
-description: "CREATE TYPE type1 AS (attr1 int4 COLLATE collation1, attr2 bool);"
+description: "/* TODO: CREATE TYPE type1 AS (attr1 int4 COLLATE collation1, attr2 bool); */ SELECT 1;"
 ---
 Parse {
-    cst: SourceFile@0..65
-      Create@0..6 "CREATE"
-      Whitespace@6..7 " "
-      TypeP@7..11 "TYPE"
-      Whitespace@11..12 " "
-      Ident@12..17 "type1"
-      Whitespace@17..18 " "
-      As@18..20 "AS"
-      Whitespace@20..21 " "
-      Ascii40@21..22 "("
-      Ident@22..27 "attr1"
-      Whitespace@27..28 " "
-      Ident@28..32 "int4"
-      Whitespace@32..33 " "
-      Collate@33..40 "COLLATE"
-      Whitespace@40..41 " "
-      Ident@41..51 "collation1"
-      Ascii44@51..52 ","
-      Whitespace@52..53 " "
-      Ident@53..58 "attr2"
-      Whitespace@58..59 " "
-      Ident@59..63 "bool"
-      Ascii41@63..64 ")"
-      Ascii59@64..65 ";"
+    cst: SourceFile@0..86
+      CComment@0..77 "/* TODO: CREATE TYPE  ..."
+      SelectStmt@77..86
+        Select@77..83 "SELECT"
+        Whitespace@83..84 " "
+        ResTarget@84..85
+          AConst@84..85
+            Iconst@84..85 "1"
+        Ascii59@85..86 ";"
     ,
     errors: [],
-    stmts: [],
+    stmts: [
+        RawStmt {
+            stmt: SelectStmt(
+                SelectStmt {
+                    distinct_clause: [],
+                    into_clause: None,
+                    target_list: [
+                        Node {
+                            node: Some(
+                                ResTarget(
+                                    ResTarget {
+                                        name: "",
+                                        indirection: [],
+                                        val: Some(
+                                            Node {
+                                                node: Some(
+                                                    AConst(
+                                                        AConst {
+                                                            isnull: false,
+                                                            location: 7,
+                                                            val: Some(
+                                                                Ival(
+                                                                    Integer {
+                                                                        ival: 1,
+                                                                    },
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                        location: 7,
+                                    },
+                                ),
+                            ),
+                        },
+                    ],
+                    from_clause: [],
+                    where_clause: None,
+                    group_clause: [],
+                    group_distinct: false,
+                    having_clause: None,
+                    window_clause: [],
+                    values_lists: [],
+                    sort_clause: [],
+                    limit_offset: None,
+                    limit_count: None,
+                    limit_option: Default,
+                    locking_clause: [],
+                    with_clause: None,
+                    op: SetopNone,
+                    all: false,
+                    larg: None,
+                    rarg: None,
+                },
+            ),
+            range: 77..86,
+        },
+    ],
 }

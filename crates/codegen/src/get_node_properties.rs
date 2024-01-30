@@ -817,6 +817,7 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "CompositeTypeStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
             tokens.push(TokenProperty::from(Token::TypeP));
+            tokens.push(TokenProperty::from(Token::As));
         },
         "CreatedbStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
