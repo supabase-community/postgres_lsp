@@ -191,25 +191,57 @@ pub static STATEMENT_START_TOKEN_MAPS: LazyLock<Vec<HashMap<SyntaxKind, Vec<Toke
             ],
         ));
 
-        // CREATE [ OR REPLACE ] OPERATOR
+        // CREATE OPERATOR
         m.push((
             SyntaxKind::DefineStmt,
             &[
                 SyntaxToken::Required(SyntaxKind::Create),
-                SyntaxToken::Optional(SyntaxKind::Or),
-                SyntaxToken::Optional(SyntaxKind::Replace),
                 SyntaxToken::Required(SyntaxKind::Operator),
             ],
         ));
 
-        // CREATE [ OR REPLACE ] TYPE
+        // CREATE TYPE name
         m.push((
             SyntaxKind::DefineStmt,
             &[
                 SyntaxToken::Required(SyntaxKind::Create),
-                SyntaxToken::Optional(SyntaxKind::Or),
-                SyntaxToken::Optional(SyntaxKind::Replace),
                 SyntaxToken::Required(SyntaxKind::TypeP),
+                SyntaxToken::Required(SyntaxKind::Ident),
+            ],
+        ));
+
+        // CREATE TYPE name AS
+        m.push((
+            SyntaxKind::CompositeTypeStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::TypeP),
+                SyntaxToken::Required(SyntaxKind::Ident),
+                SyntaxToken::Required(SyntaxKind::As),
+            ],
+        ));
+
+        // CREATE TYPE name AS ENUM
+        m.push((
+            SyntaxKind::CreateEnumStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::TypeP),
+                SyntaxToken::Required(SyntaxKind::Ident),
+                SyntaxToken::Required(SyntaxKind::As),
+                SyntaxToken::Required(SyntaxKind::EnumP),
+            ],
+        ));
+
+        // CREATE TYPE name AS RANGE
+        m.push((
+            SyntaxKind::CreateRangeStmt,
+            &[
+                SyntaxToken::Required(SyntaxKind::Create),
+                SyntaxToken::Required(SyntaxKind::TypeP),
+                SyntaxToken::Required(SyntaxKind::Ident),
+                SyntaxToken::Required(SyntaxKind::As),
+                SyntaxToken::Required(SyntaxKind::Range),
             ],
         ));
 
@@ -623,28 +655,6 @@ pub static STATEMENT_START_TOKEN_MAPS: LazyLock<Vec<HashMap<SyntaxKind, Vec<Toke
         ));
 
         m.push((
-            SyntaxKind::CreateEnumStmt,
-            &[
-                SyntaxToken::Required(SyntaxKind::Create),
-                SyntaxToken::Required(SyntaxKind::TypeP),
-                SyntaxToken::Required(SyntaxKind::Ident),
-                SyntaxToken::Required(SyntaxKind::As),
-                SyntaxToken::Required(SyntaxKind::EnumP),
-            ],
-        ));
-
-        m.push((
-            SyntaxKind::CreateRangeStmt,
-            &[
-                SyntaxToken::Required(SyntaxKind::Create),
-                SyntaxToken::Required(SyntaxKind::TypeP),
-                SyntaxToken::Required(SyntaxKind::Ident),
-                SyntaxToken::Required(SyntaxKind::As),
-                SyntaxToken::Required(SyntaxKind::Range),
-            ],
-        ));
-
-        m.push((
             SyntaxKind::CreateFdwStmt,
             &[
                 SyntaxToken::Required(SyntaxKind::Create),
@@ -956,7 +966,6 @@ pub static STATEMENT_START_TOKEN_MAPS: LazyLock<Vec<HashMap<SyntaxKind, Vec<Toke
 // AlterObjectDependsStmt,
 // AlterObjectSchemaStmt,
 // AlterOwnerStmt,
-// CompositeTypeStmt,
 // AlterEnumStmt,
 // AlterTsdictionaryStmt,
 // AlterTsconfigurationStmt,

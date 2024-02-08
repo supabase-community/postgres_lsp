@@ -630,6 +630,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
                         }                     }
                         // if its a list, we handle it in the handler for `List`
                 },
+                protobuf::ObjectType::ObjectType => {
+                    tokens.push(TokenProperty::from(Token::TypeP));
+                },
                 _ => panic!("Unknown DefineStmt {:#?}", n.kind()),
             }
         },
@@ -814,6 +817,7 @@ fn custom_handlers(node: &Node) -> TokenStream {
         "CompositeTypeStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
             tokens.push(TokenProperty::from(Token::TypeP));
+            tokens.push(TokenProperty::from(Token::As));
         },
         "CreatedbStmt" => quote! {
             tokens.push(TokenProperty::from(Token::Create));
