@@ -9,6 +9,7 @@ resolver = "2"
 rust-version = "1.71"
 
 [workspace.dependencies]
+schema_cache = { path = "./crates/schema_cache", version = "0.0.0" }
 parser = { path = "./crates/parser", version = "0.0.0" }
 codegen = { path = "./crates/codegen", version = "0.0.0" }
 sourcegen = { path = "./crates/sourcegen", version = "0.0.0" }
