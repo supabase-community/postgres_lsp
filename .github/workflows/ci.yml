@@ -28,6 +28,14 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: 🐘 Start Postgres
+        id: postgres
+        run: supabase start -x gotrue,realtime,storage-api,imgproxy,kong,inbucket,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer,pg_prove
+
       - name: 📦 Build
         id: build
         run: cargo build
