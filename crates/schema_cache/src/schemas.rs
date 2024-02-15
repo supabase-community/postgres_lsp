@@ -10,6 +10,8 @@ pub struct Schema {
 }
 
 impl SchemaCacheItem for Schema {
+    type Item = Schema;
+
     async fn load(pool: &PgPool) -> Vec<Schema> {
         sqlx::query_as!(
             Schema,

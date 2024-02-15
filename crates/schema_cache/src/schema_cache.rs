@@ -2,18 +2,20 @@ use std::future::join;
 
 use sqlx::postgres::PgPool;
 
-use crate::schemas::Schemas;
+use crate::schemas::Schema;
+use crate::tables::Table;
 
 #[derive(Debug, Clone, Default)]
 pub struct SchemaCache {
-    pub schemas: Schemas,
+    pub schemas: Vec<Schema>,
+    pub tables: Vec<Table>,
 }
 
 impl SchemaCache {
     pub async fn load(pool: &PgPool) -> SchemaCache {
-        let (schemas) = join!(Schemas::load(pool)).await;
+        let (schemas, tables) = join!(Schema::load(pool), Table::load(pool)).await;
 
-        SchemaCache { schemas }
+        SchemaCache { schemas, tables }
     }
 
     /// Applies an AST node to the repository
@@ -26,5 +28,7 @@ impl SchemaCache {
 }
 
 pub trait SchemaCacheItem {
-    async fn load(pool: &PgPool) -> Vec<Self>;
+    type Item;
+
+    async fn load(pool: &PgPool) -> Vec<Self::Item>;
 }

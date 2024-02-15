@@ -2,11 +2,18 @@ use sqlx::PgPool;
 
 use crate::schema_cache::SchemaCacheItem;
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum ReplicaIdentity {
     Default,
     Index,
     Full,
     Nothing,
+}
+
+impl Default for ReplicaIdentity {
+    fn default() -> Self {
+        ReplicaIdentity::Default
+    }
 }
 
 impl From<String> for ReplicaIdentity {
@@ -37,6 +44,8 @@ pub struct Table {
 }
 
 impl SchemaCacheItem for Table {
+    type Item = Table;
+
     async fn load(pool: &PgPool) -> Vec<Table> {
         sqlx::query_as!(
             Table,
