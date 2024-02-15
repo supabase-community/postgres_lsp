@@ -11,19 +11,17 @@ use sqlx::postgres::PgPool;
 
 #[derive(Debug, Clone)]
 struct SchemaCacheManager {
-    pool: PgPool,
     pub cache: SchemaCache,
 }
 
 impl SchemaCacheManager {
-    pub async fn init(pool: PgPool) -> Self {
+    pub async fn init(pool: &PgPool) -> Self {
         SchemaCacheManager {
-            cache: SchemaCache::load(&pool).await,
-            pool,
+            cache: SchemaCache::load(pool).await,
         }
     }
 
-    pub async fn reload_cache(&mut self) {
-        self.cache = SchemaCache::load(&self.pool).await;
+    pub async fn reload_cache(&mut self, pool: &PgPool) {
+        self.cache = SchemaCache::load(pool).await;
     }
 }
