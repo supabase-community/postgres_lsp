@@ -17,6 +17,14 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+
     steps:
       - name: 🏗 Setup repository
         uses: actions/checkout@v3
@@ -27,14 +35,6 @@ jobs:
         uses: ./.github/actions/setup-monorepo
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: 🐘 Start Postgres
-        id: postgres
-        run: supabase start -x gotrue,realtime,storage-api,imgproxy,kong,inbucket,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer,pg_prove
 
       - name: 📦 Build
         id: build
