@@ -1,5 +1,6 @@
 //! The schema cache
 
+#![allow(dead_code)]
 #![feature(future_join)]
 
 mod schema_cache;
