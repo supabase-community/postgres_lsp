@@ -1,7 +1,7 @@
 [submodule "libpg_query"]
 	path = libpg_query
 	url = https://github.com/pganalyze/libpg_query.git
-[submodule "crates/tree_sitter_parser/tree-sitter-sql"]
-	path = crates/tree_sitter_parser/tree-sitter-sql
+[submodule "crates/tree_sitter_sql/tree-sitter-sql"]
+	path = crates/tree_sitter_sql/tree-sitter-sql
 	url = https://github.com/DerekStride/tree-sitter-sql
 	branch = gh-pages
