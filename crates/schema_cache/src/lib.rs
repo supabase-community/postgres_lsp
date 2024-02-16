@@ -7,8 +7,9 @@ mod schema_cache;
 mod schemas;
 mod tables;
 
-use schema_cache::SchemaCache;
 use sqlx::postgres::PgPool;
+
+pub use schema_cache::SchemaCache;
 
 #[derive(Debug, Clone)]
 struct SchemaCacheManager {
