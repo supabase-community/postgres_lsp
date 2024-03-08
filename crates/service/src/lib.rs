@@ -1,4 +1,4 @@
 #![feature(extract_if, lazy_cell)]
 
-mod diagnostics;
-mod workspace;
+pub mod diagnostics;
+pub mod workspace;
