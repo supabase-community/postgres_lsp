@@ -5,7 +5,8 @@ edition = "2021"
 
 [dependencies]
 text-size = "1.1.1"
-
+parser.workspace = true
+line_index.workspace = true
 tree-sitter.workspace = true
 tree_sitter_sql.workspace = true
 

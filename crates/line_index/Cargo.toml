@@ -1,7 +1,7 @@
 [package]
-name = "line-index"
+name = "line_index"
 version = "0.0.0"
-rust-version.workspace = true
+edition = "2021"
 
 [dependencies]
 text-size = "1.1.1"

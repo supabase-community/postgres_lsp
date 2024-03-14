@@ -1,6 +1,8 @@
 mod dispatch;
 
+use base_db::{FileChangesParams, PgLspPath, SourceFile, SourceFileParams};
 use crossbeam_channel::{unbounded, Receiver, Sender};
+use dashmap::DashMap;
 use lsp_server::{Connection, ErrorCode, Message, RequestId};
 use lsp_types::{
     notification::{
@@ -12,10 +14,16 @@ use lsp_types::{
     SaveOptions, ServerCapabilities, ServerInfo, TextDocumentSyncCapability, TextDocumentSyncKind,
     TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
 };
-use std::sync::Arc;
+use std::{
+    collections::{HashMap, HashSet},
+    sync::Arc,
+};
 use threadpool::ThreadPool;
 
-use crate::client::LspClient;
+use crate::{
+    client::LspClient,
+    utils::{file_path, from_proto, normalize_uri},
+};
 
 #[derive(Debug)]
 enum InternalMessage {
@@ -28,6 +36,10 @@ pub struct Server {
     internal_tx: Sender<InternalMessage>,
     internal_rx: Receiver<InternalMessage>,
     pool: ThreadPool,
+
+    // it might make sense to move this into its own struct at some point
+    // do we need a dashmap?
+    documents: DashMap<PgLspPath, SourceFile>,
 }
 
 impl Server {
@@ -38,6 +50,8 @@ impl Server {
 
         let (id, params) = connection.initialize_start()?;
         let params: InitializeParams = serde_json::from_value(params)?;
+
+        // TODO: setup pg notify listener and refresh schema cache
 
         let result = InitializeResult {
             capabilities: Self::capabilities(),
@@ -55,6 +69,8 @@ impl Server {
             internal_tx,
             client,
             pool: threadpool::Builder::new().build(),
+
+            documents: DashMap::new(),
         };
 
         server.run()?;
@@ -106,79 +122,44 @@ impl Server {
     }
 
     fn did_open(&mut self, params: DidOpenTextDocumentParams) -> anyhow::Result<()> {
-        // let mut uri = params.text_document.uri;
-        // normalize_uri(&mut uri);
-        //
-        // let language_id = &params.text_document.language_id;
-        // let language = Language::from_id(language_id).unwrap_or(Language::Tex);
-        // self.workspace.write().open(
-        //     uri.clone(),
-        //     params.text_document.text,
-        //     language,
-        //     Owner::Client,
-        //     LineCol { line: 0, col: 0 },
-        // );
-        //
-        // self.update_workspace();
-        //
-        // let workspace = self.workspace.read();
-        // self.diagnostic_manager
-        //     .update_syntax(&workspace, workspace.lookup(&uri).unwrap());
-        //
-        // if workspace.config().diagnostics.chktex.on_open {
-        //     drop(workspace);
-        //     self.run_chktex(&uri);
-        // }
+        let mut uri = params.text_document.uri;
+        normalize_uri(&mut uri);
+
+        let path = file_path(&uri);
+
+        self.documents.insert(
+            path,
+            SourceFile::new(SourceFileParams {
+                text: params.text_document.text,
+            }),
+        );
 
         Ok(())
     }
 
     fn did_change(&mut self, params: DidChangeTextDocumentParams) -> anyhow::Result<()> {
-        // let mut uri = params.text_document.uri;
-        // normalize_uri(&mut uri);
-        //
-        // let mut workspace = self.workspace.write();
-        //
-        // for change in params.content_changes {
-        //     let Some(document) = workspace.lookup(&uri) else {
-        //         return Ok(());
-        //     };
-        //     match change.range {
-        //         Some(range) => {
-        //             let range = document.line_index.offset_lsp_range(range).unwrap();
-        //             workspace.edit(&uri, range, &change.text);
-        //         }
-        //         None => {
-        //             let new_line = document.cursor.line.min(change.text.lines().count() as u32);
-        //             let language = document.language;
-        //             workspace.open(
-        //                 uri.clone(),
-        //                 change.text,
-        //                 language,
-        //                 Owner::Client,
-        //                 LineCol {
-        //                     line: new_line,
-        //                     col: 0,
-        //                 },
-        //             );
-        //         }
-        //     };
-        // }
-        //
-        // self.diagnostic_manager
-        //     .update_syntax(&workspace, workspace.lookup(&uri).unwrap());
-        //
-        // drop(workspace);
-        // self.update_workspace();
-        //
-        // if self.workspace.read().config().diagnostics.chktex.on_edit {
-        //     self.run_chktex(&uri);
-        // }
+        let mut uri = params.text_document.uri;
+        normalize_uri(&mut uri);
+
+        let path = file_path(&uri);
+
+        self.documents.entry(path).and_modify(|document| {
+            let changes = from_proto::content_changes(&document, params.content_changes);
+
+            document.apply_changes(FileChangesParams {
+                version: params.text_document.version,
+                changes,
+            });
+        });
+
+        // TODO: update diagnostics
 
         Ok(())
     }
 
     fn did_save(&mut self, params: DidSaveTextDocumentParams) -> anyhow::Result<()> {
+        // on save we want to run static analysis and ultimately publish diagnostics
+
         // let mut uri = params.text_document.uri;
         // normalize_uri(&mut uri);
         //
@@ -202,6 +183,17 @@ impl Server {
     }
 
     fn did_close(&mut self, params: DidCloseTextDocumentParams) -> anyhow::Result<()> {
+        // this just means that the document is no longer open in the client
+        // if we would listen to fs events, we would use this to overwrite the files owner to be
+        // "server" instead of "client". for now we will ignore this notification since we dont
+        // need to watch files that are not open.
+
+        let mut uri = params.text_document.uri;
+        normalize_uri(&mut uri);
+        let path = file_path(&uri);
+
+        self.documents.remove(&path);
+
         // let mut uri = params.text_document.uri;
         // normalize_uri(&mut uri);
         // self.workspace.write().close(&uri);

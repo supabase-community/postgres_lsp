@@ -2,9 +2,10 @@
 
 //! `LineIndex` maps flat `TextSize` offsets into `(Line, Column)`
 //! representation.
-use std::iter;
+use std::{collections::HashMap, iter};
 
-use text_size::{TextRange, TextSize};
+use text_size::TextRange;
+use text_size::TextSize;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LineIndex {
@@ -56,7 +57,7 @@ impl Utf16Char {
 
 impl LineIndex {
     pub fn new(text: &str) -> LineIndex {
-        let mut utf16_lines = FxHashMap::default();
+        let mut utf16_lines = HashMap::default();
         let mut utf16_chars = Vec::new();
 
         let mut newlines = vec![0.into()];

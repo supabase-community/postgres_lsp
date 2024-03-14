@@ -13,6 +13,7 @@ serde_json = "1.0"
 regex = "1.9.1"
 env_logger = { version = "0.9.1" }
 log = { version = "0.4.20" }
+text-size = "1.1.1"
 
 codegen.workspace = true
 pg_query_proto_parser.workspace = true
