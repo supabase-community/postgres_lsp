@@ -9,6 +9,8 @@ resolver = "2"
 rust-version = "1.71"
 
 [workspace.dependencies]
+base_db = { path = "./crates/base_db", version = "0.0.0" }
+lsp = { path = "./crates/lsp", version = "0.0.0" }
 tree_sitter_sql = { path = "./crates/tree_sitter_sql", version = "0.0.0" }
 schema_cache = { path = "./crates/schema_cache", version = "0.0.0" }
 parser = { path = "./crates/parser", version = "0.0.0" }

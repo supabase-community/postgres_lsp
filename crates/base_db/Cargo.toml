@@ -1,0 +1,13 @@
+[package]
+name = "base_db"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+
+[dev-dependencies]
+
+[lib]
+doctest = false
+
+[features]
