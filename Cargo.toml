@@ -10,6 +10,7 @@ rust-version = "1.71"
 
 [workspace.dependencies]
 base_db = { path = "./crates/base_db", version = "0.0.0" }
+line_index = { path = "./crates/line_index", version = "0.0.0" }
 lsp = { path = "./crates/lsp", version = "0.0.0" }
 tree_sitter_sql = { path = "./crates/tree_sitter_sql", version = "0.0.0" }
 schema_cache = { path = "./crates/schema_cache", version = "0.0.0" }
@@ -18,6 +19,7 @@ codegen = { path = "./crates/codegen", version = "0.0.0" }
 sourcegen = { path = "./crates/sourcegen", version = "0.0.0" }
 pg_query_proto_parser = { path = "./crates/pg_query_proto_parser", version = "0.0.0" }
 triomphe = { version = "0.1.8", default-features = false, features = ["std"] }
+tree-sitter = "0.20.10"
 
 [profile.dev.package]
 insta.opt-level = 3

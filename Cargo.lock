@@ -289,6 +289,11 @@ checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
 [[package]]
 name = "base_db"
 version = "0.0.0"
+dependencies = [
+ "text-size",
+ "tree-sitter",
+ "tree_sitter_sql",
+]
 
 [[package]]
 name = "bindgen"
@@ -1196,6 +1201,13 @@ dependencies = [
  "cc",
  "pkg-config",
  "vcpkg",
+]
+
+[[package]]
+name = "line-index"
+version = "0.0.0"
+dependencies = [
+ "text-size",
 ]
 
 [[package]]
