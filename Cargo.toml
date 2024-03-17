@@ -20,6 +20,7 @@ sourcegen = { path = "./crates/sourcegen", version = "0.0.0" }
 pg_query_proto_parser = { path = "./crates/pg_query_proto_parser", version = "0.0.0" }
 triomphe = { version = "0.1.8", default-features = false, features = ["std"] }
 tree-sitter = "0.20.10"
+tracing = "0.1.40"
 
 [profile.dev.package]
 insta.opt-level = 3

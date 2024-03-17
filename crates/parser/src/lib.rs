@@ -26,7 +26,9 @@ mod sibling_token;
 mod syntax_error;
 mod syntax_node;
 
+use cstree::syntax::ResolvedNode;
 use lexer::lex;
+use parse::libpg_query_node::libpg_query_node;
 use parse::source::source;
 use parse::statement::collect_statement_token_range;
 use parse::statement_start::is_at_stmt_start;
@@ -35,13 +37,34 @@ use text_size::TextRange;
 pub use crate::codegen::SyntaxKind;
 pub use crate::parser::{Parse, Parser};
 pub use crate::syntax_node::{SyntaxElement, SyntaxNode, SyntaxToken};
+pub use pg_query::{Error as NativeError, NodeEnum};
 
-// TODO: I think we should add some kind of `EntryPoint` enum and make the api more flexible
-// maybe have an intermediate struct that takes &str inputs, lexes the input and then calls the parser
+pub type Cst = ResolvedNode<SyntaxKind, ()>;
+
 pub fn parse_source(text: &str) -> Parse {
     let mut p = Parser::new(lex(text));
     source(&mut p);
     p.finish()
+}
+
+pub fn build_cst(text: &str, node: &NodeEnum) -> Cst {
+    let mut p = Parser::new(lex(text));
+    let range = p.token_range();
+    libpg_query_node(&mut p, node, &range);
+    p.finish().cst
+}
+
+pub fn parse_sql_statement(text: &str) -> pg_query::Result<NodeEnum> {
+    pg_query::parse(text).map(|parsed| {
+        parsed
+            .protobuf
+            .nodes()
+            .iter()
+            .find(|n| n.1 == 1)
+            .unwrap()
+            .0
+            .to_enum()
+    })
 }
 
 pub fn get_statements(text: &str) -> Vec<(TextRange, String)> {

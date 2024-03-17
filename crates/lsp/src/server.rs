@@ -1,6 +1,6 @@
 mod dispatch;
 
-use base_db::{FileChangesParams, PgLspPath, SourceFile, SourceFileParams};
+use base_db::{DocumentChangesParams, PgLspPath, SourceFile, SourceFileParams};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use dashmap::DashMap;
 use lsp_server::{Connection, ErrorCode, Message, RequestId};
@@ -146,7 +146,7 @@ impl Server {
         self.documents.entry(path).and_modify(|document| {
             let changes = from_proto::content_changes(&document, params.content_changes);
 
-            document.apply_changes(FileChangesParams {
+            document.apply_changes(DocumentChangesParams {
                 version: params.text_document.version,
                 changes,
             });

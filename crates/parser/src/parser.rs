@@ -69,6 +69,10 @@ impl Parser {
         }
     }
 
+    pub fn token_range(&self) -> Range<usize> {
+        0..self.tokens.len()
+    }
+
     /// start a new node of `SyntaxKind`
     pub fn start_node(&mut self, kind: SyntaxKind) {
         debug!("start_node: {:?}", kind);

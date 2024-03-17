@@ -14,7 +14,7 @@ use pg_query::NodeEnum;
 
 use crate::Parser;
 
-pub fn libpg_query_node(parser: &mut Parser, node: NodeEnum, token_range: &Range<usize>) {
+pub fn libpg_query_node(parser: &mut Parser, node: &NodeEnum, token_range: &Range<usize>) {
     LibpgQueryNodeParser::new(parser, node, token_range).parse();
 }
 
@@ -47,7 +47,7 @@ struct LibpgQueryNodeParser<'p> {
 impl<'p> LibpgQueryNodeParser<'p> {
     pub fn new(
         parser: &'p mut Parser,
-        node: NodeEnum,
+        node: &'p NodeEnum,
         token_range: &'p Range<usize>,
     ) -> LibpgQueryNodeParser<'p> {
         let current_depth = parser.depth.clone();
@@ -430,6 +430,7 @@ fn cmp_tokens(p: &crate::codegen::TokenProperty, token: &crate::lexer::Token) ->
     assert!(p.value.is_some() || p.kind.is_some());
 
     // TODO: move this to lexer
+    // we should also move alias handling to the lexer
 
     // remove enclosing ' quotes from token text
     let string_delimiter: &[char; 3] = &['\'', '$', '\"'];

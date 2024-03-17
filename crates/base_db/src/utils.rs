@@ -1,8 +1,8 @@
 use tree_sitter::InputEdit;
 
-use crate::source_file::FileChange;
+use crate::document_change::DocumentChange;
 
-pub fn apply_text_change(text: &String, change: &FileChange) -> String {
+pub fn apply_text_change(text: &String, change: &DocumentChange) -> String {
     if change.range.is_none() {
         return change.text.clone();
     }

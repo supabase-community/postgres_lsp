@@ -1,13 +1,13 @@
 use super::line_index_ext::LineIndexExt;
-use base_db::{FileChange, SourceFile};
+use base_db::{DocumentChange, SourceFile};
 
 pub fn content_changes(
     source_file: &SourceFile,
     changes: Vec<lsp_types::TextDocumentContentChangeEvent>,
-) -> Vec<FileChange> {
+) -> Vec<DocumentChange> {
     changes
         .iter()
-        .map(|change| FileChange {
+        .map(|change| DocumentChange {
             range: change
                 .range
                 .map(|range| source_file.line_index.offset_lsp_range(range).unwrap()),

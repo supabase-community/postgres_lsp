@@ -44,7 +44,7 @@ pub fn statement(parser: &mut Parser, kind: SyntaxKind) {
             );
 
             parser.stmt(root.clone(), text_range);
-            libpg_query_node(parser, root, &token_range);
+            libpg_query_node(parser, &root, &token_range);
         }
         Err(err) => {
             parser.error(

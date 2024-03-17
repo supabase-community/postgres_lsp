@@ -9,6 +9,7 @@ parser.workspace = true
 line_index.workspace = true
 tree-sitter.workspace = true
 tree_sitter_sql.workspace = true
+tracing.workspace = true
 
 [dev-dependencies]
 
