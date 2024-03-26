@@ -1,8 +1,8 @@
 use super::line_index_ext::LineIndexExt;
-use base_db::{DocumentChange, SourceFile};
+use base_db::{Document, DocumentChange};
 
 pub fn content_changes(
-    source_file: &SourceFile,
+    document: &Document,
     changes: Vec<lsp_types::TextDocumentContentChangeEvent>,
 ) -> Vec<DocumentChange> {
     changes
@@ -10,7 +10,7 @@ pub fn content_changes(
         .map(|change| DocumentChange {
             range: change
                 .range
-                .map(|range| source_file.line_index.offset_lsp_range(range).unwrap()),
+                .map(|range| document.line_index.offset_lsp_range(range).unwrap()),
             text: change.text.clone(),
         })
         .collect()

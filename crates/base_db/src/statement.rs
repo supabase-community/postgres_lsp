@@ -4,8 +4,10 @@ use text_size::{TextRange, TextSize};
 use tracing::{span, Level};
 
 use crate::{
+    diagnostics::Diagnostic,
     document_change::DocumentChange,
     utils::{apply_text_change, edit_from_change},
+    PgLspPath,
 };
 
 pub struct StatementParams {
@@ -13,17 +15,11 @@ pub struct StatementParams {
     pub range: Option<TextRange>,
 }
 
-pub struct Statement {
+#[derive(Debug, Hash)]
+pub struct StatementRef {
     pub version: i32,
-    pub text: String,
     pub range: TextRange,
-
-    parser: tree_sitter::Parser,
-
-    pub tree: tree_sitter::Tree,
-    pub ast: Option<parser::NodeEnum>,
-    pub native_diagnostics: Option<parser::NativeError>,
-    pub cst: Option<parser::Cst>,
+    pub document_url: PgLspPath,
 }
 
 impl Statement {
@@ -43,6 +39,10 @@ impl Statement {
                 Err(e) => (None, Some(e)),
             }
         };
+
+        let diagnostics = native_diagnostics
+            .map(|e| vec![e.into()])
+            .unwrap_or_default();
 
         let cst = if ast.is_some() {
             let res = catch_unwind(|| parser::build_cst(&params.text, ast.as_ref().unwrap()));
@@ -65,7 +65,6 @@ impl Statement {
             parser,
             tree,
             ast,
-            native_diagnostics,
             cst,
         }
     }
@@ -111,7 +110,10 @@ impl Statement {
         };
 
         self.ast = ast;
-        self.native_diagnostics = native_diagnostics;
+
+        self.diagnostics = native_diagnostics
+            .map(|e| vec![e.into()])
+            .unwrap_or_default();
 
         self.cst = if self.ast.is_some() {
             let res = catch_unwind(|| parser::build_cst(&self.text, self.ast.as_ref().unwrap()));

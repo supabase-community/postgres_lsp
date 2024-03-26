@@ -2,7 +2,7 @@ use text_size::{TextRange, TextSize};
 
 #[derive(Debug)]
 pub struct DocumentChangesParams {
-    pub version: u32,
+    pub version: i32,
     pub changes: Vec<DocumentChange>,
 }
 

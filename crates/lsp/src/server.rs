@@ -1,23 +1,19 @@
 mod dispatch;
 
-use base_db::{DocumentChangesParams, PgLspPath, SourceFile, SourceFileParams};
+use base_db::{Document, DocumentChangesParams, DocumentParams, PgLspPath, Statement};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use dashmap::DashMap;
-use lsp_server::{Connection, ErrorCode, Message, RequestId};
+use lsp_server::{Connection, Message};
 use lsp_types::{
     notification::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, DidSaveTextDocument,
-        PublishDiagnostics,
     },
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    DidSaveTextDocumentParams, InitializeParams, InitializeResult, PublishDiagnosticsParams,
-    SaveOptions, ServerCapabilities, ServerInfo, TextDocumentSyncCapability, TextDocumentSyncKind,
-    TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
+    DidSaveTextDocumentParams, InitializeParams, InitializeResult, SaveOptions, ServerCapabilities,
+    ServerInfo, TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions,
+    TextDocumentSyncSaveOptions,
 };
-use std::{
-    collections::{HashMap, HashSet},
-    sync::Arc,
-};
+use std::sync::Arc;
 use threadpool::ThreadPool;
 
 use crate::{
@@ -39,7 +35,9 @@ pub struct Server {
 
     // it might make sense to move this into its own struct at some point
     // do we need a dashmap?
-    documents: DashMap<PgLspPath, SourceFile>,
+    documents: DashMap<PgLspPath, Document>,
+
+    test: DashMap<PgLspPath, DashSet<Statement>>,
 }
 
 impl Server {
@@ -71,6 +69,7 @@ impl Server {
             pool: threadpool::Builder::new().build(),
 
             documents: DashMap::new(),
+            test: DashMap::new(),
         };
 
         server.run()?;
@@ -129,10 +128,11 @@ impl Server {
 
         self.documents.insert(
             path,
-            SourceFile::new(SourceFileParams {
+            Document::new(DocumentParams {
                 text: params.text_document.text,
             }),
         );
+        let stmts = self.test.get(&path).unwrap();
 
         Ok(())
     }
@@ -160,25 +160,6 @@ impl Server {
     fn did_save(&mut self, params: DidSaveTextDocumentParams) -> anyhow::Result<()> {
         // on save we want to run static analysis and ultimately publish diagnostics
 
-        // let mut uri = params.text_document.uri;
-        // normalize_uri(&mut uri);
-        //
-        // if self.workspace.read().config().build.on_save {
-        //     let text_document = TextDocumentIdentifier::new(uri.clone());
-        //     let params = BuildParams {
-        //         text_document,
-        //         position: None,
-        //     };
-        //
-        //     self.build(None, params)?;
-        // }
-        //
-        // self.publish_diagnostics_with_delay();
-        //
-        // if self.workspace.read().config().diagnostics.chktex.on_save {
-        //     self.run_chktex(&uri);
-        // }
-
         Ok(())
     }
 
@@ -193,11 +174,6 @@ impl Server {
         let path = file_path(&uri);
 
         self.documents.remove(&path);
-
-        // let mut uri = params.text_document.uri;
-        // normalize_uri(&mut uri);
-        // self.workspace.write().close(&uri);
-        // self.publish_diagnostics_with_delay();
         Ok(())
     }
 

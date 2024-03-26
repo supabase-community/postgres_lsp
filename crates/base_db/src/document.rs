@@ -1,8 +1,8 @@
-use std::ops::{AddAssign, SubAssign};
+use std::ops::{AddAssign, RangeBounds, SubAssign};
 
 use line_index::LineIndex;
 use parser::get_statements;
-use text_size::TextLen;
+use text_size::{TextLen, TextSize};
 
 use crate::{
     statement::{Statement, StatementParams},
@@ -19,7 +19,7 @@ pub struct DocumentParams {
 
 pub struct Document {
     pub text: String,
-    pub version: u32,
+    pub version: i32,
     // vector of statements sorted by range.start()
     pub statements: Vec<Statement>,
     pub line_index: LineIndex,
@@ -43,6 +43,14 @@ impl Document {
         }
     }
 
+    pub fn diagnostics(&self) -> Vec<crate::diagnostics::Diagnostic> {
+        self.statements
+            .iter()
+            .flat_map(|stmt| stmt.diagnostics.iter())
+            .cloned()
+            .collect()
+    }
+
     pub fn apply_changes(&mut self, params: DocumentChangesParams) {
         // TODO: optimize this by searching for the last change without a range and start applying
         // from there
@@ -51,6 +59,12 @@ impl Document {
             self.apply_change(change);
         }
         self.version = params.version;
+    }
+
+    pub fn statement_at_offset(&self, offset: TextSize) -> Option<&Statement> {
+        self.statements
+            .iter()
+            .find(|stmt| stmt.range.contains(offset.into()))
     }
 
     fn apply_change(&mut self, change: DocumentChange) {
@@ -182,14 +196,17 @@ mod tests {
             text: input.to_string(),
         });
 
-        let mut ctr: u32 = 1;
+        let mut ctr: i32 = 1;
 
         b.iter(|| {
             d.apply_changes(DocumentChangesParams {
                 version: ctr,
                 changes: vec![DocumentChange {
                     text: "a".to_string(),
-                    range: Some(TextRange::new((8 + ctr).into(), (8 + ctr).into())),
+                    range: Some(TextRange::new(
+                        u32::try_from(8 + ctr).unwrap().into(),
+                        u32::try_from(8 + ctr).unwrap().into(),
+                    )),
                 }],
             });
             ctr = ctr + 1;

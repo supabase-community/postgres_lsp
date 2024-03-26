@@ -37,7 +37,7 @@ use text_size::TextRange;
 pub use crate::codegen::SyntaxKind;
 pub use crate::parser::{Parse, Parser};
 pub use crate::syntax_node::{SyntaxElement, SyntaxNode, SyntaxToken};
-pub use pg_query::{Error as NativeError, NodeEnum};
+pub use pg_query;
 
 pub type Cst = ResolvedNode<SyntaxKind, ()>;
 
@@ -47,14 +47,15 @@ pub fn parse_source(text: &str) -> Parse {
     p.finish()
 }
 
-pub fn build_cst(text: &str, node: &NodeEnum) -> Cst {
+pub fn build_cst(text: &str, node: &pg_query::NodeEnum) -> Cst {
     let mut p = Parser::new(lex(text));
     let range = p.token_range();
     libpg_query_node(&mut p, node, &range);
     p.finish().cst
 }
 
-pub fn parse_sql_statement(text: &str) -> pg_query::Result<NodeEnum> {
+pub fn parse_sql_statement(text: &str) -> pg_query::Result<pg_query::NodeEnum> {
+    let r = pg_query::parse(text);
     pg_query::parse(text).map(|parsed| {
         parsed
             .protobuf

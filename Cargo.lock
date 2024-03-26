@@ -1042,6 +1042,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "hover"
+version = "0.0.0"
+dependencies = [
+ "base_db",
+ "schema_cache",
+ "text-size",
+ "tracing",
+]
+
+[[package]]
 name = "httparse"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1218,6 +1228,16 @@ name = "linked-hash-map"
 version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0717cef1bc8b636c6e1c1bbdefc09e6322da8a9321966e8928ef80d20f7f770f"
+
+[[package]]
+name = "lint"
+version = "0.0.0"
+dependencies = [
+ "base_db",
+ "parser",
+ "schema_cache",
+ "tracing",
+]
 
 [[package]]
 name = "linux-raw-sys"
@@ -2691,6 +2711,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "859eb650cfee7434994602c3a68b25d77ad9e68c8a6cd491616ef86661382eb3"
 dependencies = [
  "stable_deref_trait",
+]
+
+[[package]]
+name = "typecheck"
+version = "0.0.0"
+dependencies = [
+ "base_db",
+ "schema_cache",
+ "tracing",
 ]
 
 [[package]]
