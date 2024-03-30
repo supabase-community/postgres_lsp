@@ -1,24 +1,5 @@
 use tree_sitter::InputEdit;
 
-use crate::document_change::DocumentChange;
-
-pub fn apply_text_change(text: &String, change: &DocumentChange) -> String {
-    if change.range.is_none() {
-        return change.text.clone();
-    }
-
-    let range = change.range.unwrap();
-    let start = usize::from(range.start());
-    let end = usize::from(range.end());
-
-    let mut new_text = String::new();
-    new_text.push_str(&text[..start]);
-    new_text.push_str(&change.text);
-    new_text.push_str(&text[end..]);
-
-    new_text
-}
-
 // i wont pretend to know whats going on here but it seems to work
 pub fn edit_from_change(
     text: &str,
