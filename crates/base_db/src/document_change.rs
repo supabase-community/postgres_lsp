@@ -59,7 +59,7 @@ impl Change {
 
         if self.range.is_none() {
             // whole file changed
-            changed_statements.extend(doc.extract_statements());
+            changed_statements.extend(doc.drain_statements());
             doc.statement_ranges = get_statements(&self.text)
                 .iter()
                 .map(|(range, _)| range.clone())
@@ -95,48 +95,27 @@ impl Change {
                         *r -= self.diff_size();
                     }
                 });
-        } else {
-            println!("change across stmts");
-            // change across stmts
 
-            // get all changed ranges + their idx
+            doc.text = self.apply_to_text(&doc.text);
+        } else {
+            // change across stmts
 
             let mut min = self.range.unwrap().start();
             let mut max = self.range.unwrap().end();
-
-            println!("stmt ranges {:#?}", doc.statement_ranges);
-            println!("change range {:#?}", self.range.unwrap());
 
             for (idx, r) in doc
                 .statement_ranges
                 .iter()
                 .enumerate()
-                .skip_while(|(idx, r)| {
-                    println!(
-                        "skip {} {:#?} {}",
-                        idx,
-                        r,
-                        self.range.unwrap().start() > r.end()
-                    );
+                .skip_while(|(_, r)| {
                     // skip until first changed stmt
                     self.range.unwrap().start() > r.end()
                 })
-                .take_while(|(idx, r)| {
-                    println!(
-                        "take {} {:#?} {}",
-                        idx,
-                        r,
-                        self.range.unwrap().end() >= r.end()
-                    );
+                .take_while(|(_, r)| {
                     // take until after last changed stmt
                     self.range.unwrap().end() >= r.end()
                 })
             {
-                println!(
-                    "changes stmt at idx {} {}",
-                    idx,
-                    doc.text[r.clone()].to_string()
-                );
                 changed_statements.push(StatementRef {
                     idx,
                     text: doc.text[r.clone()].to_string(),
@@ -151,6 +130,8 @@ impl Change {
                 }
             }
 
+            doc.text = self.apply_to_text(&doc.text);
+
             if doc.text.text_len() < max {
                 max = doc.text.text_len();
             }
@@ -162,7 +143,10 @@ impl Change {
                 .get(usize::from(min)..usize::from(max))
                 .unwrap();
 
-            println!("affected text '{}'", extracted_text);
+            doc.statement_ranges.drain(
+                changed_statements.iter().min_by_key(|s| s.idx).unwrap().idx
+                    ..changed_statements.iter().max_by_key(|s| s.idx).unwrap().idx + 1,
+            );
 
             for (range, _) in get_statements(extracted_text) {
                 match doc
@@ -171,14 +155,11 @@ impl Change {
                 {
                     Ok(_) => {}
                     Err(pos) => {
-                        println!("insert stmt at pos {} with range {:#?}", pos, range);
                         doc.statement_ranges.insert(pos, range);
                     }
                 }
             }
         }
-
-        doc.text = self.apply_to_text(&doc.text);
 
         changed_statements
     }
@@ -202,6 +183,7 @@ impl DocumentChange {
 
 #[cfg(test)]
 mod tests {
+    use parser::get_statements;
     use text_size::TextRange;
 
     use crate::{
@@ -250,6 +232,18 @@ mod tests {
 
         assert_eq!("select id,test from users\nselect 1;", d.text);
         assert_eq!(d.statement_ranges.len(), 2);
+
+        for (r, _) in &get_statements(&d.text) {
+            assert_eq!(
+                d.statement_ranges.iter().position(|x| r == x).is_some(),
+                true,
+                "should have stmt with range {:#?}",
+                r
+            );
+        }
+
+        assert_eq!(d.statement_ranges[0], TextRange::new(0.into(), 26.into()));
+        assert_eq!(d.statement_ranges[1], TextRange::new(26.into(), 35.into()));
     }
 
     // #[bench]

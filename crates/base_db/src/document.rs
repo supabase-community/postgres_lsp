@@ -53,7 +53,7 @@ impl Document {
             .map(|idx| self.statement_ref(idx))
     }
 
-    pub fn extract_statements(&mut self) -> Vec<StatementRef> {
+    pub fn drain_statements(&mut self) -> Vec<StatementRef> {
         self.statement_ranges
             .drain(..)
             .enumerate()
