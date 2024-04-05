@@ -7,6 +7,6 @@ mod path;
 mod utils;
 
 pub use diagnostics::{Diagnostic, DiagnosticSource, Severity};
-pub use document::{Document, DocumentParams};
-pub use document_change::DocumentChange;
+pub use document::{Document, DocumentParams, StatementRef};
+pub use document_change::{Change, DocumentChange, StatementChange};
 pub use path::PgLspPath;

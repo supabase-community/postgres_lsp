@@ -3,13 +3,26 @@ use text_size::{TextLen, TextRange, TextSize};
 
 use crate::document::{Document, StatementRef};
 
+#[derive(Debug, Clone)]
+pub struct StatementChange {
+    /// The statement that changed
+    pub statement: StatementRef,
+    /// If `Some`, the change that was applied to the statement
+    /// If `None`, the statement was deleted
+    pub change: Option<Change>,
+}
+
 #[derive(Debug)]
 pub struct DocumentChange {
     pub version: i32,
     pub changes: Vec<Change>,
+
+    changed_statements: Vec<StatementChange>,
+
+    applied: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Change {
     /// The range of the file that changed. If `None`, the whole file changed.
     pub range: Option<TextRange>,
@@ -54,12 +67,17 @@ impl Change {
         new_text
     }
 
-    pub fn apply(&self, doc: &mut Document) -> Vec<StatementRef> {
-        let mut changed_statements: Vec<StatementRef> = Vec::new();
+    pub fn apply(&self, doc: &mut Document) -> Vec<StatementChange> {
+        let mut changed_statements: Vec<StatementChange> = Vec::new();
 
         if self.range.is_none() {
             // whole file changed
-            changed_statements.extend(doc.drain_statements());
+            changed_statements.extend(doc.drain_statements().into_iter().map(|s| {
+                StatementChange {
+                    statement: s,
+                    change: None,
+                }
+            }));
             doc.statement_ranges = get_statements(&self.text)
                 .iter()
                 .map(|(range, _)| range.clone())
@@ -79,10 +97,17 @@ impl Change {
                     if pos == changed_stmt_pos {
                         // only this ones ref is different, the rest do not have any text
                         // changes
-                        changed_statements.push(StatementRef {
-                            idx: pos,
-                            text: doc.text[r.clone()].to_string(),
-                            document_url: doc.url.clone(),
+                        changed_statements.push(StatementChange {
+                            statement: StatementRef {
+                                idx: pos,
+                                text: doc.text[r.clone()].to_string(),
+                                document_url: doc.url.clone(),
+                            },
+                            change: Some(Change {
+                                // change must be relative to statement
+                                range: self.range.unwrap().checked_sub(r.start()),
+                                text: self.text.clone(),
+                            }),
                         });
 
                         // if addition, expand the range
@@ -115,10 +140,13 @@ impl Change {
                     self.range.unwrap().end() >= r.end()
                 })
             {
-                changed_statements.push(StatementRef {
-                    idx,
-                    text: doc.text[r.clone()].to_string(),
-                    document_url: doc.url.clone(),
+                changed_statements.push(StatementChange {
+                    statement: StatementRef {
+                        idx,
+                        text: doc.text[r.clone()].to_string(),
+                        document_url: doc.url.clone(),
+                    },
+                    change: None,
                 });
 
                 if r.start() < min {
@@ -143,11 +171,22 @@ impl Change {
                 .unwrap();
 
             doc.statement_ranges.drain(
-                changed_statements.iter().min_by_key(|s| s.idx).unwrap().idx
-                    ..changed_statements.iter().max_by_key(|s| s.idx).unwrap().idx + 1,
+                changed_statements
+                    .iter()
+                    .min_by_key(|c| c.statement.idx)
+                    .unwrap()
+                    .statement
+                    .idx
+                    ..changed_statements
+                        .iter()
+                        .max_by_key(|c| c.statement.idx)
+                        .unwrap()
+                        .statement
+                        .idx
+                        + 1,
             );
 
-            for (range, _) in get_statements(extracted_text) {
+            for (range, text) in get_statements(extracted_text) {
                 match doc
                     .statement_ranges
                     .binary_search_by(|r| r.start().cmp(&range.start()))
@@ -155,6 +194,17 @@ impl Change {
                     Ok(_) => {}
                     Err(pos) => {
                         doc.statement_ranges.insert(pos, range);
+                        changed_statements.push(StatementChange {
+                            statement: StatementRef {
+                                idx: pos,
+                                text: text.to_string(),
+                                document_url: doc.url.clone(),
+                            },
+                            change: Some(Change {
+                                range: None,
+                                text: text.to_string(),
+                            }),
+                        });
                     }
                 }
             }
@@ -166,24 +216,34 @@ impl Change {
 
 impl DocumentChange {
     fn new(version: i32, changes: Vec<Change>) -> DocumentChange {
-        DocumentChange { version, changes }
+        DocumentChange {
+            version,
+            changes,
+            changed_statements: Vec::new(),
+            applied: false,
+        }
     }
 
-    pub fn apply(&self, doc: &mut Document) -> Vec<StatementRef> {
+    pub fn apply(&mut self, doc: &mut Document) {
+        assert!(!self.applied, "DocumentChange already applied");
         // TODO: optimize this by searching for the last change without a range and start applying
         // from there
-        let changed_statements = self.changes.iter().flat_map(|c| c.apply(doc)).collect();
+        self.changed_statements
+            .extend(self.changes.iter().flat_map(|c| c.apply(doc)));
 
         doc.version = self.version;
+    }
 
-        changed_statements
+    pub fn collect_statement_changes(&mut self) -> Vec<StatementChange> {
+        assert!(self.applied, "DocumentChange not yet applied");
+        self.changed_statements.drain(..).collect()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use parser::get_statements;
-    use text_size::{TextRange, TextSize};
+    use text_size::TextRange;
 
     use crate::{
         document::StatementRef, document_change::Change, Document, DocumentChange, DocumentParams,
@@ -201,7 +261,7 @@ mod tests {
 
         assert_eq!(d.statement_ranges.len(), 2);
 
-        let change = DocumentChange::new(
+        let mut change = DocumentChange::new(
             1,
             vec![Change {
                 text: ",test from users\nselect 1;".to_string(),
@@ -209,11 +269,12 @@ mod tests {
             }],
         );
 
-        let changed = change.apply(&mut d);
+        change.apply(&mut d);
+        let changed = change.collect_statement_changes();
 
         assert_eq!(changed.len(), 2);
         assert_eq!(
-            changed[0],
+            changed[0].statement,
             StatementRef {
                 document_url: PgLspPath::new("test.sql"),
                 text: "select id from users;".to_string(),
@@ -221,7 +282,7 @@ mod tests {
             }
         );
         assert_eq!(
-            changed[1],
+            changed[1].statement,
             StatementRef {
                 document_url: PgLspPath::new("test.sql"),
                 text: "select * from contacts;".to_string(),
@@ -266,7 +327,7 @@ mod tests {
         let update_text_len = u32::try_from(update_text.chars().count()).unwrap();
         let update_addition = update_text_len - u32::from(update_range.len());
 
-        let change = DocumentChange::new(
+        let mut change = DocumentChange::new(
             1,
             vec![Change {
                 text: update_text.to_string(),
@@ -314,7 +375,7 @@ mod tests {
         let update_text_len = u32::try_from(update_text.chars().count()).unwrap();
         let update_addition = update_text_len - u32::from(update_range.len());
 
-        let change = DocumentChange::new(
+        let mut change = DocumentChange::new(
             1,
             vec![Change {
                 text: update_text.to_string(),

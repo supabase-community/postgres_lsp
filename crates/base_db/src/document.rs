@@ -1,4 +1,4 @@
-use std::{ops::RangeBounds, usize};
+use std::{hash::Hash, hash::Hasher, ops::RangeBounds, usize};
 
 use line_index::LineIndex;
 use parser::get_statements;
@@ -23,7 +23,13 @@ pub struct Document {
     pub line_index: LineIndex,
 }
 
-#[derive(Debug, Hash, PartialEq)]
+impl Hash for Document {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.url.hash(state);
+    }
+}
+
+#[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub struct StatementRef {
     pub document_url: PgLspPath,
     // TODO use string interner for text

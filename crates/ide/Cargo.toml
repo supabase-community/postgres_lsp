@@ -1,12 +1,16 @@
 [package]
-name = "base_db"
+name = "ide"
 version = "0.0.0"
 edition = "2021"
 
 [dependencies]
 text-size = "1.1.1"
-line_index.workspace = true
+dashmap = "5.5.3"
+base_db.workspace =  true
 parser.workspace = true
+tree-sitter.workspace = true
+tree_sitter_sql.workspace = true
+tracing.workspace = true
 
 [dev-dependencies]
 
