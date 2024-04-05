@@ -87,8 +87,7 @@ impl Change {
 
                         // if addition, expand the range
                         // if deletion, shrink the range
-                        *r =
-                            TextRange::new(r.start(), r.start() + TextSize::from(self.diff_size()));
+                        *r = TextRange::new(r.start(), r.end() + TextSize::from(self.diff_size()));
                     } else if self.is_addition() {
                         *r += self.diff_size();
                     } else if self.is_deletion() {
@@ -184,7 +183,7 @@ impl DocumentChange {
 #[cfg(test)]
 mod tests {
     use parser::get_statements;
-    use text_size::TextRange;
+    use text_size::{TextRange, TextSize};
 
     use crate::{
         document::StatementRef, document_change::Change, Document, DocumentChange, DocumentParams,
@@ -246,159 +245,102 @@ mod tests {
         assert_eq!(d.statement_ranges[1], TextRange::new(26.into(), 35.into()));
     }
 
-    // #[bench]
-    // fn bench_typing(b: &mut Bencher) {
-    //     let input = "select id  from users;\nselect * from contacts;";
-    //
-    //     let mut d = Document::new(DocumentParams {
-    //         text: input.to_string(),
-    //     });
-    //
-    //     let mut ctr: i32 = 1;
-    //
-    //     b.iter(|| {
-    //         d.apply_changes(DocumentChangesParams {
-    //             version: ctr,
-    //             changes: vec![DocumentChange {
-    //                 text: "a".to_string(),
-    //                 range: Some(TextRange::new(
-    //                     u32::try_from(8 + ctr).unwrap().into(),
-    //                     u32::try_from(8 + ctr).unwrap().into(),
-    //                 )),
-    //             }],
-    //         });
-    //         ctr = ctr + 1;
-    //     });
-    // }
-    //
-    // #[test]
-    // fn test_document_apply_changes_at_end_of_statement() {
-    //     let input = "select id from\nselect * from contacts;";
-    //
-    //     let mut d = Document::new(DocumentParams {
-    //         text: input.to_string(),
-    //     });
-    //
-    //     assert_eq!(d.statements.len(), 2);
-    //
-    //     let stmt_1_range = d.statements[0].range.clone();
-    //     let stmt_2_range = d.statements[1].range.clone();
-    //
-    //     let update_text = " contacts;";
-    //
-    //     let update_range = TextRange::new(14.into(), 14.into());
-    //
-    //     let update_text_len = u32::try_from(update_text.chars().count()).unwrap();
-    //     let update_addition = update_text_len - u32::from(update_range.len());
-    //
-    //     d.apply_changes(DocumentChangesParams {
-    //         version: 1,
-    //         changes: vec![DocumentChange {
-    //             text: update_text.to_string(),
-    //             range: Some(update_range),
-    //         }],
-    //     });
-    //
-    //     assert_eq!("select id from contacts;\nselect * from contacts;", d.text);
-    //     assert_eq!(d.statements.len(), 2);
-    //     assert_eq!(d.statements[0].range.start(), stmt_1_range.start());
-    //     assert_eq!(
-    //         u32::from(d.statements[0].range.end()),
-    //         u32::from(stmt_1_range.end()) + update_addition
-    //     );
-    //     assert_eq!(
-    //         u32::from(d.statements[1].range.start()),
-    //         u32::from(stmt_2_range.start()) + update_addition
-    //     );
-    //     assert_eq!(
-    //         u32::from(d.statements[1].range.end()),
-    //         u32::from(stmt_2_range.end()) + update_addition
-    //     );
-    //
-    //     assert_eq!(
-    //         d.statements
-    //             .iter()
-    //             .find(|s| s.range.start() == TextSize::from(0))
-    //             .unwrap()
-    //             .version,
-    //         1,
-    //         "should touch the first statement"
-    //     );
-    //     assert_eq!(
-    //         d.statements
-    //             .iter()
-    //             .find(|s| s.range.start() != TextSize::from(0))
-    //             .unwrap()
-    //             .version,
-    //         0,
-    //         "should not touch the second statement"
-    //     );
-    // }
-    //
-    // #[test]
-    // fn test_document_apply_changes_within_statement() {
-    //     let input = "select id  from users;\nselect * from contacts;";
-    //
-    //     let mut d = Document::new(DocumentParams {
-    //         text: input.to_string(),
-    //     });
-    //
-    //     assert_eq!(d.statements.len(), 2);
-    //
-    //     let stmt_1_range = d.statements[0].range.clone();
-    //     let stmt_2_range = d.statements[1].range.clone();
-    //
-    //     let update_text = ",test";
-    //
-    //     let update_range = TextRange::new(9.into(), 10.into());
-    //
-    //     let update_text_len = u32::try_from(update_text.chars().count()).unwrap();
-    //     let update_addition = update_text_len - u32::from(update_range.len());
-    //
-    //     d.apply_changes(DocumentChangesParams {
-    //         version: 1,
-    //         changes: vec![DocumentChange {
-    //             text: update_text.to_string(),
-    //             range: Some(update_range),
-    //         }],
-    //     });
-    //
-    //     assert_eq!(
-    //         "select id,test from users;\nselect * from contacts;",
-    //         d.text
-    //     );
-    //     assert_eq!(d.statements.len(), 2);
-    //     assert_eq!(d.statements[0].range.start(), stmt_1_range.start());
-    //     assert_eq!(
-    //         u32::from(d.statements[0].range.end()),
-    //         u32::from(stmt_1_range.end()) + update_addition
-    //     );
-    //     assert_eq!(
-    //         u32::from(d.statements[1].range.start()),
-    //         u32::from(stmt_2_range.start()) + update_addition
-    //     );
-    //     assert_eq!(
-    //         u32::from(d.statements[1].range.end()),
-    //         u32::from(stmt_2_range.end()) + update_addition
-    //     );
-    //
-    //     assert_eq!(
-    //         d.statements
-    //             .iter()
-    //             .find(|s| s.range.start() == TextSize::from(0))
-    //             .unwrap()
-    //             .version,
-    //         1,
-    //         "should touch the first statement"
-    //     );
-    //     assert_eq!(
-    //         d.statements
-    //             .iter()
-    //             .find(|s| s.range.start() != TextSize::from(0))
-    //             .unwrap()
-    //             .version,
-    //         0,
-    //         "should not touch the second statement"
-    //     );
-    // }
+    #[test]
+    fn test_document_apply_changes_at_end_of_statement() {
+        let input = "select id from\nselect * from contacts;";
+
+        let mut d = Document::new(DocumentParams {
+            url: PgLspPath::new("test.sql"),
+            text: input.to_string(),
+        });
+
+        assert_eq!(d.statement_ranges.len(), 2);
+
+        let stmt_1_range = d.statement_ranges[0].clone();
+        let stmt_2_range = d.statement_ranges[1].clone();
+
+        let update_text = " contacts;";
+
+        let update_range = TextRange::new(14.into(), 14.into());
+
+        let update_text_len = u32::try_from(update_text.chars().count()).unwrap();
+        let update_addition = update_text_len - u32::from(update_range.len());
+
+        let change = DocumentChange::new(
+            1,
+            vec![Change {
+                text: update_text.to_string(),
+                range: Some(update_range),
+            }],
+        );
+
+        change.apply(&mut d);
+
+        assert_eq!("select id from contacts;\nselect * from contacts;", d.text);
+        assert_eq!(d.statement_ranges.len(), 2);
+        assert_eq!(d.statement_ranges[0].start(), stmt_1_range.start());
+        assert_eq!(
+            u32::from(d.statement_ranges[0].end()),
+            u32::from(stmt_1_range.end()) + update_addition
+        );
+        assert_eq!(
+            u32::from(d.statement_ranges[1].start()),
+            u32::from(stmt_2_range.start()) + update_addition
+        );
+        assert_eq!(
+            u32::from(d.statement_ranges[1].end()),
+            u32::from(stmt_2_range.end()) + update_addition
+        );
+    }
+
+    #[test]
+    fn test_document_apply_changes_within_statement() {
+        let input = "select id  from users;\nselect * from contacts;";
+
+        let mut d = Document::new(DocumentParams {
+            url: PgLspPath::new("test.sql"),
+            text: input.to_string(),
+        });
+
+        assert_eq!(d.statement_ranges.len(), 2);
+
+        let stmt_1_range = d.statement_ranges[0].clone();
+        let stmt_2_range = d.statement_ranges[1].clone();
+
+        let update_text = ",test";
+
+        let update_range = TextRange::new(9.into(), 10.into());
+
+        let update_text_len = u32::try_from(update_text.chars().count()).unwrap();
+        let update_addition = update_text_len - u32::from(update_range.len());
+
+        let change = DocumentChange::new(
+            1,
+            vec![Change {
+                text: update_text.to_string(),
+                range: Some(update_range),
+            }],
+        );
+
+        change.apply(&mut d);
+
+        assert_eq!(
+            "select id,test from users;\nselect * from contacts;",
+            d.text
+        );
+        assert_eq!(d.statement_ranges.len(), 2);
+        assert_eq!(d.statement_ranges[0].start(), stmt_1_range.start());
+        assert_eq!(
+            u32::from(d.statement_ranges[0].end()),
+            u32::from(stmt_1_range.end()) + update_addition
+        );
+        assert_eq!(
+            u32::from(d.statement_ranges[1].start()),
+            u32::from(stmt_2_range.start()) + update_addition
+        );
+        assert_eq!(
+            u32::from(d.statement_ranges[1].end()),
+            u32::from(stmt_2_range.end()) + update_addition
+        );
+    }
 }
