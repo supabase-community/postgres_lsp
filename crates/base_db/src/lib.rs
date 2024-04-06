@@ -4,7 +4,6 @@ mod diagnostics;
 mod document;
 mod document_change;
 mod path;
-mod utils;
 
 pub use diagnostics::{Diagnostic, DiagnosticSource, Severity};
 pub use document::{Document, DocumentParams, StatementRef};

@@ -33,10 +33,9 @@ impl TreeSitterParser {
 
             if c.change.as_ref().unwrap().range.is_none() {
                 // statement was added
-                let text = c.statement.text.clone();
                 let mut guard = self.parser.write().expect("Error reading parser");
                 // todo handle error
-                let tree = guard.parse(text, None).unwrap();
+                let tree = guard.parse(&c.statement.text, None).unwrap();
                 drop(guard);
                 self.db.insert(c.statement.clone(), tree);
                 continue;

@@ -47,27 +47,6 @@ pub fn parse_source(text: &str) -> Parse {
     p.finish()
 }
 
-pub fn build_cst(text: &str, node: &pg_query::NodeEnum) -> Cst {
-    let mut p = Parser::new(lex(text));
-    let range = p.token_range();
-    libpg_query_node(&mut p, node, &range);
-    p.finish().cst
-}
-
-pub fn parse_sql_statement(text: &str) -> pg_query::Result<pg_query::NodeEnum> {
-    let r = pg_query::parse(text);
-    pg_query::parse(text).map(|parsed| {
-        parsed
-            .protobuf
-            .nodes()
-            .iter()
-            .find(|n| n.1 == 1)
-            .unwrap()
-            .0
-            .to_enum()
-    })
-}
-
 pub fn get_statements(text: &str) -> Vec<(TextRange, String)> {
     let mut parser = Parser::new(lex(text));
     parser.start_node(SyntaxKind::SourceFile);
@@ -105,6 +84,64 @@ pub fn get_statements(text: &str) -> Vec<(TextRange, String)> {
     parser.finish_node();
 
     ranges
+}
+
+// NEW STUFF BELOW
+pub fn get_statement_ranges(text: &str) -> Vec<TextRange> {
+    let mut parser = Parser::new(lex(text));
+    parser.start_node(SyntaxKind::SourceFile);
+
+    let mut ranges = vec![];
+
+    while !parser.eof() {
+        match is_at_stmt_start(&mut parser) {
+            Some(stmt) => {
+                let range = collect_statement_token_range(&mut parser, stmt);
+
+                let from = parser.tokens.get(range.start);
+                let to = parser.tokens.get(range.end - 1);
+                // get text range from token range
+                let start = from.unwrap().span.start();
+                let end = to.unwrap().span.end();
+
+                ranges.push(TextRange::new(
+                    text_size::TextSize::from(u32::from(start)),
+                    text_size::TextSize::from(u32::from(end)),
+                ));
+
+                while parser.pos < range.end {
+                    parser.advance();
+                }
+            }
+            None => {
+                parser.advance();
+            }
+        }
+    }
+
+    parser.finish_node();
+
+    ranges
+}
+
+pub fn parse_sql_statement(text: &str) -> pg_query::Result<pg_query::NodeEnum> {
+    pg_query::parse(text).map(|parsed| {
+        parsed
+            .protobuf
+            .nodes()
+            .iter()
+            .find(|n| n.1 == 1)
+            .unwrap()
+            .0
+            .to_enum()
+    })
+}
+
+pub fn build_cst(text: &str, node: &pg_query::NodeEnum) -> Cst {
+    let mut p = Parser::new(lex(text));
+    let range = p.token_range();
+    libpg_query_node(&mut p, node, &range);
+    p.finish().cst
 }
 
 #[cfg(test)]
