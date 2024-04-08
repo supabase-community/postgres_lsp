@@ -20,6 +20,8 @@ lsp = { path = "./crates/lsp", version = "0.0.0" }
 tree_sitter_sql = { path = "./crates/tree_sitter_sql", version = "0.0.0" }
 schema_cache = { path = "./crates/schema_cache", version = "0.0.0" }
 parser = { path = "./crates/parser", version = "0.0.0" }
+sql_parser = { path = "./crates/sql_parser", version = "0.0.0" }
+sql_parser_codegen = { path = "./crates/sql_parser_codegen", version = "0.0.0" }
 codegen = { path = "./crates/codegen", version = "0.0.0" }
 sourcegen = { path = "./crates/sourcegen", version = "0.0.0" }
 pg_query_proto_parser = { path = "./crates/pg_query_proto_parser", version = "0.0.0" }

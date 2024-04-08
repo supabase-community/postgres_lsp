@@ -2216,6 +2216,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3b9b39299b249ad65f3b7e96443bad61c02ca5cd3589f46cb6d610a0fd6c0d6a"
 
 [[package]]
+name = "sql_parser"
+version = "0.0.0"
+dependencies = [
+ "cstree",
+ "insta",
+ "petgraph",
+ "pg_query",
+ "pg_query_proto_parser",
+ "regex",
+ "sql_parser_codegen",
+ "text-size",
+]
+
+[[package]]
+name = "sql_parser_codegen"
+version = "0.0.0"
+dependencies = [
+ "pg_query_proto_parser",
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
 name = "sqlformat"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
