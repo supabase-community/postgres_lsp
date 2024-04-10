@@ -1,7 +1,8 @@
 use std::sync::RwLock;
 
-use base_db::{Change, StatementChange, StatementRef};
+use base_db::{ChangedStatement, StatementRef};
 use dashmap::DashMap;
+use text_size::TextRange;
 use tree_sitter::{InputEdit, Tree};
 
 pub struct TreeSitterParser {
@@ -23,43 +24,37 @@ impl TreeSitterParser {
         }
     }
 
-    pub fn process_changes(&self, changes: &Vec<StatementChange>) {
-        for c in changes {
-            if c.change.is_none() {
-                // statement was removed
-                self.db.remove(&c.statement);
-                continue;
-            }
+    pub fn add_statement(&self, statement: &StatementRef) {
+        let mut guard = self.parser.write().expect("Error reading parser");
+        // todo handle error
+        let tree = guard.parse(&statement.text, None).unwrap();
+        drop(guard);
+        self.db.insert(statement.clone(), tree);
+    }
 
-            if c.change.as_ref().unwrap().range.is_none() {
-                // statement was added
-                let mut guard = self.parser.write().expect("Error reading parser");
-                // todo handle error
-                let tree = guard.parse(&c.statement.text, None).unwrap();
-                drop(guard);
-                self.db.insert(c.statement.clone(), tree);
-                continue;
-            }
+    pub fn remove_statement(&self, statement: &StatementRef) {
+        self.db.remove(&statement);
+    }
 
-            // statement was changed
-            self.db.entry(c.statement.clone()).and_modify(|tree| {
-                let edit = edit_from_change(
-                    &c.statement.text.as_str(),
-                    usize::from(c.change.as_ref().unwrap().range.unwrap().start()),
-                    usize::from(c.change.as_ref().unwrap().range.unwrap().end()),
-                    c.change.as_ref().unwrap().text.as_str(),
-                );
+    pub fn modify_statement(&self, change: &ChangedStatement) {
+        self.db.entry(change.statement.clone()).and_modify(|tree| {
+            let edit = edit_from_change(
+                &change.statement.text.as_str(),
+                usize::from(change.range.start()),
+                usize::from(change.range.end()),
+                change.text.as_str(),
+            );
 
-                tree.edit(&edit);
+            tree.edit(&edit);
 
-                let new_text = apply_text_change(&c.statement.text, c.change.as_ref().unwrap());
+            let new_text =
+                apply_text_change(&change.statement.text, Some(change.range), &change.text);
 
-                let mut guard = self.parser.write().expect("Error reading parser");
-                // todo handle error
-                *tree = guard.parse(new_text, Some(tree)).unwrap();
-                drop(guard);
-            });
-        }
+            let mut guard = self.parser.write().expect("Error reading parser");
+            // todo handle error
+            *tree = guard.parse(new_text, Some(tree)).unwrap();
+            drop(guard);
+        });
     }
 }
 
@@ -147,18 +142,18 @@ pub fn edit_from_change(
     }
 }
 
-pub fn apply_text_change(text: &String, change: &Change) -> String {
-    if change.range.is_none() {
-        return change.text.clone();
+pub fn apply_text_change(text: &String, range: Option<TextRange>, change_text: &String) -> String {
+    if range.is_none() {
+        return change_text.clone();
     }
 
-    let range = change.range.unwrap();
+    let range = range.unwrap();
     let start = usize::from(range.start());
     let end = usize::from(range.end());
 
     let mut new_text = String::new();
     new_text.push_str(&text[..start]);
-    new_text.push_str(&change.text);
+    new_text.push_str(&change_text);
     new_text.push_str(&text[end..]);
 
     new_text

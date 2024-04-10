@@ -1,15 +1,32 @@
+use std::ops::Sub;
+
 use parser::get_statements;
 use text_size::{TextLen, TextRange, TextSize};
 
 use crate::document::{Document, StatementRef};
 
-#[derive(Debug, Clone)]
-pub struct StatementChange {
-    /// The statement that changed
+#[derive(Debug)]
+pub enum StatementChange {
+    Added(StatementRef),
+    Deleted(StatementRef),
+    Modified(ChangedStatement),
+}
+
+impl StatementChange {
+    pub fn statement(&self) -> &StatementRef {
+        match self {
+            StatementChange::Added(stmt) => stmt,
+            StatementChange::Deleted(stmt) => stmt,
+            StatementChange::Modified(stmt) => &stmt.statement,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct ChangedStatement {
     pub statement: StatementRef,
-    /// If `Some`, the change that was applied to the statement
-    /// If `None`, the statement was deleted
-    pub change: Option<Change>,
+    pub range: TextRange,
+    pub text: String,
 }
 
 #[derive(Debug)]
@@ -72,12 +89,11 @@ impl Change {
 
         if self.range.is_none() {
             // whole file changed
-            changed_statements.extend(doc.drain_statements().into_iter().map(|s| {
-                StatementChange {
-                    statement: s,
-                    change: None,
-                }
-            }));
+            changed_statements.extend(
+                doc.drain_statements()
+                    .into_iter()
+                    .map(|s| StatementChange::Deleted(s)),
+            );
             doc.statement_ranges = get_statements(&self.text)
                 .iter()
                 .map(|(range, _)| range.clone())
@@ -97,18 +113,16 @@ impl Change {
                     if pos == changed_stmt_pos {
                         // only this ones ref is different, the rest do not have any text
                         // changes
-                        changed_statements.push(StatementChange {
+                        changed_statements.push(StatementChange::Modified(ChangedStatement {
                             statement: StatementRef {
                                 idx: pos,
                                 text: doc.text[r.clone()].to_string(),
                                 document_url: doc.url.clone(),
                             },
-                            change: Some(Change {
-                                // change must be relative to statement
-                                range: self.range.unwrap().checked_sub(r.start()),
-                                text: self.text.clone(),
-                            }),
-                        });
+                            // change must be relative to statement
+                            range: self.range.unwrap().sub(r.start()),
+                            text: self.text.clone(),
+                        }));
 
                         // if addition, expand the range
                         // if deletion, shrink the range
@@ -140,14 +154,11 @@ impl Change {
                     self.range.unwrap().end() >= r.end()
                 })
             {
-                changed_statements.push(StatementChange {
-                    statement: StatementRef {
-                        idx,
-                        text: doc.text[r.clone()].to_string(),
-                        document_url: doc.url.clone(),
-                    },
-                    change: None,
-                });
+                changed_statements.push(StatementChange::Deleted(StatementRef {
+                    idx,
+                    text: doc.text[r.clone()].to_string(),
+                    document_url: doc.url.clone(),
+                }));
 
                 if r.start() < min {
                     min = r.start();
@@ -173,15 +184,15 @@ impl Change {
             doc.statement_ranges.drain(
                 changed_statements
                     .iter()
-                    .min_by_key(|c| c.statement.idx)
+                    .min_by_key(|c| c.statement().idx)
                     .unwrap()
-                    .statement
+                    .statement()
                     .idx
                     ..changed_statements
                         .iter()
-                        .max_by_key(|c| c.statement.idx)
+                        .max_by_key(|c| c.statement().idx)
                         .unwrap()
-                        .statement
+                        .statement()
                         .idx
                         + 1,
             );
@@ -194,17 +205,11 @@ impl Change {
                     Ok(_) => {}
                     Err(pos) => {
                         doc.statement_ranges.insert(pos, range);
-                        changed_statements.push(StatementChange {
-                            statement: StatementRef {
-                                idx: pos,
-                                text: text.to_string(),
-                                document_url: doc.url.clone(),
-                            },
-                            change: Some(Change {
-                                range: None,
-                                text: text.to_string(),
-                            }),
-                        });
+                        changed_statements.push(StatementChange::Added(StatementRef {
+                            idx: pos,
+                            text: text.to_string(),
+                            document_url: doc.url.clone(),
+                        }));
                     }
                 }
             }
@@ -246,8 +251,7 @@ mod tests {
     use text_size::TextRange;
 
     use crate::{
-        document::StatementRef, document_change::Change, Document, DocumentChange, DocumentParams,
-        PgLspPath,
+        change::Change, document::StatementRef, Document, DocumentChange, DocumentParams, PgLspPath,
     };
 
     #[test]
@@ -274,7 +278,7 @@ mod tests {
 
         assert_eq!(changed.len(), 2);
         assert_eq!(
-            changed[0].statement,
+            changed[0].statement().to_owned(),
             StatementRef {
                 document_url: PgLspPath::new("test.sql"),
                 text: "select id from users;".to_string(),
@@ -282,7 +286,7 @@ mod tests {
             }
         );
         assert_eq!(
-            changed[1].statement,
+            changed[1].statement().to_owned(),
             StatementRef {
                 document_url: PgLspPath::new("test.sql"),
                 text: "select * from contacts;".to_string(),

@@ -15,8 +15,7 @@ pub struct StatementRangesResult {
 }
 
 pub fn extract_sql_statement_ranges(sql: &str) -> StatementRangesResult {
-    let mut parser = Parser::new(lex(sql));
-    parser.start_node(SyntaxKind::SourceFile);
+    let mut parser = Parser::new(lex(sql), None);
 
     let mut ranges = vec![];
 
@@ -45,8 +44,6 @@ pub fn extract_sql_statement_ranges(sql: &str) -> StatementRangesResult {
             }
         }
     }
-
-    parser.finish_node();
 
     StatementRangesResult {
         ranges,

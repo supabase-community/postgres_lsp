@@ -1,61 +1,20 @@
-use cstree::syntax::ResolvedNode;
 use petgraph::{
     stable_graph::{DefaultIx, NodeIndex, StableGraph},
     visit::{Bfs, Dfs},
     Direction,
 };
-use pg_query::{Error, NodeEnum};
-use text_size::TextRange;
+use pg_query::NodeEnum;
 
 use crate::{
     codegen::{get_nodes, Node, SyntaxKind},
     lexer::{lex, TokenType},
-    syntax_error::SyntaxError,
+    parser::Parser,
 };
 
-use super::{parse_sql_statement, Parser};
-
-pub struct AstNode {
-    pub node: NodeEnum,
-    pub range: TextRange,
-}
-
-struct Ast {
-    root: NodeEnum,
-    /// A list of all nodes in the tree with resolved ranges.
-    /// This is not optimal, but i dont know how to get a ref into the root nodes children without
-    // cloning them
-    nodes: Vec<AstNode>,
-}
-
-type Cst = ResolvedNode<SyntaxKind>;
-
-struct ParsedAst {
-    /// The abstract syntax tree with resolved ranges for each node
-    pub ast: Ast,
-    /// The concrete syntax tree
-    pub cst: Cst,
-    /// The syntax errors accumulated during parsing
-    pub errors: Vec<SyntaxError>,
-}
-
-pub fn parse_ast(sql: &str) -> ParsedAst {
-    // AFTER THE PARSING IS COMPLETE, WE CAN USE SET_DATA TO SET DATA ON EVERY NODE
-    // How to get the damn ref from the cst to the ast node?
-    // --> i think the only valid option is to build a second petgraph with refs to the ast node
-    // and their ranges and then query the enriched ast directly for the ranges
-
-    // -> refactor parser to store event stream instead of cst
-    // -> use event stream to build cst and "enriched" ast in one go
-
-    let root = parse_sql_statement::parse_sql_statement(sql);
-    let mut parser = Parser::new(lex(sql));
-    SqlStatementParser::new(&mut parser, &root.unwrap()).parse();
-    let r = parser.finish();
-}
+use super::tree_builder::TreeBuilder;
 
 // TODO: implement sibling token handling
-pub static SKIPPABLE_TOKENS: &[SyntaxKind] = &[
+static SKIPPABLE_TOKENS: &[SyntaxKind] = &[
     // "["
     SyntaxKind::Ascii91,
     // "]"
@@ -72,20 +31,24 @@ pub static SKIPPABLE_TOKENS: &[SyntaxKind] = &[
     SyntaxKind::Ascii59,
 ];
 
-struct SqlStatementParser<'p> {
-    parser: &'p mut Parser,
+pub(super) struct SqlStatementParser<'p> {
+    parser: Parser<'p>,
     node_graph: StableGraph<Node, ()>,
     current_node: NodeIndex<DefaultIx>,
     open_nodes: Vec<NodeIndex<DefaultIx>>,
 }
 
 impl<'p> SqlStatementParser<'p> {
-    pub fn new(parser: &'p mut Parser, node: &pg_query::NodeEnum) -> SqlStatementParser<'p> {
+    pub fn new(
+        root: &NodeEnum,
+        sql: &str,
+        event_sink: &'p mut TreeBuilder,
+    ) -> SqlStatementParser<'p> {
         Self {
-            parser,
-            node_graph: get_nodes(&node),
+            node_graph: get_nodes(&root),
             current_node: NodeIndex::<DefaultIx>::new(0),
             open_nodes: Vec::new(),
+            parser: Parser::new(lex(sql), Some(event_sink)),
         }
     }
 
@@ -390,8 +353,7 @@ impl<'p> SqlStatementParser<'p> {
                 self.current_location()
             );
         }
-        self.parser
-            .start_node(SyntaxKind::from(&self.node_graph[idx].inner));
+        self.parser.start_node(self.node_graph[idx].inner.clone());
         self.open_nodes.push(idx);
     }
 

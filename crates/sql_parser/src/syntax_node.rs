@@ -10,6 +10,6 @@ use pg_query::NodeEnum;
 
 use crate::codegen::SyntaxKind;
 
-pub type SyntaxNode = cstree::syntax::SyntaxNode<SyntaxKind, NodeEnum>;
+pub type SyntaxNode = cstree::syntax::SyntaxNode<SyntaxKind>;
 pub type SyntaxToken = cstree::syntax::SyntaxToken<SyntaxKind>;
 pub type SyntaxElement = cstree::syntax::SyntaxElement<SyntaxKind>;

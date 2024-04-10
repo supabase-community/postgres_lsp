@@ -1,33 +1,39 @@
-use cstree::build::Checkpoint;
 use cstree::syntax::ResolvedNode;
+use cstree::text::TextRange;
 use cstree::text::TextSize;
-use cstree::{build::GreenNodeBuilder, text::TextRange};
 use pg_query::NodeEnum;
 use std::cmp::min;
 use std::ops::Range;
 
-mod extract_sql_statement_ranges;
+pub mod extract_sql_statement_ranges;
 mod is_at_statement_start;
-mod parse_ast;
-mod parse_sql_statement;
+pub mod parse_ast;
+pub mod parse_sql_statement;
 
 use crate::codegen::SyntaxKind;
 use crate::lexer::{Token, TokenType};
 use crate::syntax_error::SyntaxError;
-use crate::syntax_node::SyntaxNode;
 
-pub static WHITESPACE_TOKENS: &[SyntaxKind] = &[
+static WHITESPACE_TOKENS: &[SyntaxKind] = &[
     SyntaxKind::Whitespace,
     SyntaxKind::Tab,
     SyntaxKind::Newline,
     SyntaxKind::SqlComment,
 ];
 
+pub enum ParserEvent<'a> {
+    Token(&'a Token),
+    StartNode(NodeEnum),
+    FinishNode,
+}
+
+trait EventSink {
+    fn push(&mut self, event: ParserEvent);
+}
+
 /// Main parser that exposes the `cstree` api, and collects errors and statements
-#[derive(Debug)]
-pub struct Parser {
-    /// The cst builder
-    inner: GreenNodeBuilder<'static, 'static, SyntaxKind>,
+pub struct Parser<'p> {
+    event_sink: Option<&'p mut dyn EventSink>,
     /// The syntax errors accumulated during parsing
     errors: Vec<SyntaxError>,
     /// The tokens to parse
@@ -53,11 +59,11 @@ pub struct Parse {
     pub errors: Vec<SyntaxError>,
 }
 
-impl Parser {
-    pub fn new(tokens: Vec<Token>) -> Self {
+impl<'p> Parser<'p> {
+    pub fn new(tokens: Vec<Token>, event_sink: Option<&'p mut dyn EventSink>) -> Self {
         Self {
+            event_sink,
             eof_token: Token::eof(usize::from(tokens.last().unwrap().span.end())),
-            inner: GreenNodeBuilder::new(),
             errors: Vec::new(),
             tokens,
             pos: 0,
@@ -72,14 +78,18 @@ impl Parser {
     }
 
     /// start a new node of `SyntaxKind`
-    pub fn start_node(&mut self, kind: SyntaxKind) {
+    pub fn start_node(&mut self, kind: NodeEnum) {
         self.flush_token_buffer();
-        self.inner.start_node(kind);
+        if let Some(ref mut event_sink) = self.event_sink {
+            (*event_sink).push(ParserEvent::StartNode(kind));
+        }
         self.depth += 1;
     }
     /// finish current node
     pub fn finish_node(&mut self) {
-        self.inner.finish_node();
+        if let Some(ref mut event_sink) = self.event_sink {
+            (*event_sink).push(ParserEvent::FinishNode);
+        }
         self.depth -= 1;
     }
 
@@ -103,30 +113,6 @@ impl Parser {
                 .span
                 .start(),
         ));
-    }
-
-    /// finish cstree and return `Parse`
-    pub fn finish(self) -> Parse {
-        let (tree, cache) = self.inner.finish();
-        Parse {
-            cst: SyntaxNode::new_root_with_resolver(tree, cache.unwrap().into_interner().unwrap()),
-            errors: self.errors,
-        }
-    }
-
-    /// Prepare for maybe wrapping the next node with a surrounding node.
-    ///
-    /// The way wrapping works is that you first get a checkpoint, then you add nodes and tokens as
-    /// normal, and then you *maybe* call [`start_node_at`](Parser::start_node_at).
-    pub fn checkpoint(self) -> Checkpoint {
-        self.inner.checkpoint()
-    }
-
-    /// Wrap the previous branch marked by [`checkpoint`](Parser::checkpoint) in a new
-    /// branch and make it current.
-    pub fn start_node_at(&mut self, checkpoint: Checkpoint, kind: SyntaxKind) {
-        self.flush_token_buffer();
-        self.inner.start_node_at(checkpoint, kind);
     }
 
     /// Opens a buffer for tokens. While the buffer is active, tokens are not applied to the tree.
@@ -154,7 +140,9 @@ impl Parser {
             self.flush_token_buffer();
             if self.token_buffer.is_none() {
                 let token = self.tokens.get(self.pos).unwrap();
-                self.inner.token(token.kind, &token.text);
+                if let Some(ref mut event_sink) = self.event_sink {
+                    (*event_sink).push(ParserEvent::Token(token));
+                }
             }
         }
         self.pos += 1;
@@ -171,7 +159,9 @@ impl Parser {
                 .get(self.whitespace_token_buffer.unwrap())
                 .unwrap();
             if self.token_buffer.is_none() {
-                self.inner.token(token.kind, &token.text);
+                if let Some(ref mut event_sink) = self.event_sink {
+                    (*event_sink).push(ParserEvent::Token(token));
+                }
             }
             self.whitespace_token_buffer = Some(self.whitespace_token_buffer.unwrap() + 1);
         }
@@ -273,127 +263,6 @@ impl Parser {
                 format!("Expected {:#?}, found {:#?}", kind, self.nth(0, false)),
                 self.pos + 1,
             );
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use std::{sync::mpsc, thread, time::Duration};
-
-    use crate::{lexer::lex, parse::source::source};
-
-    use super::*;
-
-    fn init() {
-        let _ = env_logger::builder().is_test(true).try_init();
-    }
-
-    #[test]
-    fn test_parser_another() {
-        init();
-
-        let input = "SELECT 1 from contact c
-        JOIN pg_class c ON nc.oid = c.relnamespace
-        left join (
-            select
-            table_id,
-            jsonb_agg(_pk.*) as primary_keys
-            from (
-                select 1
-                from
-                pg_class c,
-                pg_attribute a
-                where
-                i.indrelid = c.oid
-                and c.relnamespace = n.oid
-                ) as _pk
-            group by table_id
-            ) as pk
-            on pk.table_id = c.oid;";
-
-        let mut p = Parser::new(lex(input));
-        source(&mut p);
-        let result = p.finish();
-
-        dbg!(&result.cst);
-        println!("{:#?}", result.errors);
-    }
-
-    #[test]
-    fn test_parser_very_simple() {
-        init();
-
-        panic_after(Duration::from_millis(100), || {
-            let input = "select * from public.contact where x = 1;";
-
-            let mut p = Parser::new(lex(input));
-            source(&mut p);
-            let result = p.finish();
-
-            dbg!(&result.cst);
-            println!("{:#?}", result.errors);
-        })
-    }
-
-    #[test]
-    fn test_nested_substatements() {
-        init();
-
-        let input = "select is ((select true), true);\nselect isnt ((select false), true);";
-
-        let mut p = Parser::new(lex(input));
-        source(&mut p);
-        let result = p.finish();
-
-        dbg!(&result.cst);
-        println!("{:#?}", result.errors);
-    }
-
-    #[test]
-    fn test_nested_trx() {
-        init();
-
-        let input = "CREATE PROCEDURE insert_data(a integer, b integer) LANGUAGE SQL BEGIN ATOMIC INSERT INTO tbl VALUES (a); INSERT INTO tbl VALUES (b); END;";
-
-        let mut p = Parser::new(lex(input));
-        source(&mut p);
-        let result = p.finish();
-
-        dbg!(&result.cst);
-        println!("{:#?}", result.errors);
-    }
-
-    #[test]
-    fn test_parser_simple() {
-        init();
-
-        let input = "alter table x rename to y \n\n alter table x alter column z set default 1";
-
-        let mut p = Parser::new(lex(input));
-        source(&mut p);
-        let result = p.finish();
-
-        dbg!(&result.cst);
-        println!("{:#?}", result.errors);
-    }
-
-    fn panic_after<T, F>(d: Duration, f: F) -> T
-    where
-        T: Send + 'static,
-        F: FnOnce() -> T,
-        F: Send + 'static,
-    {
-        let (done_tx, done_rx) = mpsc::channel();
-        let handle = thread::spawn(move || {
-            let val = f();
-            done_tx.send(()).expect("Unable to send completion signal");
-            val
-        });
-
-        match done_rx.recv_timeout(d) {
-            Ok(_) => handle.join().expect("Thread panicked"),
-            Err(_) => panic!("Thread took too long"),
         }
     }
 }

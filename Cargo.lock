@@ -1073,7 +1073,7 @@ version = "0.0.0"
 dependencies = [
  "base_db",
  "dashmap",
- "parser",
+ "sql_parser",
  "text-size",
  "tracing",
  "tree-sitter",

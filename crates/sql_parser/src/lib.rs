@@ -1,8 +1,3 @@
-// TODOS
-// 1. parse statement ranges
-// 2. parse sql statement -> if error return error, else return root node (ast) + node tree with
-//    ref to ast node and range + cst
-
 #![feature(lazy_cell, is_sorted)]
 
 mod codegen;
@@ -11,8 +6,7 @@ mod parser;
 mod syntax_error;
 mod syntax_node;
 
-use text_size::TextRange;
-
-pub fn extract_sql_statement_ranges(sql: &str) -> Vec<TextRange> {
-    vec![]
-}
+pub use parser::extract_sql_statement_ranges::extract_sql_statement_ranges;
+pub use parser::parse_ast::{parse_ast, Cst, EnrichedAst, ParsedStatement};
+pub use parser::parse_sql_statement::parse_sql_statement;
+pub use pg_query::{Error as NativeError, NodeEnum as AstNode};
