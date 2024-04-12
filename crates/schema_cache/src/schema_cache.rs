@@ -12,6 +12,10 @@ pub struct SchemaCache {
 }
 
 impl SchemaCache {
+    pub fn new() -> SchemaCache {
+        SchemaCache::default()
+    }
+
     pub async fn load(pool: &PgPool) -> SchemaCache {
         let (schemas, tables) = join!(Schema::load(pool), Table::load(pool)).await;
 

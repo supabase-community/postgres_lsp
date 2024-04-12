@@ -9,6 +9,7 @@ dashmap = "5.5.3"
 base_db.workspace =  true
 sql_parser.workspace = true
 tree-sitter.workspace = true
+schema_cache.workspace = true
 tree_sitter_sql.workspace = true
 tracing.workspace = true
 

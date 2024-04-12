@@ -1,3 +1,5 @@
+pub mod client_flags;
+
 use std::{
     collections::HashMap,
     sync::{
@@ -9,7 +11,10 @@ use std::{
 use anyhow::{bail, Result};
 use crossbeam_channel::Sender;
 use lsp_server::{ErrorCode, Message, Request, RequestId, Response};
+use lsp_types::{notification::ShowMessage, MessageType, ShowMessageParams};
 use serde::{de::DeserializeOwned, Serialize};
+
+use crate::server::options::Options;
 
 #[derive(Debug)]
 struct RawClient {
@@ -90,5 +95,27 @@ impl LspClient {
 
         tx.send(response)?;
         Ok(())
+    }
+
+    pub fn parse_options(&self, mut value: serde_json::Value) -> Result<Options> {
+        // if there are multiple servers, we need to extract the options for pglsp first
+        let options = match value.get_mut("pglsp") {
+            Some(section) => section.take(),
+            None => value,
+        };
+
+        let options = match serde_json::from_value(options) {
+            Ok(new_options) => new_options,
+            Err(why) => {
+                let message = format!(
+                    "The texlab configuration is invalid; using the default settings instead.\nDetails: {why}"
+                );
+                let typ = MessageType::WARNING;
+                self.send_notification::<ShowMessage>(ShowMessageParams { message, typ })?;
+                None
+            }
+        };
+
+        Ok(options.unwrap_or_default())
     }
 }

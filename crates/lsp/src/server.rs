@@ -1,29 +1,36 @@
 mod dispatch;
+pub mod options;
 
 use base_db::{Document, DocumentChangesParams, DocumentParams, PgLspPath, Statement};
 use crossbeam_channel::{unbounded, Receiver, Sender};
-use dashmap::DashMap;
+use ide::IDE;
 use lsp_server::{Connection, Message};
 use lsp_types::{
     notification::{
-        DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, DidSaveTextDocument,
+        DidChangeConfiguration, DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument,
+        DidSaveTextDocument, Notification as _,
     },
-    DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    DidSaveTextDocumentParams, InitializeParams, InitializeResult, SaveOptions, ServerCapabilities,
-    ServerInfo, TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions,
-    TextDocumentSyncSaveOptions,
+    request::{RegisterCapability, WorkspaceConfiguration},
+    ConfigurationItem, ConfigurationParams, DidChangeTextDocumentParams,
+    DidCloseTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams,
+    InitializeParams, InitializeResult, Registration, RegistrationParams, SaveOptions,
+    ServerCapabilities, ServerInfo, TextDocumentSyncCapability, TextDocumentSyncKind,
+    TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
 };
 use std::sync::Arc;
 use threadpool::ThreadPool;
 
 use crate::{
-    client::LspClient,
+    client::{client_flags::ClientFlags, LspClient},
     utils::{file_path, from_proto, normalize_uri},
 };
+
+use self::options::Options;
 
 #[derive(Debug)]
 enum InternalMessage {
     Diagnostics,
+    SetOptions(Options),
 }
 
 pub struct Server {
@@ -32,12 +39,9 @@ pub struct Server {
     internal_tx: Sender<InternalMessage>,
     internal_rx: Receiver<InternalMessage>,
     pool: ThreadPool,
-
-    // it might make sense to move this into its own struct at some point
-    // do we need a dashmap?
-    documents: DashMap<PgLspPath, Document>,
-
-    test: DashMap<PgLspPath, DashSet<Statement>>,
+    client_flags: Arc<ClientFlags>,
+    ide: IDE,
+    // TODO add "watcher" like for db schema
 }
 
 impl Server {
@@ -48,8 +52,6 @@ impl Server {
 
         let (id, params) = connection.initialize_start()?;
         let params: InitializeParams = serde_json::from_value(params)?;
-
-        // TODO: setup pg notify listener and refresh schema cache
 
         let result = InitializeResult {
             capabilities: Self::capabilities(),
@@ -67,13 +69,22 @@ impl Server {
             internal_tx,
             client,
             pool: threadpool::Builder::new().build(),
+            client_flags: Arc::new(from_proto::client_flags(
+                params.capabilities,
+                params.client_info,
+            )),
 
-            documents: DashMap::new(),
-            test: DashMap::new(),
+            ide: IDE::new(),
         };
 
         server.run()?;
         Ok(())
+    }
+
+    fn update_options(&mut self, options: Options) {
+        // let mut workspace = self.workspace.write();
+        // workspace.set_config(Config::from(options));
+        // TODO update pglsp watcher
     }
 
     fn capabilities() -> ServerCapabilities {
@@ -211,13 +222,74 @@ impl Server {
                         InternalMessage::Diagnostics => {
                             self.publish_diagnostics()?;
                         }
+                        InternalMessage::SetOptions(options) => {
+                            self.update_options(options);
+                        }
                     };
                 }
             };
         }
     }
 
+    fn pull_options(&mut self) {
+        if !self.client_flags.configuration_pull {
+            return;
+        }
+
+        let params = ConfigurationParams {
+            items: vec![ConfigurationItem {
+                section: Some("pglsp".to_string()),
+                scope_uri: None,
+            }],
+        };
+
+        let client = self.client.clone();
+        let sender = self.internal_tx.clone();
+        self.pool.execute(move || {
+            match client.send_request::<WorkspaceConfiguration>(params) {
+                Ok(mut json) => {
+                    let options = client
+                        .parse_options(json.pop().expect("invalid configuration request"))
+                        .unwrap();
+
+                    sender.send(InternalMessage::SetOptions(options)).unwrap();
+                }
+                Err(why) => {
+                    // log::error!("Retrieving configuration failed: {}", why);
+                }
+            };
+        });
+    }
+
+    fn register_configuration(&mut self) {
+        if self.client_flags.configuration_push {
+            let registration = Registration {
+                id: "pull-config".to_string(),
+                method: DidChangeConfiguration::METHOD.to_string(),
+                register_options: None,
+            };
+
+            let params = RegistrationParams {
+                registrations: vec![registration],
+            };
+
+            let client = self.client.clone();
+            self.pool.execute(move || {
+                if let Err(why) = client.send_request::<RegisterCapability>(params) {
+                    // log::error!(
+                    //     "Failed to register \"{}\" notification: {}",
+                    //     DidChangeConfiguration::METHOD,
+                    //     why
+                    // );
+                }
+            });
+        }
+    }
+
     pub fn run(mut self) -> anyhow::Result<()> {
+        // TODO: setup pg notify listener ddand add job to refresh schema cache
+        self.register_configuration();
+        self.pull_options();
         self.process_messages()?;
         self.pool.join();
         Ok(())

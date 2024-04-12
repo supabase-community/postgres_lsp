@@ -1073,6 +1073,7 @@ version = "0.0.0"
 dependencies = [
  "base_db",
  "dashmap",
+ "schema_cache",
  "sql_parser",
  "text-size",
  "tracing",
@@ -1296,6 +1297,7 @@ dependencies = [
  "crossbeam-channel",
  "cstree",
  "dashmap",
+ "ide",
  "line_index",
  "lsp-server",
  "lsp-types 0.95.0",

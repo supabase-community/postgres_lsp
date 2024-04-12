@@ -1,13 +1,17 @@
 mod pg_query;
 mod tree_sitter;
 
+use std::sync::{RwLock, RwLockWriteGuard};
+
 use base_db::{Document, DocumentChange, PgLspPath};
 use dashmap::DashMap;
 use pg_query::PgQueryParser;
+use schema_cache::SchemaCache;
 use tree_sitter::TreeSitterParser;
 
 pub struct IDE {
     documents: DashMap<PgLspPath, Document>,
+    schema_cache: RwLock<SchemaCache>,
 
     tree_sitter: TreeSitterParser,
     pg_query: PgQueryParser,
@@ -17,6 +21,8 @@ impl IDE {
     pub fn new() -> IDE {
         IDE {
             documents: DashMap::new(),
+            schema_cache: RwLock::new(SchemaCache::new()),
+
             tree_sitter: TreeSitterParser::new(),
             pg_query: PgQueryParser::new(),
         }
@@ -44,4 +50,12 @@ impl IDE {
             }
         }
     }
+
+    pub fn set_schema_cache(&self, cache: SchemaCache) {
+        let mut schema_cache: RwLockWriteGuard<SchemaCache> = self.schema_cache.write().unwrap();
+        *schema_cache = cache;
+    }
+
+    // add fns here to interact with the IDE
+    // e.g. get diagnostics, hover, etc.
 }

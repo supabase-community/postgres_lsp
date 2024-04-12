@@ -13,6 +13,7 @@ anyhow = "1.0.81"
 threadpool = "1.8.1"
 line_index.workspace = true
 base_db.workspace = true
+ide.workspace = true
 dashmap = "5.5.3"
 cstree = { version = "0.12.0" }
 
