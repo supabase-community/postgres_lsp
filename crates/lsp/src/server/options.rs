@@ -4,5 +4,5 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 #[serde(default)]
 pub struct Options {
-    pub db_connection_string: String,
+    pub db_connection_string: Option<String>,
 }

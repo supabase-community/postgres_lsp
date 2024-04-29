@@ -1046,16 +1046,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hover"
-version = "0.0.0"
-dependencies = [
- "base_db",
- "schema_cache",
- "text-size",
- "tracing",
-]
-
-[[package]]
 name = "httparse"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1248,16 +1238,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0717cef1bc8b636c6e1c1bbdefc09e6322da8a9321966e8928ef80d20f7f770f"
 
 [[package]]
-name = "lint"
-version = "0.0.0"
-dependencies = [
- "base_db",
- "parser",
- "schema_cache",
- "tracing",
-]
-
-[[package]]
 name = "linux-raw-sys"
 version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1293,6 +1273,7 @@ name = "lsp"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "async-std",
  "base_db",
  "crossbeam-channel",
  "cstree",
@@ -1301,8 +1282,10 @@ dependencies = [
  "line_index",
  "lsp-server",
  "lsp-types 0.95.0",
+ "schema_cache",
  "serde",
  "serde_json",
+ "sqlx",
  "threadpool",
 ]
 

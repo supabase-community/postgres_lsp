@@ -1,15 +1,15 @@
 use crate::client::client_flags::ClientFlags;
 
 use super::line_index_ext::LineIndexExt;
-use base_db::{Document, DocumentChange};
+use base_db::{Change, Document};
 
 pub fn content_changes(
     document: &Document,
     changes: Vec<lsp_types::TextDocumentContentChangeEvent>,
-) -> Vec<DocumentChange> {
+) -> Vec<Change> {
     changes
         .iter()
-        .map(|change| DocumentChange {
+        .map(|change| Change {
             range: change
                 .range
                 .map(|range| document.line_index.offset_lsp_range(range).unwrap()),

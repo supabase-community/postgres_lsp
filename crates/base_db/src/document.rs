@@ -38,6 +38,16 @@ pub struct StatementRef {
 }
 
 impl Document {
+    pub fn new_empty(url: PgLspPath) -> Document {
+        Document {
+            version: 0,
+            statement_ranges: Vec::new(),
+            line_index: LineIndex::new(""),
+            text: "".to_string(),
+            url,
+        }
+    }
+
     pub fn new(params: DocumentParams) -> Document {
         Document {
             version: 0,

@@ -220,7 +220,7 @@ impl Change {
 }
 
 impl DocumentChange {
-    fn new(version: i32, changes: Vec<Change>) -> DocumentChange {
+    pub fn new(version: i32, changes: Vec<Change>) -> DocumentChange {
         DocumentChange {
             version,
             changes,
@@ -237,6 +237,7 @@ impl DocumentChange {
             .extend(self.changes.iter().flat_map(|c| c.apply(doc)));
 
         doc.version = self.version;
+        self.applied = true;
     }
 
     pub fn collect_statement_changes(&mut self) -> Vec<StatementChange> {

@@ -1,10 +1,11 @@
 mod dispatch;
 pub mod options;
 
-use base_db::{Document, DocumentChangesParams, DocumentParams, PgLspPath, Statement};
+use async_std::task::{self};
+use base_db::{Change, DocumentChange};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use ide::IDE;
-use lsp_server::{Connection, Message};
+use lsp_server::{Connection, Message, Notification};
 use lsp_types::{
     notification::{
         DidChangeConfiguration, DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument,
@@ -17,6 +18,7 @@ use lsp_types::{
     ServerCapabilities, ServerInfo, TextDocumentSyncCapability, TextDocumentSyncKind,
     TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
 };
+use schema_cache::SchemaCache;
 use std::sync::Arc;
 use threadpool::ThreadPool;
 
@@ -26,11 +28,29 @@ use crate::{
 };
 
 use self::options::Options;
+use sqlx::postgres::{PgListener, PgPool};
 
 #[derive(Debug)]
 enum InternalMessage {
     Diagnostics,
     SetOptions(Options),
+    RefreshSchemaCache,
+    SetSchemaCache(SchemaCache),
+}
+
+struct DbConnection {
+    pub pool: PgPool,
+    connection_string: String,
+}
+
+impl DbConnection {
+    pub async fn new(connection_string: &str) -> Result<Self, sqlx::Error> {
+        let pool = PgPool::connect(connection_string).await?;
+        Ok(Self {
+            pool,
+            connection_string: connection_string.to_owned(),
+        })
+    }
 }
 
 pub struct Server {
@@ -41,7 +61,7 @@ pub struct Server {
     pool: ThreadPool,
     client_flags: Arc<ClientFlags>,
     ide: IDE,
-    // TODO add "watcher" like for db schema
+    db_conn: Option<DbConnection>,
 }
 
 impl Server {
@@ -73,7 +93,7 @@ impl Server {
                 params.capabilities,
                 params.client_info,
             )),
-
+            db_conn: None,
             ide: IDE::new(),
         };
 
@@ -81,10 +101,58 @@ impl Server {
         Ok(())
     }
 
+    fn start_listening(&self) {
+        if self.db_conn.is_none() {
+            return;
+        }
+
+        let pool = self.db_conn.as_ref().unwrap().pool.clone();
+        let tx = self.internal_tx.clone();
+
+        task::spawn(async move {
+            let mut listener = PgListener::connect_with(&pool).await.unwrap();
+            listener.listen_all(["pglsp", "pgrst"]).await.unwrap();
+            loop {
+                match listener.recv().await {
+                    Ok(notification) => {
+                        if notification.payload().to_string() == "reload schema" {
+                            tx.send(InternalMessage::RefreshSchemaCache).unwrap();
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Listener error: {}", e);
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    async fn update_db_connection(&mut self, connection_string: Option<String>) {
+        if connection_string == self.db_conn.as_ref().map(|c| c.connection_string.clone()) {
+            return;
+        }
+        if let Some(conn) = self.db_conn.take() {
+            conn.pool.close().await;
+        }
+
+        if connection_string.is_none() {
+            return;
+        }
+
+        let new_conn = DbConnection::new(connection_string.unwrap().as_str()).await;
+
+        if new_conn.is_err() {
+            // log::error!("Failed to connect to database: {}", new_conn.unwrap_err());
+            return;
+        }
+
+        self.db_conn = Some(new_conn.unwrap());
+    }
+
     fn update_options(&mut self, options: Options) {
-        // let mut workspace = self.workspace.write();
-        // workspace.set_config(Config::from(options));
-        // TODO update pglsp watcher
+        async_std::task::block_on(self.update_db_connection(options.db_connection_string));
+        self.start_listening();
     }
 
     fn capabilities() -> ServerCapabilities {
@@ -104,7 +172,7 @@ impl Server {
         }
     }
 
-    fn publish_diagnostics(&mut self) -> anyhow::Result<()> {
+    fn publish_diagnostics(&self) -> anyhow::Result<()> {
         // let workspace = self.workspace.read();
         //
         // for (uri, diagnostics) in self.diagnostic_manager.get(&workspace) {
@@ -131,50 +199,57 @@ impl Server {
         Ok(())
     }
 
-    fn did_open(&mut self, params: DidOpenTextDocumentParams) -> anyhow::Result<()> {
+    fn did_open(&self, params: DidOpenTextDocumentParams) -> anyhow::Result<()> {
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
 
         let path = file_path(&uri);
 
-        self.documents.insert(
+        self.ide.apply_change(
             path,
-            Document::new(DocumentParams {
-                text: params.text_document.text,
-            }),
+            DocumentChange::new(
+                params.text_document.version,
+                vec![Change {
+                    range: None,
+                    text: params.text_document.text,
+                }],
+            ),
         );
-        let stmts = self.test.get(&path).unwrap();
 
         Ok(())
     }
 
-    fn did_change(&mut self, params: DidChangeTextDocumentParams) -> anyhow::Result<()> {
+    fn did_change(&self, params: DidChangeTextDocumentParams) -> anyhow::Result<()> {
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
 
         let path = file_path(&uri);
 
-        self.documents.entry(path).and_modify(|document| {
-            let changes = from_proto::content_changes(&document, params.content_changes);
+        let document = self.ide.documents.get(&path);
 
-            document.apply_changes(DocumentChangesParams {
-                version: params.text_document.version,
-                changes,
-            });
-        });
+        if document.is_none() {
+            return Ok(());
+        }
+
+        let changes = from_proto::content_changes(&document.unwrap(), params.content_changes);
+
+        self.ide.apply_change(
+            path,
+            DocumentChange::new(params.text_document.version, changes),
+        );
 
         // TODO: update diagnostics
 
         Ok(())
     }
 
-    fn did_save(&mut self, params: DidSaveTextDocumentParams) -> anyhow::Result<()> {
+    fn did_save(&self, params: DidSaveTextDocumentParams) -> anyhow::Result<()> {
         // on save we want to run static analysis and ultimately publish diagnostics
 
         Ok(())
     }
 
-    fn did_close(&mut self, params: DidCloseTextDocumentParams) -> anyhow::Result<()> {
+    fn did_close(&self, params: DidCloseTextDocumentParams) -> anyhow::Result<()> {
         // this just means that the document is no longer open in the client
         // if we would listen to fs events, we would use this to overwrite the files owner to be
         // "server" instead of "client". for now we will ignore this notification since we dont
@@ -184,8 +259,23 @@ impl Server {
         normalize_uri(&mut uri);
         let path = file_path(&uri);
 
-        self.documents.remove(&path);
+        self.ide.documents.remove(&path);
         Ok(())
+    }
+
+    fn refresh_schema_cache(&self) {
+        if self.db_conn.is_none() {
+            return;
+        }
+
+        let tx = self.internal_tx.clone();
+        let conn = self.db_conn.as_ref().unwrap().pool.clone();
+
+        async_std::task::spawn(async move {
+            let schema_cache = SchemaCache::load(&conn).await;
+            tx.send(InternalMessage::SetSchemaCache(schema_cache))
+                .unwrap();
+        });
     }
 
     fn process_messages(&mut self) -> anyhow::Result<()> {
@@ -219,6 +309,12 @@ impl Server {
                 },
                 recv(&self.internal_rx) -> msg => {
                     match msg? {
+                        InternalMessage::SetSchemaCache(c) => {
+                            self.ide.set_schema_cache(c);
+                        }
+                        InternalMessage::RefreshSchemaCache => {
+                            self.refresh_schema_cache();
+                        }
                         InternalMessage::Diagnostics => {
                             self.publish_diagnostics()?;
                         }
@@ -287,7 +383,6 @@ impl Server {
     }
 
     pub fn run(mut self) -> anyhow::Result<()> {
-        // TODO: setup pg notify listener ddand add job to refresh schema cache
         self.register_configuration();
         self.pull_options();
         self.process_messages()?;
