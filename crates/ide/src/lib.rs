@@ -7,6 +7,7 @@ use base_db::{Document, DocumentChange, DocumentParams, PgLspPath};
 use dashmap::DashMap;
 use pg_query::PgQueryParser;
 use schema_cache::SchemaCache;
+use tracing::{event, span, Level};
 use tree_sitter::TreeSitterParser;
 
 pub struct IDE {
@@ -30,6 +31,9 @@ impl IDE {
 
     /// Applies changes to the current state of the world
     pub fn apply_change(&self, url: PgLspPath, mut change: DocumentChange) {
+        let span = span!(Level::INFO, "apply_change");
+        let _guard = span.enter();
+        event!(Level::INFO, ?url, ?change);
         let mut doc = self
             .documents
             .entry(url.clone())
@@ -54,6 +58,7 @@ impl IDE {
                 }
             }
         }
+        drop(_guard);
     }
 
     /// Computes the set of diagnostics for a given document

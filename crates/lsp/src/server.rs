@@ -9,18 +9,20 @@ use lsp_server::{Connection, Message, Notification};
 use lsp_types::{
     notification::{
         DidChangeConfiguration, DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument,
-        DidSaveTextDocument, Notification as _,
+        DidSaveTextDocument, LogMessage, Notification as _, ShowMessage,
     },
     request::{RegisterCapability, WorkspaceConfiguration},
-    ConfigurationItem, ConfigurationParams, DidChangeTextDocumentParams,
-    DidCloseTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams,
-    InitializeParams, InitializeResult, Registration, RegistrationParams, SaveOptions,
-    ServerCapabilities, ServerInfo, TextDocumentSyncCapability, TextDocumentSyncKind,
-    TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
+    ConfigurationItem, ConfigurationParams, DidChangeConfigurationParams,
+    DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
+    DidSaveTextDocumentParams, InitializeParams, InitializeResult, LogMessageParams, Registration,
+    RegistrationParams, SaveOptions, ServerCapabilities, ServerInfo, ShowMessageParams,
+    TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions,
+    TextDocumentSyncSaveOptions,
 };
 use schema_cache::SchemaCache;
 use std::sync::Arc;
 use threadpool::ThreadPool;
+use tracing::{event, instrument, Level};
 
 use crate::{
     client::{client_flags::ClientFlags, LspClient},
@@ -38,6 +40,7 @@ enum InternalMessage {
     SetSchemaCache(SchemaCache),
 }
 
+#[derive(Debug)]
 struct DbConnection {
     pub pool: PgPool,
     connection_string: String,
@@ -83,16 +86,18 @@ impl Server {
 
         connection.initialize_finish(id, serde_json::to_value(result)?)?;
 
+        let client_flags = Arc::new(from_proto::client_flags(
+            params.capabilities,
+            params.client_info,
+        ));
+
         let server = Self {
             connection: Arc::new(connection),
             internal_rx,
             internal_tx,
             client,
             pool: threadpool::Builder::new().build(),
-            client_flags: Arc::new(from_proto::client_flags(
-                params.capabilities,
-                params.client_info,
-            )),
+            client_flags,
             db_conn: None,
             ide: IDE::new(),
         };
@@ -128,6 +133,7 @@ impl Server {
         });
     }
 
+    #[instrument(skip(self), name = "pglsp/update_db_connection")]
     async fn update_db_connection(&mut self, connection_string: Option<String>) {
         if connection_string == self.db_conn.as_ref().map(|c| c.connection_string.clone()) {
             return;
@@ -143,13 +149,22 @@ impl Server {
         let new_conn = DbConnection::new(connection_string.unwrap().as_str()).await;
 
         if new_conn.is_err() {
-            // log::error!("Failed to connect to database: {}", new_conn.unwrap_err());
+            let err = new_conn.unwrap_err();
+            event!(Level::ERROR, "Failed to connect to database: {:?}", err);
             return;
         }
 
         self.db_conn = Some(new_conn.unwrap());
+
+        self.client
+            .send_notification::<ShowMessage>(ShowMessageParams {
+                typ: lsp_types::MessageType::INFO,
+                message: "Connection to database established".to_string(),
+            })
+            .unwrap();
     }
 
+    #[instrument(skip(self), name = "pglsp/update_options")]
     fn update_options(&mut self, options: Options) {
         async_std::task::block_on(self.update_db_connection(options.db_connection_string));
         self.start_listening();
@@ -199,7 +214,10 @@ impl Server {
         Ok(())
     }
 
+    #[instrument(skip(self), name = "pglsp/did_open")]
     fn did_open(&self, params: DidOpenTextDocumentParams) -> anyhow::Result<()> {
+        event!(Level::INFO, "did_open");
+
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
 
@@ -219,6 +237,7 @@ impl Server {
         Ok(())
     }
 
+    #[instrument(skip(self), name = "pglsp/did_change")]
     fn did_change(&self, params: DidChangeTextDocumentParams) -> anyhow::Result<()> {
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
@@ -243,12 +262,14 @@ impl Server {
         Ok(())
     }
 
+    #[instrument(skip(self), name = "pglsp/did_save")]
     fn did_save(&self, params: DidSaveTextDocumentParams) -> anyhow::Result<()> {
         // on save we want to run static analysis and ultimately publish diagnostics
 
         Ok(())
     }
 
+    #[instrument(skip(self), name = "pglsp/did_close")]
     fn did_close(&self, params: DidCloseTextDocumentParams) -> anyhow::Result<()> {
         // this just means that the document is no longer open in the client
         // if we would listen to fs events, we would use this to overwrite the files owner to be
@@ -263,6 +284,7 @@ impl Server {
         Ok(())
     }
 
+    #[instrument(skip(self), name = "pglsp/refresh_schema_cache")]
     fn refresh_schema_cache(&self) {
         if self.db_conn.is_none() {
             return;
@@ -276,6 +298,20 @@ impl Server {
             tx.send(InternalMessage::SetSchemaCache(schema_cache))
                 .unwrap();
         });
+    }
+
+    fn did_change_configuration(
+        &mut self,
+        params: DidChangeConfigurationParams,
+    ) -> anyhow::Result<()> {
+        if self.client_flags.configuration_pull {
+            self.pull_options();
+        } else {
+            let options = self.client.parse_options(params.settings)?;
+            self.update_options(options);
+        }
+
+        Ok(())
     }
 
     fn process_messages(&mut self) -> anyhow::Result<()> {
@@ -296,6 +332,10 @@ impl Server {
                         }
                         Message::Notification(notification) => {
                             dispatch::NotificationDispatcher::new(notification)
+                                .on::<DidChangeConfiguration, _>(|params| {
+                                    self.did_change_configuration(params)
+                                })?
+                                .on::<DidCloseTextDocument, _>(|params| self.did_close(params))?
                                 .on::<DidOpenTextDocument, _>(|params| self.did_open(params))?
                                 .on::<DidChangeTextDocument, _>(|params| self.did_change(params))?
                                 .on::<DidSaveTextDocument, _>(|params| self.did_save(params))?
@@ -334,7 +374,7 @@ impl Server {
 
         let params = ConfigurationParams {
             items: vec![ConfigurationItem {
-                section: Some("pglsp".to_string()),
+                section: Some("postgres_lsp".to_string()),
                 scope_uri: None,
             }],
         };

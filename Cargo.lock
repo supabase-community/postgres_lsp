@@ -1287,6 +1287,7 @@ dependencies = [
  "serde_json",
  "sqlx",
  "threadpool",
+ "tracing",
 ]
 
 [[package]]
