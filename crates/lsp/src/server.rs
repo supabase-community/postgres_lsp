@@ -113,10 +113,15 @@ impl Server {
 
         let pool = self.db_conn.as_ref().unwrap().pool.clone();
         let tx = self.internal_tx.clone();
+        let client = self.client.clone();
 
         task::spawn(async move {
             let mut listener = PgListener::connect_with(&pool).await.unwrap();
-            listener.listen_all(["pglsp", "pgrst"]).await.unwrap();
+            listener
+                .listen_all(["postgres_lsp", "pgrst"])
+                .await
+                .unwrap();
+
             loop {
                 match listener.recv().await {
                     Ok(notification) => {
@@ -162,12 +167,15 @@ impl Server {
                 message: "Connection to database established".to_string(),
             })
             .unwrap();
+
+        self.refresh_schema_cache();
+
+        self.start_listening();
     }
 
     #[instrument(skip(self), name = "pglsp/update_options")]
     fn update_options(&mut self, options: Options) {
         async_std::task::block_on(self.update_db_connection(options.db_connection_string));
-        self.start_listening();
     }
 
     fn capabilities() -> ServerCapabilities {
@@ -292,8 +300,15 @@ impl Server {
 
         let tx = self.internal_tx.clone();
         let conn = self.db_conn.as_ref().unwrap().pool.clone();
+        let client = self.client.clone();
 
         async_std::task::spawn(async move {
+            client
+                .send_notification::<ShowMessage>(ShowMessageParams {
+                    typ: lsp_types::MessageType::INFO,
+                    message: "Refreshing schema cache...".to_string(),
+                })
+                .unwrap();
             let schema_cache = SchemaCache::load(&conn).await;
             tx.send(InternalMessage::SetSchemaCache(schema_cache))
                 .unwrap();
@@ -351,6 +366,12 @@ impl Server {
                     match msg? {
                         InternalMessage::SetSchemaCache(c) => {
                             self.ide.set_schema_cache(c);
+                            self.client
+                                .send_notification::<ShowMessage>(ShowMessageParams {
+                                    typ: lsp_types::MessageType::INFO,
+                                    message: "Schema cache loaded".to_string(),
+                                })
+                                .unwrap();
                         }
                         InternalMessage::RefreshSchemaCache => {
                             self.refresh_schema_cache();
