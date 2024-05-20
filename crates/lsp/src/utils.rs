@@ -1,5 +1,6 @@
 pub mod from_proto;
 pub mod line_index_ext;
+pub mod to_proto;
 
 use std::path::PathBuf;
 

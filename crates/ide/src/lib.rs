@@ -3,15 +3,19 @@ mod tree_sitter;
 
 use std::sync::{RwLock, RwLockWriteGuard};
 
-use base_db::{Document, DocumentChange, DocumentParams, PgLspPath};
-use dashmap::DashMap;
+use base_db::{Document, DocumentChange, PgLspPath, StatementRef};
+use dashmap::{DashMap, DashSet};
+use diagnostics::Diagnostic;
 use pg_query::PgQueryParser;
 use schema_cache::SchemaCache;
+use text_size::TextRange;
 use tracing::{event, span, Level};
 use tree_sitter::TreeSitterParser;
 
 pub struct IDE {
     pub documents: DashMap<PgLspPath, Document>,
+    // Stores the statements that have changed since the last analysis
+    changed_stmts: DashSet<StatementRef>,
     schema_cache: RwLock<SchemaCache>,
 
     tree_sitter: TreeSitterParser,
@@ -23,6 +27,7 @@ impl IDE {
         IDE {
             documents: DashMap::new(),
             schema_cache: RwLock::new(SchemaCache::new()),
+            changed_stmts: DashSet::new(),
 
             tree_sitter: TreeSitterParser::new(),
             pg_query: PgQueryParser::new(),
@@ -30,14 +35,18 @@ impl IDE {
     }
 
     /// Applies changes to the current state of the world
+    ///
+    /// Returns a list of changed statements
     pub fn apply_change(&self, url: PgLspPath, mut change: DocumentChange) {
         let span = span!(Level::INFO, "apply_change");
         let _guard = span.enter();
         event!(Level::INFO, ?url, ?change);
+
         let mut doc = self
             .documents
             .entry(url.clone())
             .or_insert(Document::new_empty(url));
+
         change.apply(doc.value_mut());
 
         let changed_stmts = change.collect_statement_changes();
@@ -57,22 +66,43 @@ impl IDE {
                     self.pg_query.modify_statement(c);
                 }
             }
+
+            self.changed_stmts.insert(c.statement().to_owned());
         }
-        drop(_guard);
     }
 
-    /// Computes the set of diagnostics for a given document
-    pub fn diagnostics(&self, url: PgLspPath) {
-        // TODO: add diagnostics struct that all native diagnostics can be transformed into and
-        // that is the glue between the ide and native diagnostics
-        // let doc = self.documents.get(&url).unwrap();
-        // let stmts = doc.stmts();
-        // for stmt in stmts {
-        //     let tree_sitter_diagnostics = self.tree_sitter.diagnostics(stmt);
-        //     let pg_query_diagnostics = self.pg_query.diagnostics(stmt);
-        //     // merge diagnostics
-        // }
+    pub fn remove_document(&self, url: PgLspPath) {
+        let r = self.documents.remove(&url);
+        if r.is_some() {
+            let doc = r.unwrap().1;
+            for stmt in doc.statement_refs() {
+                self.tree_sitter.remove_statement(&stmt);
+                self.pg_query.remove_statement(&stmt);
+            }
+        }
     }
+
+    /// Collects all diagnostics for a given document. It does not compute them, it just collects.
+    pub fn diagnostics(&self, url: PgLspPath) -> Vec<diagnostics::Diagnostic> {
+        let mut diagnostics: Vec<diagnostics::Diagnostic> = vec![];
+
+        let doc = self.documents.get(&url);
+
+        if doc.is_none() {
+            return diagnostics;
+        }
+
+        let doc = doc.unwrap();
+
+        for (range, stmt) in doc.statement_refs_with_range() {
+            diagnostics.extend(self.pg_query.diagnostics(&stmt, range));
+        }
+
+        diagnostics
+    }
+
+    /// Analyse all statements that were changed since the last analysis
+    pub fn analyse(&self) {}
 
     pub fn set_schema_cache(&self, cache: SchemaCache) {
         let mut schema_cache: RwLockWriteGuard<SchemaCache> = self.schema_cache.write().unwrap();
@@ -87,6 +117,7 @@ impl IDE {
 mod tests {
 
     use base_db::{Change, DocumentChange};
+    use text_size::{TextRange, TextSize};
 
     use crate::{PgLspPath, IDE};
 
@@ -104,5 +135,147 @@ mod tests {
                 }],
             ),
         );
+    }
+
+    #[test]
+    fn test_apply_change_with_error() {
+        let ide = IDE::new();
+
+        let path = PgLspPath::new("test.sql");
+
+        ide.apply_change(
+            path.clone(),
+            DocumentChange::new(
+                1,
+                vec![Change {
+                    range: None,
+                    text: "select 1;\nselect 2;".to_string(),
+                }],
+            ),
+        );
+
+        {
+            let doc = ide.documents.get(&path).unwrap();
+            assert_eq!(doc.statement_ref(0).text, "select 1;".to_string());
+            assert_eq!(doc.statement_ref(1).text, "select 2;".to_string());
+            assert_eq!(
+                doc.statement_ranges[0],
+                TextRange::new(TextSize::new(0), TextSize::new(9))
+            );
+            assert_eq!(
+                doc.statement_ranges[1],
+                TextRange::new(TextSize::new(10), TextSize::new(19))
+            );
+        }
+
+        ide.apply_change(
+            path.clone(),
+            DocumentChange::new(
+                2,
+                vec![Change {
+                    range: Some(TextRange::new(7.into(), 8.into())),
+                    text: "".to_string(),
+                }],
+            ),
+        );
+
+        {
+            let doc = ide.documents.get(&path).unwrap();
+
+            assert_eq!(doc.text, "select ;\nselect 2;");
+            assert_eq!(doc.statement_refs().len(), 2);
+            assert_eq!(doc.statement_ref(0).text, "select ;".to_string());
+            assert_eq!(doc.statement_ref(1).text, "select 2;".to_string());
+            assert_eq!(
+                doc.statement_ranges[0],
+                TextRange::new(TextSize::new(0), TextSize::new(8))
+            );
+            assert_eq!(
+                doc.statement_ranges[1],
+                TextRange::new(TextSize::new(9), TextSize::new(18))
+            );
+        }
+
+        ide.apply_change(
+            path.clone(),
+            DocumentChange::new(
+                3,
+                vec![Change {
+                    range: Some(TextRange::new(7.into(), 7.into())),
+                    text: "!".to_string(),
+                }],
+            ),
+        );
+
+        {
+            let doc = ide.documents.get(&path).unwrap();
+
+            assert_eq!(doc.text, "select !;\nselect 2;");
+            assert_eq!(doc.statement_refs().len(), 2);
+            assert_eq!(
+                doc.statement_ranges[0],
+                TextRange::new(TextSize::new(0), TextSize::new(9))
+            );
+            assert_eq!(
+                doc.statement_ranges[1],
+                TextRange::new(TextSize::new(10), TextSize::new(19))
+            );
+        }
+
+        assert_eq!(ide.diagnostics(PgLspPath::new("test.sql")).len(), 1);
+
+        ide.apply_change(
+            path.clone(),
+            DocumentChange::new(
+                2,
+                vec![Change {
+                    range: Some(TextRange::new(7.into(), 8.into())),
+                    text: "".to_string(),
+                }],
+            ),
+        );
+
+        {
+            let doc = ide.documents.get(&path).unwrap();
+
+            assert_eq!(doc.text, "select ;\nselect 2;");
+            assert_eq!(doc.statement_refs().len(), 2);
+            assert_eq!(
+                doc.statement_ranges[0],
+                TextRange::new(TextSize::new(0), TextSize::new(8))
+            );
+            assert_eq!(
+                doc.statement_ranges[1],
+                TextRange::new(TextSize::new(9), TextSize::new(18))
+            );
+        }
+
+        ide.apply_change(
+            path.clone(),
+            DocumentChange::new(
+                3,
+                vec![Change {
+                    range: Some(TextRange::new(7.into(), 7.into())),
+                    text: "1".to_string(),
+                }],
+            ),
+        );
+
+        {
+            let doc = ide.documents.get(&path).unwrap();
+
+            assert_eq!(doc.text, "select 1;\nselect 2;");
+            assert_eq!(doc.statement_refs().len(), 2);
+            assert_eq!(
+                doc.statement_ranges[0],
+                TextRange::new(TextSize::new(0), TextSize::new(9))
+            );
+            assert_eq!(
+                doc.statement_ranges[1],
+                TextRange::new(TextSize::new(10), TextSize::new(19))
+            );
+        }
+
+        assert_eq!(ide.diagnostics(PgLspPath::new("test.sql")).len(), 0);
     }
 }

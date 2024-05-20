@@ -21,6 +21,7 @@ threadpool = "1.8.1"
 line_index.workspace = true
 tracing.workspace = true
 base_db.workspace = true
+diagnostics.workspace = true
 schema_cache.workspace = true
 ide.workspace = true
 dashmap = "5.5.3"

@@ -24,9 +24,39 @@ impl StatementChange {
 
 #[derive(Debug)]
 pub struct ChangedStatement {
+    /// The now "old" statement ref
     pub statement: StatementRef,
+    /// The range in which the text changed
     pub range: TextRange,
+    /// The new text
     pub text: String,
+}
+
+impl ChangedStatement {
+    pub fn new_statement(&self) -> StatementRef {
+        StatementRef {
+            idx: self.statement.idx,
+            text: apply_text_change(&self.statement.text, Some(self.range), &self.text),
+            document_url: self.statement.document_url.clone(),
+        }
+    }
+}
+
+fn apply_text_change(text: &String, range: Option<TextRange>, change_text: &String) -> String {
+    if range.is_none() {
+        return change_text.clone();
+    }
+
+    let range = range.unwrap();
+    let start = usize::from(range.start());
+    let end = usize::from(range.end());
+
+    let mut new_text = String::new();
+    new_text.push_str(&text[..start]);
+    new_text.push_str(&change_text);
+    new_text.push_str(&text[end..]);
+
+    new_text
 }
 
 #[derive(Debug)]
@@ -99,6 +129,12 @@ impl Change {
                 .map(|(range, _)| range.clone())
                 .collect();
             doc.text = self.text.clone();
+
+            changed_statements.extend(
+                doc.statement_refs()
+                    .iter()
+                    .map(|stmt| StatementChange::Added(stmt.to_owned())),
+            );
         } else if let Some(changed_stmt_pos) = doc
             .statement_ranges
             .iter()
@@ -126,7 +162,17 @@ impl Change {
 
                         // if addition, expand the range
                         // if deletion, shrink the range
-                        *r = TextRange::new(r.start(), r.end() + TextSize::from(self.diff_size()));
+                        if self.is_addition() {
+                            *r = TextRange::new(
+                                r.start(),
+                                r.end() + TextSize::from(self.diff_size()),
+                            );
+                        } else if self.is_deletion() {
+                            *r = TextRange::new(
+                                r.start(),
+                                r.end() - TextSize::from(self.diff_size()),
+                            );
+                        }
                     } else if self.is_addition() {
                         *r += self.diff_size();
                     } else if self.is_deletion() {
@@ -249,7 +295,7 @@ impl DocumentChange {
 #[cfg(test)]
 mod tests {
     use parser::get_statements;
-    use text_size::TextRange;
+    use text_size::{TextRange, TextSize};
 
     use crate::{
         change::Change, document::StatementRef, Document, DocumentChange, DocumentParams, PgLspPath,
@@ -356,6 +402,119 @@ mod tests {
         assert_eq!(
             u32::from(d.statement_ranges[1].end()),
             u32::from(stmt_2_range.end()) + update_addition
+        );
+    }
+
+    #[test]
+    fn test_document_apply_changes_replacement() {
+        let path = PgLspPath::new("test.sql");
+
+        let mut doc = Document::new_empty(path);
+
+        let mut c = DocumentChange::new(
+            1,
+            vec![Change {
+                range: None,
+                text: "select 1;\nselect 2;".to_string(),
+            }],
+        );
+
+        c.apply(&mut doc);
+
+        assert_eq!(doc.statement_ref(0).text, "select 1;".to_string());
+        assert_eq!(doc.statement_ref(1).text, "select 2;".to_string());
+        assert_eq!(
+            doc.statement_ranges[0],
+            TextRange::new(TextSize::new(0), TextSize::new(9))
+        );
+        assert_eq!(
+            doc.statement_ranges[1],
+            TextRange::new(TextSize::new(10), TextSize::new(19))
+        );
+
+        let mut c = DocumentChange::new(
+            2,
+            vec![Change {
+                range: Some(TextRange::new(7.into(), 8.into())),
+                text: "".to_string(),
+            }],
+        );
+
+        c.apply(&mut doc);
+
+        assert_eq!(doc.text, "select ;\nselect 2;");
+        assert_eq!(doc.statement_refs().len(), 2);
+        assert_eq!(doc.statement_ref(0).text, "select ;".to_string());
+        assert_eq!(doc.statement_ref(1).text, "select 2;".to_string());
+        assert_eq!(
+            doc.statement_ranges[0],
+            TextRange::new(TextSize::new(0), TextSize::new(8))
+        );
+        assert_eq!(
+            doc.statement_ranges[1],
+            TextRange::new(TextSize::new(9), TextSize::new(18))
+        );
+
+        let mut c = DocumentChange::new(
+            3,
+            vec![Change {
+                range: Some(TextRange::new(7.into(), 7.into())),
+                text: "!".to_string(),
+            }],
+        );
+
+        c.apply(&mut doc);
+
+        assert_eq!(doc.text, "select !;\nselect 2;");
+        assert_eq!(doc.statement_refs().len(), 2);
+        assert_eq!(
+            doc.statement_ranges[0],
+            TextRange::new(TextSize::new(0), TextSize::new(9))
+        );
+        assert_eq!(
+            doc.statement_ranges[1],
+            TextRange::new(TextSize::new(10), TextSize::new(19))
+        );
+
+        let mut c = DocumentChange::new(
+            4,
+            vec![Change {
+                range: Some(TextRange::new(7.into(), 8.into())),
+                text: "".to_string(),
+            }],
+        );
+
+        c.apply(&mut doc);
+
+        assert_eq!(doc.text, "select ;\nselect 2;");
+        assert_eq!(doc.statement_refs().len(), 2);
+        assert_eq!(
+            doc.statement_ranges[0],
+            TextRange::new(TextSize::new(0), TextSize::new(8))
+        );
+        assert_eq!(
+            doc.statement_ranges[1],
+            TextRange::new(TextSize::new(9), TextSize::new(18))
+        );
+
+        let mut c = DocumentChange::new(
+            5,
+            vec![Change {
+                range: Some(TextRange::new(7.into(), 7.into())),
+                text: "1".to_string(),
+            }],
+        );
+        c.apply(&mut doc);
+
+        assert_eq!(doc.text, "select 1;\nselect 2;");
+        assert_eq!(doc.statement_refs().len(), 2);
+        assert_eq!(
+            doc.statement_ranges[0],
+            TextRange::new(TextSize::new(0), TextSize::new(9))
+        );
+        assert_eq!(
+            doc.statement_ranges[1],
+            TextRange::new(TextSize::new(10), TextSize::new(19))
         );
     }
 

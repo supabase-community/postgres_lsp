@@ -37,24 +37,32 @@ impl TreeSitterParser {
     }
 
     pub fn modify_statement(&self, change: &ChangedStatement) {
-        self.db.entry(change.statement.clone()).and_modify(|tree| {
-            let edit = edit_from_change(
-                &change.statement.text.as_str(),
-                usize::from(change.range.start()),
-                usize::from(change.range.end()),
-                change.text.as_str(),
-            );
+        let old = self.db.remove(&change.statement);
 
-            tree.edit(&edit);
+        if old.is_none() {
+            self.add_statement(&change.new_statement());
+            return;
+        }
 
-            let new_text =
-                apply_text_change(&change.statement.text, Some(change.range), &change.text);
+        let mut tree = old.unwrap().1;
 
-            let mut guard = self.parser.write().expect("Error reading parser");
-            // todo handle error
-            *tree = guard.parse(new_text, Some(tree)).unwrap();
-            drop(guard);
-        });
+        let edit = edit_from_change(
+            &change.statement.text.as_str(),
+            usize::from(change.range.start()),
+            usize::from(change.range.end()),
+            change.text.as_str(),
+        );
+
+        tree.edit(&edit);
+
+        let new_stmt = change.new_statement();
+        let new_text = new_stmt.text.clone();
+
+        let mut guard = self.parser.write().expect("Error reading parser");
+        // todo handle error
+        self.db
+            .insert(new_stmt, guard.parse(new_text, Some(&tree)).unwrap());
+        drop(guard);
     }
 }
 

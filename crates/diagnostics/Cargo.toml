@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 text-size = "1.1.1"
+base_db.workspace = true
 
 [dev-dependencies]
 

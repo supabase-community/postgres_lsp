@@ -81,6 +81,35 @@ impl Document {
             .collect()
     }
 
+    pub fn statement_refs_with_range(&self) -> Vec<(TextRange, StatementRef)> {
+        self.statement_ranges
+            .iter()
+            .enumerate()
+            .map(|(idx, range)| {
+                (
+                    range.clone(),
+                    StatementRef {
+                        document_url: self.url.clone(),
+                        text: self.text[range.clone()].to_string(),
+                        idx,
+                    },
+                )
+            })
+            .collect()
+    }
+
+    pub fn statement_refs(&self) -> Vec<StatementRef> {
+        self.statement_ranges
+            .iter()
+            .enumerate()
+            .map(|(idx, range)| StatementRef {
+                document_url: self.url.clone(),
+                text: self.text[range.clone()].to_string(),
+                idx,
+            })
+            .collect()
+    }
+
     pub fn statement_ref(&self, pos: usize) -> StatementRef {
         self.statement_ranges
             .get(pos)

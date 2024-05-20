@@ -1,5 +1,7 @@
 use base_db::{ChangedStatement, StatementRef};
 use dashmap::DashMap;
+use diagnostics::{Diagnostic, Severity};
+use text_size::TextRange;
 
 pub struct PgQueryParser {
     ast_db: DashMap<StatementRef, sql_parser::AstNode>,
@@ -16,6 +18,20 @@ impl PgQueryParser {
             enriched_ast_db: DashMap::new(),
             cst_db: DashMap::new(),
         }
+    }
+
+    pub fn diagnostics(&self, statement: &StatementRef, at_range: TextRange) -> Vec<Diagnostic> {
+        let mut diagnostics = Vec::new();
+        if let Some(err) = self.native_diagnostics.get(statement) {
+            diagnostics.push(Diagnostic {
+                description: None,
+                source: "pg_query".to_string(),
+                range: at_range,
+                severity: Severity::Error,
+                message: err.to_string(),
+            });
+        }
+        diagnostics
     }
 
     pub fn add_statement(&self, statement: &StatementRef) {
@@ -37,6 +53,6 @@ impl PgQueryParser {
 
     pub fn modify_statement(&self, change: &ChangedStatement) {
         self.remove_statement(&change.statement);
-        self.add_statement(&change.statement);
+        self.add_statement(&change.new_statement());
     }
 }

@@ -2,22 +2,22 @@ mod dispatch;
 pub mod options;
 
 use async_std::task::{self};
-use base_db::{Change, DocumentChange};
+use base_db::{Change, Document, DocumentChange, PgLspPath, StatementRef};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use ide::IDE;
 use lsp_server::{Connection, Message, Notification};
 use lsp_types::{
     notification::{
         DidChangeConfiguration, DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument,
-        DidSaveTextDocument, LogMessage, Notification as _, ShowMessage,
+        DidSaveTextDocument, LogMessage, Notification as _, PublishDiagnostics, ShowMessage,
     },
     request::{RegisterCapability, WorkspaceConfiguration},
     ConfigurationItem, ConfigurationParams, DidChangeConfigurationParams,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    DidSaveTextDocumentParams, InitializeParams, InitializeResult, LogMessageParams, Registration,
-    RegistrationParams, SaveOptions, ServerCapabilities, ServerInfo, ShowMessageParams,
-    TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions,
-    TextDocumentSyncSaveOptions,
+    DidSaveTextDocumentParams, InitializeParams, InitializeResult, LogMessageParams,
+    PublishDiagnosticsParams, Registration, RegistrationParams, SaveOptions, ServerCapabilities,
+    ServerInfo, ShowMessageParams, TextDocumentSyncCapability, TextDocumentSyncKind,
+    TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
 };
 use schema_cache::SchemaCache;
 use std::sync::Arc;
@@ -26,15 +26,17 @@ use tracing::{event, instrument, Level};
 
 use crate::{
     client::{client_flags::ClientFlags, LspClient},
-    utils::{file_path, from_proto, normalize_uri},
+    utils::{file_path, from_proto, normalize_uri, to_proto},
 };
 
 use self::options::Options;
-use sqlx::postgres::{PgListener, PgPool};
+use sqlx::{
+    postgres::{PgListener, PgPool},
+    Statement,
+};
 
 #[derive(Debug)]
 enum InternalMessage {
-    Diagnostics,
     SetOptions(Options),
     RefreshSchemaCache,
     SetSchemaCache(SchemaCache),
@@ -113,7 +115,6 @@ impl Server {
 
         let pool = self.db_conn.as_ref().unwrap().pool.clone();
         let tx = self.internal_tx.clone();
-        let client = self.client.clone();
 
         task::spawn(async move {
             let mut listener = PgListener::connect_with(&pool).await.unwrap();
@@ -195,29 +196,33 @@ impl Server {
         }
     }
 
-    fn publish_diagnostics(&self) -> anyhow::Result<()> {
-        // let workspace = self.workspace.read();
-        //
-        // for (uri, diagnostics) in self.diagnostic_manager.get(&workspace) {
-        //     let Some(document) = workspace.lookup(&uri) else {
-        //         continue;
-        //     };
-        //
-        //     let diagnostics = diagnostics
-        //         .into_iter()
-        //         .filter_map(|diagnostic| to_proto::diagnostic(&workspace, document, &diagnostic))
-        //         .collect();
-        //
-        //     let version = None;
-        //     let params = PublishDiagnosticsParams {
-        //         uri,
-        //         diagnostics,
-        //         version,
-        //     };
-        //
-        //     self.client
-        //         .send_notification::<PublishDiagnostics>(params)?;
-        // }
+    fn publish_diagnostics(&self, uri: lsp_types::Url) -> anyhow::Result<()> {
+        let mut url = uri.clone();
+        normalize_uri(&mut url);
+
+        let path = file_path(&url);
+
+        let doc = self.ide.documents.get(&path);
+
+        if doc.is_none() {
+            return Ok(());
+        }
+
+        let diagnostics: Vec<lsp_types::Diagnostic> = self
+            .ide
+            .diagnostics(path)
+            .iter()
+            .map(|d| to_proto::diagnostic(&doc.as_ref().unwrap(), d))
+            .collect();
+
+        let params = PublishDiagnosticsParams {
+            uri,
+            diagnostics,
+            version: None,
+        };
+
+        self.client
+            .send_notification::<PublishDiagnostics>(params)?;
 
         Ok(())
     }
@@ -242,6 +247,8 @@ impl Server {
             ),
         );
 
+        self.publish_diagnostics(uri)?;
+
         Ok(())
     }
 
@@ -265,14 +272,16 @@ impl Server {
             DocumentChange::new(params.text_document.version, changes),
         );
 
-        // TODO: update diagnostics
-
         Ok(())
     }
 
     #[instrument(skip(self), name = "pglsp/did_save")]
     fn did_save(&self, params: DidSaveTextDocumentParams) -> anyhow::Result<()> {
         // on save we want to run static analysis and ultimately publish diagnostics
+        let mut uri = params.text_document.uri;
+        normalize_uri(&mut uri);
+
+        self.publish_diagnostics(uri)?;
 
         Ok(())
     }
@@ -288,7 +297,8 @@ impl Server {
         normalize_uri(&mut uri);
         let path = file_path(&uri);
 
-        self.ide.documents.remove(&path);
+        self.ide.remove_document(path);
+
         Ok(())
     }
 
@@ -376,9 +386,9 @@ impl Server {
                         InternalMessage::RefreshSchemaCache => {
                             self.refresh_schema_cache();
                         }
-                        InternalMessage::Diagnostics => {
-                            self.publish_diagnostics()?;
-                        }
+                        // InternalMessage::Diagnostics => {
+                        //     self.publish_diagnostics()?;
+                        // }
                         InternalMessage::SetOptions(options) => {
                             self.update_options(options);
                         }

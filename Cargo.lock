@@ -595,6 +595,7 @@ dependencies = [
 name = "diagnostics"
 version = "0.0.0"
 dependencies = [
+ "base_db",
  "text-size",
 ]
 
@@ -1063,6 +1064,7 @@ version = "0.0.0"
 dependencies = [
  "base_db",
  "dashmap",
+ "diagnostics",
  "schema_cache",
  "sql_parser",
  "text-size",
@@ -1278,6 +1280,7 @@ dependencies = [
  "crossbeam-channel",
  "cstree",
  "dashmap",
+ "diagnostics",
  "ide",
  "line_index",
  "lsp-server",
