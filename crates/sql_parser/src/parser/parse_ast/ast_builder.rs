@@ -1,7 +1,13 @@
-use petgraph::stable_graph::{DefaultIx, NodeIndex, StableGraph};
+use petgraph::{
+    graph::Node,
+    stable_graph::{DefaultIx, NodeIndex, StableGraph},
+    visit::{Bfs, Dfs},
+    Direction,
+};
 use pg_query::NodeEnum;
 use text_size::{TextRange, TextSize};
 
+#[derive(Debug, Clone)]
 pub struct RangedNode {
     pub node: NodeEnum,
     pub start: TextSize,
@@ -14,10 +20,36 @@ impl RangedNode {
     }
 }
 
-pub type EnrichedAst = StableGraph<RangedNode, ()>;
+pub struct EnrichedAst {
+    inner: StableGraph<RangedNode, ()>,
+}
+
+impl EnrichedAst {
+    pub fn new(g: StableGraph<RangedNode, ()>) -> Self {
+        Self { inner: g }
+    }
+
+    pub fn covering_node(&self, range: TextRange) -> Option<RangedNode> {
+        let mut res: NodeIndex = NodeIndex::<DefaultIx>::new(0);
+
+        // check if any children contains the range. if not return, else continue
+        while let Some(idx) = self
+            .inner
+            .neighbors_directed(res, Direction::Outgoing)
+            .find(|&idx| {
+                let node = &self.inner[idx];
+                node.range().contains_range(range)
+            })
+        {
+            res = idx;
+        }
+
+        Some(self.inner[res].clone())
+    }
+}
 
 pub(super) struct AstBuilder {
-    inner: EnrichedAst,
+    inner: StableGraph<RangedNode, ()>,
     open_nodes: Vec<NodeIndex<DefaultIx>>,
     current_pos: usize,
     current_idx: NodeIndex<DefaultIx>,
@@ -59,6 +91,6 @@ impl AstBuilder {
     }
 
     pub fn finish(self) -> EnrichedAst {
-        self.inner
+        EnrichedAst::new(self.inner)
     }
 }

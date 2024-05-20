@@ -12,6 +12,8 @@ rust-version = "1.71"
 ide = { path = "./crates/ide", version = "0.0.0" }
 diagnostics = { path = "./crates/diagnostics", version = "0.0.0" }
 typecheck = { path = "./crates/typecheck", version = "0.0.0" }
+lint = { path = "./crates/lint", version = "0.0.0" }
+hover = { path = "./crates/hover", version = "0.0.0" }
 base_db = { path = "./crates/base_db", version = "0.0.0" }
 line_index = { path = "./crates/line_index", version = "0.0.0" }
 lsp = { path = "./crates/lsp", version = "0.0.0" }

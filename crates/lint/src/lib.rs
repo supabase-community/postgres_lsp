@@ -1,0 +1,1 @@
+// squawk like migration linter
