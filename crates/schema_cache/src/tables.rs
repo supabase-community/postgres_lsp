@@ -30,17 +30,17 @@ impl From<String> for ReplicaIdentity {
 
 #[derive(Debug, Clone, Default)]
 pub struct Table {
-    id: i64,
-    schema: String,
-    name: String,
-    rls_enabled: bool,
-    rls_forced: bool,
-    replica_identity: ReplicaIdentity,
-    bytes: i64,
-    size: String,
-    live_rows_estimate: i64,
-    dead_rows_estimate: i64,
-    comment: Option<String>,
+    pub id: i64,
+    pub schema: String,
+    pub name: String,
+    pub rls_enabled: bool,
+    pub rls_forced: bool,
+    pub replica_identity: ReplicaIdentity,
+    pub bytes: i64,
+    pub size: String,
+    pub live_rows_estimate: i64,
+    pub dead_rows_estimate: i64,
+    pub comment: Option<String>,
 }
 
 impl SchemaCacheItem for Table {

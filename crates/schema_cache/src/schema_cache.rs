@@ -29,6 +29,12 @@ impl SchemaCache {
     pub fn mutate(&mut self) {
         unimplemented!();
     }
+
+    pub fn find_table(&self, name: &str, schema: Option<&str>) -> Option<&Table> {
+        self.tables
+            .iter()
+            .find(|t| t.name == name && t.schema == schema.unwrap_or("public"))
+    }
 }
 
 pub trait SchemaCacheItem {

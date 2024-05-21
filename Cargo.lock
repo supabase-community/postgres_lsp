@@ -1054,6 +1054,7 @@ dependencies = [
  "sql_parser",
  "text-size",
  "tree-sitter",
+ "tree_sitter_sql",
 ]
 
 [[package]]
