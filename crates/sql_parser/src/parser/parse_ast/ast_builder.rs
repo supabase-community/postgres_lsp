@@ -20,6 +20,7 @@ impl RangedNode {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct EnrichedAst {
     inner: StableGraph<RangedNode, ()>,
 }

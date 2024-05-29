@@ -23,7 +23,7 @@ pub enum Hoverable {
     Column(HoverableColumn),
 }
 
-pub fn resolve_from_enriched_ast(pos: TextSize, ast: EnrichedAst) -> Option<Hoverable> {
+pub fn resolve_from_enriched_ast(pos: TextSize, ast: &EnrichedAst) -> Option<Hoverable> {
     let node = ast.covering_node(TextRange::empty(pos));
 
     if node.is_none() {
@@ -46,7 +46,7 @@ pub fn resolve_from_enriched_ast(pos: TextSize, ast: EnrichedAst) -> Option<Hove
     }
 }
 
-pub fn resolve_from_tree_sitter(pos: TextSize, tree: Tree, source: &str) -> Option<Hoverable> {
+pub fn resolve_from_tree_sitter(pos: TextSize, tree: &Tree, source: &str) -> Option<Hoverable> {
     let r = tree
         .root_node()
         .named_descendant_for_byte_range(usize::from(pos), usize::from(pos));
@@ -90,7 +90,7 @@ mod tests {
         let root = sql_parser::parse_sql_statement(input).unwrap();
         let ast = parse_ast(input, &root).ast;
 
-        let hover = super::resolve_from_enriched_ast(position, ast);
+        let hover = super::resolve_from_enriched_ast(position, &ast);
 
         assert!(hover.is_some());
 
@@ -116,7 +116,7 @@ mod tests {
 
         let tree = parser.parse(input, None).unwrap();
 
-        let hover = super::resolve_from_tree_sitter(position, tree, input);
+        let hover = super::resolve_from_tree_sitter(position, &tree, input);
 
         assert!(hover.is_some());
 

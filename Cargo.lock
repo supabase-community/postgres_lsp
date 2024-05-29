@@ -1076,6 +1076,7 @@ dependencies = [
  "base_db",
  "dashmap",
  "diagnostics",
+ "hover",
  "schema_cache",
  "sql_parser",
  "text-size",

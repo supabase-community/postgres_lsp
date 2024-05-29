@@ -4,11 +4,11 @@ use resolve::Hoverable;
 use schema_cache::SchemaCache;
 use text_size::{TextRange, TextSize};
 
-pub struct HoverParams {
+pub struct HoverParams<'a> {
     pub position: text_size::TextSize,
     pub source: String,
-    pub ast: Option<sql_parser::EnrichedAst>,
-    pub tree: tree_sitter::Tree,
+    pub enriched_ast: Option<&'a sql_parser::EnrichedAst>,
+    pub tree: &'a tree_sitter::Tree,
     pub schema_cache: SchemaCache,
 }
 
@@ -19,8 +19,8 @@ pub struct HoverResult {
 }
 
 pub fn hover(params: HoverParams) -> Option<HoverResult> {
-    let elem = if params.ast.is_some() {
-        resolve::resolve_from_enriched_ast(params.position, params.ast.unwrap())
+    let elem = if params.enriched_ast.is_some() {
+        resolve::resolve_from_enriched_ast(params.position, params.enriched_ast.unwrap())
     } else {
         resolve::resolve_from_tree_sitter(params.position, params.tree, &params.source)
     };

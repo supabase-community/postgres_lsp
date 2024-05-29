@@ -1,12 +1,12 @@
-use std::sync::RwLock;
+use std::sync::{Arc, RwLock};
 
 use base_db::{ChangedStatement, StatementRef};
 use dashmap::DashMap;
 use text_size::TextRange;
-use tree_sitter::{InputEdit, Tree};
+use tree_sitter::InputEdit;
 
 pub struct TreeSitterParser {
-    db: DashMap<StatementRef, Tree>,
+    db: DashMap<StatementRef, Arc<tree_sitter::Tree>>,
 
     parser: RwLock<tree_sitter::Parser>,
 }
@@ -24,12 +24,16 @@ impl TreeSitterParser {
         }
     }
 
+    pub fn tree(&self, statement: &StatementRef) -> Option<Arc<tree_sitter::Tree>> {
+        self.db.get(statement).map(|x| x.clone())
+    }
+
     pub fn add_statement(&self, statement: &StatementRef) {
         let mut guard = self.parser.write().expect("Error reading parser");
         // todo handle error
         let tree = guard.parse(&statement.text, None).unwrap();
         drop(guard);
-        self.db.insert(statement.clone(), tree);
+        self.db.insert(statement.clone(), Arc::new(tree));
     }
 
     pub fn remove_statement(&self, statement: &StatementRef) {
@@ -60,8 +64,10 @@ impl TreeSitterParser {
 
         let mut guard = self.parser.write().expect("Error reading parser");
         // todo handle error
-        self.db
-            .insert(new_stmt, guard.parse(new_text, Some(&tree)).unwrap());
+        self.db.insert(
+            new_stmt,
+            Arc::new(guard.parse(new_text, Some(&tree)).unwrap()),
+        );
         drop(guard);
     }
 }

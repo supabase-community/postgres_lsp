@@ -1,3 +1,4 @@
+mod features;
 mod pg_query;
 mod tree_sitter;
 
@@ -5,10 +6,8 @@ use std::sync::{RwLock, RwLockWriteGuard};
 
 use base_db::{Document, DocumentChange, PgLspPath, StatementRef};
 use dashmap::{DashMap, DashSet};
-use diagnostics::Diagnostic;
 use pg_query::PgQueryParser;
 use schema_cache::SchemaCache;
-use text_size::TextRange;
 use tracing::{event, span, Level};
 use tree_sitter::TreeSitterParser;
 
@@ -101,8 +100,42 @@ impl IDE {
         diagnostics
     }
 
-    /// Analyse all statements that were changed since the last analysis
-    pub fn analyse(&self) {}
+    pub fn hover(&self, params: features::hover::HoverParams) -> Option<hover::HoverResult> {
+        let doc = self.documents.get(&params.url)?;
+        let stmt = doc.statement_at_offset(&params.position)?;
+
+        let tree = self.tree_sitter.tree(&stmt);
+
+        if tree.is_none() {
+            return None;
+        }
+
+        hover::hover(hover::HoverParams {
+            tree: tree.unwrap().as_ref(),
+            enriched_ast: self
+                .pg_query
+                .enriched_ast(&stmt)
+                .as_ref()
+                .map(|x| x.as_ref()),
+            // TODO translate position to statement position range
+            position: params.position,
+            source: stmt.text,
+            schema_cache: self.schema_cache.read().unwrap().clone(),
+        })
+    }
+
+    /// Drain changed statements to kick off analysis
+    pub fn drain_changed_stmt(&self) -> Vec<StatementRef> {
+        let changed: Vec<StatementRef> = self
+            .changed_stmts
+            .iter()
+            .map(|arc| (*arc).clone())
+            .collect();
+
+        self.changed_stmts.clear();
+
+        changed
+    }
 
     pub fn set_schema_cache(&self, cache: SchemaCache) {
         let mut schema_cache: RwLockWriteGuard<SchemaCache> = self.schema_cache.write().unwrap();

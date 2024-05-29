@@ -5,21 +5,22 @@ use async_std::task::{self};
 use base_db::{Change, Document, DocumentChange, PgLspPath, StatementRef};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use ide::IDE;
-use lsp_server::{Connection, Message, Notification};
+use lsp_server::{Connection, Message, Notification, RequestId};
 use lsp_types::{
     notification::{
         DidChangeConfiguration, DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument,
         DidSaveTextDocument, LogMessage, Notification as _, PublishDiagnostics, ShowMessage,
     },
-    request::{RegisterCapability, WorkspaceConfiguration},
+    request::{HoverRequest, RegisterCapability, WorkspaceConfiguration},
     ConfigurationItem, ConfigurationParams, DidChangeConfigurationParams,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    DidSaveTextDocumentParams, InitializeParams, InitializeResult, LogMessageParams,
-    PublishDiagnosticsParams, Registration, RegistrationParams, SaveOptions, ServerCapabilities,
-    ServerInfo, ShowMessageParams, TextDocumentSyncCapability, TextDocumentSyncKind,
-    TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
+    DidSaveTextDocumentParams, HoverParams, HoverProviderCapability, InitializeParams,
+    InitializeResult, LogMessageParams, PublishDiagnosticsParams, Registration, RegistrationParams,
+    SaveOptions, ServerCapabilities, ServerInfo, ShowMessageParams, TextDocumentSyncCapability,
+    TextDocumentSyncKind, TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
 };
 use schema_cache::SchemaCache;
+use serde::Serialize;
 use std::sync::Arc;
 use threadpool::ThreadPool;
 use tracing::{event, instrument, Level};
@@ -65,7 +66,7 @@ pub struct Server {
     internal_rx: Receiver<InternalMessage>,
     pool: ThreadPool,
     client_flags: Arc<ClientFlags>,
-    ide: IDE,
+    ide: Arc<IDE>,
     db_conn: Option<DbConnection>,
 }
 
@@ -192,6 +193,7 @@ impl Server {
                     })),
                 },
             )),
+            hover_provider: Some(HoverProviderCapability::Simple(true)),
             ..ServerCapabilities::default()
         }
     }
@@ -302,6 +304,28 @@ impl Server {
         Ok(())
     }
 
+    fn hover(&mut self, id: RequestId, mut params: HoverParams) -> anyhow::Result<()> {
+        normalize_uri(&mut params.text_document_position_params.text_document.uri);
+
+        self.run_query(id, move |ide| ide.hover(params));
+
+        Ok(())
+    }
+
+    fn run_query<R, Q>(&self, id: RequestId, query: Q)
+    where
+        R: Serialize,
+        Q: FnOnce(&IDE) -> R + Send + 'static,
+    {
+        let client = self.client.clone();
+        let ide = Arc::clone(&self.ide);
+
+        self.pool.execute(move || {
+            let response = lsp_server::Response::new_ok(id, query(&ide));
+            client.send_response(response).unwrap();
+        });
+    }
+
     #[instrument(skip(self), name = "pglsp/refresh_schema_cache")]
     fn refresh_schema_cache(&self) {
         if self.db_conn.is_none() {
@@ -350,6 +374,7 @@ impl Server {
                             }
 
                             if let Some(response) = dispatch::RequestDispatcher::new(request)
+                                .on::<HoverRequest, _>(|id, params| self.hover(id, params))?
                                 .default()
                             {
                                 self.client.send_response(response)?;
