@@ -1,6 +1,7 @@
 use std::ops::Sub;
 
-use parser::get_statements;
+use line_index::LineIndex;
+use sql_parser::extract_sql_statement_ranges;
 use text_size::{TextLen, TextRange, TextSize};
 
 use crate::document::{Document, StatementRef};
@@ -124,11 +125,14 @@ impl Change {
                     .into_iter()
                     .map(|s| StatementChange::Deleted(s)),
             );
-            doc.statement_ranges = get_statements(&self.text)
+            // TODO also use errors returned by extract sql statement ranges
+            doc.statement_ranges = extract_sql_statement_ranges(&self.text)
+                .ranges
                 .iter()
-                .map(|(range, _)| range.clone())
+                .map(|r| r.clone())
                 .collect();
             doc.text = self.text.clone();
+            doc.line_index = LineIndex::new(&doc.text);
 
             changed_statements.extend(
                 doc.statement_refs()
@@ -181,6 +185,7 @@ impl Change {
                 });
 
             doc.text = self.apply_to_text(&doc.text);
+            doc.line_index = LineIndex::new(&doc.text);
         } else {
             // change across stmts
 
@@ -215,6 +220,7 @@ impl Change {
             }
 
             doc.text = self.apply_to_text(&doc.text);
+            doc.line_index = LineIndex::new(&doc.text);
 
             if doc.text.text_len() < max {
                 max = doc.text.text_len();
@@ -243,7 +249,7 @@ impl Change {
                         + 1,
             );
 
-            for (range, text) in get_statements(extracted_text) {
+            for range in extract_sql_statement_ranges(extracted_text).ranges {
                 match doc
                     .statement_ranges
                     .binary_search_by(|r| r.start().cmp(&range.start()))
@@ -253,7 +259,7 @@ impl Change {
                         doc.statement_ranges.insert(pos, range);
                         changed_statements.push(StatementChange::Added(StatementRef {
                             idx: pos,
-                            text: text.to_string(),
+                            text: extracted_text[range].to_string(),
                             document_url: doc.url.clone(),
                         }));
                     }
@@ -294,7 +300,7 @@ impl DocumentChange {
 
 #[cfg(test)]
 mod tests {
-    use parser::get_statements;
+    use sql_parser::extract_sql_statement_ranges;
     use text_size::{TextRange, TextSize};
 
     use crate::{
@@ -344,7 +350,7 @@ mod tests {
         assert_eq!("select id,test from users\nselect 1;", d.text);
         assert_eq!(d.statement_ranges.len(), 2);
 
-        for (r, _) in &get_statements(&d.text) {
+        for r in &extract_sql_statement_ranges(&d.text).ranges {
             assert_eq!(
                 d.statement_ranges.iter().position(|x| r == x).is_some(),
                 true,

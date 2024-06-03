@@ -51,3 +51,27 @@ impl LineIndexExt for LineIndex {
         Some(Range::new(start, end))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use base_db::{Document, DocumentParams, PgLspPath};
+    use cstree::text::{TextRange, TextSize};
+
+    use super::LineIndexExt;
+
+    #[test]
+    fn test_line_col_lsp_range() {
+        let url = PgLspPath::new("test.sql");
+
+        let d = Document::new(DocumentParams {
+            url,
+            text: "select 1 from contact;\nselect 1;\nalter table test drop column id;".to_string(),
+        });
+
+        println!(
+            "{:#?}",
+            d.line_index
+                .line_col_lsp_range(TextRange::new(TextSize::new(52), TextSize::new(66)))
+        );
+    }
+}

@@ -1,7 +1,7 @@
 use std::{hash::Hash, hash::Hasher, ops::RangeBounds, usize};
 
 use line_index::LineIndex;
-use parser::get_statements;
+use sql_parser::extract_sql_statement_ranges;
 use text_size::{TextRange, TextSize};
 
 use crate::PgLspPath;
@@ -51,10 +51,11 @@ impl Document {
     pub fn new(params: DocumentParams) -> Document {
         Document {
             version: 0,
-            // todo: update get statements to return just the range
-            statement_ranges: get_statements(&params.text)
+            // todo: use errors returned by extract_sql_statement_ranges
+            statement_ranges: extract_sql_statement_ranges(&params.text)
+                .ranges
                 .iter()
-                .map(|(range, _)| range.clone())
+                .map(|range| range.clone())
                 .collect(),
             line_index: LineIndex::new(&params.text),
             text: params.text,
@@ -67,6 +68,16 @@ impl Document {
             .iter()
             .position(|r| r.contains(offset))
             .map(|idx| self.statement_ref(idx))
+    }
+
+    pub fn statement_at_offset_with_range(
+        &self,
+        offset: &TextSize,
+    ) -> Option<(TextRange, StatementRef)> {
+        self.statement_ranges
+            .iter()
+            .position(|r| r.contains(offset))
+            .map(|idx| self.statement_ref_with_range(idx))
     }
 
     pub fn drain_statements(&mut self) -> Vec<StatementRef> {
@@ -117,6 +128,22 @@ impl Document {
                 document_url: self.url.clone(),
                 text: self.text[range.clone()].to_string(),
                 idx: pos,
+            })
+            .unwrap()
+    }
+
+    pub fn statement_ref_with_range(&self, pos: usize) -> (TextRange, StatementRef) {
+        self.statement_ranges
+            .get(pos)
+            .map(|range| {
+                (
+                    range.clone(),
+                    StatementRef {
+                        document_url: self.url.clone(),
+                        text: self.text[range.clone()].to_string(),
+                        idx: pos,
+                    },
+                )
             })
             .unwrap()
     }

@@ -7,6 +7,7 @@ edition = "2021"
 text-size = "1.1.1"
 dashmap = "5.5.3"
 base_db.workspace =  true
+lint.workspace =  true
 hover.workspace =  true
 sql_parser.workspace = true
 diagnostics.workspace = true

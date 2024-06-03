@@ -170,14 +170,8 @@ pub fn lex(text: &str) -> Vec<Token> {
 mod tests {
     use super::*;
 
-    fn init() {
-        let _ = env_logger::builder().is_test(true).try_init();
-    }
-
     #[test]
     fn test_lexer() {
-        init();
-
         let input = "select 1; \n -- some comment \n select 2";
 
         let tokens = lex(input);

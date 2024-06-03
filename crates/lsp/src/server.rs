@@ -4,6 +4,7 @@ pub mod options;
 use async_std::task::{self};
 use base_db::{Change, Document, DocumentChange, PgLspPath, StatementRef};
 use crossbeam_channel::{unbounded, Receiver, Sender};
+use hover::HoverParams;
 use ide::IDE;
 use lsp_server::{Connection, Message, Notification, RequestId};
 use lsp_types::{
@@ -14,9 +15,9 @@ use lsp_types::{
     request::{HoverRequest, RegisterCapability, WorkspaceConfiguration},
     ConfigurationItem, ConfigurationParams, DidChangeConfigurationParams,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    DidSaveTextDocumentParams, HoverParams, HoverProviderCapability, InitializeParams,
-    InitializeResult, LogMessageParams, PublishDiagnosticsParams, Registration, RegistrationParams,
-    SaveOptions, ServerCapabilities, ServerInfo, ShowMessageParams, TextDocumentSyncCapability,
+    DidSaveTextDocumentParams, HoverProviderCapability, InitializeParams, InitializeResult,
+    LogMessageParams, PublishDiagnosticsParams, Registration, RegistrationParams, SaveOptions,
+    ServerCapabilities, ServerInfo, ShowMessageParams, TextDocumentSyncCapability,
     TextDocumentSyncKind, TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
 };
 use schema_cache::SchemaCache;
@@ -27,7 +28,7 @@ use tracing::{event, instrument, Level};
 
 use crate::{
     client::{client_flags::ClientFlags, LspClient},
-    utils::{file_path, from_proto, normalize_uri, to_proto},
+    utils::{file_path, from_proto, line_index_ext::LineIndexExt, normalize_uri, to_proto},
 };
 
 use self::options::Options;
@@ -38,6 +39,7 @@ use sqlx::{
 
 #[derive(Debug)]
 enum InternalMessage {
+    PublishDiagnostics(lsp_types::Url),
     SetOptions(Options),
     RefreshSchemaCache,
     SetSchemaCache(SchemaCache),
@@ -102,7 +104,7 @@ impl Server {
             pool: threadpool::Builder::new().build(),
             client_flags,
             db_conn: None,
-            ide: IDE::new(),
+            ide: Arc::new(IDE::new()),
         };
 
         server.run()?;
@@ -212,7 +214,7 @@ impl Server {
 
         let diagnostics: Vec<lsp_types::Diagnostic> = self
             .ide
-            .diagnostics(path)
+            .diagnostics(&path)
             .iter()
             .map(|d| to_proto::diagnostic(&doc.as_ref().unwrap(), d))
             .collect();
@@ -283,7 +285,18 @@ impl Server {
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
 
+        let cloned_uri = uri.clone();
         self.publish_diagnostics(uri)?;
+
+        let ide = Arc::clone(&self.ide);
+        let tx = self.internal_tx.clone();
+        self.pool.execute(move || {
+            // TODO this should happen on change too but once at a time after some debounced delay
+            // also on open
+            // check chatgpt for sample for debouncer
+            ide.compute();
+            tx.send(InternalMessage::PublishDiagnostics(cloned_uri));
+        });
 
         Ok(())
     }
@@ -304,10 +317,38 @@ impl Server {
         Ok(())
     }
 
-    fn hover(&mut self, id: RequestId, mut params: HoverParams) -> anyhow::Result<()> {
+    fn hover(&mut self, id: RequestId, mut params: lsp_types::HoverParams) -> anyhow::Result<()> {
         normalize_uri(&mut params.text_document_position_params.text_document.uri);
 
-        self.run_query(id, move |ide| ide.hover(params));
+        self.run_query(id, move |ide| {
+            let path = file_path(&params.text_document_position_params.text_document.uri);
+            let doc = ide.documents.get(&path)?;
+
+            let pos = doc
+                .line_index
+                .offset_lsp(params.text_document_position_params.position)
+                .unwrap();
+
+            let (range, stmt) = doc.statement_at_offset_with_range(&pos)?;
+
+            ::hover::hover(HoverParams {
+                position: pos - range.start(),
+                source: stmt.text.clone(),
+                enriched_ast: ide
+                    .pg_query
+                    .enriched_ast(&stmt)
+                    .as_ref()
+                    .map(|x| x.as_ref()),
+                tree: ide.tree_sitter.tree(&stmt).as_ref().map(|x| x.as_ref()),
+                schema_cache: ide.schema_cache.read().unwrap().clone(),
+            })
+            .map(|hover| lsp_types::Hover {
+                contents: lsp_types::HoverContents::Scalar(lsp_types::MarkedString::String(
+                    hover.content,
+                )),
+                range: Some(doc.line_index.line_col_lsp_range(range).unwrap()),
+            })
+        });
 
         Ok(())
     }
@@ -411,9 +452,9 @@ impl Server {
                         InternalMessage::RefreshSchemaCache => {
                             self.refresh_schema_cache();
                         }
-                        // InternalMessage::Diagnostics => {
-                        //     self.publish_diagnostics()?;
-                        // }
+                        InternalMessage::PublishDiagnostics(uri) => {
+                            self.publish_diagnostics(uri)?;
+                        }
                         InternalMessage::SetOptions(options) => {
                             self.update_options(options);
                         }

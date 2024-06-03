@@ -1,4 +1,4 @@
-mod features;
+mod lint;
 mod pg_query;
 mod tree_sitter;
 
@@ -6,6 +6,7 @@ use std::sync::{RwLock, RwLockWriteGuard};
 
 use base_db::{Document, DocumentChange, PgLspPath, StatementRef};
 use dashmap::{DashMap, DashSet};
+use lint::Linter;
 use pg_query::PgQueryParser;
 use schema_cache::SchemaCache;
 use tracing::{event, span, Level};
@@ -15,10 +16,11 @@ pub struct IDE {
     pub documents: DashMap<PgLspPath, Document>,
     // Stores the statements that have changed since the last analysis
     changed_stmts: DashSet<StatementRef>,
-    schema_cache: RwLock<SchemaCache>,
+    pub schema_cache: RwLock<SchemaCache>,
 
-    tree_sitter: TreeSitterParser,
-    pg_query: PgQueryParser,
+    pub tree_sitter: TreeSitterParser,
+    pub pg_query: PgQueryParser,
+    pub linter: Linter,
 }
 
 impl IDE {
@@ -30,6 +32,7 @@ impl IDE {
 
             tree_sitter: TreeSitterParser::new(),
             pg_query: PgQueryParser::new(),
+            linter: Linter::new(),
         }
     }
 
@@ -59,10 +62,12 @@ impl IDE {
                 base_db::StatementChange::Deleted(s) => {
                     self.tree_sitter.remove_statement(s);
                     self.pg_query.remove_statement(s);
+                    self.linter.clear_statement_violations(s);
                 }
                 base_db::StatementChange::Modified(c) => {
                     self.tree_sitter.modify_statement(c);
                     self.pg_query.modify_statement(c);
+                    self.linter.clear_statement_violations(&c.statement);
                 }
             }
 
@@ -82,7 +87,7 @@ impl IDE {
     }
 
     /// Collects all diagnostics for a given document. It does not compute them, it just collects.
-    pub fn diagnostics(&self, url: PgLspPath) -> Vec<diagnostics::Diagnostic> {
+    pub fn diagnostics(&self, url: &PgLspPath) -> Vec<diagnostics::Diagnostic> {
         let mut diagnostics: Vec<diagnostics::Diagnostic> = vec![];
 
         let doc = self.documents.get(&url);
@@ -95,37 +100,14 @@ impl IDE {
 
         for (range, stmt) in doc.statement_refs_with_range() {
             diagnostics.extend(self.pg_query.diagnostics(&stmt, range));
+            diagnostics.extend(self.linter.diagnostics(&stmt, range));
         }
 
         diagnostics
     }
 
-    pub fn hover(&self, params: features::hover::HoverParams) -> Option<hover::HoverResult> {
-        let doc = self.documents.get(&params.url)?;
-        let stmt = doc.statement_at_offset(&params.position)?;
-
-        let tree = self.tree_sitter.tree(&stmt);
-
-        if tree.is_none() {
-            return None;
-        }
-
-        hover::hover(hover::HoverParams {
-            tree: tree.unwrap().as_ref(),
-            enriched_ast: self
-                .pg_query
-                .enriched_ast(&stmt)
-                .as_ref()
-                .map(|x| x.as_ref()),
-            // TODO translate position to statement position range
-            position: params.position,
-            source: stmt.text,
-            schema_cache: self.schema_cache.read().unwrap().clone(),
-        })
-    }
-
     /// Drain changed statements to kick off analysis
-    pub fn drain_changed_stmt(&self) -> Vec<StatementRef> {
+    pub fn compute(&self) {
         let changed: Vec<StatementRef> = self
             .changed_stmts
             .iter()
@@ -134,7 +116,23 @@ impl IDE {
 
         self.changed_stmts.clear();
 
-        changed
+        changed.iter().for_each(|stmt| {
+            self.pg_query.compute_cst(stmt);
+
+            if let Some(ast) = self.pg_query.ast(stmt) {
+                self.linter.compute_statement_violations(
+                    stmt,
+                    ::lint::LinterParams {
+                        ast: ast.as_ref(),
+                        enriched_ast: self
+                            .pg_query
+                            .enriched_ast(stmt)
+                            .as_ref()
+                            .map(|a| a.as_ref()),
+                    },
+                );
+            }
+        });
     }
 
     pub fn set_schema_cache(&self, cache: SchemaCache) {
@@ -150,6 +148,7 @@ impl IDE {
 mod tests {
 
     use base_db::{Change, DocumentChange};
+    use diagnostics::Diagnostic;
     use text_size::{TextRange, TextSize};
 
     use crate::{PgLspPath, IDE};
@@ -167,6 +166,55 @@ mod tests {
                     text: "select 1;".to_string(),
                 }],
             ),
+        );
+    }
+
+    #[test]
+    fn test_lint() {
+        let ide = IDE::new();
+        let path = PgLspPath::new("test.sql");
+
+        ide.apply_change(
+            path.clone(),
+            DocumentChange::new(
+                1,
+                vec![Change {
+                    range: None,
+                    text: "select 1 from contact;\nselect 1;\nalter table test drop column id;"
+                        .to_string(),
+                }],
+            ),
+        );
+
+        {
+            let doc = ide.documents.get(&path).unwrap();
+            assert_eq!(doc.statement_ranges.len(), 3);
+            assert_eq!(
+                doc.statement_ref(0).text,
+                "select 1 from contact;".to_string()
+            );
+            assert_eq!(doc.statement_ref(1).text, "select 1;".to_string());
+            assert_eq!(
+                doc.statement_ref(2).text,
+                "alter table test drop column id;".to_string()
+            );
+        }
+
+        ide.compute();
+
+        let d = ide.diagnostics(&path);
+
+        assert_eq!(d.len(), 1);
+
+        assert_eq!(
+            d[0],
+            Diagnostic {
+                message: "Dropping a column may break existing clients.".to_string(),
+                description: None,
+                severity: diagnostics::Severity::Warning,
+                source: "lint".to_string(),
+                range: TextRange::new(TextSize::new(50), TextSize::new(64)),
+            }
         );
     }
 
@@ -255,7 +303,7 @@ mod tests {
             );
         }
 
-        assert_eq!(ide.diagnostics(PgLspPath::new("test.sql")).len(), 1);
+        assert_eq!(ide.diagnostics(&PgLspPath::new("test.sql")).len(), 1);
 
         ide.apply_change(
             path.clone(),
@@ -309,6 +357,6 @@ mod tests {
             );
         }
 
-        assert_eq!(ide.diagnostics(PgLspPath::new("test.sql")).len(), 0);
+        assert_eq!(ide.diagnostics(&PgLspPath::new("test.sql")).len(), 0);
     }
 }

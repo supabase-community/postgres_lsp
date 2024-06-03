@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use text_size::TextRange;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Diagnostic {
     pub message: String,
     pub description: Option<String>,

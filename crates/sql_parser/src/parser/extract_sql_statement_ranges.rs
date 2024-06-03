@@ -9,9 +9,10 @@ use super::{
     Parser,
 };
 
+#[derive(Debug)]
 pub struct StatementRangesResult {
-    ranges: Vec<TextRange>,
-    errors: Vec<SyntaxError>,
+    pub ranges: Vec<TextRange>,
+    pub errors: Vec<SyntaxError>,
 }
 
 pub fn extract_sql_statement_ranges(sql: &str) -> StatementRangesResult {
@@ -135,5 +136,24 @@ fn advance_over_start_tokens(parser: &mut Parser, kind: SyntaxKind) {
                 break;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_drop_column() {
+        let input = "select 1 from contact;\nselect 1;\nalter table test drop column id;";
+
+        let res = extract_sql_statement_ranges(input);
+        assert_eq!(res.ranges.len(), 3);
+        assert_eq!("select 1 from contact;", input[res.ranges[0]].to_string());
+        assert_eq!("select 1;", input[res.ranges[1]].to_string());
+        assert_eq!(
+            "alter table test drop column id;",
+            input[res.ranges[2]].to_string()
+        );
     }
 }

@@ -48,7 +48,9 @@ impl TreeSitterParser {
             return;
         }
 
-        let mut tree = old.unwrap().1;
+        // we clone the three for now, lets see if that is sufficient or if we need to mutate the
+        // original tree instead but that will require some kind of locking
+        let mut tree = old.unwrap().1.as_ref().clone();
 
         let edit = edit_from_change(
             &change.statement.text.as_str(),

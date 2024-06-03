@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 text-size = "1.1.1"
 line_index.workspace = true
-parser.workspace = true
+sql_parser.workspace = true
 
 [dev-dependencies]
 

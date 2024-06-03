@@ -315,9 +315,9 @@ fn custom_handlers(node: &Node) -> TokenStream {
             tokens.push(TokenProperty::from(Token::Table));
         },
         "AlterTableCmd" => quote! {
-            tokens.push(TokenProperty::from(Token::Alter));
             match n.subtype() {
                 protobuf::AlterTableType::AtColumnDefault => {
+                    tokens.push(TokenProperty::from(Token::Alter));
                     tokens.push(TokenProperty::from(Token::Column));
                     tokens.push(TokenProperty::from(Token::Set));
                     tokens.push(TokenProperty::from(Token::Default));
@@ -327,6 +327,10 @@ fn custom_handlers(node: &Node) -> TokenStream {
                     tokens.push(TokenProperty::from(Token::Alter));
                     tokens.push(TokenProperty::from(Token::Column));
                     tokens.push(TokenProperty::from(Token::TypeP));
+                },
+                protobuf::AlterTableType::AtDropColumn => {
+                    tokens.push(TokenProperty::from(Token::Drop));
+                    tokens.push(TokenProperty::from(Token::Column));
                 },
                 _ => panic!("Unknown AlterTableCmd {:#?}", n.subtype()),
             }

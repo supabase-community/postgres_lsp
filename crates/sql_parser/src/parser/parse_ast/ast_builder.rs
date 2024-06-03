@@ -1,7 +1,6 @@
 use petgraph::{
-    graph::Node,
     stable_graph::{DefaultIx, NodeIndex, StableGraph},
-    visit::{Bfs, Dfs},
+    visit::{Bfs, Dfs, IntoNodeReferences, Walker},
     Direction,
 };
 use pg_query::NodeEnum;
@@ -28,6 +27,14 @@ pub struct EnrichedAst {
 impl EnrichedAst {
     pub fn new(g: StableGraph<RangedNode, ()>) -> Self {
         Self { inner: g }
+    }
+
+    pub fn root_node(&self) -> &RangedNode {
+        &self.inner[NodeIndex::<DefaultIx>::new(0)]
+    }
+
+    pub fn iter_nodes(&self) -> impl Iterator<Item = &RangedNode> {
+        self.inner.node_references().map(|(_, node)| node)
     }
 
     pub fn covering_node(&self, range: TextRange) -> Option<RangedNode> {
