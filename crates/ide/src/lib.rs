@@ -9,6 +9,7 @@ use dashmap::{DashMap, DashSet};
 use lint::Linter;
 use pg_query::PgQueryParser;
 use schema_cache::SchemaCache;
+use sqlx::PgPool;
 use tracing::{event, span, Level};
 use tree_sitter::TreeSitterParser;
 
@@ -107,7 +108,7 @@ impl IDE {
     }
 
     /// Drain changed statements to kick off analysis
-    pub fn compute(&self) {
+    pub fn compute(&self, conn: Option<PgPool>) {
         let changed: Vec<StatementRef> = self
             .changed_stmts
             .iter()

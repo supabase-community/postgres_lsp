@@ -290,11 +290,13 @@ impl Server {
 
         let ide = Arc::clone(&self.ide);
         let tx = self.internal_tx.clone();
+        let conn = self.db_conn.as_ref().map(|p| p.pool.clone());
+
         self.pool.execute(move || {
             // TODO this should happen on change too but once at a time after some debounced delay
             // also on open
             // check chatgpt for sample for debouncer
-            ide.compute();
+            ide.compute(conn);
             tx.send(InternalMessage::PublishDiagnostics(cloned_uri));
         });
 

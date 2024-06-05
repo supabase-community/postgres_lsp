@@ -1080,6 +1080,7 @@ dependencies = [
  "lint",
  "schema_cache",
  "sql_parser",
+ "sqlx",
  "text-size",
  "tracing",
  "tree-sitter",
@@ -2780,11 +2781,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "typecheck"
+name = "typecheck_sqlx"
 version = "0.0.0"
 dependencies = [
+ "async-std",
  "base_db",
  "schema_cache",
+ "sql_parser",
+ "sqlx",
+ "text-size",
  "tracing",
 ]
 

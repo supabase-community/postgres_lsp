@@ -9,6 +9,7 @@ dashmap = "5.5.3"
 base_db.workspace =  true
 lint.workspace =  true
 hover.workspace =  true
+sqlx = { version = "0.7.3", features = [ "runtime-async-std", "tls-rustls", "postgres", "json" ] }
 sql_parser.workspace = true
 diagnostics.workspace = true
 tree-sitter.workspace = true
