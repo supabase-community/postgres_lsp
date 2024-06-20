@@ -1,5 +1,5 @@
 use sqlx::postgres::PgDatabaseError;
-use sqlx::postgres::PgSeverity;
+pub use sqlx::postgres::PgSeverity;
 use sqlx::Executor;
 use sqlx::PgPool;
 use text_size::TextRange;
@@ -9,6 +9,7 @@ pub struct TypecheckerParams<'a> {
     pub conn: &'a PgPool,
     pub sql: &'a str,
     pub enriched_ast: Option<&'a sql_parser::EnrichedAst>,
+    pub ast: &'a sql_parser::AstNode,
 }
 
 #[derive(Debug, Clone)]
@@ -26,6 +27,18 @@ pub struct TypeError {
 
 pub async fn check_sql<'a>(params: TypecheckerParams<'a>) -> Vec<TypeError> {
     let mut errs = vec![];
+
+    // prpeared statements work only for select, insert, update, delete, and cte
+    if match params.ast {
+        sql_parser::AstNode::SelectStmt(_) => false,
+        sql_parser::AstNode::InsertStmt(_) => false,
+        sql_parser::AstNode::UpdateStmt(_) => false,
+        sql_parser::AstNode::DeleteStmt(_) => false,
+        sql_parser::AstNode::CommonTableExpr(_) => false,
+        _ => true,
+    } {
+        return errs;
+    }
 
     let res = params.conn.prepare(params.sql).await;
 
@@ -91,6 +104,7 @@ mod tests {
         let errs = block_on(check_sql(TypecheckerParams {
             conn: &pool,
             sql: input,
+            ast: &root,
             enriched_ast: Some(&ast),
         }));
 

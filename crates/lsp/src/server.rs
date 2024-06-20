@@ -1,8 +1,9 @@
+mod debouncer;
 mod dispatch;
 pub mod options;
 
 use async_std::task::{self};
-use base_db::{Change, Document, DocumentChange, PgLspPath, StatementRef};
+use base_db::{Change, DocumentChange};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use hover::HoverParams;
 use ide::IDE;
@@ -12,7 +13,10 @@ use lsp_types::{
         DidChangeConfiguration, DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument,
         DidSaveTextDocument, LogMessage, Notification as _, PublishDiagnostics, ShowMessage,
     },
-    request::{HoverRequest, RegisterCapability, WorkspaceConfiguration},
+    request::{
+        CodeActionRequest, CodeActionResolveRequest, HoverRequest, RegisterCapability,
+        WorkspaceConfiguration,
+    },
     ConfigurationItem, ConfigurationParams, DidChangeConfigurationParams,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
     DidSaveTextDocumentParams, HoverProviderCapability, InitializeParams, InitializeResult,
@@ -22,7 +26,11 @@ use lsp_types::{
 };
 use schema_cache::SchemaCache;
 use serde::Serialize;
-use std::sync::Arc;
+use std::{
+    collections::{HashMap, HashSet},
+    sync::Arc,
+    time::Duration,
+};
 use threadpool::ThreadPool;
 use tracing::{event, instrument, Level};
 
@@ -31,10 +39,10 @@ use crate::{
     utils::{file_path, from_proto, line_index_ext::LineIndexExt, normalize_uri, to_proto},
 };
 
-use self::options::Options;
+use self::{debouncer::EventDebouncer, options::Options};
 use sqlx::{
     postgres::{PgListener, PgPool},
-    Statement,
+    PgConnection, Statement,
 };
 
 #[derive(Debug)]
@@ -66,10 +74,11 @@ pub struct Server {
     client: LspClient,
     internal_tx: Sender<InternalMessage>,
     internal_rx: Receiver<InternalMessage>,
-    pool: ThreadPool,
+    pool: Arc<ThreadPool>,
     client_flags: Arc<ClientFlags>,
     ide: Arc<IDE>,
     db_conn: Option<DbConnection>,
+    compute_debouncer: EventDebouncer<Option<PgPool>>,
 }
 
 impl Server {
@@ -96,19 +105,102 @@ impl Server {
             params.client_info,
         ));
 
+        let pool = Arc::new(threadpool::Builder::new().build());
+
+        let ide = Arc::new(IDE::new());
+
+        let cloned_tx = internal_tx.clone();
+        let cloned_ide = ide.clone();
+        let cloned_pool = pool.clone();
+        let cloned_client = client.clone();
+
         let server = Self {
             connection: Arc::new(connection),
             internal_rx,
             internal_tx,
             client,
-            pool: threadpool::Builder::new().build(),
             client_flags,
             db_conn: None,
-            ide: Arc::new(IDE::new()),
+            ide,
+            compute_debouncer: EventDebouncer::new(
+                Duration::from_millis(500),
+                move |conn: Option<PgPool>| {
+                    let inner_cloned_ide = cloned_ide.clone();
+                    let inner_cloned_tx = cloned_tx.clone();
+                    let inner_cloned_client = cloned_client.clone();
+                    cloned_pool.execute(move || {
+                        inner_cloned_client
+                            .send_notification::<ShowMessage>(ShowMessageParams {
+                                typ: lsp_types::MessageType::INFO,
+                                message: format!("Computing debounced {}", conn.is_some()),
+                            })
+                            .unwrap();
+                        let changed = inner_cloned_ide.compute(conn);
+
+                        let urls = HashSet::<&str>::from_iter(
+                            changed.iter().map(|f| f.document_url.to_str().unwrap()),
+                        );
+                        for url in urls.iter() {
+                            inner_cloned_tx
+                                .send(InternalMessage::PublishDiagnostics(
+                                    lsp_types::Url::from_file_path(url).unwrap(),
+                                ))
+                                .unwrap();
+                        }
+                    });
+                },
+            ),
+            pool,
         };
 
         server.run()?;
         Ok(())
+    }
+
+    fn compute_now(&self) {
+        let conn = self.db_conn.as_ref().map(|p| p.pool.clone());
+        let cloned_ide = self.ide.clone();
+        let cloned_tx = self.internal_tx.clone();
+        let client = self.client.clone();
+
+        // the debouncer does not work because stop will actually "kill" it and get the value
+        self.compute_debouncer.clear();
+
+        client
+            .send_notification::<ShowMessage>(ShowMessageParams {
+                typ: lsp_types::MessageType::INFO,
+                message: format!("max count{:?} ", self.pool.max_count()),
+            })
+            .unwrap();
+        self.pool.execute(move || {
+            client
+                .send_notification::<ShowMessage>(ShowMessageParams {
+                    typ: lsp_types::MessageType::INFO,
+                    message: format!("Computing now {}", conn.is_some()),
+                })
+                .unwrap();
+
+            if conn.is_some() {
+                client
+                    .send_notification::<ShowMessage>(ShowMessageParams {
+                        typ: lsp_types::MessageType::INFO,
+                        message: format!("pool closed {}", conn.as_ref().unwrap().is_closed()),
+                    })
+                    .unwrap();
+            }
+            let changed = cloned_ide.compute(conn);
+            let urls = HashSet::<&str>::from_iter(
+                changed.iter().map(|f| f.document_url.to_str().unwrap()),
+            );
+
+            for url in urls {
+                cloned_tx
+                    .send(InternalMessage::PublishDiagnostics(
+                        lsp_types::Url::from_file_path(url).unwrap(),
+                    ))
+                    .unwrap();
+            }
+        });
     }
 
     fn start_listening(&self) {
@@ -196,10 +288,12 @@ impl Server {
                 },
             )),
             hover_provider: Some(HoverProviderCapability::Simple(true)),
+            code_action_provider: Some(lsp_types::CodeActionProviderCapability::Simple(true)),
             ..ServerCapabilities::default()
         }
     }
 
+    // TODO allow option url and publish diagnostics for all files
     fn publish_diagnostics(&self, uri: lsp_types::Url) -> anyhow::Result<()> {
         let mut url = uri.clone();
         normalize_uri(&mut url);
@@ -219,6 +313,13 @@ impl Server {
             .map(|d| to_proto::diagnostic(&doc.as_ref().unwrap(), d))
             .collect();
 
+        self.client
+            .send_notification::<ShowMessage>(ShowMessageParams {
+                typ: lsp_types::MessageType::INFO,
+                message: format!("diagnostics {}", diagnostics.len()),
+            })
+            .unwrap();
+
         let params = PublishDiagnosticsParams {
             uri,
             diagnostics,
@@ -236,6 +337,14 @@ impl Server {
         event!(Level::INFO, "did_open");
 
         let mut uri = params.text_document.uri;
+
+        self.client
+            .send_notification::<ShowMessage>(ShowMessageParams {
+                typ: lsp_types::MessageType::INFO,
+                message: format!("opened url {:?}", uri),
+            })
+            .unwrap();
+
         normalize_uri(&mut uri);
 
         let path = file_path(&uri);
@@ -251,7 +360,7 @@ impl Server {
             ),
         );
 
-        self.publish_diagnostics(uri)?;
+        self.compute_now();
 
         Ok(())
     }
@@ -276,29 +385,20 @@ impl Server {
             DocumentChange::new(params.text_document.version, changes),
         );
 
+        let conn = self.db_conn.as_ref().map(|p| p.pool.clone());
+        self.compute_debouncer.put(conn);
+
         Ok(())
     }
 
     #[instrument(skip(self), name = "pglsp/did_save")]
     fn did_save(&self, params: DidSaveTextDocumentParams) -> anyhow::Result<()> {
-        // on save we want to run static analysis and ultimately publish diagnostics
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
 
-        let cloned_uri = uri.clone();
         self.publish_diagnostics(uri)?;
 
-        let ide = Arc::clone(&self.ide);
-        let tx = self.internal_tx.clone();
-        let conn = self.db_conn.as_ref().map(|p| p.pool.clone());
-
-        self.pool.execute(move || {
-            // TODO this should happen on change too but once at a time after some debounced delay
-            // also on open
-            // check chatgpt for sample for debouncer
-            ide.compute(conn);
-            tx.send(InternalMessage::PublishDiagnostics(cloned_uri));
-        });
+        self.compute_now();
 
         Ok(())
     }
@@ -316,6 +416,30 @@ impl Server {
 
         self.ide.remove_document(path);
 
+        Ok(())
+    }
+
+    fn code_actions(
+        &self,
+        id: RequestId,
+        _params: lsp_types::CodeActionParams,
+    ) -> anyhow::Result<()> {
+        // compute actions
+        self.client.send_response(lsp_server::Response::new_ok(
+            id,
+            Vec::<lsp_types::CodeAction>::new(),
+        ))?;
+        Ok(())
+    }
+
+    fn code_action_resolve(
+        &self,
+        id: RequestId,
+        action: lsp_types::CodeAction,
+    ) -> anyhow::Result<()> {
+        // resolve action
+        self.client
+            .send_response(lsp_server::Response::new_ok(id, action))?;
         Ok(())
     }
 
@@ -418,6 +542,12 @@ impl Server {
 
                             if let Some(response) = dispatch::RequestDispatcher::new(request)
                                 .on::<HoverRequest, _>(|id, params| self.hover(id, params))?
+                                .on::<CodeActionRequest, _>(|id, params| {
+                                    self.code_actions(id, params)
+                                })?
+                                .on::<CodeActionResolveRequest, _>(|id, params| {
+                                    self.code_action_resolve(id, params)
+                                })?
                                 .default()
                             {
                                 self.client.send_response(response)?;
@@ -444,12 +574,7 @@ impl Server {
                     match msg? {
                         InternalMessage::SetSchemaCache(c) => {
                             self.ide.set_schema_cache(c);
-                            self.client
-                                .send_notification::<ShowMessage>(ShowMessageParams {
-                                    typ: lsp_types::MessageType::INFO,
-                                    message: "Schema cache loaded".to_string(),
-                                })
-                                .unwrap();
+                            self.compute_now();
                         }
                         InternalMessage::RefreshSchemaCache => {
                             self.refresh_schema_cache();

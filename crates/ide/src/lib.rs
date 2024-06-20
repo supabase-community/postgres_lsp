@@ -1,6 +1,7 @@
 mod lint;
 mod pg_query;
 mod tree_sitter;
+mod typecheck_sqlx;
 
 use std::sync::{RwLock, RwLockWriteGuard};
 
@@ -12,6 +13,7 @@ use schema_cache::SchemaCache;
 use sqlx::PgPool;
 use tracing::{event, span, Level};
 use tree_sitter::TreeSitterParser;
+use typecheck_sqlx::Typechecker;
 
 pub struct IDE {
     pub documents: DashMap<PgLspPath, Document>,
@@ -22,6 +24,7 @@ pub struct IDE {
     pub tree_sitter: TreeSitterParser,
     pub pg_query: PgQueryParser,
     pub linter: Linter,
+    pub typechecker: Typechecker,
 }
 
 impl IDE {
@@ -34,6 +37,7 @@ impl IDE {
             tree_sitter: TreeSitterParser::new(),
             pg_query: PgQueryParser::new(),
             linter: Linter::new(),
+            typechecker: Typechecker::new(),
         }
     }
 
@@ -64,11 +68,13 @@ impl IDE {
                     self.tree_sitter.remove_statement(s);
                     self.pg_query.remove_statement(s);
                     self.linter.clear_statement_violations(s);
+                    self.typechecker.clear_statement_errors(s);
                 }
                 base_db::StatementChange::Modified(c) => {
                     self.tree_sitter.modify_statement(c);
                     self.pg_query.modify_statement(c);
                     self.linter.clear_statement_violations(&c.statement);
+                    self.typechecker.clear_statement_errors(&c.statement);
                 }
             }
 
@@ -83,6 +89,8 @@ impl IDE {
             for stmt in doc.statement_refs() {
                 self.tree_sitter.remove_statement(&stmt);
                 self.pg_query.remove_statement(&stmt);
+                self.linter.clear_statement_violations(&stmt);
+                self.typechecker.clear_statement_errors(&stmt);
             }
         }
     }
@@ -102,13 +110,14 @@ impl IDE {
         for (range, stmt) in doc.statement_refs_with_range() {
             diagnostics.extend(self.pg_query.diagnostics(&stmt, range));
             diagnostics.extend(self.linter.diagnostics(&stmt, range));
+            diagnostics.extend(self.typechecker.diagnostics(&stmt, range));
         }
 
         diagnostics
     }
 
     /// Drain changed statements to kick off analysis
-    pub fn compute(&self, conn: Option<PgPool>) {
+    pub fn compute(&self, conn: Option<PgPool>) -> Vec<StatementRef> {
         let changed: Vec<StatementRef> = self
             .changed_stmts
             .iter()
@@ -132,17 +141,40 @@ impl IDE {
                             .map(|a| a.as_ref()),
                     },
                 );
+                if let Some(conn) = conn.as_ref() {
+                    self.typechecker.run_typecheck(
+                        stmt,
+                        ::typecheck_sqlx::TypecheckerParams {
+                            conn,
+                            sql: &stmt.text,
+                            ast: ast.as_ref(),
+                            enriched_ast: self
+                                .pg_query
+                                .enriched_ast(stmt)
+                                .as_ref()
+                                .map(|a| a.as_ref()),
+                        },
+                    );
+                }
             }
         });
+        changed
     }
 
     pub fn set_schema_cache(&self, cache: SchemaCache) {
         let mut schema_cache: RwLockWriteGuard<SchemaCache> = self.schema_cache.write().unwrap();
         *schema_cache = cache;
-    }
 
-    // add fns here to interact with the IDE
-    // e.g. get diagnostics, hover, etc.
+        // clear all schema cache related diagnostics
+        // and add all statements to the changed statements
+        self.typechecker.clear_errors();
+        self.documents
+            .iter()
+            .flat_map(|entry| entry.value().statement_refs())
+            .for_each(|f| {
+                self.changed_stmts.insert(f);
+            })
+    }
 }
 
 #[cfg(test)]
@@ -201,7 +233,7 @@ mod tests {
             );
         }
 
-        ide.compute();
+        ide.compute(None);
 
         let d = ide.diagnostics(&path);
 
