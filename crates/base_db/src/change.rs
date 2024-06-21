@@ -148,7 +148,7 @@ impl Change {
             doc.statement_ranges
                 .iter_mut()
                 .enumerate()
-                .skip_while(|(_, r)| self.range.unwrap().end() < r.start())
+                .skip_while(|(_, r)| self.range.unwrap().end() > r.end())
                 .for_each(|(pos, r)| {
                     if pos == changed_stmt_pos {
                         // only this ones ref is different, the rest do not have any text

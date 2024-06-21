@@ -378,7 +378,21 @@ impl Server {
             return Ok(());
         }
 
+        self.client
+            .send_notification::<ShowMessage>(ShowMessageParams {
+                typ: lsp_types::MessageType::INFO,
+                message: format!("content changes {:?}", params.content_changes),
+            })
+            .unwrap();
+
         let changes = from_proto::content_changes(&document.unwrap(), params.content_changes);
+
+        self.client
+            .send_notification::<ShowMessage>(ShowMessageParams {
+                typ: lsp_types::MessageType::INFO,
+                message: format!("document changes {:?}", changes),
+            })
+            .unwrap();
 
         self.ide.apply_change(
             path,

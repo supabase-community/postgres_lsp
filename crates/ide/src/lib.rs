@@ -203,6 +203,61 @@ mod tests {
     }
 
     #[test]
+    fn test_apply_deletion_change() {
+        let ide = IDE::new();
+
+        ide.apply_change(
+            PgLspPath::new("test.sql"),
+            DocumentChange::new(
+                1,
+                vec![Change {
+                    range: None,
+                    text: "select unknown from contact;\n\nselect 12345;\n\nalter table test drop column id;\n".to_string(),
+                }],
+            ),
+        );
+
+        {
+            let doc = ide.documents.get(&PgLspPath::new("test.sql")).unwrap();
+            assert_eq!(doc.statement_refs().len(), 3);
+            assert_eq!(
+                doc.statement_ref(0).text,
+                "select unknown from contact;".to_string()
+            );
+            assert_eq!(doc.statement_ref(1).text, "select 12345;".to_string());
+            assert_eq!(
+                doc.statement_ref(2).text,
+                "alter table test drop column id;".to_string()
+            );
+        }
+
+        ide.apply_change(
+            PgLspPath::new("test.sql"),
+            DocumentChange::new(
+                1,
+                vec![Change {
+                    range: Some(TextRange::new(39.into(), 40.into())),
+                    text: "".to_string(),
+                }],
+            ),
+        );
+
+        {
+            let doc = ide.documents.get(&PgLspPath::new("test.sql")).unwrap();
+            assert_eq!(doc.statement_refs().len(), 3);
+            assert_eq!(
+                doc.statement_ref(0).text,
+                "select unknown from contact;".to_string()
+            );
+            assert_eq!(doc.statement_ref(1).text, "select 1245;".to_string());
+            assert_eq!(
+                doc.statement_ref(2).text,
+                "alter table test drop column id;".to_string()
+            );
+        }
+    }
+
+    #[test]
     fn test_lint() {
         let ide = IDE::new();
         let path = PgLspPath::new("test.sql");
