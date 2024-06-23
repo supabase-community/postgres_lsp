@@ -42,7 +42,7 @@ use crate::{
 use self::{debouncer::EventDebouncer, options::Options};
 use sqlx::{
     postgres::{PgListener, PgPool},
-    PgConnection, Statement,
+    Executor, PgConnection, Statement,
 };
 
 #[derive(Debug)]
@@ -135,6 +135,15 @@ impl Server {
                                 message: format!("Computing debounced {}", conn.is_some()),
                             })
                             .unwrap();
+                        let r =
+                            async_std::task::block_on(conn.as_ref().unwrap().execute("SELECT 1"));
+                        inner_cloned_client
+                            .send_notification::<ShowMessage>(ShowMessageParams {
+                                typ: lsp_types::MessageType::INFO,
+                                message: format!("res {:?}", r.unwrap()),
+                            })
+                            .unwrap();
+
                         let changed = inner_cloned_ide.compute(conn);
 
                         let urls = HashSet::<&str>::from_iter(
@@ -163,15 +172,8 @@ impl Server {
         let cloned_tx = self.internal_tx.clone();
         let client = self.client.clone();
 
-        // the debouncer does not work because stop will actually "kill" it and get the value
         self.compute_debouncer.clear();
 
-        client
-            .send_notification::<ShowMessage>(ShowMessageParams {
-                typ: lsp_types::MessageType::INFO,
-                message: format!("max count{:?} ", self.pool.max_count()),
-            })
-            .unwrap();
         self.pool.execute(move || {
             client
                 .send_notification::<ShowMessage>(ShowMessageParams {
@@ -185,6 +187,14 @@ impl Server {
                     .send_notification::<ShowMessage>(ShowMessageParams {
                         typ: lsp_types::MessageType::INFO,
                         message: format!("pool closed {}", conn.as_ref().unwrap().is_closed()),
+                    })
+                    .unwrap();
+
+                let r = async_std::task::block_on(conn.as_ref().unwrap().execute("SELECT 1"));
+                client
+                    .send_notification::<ShowMessage>(ShowMessageParams {
+                        typ: lsp_types::MessageType::INFO,
+                        message: format!("res {:?}", r.unwrap()),
                     })
                     .unwrap();
             }
@@ -338,13 +348,6 @@ impl Server {
 
         let mut uri = params.text_document.uri;
 
-        self.client
-            .send_notification::<ShowMessage>(ShowMessageParams {
-                typ: lsp_types::MessageType::INFO,
-                message: format!("opened url {:?}", uri),
-            })
-            .unwrap();
-
         normalize_uri(&mut uri);
 
         let path = file_path(&uri);
@@ -378,21 +381,7 @@ impl Server {
             return Ok(());
         }
 
-        self.client
-            .send_notification::<ShowMessage>(ShowMessageParams {
-                typ: lsp_types::MessageType::INFO,
-                message: format!("content changes {:?}", params.content_changes),
-            })
-            .unwrap();
-
         let changes = from_proto::content_changes(&document.unwrap(), params.content_changes);
-
-        self.client
-            .send_notification::<ShowMessage>(ShowMessageParams {
-                typ: lsp_types::MessageType::INFO,
-                message: format!("document changes {:?}", changes),
-            })
-            .unwrap();
 
         self.ide.apply_change(
             path,

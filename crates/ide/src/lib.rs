@@ -63,22 +63,27 @@ impl IDE {
                 base_db::StatementChange::Added(s) => {
                     self.tree_sitter.add_statement(s);
                     self.pg_query.add_statement(s);
+
+                    self.changed_stmts.insert(s.to_owned());
                 }
                 base_db::StatementChange::Deleted(s) => {
                     self.tree_sitter.remove_statement(s);
                     self.pg_query.remove_statement(s);
                     self.linter.clear_statement_violations(s);
                     self.typechecker.clear_statement_errors(s);
+
+                    self.changed_stmts.insert(s.to_owned());
                 }
-                base_db::StatementChange::Modified(c) => {
-                    self.tree_sitter.modify_statement(c);
-                    self.pg_query.modify_statement(c);
-                    self.linter.clear_statement_violations(&c.statement);
-                    self.typechecker.clear_statement_errors(&c.statement);
+                base_db::StatementChange::Modified(s) => {
+                    self.tree_sitter.modify_statement(s);
+                    self.pg_query.modify_statement(s);
+                    self.linter.clear_statement_violations(&s.statement);
+                    self.typechecker.clear_statement_errors(&s.statement);
+
+                    self.changed_stmts.remove(&s.statement);
+                    self.changed_stmts.insert(s.new_statement().to_owned());
                 }
             }
-
-            self.changed_stmts.insert(c.statement().to_owned());
         }
     }
 
@@ -203,11 +208,13 @@ mod tests {
     }
 
     #[test]
-    fn test_apply_deletion_change() {
+    fn test_diagnostics_within_statement() {
         let ide = IDE::new();
 
+        let url = PgLspPath::new("test.sql");
+
         ide.apply_change(
-            PgLspPath::new("test.sql"),
+            url.clone(),
             DocumentChange::new(
                 1,
                 vec![Change {
@@ -216,6 +223,10 @@ mod tests {
                 }],
             ),
         );
+
+        ide.compute(None);
+
+        assert_eq!(ide.diagnostics(&url).len(), 1);
 
         {
             let doc = ide.documents.get(&PgLspPath::new("test.sql")).unwrap();
@@ -231,6 +242,80 @@ mod tests {
             );
         }
 
+        ide.compute(None);
+
+        assert_eq!(ide.diagnostics(&url).len(), 1);
+
+        ide.apply_change(
+            PgLspPath::new("test.sql"),
+            DocumentChange::new(
+                1,
+                vec![Change {
+                    range: Some(TextRange::new(76.into(), 76.into())),
+                    text: "a".to_string(),
+                }],
+            ),
+        );
+
+        {
+            let doc = ide.documents.get(&PgLspPath::new("test.sql")).unwrap();
+            assert_eq!(doc.statement_refs().len(), 3);
+            assert_eq!(
+                doc.statement_ref(0).text,
+                "select unknown from contact;".to_string()
+            );
+            assert_eq!(doc.statement_ref(1).text, "select 12345;".to_string());
+            assert_eq!(
+                doc.statement_ref(2).text,
+                "alter table test drop column ida;".to_string()
+            );
+        }
+
+        // the problem is here!
+        ide.compute(None);
+
+        assert_eq!(ide.diagnostics(&url).len(), 1);
+    }
+
+    #[test]
+    fn test_apply_deletion_change() {
+        let ide = IDE::new();
+
+        let url = PgLspPath::new("test.sql");
+
+        ide.apply_change(
+            url.clone(),
+            DocumentChange::new(
+                1,
+                vec![Change {
+                    range: None,
+                    text: "select unknown from contact;\n\nselect 12345;\n\nalter table test drop column id;\n".to_string(),
+                }],
+            ),
+        );
+
+        ide.compute(None);
+
+        assert_eq!(ide.diagnostics(&url).len(), 1);
+
+        {
+            let doc = ide.documents.get(&PgLspPath::new("test.sql")).unwrap();
+            assert_eq!(doc.statement_refs().len(), 3);
+            assert_eq!(
+                doc.statement_ref(0).text,
+                "select unknown from contact;".to_string()
+            );
+            assert_eq!(doc.statement_ref(1).text, "select 12345;".to_string());
+            assert_eq!(
+                doc.statement_ref(2).text,
+                "alter table test drop column id;".to_string()
+            );
+        }
+
+        ide.compute(None);
+
+        assert_eq!(ide.diagnostics(&url).len(), 1);
+
         ide.apply_change(
             PgLspPath::new("test.sql"),
             DocumentChange::new(
@@ -241,6 +326,10 @@ mod tests {
                 }],
             ),
         );
+
+        ide.compute(None);
+
+        assert_eq!(ide.diagnostics(&url).len(), 1);
 
         {
             let doc = ide.documents.get(&PgLspPath::new("test.sql")).unwrap();
@@ -255,6 +344,10 @@ mod tests {
                 "alter table test drop column id;".to_string()
             );
         }
+
+        ide.compute(None);
+
+        assert_eq!(ide.diagnostics(&url).len(), 1);
     }
 
     #[test]

@@ -1,6 +1,6 @@
-select unknown from contact;
+select id, name, test1231234123, unknown from contact;
 
-select 14;
+select 1443331333133333121233;
 
 alter table test drop column id;
 
