@@ -2066,6 +2066,8 @@ name = "schema_cache"
 version = "0.0.0"
 dependencies = [
  "async-std",
+ "serde",
+ "serde_json",
  "sqlx",
 ]
 

@@ -3,6 +3,7 @@
 #![allow(dead_code)]
 #![feature(future_join)]
 
+mod functions;
 mod schema_cache;
 mod schemas;
 mod tables;

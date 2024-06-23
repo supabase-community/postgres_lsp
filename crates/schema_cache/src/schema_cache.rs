@@ -2,6 +2,7 @@ use std::future::join;
 
 use sqlx::postgres::PgPool;
 
+use crate::functions::Function;
 use crate::schemas::Schema;
 use crate::tables::Table;
 
@@ -9,6 +10,7 @@ use crate::tables::Table;
 pub struct SchemaCache {
     pub schemas: Vec<Schema>,
     pub tables: Vec<Table>,
+    pub functions: Vec<Function>,
 }
 
 impl SchemaCache {
@@ -17,9 +19,14 @@ impl SchemaCache {
     }
 
     pub async fn load(pool: &PgPool) -> SchemaCache {
-        let (schemas, tables) = join!(Schema::load(pool), Table::load(pool)).await;
+        let (schemas, tables, functions) =
+            join!(Schema::load(pool), Table::load(pool), Function::load(pool)).await;
 
-        SchemaCache { schemas, tables }
+        SchemaCache {
+            schemas,
+            tables,
+            functions,
+        }
     }
 
     /// Applies an AST node to the repository
@@ -41,4 +48,22 @@ pub trait SchemaCacheItem {
     type Item;
 
     async fn load(pool: &PgPool) -> Vec<Self::Item>;
+}
+
+#[cfg(test)]
+mod tests {
+    use sqlx::PgPool;
+
+    use crate::SchemaCache;
+
+    #[test]
+    fn test_schema_cache() {
+        let conn_string = std::env::var("DB_CONNECTION_STRING").unwrap();
+
+        let pool = async_std::task::block_on(PgPool::connect(conn_string.as_str())).unwrap();
+
+        async_std::task::block_on(SchemaCache::load(&pool));
+
+        assert!(true);
+    }
 }
