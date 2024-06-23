@@ -11,6 +11,7 @@ rust-version = "1.71"
 [workspace.dependencies]
 ide = { path = "./crates/ide", version = "0.0.0" }
 diagnostics = { path = "./crates/diagnostics", version = "0.0.0" }
+commands = { path = "./crates/commands", version = "0.0.0" }
 typecheck_sqlx = { path = "./crates/typecheck_sqlx", version = "0.0.0" }
 lint = { path = "./crates/lint", version = "0.0.0" }
 hover = { path = "./crates/hover", version = "0.0.0" }

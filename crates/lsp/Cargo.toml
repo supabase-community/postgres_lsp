@@ -21,6 +21,7 @@ async-std = "1.12.0"
 threadpool = "1.8.1"
 line_index.workspace = true
 hover.workspace = true
+commands.workspace = true
 tracing.workspace = true
 base_db.workspace = true
 diagnostics.workspace = true

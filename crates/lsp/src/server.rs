@@ -4,28 +4,30 @@ pub mod options;
 
 use async_std::task::{self};
 use base_db::{Change, DocumentChange};
+use commands::{Command, CommandType, ExecuteStatementCommand};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use hover::HoverParams;
 use ide::IDE;
-use lsp_server::{Connection, Message, Notification, RequestId};
+use lsp_server::{Connection, ErrorCode, Message, Notification, RequestId};
 use lsp_types::{
     notification::{
         DidChangeConfiguration, DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument,
         DidSaveTextDocument, LogMessage, Notification as _, PublishDiagnostics, ShowMessage,
     },
     request::{
-        CodeActionRequest, CodeActionResolveRequest, HoverRequest, RegisterCapability,
-        WorkspaceConfiguration,
+        CodeActionRequest, CodeActionResolveRequest, ExecuteCommand, HoverRequest,
+        RegisterCapability, WorkspaceConfiguration,
     },
     ConfigurationItem, ConfigurationParams, DidChangeConfigurationParams,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    DidSaveTextDocumentParams, HoverProviderCapability, InitializeParams, InitializeResult,
-    LogMessageParams, PublishDiagnosticsParams, Registration, RegistrationParams, SaveOptions,
-    ServerCapabilities, ServerInfo, ShowMessageParams, TextDocumentSyncCapability,
-    TextDocumentSyncKind, TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
+    DidSaveTextDocumentParams, ExecuteCommandOptions, ExecuteCommandParams,
+    HoverProviderCapability, InitializeParams, InitializeResult, LogMessageParams,
+    PublishDiagnosticsParams, Registration, RegistrationParams, SaveOptions, ServerCapabilities,
+    ServerInfo, ShowMessageParams, TextDocumentSyncCapability, TextDocumentSyncKind,
+    TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
 };
 use schema_cache::SchemaCache;
-use serde::Serialize;
+use serde::{de::DeserializeOwned, Serialize};
 use std::{
     collections::{HashMap, HashSet},
     sync::Arc,
@@ -298,6 +300,13 @@ impl Server {
                 },
             )),
             hover_provider: Some(HoverProviderCapability::Simple(true)),
+            execute_command_provider: Some(ExecuteCommandOptions {
+                commands: CommandType::ALL
+                    .iter()
+                    .map(|c| c.id().to_string())
+                    .collect(),
+                ..Default::default()
+            }),
             code_action_provider: Some(lsp_types::CodeActionProviderCapability::Simple(true)),
             ..ServerCapabilities::default()
         }
@@ -425,24 +434,57 @@ impl Server {
     fn code_actions(
         &self,
         id: RequestId,
-        _params: lsp_types::CodeActionParams,
+        params: lsp_types::CodeActionParams,
     ) -> anyhow::Result<()> {
-        // compute actions
-        self.client.send_response(lsp_server::Response::new_ok(
-            id,
-            Vec::<lsp_types::CodeAction>::new(),
-        ))?;
-        Ok(())
-    }
+        let mut actions = Vec::<lsp_types::CodeAction>::new();
 
-    fn code_action_resolve(
-        &self,
-        id: RequestId,
-        action: lsp_types::CodeAction,
-    ) -> anyhow::Result<()> {
-        // resolve action
+        if self.db_conn.is_none() {
+            self.client
+                .send_response(lsp_server::Response::new_ok(id, actions))?;
+            return Ok(());
+        }
+
+        let mut uri = params.text_document.uri;
+        normalize_uri(&mut uri);
+        let path = file_path(&uri);
+
+        let doc = self.ide.documents.get(&path);
+
+        if doc.is_none() {
+            self.client
+                .send_response(lsp_server::Response::new_ok(id, actions))?;
+            return Ok(());
+        }
+
+        let doc = doc.unwrap();
+
+        let range = doc.line_index.offset_lsp_range(params.range).unwrap();
+
+        actions.extend(doc.statements_at_range(&range).iter().map(|stmt| {
+            let cmd = ExecuteStatementCommand::command_type();
+            let title = format!(
+                "Execute '{}'",
+                ExecuteStatementCommand::trim_statement(stmt.text.clone(), 50)
+            );
+            lsp_types::CodeAction {
+                title: title.clone(),
+                kind: None,
+                edit: None,
+                command: Some(lsp_types::Command {
+                    title,
+                    command: format!("pglsp.{}", cmd.id()),
+                    arguments: Some(vec![serde_json::to_value(stmt.text.clone()).unwrap()]),
+                }),
+                diagnostics: None,
+                is_preferred: None,
+                disabled: None,
+                data: None,
+            }
+        }));
+
         self.client
-            .send_response(lsp_server::Response::new_ok(id, action))?;
+            .send_response(lsp_server::Response::new_ok(id, actions))?;
+
         Ok(())
     }
 
@@ -480,6 +522,80 @@ impl Server {
         });
 
         Ok(())
+    }
+
+    fn execute_command(&self, id: RequestId, params: ExecuteCommandParams) -> anyhow::Result<()> {
+        match CommandType::from_id(params.command.replace("pglsp.", "").as_str()) {
+            Some(CommandType::ExecuteStatement) => {
+                let stmt = self.parse_command_params::<String>(params.arguments)?;
+
+                let command = ExecuteStatementCommand::new(stmt);
+
+                let conn = self.db_conn.as_ref().map(|p| p.pool.clone());
+
+                let client = self.client.clone();
+
+                self.run_fallible(id, move || {
+                    // todo return the rows and do something with them
+                    // maybe store them and add the table to the hover output?
+                    let res = async_std::task::block_on(command.run(conn))?;
+
+                    // todo if its a ddl statement, recompute schema cache
+
+                    client
+                        .send_notification::<ShowMessage>(ShowMessageParams {
+                            typ: lsp_types::MessageType::INFO,
+                            message: format!("Success! Affected rows: {}", res.rows_affected()),
+                        })
+                        .unwrap();
+
+                    Ok(())
+                });
+            }
+            None => {
+                self.client
+                    .send_error(
+                        id,
+                        ErrorCode::InvalidParams,
+                        format!("Unknown command: {}", params.command),
+                    )
+                    .unwrap();
+            }
+        };
+
+        Ok(())
+    }
+
+    fn run_fallible<R, Q>(&self, id: RequestId, query: Q)
+    where
+        R: Serialize,
+        Q: FnOnce() -> anyhow::Result<R> + Send + 'static,
+    {
+        let client = self.client.clone();
+        self.pool.execute(move || match query() {
+            Ok(result) => {
+                let response = lsp_server::Response::new_ok(id, result);
+                client.send_response(response).unwrap();
+            }
+            Err(why) => {
+                client
+                    .send_error(id, ErrorCode::InternalError, why.to_string())
+                    .unwrap();
+            }
+        });
+    }
+
+    fn parse_command_params<T: DeserializeOwned>(
+        &self,
+        params: Vec<serde_json::Value>,
+    ) -> anyhow::Result<T> {
+        if params.is_empty() {
+            anyhow::bail!("No argument provided!");
+        }
+
+        let value = params.into_iter().next().unwrap();
+        let value = serde_json::from_value(value)?;
+        Ok(value)
     }
 
     fn run_query<R, Q>(&self, id: RequestId, query: Q)
@@ -545,11 +661,9 @@ impl Server {
 
                             if let Some(response) = dispatch::RequestDispatcher::new(request)
                                 .on::<HoverRequest, _>(|id, params| self.hover(id, params))?
+                                .on::<ExecuteCommand,_>(|id, params| self.execute_command(id, params))?
                                 .on::<CodeActionRequest, _>(|id, params| {
                                     self.code_actions(id, params)
-                                })?
-                                .on::<CodeActionResolveRequest, _>(|id, params| {
-                                    self.code_action_resolve(id, params)
                                 })?
                                 .default()
                             {

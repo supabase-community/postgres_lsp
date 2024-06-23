@@ -70,6 +70,17 @@ impl Document {
             .map(|idx| self.statement_ref(idx))
     }
 
+    pub fn statements_at_range(&self, range: &TextRange) -> Vec<StatementRef> {
+        self.statement_ranges
+            .iter()
+            .enumerate()
+            .filter(|(_, r)| {
+                range.contains_range(r.to_owned().to_owned()) || r.contains_range(range.to_owned())
+            })
+            .map(|(idx, _)| self.statement_ref(idx))
+            .collect()
+    }
+
     pub fn statement_at_offset_with_range(
         &self,
         offset: &TextSize,
@@ -146,5 +157,29 @@ impl Document {
                 )
             })
             .unwrap()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use text_size::{TextRange, TextSize};
+
+    use crate::{Document, DocumentParams, PgLspPath};
+
+    #[test]
+    fn test_statements_at_range() {
+        let url = PgLspPath::new("test.sql");
+
+        let doc = Document::new(DocumentParams {
+            url,
+            text: "select unknown from contact;\n\nselect 12345;\n\nalter table test drop column id;\n".to_string()
+        });
+
+        let x = doc.statements_at_range(&TextRange::new(TextSize::from(2), TextSize::from(5)));
+
+        assert_eq!(x.len(), 1);
+
+        assert_eq!(x[0].text, "select unknown from contact;");
     }
 }
