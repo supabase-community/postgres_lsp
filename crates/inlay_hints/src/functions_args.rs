@@ -103,10 +103,12 @@ mod tests {
 
         let res = parse_ast(input, &root);
 
+        let schema_cache = block_on(SchemaCache::load(&pool));
+
         let hints = FunctionArgHint::find_all(InlayHintsParams {
             ast: Some(&root),
             tree: None,
-            schema_cache: block_on(SchemaCache::load(&pool)),
+            schema_cache: &schema_cache,
             enriched_ast: Some(&res.ast),
             cst: Some(&res.cst),
         });
