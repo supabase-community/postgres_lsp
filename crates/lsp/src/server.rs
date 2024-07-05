@@ -16,7 +16,7 @@ use lsp_types::{
     },
     request::{
         CodeActionRequest, CodeActionResolveRequest, ExecuteCommand, HoverRequest,
-        RegisterCapability, WorkspaceConfiguration,
+        InlayHintRequest, RegisterCapability, WorkspaceConfiguration,
     },
     ConfigurationItem, ConfigurationParams, DidChangeConfigurationParams,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
@@ -307,6 +307,7 @@ impl Server {
                     .collect(),
                 ..Default::default()
             }),
+            inlay_hint_provider: Some(lsp_types::OneOf::Left(true)),
             code_action_provider: Some(lsp_types::CodeActionProviderCapability::Simple(true)),
             ..ServerCapabilities::default()
         }
@@ -436,59 +437,129 @@ impl Server {
         id: RequestId,
         params: lsp_types::CodeActionParams,
     ) -> anyhow::Result<()> {
-        let mut actions = Vec::<lsp_types::CodeAction>::new();
+        let db_conn = self.db_conn.as_ref().map(|p| p.pool.clone());
+        self.run_query(id, move |ide| {
+            let mut actions = Vec::<lsp_types::CodeAction>::new();
 
-        if self.db_conn.is_none() {
-            self.client
-                .send_response(lsp_server::Response::new_ok(id, actions))?;
-            return Ok(());
-        }
-
-        let mut uri = params.text_document.uri;
-        normalize_uri(&mut uri);
-        let path = file_path(&uri);
-
-        let doc = self.ide.documents.get(&path);
-
-        if doc.is_none() {
-            self.client
-                .send_response(lsp_server::Response::new_ok(id, actions))?;
-            return Ok(());
-        }
-
-        let doc = doc.unwrap();
-
-        let range = doc.line_index.offset_lsp_range(params.range).unwrap();
-
-        actions.extend(doc.statements_at_range(&range).iter().map(|stmt| {
-            let cmd = ExecuteStatementCommand::command_type();
-            let title = format!(
-                "Execute '{}'",
-                ExecuteStatementCommand::trim_statement(stmt.text.clone(), 50)
-            );
-            lsp_types::CodeAction {
-                title: title.clone(),
-                kind: None,
-                edit: None,
-                command: Some(lsp_types::Command {
-                    title,
-                    command: format!("pglsp.{}", cmd.id()),
-                    arguments: Some(vec![serde_json::to_value(stmt.text.clone()).unwrap()]),
-                }),
-                diagnostics: None,
-                is_preferred: None,
-                disabled: None,
-                data: None,
+            if db_conn.is_none() {
+                return actions;
             }
-        }));
 
-        self.client
-            .send_response(lsp_server::Response::new_ok(id, actions))?;
+            let mut uri = params.text_document.uri;
+            normalize_uri(&mut uri);
+            let path = file_path(&uri);
+
+            let doc = ide.documents.get(&path);
+
+            if doc.is_none() {
+                return actions;
+            }
+
+            let doc = doc.unwrap();
+
+            let range = doc.line_index.offset_lsp_range(params.range).unwrap();
+
+            actions.extend(doc.statements_at_range(&range).iter().map(|stmt| {
+                let cmd = ExecuteStatementCommand::command_type();
+                let title = format!(
+                    "Execute '{}'",
+                    ExecuteStatementCommand::trim_statement(stmt.text.clone(), 50)
+                );
+                lsp_types::CodeAction {
+                    title: title.clone(),
+                    kind: None,
+                    edit: None,
+                    command: Some(lsp_types::Command {
+                        title,
+                        command: format!("pglsp.{}", cmd.id()),
+                        arguments: Some(vec![serde_json::to_value(stmt.text.clone()).unwrap()]),
+                    }),
+                    diagnostics: None,
+                    is_preferred: None,
+                    disabled: None,
+                    data: None,
+                }
+            }));
+
+            actions
+        });
 
         Ok(())
     }
 
-    fn hover(&mut self, id: RequestId, mut params: lsp_types::HoverParams) -> anyhow::Result<()> {
+    fn inlay_hint(
+        &self,
+        id: RequestId,
+        mut params: lsp_types::InlayHintParams,
+    ) -> anyhow::Result<()> {
+        normalize_uri(&mut params.text_document.uri);
+
+        let c = self.client.clone();
+
+        self.run_query(id, move |ide| {
+            let path = file_path(&params.text_document.uri);
+
+            let doc = ide.documents.get(&path);
+
+            if doc.is_none() {
+                return Vec::new();
+            }
+
+            let doc = doc.unwrap();
+
+            let range = doc.line_index.offset_lsp_range(params.range).unwrap();
+
+            let schema_cache = ide.schema_cache.read().unwrap();
+
+            c.send_notification::<ShowMessage>(ShowMessageParams {
+                typ: lsp_types::MessageType::INFO,
+                message: "querying inlay hints".to_string(),
+            })
+            .unwrap();
+
+            doc.statements_at_range(&range)
+                .iter()
+                .flat_map(|stmt| {
+                    ::inlay_hints::inlay_hints(::inlay_hints::InlayHintsParams {
+                        ast: ide.pg_query.ast(&stmt).as_ref().map(|x| x.as_ref()),
+                        enriched_ast: ide
+                            .pg_query
+                            .enriched_ast(&stmt)
+                            .as_ref()
+                            .map(|x| x.as_ref()),
+                        tree: ide.tree_sitter.tree(&stmt).as_ref().map(|x| x.as_ref()),
+                        cst: ide.pg_query.cst(&stmt).as_ref().map(|x| x.as_ref()),
+                        schema_cache: &schema_cache,
+                    })
+                })
+                .map(|hint| lsp_types::InlayHint {
+                    position: doc.line_index.line_col_lsp(hint.offset).unwrap(),
+                    label: match hint.content {
+                        inlay_hints::InlayHintContent::FunctionArg(arg) => {
+                            lsp_types::InlayHintLabel::String(match arg.name {
+                                Some(name) => format!("{} ({})", name, arg.type_name),
+                                None => arg.type_name.clone(),
+                            })
+                        }
+                    },
+                    kind: match hint.content {
+                        inlay_hints::InlayHintContent::FunctionArg(_) => {
+                            Some(lsp_types::InlayHintKind::PARAMETER)
+                        }
+                    },
+                    text_edits: None,
+                    tooltip: None,
+                    padding_left: None,
+                    padding_right: None,
+                    data: None,
+                })
+                .collect()
+        });
+
+        Ok(())
+    }
+
+    fn hover(&self, id: RequestId, mut params: lsp_types::HoverParams) -> anyhow::Result<()> {
         normalize_uri(&mut params.text_document_position_params.text_document.uri);
 
         self.run_query(id, move |ide| {
@@ -660,6 +731,7 @@ impl Server {
                             }
 
                             if let Some(response) = dispatch::RequestDispatcher::new(request)
+                                .on::<InlayHintRequest, _>(|id, params| self.inlay_hint(id, params))?
                                 .on::<HoverRequest, _>(|id, params| self.hover(id, params))?
                                 .on::<ExecuteCommand,_>(|id, params| self.execute_command(id, params))?
                                 .on::<CodeActionRequest, _>(|id, params| {

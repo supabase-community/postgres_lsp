@@ -7,9 +7,11 @@ mod functions;
 mod schema_cache;
 mod schemas;
 mod tables;
+mod types;
 
 use sqlx::postgres::PgPool;
 
+pub use functions::{Behavior, Function, FunctionArg, FunctionArgs};
 pub use schema_cache::SchemaCache;
 
 #[derive(Debug, Clone)]

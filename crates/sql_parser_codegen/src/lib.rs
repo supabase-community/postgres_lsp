@@ -1,11 +1,13 @@
 mod get_location;
 mod get_node_properties;
 mod get_nodes;
+mod node_iterator;
 mod syntax_kind;
 
 use get_location::get_location_mod;
 use get_node_properties::get_node_properties_mod;
 use get_nodes::get_nodes_mod;
+use node_iterator::node_iterator_mod;
 use pg_query_proto_parser::ProtoParser;
 use quote::quote;
 use std::{env, path, path::Path};
@@ -19,6 +21,7 @@ pub fn parser_codegen(_item: proc_macro::TokenStream) -> proc_macro::TokenStream
     let get_location = get_location_mod(&proto_file);
     let get_node_properties = get_node_properties_mod(&proto_file);
     let get_nodes = get_nodes_mod(&proto_file);
+    let iterator = node_iterator_mod(&proto_file);
 
     quote! {
         use std::collections::VecDeque;
@@ -34,6 +37,7 @@ pub fn parser_codegen(_item: proc_macro::TokenStream) -> proc_macro::TokenStream
         #get_location
         #get_node_properties
         #get_nodes
+        #iterator
     }
     .into()
 }

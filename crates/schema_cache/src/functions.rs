@@ -32,16 +32,16 @@ impl From<Option<String>> for Behavior {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-struct FunctionArg {
-    mode: String,
-    name: String,
-    type_id: i64,
-    has_default: Option<bool>,
+pub struct FunctionArg {
+    pub mode: String,
+    pub name: String,
+    pub type_id: i64,
+    pub has_default: Option<bool>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct FunctionArgs {
-    args: Vec<FunctionArg>,
+    pub args: Vec<FunctionArg>,
 }
 
 impl From<Option<JsonValue>> for FunctionArgs {

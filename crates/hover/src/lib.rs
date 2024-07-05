@@ -35,13 +35,18 @@ pub fn hover(params: HoverParams) -> Option<HoverResult> {
         Hoverable::Relation(r) => {
             let table = params.schema_cache.find_table(&r.name, r.schema.as_deref());
 
-            table.map(|t| HoverResult {
-                range: Some(r.range),
-                content: if t.comment.is_some() {
-                    format!("{}\n{}", t.name, t.comment.as_ref().unwrap())
-                } else {
-                    format!("Hello from the lsp. This is the table {}", t.name.clone())
-                },
+            table.map(|t| {
+                let mut content = t.name.to_owned();
+
+                if t.comment.is_some() {
+                    content.push_str("\n");
+                    content.push_str(t.comment.as_ref().unwrap());
+                }
+
+                return HoverResult {
+                    range: Some(r.range),
+                    content,
+                };
             })
         }
         _ => None,

@@ -15,6 +15,8 @@ commands = { path = "./crates/commands", version = "0.0.0" }
 typecheck_sqlx = { path = "./crates/typecheck_sqlx", version = "0.0.0" }
 lint = { path = "./crates/lint", version = "0.0.0" }
 hover = { path = "./crates/hover", version = "0.0.0" }
+inlay_hints = { path = "./crates/inlay_hints", version = "0.0.0" }
+type_resolver = { path = "./crates/type_resolver", version = "0.0.0" }
 base_db = { path = "./crates/base_db", version = "0.0.0" }
 line_index = { path = "./crates/line_index", version = "0.0.0" }
 lsp = { path = "./crates/lsp", version = "0.0.0" }

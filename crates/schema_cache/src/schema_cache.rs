@@ -5,12 +5,14 @@ use sqlx::postgres::PgPool;
 use crate::functions::Function;
 use crate::schemas::Schema;
 use crate::tables::Table;
+use crate::types::PostgresType;
 
 #[derive(Debug, Clone, Default)]
 pub struct SchemaCache {
     pub schemas: Vec<Schema>,
     pub tables: Vec<Table>,
     pub functions: Vec<Function>,
+    pub types: Vec<PostgresType>,
 }
 
 impl SchemaCache {
@@ -19,13 +21,19 @@ impl SchemaCache {
     }
 
     pub async fn load(pool: &PgPool) -> SchemaCache {
-        let (schemas, tables, functions) =
-            join!(Schema::load(pool), Table::load(pool), Function::load(pool)).await;
+        let (schemas, tables, functions, types) = join!(
+            Schema::load(pool),
+            Table::load(pool),
+            Function::load(pool),
+            PostgresType::load(pool)
+        )
+        .await;
 
         SchemaCache {
             schemas,
             tables,
             functions,
+            types,
         }
     }
 
@@ -40,7 +48,20 @@ impl SchemaCache {
     pub fn find_table(&self, name: &str, schema: Option<&str>) -> Option<&Table> {
         self.tables
             .iter()
-            .find(|t| t.name == name && t.schema == schema.unwrap_or("public"))
+            .find(|t| t.name == name && schema.is_none() || Some(t.schema.as_str()) == schema)
+    }
+
+    pub fn find_type(&self, name: &str, schema: Option<&str>) -> Option<&PostgresType> {
+        self.types
+            .iter()
+            .find(|t| t.name == name && schema.is_none() || Some(t.schema.as_str()) == schema)
+    }
+
+    pub fn find_types(&self, name: &str, schema: Option<&str>) -> Vec<&PostgresType> {
+        self.types
+            .iter()
+            .filter(|t| t.name == name && schema.is_none() || Some(t.schema.as_str()) == schema)
+            .collect()
     }
 }
 

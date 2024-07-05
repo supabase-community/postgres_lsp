@@ -10,7 +10,8 @@ pub fn ban_drop_column(params: &LinterParams) -> Vec<RuleViolation> {
         if let sql_parser::AstNode::AlterTableStmt(_) = &enriched_ast.root_node().node {
             for node in enriched_ast.iter_nodes() {
                 if let sql_parser::AstNode::AlterTableCmd(cmd) = &node.node {
-                    if cmd.subtype() == sql_parser::AlterTableType::AtDropColumn {
+                    if cmd.subtype() == sql_parser::pg_query_protobuf::AlterTableType::AtDropColumn
+                    {
                         errs.push(RuleViolation::new(
                             RuleViolationKind::BanDropColumn,
                             Some(node.range()),
@@ -25,7 +26,9 @@ pub fn ban_drop_column(params: &LinterParams) -> Vec<RuleViolation> {
             sql_parser::AstNode::AlterTableStmt(stmt) => {
                 for cmd in &stmt.cmds {
                     if let Some(sql_parser::AstNode::AlterTableCmd(cmd)) = &cmd.node {
-                        if cmd.subtype() == sql_parser::AlterTableType::AtDropColumn {
+                        if cmd.subtype()
+                            == sql_parser::pg_query_protobuf::AlterTableType::AtDropColumn
+                        {
                             errs.push(RuleViolation::new(
                                 RuleViolationKind::BanDropColumn,
                                 None,

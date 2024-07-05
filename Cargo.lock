@@ -1129,6 +1129,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "inlay_hints"
+version = "0.0.0"
+dependencies = [
+ "async-std",
+ "schema_cache",
+ "sql_parser",
+ "sqlx",
+ "text-size",
+ "tree-sitter",
+ "tree_sitter_sql",
+ "type_resolver",
+]
+
+[[package]]
 name = "insta"
 version = "1.34.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1324,6 +1338,7 @@ dependencies = [
  "diagnostics",
  "hover",
  "ide",
+ "inlay_hints",
  "line_index",
  "lsp-server",
  "lsp-types 0.95.0",
@@ -2793,6 +2808,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "859eb650cfee7434994602c3a68b25d77ad9e68c8a6cd491616ef86661382eb3"
 dependencies = [
  "stable_deref_trait",
+]
+
+[[package]]
+name = "type_resolver"
+version = "0.0.0"
+dependencies = [
+ "schema_cache",
+ "sql_parser",
 ]
 
 [[package]]
