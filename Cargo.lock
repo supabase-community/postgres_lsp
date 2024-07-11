@@ -439,6 +439,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "completions"
+version = "0.0.0"
+dependencies = [
+ "async-std",
+ "schema_cache",
+ "sql_parser",
+ "sqlx",
+ "text-size",
+ "tree-sitter",
+ "tree_sitter_sql",
+]
+
+[[package]]
 name = "concurrent-queue"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1332,6 +1345,7 @@ dependencies = [
  "async-std",
  "base_db",
  "commands",
+ "completions",
  "crossbeam-channel",
  "cstree",
  "dashmap",

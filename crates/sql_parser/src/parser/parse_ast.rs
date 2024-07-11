@@ -6,7 +6,7 @@ use pg_query::NodeEnum;
 
 use self::{sql_statement_parser::SqlStatementParser, tree_builder::TreeBuilder};
 
-pub use ast_builder::EnrichedAst;
+pub use ast_builder::{EnrichedAst, RangedNode};
 pub use tree_builder::Cst;
 
 pub struct ParsedStatement {

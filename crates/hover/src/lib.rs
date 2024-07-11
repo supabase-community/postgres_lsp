@@ -6,7 +6,7 @@ use text_size::TextRange;
 
 pub struct HoverParams<'a> {
     pub position: text_size::TextSize,
-    pub source: String,
+    pub source: &'a str,
     pub enriched_ast: Option<&'a sql_parser::EnrichedAst>,
     pub tree: Option<&'a tree_sitter::Tree>,
     pub schema_cache: SchemaCache,

@@ -5,7 +5,9 @@ pub mod options;
 use async_std::task::{self};
 use base_db::{Change, DocumentChange};
 use commands::{Command, CommandType, ExecuteStatementCommand};
+use completions::{CompletionParams, CompletionProviderParams};
 use crossbeam_channel::{unbounded, Receiver, Sender};
+use cstree::text::{TextRange, TextSize};
 use hover::HoverParams;
 use ide::IDE;
 use lsp_server::{Connection, ErrorCode, Message, Notification, RequestId};
@@ -15,21 +17,22 @@ use lsp_types::{
         DidSaveTextDocument, LogMessage, Notification as _, PublishDiagnostics, ShowMessage,
     },
     request::{
-        CodeActionRequest, CodeActionResolveRequest, ExecuteCommand, HoverRequest,
+        CodeActionRequest, CodeActionResolveRequest, Completion, ExecuteCommand, HoverRequest,
         InlayHintRequest, RegisterCapability, WorkspaceConfiguration,
     },
-    ConfigurationItem, ConfigurationParams, DidChangeConfigurationParams,
-    DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    DidSaveTextDocumentParams, ExecuteCommandOptions, ExecuteCommandParams,
-    HoverProviderCapability, InitializeParams, InitializeResult, LogMessageParams,
-    PublishDiagnosticsParams, Registration, RegistrationParams, SaveOptions, ServerCapabilities,
-    ServerInfo, ShowMessageParams, TextDocumentSyncCapability, TextDocumentSyncKind,
-    TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
+    CompletionList, CompletionOptions, ConfigurationItem, ConfigurationParams,
+    DidChangeConfigurationParams, DidChangeTextDocumentParams, DidCloseTextDocumentParams,
+    DidOpenTextDocumentParams, DidSaveTextDocumentParams, ExecuteCommandOptions,
+    ExecuteCommandParams, HoverProviderCapability, InitializeParams, InitializeResult,
+    LogMessageParams, PublishDiagnosticsParams, Registration, RegistrationParams, SaveOptions,
+    ServerCapabilities, ServerInfo, ShowMessageParams, TextDocumentSyncCapability,
+    TextDocumentSyncKind, TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
 };
 use schema_cache::SchemaCache;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{
     collections::{HashMap, HashSet},
+    panic::catch_unwind,
     sync::Arc,
     time::Duration,
 };
@@ -309,6 +312,7 @@ impl Server {
             }),
             inlay_hint_provider: Some(lsp_types::OneOf::Left(true)),
             code_action_provider: Some(lsp_types::CodeActionProviderCapability::Simple(true)),
+            completion_provider: Some(CompletionOptions::default()),
             ..ServerCapabilities::default()
         }
     }
@@ -559,6 +563,65 @@ impl Server {
         Ok(())
     }
 
+    fn completion(
+        &self,
+        id: RequestId,
+        mut params: lsp_types::CompletionParams,
+    ) -> anyhow::Result<()> {
+        normalize_uri(&mut params.text_document_position.text_document.uri);
+
+        self.run_query(id, move |ide| {
+            let path = file_path(&params.text_document_position.text_document.uri);
+
+            let doc = ide.documents.get(&path)?;
+
+            let pos = doc
+                .line_index
+                .offset_lsp(params.text_document_position.position)
+                .unwrap();
+
+            let (range, stmt) = doc.statement_at_offset_with_range(&pos)?;
+
+            let schema = ide.schema_cache.read().unwrap();
+
+            Some(CompletionList {
+                is_incomplete: false,
+                items: completions::complete(&CompletionParams {
+                    position: pos - range.start() - TextSize::from(1),
+                    text: stmt.text.as_str(),
+                    tree: ide.tree_sitter.tree(&stmt).as_ref().map(|x| x.as_ref()),
+                    schema: &schema,
+                })
+                .items
+                .iter()
+                .map(|i| lsp_types::CompletionItem {
+                    // TODO: add more data
+                    label: i.data.label().to_string(),
+                    label_details: None,
+                    kind: Some(lsp_types::CompletionItemKind::CLASS),
+                    detail: None,
+                    documentation: None,
+                    deprecated: None,
+                    preselect: None,
+                    sort_text: None,
+                    filter_text: None,
+                    insert_text: None,
+                    insert_text_format: None,
+                    insert_text_mode: None,
+                    text_edit: None,
+                    additional_text_edits: None,
+                    commit_characters: None,
+                    data: None,
+                    tags: None,
+                    command: None,
+                })
+                .collect(),
+            })
+        });
+
+        Ok(())
+    }
+
     fn hover(&self, id: RequestId, mut params: lsp_types::HoverParams) -> anyhow::Result<()> {
         normalize_uri(&mut params.text_document_position_params.text_document.uri);
 
@@ -575,7 +638,7 @@ impl Server {
 
             ::hover::hover(HoverParams {
                 position: pos - range.start(),
-                source: stmt.text.clone(),
+                source: stmt.text.as_str(),
                 enriched_ast: ide
                     .pg_query
                     .enriched_ast(&stmt)
@@ -730,10 +793,15 @@ impl Server {
                                 return Ok(());
                             }
 
+                            let c = self.client.clone();
+
                             if let Some(response) = dispatch::RequestDispatcher::new(request)
                                 .on::<InlayHintRequest, _>(|id, params| self.inlay_hint(id, params))?
                                 .on::<HoverRequest, _>(|id, params| self.hover(id, params))?
                                 .on::<ExecuteCommand,_>(|id, params| self.execute_command(id, params))?
+                                .on::<Completion, _>(|id, params| {
+                                    self.completion(id, params)
+                                })?
                                 .on::<CodeActionRequest, _>(|id, params| {
                                     self.code_actions(id, params)
                                 })?

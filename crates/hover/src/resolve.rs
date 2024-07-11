@@ -24,13 +24,7 @@ pub enum Hoverable {
 }
 
 pub fn resolve_from_enriched_ast(pos: TextSize, ast: &EnrichedAst) -> Option<Hoverable> {
-    let node = ast.covering_node(TextRange::empty(pos));
-
-    if node.is_none() {
-        return None;
-    }
-
-    let node = node.unwrap();
+    let node = ast.covering_node(TextRange::empty(pos))?;
 
     match node.node {
         AstNode::RangeVar(ref range_var) => Some(Hoverable::Relation(HoverableRelation {
@@ -47,19 +41,17 @@ pub fn resolve_from_enriched_ast(pos: TextSize, ast: &EnrichedAst) -> Option<Hov
 }
 
 pub fn resolve_from_tree_sitter(pos: TextSize, tree: &Tree, source: &str) -> Option<Hoverable> {
-    let r = tree
+    let mut node = tree
         .root_node()
-        .named_descendant_for_byte_range(usize::from(pos), usize::from(pos));
+        .named_descendant_for_byte_range(usize::from(pos), usize::from(pos))?;
 
-    if r.is_none() {
-        return None;
-    }
-
-    let mut node = r.unwrap();
     let node_range = node.range();
 
-    while node.parent().is_some() && node.parent().unwrap().range() == node_range {
-        node = node.parent().unwrap();
+    while let Some(parent) = node.parent() {
+        if parent.range() != node_range {
+            break;
+        }
+        node = parent;
     }
 
     match node.kind() {

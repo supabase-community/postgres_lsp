@@ -596,10 +596,10 @@ pub static STATEMENT_START_TOKEN_MAPS: LazyLock<Vec<HashMap<SyntaxKind, Vec<Toke
             &[SyntaxToken::Required(SyntaxKind::Prepare)],
         ));
 
-        m.push((
-            SyntaxKind::ExecuteStmt,
-            &[SyntaxToken::Required(SyntaxKind::Execute)],
-        ));
+        // m.push((
+        //     SyntaxKind::ExecuteStmt,
+        //     &[SyntaxToken::Required(SyntaxKind::Execute)],
+        // ));
 
         m.push((
             SyntaxKind::DeallocateStmt,

@@ -2,7 +2,7 @@ use sqlx::PgPool;
 
 use crate::schema_cache::SchemaCacheItem;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ReplicaIdentity {
     Default,
     Index,
@@ -28,7 +28,7 @@ impl From<String> for ReplicaIdentity {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Table {
     pub id: i64,
     pub schema: String,
