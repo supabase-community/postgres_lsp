@@ -1,0 +1,17 @@
+[package]
+name = "pg_base_db"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+text-size = "1.1.1"
+line_index.workspace = true
+
+pg_statement_splitter.workspace = true
+
+[dev-dependencies]
+
+[lib]
+doctest = false
+
+[features]

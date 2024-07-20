@@ -1,0 +1,22 @@
+[package]
+name = "pg_lexer"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+regex = "1.9.1"
+
+pg_query = "0.8"
+pg_lexer_codegen.workspace = true
+
+text-size = "1.1.1"
+cstree = { version = "0.12.0", features = ["derive"] }
+
+[dev-dependencies]
+insta = "1.31.0"
+
+[lib]
+doctest = false
+
+[features]
+lazy_cell = []

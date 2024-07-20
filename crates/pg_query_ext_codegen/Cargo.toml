@@ -1,0 +1,15 @@
+[package]
+name = "pg_query_ext_codegen"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+proc-macro2 = "1.0.66"
+quote = "1.0.33"
+
+pg_query_proto_parser.workspace = true
+
+[lib]
+proc-macro = true
+doctest = false
+

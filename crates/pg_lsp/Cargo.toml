@@ -1,0 +1,41 @@
+[package]
+name = "pg_lsp"
+version = "0.0.0"
+edition = "2021"
+
+[[bin]]
+name = "pglsp"
+path = "src/main.rs"
+test = false
+
+[dependencies]
+lsp-server = "0.7.6"
+crossbeam-channel = "0.5.12"
+async-channel = "2.3.1"
+lsp-types = "0.95.0"
+serde = "1.0.195"
+serde_json = "1.0.114"
+anyhow = "1.0.81"
+sqlx = { version = "0.7.3", features = [ "runtime-async-std", "tls-rustls", "postgres", "json" ] }
+async-std = "1.12.0"
+threadpool = "1.8.1"
+dashmap = "5.5.3"
+text-size = "1.1.1"
+
+line_index.workspace = true
+
+pg_hover.workspace = true
+pg_completions.workspace = true
+pg_inlay_hints.workspace = true
+pg_commands.workspace = true
+pg_base_db.workspace = true
+pg_schema_cache.workspace = true
+pg_workspace.workspace = true
+pg_diagnostics.workspace = true
+
+[dev-dependencies]
+
+[lib]
+doctest = false
+
+[features]

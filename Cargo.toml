@@ -9,28 +9,36 @@ resolver = "2"
 rust-version = "1.71"
 
 [workspace.dependencies]
-ide = { path = "./crates/ide", version = "0.0.0" }
-diagnostics = { path = "./crates/diagnostics", version = "0.0.0" }
-commands = { path = "./crates/commands", version = "0.0.0" }
-completions = { path = "./crates/completions", version = "0.0.0" }
-typecheck_sqlx = { path = "./crates/typecheck_sqlx", version = "0.0.0" }
-lint = { path = "./crates/lint", version = "0.0.0" }
-hover = { path = "./crates/hover", version = "0.0.0" }
-inlay_hints = { path = "./crates/inlay_hints", version = "0.0.0" }
-type_resolver = { path = "./crates/type_resolver", version = "0.0.0" }
-base_db = { path = "./crates/base_db", version = "0.0.0" }
+# supporting crates unrelated to postgres
 line_index = { path = "./crates/line_index", version = "0.0.0" }
-lsp = { path = "./crates/lsp", version = "0.0.0" }
 tree_sitter_sql = { path = "./crates/tree_sitter_sql", version = "0.0.0" }
-schema_cache = { path = "./crates/schema_cache", version = "0.0.0" }
-parser = { path = "./crates/parser", version = "0.0.0" }
-sql_parser = { path = "./crates/sql_parser", version = "0.0.0" }
-sql_parser_codegen = { path = "./crates/sql_parser_codegen", version = "0.0.0" }
-codegen = { path = "./crates/codegen", version = "0.0.0" }
-pg_query_proto_parser = { path = "./crates/pg_query_proto_parser", version = "0.0.0" }
-triomphe = { version = "0.1.8", default-features = false, features = ["std"] }
 tree-sitter = "0.20.10"
-tracing = "0.1.40"
+
+# postgres specific crates
+pg_lexer = { path = "./crates/pg_lexer", version = "0.0.0" }
+pg_diagnostics = { path = "./crates/pg_diagnostics", version = "0.0.0" }
+pg_lexer_codegen = { path = "./crates/pg_lexer_codegen", version = "0.0.0" }
+pg_statement_splitter = { path = "./crates/pg_statement_splitter", version = "0.0.0" }
+pg_query_ext = { path = "./crates/pg_query_ext", version = "0.0.0" }
+pg_query_ext_codegen = { path = "./crates/pg_query_ext_codegen", version = "0.0.0" }
+pg_syntax = { path = "./crates/pg_syntax", version = "0.0.0" }
+pg_schema_cache = { path = "./crates/pg_schema_cache", version = "0.0.0" }
+pg_commands = { path = "./crates/pg_commands", version = "0.0.0" }
+pg_completions = { path = "./crates/pg_completions", version = "0.0.0" }
+pg_base_db = { path = "./crates/pg_base_db", version = "0.0.0" }
+pg_query_proto_parser = { path = "./crates/pg_query_proto_parser", version = "0.0.0" }
+pg_typecheck = { path = "./crates/pg_typecheck", version = "0.0.0" }
+pg_type_resolver = { path = "./crates/pg_type_resolver", version = "0.0.0" }
+pg_hover = { path = "./crates/pg_hover", version = "0.0.0" }
+pg_inlay_hints = { path = "./crates/pg_inlay_hints", version = "0.0.0" }
+pg_lint = { path = "./crates/pg_lint", version = "0.0.0" }
+pg_workspace = { path = "./crates/pg_workspace", version = "0.0.0" }
+pg_lsp = { path = "./crates/lsp", version = "0.0.0" }
+
+# parser = { path = "./crates/parser", version = "0.0.0" }
+# sql_parser = { path = "./crates/sql_parser", version = "0.0.0" }
+# sql_parser_codegen = { path = "./crates/sql_parser_codegen", version = "0.0.0" }
+
 
 [profile.dev.package]
 insta.opt-level = 3
