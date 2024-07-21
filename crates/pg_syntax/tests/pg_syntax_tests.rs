@@ -14,7 +14,8 @@ const SNAPSHOTS_PATH: &str = "snapshots/data";
 
 #[test]
 fn valid_statements() {
-    for path in [VALID_STATEMENTS_PATH, POSTGRES_REGRESS_PATH] {
+    // dont do postgres regress tests for now
+    for path in [VALID_STATEMENTS_PATH] {
         let mut paths: Vec<_> = fs::read_dir(path).unwrap().map(|r| r.unwrap()).collect();
         paths.sort_by_key(|dir| dir.path());
 

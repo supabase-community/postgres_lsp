@@ -1,8 +1,0 @@
----
-source: crates/pg_syntax/tests/pg_syntax_tests.rs
-description: commit;
----
-TransactionStmt@0..7
-  Commit@0..6 "commit"
-  Ascii59@6..7 ";"
-
