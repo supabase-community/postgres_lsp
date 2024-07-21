@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/*",
+    "lib/*",
     "xtask/"
 ]
 resolver = "2"
@@ -10,8 +11,8 @@ rust-version = "1.71"
 
 [workspace.dependencies]
 # supporting crates unrelated to postgres
-line_index = { path = "./crates/line_index", version = "0.0.0" }
-tree_sitter_sql = { path = "./crates/tree_sitter_sql", version = "0.0.0" }
+line_index = { path = "./lib/line_index", version = "0.0.0" }
+tree_sitter_sql = { path = "./lib/tree_sitter_sql", version = "0.0.0" }
 tree-sitter = "0.20.10"
 
 # postgres specific crates
