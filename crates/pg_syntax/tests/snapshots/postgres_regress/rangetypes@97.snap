@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO numrange_test2 VALUES(numrange(1.1, 2.2));"
+---
+InsertStmt@0..54
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..26
+    Ident@12..26 "numrange_test2"
+  Whitespace@26..27 " "
+  SelectStmt@27..51
+    Values@27..33 "VALUES"
+    Ascii40@33..34 "("
+    List@34..51
+      FuncCall@34..51
+        Ident@34..42 "numrange"
+        Ascii40@42..43 "("
+        AConst@43..46
+          Fconst@43..46 "1.1"
+        Ascii44@46..47 ","
+        Whitespace@47..48 " "
+        AConst@48..51
+          Fconst@48..51 "2.2"
+  Ascii41@51..52 ")"
+  Ascii41@52..53 ")"
+  Ascii59@53..54 ";"
+

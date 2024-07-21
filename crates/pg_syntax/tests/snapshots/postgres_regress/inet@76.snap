@@ -1,0 +1,41 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM inet_tbl WHERE i > '192.168.1.0/24'::cidr ORDER BY i;"
+---
+SelectStmt@0..67
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..22
+    Ident@14..22 "inet_tbl"
+  Whitespace@22..23 " "
+  Where@23..28 "WHERE"
+  Whitespace@28..29 " "
+  AExpr@29..55
+    ColumnRef@29..30
+      Ident@29..30 "i"
+    Whitespace@30..31 " "
+    Ascii62@31..32 ">"
+    Whitespace@32..33 " "
+    TypeCast@33..55
+      AConst@33..49
+        Sconst@33..49 "'192.168.1.0/24'"
+      Typecast@49..51 "::"
+      TypeName@51..55
+        Ident@51..55 "cidr"
+  Whitespace@55..56 " "
+  SortBy@56..66
+    Order@56..61 "ORDER"
+    Whitespace@61..62 " "
+    By@62..64 "BY"
+    Whitespace@64..65 " "
+    ColumnRef@65..66
+      Ident@65..66 "i"
+  Ascii59@66..67 ";"
+

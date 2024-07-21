@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select * from cc order by f1;
+---
+SelectStmt@0..29
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeVar@14..16
+    Ident@14..16 "cc"
+  Whitespace@16..17 " "
+  SortBy@17..28
+    Order@17..22 "order"
+    Whitespace@22..23 " "
+    By@23..25 "by"
+    Whitespace@25..26 " "
+    ColumnRef@26..28
+      Ident@26..28 "f1"
+  Ascii59@28..29 ";"
+

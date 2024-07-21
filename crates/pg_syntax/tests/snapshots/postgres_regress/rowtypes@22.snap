@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into people values ('(Joe,Blow)', '1984-01-10');"
+---
+InsertStmt@0..55
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "people"
+  Whitespace@18..19 " "
+  SelectStmt@19..53
+    Values@19..25 "values"
+    Whitespace@25..26 " "
+    Ascii40@26..27 "("
+    List@27..53
+      AConst@27..39
+        Sconst@27..39 "'(Joe,Blow)'"
+      Ascii44@39..40 ","
+      Whitespace@40..41 " "
+      AConst@41..53
+        Sconst@41..53 "'1984-01-10'"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

@@ -1,0 +1,47 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT json_build_object(r,2) FROM (SELECT 1 AS a, 2 AS b) r;"
+---
+SelectStmt@0..61
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..28
+    FuncCall@7..28
+      Ident@7..24 "json_build_object"
+      Ascii40@24..25 "("
+      ColumnRef@25..26
+        Ident@25..26 "r"
+      Ascii44@26..27 ","
+      AConst@27..28
+        Iconst@27..28 "2"
+  Ascii41@28..29 ")"
+  Whitespace@29..30 " "
+  From@30..34 "FROM"
+  Whitespace@34..35 " "
+  Ascii40@35..36 "("
+  RangeSubselect@36..60
+    SelectStmt@36..57
+      Select@36..42 "SELECT"
+      Whitespace@42..43 " "
+      ResTarget@43..49
+        AConst@43..44
+          Iconst@43..44 "1"
+        Whitespace@44..45 " "
+        As@45..47 "AS"
+        Whitespace@47..48 " "
+        Ident@48..49 "a"
+      Ascii44@49..50 ","
+      Whitespace@50..51 " "
+      ResTarget@51..57
+        AConst@51..52
+          Iconst@51..52 "2"
+        Whitespace@52..53 " "
+        As@53..55 "AS"
+        Whitespace@55..56 " "
+        Ident@56..57 "b"
+    Ascii41@57..58 ")"
+    Whitespace@58..59 " "
+    Alias@59..60
+      Ident@59..60 "r"
+  Ascii59@60..61 ";"
+

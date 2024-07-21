@@ -1,0 +1,145 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT row_to_json(q)\nFROM (SELECT $$a$$ || x AS b,\n         y AS c,\n         ARRAY[ROW(x.*,ARRAY[1,2,3]),\n               ROW(y.*,ARRAY[4,5,6])] AS z\n      FROM generate_series(1,2) x,\n           generate_series(4,5) y) q;"
+---
+SelectStmt@0..222
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..20
+    FuncCall@7..20
+      Ident@7..18 "row_to_json"
+      Ascii40@18..19 "("
+      ColumnRef@19..20
+        Ident@19..20 "q"
+  Ascii41@20..21 ")"
+  Newline@21..22 "\n"
+  From@22..26 "FROM"
+  Whitespace@26..27 " "
+  Ascii40@27..28 "("
+  RangeSubselect@28..221
+    SelectStmt@28..218
+      Select@28..34 "SELECT"
+      Whitespace@34..35 " "
+      ResTarget@35..50
+        AExpr@35..45
+          AConst@35..40
+            Sconst@35..40 "$$a$$"
+          Whitespace@40..41 " "
+          Op@41..43 "||"
+          Whitespace@43..44 " "
+          ColumnRef@44..45
+            Ident@44..45 "x"
+        Whitespace@45..46 " "
+        As@46..48 "AS"
+        Whitespace@48..49 " "
+        Ident@49..50 "b"
+      Ascii44@50..51 ","
+      Newline@51..52 "\n"
+      Whitespace@52..61 "         "
+      ResTarget@61..67
+        ColumnRef@61..62
+          Ident@61..62 "y"
+        Whitespace@62..63 " "
+        As@63..65 "AS"
+        Whitespace@65..66 " "
+        Ident@66..67 "c"
+      Ascii44@67..68 ","
+      Newline@68..69 "\n"
+      Whitespace@69..78 "         "
+      ResTarget@78..149
+        AArrayExpr@78..141
+          Array@78..83 "ARRAY"
+          Ascii91@83..84 "["
+          RowExpr@84..103
+            Row@84..87 "ROW"
+            Ascii40@87..88 "("
+            ColumnRef@88..91
+              Ident@88..89 "x"
+              Ascii46@89..90 "."
+              AStar@90..91
+                Ascii42@90..91 "*"
+            Ascii44@91..92 ","
+            AArrayExpr@92..103
+              Array@92..97 "ARRAY"
+              Ascii91@97..98 "["
+              AConst@98..99
+                Iconst@98..99 "1"
+              Ascii44@99..100 ","
+              AConst@100..101
+                Iconst@100..101 "2"
+              Ascii44@101..102 ","
+              AConst@102..103
+                Iconst@102..103 "3"
+          Ascii93@103..104 "]"
+          Ascii41@104..105 ")"
+          Ascii44@105..106 ","
+          Newline@106..107 "\n"
+          Whitespace@107..122 "               "
+          RowExpr@122..141
+            Row@122..125 "ROW"
+            Ascii40@125..126 "("
+            ColumnRef@126..129
+              Ident@126..127 "y"
+              Ascii46@127..128 "."
+              AStar@128..129
+                Ascii42@128..129 "*"
+            Ascii44@129..130 ","
+            AArrayExpr@130..141
+              Array@130..135 "ARRAY"
+              Ascii91@135..136 "["
+              AConst@136..137
+                Iconst@136..137 "4"
+              Ascii44@137..138 ","
+              AConst@138..139
+                Iconst@138..139 "5"
+              Ascii44@139..140 ","
+              AConst@140..141
+                Iconst@140..141 "6"
+        Ascii93@141..142 "]"
+        Ascii41@142..143 ")"
+        Ascii93@143..144 "]"
+        Whitespace@144..145 " "
+        As@145..147 "AS"
+        Whitespace@147..148 " "
+        Ident@148..149 "z"
+      Newline@149..150 "\n"
+      Whitespace@150..156 "      "
+      From@156..160 "FROM"
+      Whitespace@160..161 " "
+      RangeFunction@161..183
+        List@161..180
+          FuncCall@161..180
+            Ident@161..176 "generate_series"
+            Ascii40@176..177 "("
+            AConst@177..178
+              Iconst@177..178 "1"
+            Ascii44@178..179 ","
+            AConst@179..180
+              Iconst@179..180 "2"
+        Ascii41@180..181 ")"
+        Whitespace@181..182 " "
+        Alias@182..183
+          Ident@182..183 "x"
+      Ascii44@183..184 ","
+      Newline@184..185 "\n"
+      Whitespace@185..196 "           "
+      RangeFunction@196..218
+        List@196..215
+          FuncCall@196..215
+            Ident@196..211 "generate_series"
+            Ascii40@211..212 "("
+            AConst@212..213
+              Iconst@212..213 "4"
+            Ascii44@213..214 ","
+            AConst@214..215
+              Iconst@214..215 "5"
+        Ascii41@215..216 ")"
+        Whitespace@216..217 " "
+        Alias@217..218
+          Ident@217..218 "y"
+    Ascii41@218..219 ")"
+    Whitespace@219..220 " "
+    Alias@220..221
+      Ident@220..221 "q"
+  Ascii59@221..222 ";"
+

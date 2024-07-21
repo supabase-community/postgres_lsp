@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT regproc('now');"
+---
+SelectStmt@0..22
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..20
+    FuncCall@7..20
+      Ident@7..14 "regproc"
+      Ascii40@14..15 "("
+      AConst@15..20
+        Sconst@15..20 "'now'"
+  Ascii41@20..21 ")"
+  Ascii59@21..22 ";"
+

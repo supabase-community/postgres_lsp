@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SET TimeZone to 'Europe/Moscow';"
+---
+VariableSetStmt@0..32
+  Set@0..3 "SET"
+  Whitespace@3..4 " "
+  Ident@4..12 "TimeZone"
+  Whitespace@12..13 " "
+  To@13..15 "to"
+  Whitespace@15..16 " "
+  AConst@16..31
+    Sconst@16..31 "'Europe/Moscow'"
+  Ascii59@31..32 ";"
+

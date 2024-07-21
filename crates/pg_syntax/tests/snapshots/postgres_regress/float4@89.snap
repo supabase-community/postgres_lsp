@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create type xfloat4 (input = xfloat4in, output = xfloat4out, like = float4);"
+---
+DefineStmt@0..76
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  TypeP@7..11 "type"
+  Whitespace@11..12 " "
+  Ident@12..19 "xfloat4"
+  Whitespace@19..20 " "
+  Ascii40@20..21 "("
+  DefElem@21..38
+    InputP@21..26 "input"
+    Whitespace@26..27 " "
+    Ascii61@27..28 "="
+    Whitespace@28..29 " "
+    TypeName@29..38
+      Ident@29..38 "xfloat4in"
+  Ascii44@38..39 ","
+  Whitespace@39..40 " "
+  DefElem@40..59
+    Ident@40..46 "output"
+    Whitespace@46..47 " "
+    Ascii61@47..48 "="
+    Whitespace@48..49 " "
+    TypeName@49..59
+      Ident@49..59 "xfloat4out"
+  Ascii44@59..60 ","
+  Whitespace@60..61 " "
+  DefElem@61..74
+    Like@61..65 "like"
+    Whitespace@65..66 " "
+    Ascii61@66..67 "="
+    Whitespace@67..68 " "
+    TypeName@68..74
+      Ident@68..74 "float4"
+  Ascii41@74..75 ")"
+  Ascii59@75..76 ";"
+

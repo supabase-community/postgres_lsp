@@ -1,0 +1,19 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX ON t(a);
+---
+IndexStmt@0..21
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  On@13..15 "ON"
+  Whitespace@15..16 " "
+  RangeVar@16..17
+    Ident@16..17 "t"
+  Ascii40@17..18 "("
+  IndexElem@18..19
+    Ident@18..19 "a"
+  Ascii41@19..20 ")"
+  Ascii59@20..21 ";"
+

@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT dup(textrange('aaa', 'bbb'));"
+---
+SelectStmt@0..36
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..33
+    FuncCall@7..33
+      Ident@7..10 "dup"
+      Ascii40@10..11 "("
+      FuncCall@11..33
+        Ident@11..20 "textrange"
+        Ascii40@20..21 "("
+        AConst@21..26
+          Sconst@21..26 "'aaa'"
+        Ascii44@26..27 ","
+        Whitespace@27..28 " "
+        AConst@28..33
+          Sconst@28..33 "'bbb'"
+  Ascii41@33..34 ")"
+  Ascii41@34..35 ")"
+  Ascii59@35..36 ";"
+

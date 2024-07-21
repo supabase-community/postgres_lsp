@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION voidtest4(a int) RETURNS VOID LANGUAGE SQL AS\n$$ INSERT INTO sometable VALUES(a - 1) RETURNING f1 $$;"
+---
+CreateFunctionStmt@0..117
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..25 "voidtest4"
+  Ascii40@25..26 "("
+  FunctionParameter@26..31
+    Ident@26..27 "a"
+    Whitespace@27..28 " "
+    TypeName@28..31
+      IntP@28..31 "int"
+  Ascii41@31..32 ")"
+  Whitespace@32..33 " "
+  Returns@33..40 "RETURNS"
+  Whitespace@40..41 " "
+  TypeName@41..45
+    Ident@41..45 "VOID"
+  Whitespace@45..46 " "
+  DefElem@46..58
+    Language@46..54 "LANGUAGE"
+    Whitespace@54..55 " "
+    SqlP@55..58 "SQL"
+  Whitespace@58..59 " "
+  DefElem@59..116
+    As@59..61 "AS"
+    Newline@61..62 "\n"
+    List@62..116
+      Sconst@62..116 "$$ INSERT INTO someta ..."
+  Ascii59@116..117 ";"
+

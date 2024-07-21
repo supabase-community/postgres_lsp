@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select unnest(textmultirange(textrange('a', 'b'), textrange('d', 'e')));"
+---
+SelectStmt@0..72
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..68
+    FuncCall@7..68
+      Ident@7..13 "unnest"
+      Ascii40@13..14 "("
+      FuncCall@14..68
+        Ident@14..28 "textmultirange"
+        Ascii40@28..29 "("
+        FuncCall@29..47
+          Ident@29..38 "textrange"
+          Ascii40@38..39 "("
+          AConst@39..42
+            Sconst@39..42 "'a'"
+          Ascii44@42..43 ","
+          Whitespace@43..44 " "
+          AConst@44..47
+            Sconst@44..47 "'b'"
+        Ascii41@47..48 ")"
+        Ascii44@48..49 ","
+        Whitespace@49..50 " "
+        FuncCall@50..68
+          Ident@50..59 "textrange"
+          Ascii40@59..60 "("
+          AConst@60..63
+            Sconst@60..63 "'d'"
+          Ascii44@63..64 ","
+          Whitespace@64..65 " "
+          AConst@65..68
+            Sconst@65..68 "'e'"
+  Ascii41@68..69 ")"
+  Ascii41@69..70 ")"
+  Ascii41@70..71 ")"
+  Ascii59@71..72 ";"
+

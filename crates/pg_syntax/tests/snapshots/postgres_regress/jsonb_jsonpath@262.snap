@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_query('\"1.23\"', '$.double()');"
+---
+SelectStmt@0..48
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..46
+    FuncCall@7..46
+      Ident@7..23 "jsonb_path_query"
+      Ascii40@23..24 "("
+      AConst@24..32
+        Sconst@24..32 "'\"1.23\"'"
+      Ascii44@32..33 ","
+      Whitespace@33..34 " "
+      AConst@34..46
+        Sconst@34..46 "'$.double()'"
+  Ascii41@46..47 ")"
+  Ascii59@47..48 ";"
+

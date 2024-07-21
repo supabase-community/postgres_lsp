@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_tsvector('synonym_tst', 'Most common mistake is to write Gogle instead of Google');"
+---
+SelectStmt@0..93
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..91
+    FuncCall@7..91
+      Ident@7..18 "to_tsvector"
+      Ascii40@18..19 "("
+      AConst@19..32
+        Sconst@19..32 "'synonym_tst'"
+      Ascii44@32..33 ","
+      Whitespace@33..34 " "
+      AConst@34..91
+        Sconst@34..91 "'Most common mistake  ..."
+  Ascii41@91..92 ")"
+  Ascii59@92..93 ";"
+

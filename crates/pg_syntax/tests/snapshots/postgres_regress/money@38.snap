@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT cash_words(m + '1.23') FROM money_data;"
+---
+SelectStmt@0..46
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..28
+    FuncCall@7..28
+      Ident@7..17 "cash_words"
+      Ascii40@17..18 "("
+      AExpr@18..28
+        ColumnRef@18..19
+          Ident@18..19 "m"
+        Whitespace@19..20 " "
+        Ascii43@20..21 "+"
+        Whitespace@21..22 " "
+        AConst@22..28
+          Sconst@22..28 "'1.23'"
+  Ascii41@28..29 ")"
+  Whitespace@29..30 " "
+  From@30..34 "FROM"
+  Whitespace@34..35 " "
+  RangeVar@35..45
+    Ident@35..45 "money_data"
+  Ascii59@45..46 ";"
+

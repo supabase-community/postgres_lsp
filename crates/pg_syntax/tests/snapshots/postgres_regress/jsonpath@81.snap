@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '$ ? (@ like_regex \"pattern\" flag \"smixq\")'::jsonpath;"
+---
+SelectStmt@0..61
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..60
+    TypeCast@7..60
+      AConst@7..50
+        Sconst@7..50 "'$ ? (@ like_regex \"p ..."
+      Typecast@50..52 "::"
+      TypeName@52..60
+        Ident@52..60 "jsonpath"
+  Ascii59@60..61 ";"
+

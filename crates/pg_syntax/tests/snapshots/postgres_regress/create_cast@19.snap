@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 1234::int4::casttesttype;"
+---
+SelectStmt@0..32
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..31
+    TypeCast@7..31
+      TypeCast@7..17
+        AConst@7..11
+          Iconst@7..11 "1234"
+        Typecast@11..13 "::"
+        TypeName@13..17
+          Ident@13..17 "int4"
+      Typecast@17..19 "::"
+      TypeName@19..31
+        Ident@19..31 "casttesttype"
+  Ascii59@31..32 ";"
+

@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into notinouter values (null), (1);"
+---
+InsertStmt@0..42
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..22
+    Ident@12..22 "notinouter"
+  Whitespace@22..23 " "
+  SelectStmt@23..40
+    Values@23..29 "values"
+    Whitespace@29..30 " "
+    Ascii40@30..31 "("
+    List@31..35
+      AConst@31..35
+        NullP@31..35 "null"
+    Ascii41@35..36 ")"
+    Ascii44@36..37 ","
+    Whitespace@37..38 " "
+    Ascii40@38..39 "("
+    List@39..40
+      AConst@39..40
+        Iconst@39..40 "1"
+  Ascii41@40..41 ")"
+  Ascii59@41..42 ";"
+

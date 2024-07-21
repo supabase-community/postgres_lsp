@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: set parallel_tuple_cost to 0;
+---
+VariableSetStmt@0..29
+  Set@0..3 "set"
+  Whitespace@3..4 " "
+  Ident@4..23 "parallel_tuple_cost"
+  Whitespace@23..24 " "
+  To@24..26 "to"
+  Whitespace@26..27 " "
+  AConst@27..28
+    Iconst@27..28 "0"
+  Ascii59@28..29 ";"
+

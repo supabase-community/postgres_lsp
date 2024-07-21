@@ -1,0 +1,11 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: TRUNCATE trunc_f;
+---
+TruncateStmt@0..17
+  Truncate@0..8 "TRUNCATE"
+  Whitespace@8..9 " "
+  RangeVar@9..16
+    Ident@9..16 "trunc_f"
+  Ascii59@16..17 ";"
+

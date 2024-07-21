@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE test_exists (a int, b text);"
+---
+CreateStmt@0..41
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..24
+    Ident@13..24 "test_exists"
+  Whitespace@24..25 " "
+  Ascii40@25..26 "("
+  ColumnDef@26..31
+    Ident@26..27 "a"
+    Whitespace@27..28 " "
+    TypeName@28..31
+      IntP@28..31 "int"
+  Ascii44@31..32 ","
+  Whitespace@32..33 " "
+  ColumnDef@33..39
+    Ident@33..34 "b"
+    Whitespace@34..35 " "
+    TypeName@35..39
+      TextP@35..39 "text"
+  Ascii41@39..40 ")"
+  Ascii59@40..41 ";"
+

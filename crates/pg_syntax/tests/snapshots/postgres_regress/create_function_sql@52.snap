@@ -1,0 +1,76 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT proname, proisstrict FROM pg_proc\n       WHERE oid in ('functest_F_1'::regproc,\n                     'functest_F_2'::regproc,\n                     'functest_F_3'::regproc,\n                     'functest_F_4'::regproc) ORDER BY proname;"
+---
+SelectStmt@0..242
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    ColumnRef@7..14
+      Ident@7..14 "proname"
+  Ascii44@14..15 ","
+  Whitespace@15..16 " "
+  ResTarget@16..27
+    ColumnRef@16..27
+      Ident@16..27 "proisstrict"
+  Whitespace@27..28 " "
+  From@28..32 "FROM"
+  Whitespace@32..33 " "
+  RangeVar@33..40
+    Ident@33..40 "pg_proc"
+  Newline@40..41 "\n"
+  Whitespace@41..48 "       "
+  Where@48..53 "WHERE"
+  Whitespace@53..54 " "
+  AExpr@54..223
+    ColumnRef@54..57
+      Ident@54..57 "oid"
+    Whitespace@57..58 " "
+    InP@58..60 "in"
+    Whitespace@60..61 " "
+    Ascii40@61..62 "("
+    List@62..223
+      TypeCast@62..85
+        AConst@62..76
+          Sconst@62..76 "'functest_F_1'"
+        Typecast@76..78 "::"
+        TypeName@78..85
+          Ident@78..85 "regproc"
+      Ascii44@85..86 ","
+      Newline@86..87 "\n"
+      Whitespace@87..108 "                     "
+      TypeCast@108..131
+        AConst@108..122
+          Sconst@108..122 "'functest_F_2'"
+        Typecast@122..124 "::"
+        TypeName@124..131
+          Ident@124..131 "regproc"
+      Ascii44@131..132 ","
+      Newline@132..133 "\n"
+      Whitespace@133..154 "                     "
+      TypeCast@154..177
+        AConst@154..168
+          Sconst@154..168 "'functest_F_3'"
+        Typecast@168..170 "::"
+        TypeName@170..177
+          Ident@170..177 "regproc"
+      Ascii44@177..178 ","
+      Newline@178..179 "\n"
+      Whitespace@179..200 "                     "
+      TypeCast@200..223
+        AConst@200..214
+          Sconst@200..214 "'functest_F_4'"
+        Typecast@214..216 "::"
+        TypeName@216..223
+          Ident@216..223 "regproc"
+  Ascii41@223..224 ")"
+  Whitespace@224..225 " "
+  SortBy@225..241
+    Order@225..230 "ORDER"
+    Whitespace@230..231 " "
+    By@231..233 "BY"
+    Whitespace@233..234 " "
+    ColumnRef@234..241
+      Ident@234..241 "proname"
+  Ascii59@241..242 ";"
+

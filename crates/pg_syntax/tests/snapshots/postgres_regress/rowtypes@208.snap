@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select row_to_json(tt3::tt2::tt1) from tt3;"
+---
+SelectStmt@0..43
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..32
+    FuncCall@7..32
+      Ident@7..18 "row_to_json"
+      Ascii40@18..19 "("
+      TypeCast@19..32
+        TypeCast@19..27
+          ColumnRef@19..22
+            Ident@19..22 "tt3"
+          Typecast@22..24 "::"
+          TypeName@24..27
+            Ident@24..27 "tt2"
+        Typecast@27..29 "::"
+        TypeName@29..32
+          Ident@29..32 "tt1"
+  Ascii41@32..33 ")"
+  Whitespace@33..34 " "
+  From@34..38 "from"
+  Whitespace@38..39 " "
+  RangeVar@39..42
+    Ident@39..42 "tt3"
+  Ascii59@42..43 ";"
+

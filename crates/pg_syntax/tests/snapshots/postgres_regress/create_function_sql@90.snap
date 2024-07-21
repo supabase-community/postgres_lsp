@@ -1,0 +1,52 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION functest_IS_2(out a int, b int default 1)\n    RETURNS int\n    LANGUAGE SQL\n    AS 'SELECT $1';"
+---
+CreateFunctionStmt@0..110
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..29 "functest_IS_2"
+  Ascii40@29..30 "("
+  FunctionParameter@30..39
+    OutP@30..33 "out"
+    Whitespace@33..34 " "
+    Ident@34..35 "a"
+    Whitespace@35..36 " "
+    TypeName@36..39
+      IntP@36..39 "int"
+  Ascii44@39..40 ","
+  Whitespace@40..41 " "
+  FunctionParameter@41..56
+    Ident@41..42 "b"
+    Whitespace@42..43 " "
+    TypeName@43..46
+      IntP@43..46 "int"
+    Whitespace@46..47 " "
+    Default@47..54 "default"
+    Whitespace@54..55 " "
+    AConst@55..56
+      Iconst@55..56 "1"
+  Ascii41@56..57 ")"
+  Newline@57..58 "\n"
+  Whitespace@58..62 "    "
+  Returns@62..69 "RETURNS"
+  Whitespace@69..70 " "
+  TypeName@70..73
+    IntP@70..73 "int"
+  Newline@73..74 "\n"
+  Whitespace@74..78 "    "
+  DefElem@78..90
+    Language@78..86 "LANGUAGE"
+    Whitespace@86..87 " "
+    SqlP@87..90 "SQL"
+  Newline@90..91 "\n"
+  Whitespace@91..95 "    "
+  DefElem@95..109
+    As@95..97 "AS"
+    Whitespace@97..98 " "
+    List@98..109
+      Sconst@98..109 "'SELECT $1'"
+  Ascii59@109..110 ";"
+

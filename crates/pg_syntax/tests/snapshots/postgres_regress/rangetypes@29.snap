@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '(a,a]'::textrange;"
+---
+SelectStmt@0..26
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..25
+    TypeCast@7..25
+      AConst@7..14
+        Sconst@7..14 "'(a,a]'"
+      Typecast@14..16 "::"
+      TypeName@16..25
+        Ident@16..25 "textrange"
+  Ascii59@25..26 ";"
+

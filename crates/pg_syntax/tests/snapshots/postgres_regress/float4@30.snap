@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 'infinity'::float4;"
+---
+SelectStmt@0..26
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..25
+    TypeCast@7..25
+      AConst@7..17
+        Sconst@7..17 "'infinity'"
+      Typecast@17..19 "::"
+      TypeName@19..25
+        Ident@19..25 "float4"
+  Ascii59@25..26 ";"
+

@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '1 + ($.a.b > 2).c.d'::jsonpath;"
+---
+SelectStmt@0..39
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..38
+    TypeCast@7..38
+      AConst@7..28
+        Sconst@7..28 "'1 + ($.a.b > 2).c.d'"
+      Typecast@28..30 "::"
+      TypeName@30..38
+        Ident@30..38 "jsonpath"
+  Ascii59@38..39 ";"
+

@@ -1,0 +1,43 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO delete_test (a, b) VALUES (50, repeat('x', 10000));"
+---
+InsertStmt@0..63
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "delete_test"
+  Whitespace@23..24 " "
+  Ascii40@24..25 "("
+  ResTarget@25..26
+    Ident@25..26 "a"
+  Ascii44@26..27 ","
+  Whitespace@27..28 " "
+  ResTarget@28..29
+    Ident@28..29 "b"
+  Ascii41@29..30 ")"
+  Whitespace@30..31 " "
+  SelectStmt@31..60
+    Values@31..37 "VALUES"
+    Whitespace@37..38 " "
+    Ascii40@38..39 "("
+    List@39..60
+      AConst@39..41
+        Iconst@39..41 "50"
+      Ascii44@41..42 ","
+      Whitespace@42..43 " "
+      FuncCall@43..60
+        Ident@43..49 "repeat"
+        Ascii40@49..50 "("
+        AConst@50..53
+          Sconst@50..53 "'x'"
+        Ascii44@53..54 ","
+        Whitespace@54..55 " "
+        AConst@55..60
+          Iconst@55..60 "10000"
+  Ascii41@60..61 ")"
+  Ascii41@61..62 ")"
+  Ascii59@62..63 ";"
+

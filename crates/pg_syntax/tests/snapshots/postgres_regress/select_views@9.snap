@@ -1,0 +1,75 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO customer\n       VALUES (101, 'regress_alice', '+81-12-3456-7890', 'passwd123'),\n              (102, 'regress_bob',   '+01-234-567-8901', 'beafsteak'),\n              (103, 'regress_eve',   '+49-8765-43210',   'hamburger');"
+---
+InsertStmt@0..233
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "customer"
+  Newline@20..21 "\n"
+  Whitespace@21..28 "       "
+  SelectStmt@28..231
+    Values@28..34 "VALUES"
+    Whitespace@34..35 " "
+    Ascii40@35..36 "("
+    List@36..89
+      AConst@36..39
+        Iconst@36..39 "101"
+      Ascii44@39..40 ","
+      Whitespace@40..41 " "
+      AConst@41..56
+        Sconst@41..56 "'regress_alice'"
+      Ascii44@56..57 ","
+      Whitespace@57..58 " "
+      AConst@58..76
+        Sconst@58..76 "'+81-12-3456-7890'"
+      Ascii44@76..77 ","
+      Whitespace@77..78 " "
+      AConst@78..89
+        Sconst@78..89 "'passwd123'"
+    Ascii41@89..90 ")"
+    Ascii44@90..91 ","
+    Newline@91..92 "\n"
+    Whitespace@92..106 "              "
+    Ascii40@106..107 "("
+    List@107..160
+      AConst@107..110
+        Iconst@107..110 "102"
+      Ascii44@110..111 ","
+      Whitespace@111..112 " "
+      AConst@112..125
+        Sconst@112..125 "'regress_bob'"
+      Ascii44@125..126 ","
+      Whitespace@126..129 "   "
+      AConst@129..147
+        Sconst@129..147 "'+01-234-567-8901'"
+      Ascii44@147..148 ","
+      Whitespace@148..149 " "
+      AConst@149..160
+        Sconst@149..160 "'beafsteak'"
+    Ascii41@160..161 ")"
+    Ascii44@161..162 ","
+    Newline@162..163 "\n"
+    Whitespace@163..177 "              "
+    Ascii40@177..178 "("
+    List@178..231
+      AConst@178..181
+        Iconst@178..181 "103"
+      Ascii44@181..182 ","
+      Whitespace@182..183 " "
+      AConst@183..196
+        Sconst@183..196 "'regress_eve'"
+      Ascii44@196..197 ","
+      Whitespace@197..200 "   "
+      AConst@200..216
+        Sconst@200..216 "'+49-8765-43210'"
+      Ascii44@216..217 ","
+      Whitespace@217..220 "   "
+      AConst@220..231
+        Sconst@220..231 "'hamburger'"
+  Ascii41@231..232 ")"
+  Ascii59@232..233 ";"
+

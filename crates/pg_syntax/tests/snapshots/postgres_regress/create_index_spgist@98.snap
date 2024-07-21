@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX ON quad_point_tbl_ord_seq1 USING spgist(p) INCLUDE(dist);
+---
+IndexStmt@0..70
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  On@13..15 "ON"
+  Whitespace@15..16 " "
+  RangeVar@16..39
+    Ident@16..39 "quad_point_tbl_ord_seq1"
+  Whitespace@39..40 " "
+  Using@40..45 "USING"
+  Whitespace@45..46 " "
+  Ident@46..52 "spgist"
+  Ascii40@52..53 "("
+  IndexElem@53..54
+    Ident@53..54 "p"
+  Ascii41@54..55 ")"
+  Whitespace@55..56 " "
+  Include@56..63 "INCLUDE"
+  Ascii40@63..64 "("
+  IndexElem@64..68
+    Ident@64..68 "dist"
+  Ascii41@68..69 ")"
+  Ascii59@69..70 ";"
+

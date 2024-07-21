@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table coercepart_ab partition of coercepart for values in ('ab');"
+---
+CreateStmt@0..72
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..26
+    Ident@13..26 "coercepart_ab"
+  Whitespace@26..27 " "
+  Partition@27..36 "partition"
+  Whitespace@36..37 " "
+  Of@37..39 "of"
+  Whitespace@39..40 " "
+  RangeVar@40..50
+    Ident@40..50 "coercepart"
+  Whitespace@50..51 " "
+  For@51..54 "for"
+  Whitespace@54..55 " "
+  Values@55..61 "values"
+  Whitespace@61..62 " "
+  PartitionBoundSpec@62..70
+    InP@62..64 "in"
+    Whitespace@64..65 " "
+    Ascii40@65..66 "("
+    AConst@66..70
+      Sconst@66..70 "'ab'"
+  Ascii41@70..71 ")"
+  Ascii59@71..72 ";"
+

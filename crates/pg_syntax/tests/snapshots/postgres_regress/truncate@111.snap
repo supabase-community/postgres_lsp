@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE truncate_a (id serial,\n                         id1 integer default nextval('truncate_a_id1'));"
+---
+CreateStmt@0..108
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..23
+    Ident@13..23 "truncate_a"
+  Whitespace@23..24 " "
+  Ascii40@24..25 "("
+  ColumnDef@25..34
+    Ident@25..27 "id"
+    Whitespace@27..28 " "
+    TypeName@28..34
+      Ident@28..34 "serial"
+  Ascii44@34..35 ","
+  Newline@35..36 "\n"
+  Whitespace@36..61 "                      ..."
+  ColumnDef@61..105
+    Ident@61..64 "id1"
+    Whitespace@64..65 " "
+    TypeName@65..72
+      Integer@65..72 "integer"
+    Whitespace@72..73 " "
+    Constraint@73..105
+      Default@73..80 "default"
+      Whitespace@80..81 " "
+      FuncCall@81..105
+        Ident@81..88 "nextval"
+        Ascii40@88..89 "("
+        AConst@89..105
+          Sconst@89..105 "'truncate_a_id1'"
+  Ascii41@105..106 ")"
+  Ascii41@106..107 ")"
+  Ascii59@107..108 ";"
+

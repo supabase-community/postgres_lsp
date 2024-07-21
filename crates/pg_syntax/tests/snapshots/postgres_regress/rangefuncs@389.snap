@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: alter table users alter column seq type numeric;
+---
+AlterTableStmt@0..48
+  Alter@0..5 "alter"
+  Whitespace@5..6 " "
+  Table@6..11 "table"
+  Whitespace@11..12 " "
+  RangeVar@12..17
+    Ident@12..17 "users"
+  Whitespace@17..18 " "
+  AlterTableCmd@18..47
+    Alter@18..23 "alter"
+    Whitespace@23..24 " "
+    Column@24..30 "column"
+    Whitespace@30..31 " "
+    Ident@31..34 "seq"
+    Whitespace@34..35 " "
+    TypeP@35..39 "type"
+    Whitespace@39..40 " "
+    ColumnDef@40..47
+      TypeName@40..47
+        Numeric@40..47 "numeric"
+  Ascii59@47..48 ";"
+

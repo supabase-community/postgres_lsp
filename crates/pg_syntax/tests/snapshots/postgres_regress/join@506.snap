@@ -1,0 +1,45 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into join_pt1 values (1, 1, 'x'), (101, 101, 'y');"
+---
+InsertStmt@0..57
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "join_pt1"
+  Whitespace@20..21 " "
+  SelectStmt@21..55
+    Values@21..27 "values"
+    Whitespace@27..28 " "
+    Ascii40@28..29 "("
+    List@29..38
+      AConst@29..30
+        Iconst@29..30 "1"
+      Ascii44@30..31 ","
+      Whitespace@31..32 " "
+      AConst@32..33
+        Iconst@32..33 "1"
+      Ascii44@33..34 ","
+      Whitespace@34..35 " "
+      AConst@35..38
+        Sconst@35..38 "'x'"
+    Ascii41@38..39 ")"
+    Ascii44@39..40 ","
+    Whitespace@40..41 " "
+    Ascii40@41..42 "("
+    List@42..55
+      AConst@42..45
+        Iconst@42..45 "101"
+      Ascii44@45..46 ","
+      Whitespace@46..47 " "
+      AConst@47..50
+        Iconst@47..50 "101"
+      Ascii44@50..51 ","
+      Whitespace@51..52 " "
+      AConst@52..55
+        Sconst@52..55 "'y'"
+  Ascii41@55..56 ")"
+  Ascii59@56..57 ";"
+

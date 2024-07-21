@@ -1,0 +1,42 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into spgist_domain_tbl values('fee'), ('fi'), ('fo'), ('fum');"
+---
+InsertStmt@0..69
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..29
+    Ident@12..29 "spgist_domain_tbl"
+  Whitespace@29..30 " "
+  SelectStmt@30..67
+    Values@30..36 "values"
+    Ascii40@36..37 "("
+    List@37..42
+      AConst@37..42
+        Sconst@37..42 "'fee'"
+    Ascii41@42..43 ")"
+    Ascii44@43..44 ","
+    Whitespace@44..45 " "
+    Ascii40@45..46 "("
+    List@46..50
+      AConst@46..50
+        Sconst@46..50 "'fi'"
+    Ascii41@50..51 ")"
+    Ascii44@51..52 ","
+    Whitespace@52..53 " "
+    Ascii40@53..54 "("
+    List@54..58
+      AConst@54..58
+        Sconst@54..58 "'fo'"
+    Ascii41@58..59 ")"
+    Ascii44@59..60 ","
+    Whitespace@60..61 " "
+    Ascii40@61..62 "("
+    List@62..67
+      AConst@62..67
+        Sconst@62..67 "'fum'"
+  Ascii41@67..68 ")"
+  Ascii59@68..69 ";"
+

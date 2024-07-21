@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO f_star (class, f)\n   VALUES ('f', '(11111111,33333333),(22222222,44444444)'::polygon);"
+---
+InsertStmt@0..98
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "f_star"
+  Whitespace@18..19 " "
+  Ascii40@19..20 "("
+  ResTarget@20..25
+    Class@20..25 "class"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..28
+    Ident@27..28 "f"
+  Ascii41@28..29 ")"
+  Newline@29..30 "\n"
+  Whitespace@30..33 "   "
+  SelectStmt@33..96
+    Values@33..39 "VALUES"
+    Whitespace@39..40 " "
+    Ascii40@40..41 "("
+    List@41..96
+      AConst@41..44
+        Sconst@41..44 "'f'"
+      Ascii44@44..45 ","
+      Whitespace@45..46 " "
+      TypeCast@46..96
+        AConst@46..87
+          Sconst@46..87 "'(11111111,33333333), ..."
+        Typecast@87..89 "::"
+        TypeName@89..96
+          Ident@89..96 "polygon"
+  Ascii41@96..97 ")"
+  Ascii59@97..98 ";"
+

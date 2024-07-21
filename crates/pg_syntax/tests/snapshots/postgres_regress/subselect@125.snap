@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into outer_7597 values (1, 0);"
+---
+InsertStmt@0..37
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..22
+    Ident@12..22 "outer_7597"
+  Whitespace@22..23 " "
+  SelectStmt@23..35
+    Values@23..29 "values"
+    Whitespace@29..30 " "
+    Ascii40@30..31 "("
+    List@31..35
+      AConst@31..32
+        Iconst@31..32 "1"
+      Ascii44@32..33 ","
+      Whitespace@33..34 " "
+      AConst@34..35
+        Iconst@34..35 "0"
+  Ascii41@35..36 ")"
+  Ascii59@36..37 ";"
+

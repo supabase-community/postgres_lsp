@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT jsonb_path_match('{}', 'lax $.a', silent => false);"
+---
+SelectStmt@0..58
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..56
+    FuncCall@7..56
+      Ident@7..23 "jsonb_path_match"
+      Ascii40@23..24 "("
+      AConst@24..28
+        Sconst@24..28 "'{}'"
+      Ascii44@28..29 ","
+      Whitespace@29..30 " "
+      AConst@30..39
+        Sconst@30..39 "'lax $.a'"
+      Ascii44@39..40 ","
+      Whitespace@40..41 " "
+      NamedArgExpr@41..56
+        Ident@41..47 "silent"
+        Whitespace@47..48 " "
+        EqualsGreater@48..50 "=>"
+        Whitespace@50..51 " "
+        AConst@51..56
+          FalseP@51..56 "false"
+  Ascii41@56..57 ")"
+  Ascii59@57..58 ";"
+

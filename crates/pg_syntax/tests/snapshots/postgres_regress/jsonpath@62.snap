@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '(1).type()'::jsonpath;"
+---
+SelectStmt@0..30
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..29
+    TypeCast@7..29
+      AConst@7..19
+        Sconst@7..19 "'(1).type()'"
+      Typecast@19..21 "::"
+      TypeName@21..29
+        Ident@21..29 "jsonpath"
+  Ascii59@29..30 ";"
+

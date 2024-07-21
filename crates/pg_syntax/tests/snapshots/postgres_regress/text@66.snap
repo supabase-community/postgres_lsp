@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select format('>>%2$*1$L<<', 10, NULL);"
+---
+SelectStmt@0..39
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..37
+    FuncCall@7..37
+      Ident@7..13 "format"
+      Ascii40@13..14 "("
+      AConst@14..27
+        Sconst@14..27 "'>>%2$*1$L<<'"
+      Ascii44@27..28 ","
+      Whitespace@28..29 " "
+      AConst@29..31
+        Iconst@29..31 "10"
+      Ascii44@31..32 ","
+      Whitespace@32..33 " "
+      AConst@33..37
+        NullP@33..37 "NULL"
+  Ascii41@37..38 ")"
+  Ascii59@38..39 ";"
+

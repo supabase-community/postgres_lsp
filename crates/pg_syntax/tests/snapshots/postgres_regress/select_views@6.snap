@@ -1,0 +1,58 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE customer (\n       cid      int primary key,\n       name     text not null,\n       tel      text,\n       passwd\ttext\n);"
+---
+CreateStmt@0..131
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..21
+    Ident@13..21 "customer"
+  Whitespace@21..22 " "
+  Ascii40@22..23 "("
+  Newline@23..24 "\n"
+  Whitespace@24..31 "       "
+  ColumnDef@31..55
+    Ident@31..34 "cid"
+    Whitespace@34..40 "      "
+    TypeName@40..43
+      IntP@40..43 "int"
+    Whitespace@43..44 " "
+    Constraint@44..55
+      Primary@44..51 "primary"
+      Whitespace@51..52 " "
+      Key@52..55 "key"
+  Ascii44@55..56 ","
+  Newline@56..57 "\n"
+  Whitespace@57..64 "       "
+  ColumnDef@64..86
+    NameP@64..68 "name"
+    Whitespace@68..73 "     "
+    TypeName@73..77
+      TextP@73..77 "text"
+    Whitespace@77..78 " "
+    Constraint@78..86
+      Not@78..81 "not"
+      Whitespace@81..82 " "
+      NullP@82..86 "null"
+  Ascii44@86..87 ","
+  Newline@87..88 "\n"
+  Whitespace@88..95 "       "
+  ColumnDef@95..108
+    Ident@95..98 "tel"
+    Whitespace@98..104 "      "
+    TypeName@104..108
+      TextP@104..108 "text"
+  Ascii44@108..109 ","
+  Newline@109..110 "\n"
+  Whitespace@110..117 "       "
+  ColumnDef@117..128
+    Ident@117..123 "passwd"
+    Newline@123..124 "\t"
+    TypeName@124..128
+      TextP@124..128 "text"
+  Newline@128..129 "\n"
+  Ascii41@129..130 ")"
+  Ascii59@130..131 ";"
+

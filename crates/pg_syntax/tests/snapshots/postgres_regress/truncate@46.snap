@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: TRUNCATE TABLE trunc_c CASCADE;
+---
+TruncateStmt@0..31
+  Truncate@0..8 "TRUNCATE"
+  Whitespace@8..9 " "
+  Table@9..14 "TABLE"
+  Whitespace@14..15 " "
+  RangeVar@15..22
+    Ident@15..22 "trunc_c"
+  Whitespace@22..23 " "
+  Cascade@23..30 "CASCADE"
+  Ascii59@30..31 ";"
+

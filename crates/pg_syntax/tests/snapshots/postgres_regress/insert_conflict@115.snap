@@ -1,0 +1,37 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create view insertconflictv as\n  select * from insertconflict with cascaded check option;"
+---
+ViewStmt@0..89
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  View@7..11 "view"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "insertconflictv"
+  Whitespace@27..28 " "
+  As@28..30 "as"
+  Newline@30..31 "\n"
+  Whitespace@31..33 "  "
+  SelectStmt@33..61
+    Select@33..39 "select"
+    Whitespace@39..40 " "
+    ResTarget@40..41
+      ColumnRef@40..41
+        AStar@40..41
+          Ascii42@40..41 "*"
+    Whitespace@41..42 " "
+    From@42..46 "from"
+    Whitespace@46..47 " "
+    RangeVar@47..61
+      Ident@47..61 "insertconflict"
+  Whitespace@61..62 " "
+  With@62..66 "with"
+  Whitespace@66..67 " "
+  Cascaded@67..75 "cascaded"
+  Whitespace@75..76 " "
+  Check@76..81 "check"
+  Whitespace@81..82 " "
+  Option@82..88 "option"
+  Ascii59@88..89 ";"
+

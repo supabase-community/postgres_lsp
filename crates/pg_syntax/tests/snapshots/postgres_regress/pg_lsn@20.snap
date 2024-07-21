@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 'FFFFFFFF/FFFFFFFE'::pg_lsn + 1::numeric;"
+---
+SelectStmt@0..48
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..47
+    AExpr@7..47
+      TypeCast@7..34
+        AConst@7..26
+          Sconst@7..26 "'FFFFFFFF/FFFFFFFE'"
+        Typecast@26..28 "::"
+        TypeName@28..34
+          Ident@28..34 "pg_lsn"
+      Whitespace@34..35 " "
+      Ascii43@35..36 "+"
+      Whitespace@36..37 " "
+      TypeCast@37..47
+        AConst@37..38
+          Iconst@37..38 "1"
+        Typecast@38..40 "::"
+        TypeName@40..47
+          Numeric@40..47 "numeric"
+  Ascii59@47..48 ";"
+

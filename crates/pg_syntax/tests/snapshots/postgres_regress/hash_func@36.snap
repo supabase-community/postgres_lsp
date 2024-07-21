@@ -1,0 +1,69 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT v as value, hash_record(v)::bit(32) as standard\nFROM   (VALUES (row(1, 'aaa')::hash_test_t2)) x(v);"
+---
+SelectStmt@0..106
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..17
+    ColumnRef@7..8
+      Ident@7..8 "v"
+    Whitespace@8..9 " "
+    As@9..11 "as"
+    Whitespace@11..12 " "
+    ValueP@12..17 "value"
+  Ascii44@17..18 ","
+  Whitespace@18..19 " "
+  ResTarget@19..54
+    TypeCast@19..41
+      FuncCall@19..32
+        Ident@19..30 "hash_record"
+        Ascii40@30..31 "("
+        ColumnRef@31..32
+          Ident@31..32 "v"
+      Ascii41@32..33 ")"
+      Typecast@33..35 "::"
+      TypeName@35..41
+        Bit@35..38 "bit"
+        Ascii40@38..39 "("
+        AConst@39..41
+          Iconst@39..41 "32"
+    Ascii41@41..42 ")"
+    Whitespace@42..43 " "
+    As@43..45 "as"
+    Whitespace@45..46 " "
+    Ident@46..54 "standard"
+  Newline@54..55 "\n"
+  From@55..59 "FROM"
+  Whitespace@59..62 "   "
+  Ascii40@62..63 "("
+  RangeSubselect@63..104
+    SelectStmt@63..98
+      Values@63..69 "VALUES"
+      Whitespace@69..70 " "
+      Ascii40@70..71 "("
+      List@71..98
+        TypeCast@71..98
+          RowExpr@71..83
+            Row@71..74 "row"
+            Ascii40@74..75 "("
+            AConst@75..76
+              Iconst@75..76 "1"
+            Ascii44@76..77 ","
+            Whitespace@77..78 " "
+            AConst@78..83
+              Sconst@78..83 "'aaa'"
+          Ascii41@83..84 ")"
+          Typecast@84..86 "::"
+          TypeName@86..98
+            Ident@86..98 "hash_test_t2"
+    Ascii41@98..99 ")"
+    Ascii41@99..100 ")"
+    Whitespace@100..101 " "
+    Alias@101..104
+      Ident@101..102 "x"
+      Ascii40@102..103 "("
+      Ident@103..104 "v"
+  Ascii41@104..105 ")"
+  Ascii59@105..106 ";"
+

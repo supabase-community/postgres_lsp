@@ -1,0 +1,45 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE OR REPLACE FUNCTION getfoo(int) RETURNS SETOF users AS $$SELECT * FROM \\\"users\\\" WHERE users.id = $1;$$ LANGUAGE sql IMMUTABLE STRICT;"
+---
+CreateFunctionStmt@0..141
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Or@7..9 "OR"
+  Whitespace@9..10 " "
+  Replace@10..17 "REPLACE"
+  Whitespace@17..18 " "
+  Function@18..26 "FUNCTION"
+  Whitespace@26..27 " "
+  Ident@27..33 "getfoo"
+  Ascii40@33..34 "("
+  FunctionParameter@34..37
+    TypeName@34..37
+      IntP@34..37 "int"
+  Ascii41@37..38 ")"
+  Whitespace@38..39 " "
+  Returns@39..46 "RETURNS"
+  Whitespace@46..47 " "
+  Setof@47..52 "SETOF"
+  Whitespace@52..53 " "
+  TypeName@53..58
+    Ident@53..58 "users"
+  Whitespace@58..59 " "
+  DefElem@59..110
+    As@59..61 "AS"
+    Whitespace@61..62 " "
+    List@62..110
+      Sconst@62..110 "$$SELECT * FROM \\\"use ..."
+  Whitespace@110..111 " "
+  DefElem@111..123
+    Language@111..119 "LANGUAGE"
+    Whitespace@119..120 " "
+    SqlP@120..123 "sql"
+  Whitespace@123..124 " "
+  DefElem@124..133
+    Immutable@124..133 "IMMUTABLE"
+  Whitespace@133..134 " "
+  DefElem@134..140
+    StrictP@134..140 "STRICT"
+  Ascii59@140..141 ";"
+

@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT pg_size_bytes('-.kb');"
+---
+SelectStmt@0..29
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..27
+    FuncCall@7..27
+      Ident@7..20 "pg_size_bytes"
+      Ascii40@20..21 "("
+      AConst@21..27
+        Sconst@21..27 "'-.kb'"
+  Ascii41@27..28 ")"
+  Ascii59@28..29 ";"
+

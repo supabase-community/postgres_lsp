@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '23:59:59.9999999'::time;"
+---
+SelectStmt@0..32
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..31
+    TypeCast@7..31
+      AConst@7..25
+        Sconst@7..25 "'23:59:59.9999999'"
+      Typecast@25..27 "::"
+      TypeName@27..31
+        Time@27..31 "time"
+  Ascii59@31..32 ";"
+

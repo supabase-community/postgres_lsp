@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT jsonb_path_match('false', '$', silent => false);"
+---
+SelectStmt@0..55
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..53
+    FuncCall@7..53
+      Ident@7..23 "jsonb_path_match"
+      Ascii40@23..24 "("
+      AConst@24..31
+        Sconst@24..31 "'false'"
+      Ascii44@31..32 ","
+      Whitespace@32..33 " "
+      AConst@33..36
+        Sconst@33..36 "'$'"
+      Ascii44@36..37 ","
+      Whitespace@37..38 " "
+      NamedArgExpr@38..53
+        Ident@38..44 "silent"
+        Whitespace@44..45 " "
+        EqualsGreater@45..47 "=>"
+        Whitespace@47..48 " "
+        AConst@48..53
+          FalseP@48..53 "false"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

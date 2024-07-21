@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '-12345678901234567'::money::numeric;"
+---
+SelectStmt@0..44
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..43
+    TypeCast@7..43
+      TypeCast@7..34
+        AConst@7..27
+          Sconst@7..27 "'-12345678901234567'"
+        Typecast@27..29 "::"
+        TypeName@29..34
+          Ident@29..34 "money"
+      Typecast@34..36 "::"
+      TypeName@36..43
+        Numeric@36..43 "numeric"
+  Ascii59@43..44 ";"
+

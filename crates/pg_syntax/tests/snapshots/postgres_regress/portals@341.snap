@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table toasted_data (f1 int[]);"
+---
+CreateStmt@0..37
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..25
+    Ident@13..25 "toasted_data"
+  Whitespace@25..26 " "
+  Ascii40@26..27 "("
+  ColumnDef@27..33
+    Ident@27..29 "f1"
+    Whitespace@29..30 " "
+    TypeName@30..33
+      IntP@30..33 "int"
+  Ascii91@33..34 "["
+  Ascii93@34..35 "]"
+  Ascii41@35..36 ")"
+  Ascii59@36..37 ";"
+

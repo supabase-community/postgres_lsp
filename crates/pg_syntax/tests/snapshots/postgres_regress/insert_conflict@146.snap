@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into excluded values(1, '1');"
+---
+InsertStmt@0..36
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "excluded"
+  Whitespace@20..21 " "
+  SelectStmt@21..34
+    Values@21..27 "values"
+    Ascii40@27..28 "("
+    List@28..34
+      AConst@28..29
+        Iconst@28..29 "1"
+      Ascii44@29..30 ","
+      Whitespace@30..31 " "
+      AConst@31..34
+        Sconst@31..34 "'1'"
+  Ascii41@34..35 ")"
+  Ascii59@35..36 ";"
+

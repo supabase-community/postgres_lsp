@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT ts_delete('base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'::tsvector, ARRAY['spaceships','rebel']);"
+---
+SelectStmt@0..120
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..117
+    FuncCall@7..117
+      Ident@7..16 "ts_delete"
+      Ascii40@16..17 "("
+      TypeCast@17..89
+        AConst@17..79
+          Sconst@17..79 "'base:7 hidden:6 rebe ..."
+        Typecast@79..81 "::"
+        TypeName@81..89
+          Ident@81..89 "tsvector"
+      Ascii44@89..90 ","
+      Whitespace@90..91 " "
+      AArrayExpr@91..117
+        Array@91..96 "ARRAY"
+        Ascii91@96..97 "["
+        AConst@97..109
+          Sconst@97..109 "'spaceships'"
+        Ascii44@109..110 ","
+        AConst@110..117
+          Sconst@110..117 "'rebel'"
+  Ascii93@117..118 "]"
+  Ascii41@118..119 ")"
+  Ascii59@119..120 ";"
+

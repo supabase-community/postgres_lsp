@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select explain_filter('explain (analyze, buffers, format text) select * from int8_tbl i8');"
+---
+SelectStmt@0..91
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..89
+    FuncCall@7..89
+      Ident@7..21 "explain_filter"
+      Ascii40@21..22 "("
+      AConst@22..89
+        Sconst@22..89 "'explain (analyze, bu ..."
+  Ascii41@89..90 ")"
+  Ascii59@90..91 ";"
+

@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT (((SELECT ARRAY[1,2,3])))[3];"
+---
+SelectStmt@0..36
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..34
+    AIndirection@7..34
+      SubLink@7..28
+        SelectStmt@7..28
+          Ascii40@7..8 "("
+          Ascii40@8..9 "("
+          Ascii40@9..10 "("
+          Select@10..16 "SELECT"
+          Whitespace@16..17 " "
+          ResTarget@17..28
+            AArrayExpr@17..28
+              Array@17..22 "ARRAY"
+              Ascii91@22..23 "["
+              AConst@23..24
+                Iconst@23..24 "1"
+              Ascii44@24..25 ","
+              AConst@25..26
+                Iconst@25..26 "2"
+              Ascii44@26..27 ","
+              AConst@27..28
+                Iconst@27..28 "3"
+      Ascii93@28..29 "]"
+      Ascii41@29..30 ")"
+      Ascii41@30..31 ")"
+      Ascii41@31..32 ")"
+      Ascii91@32..33 "["
+      AIndices@33..34
+        AConst@33..34
+          Iconst@33..34 "3"
+  Ascii93@34..35 "]"
+  Ascii59@35..36 ";"
+

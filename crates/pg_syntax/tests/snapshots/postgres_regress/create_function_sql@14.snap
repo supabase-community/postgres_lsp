@@ -1,0 +1,37 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION functest_B_3(int) RETURNS bool LANGUAGE 'sql'\n       STABLE AS 'SELECT $1 = 0';"
+---
+CreateFunctionStmt@0..95
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..28 "functest_B_3"
+  Ascii40@28..29 "("
+  FunctionParameter@29..32
+    TypeName@29..32
+      IntP@29..32 "int"
+  Ascii41@32..33 ")"
+  Whitespace@33..34 " "
+  Returns@34..41 "RETURNS"
+  Whitespace@41..42 " "
+  TypeName@42..46
+    Ident@42..46 "bool"
+  Whitespace@46..47 " "
+  DefElem@47..61
+    Language@47..55 "LANGUAGE"
+    Whitespace@55..56 " "
+    Sconst@56..61 "'sql'"
+  Newline@61..62 "\n"
+  Whitespace@62..69 "       "
+  DefElem@69..75
+    Stable@69..75 "STABLE"
+  Whitespace@75..76 " "
+  DefElem@76..94
+    As@76..78 "AS"
+    Whitespace@78..79 " "
+    List@79..94
+      Sconst@79..94 "'SELECT $1 = 0'"
+  Ascii59@94..95 ";"
+

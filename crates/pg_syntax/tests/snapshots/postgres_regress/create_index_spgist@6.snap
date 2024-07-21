@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX sp_kd_ind ON kd_point_tbl USING spgist (p kd_point_ops);
+---
+IndexStmt@0..69
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..22 "sp_kd_ind"
+  Whitespace@22..23 " "
+  On@23..25 "ON"
+  Whitespace@25..26 " "
+  RangeVar@26..38
+    Ident@26..38 "kd_point_tbl"
+  Whitespace@38..39 " "
+  Using@39..44 "USING"
+  Whitespace@44..45 " "
+  Ident@45..51 "spgist"
+  Whitespace@51..52 " "
+  Ascii40@52..53 "("
+  IndexElem@53..67
+    Ident@53..54 "p"
+    Whitespace@54..55 " "
+    Ident@55..67 "kd_point_ops"
+  Ascii41@67..68 ")"
+  Ascii59@68..69 ";"
+

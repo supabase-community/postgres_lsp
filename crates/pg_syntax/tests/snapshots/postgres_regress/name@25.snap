@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT parse_ident('foo.boo[]');"
+---
+SelectStmt@0..32
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..30
+    FuncCall@7..30
+      Ident@7..18 "parse_ident"
+      Ascii40@18..19 "("
+      AConst@19..30
+        Sconst@19..30 "'foo.boo[]'"
+  Ascii41@30..31 ")"
+  Ascii59@31..32 ";"
+

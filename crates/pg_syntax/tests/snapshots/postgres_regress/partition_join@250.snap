@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX prt1_adv_a_idx ON prt1_adv (a);
+---
+IndexStmt@0..44
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..27 "prt1_adv_a_idx"
+  Whitespace@27..28 " "
+  On@28..30 "ON"
+  Whitespace@30..31 " "
+  RangeVar@31..39
+    Ident@31..39 "prt1_adv"
+  Whitespace@39..40 " "
+  Ascii40@40..41 "("
+  IndexElem@41..42
+    Ident@41..42 "a"
+  Ascii41@42..43 ")"
+  Ascii59@43..44 ";"
+

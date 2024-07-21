@@ -1,0 +1,121 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT d1 as timestamptz,\n   date_part( 'decade', d1) AS decade,\n   date_part( 'century', d1) AS century,\n   date_part( 'millennium', d1) AS millennium,\n   round(date_part( 'julian', d1)) AS julian,\n   date_part( 'epoch', d1) AS epoch\n   FROM TIMESTAMPTZ_TBL;"
+---
+SelectStmt@0..259
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..24
+    ColumnRef@7..9
+      Ident@7..9 "d1"
+    Whitespace@9..10 " "
+    As@10..12 "as"
+    Whitespace@12..13 " "
+    Ident@13..24 "timestamptz"
+  Ascii44@24..25 ","
+  Newline@25..26 "\n"
+  Whitespace@26..29 "   "
+  ResTarget@29..63
+    FuncCall@29..52
+      Ident@29..38 "date_part"
+      Ascii40@38..39 "("
+      Whitespace@39..40 " "
+      AConst@40..48
+        Sconst@40..48 "'decade'"
+      Ascii44@48..49 ","
+      Whitespace@49..50 " "
+      ColumnRef@50..52
+        Ident@50..52 "d1"
+    Ascii41@52..53 ")"
+    Whitespace@53..54 " "
+    As@54..56 "AS"
+    Whitespace@56..57 " "
+    Ident@57..63 "decade"
+  Ascii44@63..64 ","
+  Newline@64..65 "\n"
+  Whitespace@65..68 "   "
+  ResTarget@68..104
+    FuncCall@68..92
+      Ident@68..77 "date_part"
+      Ascii40@77..78 "("
+      Whitespace@78..79 " "
+      AConst@79..88
+        Sconst@79..88 "'century'"
+      Ascii44@88..89 ","
+      Whitespace@89..90 " "
+      ColumnRef@90..92
+        Ident@90..92 "d1"
+    Ascii41@92..93 ")"
+    Whitespace@93..94 " "
+    As@94..96 "AS"
+    Whitespace@96..97 " "
+    Ident@97..104 "century"
+  Ascii44@104..105 ","
+  Newline@105..106 "\n"
+  Whitespace@106..109 "   "
+  ResTarget@109..151
+    FuncCall@109..136
+      Ident@109..118 "date_part"
+      Ascii40@118..119 "("
+      Whitespace@119..120 " "
+      AConst@120..132
+        Sconst@120..132 "'millennium'"
+      Ascii44@132..133 ","
+      Whitespace@133..134 " "
+      ColumnRef@134..136
+        Ident@134..136 "d1"
+    Ascii41@136..137 ")"
+    Whitespace@137..138 " "
+    As@138..140 "AS"
+    Whitespace@140..141 " "
+    Ident@141..151 "millennium"
+  Ascii44@151..152 ","
+  Newline@152..153 "\n"
+  Whitespace@153..156 "   "
+  ResTarget@156..197
+    FuncCall@156..185
+      Ident@156..161 "round"
+      Ascii40@161..162 "("
+      FuncCall@162..185
+        Ident@162..171 "date_part"
+        Ascii40@171..172 "("
+        Whitespace@172..173 " "
+        AConst@173..181
+          Sconst@173..181 "'julian'"
+        Ascii44@181..182 ","
+        Whitespace@182..183 " "
+        ColumnRef@183..185
+          Ident@183..185 "d1"
+    Ascii41@185..186 ")"
+    Ascii41@186..187 ")"
+    Whitespace@187..188 " "
+    As@188..190 "AS"
+    Whitespace@190..191 " "
+    Ident@191..197 "julian"
+  Ascii44@197..198 ","
+  Newline@198..199 "\n"
+  Whitespace@199..202 "   "
+  ResTarget@202..234
+    FuncCall@202..224
+      Ident@202..211 "date_part"
+      Ascii40@211..212 "("
+      Whitespace@212..213 " "
+      AConst@213..220
+        Sconst@213..220 "'epoch'"
+      Ascii44@220..221 ","
+      Whitespace@221..222 " "
+      ColumnRef@222..224
+        Ident@222..224 "d1"
+    Ascii41@224..225 ")"
+    Whitespace@225..226 " "
+    As@226..228 "AS"
+    Whitespace@228..229 " "
+    Ident@229..234 "epoch"
+  Newline@234..235 "\n"
+  Whitespace@235..238 "   "
+  From@238..242 "FROM"
+  Whitespace@242..243 " "
+  RangeVar@243..258
+    Ident@243..258 "TIMESTAMPTZ_TBL"
+  Ascii59@258..259 ";"
+

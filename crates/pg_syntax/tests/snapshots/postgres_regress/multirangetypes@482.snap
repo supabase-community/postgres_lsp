@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from nummultirange_test2 where nmr = '{}';"
+---
+SelectStmt@0..51
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeVar@14..33
+    Ident@14..33 "nummultirange_test2"
+  Whitespace@33..34 " "
+  Where@34..39 "where"
+  Whitespace@39..40 " "
+  AExpr@40..50
+    ColumnRef@40..43
+      Ident@40..43 "nmr"
+    Whitespace@43..44 " "
+    Ascii61@44..45 "="
+    Whitespace@45..46 " "
+    AConst@46..50
+      Sconst@46..50 "'{}'"
+  Ascii59@50..51 ";"
+

@@ -1,0 +1,18 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select 'xy' ~ 'x(?=[xy])';"
+---
+SelectStmt@0..26
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..25
+    AExpr@7..25
+      AConst@7..11
+        Sconst@7..11 "'xy'"
+      Whitespace@11..12 " "
+      Op@12..13 "~"
+      Whitespace@13..14 " "
+      AConst@14..25
+        Sconst@14..25 "'x(?=[xy])'"
+  Ascii59@25..26 ";"
+

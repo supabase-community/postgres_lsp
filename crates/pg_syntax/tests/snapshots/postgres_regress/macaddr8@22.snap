@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE macaddr8_data (a int, b macaddr8);"
+---
+CreateStmt@0..47
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..26
+    Ident@13..26 "macaddr8_data"
+  Whitespace@26..27 " "
+  Ascii40@27..28 "("
+  ColumnDef@28..33
+    Ident@28..29 "a"
+    Whitespace@29..30 " "
+    TypeName@30..33
+      IntP@30..33 "int"
+  Ascii44@33..34 ","
+  Whitespace@34..35 " "
+  ColumnDef@35..45
+    Ident@35..36 "b"
+    Whitespace@36..37 " "
+    TypeName@37..45
+      Ident@37..45 "macaddr8"
+  Ascii41@45..46 ")"
+  Ascii59@46..47 ";"
+

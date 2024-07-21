@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT 2 * m FROM money_data;
+---
+SelectStmt@0..29
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..12
+    AExpr@7..12
+      AConst@7..8
+        Iconst@7..8 "2"
+      Whitespace@8..9 " "
+      Ascii42@9..10 "*"
+      Whitespace@10..11 " "
+      ColumnRef@11..12
+        Ident@11..12 "m"
+  Whitespace@12..13 " "
+  From@13..17 "FROM"
+  Whitespace@17..18 " "
+  RangeVar@18..28
+    Ident@18..28 "money_data"
+  Ascii59@28..29 ";"
+

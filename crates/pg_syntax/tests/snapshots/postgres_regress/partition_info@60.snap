@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM pg_partition_tree('ptif_test_matview');"
+---
+SelectStmt@0..53
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeFunction@14..51
+    List@14..51
+      FuncCall@14..51
+        Ident@14..31 "pg_partition_tree"
+        Ascii40@31..32 "("
+        AConst@32..51
+          Sconst@32..51 "'ptif_test_matview'"
+  Ascii41@51..52 ")"
+  Ascii59@52..53 ";"
+

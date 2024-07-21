@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT * FROM my_credit_card_secure WHERE f_leak(cnum);
+---
+SelectStmt@0..55
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..35
+    Ident@14..35 "my_credit_card_secure"
+  Whitespace@35..36 " "
+  Where@36..41 "WHERE"
+  Whitespace@41..42 " "
+  FuncCall@42..53
+    Ident@42..48 "f_leak"
+    Ascii40@48..49 "("
+    ColumnRef@49..53
+      Ident@49..53 "cnum"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

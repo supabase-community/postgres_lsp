@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT 2 + 2 / 2 AS three;
+---
+SelectStmt@0..26
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..25
+    AExpr@7..16
+      AConst@7..8
+        Iconst@7..8 "2"
+      Whitespace@8..9 " "
+      Ascii43@9..10 "+"
+      Whitespace@10..11 " "
+      AExpr@11..16
+        AConst@11..12
+          Iconst@11..12 "2"
+        Whitespace@12..13 " "
+        Ascii47@13..14 "/"
+        Whitespace@14..15 " "
+        AConst@15..16
+          Iconst@15..16 "2"
+    Whitespace@16..17 " "
+    As@17..19 "AS"
+    Whitespace@19..20 " "
+    Ident@20..25 "three"
+  Ascii59@25..26 ";"
+

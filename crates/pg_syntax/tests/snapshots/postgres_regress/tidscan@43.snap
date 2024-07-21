@@ -1,0 +1,47 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT count(*) FROM tenk1 t1 JOIN tenk1 t2 ON t1.ctid = t2.ctid;
+---
+SelectStmt@0..65
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "FROM"
+  Whitespace@20..21 " "
+  JoinExpr@21..64
+    RangeVar@21..29
+      Ident@21..26 "tenk1"
+      Whitespace@26..27 " "
+      Alias@27..29
+        Ident@27..29 "t1"
+    Whitespace@29..30 " "
+    Join@30..34 "JOIN"
+    Whitespace@34..35 " "
+    RangeVar@35..43
+      Ident@35..40 "tenk1"
+      Whitespace@40..41 " "
+      Alias@41..43
+        Ident@41..43 "t2"
+    Whitespace@43..44 " "
+    On@44..46 "ON"
+    Whitespace@46..47 " "
+    AExpr@47..64
+      ColumnRef@47..54
+        Ident@47..49 "t1"
+        Ascii46@49..50 "."
+        Ident@50..54 "ctid"
+      Whitespace@54..55 " "
+      Ascii61@55..56 "="
+      Whitespace@56..57 " "
+      ColumnRef@57..64
+        Ident@57..59 "t2"
+        Ascii46@59..60 "."
+        Ident@60..64 "ctid"
+  Ascii59@64..65 ";"
+

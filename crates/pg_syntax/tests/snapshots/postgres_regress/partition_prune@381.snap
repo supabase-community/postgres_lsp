@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: insert into tbl1 values (4400);
+---
+InsertStmt@0..31
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..16
+    Ident@12..16 "tbl1"
+  Whitespace@16..17 " "
+  SelectStmt@17..29
+    Values@17..23 "values"
+    Whitespace@23..24 " "
+    Ascii40@24..25 "("
+    List@25..29
+      AConst@25..29
+        Iconst@25..29 "4400"
+  Ascii41@29..30 ")"
+  Ascii59@30..31 ";"
+

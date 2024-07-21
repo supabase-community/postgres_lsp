@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO quad_point_tbl\n    SELECT '(333.0,400.0)'::point FROM generate_series(1,1000);"
+---
+InsertStmt@0..90
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..26
+    Ident@12..26 "quad_point_tbl"
+  Newline@26..27 "\n"
+  Whitespace@27..31 "    "
+  SelectStmt@31..88
+    Select@31..37 "SELECT"
+    Whitespace@37..38 " "
+    ResTarget@38..60
+      TypeCast@38..60
+        AConst@38..53
+          Sconst@38..53 "'(333.0,400.0)'"
+        Typecast@53..55 "::"
+        TypeName@55..60
+          Ident@55..60 "point"
+    Whitespace@60..61 " "
+    From@61..65 "FROM"
+    Whitespace@65..66 " "
+    RangeFunction@66..88
+      List@66..88
+        FuncCall@66..88
+          Ident@66..81 "generate_series"
+          Ascii40@81..82 "("
+          AConst@82..83
+            Iconst@82..83 "1"
+          Ascii44@83..84 ","
+          AConst@84..88
+            Iconst@84..88 "1000"
+  Ascii41@88..89 ")"
+  Ascii59@89..90 ";"
+

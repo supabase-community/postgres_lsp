@@ -1,0 +1,42 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE num_result (id1 int4, id2 int4, result numeric(1000,800));"
+---
+CreateStmt@0..71
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..23
+    Ident@13..23 "num_result"
+  Whitespace@23..24 " "
+  Ascii40@24..25 "("
+  ColumnDef@25..33
+    Ident@25..28 "id1"
+    Whitespace@28..29 " "
+    TypeName@29..33
+      Ident@29..33 "int4"
+  Ascii44@33..34 ","
+  Whitespace@34..35 " "
+  ColumnDef@35..43
+    Ident@35..38 "id2"
+    Whitespace@38..39 " "
+    TypeName@39..43
+      Ident@39..43 "int4"
+  Ascii44@43..44 ","
+  Whitespace@44..45 " "
+  ColumnDef@45..68
+    Ident@45..51 "result"
+    Whitespace@51..52 " "
+    TypeName@52..68
+      Numeric@52..59 "numeric"
+      Ascii40@59..60 "("
+      AConst@60..64
+        Iconst@60..64 "1000"
+      Ascii44@64..65 ","
+      AConst@65..68
+        Iconst@65..68 "800"
+  Ascii41@68..69 ")"
+  Ascii41@69..70 ")"
+  Ascii59@70..71 ";"
+

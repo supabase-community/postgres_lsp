@@ -1,0 +1,45 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_char(now(), 'of') as \"Of\", to_char(now(), 'tzh:tzm') as \"tzh:tzm\";"
+---
+SelectStmt@0..76
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..35
+    FuncCall@7..26
+      Ident@7..14 "to_char"
+      Ascii40@14..15 "("
+      FuncCall@15..18
+        Ident@15..18 "now"
+      Ascii40@18..19 "("
+      Ascii41@19..20 ")"
+      Ascii44@20..21 ","
+      Whitespace@21..22 " "
+      AConst@22..26
+        Sconst@22..26 "'of'"
+    Ascii41@26..27 ")"
+    Whitespace@27..28 " "
+    As@28..30 "as"
+    Whitespace@30..31 " "
+    Ident@31..35 "\"Of\""
+  Ascii44@35..36 ","
+  Whitespace@36..37 " "
+  ResTarget@37..75
+    FuncCall@37..61
+      Ident@37..44 "to_char"
+      Ascii40@44..45 "("
+      FuncCall@45..48
+        Ident@45..48 "now"
+      Ascii40@48..49 "("
+      Ascii41@49..50 ")"
+      Ascii44@50..51 ","
+      Whitespace@51..52 " "
+      AConst@52..61
+        Sconst@52..61 "'tzh:tzm'"
+    Ascii41@61..62 ")"
+    Whitespace@62..63 " "
+    As@63..65 "as"
+    Whitespace@65..66 " "
+    Ident@66..75 "\"tzh:tzm\""
+  Ascii59@75..76 ";"
+

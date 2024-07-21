@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SET no_such_variable TO 42;
+---
+VariableSetStmt@0..27
+  Set@0..3 "SET"
+  Whitespace@3..4 " "
+  Ident@4..20 "no_such_variable"
+  Whitespace@20..21 " "
+  To@21..23 "TO"
+  Whitespace@23..24 " "
+  AConst@24..26
+    Iconst@24..26 "42"
+  Ascii59@26..27 ";"
+

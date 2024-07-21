@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_query('{\"c\": {\"a\": 2, \"b\":1}}', '$.** ? (@.a == 1 + 1)');"
+---
+SelectStmt@0..75
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..73
+    FuncCall@7..73
+      Ident@7..23 "jsonb_path_query"
+      Ascii40@23..24 "("
+      AConst@24..48
+        Sconst@24..48 "'{\"c\": {\"a\": 2, \"b\":1}}'"
+      Ascii44@48..49 ","
+      Whitespace@49..50 " "
+      AConst@50..73
+        Sconst@50..73 "'$.** ? (@.a == 1 + 1)'"
+  Ascii41@73..74 ")"
+  Ascii59@74..75 ";"
+

@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT tsquery_phrase('a <3> g', 'b & d', 10);"
+---
+SelectStmt@0..46
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..44
+    FuncCall@7..44
+      Ident@7..21 "tsquery_phrase"
+      Ascii40@21..22 "("
+      AConst@22..31
+        Sconst@22..31 "'a <3> g'"
+      Ascii44@31..32 ","
+      Whitespace@32..33 " "
+      AConst@33..40
+        Sconst@33..40 "'b & d'"
+      Ascii44@40..41 ","
+      Whitespace@41..42 " "
+      AConst@42..44
+        Iconst@42..44 "10"
+  Ascii41@44..45 ")"
+  Ascii59@45..46 ";"
+

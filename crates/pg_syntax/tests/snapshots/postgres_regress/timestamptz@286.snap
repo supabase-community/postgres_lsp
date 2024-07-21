@@ -1,0 +1,17 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT to_timestamp(         0);
+---
+SelectStmt@0..32
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..30
+    FuncCall@7..30
+      Ident@7..19 "to_timestamp"
+      Ascii40@19..20 "("
+      Whitespace@20..29 "         "
+      AConst@29..30
+        Iconst@29..30 "0"
+  Ascii41@30..31 ")"
+  Ascii59@31..32 ";"
+

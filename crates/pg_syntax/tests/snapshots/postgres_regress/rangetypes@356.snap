@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create type two_ints_range as range (subtype = two_ints);
+---
+CreateRangeStmt@0..57
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  TypeP@7..11 "type"
+  Whitespace@11..12 " "
+  Ident@12..26 "two_ints_range"
+  Whitespace@26..27 " "
+  As@27..29 "as"
+  Whitespace@29..30 " "
+  Range@30..35 "range"
+  Whitespace@35..36 " "
+  Ascii40@36..37 "("
+  DefElem@37..55
+    Ident@37..44 "subtype"
+    Whitespace@44..45 " "
+    Ascii61@45..46 "="
+    Whitespace@46..47 " "
+    TypeName@47..55
+      Ident@47..55 "two_ints"
+  Ascii41@55..56 ")"
+  Ascii59@56..57 ";"
+

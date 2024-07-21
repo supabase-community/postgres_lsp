@@ -1,0 +1,63 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT q1 FROM int8_tbl UNION ALL (((SELECT q2 FROM int8_tbl EXCEPT SELECT q1 FROM int8_tbl ORDER BY 1)));
+---
+SelectStmt@0..106
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  SelectStmt@7..23
+    ResTarget@7..9
+      ColumnRef@7..9
+        Ident@7..9 "q1"
+    Whitespace@9..10 " "
+    From@10..14 "FROM"
+    Whitespace@14..15 " "
+    RangeVar@15..23
+      Ident@15..23 "int8_tbl"
+  Whitespace@23..24 " "
+  Union@24..29 "UNION"
+  Whitespace@29..30 " "
+  All@30..33 "ALL"
+  Whitespace@33..34 " "
+  Ascii40@34..35 "("
+  Ascii40@35..36 "("
+  Ascii40@36..37 "("
+  SelectStmt@37..102
+    Select@37..43 "SELECT"
+    Whitespace@43..44 " "
+    SelectStmt@44..60
+      ResTarget@44..46
+        ColumnRef@44..46
+          Ident@44..46 "q2"
+      Whitespace@46..47 " "
+      From@47..51 "FROM"
+      Whitespace@51..52 " "
+      RangeVar@52..60
+        Ident@52..60 "int8_tbl"
+    Whitespace@60..61 " "
+    Except@61..67 "EXCEPT"
+    Whitespace@67..68 " "
+    SelectStmt@68..91
+      Select@68..74 "SELECT"
+      Whitespace@74..75 " "
+      ResTarget@75..77
+        ColumnRef@75..77
+          Ident@75..77 "q1"
+      Whitespace@77..78 " "
+      From@78..82 "FROM"
+      Whitespace@82..83 " "
+      RangeVar@83..91
+        Ident@83..91 "int8_tbl"
+    Whitespace@91..92 " "
+    SortBy@92..102
+      Order@92..97 "ORDER"
+      Whitespace@97..98 " "
+      By@98..100 "BY"
+      Whitespace@100..101 " "
+      AConst@101..102
+        Iconst@101..102 "1"
+  Ascii41@102..103 ")"
+  Ascii41@103..104 ")"
+  Ascii41@104..105 ")"
+  Ascii59@105..106 ";"
+

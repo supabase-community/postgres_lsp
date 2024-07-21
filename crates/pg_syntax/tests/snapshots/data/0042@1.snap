@@ -1,0 +1,42 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE DOMAIN us_postal_code AS TEXT CHECK(VALUE ~ '^\\d{5}$' OR VALUE ~ '^\\d{5}-\\d{4}$');"
+---
+CreateDomainStmt@0..89
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  DomainP@7..13 "DOMAIN"
+  Whitespace@13..14 " "
+  Ident@14..28 "us_postal_code"
+  Whitespace@28..29 " "
+  As@29..31 "AS"
+  Whitespace@31..32 " "
+  TypeName@32..36
+    TextP@32..36 "TEXT"
+  Whitespace@36..37 " "
+  Constraint@37..87
+    Check@37..42 "CHECK"
+    Ascii40@42..43 "("
+    BoolExpr@43..87
+      AExpr@43..60
+        ColumnRef@43..48
+          ValueP@43..48 "VALUE"
+        Whitespace@48..49 " "
+        Op@49..50 "~"
+        Whitespace@50..51 " "
+        AConst@51..60
+          Sconst@51..60 "'^\\d{5}$'"
+      Whitespace@60..61 " "
+      Or@61..63 "OR"
+      Whitespace@63..64 " "
+      AExpr@64..87
+        ColumnRef@64..69
+          ValueP@64..69 "VALUE"
+        Whitespace@69..70 " "
+        Op@70..71 "~"
+        Whitespace@71..72 " "
+        AConst@72..87
+          Sconst@72..87 "'^\\d{5}-\\d{4}$'"
+  Ascii41@87..88 ")"
+  Ascii59@88..89 ";"
+

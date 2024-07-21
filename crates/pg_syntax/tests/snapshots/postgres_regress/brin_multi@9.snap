@@ -1,0 +1,104 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE brinopers_multi (colname name, typ text,\n\top text[], value text[], matches int[],\n\tcheck (cardinality(op) = cardinality(value)),\n\tcheck (cardinality(op) = cardinality(matches)));"
+---
+CreateStmt@0..191
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..28
+    Ident@13..28 "brinopers_multi"
+  Whitespace@28..29 " "
+  Ascii40@29..30 "("
+  ColumnDef@30..42
+    Ident@30..37 "colname"
+    Whitespace@37..38 " "
+    TypeName@38..42
+      NameP@38..42 "name"
+  Ascii44@42..43 ","
+  Whitespace@43..44 " "
+  ColumnDef@44..52
+    Ident@44..47 "typ"
+    Whitespace@47..48 " "
+    TypeName@48..52
+      TextP@48..52 "text"
+  Ascii44@52..53 ","
+  Newline@53..54 "\n"
+  Newline@54..55 "\t"
+  ColumnDef@55..62
+    Ident@55..57 "op"
+    Whitespace@57..58 " "
+    TypeName@58..62
+      TextP@58..62 "text"
+  Ascii91@62..63 "["
+  Ascii93@63..64 "]"
+  Ascii44@64..65 ","
+  Whitespace@65..66 " "
+  ColumnDef@66..76
+    ValueP@66..71 "value"
+    Whitespace@71..72 " "
+    TypeName@72..76
+      TextP@72..76 "text"
+  Ascii91@76..77 "["
+  Ascii93@77..78 "]"
+  Ascii44@78..79 ","
+  Whitespace@79..80 " "
+  ColumnDef@80..91
+    Ident@80..87 "matches"
+    Whitespace@87..88 " "
+    TypeName@88..91
+      IntP@88..91 "int"
+  Ascii91@91..92 "["
+  Ascii93@92..93 "]"
+  Ascii44@93..94 ","
+  Newline@94..95 "\n"
+  Newline@95..96 "\t"
+  Constraint@96..138
+    Check@96..101 "check"
+    Whitespace@101..102 " "
+    Ascii40@102..103 "("
+    AExpr@103..138
+      FuncCall@103..117
+        Ident@103..114 "cardinality"
+        Ascii40@114..115 "("
+        ColumnRef@115..117
+          Ident@115..117 "op"
+      Ascii41@117..118 ")"
+      Whitespace@118..119 " "
+      Ascii61@119..120 "="
+      Whitespace@120..121 " "
+      FuncCall@121..138
+        Ident@121..132 "cardinality"
+        Ascii40@132..133 "("
+        ColumnRef@133..138
+          ValueP@133..138 "value"
+  Ascii41@138..139 ")"
+  Ascii41@139..140 ")"
+  Ascii44@140..141 ","
+  Newline@141..142 "\n"
+  Newline@142..143 "\t"
+  Constraint@143..187
+    Check@143..148 "check"
+    Whitespace@148..149 " "
+    Ascii40@149..150 "("
+    AExpr@150..187
+      FuncCall@150..164
+        Ident@150..161 "cardinality"
+        Ascii40@161..162 "("
+        ColumnRef@162..164
+          Ident@162..164 "op"
+      Ascii41@164..165 ")"
+      Whitespace@165..166 " "
+      Ascii61@166..167 "="
+      Whitespace@167..168 " "
+      FuncCall@168..187
+        Ident@168..179 "cardinality"
+        Ascii40@179..180 "("
+        ColumnRef@180..187
+          Ident@180..187 "matches"
+  Ascii41@187..188 ")"
+  Ascii41@188..189 ")"
+  Ascii41@189..190 ")"
+  Ascii59@190..191 ";"
+

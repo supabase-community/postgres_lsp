@@ -1,0 +1,115 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from\n  (select 1 as id) as xx\n  left join\n    (tenk1 as a1 full join (select 1 as id) as yy on (a1.unique1 = yy.id))\n  on (xx.id = coalesce(yy.id));"
+---
+SelectStmt@0..157
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Newline@13..14 "\n"
+  Whitespace@14..16 "  "
+  Ascii40@16..17 "("
+  JoinExpr@17..154
+    RangeSubselect@17..38
+      SelectStmt@17..31
+        Select@17..23 "select"
+        Whitespace@23..24 " "
+        ResTarget@24..31
+          AConst@24..25
+            Iconst@24..25 "1"
+          Whitespace@25..26 " "
+          As@26..28 "as"
+          Whitespace@28..29 " "
+          Ident@29..31 "id"
+      Ascii41@31..32 ")"
+      Whitespace@32..33 " "
+      Alias@33..38
+        As@33..35 "as"
+        Whitespace@35..36 " "
+        Ident@36..38 "xx"
+    Newline@38..39 "\n"
+    Whitespace@39..41 "  "
+    Left@41..45 "left"
+    Whitespace@45..46 " "
+    Join@46..50 "join"
+    Newline@50..51 "\n"
+    Whitespace@51..55 "    "
+    Ascii40@55..56 "("
+    JoinExpr@56..123
+      RangeVar@56..67
+        Ident@56..61 "tenk1"
+        Whitespace@61..62 " "
+        Alias@62..67
+          As@62..64 "as"
+          Whitespace@64..65 " "
+          Ident@65..67 "a1"
+      Whitespace@67..68 " "
+      Full@68..72 "full"
+      Whitespace@72..73 " "
+      Join@73..77 "join"
+      Whitespace@77..78 " "
+      Ascii40@78..79 "("
+      RangeSubselect@79..100
+        SelectStmt@79..93
+          Select@79..85 "select"
+          Whitespace@85..86 " "
+          ResTarget@86..93
+            AConst@86..87
+              Iconst@86..87 "1"
+            Whitespace@87..88 " "
+            As@88..90 "as"
+            Whitespace@90..91 " "
+            Ident@91..93 "id"
+        Ascii41@93..94 ")"
+        Whitespace@94..95 " "
+        Alias@95..100
+          As@95..97 "as"
+          Whitespace@97..98 " "
+          Ident@98..100 "yy"
+      Whitespace@100..101 " "
+      On@101..103 "on"
+      Whitespace@103..104 " "
+      Ascii40@104..105 "("
+      AExpr@105..123
+        ColumnRef@105..115
+          Ident@105..107 "a1"
+          Ascii46@107..108 "."
+          Ident@108..115 "unique1"
+        Whitespace@115..116 " "
+        Ascii61@116..117 "="
+        Whitespace@117..118 " "
+        ColumnRef@118..123
+          Ident@118..120 "yy"
+          Ascii46@120..121 "."
+          Ident@121..123 "id"
+    Ascii41@123..124 ")"
+    Ascii41@124..125 ")"
+    Newline@125..126 "\n"
+    Whitespace@126..128 "  "
+    On@128..130 "on"
+    Whitespace@130..131 " "
+    Ascii40@131..132 "("
+    AExpr@132..154
+      ColumnRef@132..137
+        Ident@132..134 "xx"
+        Ascii46@134..135 "."
+        Ident@135..137 "id"
+      Whitespace@137..138 " "
+      Ascii61@138..139 "="
+      Whitespace@139..140 " "
+      CoalesceExpr@140..154
+        Coalesce@140..148 "coalesce"
+        Ascii40@148..149 "("
+        ColumnRef@149..154
+          Ident@149..151 "yy"
+          Ascii46@151..152 "."
+          Ident@152..154 "id"
+  Ascii41@154..155 ")"
+  Ascii41@155..156 ")"
+  Ascii59@156..157 ";"
+

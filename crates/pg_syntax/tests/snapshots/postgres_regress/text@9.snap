@@ -1,0 +1,43 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select concat(1,2,3,'hello',true, false, to_date('20100309','YYYYMMDD'));"
+---
+SelectStmt@0..73
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..70
+    FuncCall@7..70
+      Ident@7..13 "concat"
+      Ascii40@13..14 "("
+      AConst@14..15
+        Iconst@14..15 "1"
+      Ascii44@15..16 ","
+      AConst@16..17
+        Iconst@16..17 "2"
+      Ascii44@17..18 ","
+      AConst@18..19
+        Iconst@18..19 "3"
+      Ascii44@19..20 ","
+      AConst@20..27
+        Sconst@20..27 "'hello'"
+      Ascii44@27..28 ","
+      AConst@28..32
+        TrueP@28..32 "true"
+      Ascii44@32..33 ","
+      Whitespace@33..34 " "
+      AConst@34..39
+        FalseP@34..39 "false"
+      Ascii44@39..40 ","
+      Whitespace@40..41 " "
+      FuncCall@41..70
+        Ident@41..48 "to_date"
+        Ascii40@48..49 "("
+        AConst@49..59
+          Sconst@49..59 "'20100309'"
+        Ascii44@59..60 ","
+        AConst@60..70
+          Sconst@60..70 "'YYYYMMDD'"
+  Ascii41@70..71 ")"
+  Ascii41@71..72 ")"
+  Ascii59@72..73 ";"
+

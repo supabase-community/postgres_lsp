@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create type testtype3 as (a int, b text);"
+---
+CompositeTypeStmt@0..41
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  TypeP@7..11 "type"
+  Whitespace@11..12 " "
+  RangeVar@12..21
+    Ident@12..21 "testtype3"
+  Whitespace@21..22 " "
+  As@22..24 "as"
+  Whitespace@24..25 " "
+  Ascii40@25..26 "("
+  ColumnDef@26..31
+    Ident@26..27 "a"
+    Whitespace@27..28 " "
+    TypeName@28..31
+      IntP@28..31 "int"
+  Ascii44@31..32 ","
+  Whitespace@32..33 " "
+  ColumnDef@33..39
+    Ident@33..34 "b"
+    Whitespace@34..35 " "
+    TypeName@35..39
+      TextP@35..39 "text"
+  Ascii41@39..40 ")"
+  Ascii59@40..41 ";"
+

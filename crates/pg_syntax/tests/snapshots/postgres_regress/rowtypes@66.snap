@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create index on test_table (a,b);"
+---
+IndexStmt@0..33
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  On@13..15 "on"
+  Whitespace@15..16 " "
+  RangeVar@16..26
+    Ident@16..26 "test_table"
+  Whitespace@26..27 " "
+  Ascii40@27..28 "("
+  IndexElem@28..29
+    Ident@28..29 "a"
+  Ascii44@29..30 ","
+  IndexElem@30..31
+    Ident@30..31 "b"
+  Ascii41@31..32 ")"
+  Ascii59@32..33 ";"
+

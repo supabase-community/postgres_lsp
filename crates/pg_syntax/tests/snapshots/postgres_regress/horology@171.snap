@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SET DateStyle TO 'US,SQL';"
+---
+VariableSetStmt@0..26
+  Set@0..3 "SET"
+  Whitespace@3..4 " "
+  Ident@4..13 "DateStyle"
+  Whitespace@13..14 " "
+  To@14..16 "TO"
+  Whitespace@16..17 " "
+  AConst@17..25
+    Sconst@17..25 "'US,SQL'"
+  Ascii59@25..26 ";"
+

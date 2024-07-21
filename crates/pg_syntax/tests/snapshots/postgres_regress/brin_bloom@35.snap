@@ -1,0 +1,52 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO brin_test_bloom SELECT x/100,x%100 FROM generate_series(1,10000) x(x);"
+---
+InsertStmt@0..82
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "brin_test_bloom"
+  Whitespace@27..28 " "
+  SelectStmt@28..80
+    Select@28..34 "SELECT"
+    Whitespace@34..35 " "
+    ResTarget@35..40
+      AExpr@35..40
+        ColumnRef@35..36
+          Ident@35..36 "x"
+        Ascii47@36..37 "/"
+        AConst@37..40
+          Iconst@37..40 "100"
+    Ascii44@40..41 ","
+    ResTarget@41..46
+      AExpr@41..46
+        ColumnRef@41..42
+          Ident@41..42 "x"
+        Ascii37@42..43 "%"
+        AConst@43..46
+          Iconst@43..46 "100"
+    Whitespace@46..47 " "
+    From@47..51 "FROM"
+    Whitespace@51..52 " "
+    RangeFunction@52..80
+      List@52..75
+        FuncCall@52..75
+          Ident@52..67 "generate_series"
+          Ascii40@67..68 "("
+          AConst@68..69
+            Iconst@68..69 "1"
+          Ascii44@69..70 ","
+          AConst@70..75
+            Iconst@70..75 "10000"
+      Ascii41@75..76 ")"
+      Whitespace@76..77 " "
+      Alias@77..80
+        Ident@77..78 "x"
+        Ascii40@78..79 "("
+        Ident@79..80 "x"
+  Ascii41@80..81 ")"
+  Ascii59@81..82 ";"
+

@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into tt6 values(1, 9);"
+---
+InsertStmt@0..29
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..15
+    Ident@12..15 "tt6"
+  Whitespace@15..16 " "
+  SelectStmt@16..27
+    Values@16..22 "values"
+    Ascii40@22..23 "("
+    List@23..27
+      AConst@23..24
+        Iconst@23..24 "1"
+      Ascii44@24..25 ","
+      Whitespace@25..26 " "
+      AConst@26..27
+        Iconst@26..27 "9"
+  Ascii41@27..28 ")"
+  Ascii59@28..29 ";"
+

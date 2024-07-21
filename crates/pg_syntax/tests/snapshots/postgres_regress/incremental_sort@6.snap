@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table t(a integer, b integer);"
+---
+CreateStmt@0..37
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..14
+    Ident@13..14 "t"
+  Ascii40@14..15 "("
+  ColumnDef@15..24
+    Ident@15..16 "a"
+    Whitespace@16..17 " "
+    TypeName@17..24
+      Integer@17..24 "integer"
+  Ascii44@24..25 ","
+  Whitespace@25..26 " "
+  ColumnDef@26..35
+    Ident@26..27 "b"
+    Whitespace@27..28 " "
+    TypeName@28..35
+      Integer@28..35 "integer"
+  Ascii41@35..36 ")"
+  Ascii59@36..37 ";"
+

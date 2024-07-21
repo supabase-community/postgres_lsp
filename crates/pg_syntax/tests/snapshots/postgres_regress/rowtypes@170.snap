@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select fcompos2(row(2,'two'));"
+---
+SelectStmt@0..30
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..27
+    FuncCall@7..27
+      Ident@7..15 "fcompos2"
+      Ascii40@15..16 "("
+      RowExpr@16..27
+        Row@16..19 "row"
+        Ascii40@19..20 "("
+        AConst@20..21
+          Iconst@20..21 "2"
+        Ascii44@21..22 ","
+        AConst@22..27
+          Sconst@22..27 "'two'"
+  Ascii41@27..28 ")"
+  Ascii41@28..29 ")"
+  Ascii59@29..30 ";"
+

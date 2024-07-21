@@ -1,0 +1,19 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select concat_ws('#','one');"
+---
+SelectStmt@0..28
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..26
+    FuncCall@7..26
+      Ident@7..16 "concat_ws"
+      Ascii40@16..17 "("
+      AConst@17..20
+        Sconst@17..20 "'#'"
+      Ascii44@20..21 ","
+      AConst@21..26
+        Sconst@21..26 "'one'"
+  Ascii41@26..27 ")"
+  Ascii59@27..28 ";"
+

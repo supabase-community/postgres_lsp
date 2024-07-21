@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO foo VALUES (847001,'t15','GE1043');"
+---
+InsertStmt@0..47
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..15
+    Ident@12..15 "foo"
+  Whitespace@15..16 " "
+  SelectStmt@16..45
+    Values@16..22 "VALUES"
+    Whitespace@22..23 " "
+    Ascii40@23..24 "("
+    List@24..45
+      AConst@24..30
+        Iconst@24..30 "847001"
+      Ascii44@30..31 ","
+      AConst@31..36
+        Sconst@31..36 "'t15'"
+      Ascii44@36..37 ","
+      AConst@37..45
+        Sconst@37..45 "'GE1043'"
+  Ascii41@45..46 ")"
+  Ascii59@46..47 ";"
+

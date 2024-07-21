@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into nt2 values (2,2,true,false);"
+---
+InsertStmt@0..40
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..15
+    Ident@12..15 "nt2"
+  Whitespace@15..16 " "
+  SelectStmt@16..38
+    Values@16..22 "values"
+    Whitespace@22..23 " "
+    Ascii40@23..24 "("
+    List@24..38
+      AConst@24..25
+        Iconst@24..25 "2"
+      Ascii44@25..26 ","
+      AConst@26..27
+        Iconst@26..27 "2"
+      Ascii44@27..28 ","
+      AConst@28..32
+        TrueP@28..32 "true"
+      Ascii44@32..33 ","
+      AConst@33..38
+        FalseP@33..38 "false"
+  Ascii41@38..39 ")"
+  Ascii59@39..40 ";"
+

@@ -1,0 +1,56 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table mc3p1 partition of mc3p\n  for values from (1, 1, 1) to (2, minvalue, minvalue);"
+---
+CreateStmt@0..92
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..18
+    Ident@13..18 "mc3p1"
+  Whitespace@18..19 " "
+  Partition@19..28 "partition"
+  Whitespace@28..29 " "
+  Of@29..31 "of"
+  Whitespace@31..32 " "
+  RangeVar@32..36
+    Ident@32..36 "mc3p"
+  Newline@36..37 "\n"
+  Whitespace@37..39 "  "
+  For@39..42 "for"
+  Whitespace@42..43 " "
+  Values@43..49 "values"
+  Whitespace@49..50 " "
+  PartitionBoundSpec@50..90
+    From@50..54 "from"
+    Whitespace@54..55 " "
+    Ascii40@55..56 "("
+    AConst@56..57
+      Iconst@56..57 "1"
+    Ascii44@57..58 ","
+    Whitespace@58..59 " "
+    AConst@59..60
+      Iconst@59..60 "1"
+    Ascii44@60..61 ","
+    Whitespace@61..62 " "
+    AConst@62..63
+      Iconst@62..63 "1"
+    Ascii41@63..64 ")"
+    Whitespace@64..65 " "
+    To@65..67 "to"
+    Whitespace@67..68 " "
+    Ascii40@68..69 "("
+    AConst@69..70
+      Iconst@69..70 "2"
+    Ascii44@70..71 ","
+    Whitespace@71..72 " "
+    ColumnRef@72..80
+      Minvalue@72..80 "minvalue"
+    Ascii44@80..81 ","
+    Whitespace@81..82 " "
+    ColumnRef@82..90
+      Minvalue@82..90 "minvalue"
+  Ascii41@90..91 ")"
+  Ascii59@91..92 ";"
+

@@ -1,0 +1,72 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM (VALUES (1),(2),(3)) v(r), generate_series(10+r,20-r) f(i);"
+---
+SelectStmt@0..73
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  Ascii40@14..15 "("
+  RangeSubselect@15..38
+    SelectStmt@15..32
+      Values@15..21 "VALUES"
+      Whitespace@21..22 " "
+      Ascii40@22..23 "("
+      List@23..24
+        AConst@23..24
+          Iconst@23..24 "1"
+      Ascii41@24..25 ")"
+      Ascii44@25..26 ","
+      Ascii40@26..27 "("
+      List@27..28
+        AConst@27..28
+          Iconst@27..28 "2"
+      Ascii41@28..29 ")"
+      Ascii44@29..30 ","
+      Ascii40@30..31 "("
+      List@31..32
+        AConst@31..32
+          Iconst@31..32 "3"
+    Ascii41@32..33 ")"
+    Ascii41@33..34 ")"
+    Whitespace@34..35 " "
+    Alias@35..38
+      Ident@35..36 "v"
+      Ascii40@36..37 "("
+      Ident@37..38 "r"
+  Ascii41@38..39 ")"
+  Ascii44@39..40 ","
+  Whitespace@40..41 " "
+  RangeFunction@41..71
+    List@41..66
+      FuncCall@41..66
+        Ident@41..56 "generate_series"
+        Ascii40@56..57 "("
+        AExpr@57..61
+          AConst@57..59
+            Iconst@57..59 "10"
+          Ascii43@59..60 "+"
+          ColumnRef@60..61
+            Ident@60..61 "r"
+        Ascii44@61..62 ","
+        AExpr@62..66
+          AConst@62..64
+            Iconst@62..64 "20"
+          Ascii45@64..65 "-"
+          ColumnRef@65..66
+            Ident@65..66 "r"
+    Ascii41@66..67 ")"
+    Whitespace@67..68 " "
+    Alias@68..71
+      Ident@68..69 "f"
+      Ascii40@69..70 "("
+      Ident@70..71 "i"
+  Ascii41@71..72 ")"
+  Ascii59@72..73 ";"
+

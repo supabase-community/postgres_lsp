@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function xfloat8in(cstring) returns xfloat8 immutable strict\n  language internal as 'int8in';"
+---
+CreateFunctionStmt@0..100
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..25 "xfloat8in"
+  Ascii40@25..26 "("
+  FunctionParameter@26..33
+    TypeName@26..33
+      Ident@26..33 "cstring"
+  Ascii41@33..34 ")"
+  Whitespace@34..35 " "
+  Returns@35..42 "returns"
+  Whitespace@42..43 " "
+  TypeName@43..50
+    Ident@43..50 "xfloat8"
+  Whitespace@50..51 " "
+  DefElem@51..60
+    Immutable@51..60 "immutable"
+  Whitespace@60..61 " "
+  DefElem@61..67
+    StrictP@61..67 "strict"
+  Newline@67..68 "\n"
+  Whitespace@68..70 "  "
+  DefElem@70..87
+    Language@70..78 "language"
+    Whitespace@78..79 " "
+    Ident@79..87 "internal"
+  Whitespace@87..88 " "
+  DefElem@88..99
+    As@88..90 "as"
+    Whitespace@90..91 " "
+    List@91..99
+      Sconst@91..99 "'int8in'"
+  Ascii59@99..100 ";"
+

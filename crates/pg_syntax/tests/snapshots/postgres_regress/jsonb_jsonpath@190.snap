@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_query('1', '$ + \"2\"', silent => true);"
+---
+SelectStmt@0..56
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..54
+    FuncCall@7..54
+      Ident@7..23 "jsonb_path_query"
+      Ascii40@23..24 "("
+      AConst@24..27
+        Sconst@24..27 "'1'"
+      Ascii44@27..28 ","
+      Whitespace@28..29 " "
+      AConst@29..38
+        Sconst@29..38 "'$ + \"2\"'"
+      Ascii44@38..39 ","
+      Whitespace@39..40 " "
+      NamedArgExpr@40..54
+        Ident@40..46 "silent"
+        Whitespace@46..47 " "
+        EqualsGreater@47..49 "=>"
+        Whitespace@49..50 " "
+        AConst@50..54
+          TrueP@50..54 "true"
+  Ascii41@54..55 ")"
+  Ascii59@55..56 ";"
+

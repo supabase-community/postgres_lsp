@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT test_json->'field2'\nFROM test_json\nWHERE json_type = 'object';"
+---
+SelectStmt@0..69
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..26
+    AExpr@7..26
+      ColumnRef@7..16
+        Ident@7..16 "test_json"
+      Op@16..18 "->"
+      AConst@18..26
+        Sconst@18..26 "'field2'"
+  Newline@26..27 "\n"
+  From@27..31 "FROM"
+  Whitespace@31..32 " "
+  RangeVar@32..41
+    Ident@32..41 "test_json"
+  Newline@41..42 "\n"
+  Where@42..47 "WHERE"
+  Whitespace@47..48 " "
+  AExpr@48..68
+    ColumnRef@48..57
+      Ident@48..57 "json_type"
+    Whitespace@57..58 " "
+    Ascii61@58..59 "="
+    Whitespace@59..60 " "
+    AConst@60..68
+      Sconst@60..68 "'object'"
+  Ascii59@68..69 ";"
+

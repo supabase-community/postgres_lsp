@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO numrange_test VALUES('[,)');"
+---
+InsertStmt@0..40
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..25
+    Ident@12..25 "numrange_test"
+  Whitespace@25..26 " "
+  SelectStmt@26..38
+    Values@26..32 "VALUES"
+    Ascii40@32..33 "("
+    List@33..38
+      AConst@33..38
+        Sconst@33..38 "'[,)'"
+  Ascii41@38..39 ")"
+  Ascii59@39..40 ";"
+

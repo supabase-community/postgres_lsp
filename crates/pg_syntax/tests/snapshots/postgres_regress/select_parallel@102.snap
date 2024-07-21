@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table bmscantest (a int, t text);"
+---
+CreateStmt@0..40
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..23
+    Ident@13..23 "bmscantest"
+  Whitespace@23..24 " "
+  Ascii40@24..25 "("
+  ColumnDef@25..30
+    Ident@25..26 "a"
+    Whitespace@26..27 " "
+    TypeName@27..30
+      IntP@27..30 "int"
+  Ascii44@30..31 ","
+  Whitespace@31..32 " "
+  ColumnDef@32..38
+    Ident@32..33 "t"
+    Whitespace@33..34 " "
+    TypeName@34..38
+      TextP@34..38 "text"
+  Ascii41@38..39 ")"
+  Ascii59@39..40 ";"
+

@@ -1,0 +1,53 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT\n\tpg_advisory_lock(1), pg_advisory_lock_shared(2),\n\tpg_advisory_lock(1, 1), pg_advisory_lock_shared(2, 2);"
+---
+SelectStmt@0..112
+  Select@0..6 "SELECT"
+  Newline@6..7 "\n"
+  Newline@7..8 "\t"
+  ResTarget@8..26
+    FuncCall@8..26
+      Ident@8..24 "pg_advisory_lock"
+      Ascii40@24..25 "("
+      AConst@25..26
+        Iconst@25..26 "1"
+  Ascii41@26..27 ")"
+  Ascii44@27..28 ","
+  Whitespace@28..29 " "
+  ResTarget@29..54
+    FuncCall@29..54
+      Ident@29..52 "pg_advisory_lock_shared"
+      Ascii40@52..53 "("
+      AConst@53..54
+        Iconst@53..54 "2"
+  Ascii41@54..55 ")"
+  Ascii44@55..56 ","
+  Newline@56..57 "\n"
+  Newline@57..58 "\t"
+  ResTarget@58..79
+    FuncCall@58..79
+      Ident@58..74 "pg_advisory_lock"
+      Ascii40@74..75 "("
+      AConst@75..76
+        Iconst@75..76 "1"
+      Ascii44@76..77 ","
+      Whitespace@77..78 " "
+      AConst@78..79
+        Iconst@78..79 "1"
+  Ascii41@79..80 ")"
+  Ascii44@80..81 ","
+  Whitespace@81..82 " "
+  ResTarget@82..110
+    FuncCall@82..110
+      Ident@82..105 "pg_advisory_lock_shared"
+      Ascii40@105..106 "("
+      AConst@106..107
+        Iconst@106..107 "2"
+      Ascii44@107..108 ","
+      Whitespace@108..109 " "
+      AConst@109..110
+        Iconst@109..110 "2"
+  Ascii41@110..111 ")"
+  Ascii59@111..112 ";"
+

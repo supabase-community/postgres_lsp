@@ -1,0 +1,18 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select 'dd x' ~ '(^(?!aa)(?!bb)(?!cc))+';"
+---
+SelectStmt@0..41
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..40
+    AExpr@7..40
+      AConst@7..13
+        Sconst@7..13 "'dd x'"
+      Whitespace@13..14 " "
+      Op@14..15 "~"
+      Whitespace@15..16 " "
+      AConst@16..40
+        Sconst@16..40 "'(^(?!aa)(?!bb)(?!cc))+'"
+  Ascii59@40..41 ";"
+

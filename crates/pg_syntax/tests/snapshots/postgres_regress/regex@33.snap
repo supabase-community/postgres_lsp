@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select regexp_matches('ab', 'a*(?<!a)b*');"
+---
+SelectStmt@0..42
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..40
+    FuncCall@7..40
+      Ident@7..21 "regexp_matches"
+      Ascii40@21..22 "("
+      AConst@22..26
+        Sconst@22..26 "'ab'"
+      Ascii44@26..27 ","
+      Whitespace@27..28 " "
+      AConst@28..40
+        Sconst@28..40 "'a*(?<!a)b*'"
+  Ascii41@40..41 ")"
+  Ascii59@41..42 ";"
+

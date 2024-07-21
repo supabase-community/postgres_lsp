@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select range_add_bounds(numrange(1.0001, 123.123));"
+---
+SelectStmt@0..51
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..48
+    FuncCall@7..48
+      Ident@7..23 "range_add_bounds"
+      Ascii40@23..24 "("
+      FuncCall@24..48
+        Ident@24..32 "numrange"
+        Ascii40@32..33 "("
+        AConst@33..39
+          Fconst@33..39 "1.0001"
+        Ascii44@39..40 ","
+        Whitespace@40..41 " "
+        AConst@41..48
+          Fconst@41..48 "123.123"
+  Ascii41@48..49 ")"
+  Ascii41@49..50 ")"
+  Ascii59@50..51 ";"
+

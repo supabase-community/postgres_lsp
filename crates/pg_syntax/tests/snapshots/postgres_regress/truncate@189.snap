@@ -1,0 +1,59 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO ref_c VALUES (100, 10), (150, 15), (200, 20), (250, 25);"
+---
+InsertStmt@0..68
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..17
+    Ident@12..17 "ref_c"
+  Whitespace@17..18 " "
+  SelectStmt@18..66
+    Values@18..24 "VALUES"
+    Whitespace@24..25 " "
+    Ascii40@25..26 "("
+    List@26..33
+      AConst@26..29
+        Iconst@26..29 "100"
+      Ascii44@29..30 ","
+      Whitespace@30..31 " "
+      AConst@31..33
+        Iconst@31..33 "10"
+    Ascii41@33..34 ")"
+    Ascii44@34..35 ","
+    Whitespace@35..36 " "
+    Ascii40@36..37 "("
+    List@37..44
+      AConst@37..40
+        Iconst@37..40 "150"
+      Ascii44@40..41 ","
+      Whitespace@41..42 " "
+      AConst@42..44
+        Iconst@42..44 "15"
+    Ascii41@44..45 ")"
+    Ascii44@45..46 ","
+    Whitespace@46..47 " "
+    Ascii40@47..48 "("
+    List@48..55
+      AConst@48..51
+        Iconst@48..51 "200"
+      Ascii44@51..52 ","
+      Whitespace@52..53 " "
+      AConst@53..55
+        Iconst@53..55 "20"
+    Ascii41@55..56 ")"
+    Ascii44@56..57 ","
+    Whitespace@57..58 " "
+    Ascii40@58..59 "("
+    List@59..66
+      AConst@59..62
+        Iconst@59..62 "250"
+      Ascii44@62..63 ","
+      Whitespace@63..64 " "
+      AConst@64..66
+        Iconst@64..66 "25"
+  Ascii41@66..67 ")"
+  Ascii59@67..68 ";"
+

@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: alter table parted_conflict_1 drop column drp;
+---
+AlterTableStmt@0..46
+  Alter@0..5 "alter"
+  Whitespace@5..6 " "
+  Table@6..11 "table"
+  Whitespace@11..12 " "
+  RangeVar@12..29
+    Ident@12..29 "parted_conflict_1"
+  Whitespace@29..30 " "
+  AlterTableCmd@30..45
+    Drop@30..34 "drop"
+    Whitespace@34..35 " "
+    Column@35..41 "column"
+    Whitespace@41..42 " "
+    Ident@42..45 "drp"
+  Ascii59@45..46 ";"
+

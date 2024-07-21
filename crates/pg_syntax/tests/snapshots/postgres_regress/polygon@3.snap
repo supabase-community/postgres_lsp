@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO POLYGON_TBL(f1) VALUES ('(3.0,1.0),(3.0,3.0),(1.0,0.0)');"
+---
+InsertStmt@0..69
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "POLYGON_TBL"
+  Ascii40@23..24 "("
+  ResTarget@24..26
+    Ident@24..26 "f1"
+  Ascii41@26..27 ")"
+  Whitespace@27..28 " "
+  SelectStmt@28..67
+    Values@28..34 "VALUES"
+    Whitespace@34..35 " "
+    Ascii40@35..36 "("
+    List@36..67
+      AConst@36..67
+        Sconst@36..67 "'(3.0,1.0),(3.0,3.0), ..."
+  Ascii41@67..68 ")"
+  Ascii59@68..69 ";"
+

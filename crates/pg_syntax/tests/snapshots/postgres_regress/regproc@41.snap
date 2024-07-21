@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT regprocedure('absinthe(numeric)');"
+---
+SelectStmt@0..41
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..39
+    FuncCall@7..39
+      Ident@7..19 "regprocedure"
+      Ascii40@19..20 "("
+      AConst@20..39
+        Sconst@20..39 "'absinthe(numeric)'"
+  Ascii41@39..40 ")"
+  Ascii59@40..41 ";"
+

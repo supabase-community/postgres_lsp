@@ -1,0 +1,51 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into test_range_gist select int4range(NULL,g*10,'(]') from generate_series(1,100) g;"
+---
+InsertStmt@0..91
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "test_range_gist"
+  Whitespace@27..28 " "
+  SelectStmt@28..90
+    Select@28..34 "select"
+    Whitespace@34..35 " "
+    ResTarget@35..59
+      FuncCall@35..59
+        Ident@35..44 "int4range"
+        Ascii40@44..45 "("
+        AConst@45..49
+          NullP@45..49 "NULL"
+        Ascii44@49..50 ","
+        AExpr@50..54
+          ColumnRef@50..51
+            Ident@50..51 "g"
+          Ascii42@51..52 "*"
+          AConst@52..54
+            Iconst@52..54 "10"
+        Ascii44@54..55 ","
+        AConst@55..59
+          Sconst@55..59 "'(]'"
+    Ascii41@59..60 ")"
+    Whitespace@60..61 " "
+    From@61..65 "from"
+    Whitespace@65..66 " "
+    RangeFunction@66..90
+      List@66..87
+        FuncCall@66..87
+          Ident@66..81 "generate_series"
+          Ascii40@81..82 "("
+          AConst@82..83
+            Iconst@82..83 "1"
+          Ascii44@83..84 ","
+          AConst@84..87
+            Iconst@84..87 "100"
+      Ascii41@87..88 ")"
+      Whitespace@88..89 " "
+      Alias@89..90
+        Ident@89..90 "g"
+  Ascii59@90..91 ";"
+

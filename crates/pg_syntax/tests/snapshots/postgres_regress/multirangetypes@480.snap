@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO nummultirange_test2 VALUES(nummultirange(numrange(1.1, 2.2,'()')));"
+---
+InsertStmt@0..79
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..31
+    Ident@12..31 "nummultirange_test2"
+  Whitespace@31..32 " "
+  SelectStmt@32..75
+    Values@32..38 "VALUES"
+    Ascii40@38..39 "("
+    List@39..75
+      FuncCall@39..75
+        Ident@39..52 "nummultirange"
+        Ascii40@52..53 "("
+        FuncCall@53..75
+          Ident@53..61 "numrange"
+          Ascii40@61..62 "("
+          AConst@62..65
+            Fconst@62..65 "1.1"
+          Ascii44@65..66 ","
+          Whitespace@66..67 " "
+          AConst@67..70
+            Fconst@67..70 "2.2"
+          Ascii44@70..71 ","
+          AConst@71..75
+            Sconst@71..75 "'()'"
+  Ascii41@75..76 ")"
+  Ascii41@76..77 ")"
+  Ascii41@77..78 ")"
+  Ascii59@78..79 ";"
+

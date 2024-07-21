@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '{[a,d), [d,e)}'::textmultirange;"
+---
+SelectStmt@0..40
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..39
+    TypeCast@7..39
+      AConst@7..23
+        Sconst@7..23 "'{[a,d), [d,e)}'"
+      Typecast@23..25 "::"
+      TypeName@25..39
+        Ident@25..39 "textmultirange"
+  Ascii59@39..40 ";"
+

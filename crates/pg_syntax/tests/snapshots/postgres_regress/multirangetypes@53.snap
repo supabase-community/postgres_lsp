@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select int4range(1, 3)::int4multirange;"
+---
+SelectStmt@0..39
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..38
+    TypeCast@7..38
+      FuncCall@7..21
+        Ident@7..16 "int4range"
+        Ascii40@16..17 "("
+        AConst@17..18
+          Iconst@17..18 "1"
+        Ascii44@18..19 ","
+        Whitespace@19..20 " "
+        AConst@20..21
+          Iconst@20..21 "3"
+      Ascii41@21..22 ")"
+      Typecast@22..24 "::"
+      TypeName@24..38
+        Ident@24..38 "int4multirange"
+  Ascii59@38..39 ";"
+

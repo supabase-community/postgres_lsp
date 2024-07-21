@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create policy p1 on ec1 using (f1 < '5'::int8alias1);"
+---
+CreatePolicyStmt@0..53
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Policy@7..13 "policy"
+  Whitespace@13..14 " "
+  Ident@14..16 "p1"
+  Whitespace@16..17 " "
+  On@17..19 "on"
+  Whitespace@19..20 " "
+  RangeVar@20..23
+    Ident@20..23 "ec1"
+  Whitespace@23..24 " "
+  Using@24..29 "using"
+  Whitespace@29..30 " "
+  Ascii40@30..31 "("
+  AExpr@31..51
+    ColumnRef@31..33
+      Ident@31..33 "f1"
+    Whitespace@33..34 " "
+    Ascii60@34..35 "<"
+    Whitespace@35..36 " "
+    TypeCast@36..51
+      AConst@36..39
+        Sconst@36..39 "'5'"
+      Typecast@39..41 "::"
+      TypeName@41..51
+        Ident@41..51 "int8alias1"
+  Ascii41@51..52 ")"
+  Ascii59@52..53 ";"
+

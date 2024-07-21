@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '-100'::int2 - '9223372036854775800'::int8;"
+---
+SelectStmt@0..50
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..49
+    AExpr@7..49
+      TypeCast@7..19
+        AConst@7..13
+          Sconst@7..13 "'-100'"
+        Typecast@13..15 "::"
+        TypeName@15..19
+          Ident@15..19 "int2"
+      Whitespace@19..20 " "
+      Ascii45@20..21 "-"
+      Whitespace@21..22 " "
+      TypeCast@22..49
+        AConst@22..43
+          Sconst@22..43 "'9223372036854775800'"
+        Typecast@43..45 "::"
+        TypeName@45..49
+          Ident@45..49 "int8"
+  Ascii59@49..50 ";"
+

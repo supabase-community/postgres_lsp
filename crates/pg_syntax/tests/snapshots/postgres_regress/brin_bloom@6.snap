@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE INDEX brinidx_bloom ON brintest_bloom USING brin (\n\tbyteacol bytea_bloom_ops(false_positive_rate = 0.26)\n);"
+---
+IndexStmt@0..114
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..26 "brinidx_bloom"
+  Whitespace@26..27 " "
+  On@27..29 "ON"
+  Whitespace@29..30 " "
+  RangeVar@30..44
+    Ident@30..44 "brintest_bloom"
+  Whitespace@44..45 " "
+  Using@45..50 "USING"
+  Whitespace@50..51 " "
+  Ident@51..55 "brin"
+  Whitespace@55..56 " "
+  Ascii40@56..57 "("
+  Newline@57..58 "\n"
+  Newline@58..59 "\t"
+  IndexElem@59..110
+    Ident@59..67 "byteacol"
+    Whitespace@67..68 " "
+    Ident@68..83 "bytea_bloom_ops"
+    Ascii40@83..84 "("
+    DefElem@84..110
+      Ident@84..103 "false_positive_rate"
+      Whitespace@103..104 " "
+      Ascii61@104..105 "="
+      Whitespace@105..106 " "
+      Fconst@106..110 "0.26"
+  Ascii41@110..111 ")"
+  Newline@111..112 "\n"
+  Ascii41@112..113 ")"
+  Ascii59@113..114 ";"
+

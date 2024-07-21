@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '[\"\\\\\",\"\\\\\"]'::textrange;"
+---
+SelectStmt@0..32
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..31
+    TypeCast@7..31
+      AConst@7..20
+        Sconst@7..20 "'[\"\\\\\",\"\\\\\"]'"
+      Typecast@20..22 "::"
+      TypeName@22..31
+        Ident@22..31 "textrange"
+  Ascii59@31..32 ";"
+

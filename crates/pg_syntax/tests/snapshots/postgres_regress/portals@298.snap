@@ -1,0 +1,48 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO current_check_1 SELECT i, 'p' || i FROM generate_series(1,9) i;"
+---
+InsertStmt@0..75
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "current_check_1"
+  Whitespace@27..28 " "
+  SelectStmt@28..74
+    Select@28..34 "SELECT"
+    Whitespace@34..35 " "
+    ResTarget@35..36
+      ColumnRef@35..36
+        Ident@35..36 "i"
+    Ascii44@36..37 ","
+    Whitespace@37..38 " "
+    ResTarget@38..46
+      AExpr@38..46
+        AConst@38..41
+          Sconst@38..41 "'p'"
+        Whitespace@41..42 " "
+        Op@42..44 "||"
+        Whitespace@44..45 " "
+        ColumnRef@45..46
+          Ident@45..46 "i"
+    Whitespace@46..47 " "
+    From@47..51 "FROM"
+    Whitespace@51..52 " "
+    RangeFunction@52..74
+      List@52..71
+        FuncCall@52..71
+          Ident@52..67 "generate_series"
+          Ascii40@67..68 "("
+          AConst@68..69
+            Iconst@68..69 "1"
+          Ascii44@69..70 ","
+          AConst@70..71
+            Iconst@70..71 "9"
+      Ascii41@71..72 ")"
+      Whitespace@72..73 " "
+      Alias@73..74
+        Ident@73..74 "i"
+  Ascii59@74..75 ";"
+

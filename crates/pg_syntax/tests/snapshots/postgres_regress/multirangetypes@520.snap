@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create type intr_multirange as (x int, y int);"
+---
+CompositeTypeStmt@0..46
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  TypeP@7..11 "type"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "intr_multirange"
+  Whitespace@27..28 " "
+  As@28..30 "as"
+  Whitespace@30..31 " "
+  Ascii40@31..32 "("
+  ColumnDef@32..37
+    Ident@32..33 "x"
+    Whitespace@33..34 " "
+    TypeName@34..37
+      IntP@34..37 "int"
+  Ascii44@37..38 ","
+  Whitespace@38..39 " "
+  ColumnDef@39..44
+    Ident@39..40 "y"
+    Whitespace@40..41 " "
+    TypeName@41..44
+      IntP@41..44 "int"
+  Ascii41@44..45 ")"
+  Ascii59@45..46 ";"
+

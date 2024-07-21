@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO FLOAT8_TBL(f1) VALUES ('   -34.84');"
+---
+InsertStmt@0..48
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..22
+    Ident@12..22 "FLOAT8_TBL"
+  Ascii40@22..23 "("
+  ResTarget@23..25
+    Ident@23..25 "f1"
+  Ascii41@25..26 ")"
+  Whitespace@26..27 " "
+  SelectStmt@27..46
+    Values@27..33 "VALUES"
+    Whitespace@33..34 " "
+    Ascii40@34..35 "("
+    List@35..46
+      AConst@35..46
+        Sconst@35..46 "'   -34.84'"
+  Ascii41@46..47 ")"
+  Ascii59@47..48 ";"
+

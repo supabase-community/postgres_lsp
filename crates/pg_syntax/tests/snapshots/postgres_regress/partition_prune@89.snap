@@ -1,0 +1,55 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table mc3p5 partition of mc3p for values from (11, 1, 1) to (20, 10, 10);"
+---
+CreateStmt@0..80
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..18
+    Ident@13..18 "mc3p5"
+  Whitespace@18..19 " "
+  Partition@19..28 "partition"
+  Whitespace@28..29 " "
+  Of@29..31 "of"
+  Whitespace@31..32 " "
+  RangeVar@32..36
+    Ident@32..36 "mc3p"
+  Whitespace@36..37 " "
+  For@37..40 "for"
+  Whitespace@40..41 " "
+  Values@41..47 "values"
+  Whitespace@47..48 " "
+  PartitionBoundSpec@48..78
+    From@48..52 "from"
+    Whitespace@52..53 " "
+    Ascii40@53..54 "("
+    AConst@54..56
+      Iconst@54..56 "11"
+    Ascii44@56..57 ","
+    Whitespace@57..58 " "
+    AConst@58..59
+      Iconst@58..59 "1"
+    Ascii44@59..60 ","
+    Whitespace@60..61 " "
+    AConst@61..62
+      Iconst@61..62 "1"
+    Ascii41@62..63 ")"
+    Whitespace@63..64 " "
+    To@64..66 "to"
+    Whitespace@66..67 " "
+    Ascii40@67..68 "("
+    AConst@68..70
+      Iconst@68..70 "20"
+    Ascii44@70..71 ","
+    Whitespace@71..72 " "
+    AConst@72..74
+      Iconst@72..74 "10"
+    Ascii44@74..75 ","
+    Whitespace@75..76 " "
+    AConst@76..78
+      Iconst@76..78 "10"
+  Ascii41@78..79 ")"
+  Ascii59@79..80 ";"
+

@@ -1,0 +1,42 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select row(1, 2)::testtype1 < row(1, 'abc')::testtype3;"
+---
+SelectStmt@0..55
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..54
+    AExpr@7..54
+      TypeCast@7..27
+        RowExpr@7..15
+          Row@7..10 "row"
+          Ascii40@10..11 "("
+          AConst@11..12
+            Iconst@11..12 "1"
+          Ascii44@12..13 ","
+          Whitespace@13..14 " "
+          AConst@14..15
+            Iconst@14..15 "2"
+        Ascii41@15..16 ")"
+        Typecast@16..18 "::"
+        TypeName@18..27
+          Ident@18..27 "testtype1"
+      Whitespace@27..28 " "
+      Ascii60@28..29 "<"
+      Whitespace@29..30 " "
+      TypeCast@30..54
+        RowExpr@30..42
+          Row@30..33 "row"
+          Ascii40@33..34 "("
+          AConst@34..35
+            Iconst@34..35 "1"
+          Ascii44@35..36 ","
+          Whitespace@36..37 " "
+          AConst@37..42
+            Sconst@37..42 "'abc'"
+        Ascii41@42..43 ")"
+        Typecast@43..45 "::"
+        TypeName@45..54
+          Ident@45..54 "testtype3"
+  Ascii59@54..55 ";"
+

@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '(Joe,von Blow)'::fullname, '(Joe,d''Blow)'::fullname;"
+---
+SelectStmt@0..61
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..33
+    TypeCast@7..33
+      AConst@7..23
+        Sconst@7..23 "'(Joe,von Blow)'"
+      Typecast@23..25 "::"
+      TypeName@25..33
+        Ident@25..33 "fullname"
+  Ascii44@33..34 ","
+  Whitespace@34..35 " "
+  ResTarget@35..60
+    TypeCast@35..60
+      AConst@35..50
+        Sconst@35..50 "'(Joe,d''Blow)'"
+      Typecast@50..52 "::"
+      TypeName@52..60
+        Ident@52..60 "fullname"
+  Ascii59@60..61 ";"
+

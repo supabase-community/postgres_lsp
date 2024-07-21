@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE prt1_l_p2_p1 PARTITION OF prt1_l_p2 FOR VALUES IN ('0000', '0001');"
+---
+CreateStmt@0..80
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..25
+    Ident@13..25 "prt1_l_p2_p1"
+  Whitespace@25..26 " "
+  Partition@26..35 "PARTITION"
+  Whitespace@35..36 " "
+  Of@36..38 "OF"
+  Whitespace@38..39 " "
+  RangeVar@39..48
+    Ident@39..48 "prt1_l_p2"
+  Whitespace@48..49 " "
+  For@49..52 "FOR"
+  Whitespace@52..53 " "
+  Values@53..59 "VALUES"
+  Whitespace@59..60 " "
+  PartitionBoundSpec@60..78
+    InP@60..62 "IN"
+    Whitespace@62..63 " "
+    Ascii40@63..64 "("
+    AConst@64..70
+      Sconst@64..70 "'0000'"
+    Ascii44@70..71 ","
+    Whitespace@71..72 " "
+    AConst@72..78
+      Sconst@72..78 "'0001'"
+  Ascii41@78..79 ")"
+  Ascii59@79..80 ";"
+

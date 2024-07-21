@@ -1,0 +1,182 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TYPE jsrec AS (\n\ti\tint,\n\tia\t_int4,\n\tia1\tint[],\n\tia2\tint[][],\n\tia3\tint[][][],\n\tia1d\tjs_int_array_1d,\n\tia2d\tjs_int_array_2d,\n\tt\ttext,\n\tta\ttext[],\n\tc\tchar(10),\n\tca\tchar(10)[],\n\tts\ttimestamp,\n\tjs\tjson,\n\tjsb\tjsonb,\n\tjsa\tjson[],\n\trec\tjpop,\n\treca\tjpop[]\n);"
+---
+CompositeTypeStmt@0..256
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  TypeP@7..11 "TYPE"
+  Whitespace@11..12 " "
+  RangeVar@12..17
+    Ident@12..17 "jsrec"
+  Whitespace@17..18 " "
+  As@18..20 "AS"
+  Whitespace@20..21 " "
+  Ascii40@21..22 "("
+  Newline@22..23 "\n"
+  Newline@23..24 "\t"
+  ColumnDef@24..29
+    Ident@24..25 "i"
+    Newline@25..26 "\t"
+    TypeName@26..29
+      IntP@26..29 "int"
+  Ascii44@29..30 ","
+  Newline@30..31 "\n"
+  Newline@31..32 "\t"
+  ColumnDef@32..40
+    Ident@32..34 "ia"
+    Newline@34..35 "\t"
+    TypeName@35..40
+      Ident@35..40 "_int4"
+  Ascii44@40..41 ","
+  Newline@41..42 "\n"
+  Newline@42..43 "\t"
+  ColumnDef@43..50
+    Ident@43..46 "ia1"
+    Newline@46..47 "\t"
+    TypeName@47..50
+      IntP@47..50 "int"
+  Ascii91@50..51 "["
+  Ascii93@51..52 "]"
+  Ascii44@52..53 ","
+  Newline@53..54 "\n"
+  Newline@54..55 "\t"
+  ColumnDef@55..62
+    Ident@55..58 "ia2"
+    Newline@58..59 "\t"
+    TypeName@59..62
+      IntP@59..62 "int"
+  Ascii91@62..63 "["
+  Ascii93@63..64 "]"
+  Ascii91@64..65 "["
+  Ascii93@65..66 "]"
+  Ascii44@66..67 ","
+  Newline@67..68 "\n"
+  Newline@68..69 "\t"
+  ColumnDef@69..76
+    Ident@69..72 "ia3"
+    Newline@72..73 "\t"
+    TypeName@73..76
+      IntP@73..76 "int"
+  Ascii91@76..77 "["
+  Ascii93@77..78 "]"
+  Ascii91@78..79 "["
+  Ascii93@79..80 "]"
+  Ascii91@80..81 "["
+  Ascii93@81..82 "]"
+  Ascii44@82..83 ","
+  Newline@83..84 "\n"
+  Newline@84..85 "\t"
+  ColumnDef@85..105
+    Ident@85..89 "ia1d"
+    Newline@89..90 "\t"
+    TypeName@90..105
+      Ident@90..105 "js_int_array_1d"
+  Ascii44@105..106 ","
+  Newline@106..107 "\n"
+  Newline@107..108 "\t"
+  ColumnDef@108..128
+    Ident@108..112 "ia2d"
+    Newline@112..113 "\t"
+    TypeName@113..128
+      Ident@113..128 "js_int_array_2d"
+  Ascii44@128..129 ","
+  Newline@129..130 "\n"
+  Newline@130..131 "\t"
+  ColumnDef@131..137
+    Ident@131..132 "t"
+    Newline@132..133 "\t"
+    TypeName@133..137
+      TextP@133..137 "text"
+  Ascii44@137..138 ","
+  Newline@138..139 "\n"
+  Newline@139..140 "\t"
+  ColumnDef@140..147
+    Ident@140..142 "ta"
+    Newline@142..143 "\t"
+    TypeName@143..147
+      TextP@143..147 "text"
+  Ascii91@147..148 "["
+  Ascii93@148..149 "]"
+  Ascii44@149..150 ","
+  Newline@150..151 "\n"
+  Newline@151..152 "\t"
+  ColumnDef@152..161
+    Ident@152..153 "c"
+    Newline@153..154 "\t"
+    TypeName@154..161
+      CharP@154..158 "char"
+      Ascii40@158..159 "("
+      AConst@159..161
+        Iconst@159..161 "10"
+  Ascii41@161..162 ")"
+  Ascii44@162..163 ","
+  Newline@163..164 "\n"
+  Newline@164..165 "\t"
+  ColumnDef@165..175
+    Ident@165..167 "ca"
+    Newline@167..168 "\t"
+    TypeName@168..175
+      CharP@168..172 "char"
+      Ascii40@172..173 "("
+      AConst@173..175
+        Iconst@173..175 "10"
+  Ascii41@175..176 ")"
+  Ascii91@176..177 "["
+  Ascii93@177..178 "]"
+  Ascii44@178..179 ","
+  Newline@179..180 "\n"
+  Newline@180..181 "\t"
+  ColumnDef@181..193
+    Ident@181..183 "ts"
+    Newline@183..184 "\t"
+    TypeName@184..193
+      Timestamp@184..193 "timestamp"
+  Ascii44@193..194 ","
+  Newline@194..195 "\n"
+  Newline@195..196 "\t"
+  ColumnDef@196..203
+    Ident@196..198 "js"
+    Newline@198..199 "\t"
+    TypeName@199..203
+      Ident@199..203 "json"
+  Ascii44@203..204 ","
+  Newline@204..205 "\n"
+  Newline@205..206 "\t"
+  ColumnDef@206..215
+    Ident@206..209 "jsb"
+    Newline@209..210 "\t"
+    TypeName@210..215
+      Ident@210..215 "jsonb"
+  Ascii44@215..216 ","
+  Newline@216..217 "\n"
+  Newline@217..218 "\t"
+  ColumnDef@218..226
+    Ident@218..221 "jsa"
+    Newline@221..222 "\t"
+    TypeName@222..226
+      Ident@222..226 "json"
+  Ascii91@226..227 "["
+  Ascii93@227..228 "]"
+  Ascii44@228..229 ","
+  Newline@229..230 "\n"
+  Newline@230..231 "\t"
+  ColumnDef@231..239
+    Ident@231..234 "rec"
+    Newline@234..235 "\t"
+    TypeName@235..239
+      Ident@235..239 "jpop"
+  Ascii44@239..240 ","
+  Newline@240..241 "\n"
+  Newline@241..242 "\t"
+  ColumnDef@242..251
+    Ident@242..246 "reca"
+    Newline@246..247 "\t"
+    TypeName@247..251
+      Ident@247..251 "jpop"
+  Ascii91@251..252 "["
+  Ascii93@252..253 "]"
+  Newline@253..254 "\n"
+  Ascii41@254..255 ")"
+  Ascii59@255..256 ";"
+

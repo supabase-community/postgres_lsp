@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT dictinitoption FROM pg_ts_dict WHERE dictname = 'synonym';"
+---
+SelectStmt@0..65
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..21
+    ColumnRef@7..21
+      Ident@7..21 "dictinitoption"
+  Whitespace@21..22 " "
+  From@22..26 "FROM"
+  Whitespace@26..27 " "
+  RangeVar@27..37
+    Ident@27..37 "pg_ts_dict"
+  Whitespace@37..38 " "
+  Where@38..43 "WHERE"
+  Whitespace@43..44 " "
+  AExpr@44..64
+    ColumnRef@44..52
+      Ident@44..52 "dictname"
+    Whitespace@52..53 " "
+    Ascii61@53..54 "="
+    Whitespace@54..55 " "
+    AConst@55..64
+      Sconst@55..64 "'synonym'"
+  Ascii59@64..65 ";"
+

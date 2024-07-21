@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select (select view_a) from view_a;
+---
+SelectStmt@0..35
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..21
+    SubLink@7..21
+      SelectStmt@7..21
+        Ascii40@7..8 "("
+        Select@8..14 "select"
+        Whitespace@14..15 " "
+        ResTarget@15..21
+          ColumnRef@15..21
+            Ident@15..21 "view_a"
+  Ascii41@21..22 ")"
+  Whitespace@22..23 " "
+  From@23..27 "from"
+  Whitespace@27..28 " "
+  RangeVar@28..34
+    Ident@28..34 "view_a"
+  Ascii59@34..35 ";"
+

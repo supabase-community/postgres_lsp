@@ -1,0 +1,38 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT f1 AS eight FROM VARCHAR_TBL\nUNION ALL\nSELECT f1 FROM CHAR_TBL;"
+---
+SelectStmt@0..70
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  SelectStmt@7..35
+    ResTarget@7..18
+      ColumnRef@7..9
+        Ident@7..9 "f1"
+      Whitespace@9..10 " "
+      As@10..12 "AS"
+      Whitespace@12..13 " "
+      Ident@13..18 "eight"
+    Whitespace@18..19 " "
+    From@19..23 "FROM"
+    Whitespace@23..24 " "
+    RangeVar@24..35
+      Ident@24..35 "VARCHAR_TBL"
+  Newline@35..36 "\n"
+  Union@36..41 "UNION"
+  Whitespace@41..42 " "
+  All@42..45 "ALL"
+  Newline@45..46 "\n"
+  SelectStmt@46..69
+    Select@46..52 "SELECT"
+    Whitespace@52..53 " "
+    ResTarget@53..55
+      ColumnRef@53..55
+        Ident@53..55 "f1"
+    Whitespace@55..56 " "
+    From@56..60 "FROM"
+    Whitespace@60..61 " "
+    RangeVar@61..69
+      Ident@61..69 "CHAR_TBL"
+  Ascii59@69..70 ";"
+

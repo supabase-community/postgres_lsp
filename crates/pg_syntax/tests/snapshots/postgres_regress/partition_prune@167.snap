@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE part_rev (b INT, c INT, a INT);"
+---
+CreateStmt@0..44
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..21
+    Ident@13..21 "part_rev"
+  Whitespace@21..22 " "
+  Ascii40@22..23 "("
+  ColumnDef@23..28
+    Ident@23..24 "b"
+    Whitespace@24..25 " "
+    TypeName@25..28
+      IntP@25..28 "INT"
+  Ascii44@28..29 ","
+  Whitespace@29..30 " "
+  ColumnDef@30..35
+    Ident@30..31 "c"
+    Whitespace@31..32 " "
+    TypeName@32..35
+      IntP@32..35 "INT"
+  Ascii44@35..36 ","
+  Whitespace@36..37 " "
+  ColumnDef@37..42
+    Ident@37..38 "a"
+    Whitespace@38..39 " "
+    TypeName@39..42
+      IntP@39..42 "INT"
+  Ascii41@42..43 ")"
+  Ascii59@43..44 ";"
+

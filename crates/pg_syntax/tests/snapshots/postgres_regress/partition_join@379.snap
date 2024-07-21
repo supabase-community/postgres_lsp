@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO plt2_adv_extra VALUES (0, 0, '0000');"
+---
+InsertStmt@0..49
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..26
+    Ident@12..26 "plt2_adv_extra"
+  Whitespace@26..27 " "
+  SelectStmt@27..47
+    Values@27..33 "VALUES"
+    Whitespace@33..34 " "
+    Ascii40@34..35 "("
+    List@35..47
+      AConst@35..36
+        Iconst@35..36 "0"
+      Ascii44@36..37 ","
+      Whitespace@37..38 " "
+      AConst@38..39
+        Iconst@38..39 "0"
+      Ascii44@39..40 ","
+      Whitespace@40..41 " "
+      AConst@41..47
+        Sconst@41..47 "'0000'"
+  Ascii41@47..48 ")"
+  Ascii59@48..49 ";"
+

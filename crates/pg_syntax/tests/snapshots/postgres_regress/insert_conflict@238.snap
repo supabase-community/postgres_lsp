@@ -1,0 +1,42 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table parted_conflict_1 (drp text, c int, a int, b text);"
+---
+CreateStmt@0..64
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..30
+    Ident@13..30 "parted_conflict_1"
+  Whitespace@30..31 " "
+  Ascii40@31..32 "("
+  ColumnDef@32..40
+    Ident@32..35 "drp"
+    Whitespace@35..36 " "
+    TypeName@36..40
+      TextP@36..40 "text"
+  Ascii44@40..41 ","
+  Whitespace@41..42 " "
+  ColumnDef@42..47
+    Ident@42..43 "c"
+    Whitespace@43..44 " "
+    TypeName@44..47
+      IntP@44..47 "int"
+  Ascii44@47..48 ","
+  Whitespace@48..49 " "
+  ColumnDef@49..54
+    Ident@49..50 "a"
+    Whitespace@50..51 " "
+    TypeName@51..54
+      IntP@51..54 "int"
+  Ascii44@54..55 ","
+  Whitespace@55..56 " "
+  ColumnDef@56..62
+    Ident@56..57 "b"
+    Whitespace@57..58 " "
+    TypeName@58..62
+      TextP@58..62 "text"
+  Ascii41@62..63 ")"
+  Ascii59@63..64 ";"
+

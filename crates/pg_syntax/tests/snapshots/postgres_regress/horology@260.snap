@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_timestamp('2000 ++ JUN', 'YYYY  MON');"
+---
+SelectStmt@0..48
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..46
+    FuncCall@7..46
+      Ident@7..19 "to_timestamp"
+      Ascii40@19..20 "("
+      AConst@20..33
+        Sconst@20..33 "'2000 ++ JUN'"
+      Ascii44@33..34 ","
+      Whitespace@34..35 " "
+      AConst@35..46
+        Sconst@35..46 "'YYYY  MON'"
+  Ascii41@46..47 ")"
+  Ascii59@47..48 ";"
+

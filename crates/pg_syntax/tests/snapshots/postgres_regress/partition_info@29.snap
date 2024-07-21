@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX ptif_test3_index ON ptif_test3 (a);
+---
+IndexStmt@0..48
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..29 "ptif_test3_index"
+  Whitespace@29..30 " "
+  On@30..32 "ON"
+  Whitespace@32..33 " "
+  RangeVar@33..43
+    Ident@33..43 "ptif_test3"
+  Whitespace@43..44 " "
+  Ascii40@44..45 "("
+  IndexElem@45..46
+    Ident@45..46 "a"
+  Ascii41@46..47 ")"
+  Ascii59@47..48 ";"
+

@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT parse_ident(' first . \"  second  \" .\"   third   \". \"  ' || repeat('x',66) || '\"');"
+---
+SelectStmt@0..89
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..87
+    FuncCall@7..87
+      Ident@7..18 "parse_ident"
+      Ascii40@18..19 "("
+      AExpr@19..87
+        AExpr@19..79
+          AConst@19..62
+            Sconst@19..62 "' first . \"  second   ..."
+          Whitespace@62..63 " "
+          Op@63..65 "||"
+          Whitespace@65..66 " "
+          FuncCall@66..79
+            Ident@66..72 "repeat"
+            Ascii40@72..73 "("
+            AConst@73..76
+              Sconst@73..76 "'x'"
+            Ascii44@76..77 ","
+            AConst@77..79
+              Iconst@77..79 "66"
+        Ascii41@79..80 ")"
+        Whitespace@80..81 " "
+        Op@81..83 "||"
+        Whitespace@83..84 " "
+        AConst@84..87
+          Sconst@84..87 "'\"'"
+  Ascii41@87..88 ")"
+  Ascii59@88..89 ";"
+

@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TYPE type1 (input = input1, output = output1, passedbyvalue);"
+---
+DefineStmt@0..68
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  TypeP@7..11 "TYPE"
+  Whitespace@11..12 " "
+  Ident@12..17 "type1"
+  Whitespace@17..18 " "
+  Ascii40@18..19 "("
+  DefElem@19..33
+    InputP@19..24 "input"
+    Whitespace@24..25 " "
+    Ascii61@25..26 "="
+    Whitespace@26..27 " "
+    TypeName@27..33
+      Ident@27..33 "input1"
+  Ascii44@33..34 ","
+  Whitespace@34..35 " "
+  DefElem@35..51
+    Ident@35..41 "output"
+    Whitespace@41..42 " "
+    Ascii61@42..43 "="
+    Whitespace@43..44 " "
+    TypeName@44..51
+      Ident@44..51 "output1"
+  Ascii44@51..52 ","
+  Whitespace@52..53 " "
+  DefElem@53..66
+    Ident@53..66 "passedbyvalue"
+  Ascii41@66..67 ")"
+  Ascii59@67..68 ";"
+

@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO flt VALUES('-0.0'::float),('+0.0'::float);"
+---
+InsertStmt@0..54
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..15
+    Ident@12..15 "flt"
+  Whitespace@15..16 " "
+  SelectStmt@16..52
+    Values@16..22 "VALUES"
+    Ascii40@22..23 "("
+    List@23..36
+      TypeCast@23..36
+        AConst@23..29
+          Sconst@23..29 "'-0.0'"
+        Typecast@29..31 "::"
+        TypeName@31..36
+          FloatP@31..36 "float"
+    Ascii41@36..37 ")"
+    Ascii44@37..38 ","
+    Ascii40@38..39 "("
+    List@39..52
+      TypeCast@39..52
+        AConst@39..45
+          Sconst@39..45 "'+0.0'"
+        Typecast@45..47 "::"
+        TypeName@47..52
+          FloatP@47..52 "float"
+  Ascii41@52..53 ")"
+  Ascii59@53..54 ";"
+

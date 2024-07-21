@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select range_add_bounds(int4multirange(int4range(1, 17)));"
+---
+SelectStmt@0..58
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..54
+    FuncCall@7..54
+      Ident@7..23 "range_add_bounds"
+      Ascii40@23..24 "("
+      FuncCall@24..54
+        Ident@24..38 "int4multirange"
+        Ascii40@38..39 "("
+        FuncCall@39..54
+          Ident@39..48 "int4range"
+          Ascii40@48..49 "("
+          AConst@49..50
+            Iconst@49..50 "1"
+          Ascii44@50..51 ","
+          Whitespace@51..52 " "
+          AConst@52..54
+            Iconst@52..54 "17"
+  Ascii41@54..55 ")"
+  Ascii41@55..56 ")"
+  Ascii41@56..57 ")"
+  Ascii59@57..58 ";"
+

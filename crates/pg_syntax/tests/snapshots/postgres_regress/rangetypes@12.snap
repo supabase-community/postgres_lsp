@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select ' ( empty, empty )  '::textrange;"
+---
+SelectStmt@0..40
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..39
+    TypeCast@7..39
+      AConst@7..28
+        Sconst@7..28 "' ( empty, empty )  '"
+      Typecast@28..30 "::"
+      TypeName@30..39
+        Ident@30..39 "textrange"
+  Ascii59@39..40 ";"
+

@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 'wa:1D wb:2A'::tsvector @@ 'w:*D & w:*A'::tsquery as \"true\";"
+---
+SelectStmt@0..67
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..66
+    AExpr@7..56
+      TypeCast@7..30
+        AConst@7..20
+          Sconst@7..20 "'wa:1D wb:2A'"
+        Typecast@20..22 "::"
+        TypeName@22..30
+          Ident@22..30 "tsvector"
+      Whitespace@30..31 " "
+      Op@31..33 "@@"
+      Whitespace@33..34 " "
+      TypeCast@34..56
+        AConst@34..47
+          Sconst@34..47 "'w:*D & w:*A'"
+        Typecast@47..49 "::"
+        TypeName@49..56
+          Ident@49..56 "tsquery"
+    Whitespace@56..57 " "
+    As@57..59 "as"
+    Whitespace@59..60 " "
+    Ident@60..66 "\"true\""
+  Ascii59@66..67 ";"
+

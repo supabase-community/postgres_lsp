@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT q1 * 2 AS \"twice int4\" FROM INT8_TBL;"
+---
+SelectStmt@0..44
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..29
+    AExpr@7..13
+      ColumnRef@7..9
+        Ident@7..9 "q1"
+      Whitespace@9..10 " "
+      Ascii42@10..11 "*"
+      Whitespace@11..12 " "
+      AConst@12..13
+        Iconst@12..13 "2"
+    Whitespace@13..14 " "
+    As@14..16 "AS"
+    Whitespace@16..17 " "
+    Ident@17..29 "\"twice int4\""
+  Whitespace@29..30 " "
+  From@30..34 "FROM"
+  Whitespace@34..35 " "
+  RangeVar@35..43
+    Ident@35..43 "INT8_TBL"
+  Ascii59@43..44 ";"
+

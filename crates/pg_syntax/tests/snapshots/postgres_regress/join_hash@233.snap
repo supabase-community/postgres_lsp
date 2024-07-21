@@ -1,0 +1,50 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO hjtest_1(a, b, id, c) VALUES ('text', 2, 1, false);"
+---
+InsertStmt@0..63
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "hjtest_1"
+  Ascii40@20..21 "("
+  ResTarget@21..22
+    Ident@21..22 "a"
+  Ascii44@22..23 ","
+  Whitespace@23..24 " "
+  ResTarget@24..25
+    Ident@24..25 "b"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..29
+    Ident@27..29 "id"
+  Ascii44@29..30 ","
+  Whitespace@30..31 " "
+  ResTarget@31..32
+    Ident@31..32 "c"
+  Ascii41@32..33 ")"
+  Whitespace@33..34 " "
+  SelectStmt@34..61
+    Values@34..40 "VALUES"
+    Whitespace@40..41 " "
+    Ascii40@41..42 "("
+    List@42..61
+      AConst@42..48
+        Sconst@42..48 "'text'"
+      Ascii44@48..49 ","
+      Whitespace@49..50 " "
+      AConst@50..51
+        Iconst@50..51 "2"
+      Ascii44@51..52 ","
+      Whitespace@52..53 " "
+      AConst@53..54
+        Iconst@53..54 "1"
+      Ascii44@54..55 ","
+      Whitespace@55..56 " "
+      AConst@56..61
+        FalseP@56..61 "false"
+  Ascii41@61..62 ")"
+  Ascii59@62..63 ";"
+

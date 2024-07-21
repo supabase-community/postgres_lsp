@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table rlp_default_default partition of rlp_default default;
+---
+CreateStmt@0..66
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..32
+    Ident@13..32 "rlp_default_default"
+  Whitespace@32..33 " "
+  Partition@33..42 "partition"
+  Whitespace@42..43 " "
+  Of@43..45 "of"
+  Whitespace@45..46 " "
+  RangeVar@46..57
+    Ident@46..57 "rlp_default"
+  Whitespace@57..58 " "
+  PartitionBoundSpec@58..65
+    Default@58..65 "default"
+  Ascii59@65..66 ";"
+

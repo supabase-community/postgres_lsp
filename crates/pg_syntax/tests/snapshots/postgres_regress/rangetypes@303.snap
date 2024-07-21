@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '[2010-01-01 01:00:00 -05, 2010-01-01 02:00:00 -08)'::tstzrange;"
+---
+SelectStmt@0..71
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..70
+    TypeCast@7..70
+      AConst@7..59
+        Sconst@7..59 "'[2010-01-01 01:00:00 ..."
+      Typecast@59..61 "::"
+      TypeName@61..70
+        Ident@61..70 "tstzrange"
+  Ascii59@70..71 ";"
+

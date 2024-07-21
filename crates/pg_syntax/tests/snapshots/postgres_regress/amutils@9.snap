@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE INDEX foocover ON foo (f1) INCLUDE (f2,f3);"
+---
+IndexStmt@0..50
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..21 "foocover"
+  Whitespace@21..22 " "
+  On@22..24 "ON"
+  Whitespace@24..25 " "
+  RangeVar@25..28
+    Ident@25..28 "foo"
+  Whitespace@28..29 " "
+  Ascii40@29..30 "("
+  IndexElem@30..32
+    Ident@30..32 "f1"
+  Ascii41@32..33 ")"
+  Whitespace@33..34 " "
+  Include@34..41 "INCLUDE"
+  Whitespace@41..42 " "
+  Ascii40@42..43 "("
+  IndexElem@43..45
+    Ident@43..45 "f2"
+  Ascii44@45..46 ","
+  IndexElem@46..48
+    Ident@46..48 "f3"
+  Ascii41@48..49 ")"
+  Ascii59@49..50 ";"
+

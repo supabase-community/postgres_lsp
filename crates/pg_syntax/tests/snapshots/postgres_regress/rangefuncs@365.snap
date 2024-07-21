@@ -1,0 +1,37 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into users values ('id2',2,'email2',true,12,true);"
+---
+InsertStmt@0..57
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..17
+    Ident@12..17 "users"
+  Whitespace@17..18 " "
+  SelectStmt@18..55
+    Values@18..24 "values"
+    Whitespace@24..25 " "
+    Ascii40@25..26 "("
+    List@26..55
+      AConst@26..31
+        Sconst@26..31 "'id2'"
+      Ascii44@31..32 ","
+      AConst@32..33
+        Iconst@32..33 "2"
+      Ascii44@33..34 ","
+      AConst@34..42
+        Sconst@34..42 "'email2'"
+      Ascii44@42..43 ","
+      AConst@43..47
+        TrueP@43..47 "true"
+      Ascii44@47..48 ","
+      AConst@48..50
+        Iconst@48..50 "12"
+      Ascii44@50..51 ","
+      AConst@51..55
+        TrueP@51..55 "true"
+  Ascii41@55..56 ")"
+  Ascii59@56..57 ";"
+

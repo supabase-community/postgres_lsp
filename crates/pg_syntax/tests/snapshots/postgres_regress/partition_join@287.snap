@@ -1,0 +1,150 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT t1.b, t1.c, t2.a, t2.c, t3.a, t3.c FROM prt2_adv t1 LEFT JOIN prt1_adv t2 ON (t1.b = t2.a) INNER JOIN prt1_adv t3 ON (t1.b = t3.a) WHERE t1.a = 0 ORDER BY t1.b, t2.a, t3.a;"
+---
+SelectStmt@0..179
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      Ident@7..9 "t1"
+      Ascii46@9..10 "."
+      Ident@10..11 "b"
+  Ascii44@11..12 ","
+  Whitespace@12..13 " "
+  ResTarget@13..17
+    ColumnRef@13..17
+      Ident@13..15 "t1"
+      Ascii46@15..16 "."
+      Ident@16..17 "c"
+  Ascii44@17..18 ","
+  Whitespace@18..19 " "
+  ResTarget@19..23
+    ColumnRef@19..23
+      Ident@19..21 "t2"
+      Ascii46@21..22 "."
+      Ident@22..23 "a"
+  Ascii44@23..24 ","
+  Whitespace@24..25 " "
+  ResTarget@25..29
+    ColumnRef@25..29
+      Ident@25..27 "t2"
+      Ascii46@27..28 "."
+      Ident@28..29 "c"
+  Ascii44@29..30 ","
+  Whitespace@30..31 " "
+  ResTarget@31..35
+    ColumnRef@31..35
+      Ident@31..33 "t3"
+      Ascii46@33..34 "."
+      Ident@34..35 "a"
+  Ascii44@35..36 ","
+  Whitespace@36..37 " "
+  ResTarget@37..41
+    ColumnRef@37..41
+      Ident@37..39 "t3"
+      Ascii46@39..40 "."
+      Ident@40..41 "c"
+  Whitespace@41..42 " "
+  From@42..46 "FROM"
+  Whitespace@46..47 " "
+  JoinExpr@47..136
+    JoinExpr@47..96
+      RangeVar@47..58
+        Ident@47..55 "prt2_adv"
+        Whitespace@55..56 " "
+        Alias@56..58
+          Ident@56..58 "t1"
+      Whitespace@58..59 " "
+      Left@59..63 "LEFT"
+      Whitespace@63..64 " "
+      Join@64..68 "JOIN"
+      Whitespace@68..69 " "
+      RangeVar@69..80
+        Ident@69..77 "prt1_adv"
+        Whitespace@77..78 " "
+        Alias@78..80
+          Ident@78..80 "t2"
+      Whitespace@80..81 " "
+      On@81..83 "ON"
+      Whitespace@83..84 " "
+      Ascii40@84..85 "("
+      AExpr@85..96
+        ColumnRef@85..89
+          Ident@85..87 "t1"
+          Ascii46@87..88 "."
+          Ident@88..89 "b"
+        Whitespace@89..90 " "
+        Ascii61@90..91 "="
+        Whitespace@91..92 " "
+        ColumnRef@92..96
+          Ident@92..94 "t2"
+          Ascii46@94..95 "."
+          Ident@95..96 "a"
+    Ascii41@96..97 ")"
+    Whitespace@97..98 " "
+    InnerP@98..103 "INNER"
+    Whitespace@103..104 " "
+    Join@104..108 "JOIN"
+    Whitespace@108..109 " "
+    RangeVar@109..120
+      Ident@109..117 "prt1_adv"
+      Whitespace@117..118 " "
+      Alias@118..120
+        Ident@118..120 "t3"
+    Whitespace@120..121 " "
+    On@121..123 "ON"
+    Whitespace@123..124 " "
+    Ascii40@124..125 "("
+    AExpr@125..136
+      ColumnRef@125..129
+        Ident@125..127 "t1"
+        Ascii46@127..128 "."
+        Ident@128..129 "b"
+      Whitespace@129..130 " "
+      Ascii61@130..131 "="
+      Whitespace@131..132 " "
+      ColumnRef@132..136
+        Ident@132..134 "t3"
+        Ascii46@134..135 "."
+        Ident@135..136 "a"
+  Ascii41@136..137 ")"
+  Whitespace@137..138 " "
+  Where@138..143 "WHERE"
+  Whitespace@143..144 " "
+  AExpr@144..152
+    ColumnRef@144..148
+      Ident@144..146 "t1"
+      Ascii46@146..147 "."
+      Ident@147..148 "a"
+    Whitespace@148..149 " "
+    Ascii61@149..150 "="
+    Whitespace@150..151 " "
+    AConst@151..152
+      Iconst@151..152 "0"
+  Whitespace@152..153 " "
+  SortBy@153..166
+    Order@153..158 "ORDER"
+    Whitespace@158..159 " "
+    By@159..161 "BY"
+    Whitespace@161..162 " "
+    ColumnRef@162..166
+      Ident@162..164 "t1"
+      Ascii46@164..165 "."
+      Ident@165..166 "b"
+  Ascii44@166..167 ","
+  Whitespace@167..168 " "
+  SortBy@168..172
+    ColumnRef@168..172
+      Ident@168..170 "t2"
+      Ascii46@170..171 "."
+      Ident@171..172 "a"
+  Ascii44@172..173 ","
+  Whitespace@173..174 " "
+  SortBy@174..178
+    ColumnRef@174..178
+      Ident@174..176 "t3"
+      Ascii46@176..177 "."
+      Ident@177..178 "a"
+  Ascii59@178..179 ";"
+

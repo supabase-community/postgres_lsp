@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select ROW(1,2) < ROW(1,NULL) as null;"
+---
+SelectStmt@0..38
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..37
+    AExpr@7..28
+      RowExpr@7..14
+        Row@7..10 "ROW"
+        Ascii40@10..11 "("
+        AConst@11..12
+          Iconst@11..12 "1"
+        Ascii44@12..13 ","
+        AConst@13..14
+          Iconst@13..14 "2"
+      Ascii41@14..15 ")"
+      Whitespace@15..16 " "
+      Ascii60@16..17 "<"
+      Whitespace@17..18 " "
+      RowExpr@18..28
+        Row@18..21 "ROW"
+        Ascii40@21..22 "("
+        AConst@22..23
+          Iconst@22..23 "1"
+        Ascii44@23..24 ","
+        AConst@24..28
+          NullP@24..28 "NULL"
+    Ascii41@28..29 ")"
+    Whitespace@29..30 " "
+    As@30..32 "as"
+    Whitespace@32..33 " "
+    NullP@33..37 "null"
+  Ascii59@37..38 ";"
+

@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE DOMAIN js_int_array_1d  AS int[]   CHECK(array_length(VALUE, 1) = 3);"
+---
+CreateDomainStmt@0..76
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  DomainP@7..13 "DOMAIN"
+  Whitespace@13..14 " "
+  Ident@14..29 "js_int_array_1d"
+  Whitespace@29..31 "  "
+  As@31..33 "AS"
+  Whitespace@33..34 " "
+  TypeName@34..37
+    IntP@34..37 "int"
+  Ascii91@37..38 "["
+  Ascii93@38..39 "]"
+  Whitespace@39..42 "   "
+  Constraint@42..74
+    Check@42..47 "CHECK"
+    Ascii40@47..48 "("
+    AExpr@48..74
+      FuncCall@48..69
+        Ident@48..60 "array_length"
+        Ascii40@60..61 "("
+        ColumnRef@61..66
+          ValueP@61..66 "VALUE"
+        Ascii44@66..67 ","
+        Whitespace@67..68 " "
+        AConst@68..69
+          Iconst@68..69 "1"
+      Ascii41@69..70 ")"
+      Whitespace@70..71 " "
+      Ascii61@71..72 "="
+      Whitespace@72..73 " "
+      AConst@73..74
+        Iconst@73..74 "3"
+  Ascii41@74..75 ")"
+  Ascii59@75..76 ";"
+

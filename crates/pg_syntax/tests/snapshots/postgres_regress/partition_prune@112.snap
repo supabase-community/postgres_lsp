@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table mc2p_default partition of mc2p default;
+---
+CreateStmt@0..52
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..25
+    Ident@13..25 "mc2p_default"
+  Whitespace@25..26 " "
+  Partition@26..35 "partition"
+  Whitespace@35..36 " "
+  Of@36..38 "of"
+  Whitespace@38..39 " "
+  RangeVar@39..43
+    Ident@39..43 "mc2p"
+  Whitespace@43..44 " "
+  PartitionBoundSpec@44..51
+    Default@44..51 "default"
+  Ascii59@51..52 ";"
+

@@ -1,0 +1,51 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE T(pk INT NOT NULL PRIMARY KEY, c_int INT DEFAULT LENGTH(foo(6)));"
+---
+CreateStmt@0..78
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..14
+    Ident@13..14 "T"
+  Ascii40@14..15 "("
+  ColumnDef@15..42
+    Ident@15..17 "pk"
+    Whitespace@17..18 " "
+    TypeName@18..21
+      IntP@18..21 "INT"
+    Whitespace@21..22 " "
+    Constraint@22..30
+      Not@22..25 "NOT"
+      Whitespace@25..26 " "
+      NullP@26..30 "NULL"
+    Whitespace@30..31 " "
+    Constraint@31..42
+      Primary@31..38 "PRIMARY"
+      Whitespace@38..39 " "
+      Key@39..42 "KEY"
+  Ascii44@42..43 ","
+  Whitespace@43..44 " "
+  ColumnDef@44..74
+    Ident@44..49 "c_int"
+    Whitespace@49..50 " "
+    TypeName@50..53
+      IntP@50..53 "INT"
+    Whitespace@53..54 " "
+    Constraint@54..74
+      Default@54..61 "DEFAULT"
+      Whitespace@61..62 " "
+      FuncCall@62..74
+        Ident@62..68 "LENGTH"
+        Ascii40@68..69 "("
+        FuncCall@69..74
+          Ident@69..72 "foo"
+          Ascii40@72..73 "("
+          AConst@73..74
+            Iconst@73..74 "6"
+  Ascii41@74..75 ")"
+  Ascii41@75..76 ")"
+  Ascii41@76..77 ")"
+  Ascii59@77..78 ";"
+

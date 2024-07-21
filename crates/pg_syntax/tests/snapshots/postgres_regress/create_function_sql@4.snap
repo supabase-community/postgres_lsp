@@ -1,0 +1,19 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SET search_path TO temp_func_test, public;"
+---
+VariableSetStmt@0..42
+  Set@0..3 "SET"
+  Whitespace@3..4 " "
+  Ident@4..15 "search_path"
+  Whitespace@15..16 " "
+  To@16..18 "TO"
+  Whitespace@18..19 " "
+  AConst@19..33
+    Ident@19..33 "temp_func_test"
+  Ascii44@33..34 ","
+  Whitespace@34..35 " "
+  AConst@35..41
+    Ident@35..41 "public"
+  Ascii59@41..42 ";"
+

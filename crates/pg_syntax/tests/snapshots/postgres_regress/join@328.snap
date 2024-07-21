@@ -1,0 +1,152 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from\n(values (1, array[10,20]), (2, array[20,30])) as v1(v1x,v1ys)\nleft join (values (1, 10), (2, 20)) as v2(v2x,v2y) on v2x = v1x\nleft join unnest(v1ys) as u1(u1y) on u1y = v2y;"
+---
+SelectStmt@0..187
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Newline@13..14 "\n"
+  Ascii40@14..15 "("
+  JoinExpr@15..186
+    JoinExpr@15..139
+      RangeSubselect@15..74
+        SelectStmt@15..56
+          Values@15..21 "values"
+          Whitespace@21..22 " "
+          Ascii40@22..23 "("
+          List@23..37
+            AConst@23..24
+              Iconst@23..24 "1"
+            Ascii44@24..25 ","
+            Whitespace@25..26 " "
+            AArrayExpr@26..37
+              Array@26..31 "array"
+              Ascii91@31..32 "["
+              AConst@32..34
+                Iconst@32..34 "10"
+              Ascii44@34..35 ","
+              AConst@35..37
+                Iconst@35..37 "20"
+          Ascii93@37..38 "]"
+          Ascii41@38..39 ")"
+          Ascii44@39..40 ","
+          Whitespace@40..41 " "
+          Ascii40@41..42 "("
+          List@42..56
+            AConst@42..43
+              Iconst@42..43 "2"
+            Ascii44@43..44 ","
+            Whitespace@44..45 " "
+            AArrayExpr@45..56
+              Array@45..50 "array"
+              Ascii91@50..51 "["
+              AConst@51..53
+                Iconst@51..53 "20"
+              Ascii44@53..54 ","
+              AConst@54..56
+                Iconst@54..56 "30"
+        Ascii93@56..57 "]"
+        Ascii41@57..58 ")"
+        Ascii41@58..59 ")"
+        Whitespace@59..60 " "
+        Alias@60..74
+          As@60..62 "as"
+          Whitespace@62..63 " "
+          Ident@63..65 "v1"
+          Ascii40@65..66 "("
+          Ident@66..69 "v1x"
+          Ascii44@69..70 ","
+          Ident@70..74 "v1ys"
+      Ascii41@74..75 ")"
+      Newline@75..76 "\n"
+      Left@76..80 "left"
+      Whitespace@80..81 " "
+      Join@81..85 "join"
+      Whitespace@85..86 " "
+      Ascii40@86..87 "("
+      RangeSubselect@87..125
+        SelectStmt@87..109
+          Values@87..93 "values"
+          Whitespace@93..94 " "
+          Ascii40@94..95 "("
+          List@95..100
+            AConst@95..96
+              Iconst@95..96 "1"
+            Ascii44@96..97 ","
+            Whitespace@97..98 " "
+            AConst@98..100
+              Iconst@98..100 "10"
+          Ascii41@100..101 ")"
+          Ascii44@101..102 ","
+          Whitespace@102..103 " "
+          Ascii40@103..104 "("
+          List@104..109
+            AConst@104..105
+              Iconst@104..105 "2"
+            Ascii44@105..106 ","
+            Whitespace@106..107 " "
+            AConst@107..109
+              Iconst@107..109 "20"
+        Ascii41@109..110 ")"
+        Ascii41@110..111 ")"
+        Whitespace@111..112 " "
+        Alias@112..125
+          As@112..114 "as"
+          Whitespace@114..115 " "
+          Ident@115..117 "v2"
+          Ascii40@117..118 "("
+          Ident@118..121 "v2x"
+          Ascii44@121..122 ","
+          Ident@122..125 "v2y"
+      Ascii41@125..126 ")"
+      Whitespace@126..127 " "
+      On@127..129 "on"
+      Whitespace@129..130 " "
+      AExpr@130..139
+        ColumnRef@130..133
+          Ident@130..133 "v2x"
+        Whitespace@133..134 " "
+        Ascii61@134..135 "="
+        Whitespace@135..136 " "
+        ColumnRef@136..139
+          Ident@136..139 "v1x"
+    Newline@139..140 "\n"
+    Left@140..144 "left"
+    Whitespace@144..145 " "
+    Join@145..149 "join"
+    Whitespace@149..150 " "
+    RangeFunction@150..172
+      List@150..161
+        FuncCall@150..161
+          Ident@150..156 "unnest"
+          Ascii40@156..157 "("
+          ColumnRef@157..161
+            Ident@157..161 "v1ys"
+      Ascii41@161..162 ")"
+      Whitespace@162..163 " "
+      Alias@163..172
+        As@163..165 "as"
+        Whitespace@165..166 " "
+        Ident@166..168 "u1"
+        Ascii40@168..169 "("
+        Ident@169..172 "u1y"
+    Ascii41@172..173 ")"
+    Whitespace@173..174 " "
+    On@174..176 "on"
+    Whitespace@176..177 " "
+    AExpr@177..186
+      ColumnRef@177..180
+        Ident@177..180 "u1y"
+      Whitespace@180..181 " "
+      Ascii61@181..182 "="
+      Whitespace@182..183 " "
+      ColumnRef@183..186
+        Ident@183..186 "v2y"
+  Ascii59@186..187 ";"
+

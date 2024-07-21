@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT repeat('[', 10000)::json;"
+---
+SelectStmt@0..32
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..31
+    TypeCast@7..31
+      FuncCall@7..24
+        Ident@7..13 "repeat"
+        Ascii40@13..14 "("
+        AConst@14..17
+          Sconst@14..17 "'['"
+        Ascii44@17..18 ","
+        Whitespace@18..19 " "
+        AConst@19..24
+          Iconst@19..24 "10000"
+      Ascii41@24..25 ")"
+      Typecast@25..27 "::"
+      TypeName@27..31
+        Ident@27..31 "json"
+  Ascii59@31..32 ";"
+

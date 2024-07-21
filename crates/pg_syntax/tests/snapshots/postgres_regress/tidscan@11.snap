@@ -1,0 +1,51 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT ctid, * FROM tidscan WHERE ctid = ANY(ARRAY['(0,1)', '(0,2)']::tid[]);"
+---
+SelectStmt@0..77
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      Ident@7..11 "ctid"
+  Ascii44@11..12 ","
+  Whitespace@12..13 " "
+  ResTarget@13..14
+    ColumnRef@13..14
+      AStar@13..14
+        Ascii42@13..14 "*"
+  Whitespace@14..15 " "
+  From@15..19 "FROM"
+  Whitespace@19..20 " "
+  RangeVar@20..27
+    Ident@20..27 "tidscan"
+  Whitespace@27..28 " "
+  Where@28..33 "WHERE"
+  Whitespace@33..34 " "
+  AExpr@34..73
+    ColumnRef@34..38
+      Ident@34..38 "ctid"
+    Whitespace@38..39 " "
+    Ascii61@39..40 "="
+    Whitespace@40..41 " "
+    Any@41..44 "ANY"
+    Ascii40@44..45 "("
+    TypeCast@45..73
+      AArrayExpr@45..67
+        Array@45..50 "ARRAY"
+        Ascii91@50..51 "["
+        AConst@51..58
+          Sconst@51..58 "'(0,1)'"
+        Ascii44@58..59 ","
+        Whitespace@59..60 " "
+        AConst@60..67
+          Sconst@60..67 "'(0,2)'"
+      Ascii93@67..68 "]"
+      Typecast@68..70 "::"
+      TypeName@70..73
+        Ident@70..73 "tid"
+  Ascii91@73..74 "["
+  Ascii93@74..75 "]"
+  Ascii41@75..76 ")"
+  Ascii59@76..77 ";"
+

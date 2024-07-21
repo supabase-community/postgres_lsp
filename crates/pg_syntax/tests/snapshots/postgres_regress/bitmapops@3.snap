@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX i_bmtest_a ON bmscantest(a);
+---
+IndexStmt@0..41
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..23 "i_bmtest_a"
+  Whitespace@23..24 " "
+  On@24..26 "ON"
+  Whitespace@26..27 " "
+  RangeVar@27..37
+    Ident@27..37 "bmscantest"
+  Ascii40@37..38 "("
+  IndexElem@38..39
+    Ident@38..39 "a"
+  Ascii41@39..40 ")"
+  Ascii59@40..41 ";"
+

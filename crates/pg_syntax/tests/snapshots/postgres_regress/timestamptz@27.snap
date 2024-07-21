@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO TIMESTAMPTZ_TBL VALUES ('infinity');"
+---
+InsertStmt@0..48
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "TIMESTAMPTZ_TBL"
+  Whitespace@27..28 " "
+  SelectStmt@28..46
+    Values@28..34 "VALUES"
+    Whitespace@34..35 " "
+    Ascii40@35..36 "("
+    List@36..46
+      AConst@36..46
+        Sconst@36..46 "'infinity'"
+  Ascii41@46..47 ")"
+  Ascii59@47..48 ";"
+

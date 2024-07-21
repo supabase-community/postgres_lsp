@@ -1,0 +1,41 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE guid2\n(\n\tguid_field UUID,\n\ttext_field TEXT DEFAULT(now())\n);"
+---
+CreateStmt@0..73
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..18
+    Ident@13..18 "guid2"
+  Newline@18..19 "\n"
+  Ascii40@19..20 "("
+  Newline@20..21 "\n"
+  Newline@21..22 "\t"
+  ColumnDef@22..37
+    Ident@22..32 "guid_field"
+    Whitespace@32..33 " "
+    TypeName@33..37
+      Ident@33..37 "UUID"
+  Ascii44@37..38 ","
+  Newline@38..39 "\n"
+  Newline@39..40 "\t"
+  ColumnDef@40..67
+    Ident@40..50 "text_field"
+    Whitespace@50..51 " "
+    TypeName@51..55
+      TextP@51..55 "TEXT"
+    Whitespace@55..56 " "
+    Constraint@56..67
+      Default@56..63 "DEFAULT"
+      Ascii40@63..64 "("
+      FuncCall@64..67
+        Ident@64..67 "now"
+  Ascii40@67..68 "("
+  Ascii41@68..69 ")"
+  Ascii41@69..70 ")"
+  Newline@70..71 "\n"
+  Ascii41@71..72 ")"
+  Ascii59@72..73 ";"
+

@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index spgist_text_idx on spgist_text_tbl using spgist(t);
+---
+IndexStmt@0..64
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..28 "spgist_text_idx"
+  Whitespace@28..29 " "
+  On@29..31 "on"
+  Whitespace@31..32 " "
+  RangeVar@32..47
+    Ident@32..47 "spgist_text_tbl"
+  Whitespace@47..48 " "
+  Using@48..53 "using"
+  Whitespace@53..54 " "
+  Ident@54..60 "spgist"
+  Ascii40@60..61 "("
+  IndexElem@61..62
+    Ident@61..62 "t"
+  Ascii41@62..63 ")"
+  Ascii59@63..64 ";"
+

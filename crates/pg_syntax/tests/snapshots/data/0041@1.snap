@@ -1,0 +1,12 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE SCHEMA myschema;
+---
+CreateSchemaStmt@0..23
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Schema@7..13 "SCHEMA"
+  Whitespace@13..14 " "
+  Ident@14..22 "myschema"
+  Ascii59@22..23 ";"
+

@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb '{\"b\": {\"a\": 12}}' @? '$.*.b';"
+---
+SelectStmt@0..43
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..42
+    Ident@7..12 "jsonb"
+    Whitespace@12..13 " "
+    AExpr@13..42
+      TypeCast@13..31
+        AConst@13..31
+          Sconst@13..31 "'{\"b\": {\"a\": 12}}'"
+      Whitespace@31..32 " "
+      Op@32..34 "@?"
+      Whitespace@34..35 " "
+      AConst@35..42
+        Sconst@35..42 "'$.*.b'"
+  Ascii59@42..43 ";"
+

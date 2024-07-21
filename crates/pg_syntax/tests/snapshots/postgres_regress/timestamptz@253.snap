@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '2014-10-26 01:00:00 MSK'::timestamptz;"
+---
+SelectStmt@0..46
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..45
+    TypeCast@7..45
+      AConst@7..32
+        Sconst@7..32 "'2014-10-26 01:00:00  ..."
+      Typecast@32..34 "::"
+      TypeName@34..45
+        Ident@34..45 "timestamptz"
+  Ascii59@45..46 ";"
+

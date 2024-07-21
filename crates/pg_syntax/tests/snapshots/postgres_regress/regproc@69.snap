@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_regprocedure('ng_catalog.abs(numeric)');"
+---
+SelectStmt@0..50
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..48
+    FuncCall@7..48
+      Ident@7..22 "to_regprocedure"
+      Ascii40@22..23 "("
+      AConst@23..48
+        Sconst@23..48 "'ng_catalog.abs(numer ..."
+  Ascii41@48..49 ")"
+  Ascii59@49..50 ";"
+

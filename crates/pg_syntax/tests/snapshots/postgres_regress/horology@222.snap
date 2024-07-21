@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_timestamp('2011-12-18 11:38 PM', 'YYYY-MM-DD HH12:MI PM');"
+---
+SelectStmt@0..68
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..66
+    FuncCall@7..66
+      Ident@7..19 "to_timestamp"
+      Ascii40@19..20 "("
+      AConst@20..41
+        Sconst@20..41 "'2011-12-18 11:38 PM'"
+      Ascii44@41..42 ","
+      Whitespace@42..43 " "
+      AConst@43..66
+        Sconst@43..66 "'YYYY-MM-DD HH12:MI PM'"
+  Ascii41@66..67 ")"
+  Ascii59@67..68 ";"
+

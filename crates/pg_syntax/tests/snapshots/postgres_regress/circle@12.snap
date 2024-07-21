@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO CIRCLE_TBL VALUES ('<(100,200),10');"
+---
+InsertStmt@0..48
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..22
+    Ident@12..22 "CIRCLE_TBL"
+  Whitespace@22..23 " "
+  SelectStmt@23..46
+    Values@23..29 "VALUES"
+    Whitespace@29..30 " "
+    Ascii40@30..31 "("
+    List@31..46
+      AConst@31..46
+        Sconst@31..46 "'<(100,200),10'"
+  Ascii41@46..47 ")"
+  Ascii59@47..48 ";"
+

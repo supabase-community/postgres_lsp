@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX code_idx ON films (code) TABLESPACE indexspace;
+---
+IndexStmt@0..60
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..21 "code_idx"
+  Whitespace@21..22 " "
+  On@22..24 "ON"
+  Whitespace@24..25 " "
+  RangeVar@25..30
+    Ident@25..30 "films"
+  Whitespace@30..31 " "
+  Ascii40@31..32 "("
+  IndexElem@32..36
+    Ident@32..36 "code"
+  Ascii41@36..37 ")"
+  Whitespace@37..38 " "
+  Tablespace@38..48 "TABLESPACE"
+  Whitespace@48..49 " "
+  Ident@49..59 "indexspace"
+  Ascii59@59..60 ";"
+

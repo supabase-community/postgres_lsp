@@ -1,0 +1,83 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT d.f1 AS \"timestamp\", t.f1 AS \"interval\", d.f1 + t.f1 AS plus\n  FROM TEMP_TIMESTAMP d, INTERVAL_TBL t\n  ORDER BY plus, \"timestamp\", \"interval\";"
+---
+SelectStmt@0..149
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..26
+    ColumnRef@7..11
+      Ident@7..8 "d"
+      Ascii46@8..9 "."
+      Ident@9..11 "f1"
+    Whitespace@11..12 " "
+    As@12..14 "AS"
+    Whitespace@14..15 " "
+    Ident@15..26 "\"timestamp\""
+  Ascii44@26..27 ","
+  Whitespace@27..28 " "
+  ResTarget@28..46
+    ColumnRef@28..32
+      Ident@28..29 "t"
+      Ascii46@29..30 "."
+      Ident@30..32 "f1"
+    Whitespace@32..33 " "
+    As@33..35 "AS"
+    Whitespace@35..36 " "
+    Ident@36..46 "\"interval\""
+  Ascii44@46..47 ","
+  Whitespace@47..48 " "
+  ResTarget@48..67
+    AExpr@48..59
+      ColumnRef@48..52
+        Ident@48..49 "d"
+        Ascii46@49..50 "."
+        Ident@50..52 "f1"
+      Whitespace@52..53 " "
+      Ascii43@53..54 "+"
+      Whitespace@54..55 " "
+      ColumnRef@55..59
+        Ident@55..56 "t"
+        Ascii46@56..57 "."
+        Ident@57..59 "f1"
+    Whitespace@59..60 " "
+    As@60..62 "AS"
+    Whitespace@62..63 " "
+    Ident@63..67 "plus"
+  Newline@67..68 "\n"
+  Whitespace@68..70 "  "
+  From@70..74 "FROM"
+  Whitespace@74..75 " "
+  RangeVar@75..91
+    Ident@75..89 "TEMP_TIMESTAMP"
+    Whitespace@89..90 " "
+    Alias@90..91
+      Ident@90..91 "d"
+  Ascii44@91..92 ","
+  Whitespace@92..93 " "
+  RangeVar@93..107
+    Ident@93..105 "INTERVAL_TBL"
+    Whitespace@105..106 " "
+    Alias@106..107
+      Ident@106..107 "t"
+  Newline@107..108 "\n"
+  Whitespace@108..110 "  "
+  SortBy@110..123
+    Order@110..115 "ORDER"
+    Whitespace@115..116 " "
+    By@116..118 "BY"
+    Whitespace@118..119 " "
+    ColumnRef@119..123
+      Ident@119..123 "plus"
+  Ascii44@123..124 ","
+  Whitespace@124..125 " "
+  SortBy@125..136
+    ColumnRef@125..136
+      Ident@125..136 "\"timestamp\""
+  Ascii44@136..137 ","
+  Whitespace@137..138 " "
+  SortBy@138..148
+    ColumnRef@138..148
+      Ident@138..148 "\"interval\""
+  Ascii59@148..149 ";"
+

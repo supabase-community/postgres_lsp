@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select explain_filter('explain (analyze, verbose) select * from int8_tbl i8');"
+---
+SelectStmt@0..78
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..76
+    FuncCall@7..76
+      Ident@7..21 "explain_filter"
+      Ascii40@21..22 "("
+      AConst@22..76
+        Sconst@22..76 "'explain (analyze, ve ..."
+  Ascii41@76..77 ")"
+  Ascii59@77..78 ";"
+

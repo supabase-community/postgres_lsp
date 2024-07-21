@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM json_populate_recordset(NULL::jpop,'[]') q;"
+---
+SelectStmt@0..57
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeFunction@14..56
+    List@14..53
+      FuncCall@14..53
+        Ident@14..37 "json_populate_recordset"
+        Ascii40@37..38 "("
+        TypeCast@38..48
+          AConst@38..42
+            NullP@38..42 "NULL"
+          Typecast@42..44 "::"
+          TypeName@44..48
+            Ident@44..48 "jpop"
+        Ascii44@48..49 ","
+        AConst@49..53
+          Sconst@49..53 "'[]'"
+    Ascii41@53..54 ")"
+    Whitespace@54..55 " "
+    Alias@55..56
+      Ident@55..56 "q"
+  Ascii59@56..57 ";"
+

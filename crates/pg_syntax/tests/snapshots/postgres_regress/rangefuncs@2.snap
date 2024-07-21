@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO rngfunc2 VALUES(1, 11);"
+---
+InsertStmt@0..35
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "rngfunc2"
+  Whitespace@20..21 " "
+  SelectStmt@21..33
+    Values@21..27 "VALUES"
+    Ascii40@27..28 "("
+    List@28..33
+      AConst@28..29
+        Iconst@28..29 "1"
+      Ascii44@29..30 ","
+      Whitespace@30..31 " "
+      AConst@31..33
+        Iconst@31..33 "11"
+  Ascii41@33..34 ")"
+  Ascii59@34..35 ";"
+

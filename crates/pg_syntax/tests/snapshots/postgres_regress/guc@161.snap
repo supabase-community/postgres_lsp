@@ -1,0 +1,17 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT name FROM pg_cursors;
+---
+SelectStmt@0..28
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      NameP@7..11 "name"
+  Whitespace@11..12 " "
+  From@12..16 "FROM"
+  Whitespace@16..17 " "
+  RangeVar@17..27
+    Ident@17..27 "pg_cursors"
+  Ascii59@27..28 ";"
+

@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO LSEG_TBL VALUES ('[-1e6,2e2,3e5, -4e1]');"
+---
+InsertStmt@0..53
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "LSEG_TBL"
+  Whitespace@20..21 " "
+  SelectStmt@21..51
+    Values@21..27 "VALUES"
+    Whitespace@27..28 " "
+    Ascii40@28..29 "("
+    List@29..51
+      AConst@29..51
+        Sconst@29..51 "'[-1e6,2e2,3e5, -4e1]'"
+  Ascii41@51..52 ")"
+  Ascii59@52..53 ";"
+

@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_query('[12, {\"a\": 13}, {\"b\": 14}]', 'lax $[0 to 10].a');"
+---
+SelectStmt@0..74
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..72
+    FuncCall@7..72
+      Ident@7..23 "jsonb_path_query"
+      Ascii40@23..24 "("
+      AConst@24..52
+        Sconst@24..52 "'[12, {\"a\": 13}, {\"b\" ..."
+      Ascii44@52..53 ","
+      Whitespace@53..54 " "
+      AConst@54..72
+        Sconst@54..72 "'lax $[0 to 10].a'"
+  Ascii41@72..73 ")"
+  Ascii59@73..74 ";"
+

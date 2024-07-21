@@ -1,0 +1,91 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into test_multirange_gist select int4multirange(int4range(g, g+10),int4range(g+20, g+30),int4range(g+40, g+50)) from generate_series(1,2000) g;"
+---
+InsertStmt@0..150
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..32
+    Ident@12..32 "test_multirange_gist"
+  Whitespace@32..33 " "
+  SelectStmt@33..149
+    Select@33..39 "select"
+    Whitespace@39..40 " "
+    ResTarget@40..116
+      FuncCall@40..116
+        Ident@40..54 "int4multirange"
+        Ascii40@54..55 "("
+        FuncCall@55..72
+          Ident@55..64 "int4range"
+          Ascii40@64..65 "("
+          ColumnRef@65..66
+            Ident@65..66 "g"
+          Ascii44@66..67 ","
+          Whitespace@67..68 " "
+          AExpr@68..72
+            ColumnRef@68..69
+              Ident@68..69 "g"
+            Ascii43@69..70 "+"
+            AConst@70..72
+              Iconst@70..72 "10"
+        Ascii41@72..73 ")"
+        Ascii44@73..74 ","
+        FuncCall@74..94
+          Ident@74..83 "int4range"
+          Ascii40@83..84 "("
+          AExpr@84..88
+            ColumnRef@84..85
+              Ident@84..85 "g"
+            Ascii43@85..86 "+"
+            AConst@86..88
+              Iconst@86..88 "20"
+          Ascii44@88..89 ","
+          Whitespace@89..90 " "
+          AExpr@90..94
+            ColumnRef@90..91
+              Ident@90..91 "g"
+            Ascii43@91..92 "+"
+            AConst@92..94
+              Iconst@92..94 "30"
+        Ascii41@94..95 ")"
+        Ascii44@95..96 ","
+        FuncCall@96..116
+          Ident@96..105 "int4range"
+          Ascii40@105..106 "("
+          AExpr@106..110
+            ColumnRef@106..107
+              Ident@106..107 "g"
+            Ascii43@107..108 "+"
+            AConst@108..110
+              Iconst@108..110 "40"
+          Ascii44@110..111 ","
+          Whitespace@111..112 " "
+          AExpr@112..116
+            ColumnRef@112..113
+              Ident@112..113 "g"
+            Ascii43@113..114 "+"
+            AConst@114..116
+              Iconst@114..116 "50"
+    Ascii41@116..117 ")"
+    Ascii41@117..118 ")"
+    Whitespace@118..119 " "
+    From@119..123 "from"
+    Whitespace@123..124 " "
+    RangeFunction@124..149
+      List@124..146
+        FuncCall@124..146
+          Ident@124..139 "generate_series"
+          Ascii40@139..140 "("
+          AConst@140..141
+            Iconst@140..141 "1"
+          Ascii44@141..142 ","
+          AConst@142..146
+            Iconst@142..146 "2000"
+      Ascii41@146..147 ")"
+      Whitespace@147..148 " "
+      Alias@148..149
+        Ident@148..149 "g"
+  Ascii59@149..150 ";"
+

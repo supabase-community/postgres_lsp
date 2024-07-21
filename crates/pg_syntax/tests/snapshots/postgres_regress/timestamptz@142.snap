@@ -1,0 +1,79 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT d1 as timestamptz,\n   date_part( 'timezone', d1) AS timezone,\n   date_part( 'timezone_hour', d1) AS timezone_hour,\n   date_part( 'timezone_minute', d1) AS timezone_minute\n   FROM TIMESTAMPTZ_TBL;"
+---
+SelectStmt@0..202
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..24
+    ColumnRef@7..9
+      Ident@7..9 "d1"
+    Whitespace@9..10 " "
+    As@10..12 "as"
+    Whitespace@12..13 " "
+    Ident@13..24 "timestamptz"
+  Ascii44@24..25 ","
+  Newline@25..26 "\n"
+  Whitespace@26..29 "   "
+  ResTarget@29..67
+    FuncCall@29..54
+      Ident@29..38 "date_part"
+      Ascii40@38..39 "("
+      Whitespace@39..40 " "
+      AConst@40..50
+        Sconst@40..50 "'timezone'"
+      Ascii44@50..51 ","
+      Whitespace@51..52 " "
+      ColumnRef@52..54
+        Ident@52..54 "d1"
+    Ascii41@54..55 ")"
+    Whitespace@55..56 " "
+    As@56..58 "AS"
+    Whitespace@58..59 " "
+    Ident@59..67 "timezone"
+  Ascii44@67..68 ","
+  Newline@68..69 "\n"
+  Whitespace@69..72 "   "
+  ResTarget@72..120
+    FuncCall@72..102
+      Ident@72..81 "date_part"
+      Ascii40@81..82 "("
+      Whitespace@82..83 " "
+      AConst@83..98
+        Sconst@83..98 "'timezone_hour'"
+      Ascii44@98..99 ","
+      Whitespace@99..100 " "
+      ColumnRef@100..102
+        Ident@100..102 "d1"
+    Ascii41@102..103 ")"
+    Whitespace@103..104 " "
+    As@104..106 "AS"
+    Whitespace@106..107 " "
+    Ident@107..120 "timezone_hour"
+  Ascii44@120..121 ","
+  Newline@121..122 "\n"
+  Whitespace@122..125 "   "
+  ResTarget@125..177
+    FuncCall@125..157
+      Ident@125..134 "date_part"
+      Ascii40@134..135 "("
+      Whitespace@135..136 " "
+      AConst@136..153
+        Sconst@136..153 "'timezone_minute'"
+      Ascii44@153..154 ","
+      Whitespace@154..155 " "
+      ColumnRef@155..157
+        Ident@155..157 "d1"
+    Ascii41@157..158 ")"
+    Whitespace@158..159 " "
+    As@159..161 "AS"
+    Whitespace@161..162 " "
+    Ident@162..177 "timezone_minute"
+  Newline@177..178 "\n"
+  Whitespace@178..181 "   "
+  From@181..185 "FROM"
+  Whitespace@185..186 " "
+  RangeVar@186..201
+    Ident@186..201 "TIMESTAMPTZ_TBL"
+  Ascii59@201..202 ";"
+

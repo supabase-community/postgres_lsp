@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select explain_filter('explain (verbose) select * from t1 where pg_temp.mysin(f1) < 0.5');"
+---
+SelectStmt@0..90
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..88
+    FuncCall@7..88
+      Ident@7..21 "explain_filter"
+      Ascii40@21..22 "("
+      AConst@22..88
+        Sconst@22..88 "'explain (verbose) se ..."
+  Ascii41@88..89 ")"
+  Ascii59@89..90 ";"
+

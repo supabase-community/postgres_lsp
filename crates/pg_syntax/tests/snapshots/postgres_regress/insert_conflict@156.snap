@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "alter table dropcol drop column drop1, drop column drop2;"
+---
+AlterTableStmt@0..57
+  Alter@0..5 "alter"
+  Whitespace@5..6 " "
+  Table@6..11 "table"
+  Whitespace@11..12 " "
+  RangeVar@12..19
+    Ident@12..19 "dropcol"
+  Whitespace@19..20 " "
+  AlterTableCmd@20..37
+    Drop@20..24 "drop"
+    Whitespace@24..25 " "
+    Column@25..31 "column"
+    Whitespace@31..32 " "
+    Ident@32..37 "drop1"
+  Ascii44@37..38 ","
+  Whitespace@38..39 " "
+  AlterTableCmd@39..56
+    Drop@39..43 "drop"
+    Whitespace@43..44 " "
+    Column@44..50 "column"
+    Whitespace@50..51 " "
+    Ident@51..56 "drop2"
+  Ascii59@56..57 ";"
+

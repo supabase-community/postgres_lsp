@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: ALTER TABLE products ADD PRIMARY KEY (product_id);
+---
+AlterTableStmt@0..50
+  Alter@0..5 "ALTER"
+  Whitespace@5..6 " "
+  Table@6..11 "TABLE"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "products"
+  Whitespace@20..21 " "
+  AlterTableCmd@21..48
+    AddP@21..24 "ADD"
+    Whitespace@24..25 " "
+    Constraint@25..48
+      Primary@25..32 "PRIMARY"
+      Whitespace@32..33 " "
+      Key@33..36 "KEY"
+      Whitespace@36..37 " "
+      Ascii40@37..38 "("
+      Ident@38..48 "product_id"
+  Ascii41@48..49 ")"
+  Ascii59@49..50 ";"
+

@@ -1,0 +1,50 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select original > 1 as initially_multibatch, final > original as increased_batches\n  from hash_join_batches(\n$$\n  select count(*) FROM simple r JOIN bigger_than_it_looks s USING (id);\n$$);"
+---
+SelectStmt@0..188
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..43
+    AExpr@7..19
+      ColumnRef@7..15
+        Ident@7..15 "original"
+      Whitespace@15..16 " "
+      Ascii62@16..17 ">"
+      Whitespace@17..18 " "
+      AConst@18..19
+        Iconst@18..19 "1"
+    Whitespace@19..20 " "
+    As@20..22 "as"
+    Whitespace@22..23 " "
+    Ident@23..43 "initially_multibatch"
+  Ascii44@43..44 ","
+  Whitespace@44..45 " "
+  ResTarget@45..82
+    AExpr@45..61
+      ColumnRef@45..50
+        Ident@45..50 "final"
+      Whitespace@50..51 " "
+      Ascii62@51..52 ">"
+      Whitespace@52..53 " "
+      ColumnRef@53..61
+        Ident@53..61 "original"
+    Whitespace@61..62 " "
+    As@62..64 "as"
+    Whitespace@64..65 " "
+    Ident@65..82 "increased_batches"
+  Newline@82..83 "\n"
+  Whitespace@83..85 "  "
+  From@85..89 "from"
+  Whitespace@89..90 " "
+  RangeFunction@90..186
+    List@90..186
+      FuncCall@90..186
+        Ident@90..107 "hash_join_batches"
+        Ascii40@107..108 "("
+        Newline@108..109 "\n"
+        AConst@109..186
+          Sconst@109..186 "$$\n  select count(*)  ..."
+  Ascii41@186..187 ")"
+  Ascii59@187..188 ";"
+

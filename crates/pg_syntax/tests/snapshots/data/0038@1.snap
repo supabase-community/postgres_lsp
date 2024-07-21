@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE CAST (bigint AS int4) WITH FUNCTION int4(bigint) AS ASSIGNMENT;
+---
+CreateCastStmt@0..70
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Cast@7..11 "CAST"
+  Whitespace@11..12 " "
+  Ascii40@12..13 "("
+  TypeName@13..19
+    Bigint@13..19 "bigint"
+  Whitespace@19..20 " "
+  As@20..22 "AS"
+  Whitespace@22..23 " "
+  TypeName@23..27
+    Ident@23..27 "int4"
+  Ascii41@27..28 ")"
+  Whitespace@28..29 " "
+  With@29..33 "WITH"
+  Whitespace@33..34 " "
+  Function@34..42 "FUNCTION"
+  Whitespace@42..43 " "
+  ObjectWithArgs@43..55
+    Ident@43..47 "int4"
+    Ascii40@47..48 "("
+    TypeName@48..54
+      Bigint@48..54 "bigint"
+    Ascii41@54..55 ")"
+  Whitespace@55..56 " "
+  As@56..58 "AS"
+  Whitespace@58..59 " "
+  Assignment@59..69 "ASSIGNMENT"
+  Ascii59@69..70 ";"
+

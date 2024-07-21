@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select myfunc(1), current_setting('work_mem');"
+---
+SelectStmt@0..46
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..15
+    FuncCall@7..15
+      Ident@7..13 "myfunc"
+      Ascii40@13..14 "("
+      AConst@14..15
+        Iconst@14..15 "1"
+  Ascii41@15..16 ")"
+  Ascii44@16..17 ","
+  Whitespace@17..18 " "
+  ResTarget@18..44
+    FuncCall@18..44
+      Ident@18..33 "current_setting"
+      Ascii40@33..34 "("
+      AConst@34..44
+        Sconst@34..44 "'work_mem'"
+  Ascii41@44..45 ")"
+  Ascii59@45..46 ";"
+

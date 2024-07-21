@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select text(fullname) from fullname;
+---
+SelectStmt@0..36
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..20
+    FuncCall@7..20
+      TextP@7..11 "text"
+      Ascii40@11..12 "("
+      ColumnRef@12..20
+        Ident@12..20 "fullname"
+  Ascii41@20..21 ")"
+  Whitespace@21..22 " "
+  From@22..26 "from"
+  Whitespace@26..27 " "
+  RangeVar@27..35
+    Ident@27..35 "fullname"
+  Ascii59@35..36 ";"
+

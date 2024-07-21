@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE pagg_tab_ml_p3_s1(c text, a int, b int);"
+---
+CreateStmt@0..53
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..30
+    Ident@13..30 "pagg_tab_ml_p3_s1"
+  Ascii40@30..31 "("
+  ColumnDef@31..37
+    Ident@31..32 "c"
+    Whitespace@32..33 " "
+    TypeName@33..37
+      TextP@33..37 "text"
+  Ascii44@37..38 ","
+  Whitespace@38..39 " "
+  ColumnDef@39..44
+    Ident@39..40 "a"
+    Whitespace@40..41 " "
+    TypeName@41..44
+      IntP@41..44 "int"
+  Ascii44@44..45 ","
+  Whitespace@45..46 " "
+  ColumnDef@46..51
+    Ident@46..47 "b"
+    Whitespace@47..48 " "
+    TypeName@48..51
+      IntP@48..51 "int"
+  Ascii41@51..52 ")"
+  Ascii59@52..53 ";"
+

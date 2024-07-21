@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_regrole('Nonexistent');"
+---
+SelectStmt@0..33
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..31
+    FuncCall@7..31
+      Ident@7..17 "to_regrole"
+      Ascii40@17..18 "("
+      AConst@18..31
+        Sconst@18..31 "'Nonexistent'"
+  Ascii41@31..32 ")"
+  Ascii59@32..33 ";"
+

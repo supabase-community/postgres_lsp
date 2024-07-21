@@ -1,0 +1,53 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select count(*) from test_multirange_gist where mr @> int4multirange(int4range(10,20), int4range(30,40));"
+---
+SelectStmt@0..105
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "from"
+  Whitespace@20..21 " "
+  RangeVar@21..41
+    Ident@21..41 "test_multirange_gist"
+  Whitespace@41..42 " "
+  Where@42..47 "where"
+  Whitespace@47..48 " "
+  AExpr@48..102
+    ColumnRef@48..50
+      Ident@48..50 "mr"
+    Whitespace@50..51 " "
+    Op@51..53 "@>"
+    Whitespace@53..54 " "
+    FuncCall@54..102
+      Ident@54..68 "int4multirange"
+      Ascii40@68..69 "("
+      FuncCall@69..84
+        Ident@69..78 "int4range"
+        Ascii40@78..79 "("
+        AConst@79..81
+          Iconst@79..81 "10"
+        Ascii44@81..82 ","
+        AConst@82..84
+          Iconst@82..84 "20"
+      Ascii41@84..85 ")"
+      Ascii44@85..86 ","
+      Whitespace@86..87 " "
+      FuncCall@87..102
+        Ident@87..96 "int4range"
+        Ascii40@96..97 "("
+        AConst@97..99
+          Iconst@97..99 "30"
+        Ascii44@99..100 ","
+        AConst@100..102
+          Iconst@100..102 "40"
+  Ascii41@102..103 ")"
+  Ascii41@103..104 ")"
+  Ascii59@104..105 ";"
+

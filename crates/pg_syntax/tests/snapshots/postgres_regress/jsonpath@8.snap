@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '$.*[*]'::jsonpath;"
+---
+SelectStmt@0..26
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..25
+    TypeCast@7..25
+      AConst@7..15
+        Sconst@7..15 "'$.*[*]'"
+      Typecast@15..17 "::"
+      TypeName@17..25
+        Ident@17..25 "jsonpath"
+  Ascii59@25..26 ";"
+

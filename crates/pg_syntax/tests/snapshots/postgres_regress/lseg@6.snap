@@ -1,0 +1,45 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO LSEG_TBL VALUES (lseg(point(11, 22), point(33,44)));"
+---
+InsertStmt@0..64
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "LSEG_TBL"
+  Whitespace@20..21 " "
+  SelectStmt@21..60
+    Values@21..27 "VALUES"
+    Whitespace@27..28 " "
+    Ascii40@28..29 "("
+    List@29..60
+      FuncCall@29..60
+        Ident@29..33 "lseg"
+        Ascii40@33..34 "("
+        FuncCall@34..46
+          Ident@34..39 "point"
+          Ascii40@39..40 "("
+          AConst@40..42
+            Iconst@40..42 "11"
+          Ascii44@42..43 ","
+          Whitespace@43..44 " "
+          AConst@44..46
+            Iconst@44..46 "22"
+        Ascii41@46..47 ")"
+        Ascii44@47..48 ","
+        Whitespace@48..49 " "
+        FuncCall@49..60
+          Ident@49..54 "point"
+          Ascii40@54..55 "("
+          AConst@55..57
+            Iconst@55..57 "33"
+          Ascii44@57..58 ","
+          AConst@58..60
+            Iconst@58..60 "44"
+  Ascii41@60..61 ")"
+  Ascii41@61..62 ")"
+  Ascii41@62..63 ")"
+  Ascii59@63..64 ";"
+

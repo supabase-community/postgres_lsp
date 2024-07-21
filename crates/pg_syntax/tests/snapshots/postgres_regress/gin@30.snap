@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from t_gin_test_tbl where i @> '{}';"
+---
+SelectStmt@0..45
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeVar@14..28
+    Ident@14..28 "t_gin_test_tbl"
+  Whitespace@28..29 " "
+  Where@29..34 "where"
+  Whitespace@34..35 " "
+  AExpr@35..44
+    ColumnRef@35..36
+      Ident@35..36 "i"
+    Whitespace@36..37 " "
+    Op@37..39 "@>"
+    Whitespace@39..40 " "
+    AConst@40..44
+      Sconst@40..44 "'{}'"
+  Ascii59@44..45 ";"
+

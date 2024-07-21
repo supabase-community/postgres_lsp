@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb '{\"c\": {\"a\": -1, \"b\":1}}' @? '$.** ? (@.a == - 1)';"
+---
+SelectStmt@0..64
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..63
+    Ident@7..12 "jsonb"
+    Whitespace@12..13 " "
+    AExpr@13..63
+      TypeCast@13..38
+        AConst@13..38
+          Sconst@13..38 "'{\"c\": {\"a\": -1, \"b\": ..."
+      Whitespace@38..39 " "
+      Op@39..41 "@?"
+      Whitespace@41..42 " "
+      AConst@42..63
+        Sconst@42..63 "'$.** ? (@.a == - 1)'"
+  Ascii59@63..64 ";"
+

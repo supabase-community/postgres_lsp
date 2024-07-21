@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_regnamespace('Nonexistent');"
+---
+SelectStmt@0..38
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..36
+    FuncCall@7..36
+      Ident@7..22 "to_regnamespace"
+      Ascii40@22..23 "("
+      AConst@23..36
+        Sconst@23..36 "'Nonexistent'"
+  Ascii41@36..37 ")"
+  Ascii59@37..38 ";"
+

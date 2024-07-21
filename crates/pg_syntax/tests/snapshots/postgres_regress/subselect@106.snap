@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: insert into table_a values (42);
+---
+InsertStmt@0..32
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..19
+    Ident@12..19 "table_a"
+  Whitespace@19..20 " "
+  SelectStmt@20..30
+    Values@20..26 "values"
+    Whitespace@26..27 " "
+    Ascii40@27..28 "("
+    List@28..30
+      AConst@28..30
+        Iconst@28..30 "42"
+  Ascii41@30..31 ")"
+  Ascii59@31..32 ";"
+

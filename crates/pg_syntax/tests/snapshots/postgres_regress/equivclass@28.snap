@@ -1,0 +1,45 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function int8alias1cmp(int8, int8alias1) returns int\n  strict immutable language internal as 'btint8cmp';"
+---
+CreateFunctionStmt@0..112
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..29 "int8alias1cmp"
+  Ascii40@29..30 "("
+  FunctionParameter@30..34
+    TypeName@30..34
+      Ident@30..34 "int8"
+  Ascii44@34..35 ","
+  Whitespace@35..36 " "
+  FunctionParameter@36..46
+    TypeName@36..46
+      Ident@36..46 "int8alias1"
+  Ascii41@46..47 ")"
+  Whitespace@47..48 " "
+  Returns@48..55 "returns"
+  Whitespace@55..56 " "
+  TypeName@56..59
+    IntP@56..59 "int"
+  Newline@59..60 "\n"
+  Whitespace@60..62 "  "
+  DefElem@62..68
+    StrictP@62..68 "strict"
+  Whitespace@68..69 " "
+  DefElem@69..78
+    Immutable@69..78 "immutable"
+  Whitespace@78..79 " "
+  DefElem@79..96
+    Language@79..87 "language"
+    Whitespace@87..88 " "
+    Ident@88..96 "internal"
+  Whitespace@96..97 " "
+  DefElem@97..111
+    As@97..99 "as"
+    Whitespace@99..100 " "
+    List@100..111
+      Sconst@100..111 "'btint8cmp'"
+  Ascii59@111..112 ";"
+

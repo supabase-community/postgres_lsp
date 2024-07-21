@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT row_to_json(q)\nFROM (SELECT 'Infinity'::float8 AS \"float8field\") q;"
+---
+SelectStmt@0..74
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..20
+    FuncCall@7..20
+      Ident@7..18 "row_to_json"
+      Ascii40@18..19 "("
+      ColumnRef@19..20
+        Ident@19..20 "q"
+  Ascii41@20..21 ")"
+  Newline@21..22 "\n"
+  From@22..26 "FROM"
+  Whitespace@26..27 " "
+  Ascii40@27..28 "("
+  RangeSubselect@28..73
+    SelectStmt@28..70
+      Select@28..34 "SELECT"
+      Whitespace@34..35 " "
+      ResTarget@35..70
+        TypeCast@35..53
+          AConst@35..45
+            Sconst@35..45 "'Infinity'"
+          Typecast@45..47 "::"
+          TypeName@47..53
+            Ident@47..53 "float8"
+        Whitespace@53..54 " "
+        As@54..56 "AS"
+        Whitespace@56..57 " "
+        Ident@57..70 "\"float8field\""
+    Ascii41@70..71 ")"
+    Whitespace@71..72 " "
+    Alias@72..73
+      Ident@72..73 "q"
+  Ascii59@73..74 ";"
+

@@ -1,0 +1,66 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE order_items (\n    product_no integer REFERENCES products,\n    order_id integer REFERENCES orders,\n    quantity integer,\n    PRIMARY KEY (product_no, order_id)\n);"
+---
+CreateStmt@0..174
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..24
+    Ident@13..24 "order_items"
+  Whitespace@24..25 " "
+  Ascii40@25..26 "("
+  Newline@26..27 "\n"
+  Whitespace@27..31 "    "
+  ColumnDef@31..69
+    Ident@31..41 "product_no"
+    Whitespace@41..42 " "
+    TypeName@42..49
+      Integer@42..49 "integer"
+    Whitespace@49..50 " "
+    Constraint@50..69
+      References@50..60 "REFERENCES"
+      Whitespace@60..61 " "
+      RangeVar@61..69
+        Ident@61..69 "products"
+  Ascii44@69..70 ","
+  Newline@70..71 "\n"
+  Whitespace@71..75 "    "
+  ColumnDef@75..109
+    Ident@75..83 "order_id"
+    Whitespace@83..84 " "
+    TypeName@84..91
+      Integer@84..91 "integer"
+    Whitespace@91..92 " "
+    Constraint@92..109
+      References@92..102 "REFERENCES"
+      Whitespace@102..103 " "
+      RangeVar@103..109
+        Ident@103..109 "orders"
+  Ascii44@109..110 ","
+  Newline@110..111 "\n"
+  Whitespace@111..115 "    "
+  ColumnDef@115..131
+    Ident@115..123 "quantity"
+    Whitespace@123..124 " "
+    TypeName@124..131
+      Integer@124..131 "integer"
+  Ascii44@131..132 ","
+  Newline@132..133 "\n"
+  Whitespace@133..137 "    "
+  Constraint@137..170
+    Primary@137..144 "PRIMARY"
+    Whitespace@144..145 " "
+    Key@145..148 "KEY"
+    Whitespace@148..149 " "
+    Ascii40@149..150 "("
+    Ident@150..160 "product_no"
+    Ascii44@160..161 ","
+    Whitespace@161..162 " "
+    Ident@162..170 "order_id"
+  Ascii41@170..171 ")"
+  Newline@171..172 "\n"
+  Ascii41@172..173 ")"
+  Ascii59@173..174 ";"
+

@@ -1,0 +1,17 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT f1 FROM DATE_TBL;
+---
+SelectStmt@0..24
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..9
+    ColumnRef@7..9
+      Ident@7..9 "f1"
+  Whitespace@9..10 " "
+  From@10..14 "FROM"
+  Whitespace@14..15 " "
+  RangeVar@15..23
+    Ident@15..23 "DATE_TBL"
+  Ascii59@23..24 ";"
+

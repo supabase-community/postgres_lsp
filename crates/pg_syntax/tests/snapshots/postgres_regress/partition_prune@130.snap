@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table boolpart_t partition of boolpart for values in ('true');"
+---
+CreateStmt@0..69
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..23
+    Ident@13..23 "boolpart_t"
+  Whitespace@23..24 " "
+  Partition@24..33 "partition"
+  Whitespace@33..34 " "
+  Of@34..36 "of"
+  Whitespace@36..37 " "
+  RangeVar@37..45
+    Ident@37..45 "boolpart"
+  Whitespace@45..46 " "
+  For@46..49 "for"
+  Whitespace@49..50 " "
+  Values@50..56 "values"
+  Whitespace@56..57 " "
+  PartitionBoundSpec@57..67
+    InP@57..59 "in"
+    Whitespace@59..60 " "
+    Ascii40@60..61 "("
+    AConst@61..67
+      Sconst@61..67 "'true'"
+  Ascii41@67..68 ")"
+  Ascii59@68..69 ";"
+

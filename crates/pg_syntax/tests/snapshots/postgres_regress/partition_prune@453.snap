@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table ma_test_p1 partition of ma_test for values from (0) to (10);
+---
+CreateStmt@0..73
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..23
+    Ident@13..23 "ma_test_p1"
+  Whitespace@23..24 " "
+  Partition@24..33 "partition"
+  Whitespace@33..34 " "
+  Of@34..36 "of"
+  Whitespace@36..37 " "
+  RangeVar@37..44
+    Ident@37..44 "ma_test"
+  Whitespace@44..45 " "
+  For@45..48 "for"
+  Whitespace@48..49 " "
+  Values@49..55 "values"
+  Whitespace@55..56 " "
+  PartitionBoundSpec@56..71
+    From@56..60 "from"
+    Whitespace@60..61 " "
+    Ascii40@61..62 "("
+    AConst@62..63
+      Iconst@62..63 "0"
+    Ascii41@63..64 ")"
+    Whitespace@64..65 " "
+    To@65..67 "to"
+    Whitespace@67..68 " "
+    Ascii40@68..69 "("
+    AConst@69..71
+      Iconst@69..71 "10"
+  Ascii41@71..72 ")"
+  Ascii59@72..73 ";"
+

@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT o.* FROM OID_TBL o WHERE o.f1 < '1234';"
+---
+SelectStmt@0..46
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..10
+    ColumnRef@7..10
+      Ident@7..8 "o"
+      Ascii46@8..9 "."
+      AStar@9..10
+        Ascii42@9..10 "*"
+  Whitespace@10..11 " "
+  From@11..15 "FROM"
+  Whitespace@15..16 " "
+  RangeVar@16..25
+    Ident@16..23 "OID_TBL"
+    Whitespace@23..24 " "
+    Alias@24..25
+      Ident@24..25 "o"
+  Whitespace@25..26 " "
+  Where@26..31 "WHERE"
+  Whitespace@31..32 " "
+  AExpr@32..45
+    ColumnRef@32..36
+      Ident@32..33 "o"
+      Ascii46@33..34 "."
+      Ident@34..36 "f1"
+    Whitespace@36..37 " "
+    Ascii60@37..38 "<"
+    Whitespace@38..39 " "
+    AConst@39..45
+      Sconst@39..45 "'1234'"
+  Ascii59@45..46 ";"
+

@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: ALTER TABLE testxmlschema.test2 DROP COLUMN aaa;
+---
+AlterTableStmt@0..48
+  Alter@0..5 "ALTER"
+  Whitespace@5..6 " "
+  Table@6..11 "TABLE"
+  Whitespace@11..12 " "
+  RangeVar@12..31
+    Ident@12..25 "testxmlschema"
+    Ascii46@25..26 "."
+    Ident@26..31 "test2"
+  Whitespace@31..32 " "
+  AlterTableCmd@32..47
+    Drop@32..36 "DROP"
+    Whitespace@36..37 " "
+    Column@37..43 "COLUMN"
+    Whitespace@43..44 " "
+    Ident@44..47 "aaa"
+  Ascii59@47..48 ";"
+

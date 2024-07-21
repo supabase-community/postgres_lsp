@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX test_index_exists on test_exists(a);
+---
+IndexStmt@0..49
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..30 "test_index_exists"
+  Whitespace@30..31 " "
+  On@31..33 "on"
+  Whitespace@33..34 " "
+  RangeVar@34..45
+    Ident@34..45 "test_exists"
+  Ascii40@45..46 "("
+  IndexElem@46..47
+    Ident@46..47 "a"
+  Ascii41@47..48 ")"
+  Ascii59@48..49 ";"
+

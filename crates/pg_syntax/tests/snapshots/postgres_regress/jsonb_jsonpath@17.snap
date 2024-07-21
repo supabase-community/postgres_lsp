@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb '[]' @? '$[*]';"
+---
+SelectStmt@0..28
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..27
+    Ident@7..12 "jsonb"
+    Whitespace@12..13 " "
+    AExpr@13..27
+      TypeCast@13..17
+        AConst@13..17
+          Sconst@13..17 "'[]'"
+      Whitespace@17..18 " "
+      Op@18..20 "@?"
+      Whitespace@20..21 " "
+      AConst@21..27
+        Sconst@21..27 "'$[*]'"
+  Ascii59@27..28 ";"
+

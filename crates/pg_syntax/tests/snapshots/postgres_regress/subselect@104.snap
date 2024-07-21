@@ -1,0 +1,97 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from\n  (select distinct f1, f2, (select f2 from t1 x where x.f1 = up.f1) as fs\n   from t1 up) ss\ngroup by f1,f2,fs;"
+---
+SelectStmt@0..124
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Newline@13..14 "\n"
+  Whitespace@14..16 "  "
+  Ascii40@16..17 "("
+  RangeSubselect@17..105
+    SelectStmt@17..101
+      Select@17..23 "select"
+      Whitespace@23..24 " "
+      Distinct@24..32 "distinct"
+      Whitespace@32..33 " "
+      ResTarget@33..35
+        ColumnRef@33..35
+          Ident@33..35 "f1"
+      Ascii44@35..36 ","
+      Whitespace@36..37 " "
+      ResTarget@37..39
+        ColumnRef@37..39
+          Ident@37..39 "f2"
+      Ascii44@39..40 ","
+      Whitespace@40..41 " "
+      ResTarget@41..87
+        SubLink@41..80
+          SelectStmt@41..80
+            Ascii40@41..42 "("
+            Select@42..48 "select"
+            Whitespace@48..49 " "
+            ResTarget@49..51
+              ColumnRef@49..51
+                Ident@49..51 "f2"
+            Whitespace@51..52 " "
+            From@52..56 "from"
+            Whitespace@56..57 " "
+            RangeVar@57..61
+              Ident@57..59 "t1"
+              Whitespace@59..60 " "
+              Alias@60..61
+                Ident@60..61 "x"
+            Whitespace@61..62 " "
+            Where@62..67 "where"
+            Whitespace@67..68 " "
+            AExpr@68..80
+              ColumnRef@68..72
+                Ident@68..69 "x"
+                Ascii46@69..70 "."
+                Ident@70..72 "f1"
+              Whitespace@72..73 " "
+              Ascii61@73..74 "="
+              Whitespace@74..75 " "
+              ColumnRef@75..80
+                Ident@75..77 "up"
+                Ascii46@77..78 "."
+                Ident@78..80 "f1"
+        Ascii41@80..81 ")"
+        Whitespace@81..82 " "
+        As@82..84 "as"
+        Whitespace@84..85 " "
+        Ident@85..87 "fs"
+      Newline@87..88 "\n"
+      Whitespace@88..91 "   "
+      From@91..95 "from"
+      Whitespace@95..96 " "
+      RangeVar@96..101
+        Ident@96..98 "t1"
+        Whitespace@98..99 " "
+        Alias@99..101
+          Ident@99..101 "up"
+    Ascii41@101..102 ")"
+    Whitespace@102..103 " "
+    Alias@103..105
+      Ident@103..105 "ss"
+  Newline@105..106 "\n"
+  GroupP@106..111 "group"
+  Whitespace@111..112 " "
+  By@112..114 "by"
+  Whitespace@114..115 " "
+  ColumnRef@115..117
+    Ident@115..117 "f1"
+  Ascii44@117..118 ","
+  ColumnRef@118..120
+    Ident@118..120 "f2"
+  Ascii44@120..121 ","
+  ColumnRef@121..123
+    Ident@121..123 "fs"
+  Ascii59@123..124 ";"
+

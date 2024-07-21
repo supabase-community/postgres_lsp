@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '9223372036854775800'::int8 / '0'::int8;"
+---
+SelectStmt@0..47
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..46
+    AExpr@7..46
+      TypeCast@7..34
+        AConst@7..28
+          Sconst@7..28 "'9223372036854775800'"
+        Typecast@28..30 "::"
+        TypeName@30..34
+          Ident@30..34 "int8"
+      Whitespace@34..35 " "
+      Ascii47@35..36 "/"
+      Whitespace@36..37 " "
+      TypeCast@37..46
+        AConst@37..40
+          Sconst@37..40 "'0'"
+        Typecast@40..42 "::"
+        TypeName@42..46
+          Ident@42..46 "int8"
+  Ascii59@46..47 ";"
+

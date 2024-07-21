@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into y values (3,333);"
+---
+InsertStmt@0..29
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..13
+    Ident@12..13 "y"
+  Whitespace@13..14 " "
+  SelectStmt@14..27
+    Values@14..20 "values"
+    Whitespace@20..21 " "
+    Ascii40@21..22 "("
+    List@22..27
+      AConst@22..23
+        Iconst@22..23 "3"
+      Ascii44@23..24 ","
+      AConst@24..27
+        Iconst@24..27 "333"
+  Ascii41@27..28 ")"
+  Ascii59@28..29 ";"
+

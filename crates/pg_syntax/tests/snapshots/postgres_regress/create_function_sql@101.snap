@@ -1,0 +1,129 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT r0.routine_name, r1.routine_name\n  FROM information_schema.routine_routine_usage rru\n       JOIN information_schema.routines r0 ON r0.specific_name = rru.specific_name\n       JOIN information_schema.routines r1 ON r1.specific_name = rru.routine_name\n  WHERE r0.routine_schema = 'temp_func_test' AND\n        r1.routine_schema = 'temp_func_test'\n  ORDER BY 1, 2;"
+---
+SelectStmt@0..367
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..22
+    ColumnRef@7..22
+      Ident@7..9 "r0"
+      Ascii46@9..10 "."
+      Ident@10..22 "routine_name"
+  Ascii44@22..23 ","
+  Whitespace@23..24 " "
+  ResTarget@24..39
+    ColumnRef@24..39
+      Ident@24..26 "r1"
+      Ascii46@26..27 "."
+      Ident@27..39 "routine_name"
+  Newline@39..40 "\n"
+  Whitespace@40..42 "  "
+  From@42..46 "FROM"
+  Whitespace@46..47 " "
+  JoinExpr@47..256
+    JoinExpr@47..174
+      RangeVar@47..91
+        Ident@47..65 "information_schema"
+        Ascii46@65..66 "."
+        Ident@66..87 "routine_routine_usage"
+        Whitespace@87..88 " "
+        Alias@88..91
+          Ident@88..91 "rru"
+      Newline@91..92 "\n"
+      Whitespace@92..99 "       "
+      Join@99..103 "JOIN"
+      Whitespace@103..104 " "
+      RangeVar@104..134
+        Ident@104..122 "information_schema"
+        Ascii46@122..123 "."
+        Routines@123..131 "routines"
+        Whitespace@131..132 " "
+        Alias@132..134
+          Ident@132..134 "r0"
+      Whitespace@134..135 " "
+      On@135..137 "ON"
+      Whitespace@137..138 " "
+      AExpr@138..174
+        ColumnRef@138..154
+          Ident@138..140 "r0"
+          Ascii46@140..141 "."
+          Ident@141..154 "specific_name"
+        Whitespace@154..155 " "
+        Ascii61@155..156 "="
+        Whitespace@156..157 " "
+        ColumnRef@157..174
+          Ident@157..160 "rru"
+          Ascii46@160..161 "."
+          Ident@161..174 "specific_name"
+    Newline@174..175 "\n"
+    Whitespace@175..182 "       "
+    Join@182..186 "JOIN"
+    Whitespace@186..187 " "
+    RangeVar@187..217
+      Ident@187..205 "information_schema"
+      Ascii46@205..206 "."
+      Routines@206..214 "routines"
+      Whitespace@214..215 " "
+      Alias@215..217
+        Ident@215..217 "r1"
+    Whitespace@217..218 " "
+    On@218..220 "ON"
+    Whitespace@220..221 " "
+    AExpr@221..256
+      ColumnRef@221..237
+        Ident@221..223 "r1"
+        Ascii46@223..224 "."
+        Ident@224..237 "specific_name"
+      Whitespace@237..238 " "
+      Ascii61@238..239 "="
+      Whitespace@239..240 " "
+      ColumnRef@240..256
+        Ident@240..243 "rru"
+        Ascii46@243..244 "."
+        Ident@244..256 "routine_name"
+  Newline@256..257 "\n"
+  Whitespace@257..259 "  "
+  Where@259..264 "WHERE"
+  Whitespace@264..265 " "
+  BoolExpr@265..350
+    AExpr@265..301
+      ColumnRef@265..282
+        Ident@265..267 "r0"
+        Ascii46@267..268 "."
+        Ident@268..282 "routine_schema"
+      Whitespace@282..283 " "
+      Ascii61@283..284 "="
+      Whitespace@284..285 " "
+      AConst@285..301
+        Sconst@285..301 "'temp_func_test'"
+    Whitespace@301..302 " "
+    And@302..305 "AND"
+    Newline@305..306 "\n"
+    Whitespace@306..314 "        "
+    AExpr@314..350
+      ColumnRef@314..331
+        Ident@314..316 "r1"
+        Ascii46@316..317 "."
+        Ident@317..331 "routine_schema"
+      Whitespace@331..332 " "
+      Ascii61@332..333 "="
+      Whitespace@333..334 " "
+      AConst@334..350
+        Sconst@334..350 "'temp_func_test'"
+  Newline@350..351 "\n"
+  Whitespace@351..353 "  "
+  SortBy@353..363
+    Order@353..358 "ORDER"
+    Whitespace@358..359 " "
+    By@359..361 "BY"
+    Whitespace@361..362 " "
+    AConst@362..363
+      Iconst@362..363 "1"
+  Ascii44@363..364 ","
+  Whitespace@364..365 " "
+  SortBy@365..366
+    AConst@365..366
+      Iconst@365..366 "2"
+  Ascii59@366..367 ";"
+

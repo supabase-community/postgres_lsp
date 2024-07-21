@@ -1,0 +1,96 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select q1, unique2, thousand, hundred\n  from int8_tbl a left join tenk1 b on q1 = unique2\n  where coalesce(thousand,123) = q1 and q1 = coalesce(hundred,123);"
+---
+SelectStmt@0..157
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..9
+    ColumnRef@7..9
+      Ident@7..9 "q1"
+  Ascii44@9..10 ","
+  Whitespace@10..11 " "
+  ResTarget@11..18
+    ColumnRef@11..18
+      Ident@11..18 "unique2"
+  Ascii44@18..19 ","
+  Whitespace@19..20 " "
+  ResTarget@20..28
+    ColumnRef@20..28
+      Ident@20..28 "thousand"
+  Ascii44@28..29 ","
+  Whitespace@29..30 " "
+  ResTarget@30..37
+    ColumnRef@30..37
+      Ident@30..37 "hundred"
+  Newline@37..38 "\n"
+  Whitespace@38..40 "  "
+  From@40..44 "from"
+  Whitespace@44..45 " "
+  JoinExpr@45..89
+    RangeVar@45..55
+      Ident@45..53 "int8_tbl"
+      Whitespace@53..54 " "
+      Alias@54..55
+        Ident@54..55 "a"
+    Whitespace@55..56 " "
+    Left@56..60 "left"
+    Whitespace@60..61 " "
+    Join@61..65 "join"
+    Whitespace@65..66 " "
+    RangeVar@66..73
+      Ident@66..71 "tenk1"
+      Whitespace@71..72 " "
+      Alias@72..73
+        Ident@72..73 "b"
+    Whitespace@73..74 " "
+    On@74..76 "on"
+    Whitespace@76..77 " "
+    AExpr@77..89
+      ColumnRef@77..79
+        Ident@77..79 "q1"
+      Whitespace@79..80 " "
+      Ascii61@80..81 "="
+      Whitespace@81..82 " "
+      ColumnRef@82..89
+        Ident@82..89 "unique2"
+  Newline@89..90 "\n"
+  Whitespace@90..92 "  "
+  Where@92..97 "where"
+  Whitespace@97..98 " "
+  BoolExpr@98..155
+    AExpr@98..125
+      CoalesceExpr@98..119
+        Coalesce@98..106 "coalesce"
+        Ascii40@106..107 "("
+        ColumnRef@107..115
+          Ident@107..115 "thousand"
+        Ascii44@115..116 ","
+        AConst@116..119
+          Iconst@116..119 "123"
+      Ascii41@119..120 ")"
+      Whitespace@120..121 " "
+      Ascii61@121..122 "="
+      Whitespace@122..123 " "
+      ColumnRef@123..125
+        Ident@123..125 "q1"
+    Whitespace@125..126 " "
+    And@126..129 "and"
+    Whitespace@129..130 " "
+    AExpr@130..155
+      ColumnRef@130..132
+        Ident@130..132 "q1"
+      Whitespace@132..133 " "
+      Ascii61@133..134 "="
+      Whitespace@134..135 " "
+      CoalesceExpr@135..155
+        Coalesce@135..143 "coalesce"
+        Ascii40@143..144 "("
+        ColumnRef@144..151
+          Ident@144..151 "hundred"
+        Ascii44@151..152 ","
+        AConst@152..155
+          Iconst@152..155 "123"
+  Ascii41@155..156 ")"
+  Ascii59@156..157 ";"
+

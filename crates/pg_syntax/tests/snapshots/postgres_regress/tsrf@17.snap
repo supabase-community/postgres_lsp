@@ -1,0 +1,55 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT few.id, generate_series(1,3) g FROM few ORDER BY id, generate_series(1,3) DESC;"
+---
+SelectStmt@0..86
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..13
+    ColumnRef@7..13
+      Ident@7..10 "few"
+      Ascii46@10..11 "."
+      Ident@11..13 "id"
+  Ascii44@13..14 ","
+  Whitespace@14..15 " "
+  ResTarget@15..37
+    FuncCall@15..34
+      Ident@15..30 "generate_series"
+      Ascii40@30..31 "("
+      AConst@31..32
+        Iconst@31..32 "1"
+      Ascii44@32..33 ","
+      AConst@33..34
+        Iconst@33..34 "3"
+    Ascii41@34..35 ")"
+    Whitespace@35..36 " "
+    Ident@36..37 "g"
+  Whitespace@37..38 " "
+  From@38..42 "FROM"
+  Whitespace@42..43 " "
+  RangeVar@43..46
+    Ident@43..46 "few"
+  Whitespace@46..47 " "
+  SortBy@47..58
+    Order@47..52 "ORDER"
+    Whitespace@52..53 " "
+    By@53..55 "BY"
+    Whitespace@55..56 " "
+    ColumnRef@56..58
+      Ident@56..58 "id"
+  Ascii44@58..59 ","
+  Whitespace@59..60 " "
+  SortBy@60..85
+    FuncCall@60..79
+      Ident@60..75 "generate_series"
+      Ascii40@75..76 "("
+      AConst@76..77
+        Iconst@76..77 "1"
+      Ascii44@77..78 ","
+      AConst@78..79
+        Iconst@78..79 "3"
+    Ascii41@79..80 ")"
+    Whitespace@80..81 " "
+    Desc@81..85 "DESC"
+  Ascii59@85..86 ";"
+

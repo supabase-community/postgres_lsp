@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_date('2011 12 18', 'YYYYxMMxDD');"
+---
+SelectStmt@0..43
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..41
+    FuncCall@7..41
+      Ident@7..14 "to_date"
+      Ascii40@14..15 "("
+      AConst@15..27
+        Sconst@15..27 "'2011 12 18'"
+      Ascii44@27..28 ","
+      Whitespace@28..29 " "
+      AConst@29..41
+        Sconst@29..41 "'YYYYxMMxDD'"
+  Ascii41@41..42 ")"
+  Ascii59@42..43 ";"
+

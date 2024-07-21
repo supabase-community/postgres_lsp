@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_match('[{\"a\": 1}, {\"a\": 2}, 3]', 'strict exists($[*].a)', silent => true);"
+---
+SelectStmt@0..92
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..90
+    FuncCall@7..90
+      Ident@7..23 "jsonb_path_match"
+      Ascii40@23..24 "("
+      AConst@24..49
+        Sconst@24..49 "'[{\"a\": 1}, {\"a\": 2}, ..."
+      Ascii44@49..50 ","
+      Whitespace@50..51 " "
+      AConst@51..74
+        Sconst@51..74 "'strict exists($[*].a)'"
+      Ascii44@74..75 ","
+      Whitespace@75..76 " "
+      NamedArgExpr@76..90
+        Ident@76..82 "silent"
+        Whitespace@82..83 " "
+        EqualsGreater@83..85 "=>"
+        Whitespace@85..86 " "
+        AConst@86..90
+          TrueP@86..90 "true"
+  Ascii41@90..91 ")"
+  Ascii59@91..92 ";"
+

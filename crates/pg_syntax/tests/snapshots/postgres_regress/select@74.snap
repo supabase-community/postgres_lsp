@@ -1,0 +1,60 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select unique1, unique2 from onek2\n  where (unique2 = 11 or unique1 = 0) and stringu1 < 'B';"
+---
+SelectStmt@0..92
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    ColumnRef@7..14
+      Ident@7..14 "unique1"
+  Ascii44@14..15 ","
+  Whitespace@15..16 " "
+  ResTarget@16..23
+    ColumnRef@16..23
+      Ident@16..23 "unique2"
+  Whitespace@23..24 " "
+  From@24..28 "from"
+  Whitespace@28..29 " "
+  RangeVar@29..34
+    Ident@29..34 "onek2"
+  Newline@34..35 "\n"
+  Whitespace@35..37 "  "
+  Where@37..42 "where"
+  Whitespace@42..43 " "
+  Ascii40@43..44 "("
+  BoolExpr@44..91
+    BoolExpr@44..71
+      AExpr@44..56
+        ColumnRef@44..51
+          Ident@44..51 "unique2"
+        Whitespace@51..52 " "
+        Ascii61@52..53 "="
+        Whitespace@53..54 " "
+        AConst@54..56
+          Iconst@54..56 "11"
+      Whitespace@56..57 " "
+      Or@57..59 "or"
+      Whitespace@59..60 " "
+      AExpr@60..71
+        ColumnRef@60..67
+          Ident@60..67 "unique1"
+        Whitespace@67..68 " "
+        Ascii61@68..69 "="
+        Whitespace@69..70 " "
+        AConst@70..71
+          Iconst@70..71 "0"
+    Ascii41@71..72 ")"
+    Whitespace@72..73 " "
+    And@73..76 "and"
+    Whitespace@76..77 " "
+    AExpr@77..91
+      ColumnRef@77..85
+        Ident@77..85 "stringu1"
+      Whitespace@85..86 " "
+      Ascii60@86..87 "<"
+      Whitespace@87..88 " "
+      AConst@88..91
+        Sconst@88..91 "'B'"
+  Ascii59@91..92 ";"
+

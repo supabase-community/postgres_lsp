@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION voidtest5(a int) RETURNS SETOF VOID LANGUAGE SQL AS\n$$ SELECT generate_series(1, a) $$ STABLE;"
+---
+CreateFunctionStmt@0..110
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..25 "voidtest5"
+  Ascii40@25..26 "("
+  FunctionParameter@26..31
+    Ident@26..27 "a"
+    Whitespace@27..28 " "
+    TypeName@28..31
+      IntP@28..31 "int"
+  Ascii41@31..32 ")"
+  Whitespace@32..33 " "
+  Returns@33..40 "RETURNS"
+  Whitespace@40..41 " "
+  Setof@41..46 "SETOF"
+  Whitespace@46..47 " "
+  TypeName@47..51
+    Ident@47..51 "VOID"
+  Whitespace@51..52 " "
+  DefElem@52..64
+    Language@52..60 "LANGUAGE"
+    Whitespace@60..61 " "
+    SqlP@61..64 "SQL"
+  Whitespace@64..65 " "
+  DefElem@65..102
+    As@65..67 "AS"
+    Newline@67..68 "\n"
+    List@68..102
+      Sconst@68..102 "$$ SELECT generate_se ..."
+  Whitespace@102..103 " "
+  DefElem@103..109
+    Stable@103..109 "STABLE"
+  Ascii59@109..110 ";"
+

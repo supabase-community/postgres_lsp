@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO b_star (class, a) VALUES ('b', 4);"
+---
+InsertStmt@0..46
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "b_star"
+  Whitespace@18..19 " "
+  Ascii40@19..20 "("
+  ResTarget@20..25
+    Class@20..25 "class"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..28
+    Ident@27..28 "a"
+  Ascii41@28..29 ")"
+  Whitespace@29..30 " "
+  SelectStmt@30..44
+    Values@30..36 "VALUES"
+    Whitespace@36..37 " "
+    Ascii40@37..38 "("
+    List@38..44
+      AConst@38..41
+        Sconst@38..41 "'b'"
+      Ascii44@41..42 ","
+      Whitespace@42..43 " "
+      AConst@43..44
+        Iconst@43..44 "4"
+  Ascii41@44..45 ")"
+  Ascii59@45..46 ";"
+

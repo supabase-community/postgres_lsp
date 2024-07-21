@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from testrngfunc() as t(f1 int8,f2 int8);"
+---
+SelectStmt@0..50
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..48
+    List@14..25
+      FuncCall@14..25
+        Ident@14..25 "testrngfunc"
+    Ascii40@25..26 "("
+    Ascii41@26..27 ")"
+    Whitespace@27..28 " "
+    Alias@28..32
+      As@28..30 "as"
+      Whitespace@30..31 " "
+      Ident@31..32 "t"
+    Ascii40@32..33 "("
+    ColumnDef@33..40
+      Ident@33..35 "f1"
+      Whitespace@35..36 " "
+      TypeName@36..40
+        Ident@36..40 "int8"
+    Ascii44@40..41 ","
+    ColumnDef@41..48
+      Ident@41..43 "f2"
+      Whitespace@43..44 " "
+      TypeName@44..48
+        Ident@44..48 "int8"
+  Ascii41@48..49 ")"
+  Ascii59@49..50 ";"
+

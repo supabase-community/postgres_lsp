@@ -1,0 +1,14 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select rngfuncbar();
+---
+SelectStmt@0..20
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..17
+    FuncCall@7..17
+      Ident@7..17 "rngfuncbar"
+  Ascii40@17..18 "("
+  Ascii41@18..19 ")"
+  Ascii59@19..20 ";"
+

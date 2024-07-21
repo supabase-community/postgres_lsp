@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO test_missing_target VALUES (3, 3, 'BBBB', 'D');"
+---
+InsertStmt@0..59
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..31
+    Ident@12..31 "test_missing_target"
+  Whitespace@31..32 " "
+  SelectStmt@32..57
+    Values@32..38 "VALUES"
+    Whitespace@38..39 " "
+    Ascii40@39..40 "("
+    List@40..57
+      AConst@40..41
+        Iconst@40..41 "3"
+      Ascii44@41..42 ","
+      Whitespace@42..43 " "
+      AConst@43..44
+        Iconst@43..44 "3"
+      Ascii44@44..45 ","
+      Whitespace@45..46 " "
+      AConst@46..52
+        Sconst@46..52 "'BBBB'"
+      Ascii44@52..53 ","
+      Whitespace@53..54 " "
+      AConst@54..57
+        Sconst@54..57 "'D'"
+  Ascii41@57..58 ")"
+  Ascii59@58..59 ";"
+

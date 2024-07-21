@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: INSERT INTO DISTTABLE VALUES(3);
+---
+InsertStmt@0..32
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..21
+    Ident@12..21 "DISTTABLE"
+  Whitespace@21..22 " "
+  SelectStmt@22..30
+    Values@22..28 "VALUES"
+    Ascii40@28..29 "("
+    List@29..30
+      AConst@29..30
+        Iconst@29..30 "3"
+  Ascii41@30..31 ")"
+  Ascii59@31..32 ";"
+

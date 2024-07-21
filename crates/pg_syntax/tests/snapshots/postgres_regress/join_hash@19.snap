@@ -1,0 +1,46 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into extremely_skewed\n  select 42 as id, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'\n  from generate_series(1, 20000);"
+---
+InsertStmt@0..118
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..28
+    Ident@12..28 "extremely_skewed"
+  Newline@28..29 "\n"
+  Whitespace@29..31 "  "
+  SelectStmt@31..116
+    Select@31..37 "select"
+    Whitespace@37..38 " "
+    ResTarget@38..46
+      AConst@38..40
+        Iconst@38..40 "42"
+      Whitespace@40..41 " "
+      As@41..43 "as"
+      Whitespace@43..44 " "
+      Ident@44..46 "id"
+    Ascii44@46..47 ","
+    Whitespace@47..48 " "
+    ResTarget@48..84
+      AConst@48..84
+        Sconst@48..84 "'aaaaaaaaaaaaaaaaaaaa ..."
+    Newline@84..85 "\n"
+    Whitespace@85..87 "  "
+    From@87..91 "from"
+    Whitespace@91..92 " "
+    RangeFunction@92..116
+      List@92..116
+        FuncCall@92..116
+          Ident@92..107 "generate_series"
+          Ascii40@107..108 "("
+          AConst@108..109
+            Iconst@108..109 "1"
+          Ascii44@109..110 ","
+          Whitespace@110..111 " "
+          AConst@111..116
+            Iconst@111..116 "20000"
+  Ascii41@116..117 ")"
+  Ascii59@117..118 ";"
+

@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select 'xyz' ~ '((.)){0}(\\2){0}' as t;"
+---
+SelectStmt@0..38
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..37
+    AExpr@7..32
+      AConst@7..12
+        Sconst@7..12 "'xyz'"
+      Whitespace@12..13 " "
+      Op@13..14 "~"
+      Whitespace@14..15 " "
+      AConst@15..32
+        Sconst@15..32 "'((.)){0}(\\2){0}'"
+    Whitespace@32..33 " "
+    As@33..35 "as"
+    Whitespace@35..36 " "
+    Ident@36..37 "t"
+  Ascii59@37..38 ";"
+

@@ -1,0 +1,38 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select multirangetypes_sql(int4multirange(int4range(1,10)), ARRAY[2,20]);"
+---
+SelectStmt@0..73
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..70
+    FuncCall@7..70
+      Ident@7..26 "multirangetypes_sql"
+      Ascii40@26..27 "("
+      FuncCall@27..56
+        Ident@27..41 "int4multirange"
+        Ascii40@41..42 "("
+        FuncCall@42..56
+          Ident@42..51 "int4range"
+          Ascii40@51..52 "("
+          AConst@52..53
+            Iconst@52..53 "1"
+          Ascii44@53..54 ","
+          AConst@54..56
+            Iconst@54..56 "10"
+      Ascii41@56..57 ")"
+      Ascii41@57..58 ")"
+      Ascii44@58..59 ","
+      Whitespace@59..60 " "
+      AArrayExpr@60..70
+        Array@60..65 "ARRAY"
+        Ascii91@65..66 "["
+        AConst@66..67
+          Iconst@66..67 "2"
+        Ascii44@67..68 ","
+        AConst@68..70
+          Iconst@68..70 "20"
+  Ascii93@70..71 "]"
+  Ascii41@71..72 ")"
+  Ascii59@72..73 ";"
+

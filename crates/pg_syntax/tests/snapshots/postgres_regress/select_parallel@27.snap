@@ -1,0 +1,37 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select round(avg(aa)), sum(aa) from a_star a4;"
+---
+SelectStmt@0..46
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..19
+    FuncCall@7..19
+      Ident@7..12 "round"
+      Ascii40@12..13 "("
+      FuncCall@13..19
+        Ident@13..16 "avg"
+        Ascii40@16..17 "("
+        ColumnRef@17..19
+          Ident@17..19 "aa"
+  Ascii41@19..20 ")"
+  Ascii41@20..21 ")"
+  Ascii44@21..22 ","
+  Whitespace@22..23 " "
+  ResTarget@23..29
+    FuncCall@23..29
+      Ident@23..26 "sum"
+      Ascii40@26..27 "("
+      ColumnRef@27..29
+        Ident@27..29 "aa"
+  Ascii41@29..30 ")"
+  Whitespace@30..31 " "
+  From@31..35 "from"
+  Whitespace@35..36 " "
+  RangeVar@36..45
+    Ident@36..42 "a_star"
+    Whitespace@42..43 " "
+    Alias@43..45
+      Ident@43..45 "a4"
+  Ascii59@45..46 ";"
+

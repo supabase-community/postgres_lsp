@@ -1,0 +1,47 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table mc2p5 partition of mc2p for values from (2, maxvalue) to (maxvalue, maxvalue);"
+---
+CreateStmt@0..91
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..18
+    Ident@13..18 "mc2p5"
+  Whitespace@18..19 " "
+  Partition@19..28 "partition"
+  Whitespace@28..29 " "
+  Of@29..31 "of"
+  Whitespace@31..32 " "
+  RangeVar@32..36
+    Ident@32..36 "mc2p"
+  Whitespace@36..37 " "
+  For@37..40 "for"
+  Whitespace@40..41 " "
+  Values@41..47 "values"
+  Whitespace@47..48 " "
+  PartitionBoundSpec@48..89
+    From@48..52 "from"
+    Whitespace@52..53 " "
+    Ascii40@53..54 "("
+    AConst@54..55
+      Iconst@54..55 "2"
+    Ascii44@55..56 ","
+    Whitespace@56..57 " "
+    ColumnRef@57..65
+      Maxvalue@57..65 "maxvalue"
+    Ascii41@65..66 ")"
+    Whitespace@66..67 " "
+    To@67..69 "to"
+    Whitespace@69..70 " "
+    Ascii40@70..71 "("
+    ColumnRef@71..79
+      Maxvalue@71..79 "maxvalue"
+    Ascii44@79..80 ","
+    Whitespace@80..81 " "
+    ColumnRef@81..89
+      Maxvalue@81..89 "maxvalue"
+  Ascii41@89..90 ")"
+  Ascii59@90..91 ";"
+

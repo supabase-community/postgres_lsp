@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '-9223372036854775809'::int8;"
+---
+SelectStmt@0..36
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..35
+    TypeCast@7..35
+      AConst@7..29
+        Sconst@7..29 "'-9223372036854775809'"
+      Typecast@29..31 "::"
+      TypeName@31..35
+        Ident@31..35 "int8"
+  Ascii59@35..36 ";"
+

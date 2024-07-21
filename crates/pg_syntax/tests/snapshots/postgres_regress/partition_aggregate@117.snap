@@ -1,0 +1,55 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO pagg_tab_para SELECT i % 30, i % 20 FROM generate_series(0, 29999) i;"
+---
+InsertStmt@0..81
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..25
+    Ident@12..25 "pagg_tab_para"
+  Whitespace@25..26 " "
+  SelectStmt@26..80
+    Select@26..32 "SELECT"
+    Whitespace@32..33 " "
+    ResTarget@33..39
+      AExpr@33..39
+        ColumnRef@33..34
+          Ident@33..34 "i"
+        Whitespace@34..35 " "
+        Ascii37@35..36 "%"
+        Whitespace@36..37 " "
+        AConst@37..39
+          Iconst@37..39 "30"
+    Ascii44@39..40 ","
+    Whitespace@40..41 " "
+    ResTarget@41..47
+      AExpr@41..47
+        ColumnRef@41..42
+          Ident@41..42 "i"
+        Whitespace@42..43 " "
+        Ascii37@43..44 "%"
+        Whitespace@44..45 " "
+        AConst@45..47
+          Iconst@45..47 "20"
+    Whitespace@47..48 " "
+    From@48..52 "FROM"
+    Whitespace@52..53 " "
+    RangeFunction@53..80
+      List@53..77
+        FuncCall@53..77
+          Ident@53..68 "generate_series"
+          Ascii40@68..69 "("
+          AConst@69..70
+            Iconst@69..70 "0"
+          Ascii44@70..71 ","
+          Whitespace@71..72 " "
+          AConst@72..77
+            Iconst@72..77 "29999"
+      Ascii41@77..78 ")"
+      Whitespace@78..79 " "
+      Alias@79..80
+        Ident@79..80 "i"
+  Ascii59@80..81 ";"
+

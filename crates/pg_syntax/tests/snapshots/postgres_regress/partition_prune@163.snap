@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE part (a INT, b INT) PARTITION BY LIST (a);"
+---
+CreateStmt@0..55
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..17
+    Ident@13..17 "part"
+  Whitespace@17..18 " "
+  Ascii40@18..19 "("
+  ColumnDef@19..24
+    Ident@19..20 "a"
+    Whitespace@20..21 " "
+    TypeName@21..24
+      IntP@21..24 "INT"
+  Ascii44@24..25 ","
+  Whitespace@25..26 " "
+  ColumnDef@26..31
+    Ident@26..27 "b"
+    Whitespace@27..28 " "
+    TypeName@28..31
+      IntP@28..31 "INT"
+  Ascii41@31..32 ")"
+  Whitespace@32..33 " "
+  PartitionSpec@33..53
+    Partition@33..42 "PARTITION"
+    Whitespace@42..43 " "
+    By@43..45 "BY"
+    Whitespace@45..46 " "
+    Ident@46..50 "LIST"
+    Whitespace@50..51 " "
+    Ascii40@51..52 "("
+    PartitionElem@52..53
+      Ident@52..53 "a"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

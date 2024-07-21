@@ -1,0 +1,44 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select f1,g from int4_tbl a, (select a.f1 as g) ss;"
+---
+SelectStmt@0..51
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..9
+    ColumnRef@7..9
+      Ident@7..9 "f1"
+  Ascii44@9..10 ","
+  ResTarget@10..11
+    ColumnRef@10..11
+      Ident@10..11 "g"
+  Whitespace@11..12 " "
+  From@12..16 "from"
+  Whitespace@16..17 " "
+  RangeVar@17..27
+    Ident@17..25 "int4_tbl"
+    Whitespace@25..26 " "
+    Alias@26..27
+      Ident@26..27 "a"
+  Ascii44@27..28 ","
+  Whitespace@28..29 " "
+  Ascii40@29..30 "("
+  RangeSubselect@30..50
+    SelectStmt@30..46
+      Select@30..36 "select"
+      Whitespace@36..37 " "
+      ResTarget@37..46
+        ColumnRef@37..41
+          Ident@37..38 "a"
+          Ascii46@38..39 "."
+          Ident@39..41 "f1"
+        Whitespace@41..42 " "
+        As@42..44 "as"
+        Whitespace@44..45 " "
+        Ident@45..46 "g"
+    Ascii41@46..47 ")"
+    Whitespace@47..48 " "
+    Alias@48..50
+      Ident@48..50 "ss"
+  Ascii59@50..51 ";"
+

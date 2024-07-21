@@ -1,0 +1,42 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select from generate_series(1,5) except select from generate_series(1,3);"
+---
+SelectStmt@0..73
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  SelectStmt@7..31
+    From@7..11 "from"
+    Whitespace@11..12 " "
+    RangeFunction@12..31
+      List@12..31
+        FuncCall@12..31
+          Ident@12..27 "generate_series"
+          Ascii40@27..28 "("
+          AConst@28..29
+            Iconst@28..29 "1"
+          Ascii44@29..30 ","
+          AConst@30..31
+            Iconst@30..31 "5"
+  Ascii41@31..32 ")"
+  Whitespace@32..33 " "
+  Except@33..39 "except"
+  Whitespace@39..40 " "
+  SelectStmt@40..71
+    Select@40..46 "select"
+    Whitespace@46..47 " "
+    From@47..51 "from"
+    Whitespace@51..52 " "
+    RangeFunction@52..71
+      List@52..71
+        FuncCall@52..71
+          Ident@52..67 "generate_series"
+          Ascii40@67..68 "("
+          AConst@68..69
+            Iconst@68..69 "1"
+          Ascii44@69..70 ","
+          AConst@70..71
+            Iconst@70..71 "3"
+  Ascii41@71..72 ")"
+  Ascii59@72..73 ";"
+

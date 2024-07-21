@@ -1,0 +1,44 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT c, sum(a) FROM pagg_tab WHERE 1 = 2 GROUP BY c;"
+---
+SelectStmt@0..54
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      Ident@7..8 "c"
+  Ascii44@8..9 ","
+  Whitespace@9..10 " "
+  ResTarget@10..15
+    FuncCall@10..15
+      Ident@10..13 "sum"
+      Ascii40@13..14 "("
+      ColumnRef@14..15
+        Ident@14..15 "a"
+  Ascii41@15..16 ")"
+  Whitespace@16..17 " "
+  From@17..21 "FROM"
+  Whitespace@21..22 " "
+  RangeVar@22..30
+    Ident@22..30 "pagg_tab"
+  Whitespace@30..31 " "
+  Where@31..36 "WHERE"
+  Whitespace@36..37 " "
+  AExpr@37..42
+    AConst@37..38
+      Iconst@37..38 "1"
+    Whitespace@38..39 " "
+    Ascii61@39..40 "="
+    Whitespace@40..41 " "
+    AConst@41..42
+      Iconst@41..42 "2"
+  Whitespace@42..43 " "
+  GroupP@43..48 "GROUP"
+  Whitespace@48..49 " "
+  By@49..51 "BY"
+  Whitespace@51..52 " "
+  ColumnRef@52..53
+    Ident@52..53 "c"
+  Ascii59@53..54 ";"
+

@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE TABLE t();
+---
+CreateStmt@0..17
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..14
+    Ident@13..14 "t"
+  Ascii40@14..15 "("
+  Ascii41@15..16 ")"
+  Ascii59@16..17 ";"
+

@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table has_fast_default(f1 int);
+---
+CreateStmt@0..38
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..29
+    Ident@13..29 "has_fast_default"
+  Ascii40@29..30 "("
+  ColumnDef@30..36
+    Ident@30..32 "f1"
+    Whitespace@32..33 " "
+    TypeName@33..36
+      IntP@33..36 "int"
+  Ascii41@36..37 ")"
+  Ascii59@37..38 ";"
+

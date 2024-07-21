@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT float4send('82381273e-35'::float4);"
+---
+SelectStmt@0..42
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..40
+    FuncCall@7..40
+      Ident@7..17 "float4send"
+      Ascii40@17..18 "("
+      TypeCast@18..40
+        AConst@18..32
+          Sconst@18..32 "'82381273e-35'"
+        Typecast@32..34 "::"
+        TypeName@34..40
+          Ident@34..40 "float4"
+  Ascii41@40..41 ")"
+  Ascii59@41..42 ";"
+

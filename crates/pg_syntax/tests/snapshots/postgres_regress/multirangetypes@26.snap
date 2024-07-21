@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '{[\"\",\"\"]}'::textmultirange;"
+---
+SelectStmt@0..35
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..34
+    TypeCast@7..34
+      AConst@7..18
+        Sconst@7..18 "'{[\"\",\"\"]}'"
+      Typecast@18..20 "::"
+      TypeName@20..34
+        Ident@20..34 "textmultirange"
+  Ascii59@34..35 ";"
+

@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SET enable_nestloop TO off;
+---
+VariableSetStmt@0..27
+  Set@0..3 "SET"
+  Whitespace@3..4 " "
+  Ident@4..19 "enable_nestloop"
+  Whitespace@19..20 " "
+  To@20..22 "TO"
+  Whitespace@22..23 " "
+  AConst@23..26
+    Off@23..26 "off"
+  Ascii59@26..27 ";"
+

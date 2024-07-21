@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_tsquery('ispell_tst', 'footballyklubber:b & rebookings:A & sky');"
+---
+SelectStmt@0..75
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..73
+    FuncCall@7..73
+      Ident@7..17 "to_tsquery"
+      Ascii40@17..18 "("
+      AConst@18..30
+        Sconst@18..30 "'ispell_tst'"
+      Ascii44@30..31 ","
+      Whitespace@31..32 " "
+      AConst@32..73
+        Sconst@32..73 "'footballyklubber:b & ..."
+  Ascii41@73..74 ")"
+  Ascii59@74..75 ";"
+

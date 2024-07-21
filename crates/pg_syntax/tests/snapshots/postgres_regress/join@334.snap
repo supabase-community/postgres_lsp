@@ -1,0 +1,154 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select a.unique1, b.unique1, c.unique1, coalesce(b.twothousand, a.twothousand)\n  from tenk1 a left join tenk1 b on b.thousand = a.unique1                        left join tenk1 c on c.unique2 = coalesce(b.twothousand, a.twothousand)\n  where a.unique2 < 10 and coalesce(b.twothousand, a.twothousand) = 44;"
+---
+SelectStmt@0..304
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..16
+    ColumnRef@7..16
+      Ident@7..8 "a"
+      Ascii46@8..9 "."
+      Ident@9..16 "unique1"
+  Ascii44@16..17 ","
+  Whitespace@17..18 " "
+  ResTarget@18..27
+    ColumnRef@18..27
+      Ident@18..19 "b"
+      Ascii46@19..20 "."
+      Ident@20..27 "unique1"
+  Ascii44@27..28 ","
+  Whitespace@28..29 " "
+  ResTarget@29..38
+    ColumnRef@29..38
+      Ident@29..30 "c"
+      Ascii46@30..31 "."
+      Ident@31..38 "unique1"
+  Ascii44@38..39 ","
+  Whitespace@39..40 " "
+  ResTarget@40..77
+    CoalesceExpr@40..77
+      Coalesce@40..48 "coalesce"
+      Ascii40@48..49 "("
+      ColumnRef@49..62
+        Ident@49..50 "b"
+        Ascii46@50..51 "."
+        Ident@51..62 "twothousand"
+      Ascii44@62..63 ","
+      Whitespace@63..64 " "
+      ColumnRef@64..77
+        Ident@64..65 "a"
+        Ascii46@65..66 "."
+        Ident@66..77 "twothousand"
+  Ascii41@77..78 ")"
+  Newline@78..79 "\n"
+  Whitespace@79..81 "  "
+  From@81..85 "from"
+  Whitespace@85..86 " "
+  JoinExpr@86..231
+    JoinExpr@86..137
+      RangeVar@86..93
+        Ident@86..91 "tenk1"
+        Whitespace@91..92 " "
+        Alias@92..93
+          Ident@92..93 "a"
+      Whitespace@93..94 " "
+      Left@94..98 "left"
+      Whitespace@98..99 " "
+      Join@99..103 "join"
+      Whitespace@103..104 " "
+      RangeVar@104..111
+        Ident@104..109 "tenk1"
+        Whitespace@109..110 " "
+        Alias@110..111
+          Ident@110..111 "b"
+      Whitespace@111..112 " "
+      On@112..114 "on"
+      Whitespace@114..115 " "
+      AExpr@115..137
+        ColumnRef@115..125
+          Ident@115..116 "b"
+          Ascii46@116..117 "."
+          Ident@117..125 "thousand"
+        Whitespace@125..126 " "
+        Ascii61@126..127 "="
+        Whitespace@127..128 " "
+        ColumnRef@128..137
+          Ident@128..129 "a"
+          Ascii46@129..130 "."
+          Ident@130..137 "unique1"
+    Whitespace@137..161 "                        "
+    Left@161..165 "left"
+    Whitespace@165..166 " "
+    Join@166..170 "join"
+    Whitespace@170..171 " "
+    RangeVar@171..178
+      Ident@171..176 "tenk1"
+      Whitespace@176..177 " "
+      Alias@177..178
+        Ident@177..178 "c"
+    Whitespace@178..179 " "
+    On@179..181 "on"
+    Whitespace@181..182 " "
+    AExpr@182..231
+      ColumnRef@182..191
+        Ident@182..183 "c"
+        Ascii46@183..184 "."
+        Ident@184..191 "unique2"
+      Whitespace@191..192 " "
+      Ascii61@192..193 "="
+      Whitespace@193..194 " "
+      CoalesceExpr@194..231
+        Coalesce@194..202 "coalesce"
+        Ascii40@202..203 "("
+        ColumnRef@203..216
+          Ident@203..204 "b"
+          Ascii46@204..205 "."
+          Ident@205..216 "twothousand"
+        Ascii44@216..217 ","
+        Whitespace@217..218 " "
+        ColumnRef@218..231
+          Ident@218..219 "a"
+          Ascii46@219..220 "."
+          Ident@220..231 "twothousand"
+  Ascii41@231..232 ")"
+  Newline@232..233 "\n"
+  Whitespace@233..235 "  "
+  Where@235..240 "where"
+  Whitespace@240..241 " "
+  BoolExpr@241..303
+    AExpr@241..255
+      ColumnRef@241..250
+        Ident@241..242 "a"
+        Ascii46@242..243 "."
+        Ident@243..250 "unique2"
+      Whitespace@250..251 " "
+      Ascii60@251..252 "<"
+      Whitespace@252..253 " "
+      AConst@253..255
+        Iconst@253..255 "10"
+    Whitespace@255..256 " "
+    And@256..259 "and"
+    Whitespace@259..260 " "
+    AExpr@260..303
+      CoalesceExpr@260..297
+        Coalesce@260..268 "coalesce"
+        Ascii40@268..269 "("
+        ColumnRef@269..282
+          Ident@269..270 "b"
+          Ascii46@270..271 "."
+          Ident@271..282 "twothousand"
+        Ascii44@282..283 ","
+        Whitespace@283..284 " "
+        ColumnRef@284..297
+          Ident@284..285 "a"
+          Ascii46@285..286 "."
+          Ident@286..297 "twothousand"
+      Ascii41@297..298 ")"
+      Whitespace@298..299 " "
+      Ascii61@299..300 "="
+      Whitespace@300..301 " "
+      AConst@301..303
+        Iconst@301..303 "44"
+  Ascii59@303..304 ";"
+

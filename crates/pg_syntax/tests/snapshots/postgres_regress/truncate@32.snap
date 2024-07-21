@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: INSERT INTO trunc_d VALUES (1);
+---
+InsertStmt@0..31
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..19
+    Ident@12..19 "trunc_d"
+  Whitespace@19..20 " "
+  SelectStmt@20..29
+    Values@20..26 "VALUES"
+    Whitespace@26..27 " "
+    Ascii40@27..28 "("
+    List@28..29
+      AConst@28..29
+        Iconst@28..29 "1"
+  Ascii41@29..30 ")"
+  Ascii59@30..31 ";"
+

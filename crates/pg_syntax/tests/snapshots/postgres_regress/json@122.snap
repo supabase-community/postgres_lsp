@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '\"foo\"'::json -> 1;"
+---
+SelectStmt@0..26
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..25
+    AExpr@7..25
+      TypeCast@7..20
+        AConst@7..14
+          Sconst@7..14 "'\"foo\"'"
+        Typecast@14..16 "::"
+        TypeName@16..20
+          Ident@16..20 "json"
+      Whitespace@20..21 " "
+      Op@21..23 "->"
+      Whitespace@23..24 " "
+      AConst@24..25
+        Iconst@24..25 "1"
+  Ascii59@25..26 ";"
+

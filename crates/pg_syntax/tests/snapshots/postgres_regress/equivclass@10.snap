@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create cast (int8 as int8alias2) without function;
+---
+CreateCastStmt@0..50
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Cast@7..11 "cast"
+  Whitespace@11..12 " "
+  Ascii40@12..13 "("
+  TypeName@13..17
+    Ident@13..17 "int8"
+  Whitespace@17..18 " "
+  As@18..20 "as"
+  Whitespace@20..21 " "
+  TypeName@21..31
+    Ident@21..31 "int8alias2"
+  Ascii41@31..32 ")"
+  Whitespace@32..33 " "
+  Without@33..40 "without"
+  Whitespace@40..41 " "
+  Function@41..49 "function"
+  Ascii59@49..50 ";"
+

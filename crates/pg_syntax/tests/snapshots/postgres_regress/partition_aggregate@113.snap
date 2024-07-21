@@ -1,0 +1,38 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE pagg_tab_para(x int, y int) PARTITION BY RANGE(x);"
+---
+CreateStmt@0..63
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..26
+    Ident@13..26 "pagg_tab_para"
+  Ascii40@26..27 "("
+  ColumnDef@27..32
+    Ident@27..28 "x"
+    Whitespace@28..29 " "
+    TypeName@29..32
+      IntP@29..32 "int"
+  Ascii44@32..33 ","
+  Whitespace@33..34 " "
+  ColumnDef@34..39
+    Ident@34..35 "y"
+    Whitespace@35..36 " "
+    TypeName@36..39
+      IntP@36..39 "int"
+  Ascii41@39..40 ")"
+  Whitespace@40..41 " "
+  PartitionSpec@41..61
+    Partition@41..50 "PARTITION"
+    Whitespace@50..51 " "
+    By@51..53 "BY"
+    Whitespace@53..54 " "
+    Range@54..59 "RANGE"
+    Ascii40@59..60 "("
+    PartitionElem@60..61
+      Ident@60..61 "x"
+  Ascii41@61..62 ")"
+  Ascii59@62..63 ";"
+

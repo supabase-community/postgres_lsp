@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE DOMAIN js_int_not_null  AS int     NOT NULL;
+---
+CreateDomainStmt@0..51
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  DomainP@7..13 "DOMAIN"
+  Whitespace@13..14 " "
+  Ident@14..29 "js_int_not_null"
+  Whitespace@29..31 "  "
+  As@31..33 "AS"
+  Whitespace@33..34 " "
+  TypeName@34..37
+    IntP@34..37 "int"
+  Whitespace@37..42 "     "
+  Constraint@42..50
+    Not@42..45 "NOT"
+    Whitespace@45..46 " "
+    NullP@46..50 "NULL"
+  Ascii59@50..51 ";"
+

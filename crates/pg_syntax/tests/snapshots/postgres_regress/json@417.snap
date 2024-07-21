@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select json_strip_nulls('[1,{\"a\":1,\"b\":null,\"c\":2},3]');"
+---
+SelectStmt@0..56
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..54
+    FuncCall@7..54
+      Ident@7..23 "json_strip_nulls"
+      Ascii40@23..24 "("
+      AConst@24..54
+        Sconst@24..54 "'[1,{\"a\":1,\"b\":null,\" ..."
+  Ascii41@54..55 ")"
+  Ascii59@55..56 ";"
+

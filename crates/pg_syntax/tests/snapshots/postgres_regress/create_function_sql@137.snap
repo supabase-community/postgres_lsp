@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT * FROM voidtest5(3);
+---
+SelectStmt@0..27
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeFunction@14..25
+    List@14..25
+      FuncCall@14..25
+        Ident@14..23 "voidtest5"
+        Ascii40@23..24 "("
+        AConst@24..25
+          Iconst@24..25 "3"
+  Ascii41@25..26 ")"
+  Ascii59@26..27 ";"
+

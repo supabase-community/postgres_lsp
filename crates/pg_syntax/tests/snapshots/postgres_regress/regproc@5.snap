@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT regprocedure('abs(numeric)');"
+---
+SelectStmt@0..36
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..34
+    FuncCall@7..34
+      Ident@7..19 "regprocedure"
+      Ascii40@19..20 "("
+      AConst@20..34
+        Sconst@20..34 "'abs(numeric)'"
+  Ascii41@34..35 ")"
+  Ascii59@35..36 ";"
+

@@ -1,0 +1,8 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: BEGIN;
+---
+TransactionStmt@0..6
+  BeginP@0..5 "BEGIN"
+  Ascii59@5..6 ";"
+

@@ -1,0 +1,108 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select x from (values (array[100::money]), (array[200::money])) _(x) union select x from (values (array[100::money]), (array[300::money])) _(x);"
+---
+SelectStmt@0..144
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  SelectStmt@7..67
+    ResTarget@7..8
+      ColumnRef@7..8
+        Ident@7..8 "x"
+    Whitespace@8..9 " "
+    From@9..13 "from"
+    Whitespace@13..14 " "
+    Ascii40@14..15 "("
+    RangeSubselect@15..67
+      SelectStmt@15..60
+        Values@15..21 "values"
+        Whitespace@21..22 " "
+        Ascii40@22..23 "("
+        List@23..39
+          AArrayExpr@23..39
+            Array@23..28 "array"
+            Ascii91@28..29 "["
+            TypeCast@29..39
+              AConst@29..32
+                Iconst@29..32 "100"
+              Typecast@32..34 "::"
+              TypeName@34..39
+                Ident@34..39 "money"
+        Ascii93@39..40 "]"
+        Ascii41@40..41 ")"
+        Ascii44@41..42 ","
+        Whitespace@42..43 " "
+        Ascii40@43..44 "("
+        List@44..60
+          AArrayExpr@44..60
+            Array@44..49 "array"
+            Ascii91@49..50 "["
+            TypeCast@50..60
+              AConst@50..53
+                Iconst@50..53 "200"
+              Typecast@53..55 "::"
+              TypeName@55..60
+                Ident@55..60 "money"
+      Ascii93@60..61 "]"
+      Ascii41@61..62 ")"
+      Ascii41@62..63 ")"
+      Whitespace@63..64 " "
+      Alias@64..67
+        Ident@64..65 "_"
+        Ascii40@65..66 "("
+        Ident@66..67 "x"
+  Ascii41@67..68 ")"
+  Whitespace@68..69 " "
+  Union@69..74 "union"
+  Whitespace@74..75 " "
+  SelectStmt@75..142
+    Select@75..81 "select"
+    Whitespace@81..82 " "
+    ResTarget@82..83
+      ColumnRef@82..83
+        Ident@82..83 "x"
+    Whitespace@83..84 " "
+    From@84..88 "from"
+    Whitespace@88..89 " "
+    Ascii40@89..90 "("
+    RangeSubselect@90..142
+      SelectStmt@90..135
+        Values@90..96 "values"
+        Whitespace@96..97 " "
+        Ascii40@97..98 "("
+        List@98..114
+          AArrayExpr@98..114
+            Array@98..103 "array"
+            Ascii91@103..104 "["
+            TypeCast@104..114
+              AConst@104..107
+                Iconst@104..107 "100"
+              Typecast@107..109 "::"
+              TypeName@109..114
+                Ident@109..114 "money"
+        Ascii93@114..115 "]"
+        Ascii41@115..116 ")"
+        Ascii44@116..117 ","
+        Whitespace@117..118 " "
+        Ascii40@118..119 "("
+        List@119..135
+          AArrayExpr@119..135
+            Array@119..124 "array"
+            Ascii91@124..125 "["
+            TypeCast@125..135
+              AConst@125..128
+                Iconst@125..128 "300"
+              Typecast@128..130 "::"
+              TypeName@130..135
+                Ident@130..135 "money"
+      Ascii93@135..136 "]"
+      Ascii41@136..137 ")"
+      Ascii41@137..138 ")"
+      Whitespace@138..139 " "
+      Alias@139..142
+        Ident@139..140 "_"
+        Ascii40@140..141 "("
+        Ident@141..142 "x"
+  Ascii41@142..143 ")"
+  Ascii59@143..144 ";"
+

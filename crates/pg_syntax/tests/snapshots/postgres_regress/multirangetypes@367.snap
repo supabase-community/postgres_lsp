@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index test_mulrirange_gist_idx on test_multirange_gist using gist (mr);
+---
+IndexStmt@0..78
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..37 "test_mulrirange_gist_idx"
+  Whitespace@37..38 " "
+  On@38..40 "on"
+  Whitespace@40..41 " "
+  RangeVar@41..61
+    Ident@41..61 "test_multirange_gist"
+  Whitespace@61..62 " "
+  Using@62..67 "using"
+  Whitespace@67..68 " "
+  Ident@68..72 "gist"
+  Whitespace@72..73 " "
+  Ascii40@73..74 "("
+  IndexElem@74..76
+    Ident@74..76 "mr"
+  Ascii41@76..77 ")"
+  Ascii59@77..78 ";"
+

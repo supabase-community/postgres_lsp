@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select ROW(11,'ABC') > ROW(11,'DEF') as false;"
+---
+SelectStmt@0..46
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..45
+    AExpr@7..35
+      RowExpr@7..19
+        Row@7..10 "ROW"
+        Ascii40@10..11 "("
+        AConst@11..13
+          Iconst@11..13 "11"
+        Ascii44@13..14 ","
+        AConst@14..19
+          Sconst@14..19 "'ABC'"
+      Ascii41@19..20 ")"
+      Whitespace@20..21 " "
+      Ascii62@21..22 ">"
+      Whitespace@22..23 " "
+      RowExpr@23..35
+        Row@23..26 "ROW"
+        Ascii40@26..27 "("
+        AConst@27..29
+          Iconst@27..29 "11"
+        Ascii44@29..30 ","
+        AConst@30..35
+          Sconst@30..35 "'DEF'"
+    Ascii41@35..36 ")"
+    Whitespace@36..37 " "
+    As@37..39 "as"
+    Whitespace@39..40 " "
+    FalseP@40..45 "false"
+  Ascii59@45..46 ";"
+

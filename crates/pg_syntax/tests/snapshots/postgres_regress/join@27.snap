@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT *\n  FROM J1_TBL tx;"
+---
+SelectStmt@0..26
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Newline@8..9 "\n"
+  Whitespace@9..11 "  "
+  From@11..15 "FROM"
+  Whitespace@15..16 " "
+  RangeVar@16..25
+    Ident@16..22 "J1_TBL"
+    Whitespace@22..23 " "
+    Alias@23..25
+      Ident@23..25 "tx"
+  Ascii59@25..26 ";"
+

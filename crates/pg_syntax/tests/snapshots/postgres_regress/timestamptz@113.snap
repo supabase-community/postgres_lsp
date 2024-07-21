@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 'Sun Nov 23 16:00:00 4714 PST BC'::timestamptz;"
+---
+SelectStmt@0..54
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..53
+    TypeCast@7..53
+      AConst@7..40
+        Sconst@7..40 "'Sun Nov 23 16:00:00  ..."
+      Typecast@40..42 "::"
+      TypeName@42..53
+        Ident@42..53 "timestamptz"
+  Ascii59@53..54 ";"
+

@@ -1,0 +1,52 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT nmr, isempty(nmr), lower(nmr), upper(nmr) FROM nummultirange_test ORDER BY nmr;"
+---
+SelectStmt@0..86
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..10
+    ColumnRef@7..10
+      Ident@7..10 "nmr"
+  Ascii44@10..11 ","
+  Whitespace@11..12 " "
+  ResTarget@12..23
+    FuncCall@12..23
+      Ident@12..19 "isempty"
+      Ascii40@19..20 "("
+      ColumnRef@20..23
+        Ident@20..23 "nmr"
+  Ascii41@23..24 ")"
+  Ascii44@24..25 ","
+  Whitespace@25..26 " "
+  ResTarget@26..35
+    FuncCall@26..35
+      Ident@26..31 "lower"
+      Ascii40@31..32 "("
+      ColumnRef@32..35
+        Ident@32..35 "nmr"
+  Ascii41@35..36 ")"
+  Ascii44@36..37 ","
+  Whitespace@37..38 " "
+  ResTarget@38..47
+    FuncCall@38..47
+      Ident@38..43 "upper"
+      Ascii40@43..44 "("
+      ColumnRef@44..47
+        Ident@44..47 "nmr"
+  Ascii41@47..48 ")"
+  Whitespace@48..49 " "
+  From@49..53 "FROM"
+  Whitespace@53..54 " "
+  RangeVar@54..72
+    Ident@54..72 "nummultirange_test"
+  Whitespace@72..73 " "
+  SortBy@73..85
+    Order@73..78 "ORDER"
+    Whitespace@78..79 " "
+    By@79..81 "BY"
+    Whitespace@81..82 " "
+    ColumnRef@82..85
+      Ident@82..85 "nmr"
+  Ascii59@85..86 ";"
+

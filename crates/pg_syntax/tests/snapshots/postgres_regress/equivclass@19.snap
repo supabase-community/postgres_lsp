@@ -1,0 +1,45 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function int8alias1eq(int8, int8alias1) returns bool\n  strict immutable language internal as 'int8eq';"
+---
+CreateFunctionStmt@0..109
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..28 "int8alias1eq"
+  Ascii40@28..29 "("
+  FunctionParameter@29..33
+    TypeName@29..33
+      Ident@29..33 "int8"
+  Ascii44@33..34 ","
+  Whitespace@34..35 " "
+  FunctionParameter@35..45
+    TypeName@35..45
+      Ident@35..45 "int8alias1"
+  Ascii41@45..46 ")"
+  Whitespace@46..47 " "
+  Returns@47..54 "returns"
+  Whitespace@54..55 " "
+  TypeName@55..59
+    Ident@55..59 "bool"
+  Newline@59..60 "\n"
+  Whitespace@60..62 "  "
+  DefElem@62..68
+    StrictP@62..68 "strict"
+  Whitespace@68..69 " "
+  DefElem@69..78
+    Immutable@69..78 "immutable"
+  Whitespace@78..79 " "
+  DefElem@79..96
+    Language@79..87 "language"
+    Whitespace@87..88 " "
+    Ident@88..96 "internal"
+  Whitespace@96..97 " "
+  DefElem@97..108
+    As@97..99 "as"
+    Whitespace@99..100 " "
+    List@100..108
+      Sconst@100..108 "'int8eq'"
+  Ascii59@108..109 ";"
+

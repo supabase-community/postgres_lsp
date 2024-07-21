@@ -1,0 +1,44 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE OR REPLACE FUNCTION distinct_func(a INT) RETURNS INT AS $$\n  BEGIN\n    RETURN a;\n  END;\n$$ LANGUAGE plpgsql PARALLEL UNSAFE;"
+---
+CreateFunctionStmt@0..131
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Or@7..9 "OR"
+  Whitespace@9..10 " "
+  Replace@10..17 "REPLACE"
+  Whitespace@17..18 " "
+  Function@18..26 "FUNCTION"
+  Whitespace@26..27 " "
+  Ident@27..40 "distinct_func"
+  Ascii40@40..41 "("
+  FunctionParameter@41..46
+    Ident@41..42 "a"
+    Whitespace@42..43 " "
+    TypeName@43..46
+      IntP@43..46 "INT"
+  Ascii41@46..47 ")"
+  Whitespace@47..48 " "
+  Returns@48..55 "RETURNS"
+  Whitespace@55..56 " "
+  TypeName@56..59
+    IntP@56..59 "INT"
+  Whitespace@59..60 " "
+  DefElem@60..97
+    As@60..62 "AS"
+    Whitespace@62..63 " "
+    List@63..97
+      Sconst@63..97 "$$\n  BEGIN\n    RETURN ..."
+  Whitespace@97..98 " "
+  DefElem@98..114
+    Language@98..106 "LANGUAGE"
+    Whitespace@106..107 " "
+    Ident@107..114 "plpgsql"
+  Whitespace@114..115 " "
+  DefElem@115..130
+    Parallel@115..123 "PARALLEL"
+    Whitespace@123..124 " "
+    Ident@124..130 "UNSAFE"
+  Ascii59@130..131 ";"
+

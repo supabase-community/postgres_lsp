@@ -1,0 +1,37 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select * from int4_tbl a full join int4_tbl b on false;
+---
+SelectStmt@0..55
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  JoinExpr@14..54
+    RangeVar@14..24
+      Ident@14..22 "int4_tbl"
+      Whitespace@22..23 " "
+      Alias@23..24
+        Ident@23..24 "a"
+    Whitespace@24..25 " "
+    Full@25..29 "full"
+    Whitespace@29..30 " "
+    Join@30..34 "join"
+    Whitespace@34..35 " "
+    RangeVar@35..45
+      Ident@35..43 "int4_tbl"
+      Whitespace@43..44 " "
+      Alias@44..45
+        Ident@44..45 "b"
+    Whitespace@45..46 " "
+    On@46..48 "on"
+    Whitespace@48..49 " "
+    AConst@49..54
+      FalseP@49..54 "false"
+  Ascii59@54..55 ";"
+

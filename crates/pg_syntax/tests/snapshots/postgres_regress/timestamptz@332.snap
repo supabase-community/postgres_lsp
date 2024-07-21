@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into tmptz values ('2017-01-18 00:00+00');"
+---
+InsertStmt@0..49
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..17
+    Ident@12..17 "tmptz"
+  Whitespace@17..18 " "
+  SelectStmt@18..47
+    Values@18..24 "values"
+    Whitespace@24..25 " "
+    Ascii40@25..26 "("
+    List@26..47
+      AConst@26..47
+        Sconst@26..47 "'2017-01-18 00:00+00'"
+  Ascii41@47..48 ")"
+  Ascii59@48..49 ";"
+

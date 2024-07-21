@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select json_to_tsvector('{}'::json, '\"all\"');"
+---
+SelectStmt@0..45
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..43
+    FuncCall@7..43
+      Ident@7..23 "json_to_tsvector"
+      Ascii40@23..24 "("
+      TypeCast@24..34
+        AConst@24..28
+          Sconst@24..28 "'{}'"
+        Typecast@28..30 "::"
+        TypeName@30..34
+          Ident@30..34 "json"
+      Ascii44@34..35 ","
+      Whitespace@35..36 " "
+      AConst@36..43
+        Sconst@36..43 "'\"all\"'"
+  Ascii41@43..44 ")"
+  Ascii59@44..45 ";"
+

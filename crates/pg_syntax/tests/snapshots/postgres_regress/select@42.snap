@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT * FROM foo ORDER BY f1 DESC;
+---
+SelectStmt@0..35
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..17
+    Ident@14..17 "foo"
+  Whitespace@17..18 " "
+  SortBy@18..34
+    Order@18..23 "ORDER"
+    Whitespace@23..24 " "
+    By@24..26 "BY"
+    Whitespace@26..27 " "
+    ColumnRef@27..29
+      Ident@27..29 "f1"
+    Whitespace@29..30 " "
+    Desc@30..34 "DESC"
+  Ascii59@34..35 ";"
+

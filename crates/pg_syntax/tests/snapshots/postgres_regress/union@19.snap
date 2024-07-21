@@ -1,0 +1,38 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT f1 AS ten FROM FLOAT8_TBL\nUNION ALL\nSELECT f1 FROM FLOAT8_TBL;"
+---
+SelectStmt@0..69
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  SelectStmt@7..32
+    ResTarget@7..16
+      ColumnRef@7..9
+        Ident@7..9 "f1"
+      Whitespace@9..10 " "
+      As@10..12 "AS"
+      Whitespace@12..13 " "
+      Ident@13..16 "ten"
+    Whitespace@16..17 " "
+    From@17..21 "FROM"
+    Whitespace@21..22 " "
+    RangeVar@22..32
+      Ident@22..32 "FLOAT8_TBL"
+  Newline@32..33 "\n"
+  Union@33..38 "UNION"
+  Whitespace@38..39 " "
+  All@39..42 "ALL"
+  Newline@42..43 "\n"
+  SelectStmt@43..68
+    Select@43..49 "SELECT"
+    Whitespace@49..50 " "
+    ResTarget@50..52
+      ColumnRef@50..52
+        Ident@50..52 "f1"
+    Whitespace@52..53 " "
+    From@53..57 "FROM"
+    Whitespace@57..58 " "
+    RangeVar@58..68
+      Ident@58..68 "FLOAT8_TBL"
+  Ascii59@68..69 ";"
+

@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM textrange_test WHERE range_contains(tr, textrange('f', 'fx'));"
+---
+SelectStmt@0..76
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..28
+    Ident@14..28 "textrange_test"
+  Whitespace@28..29 " "
+  Where@29..34 "WHERE"
+  Whitespace@34..35 " "
+  FuncCall@35..73
+    Ident@35..49 "range_contains"
+    Ascii40@49..50 "("
+    ColumnRef@50..52
+      Ident@50..52 "tr"
+    Ascii44@52..53 ","
+    Whitespace@53..54 " "
+    FuncCall@54..73
+      Ident@54..63 "textrange"
+      Ascii40@63..64 "("
+      AConst@64..67
+        Sconst@64..67 "'f'"
+      Ascii44@67..68 ","
+      Whitespace@68..69 " "
+      AConst@69..73
+        Sconst@69..73 "'fx'"
+  Ascii41@73..74 ")"
+  Ascii41@74..75 ")"
+  Ascii59@75..76 ";"
+

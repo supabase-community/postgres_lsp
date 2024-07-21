@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO POINT_TBL(f1) VALUES ('(10.0 10.0)');"
+---
+InsertStmt@0..49
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..21
+    Ident@12..21 "POINT_TBL"
+  Ascii40@21..22 "("
+  ResTarget@22..24
+    Ident@22..24 "f1"
+  Ascii41@24..25 ")"
+  Whitespace@25..26 " "
+  SelectStmt@26..47
+    Values@26..32 "VALUES"
+    Whitespace@32..33 " "
+    Ascii40@33..34 "("
+    List@34..47
+      AConst@34..47
+        Sconst@34..47 "'(10.0 10.0)'"
+  Ascii41@47..48 ")"
+  Ascii59@48..49 ";"
+

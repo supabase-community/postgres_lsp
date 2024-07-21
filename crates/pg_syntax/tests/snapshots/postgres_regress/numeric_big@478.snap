@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO num_data VALUES (6, '0.0469370721950711508944806393077762204079964905145503836835397203739563036579760026190241480514409364');"
+---
+InsertStmt@0..138
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "num_data"
+  Whitespace@20..21 " "
+  SelectStmt@21..136
+    Values@21..27 "VALUES"
+    Whitespace@27..28 " "
+    Ascii40@28..29 "("
+    List@29..136
+      AConst@29..30
+        Iconst@29..30 "6"
+      Ascii44@30..31 ","
+      Whitespace@31..32 " "
+      AConst@32..136
+        Sconst@32..136 "'0.046937072195071150 ..."
+  Ascii41@136..137 ")"
+  Ascii59@137..138 ";"
+

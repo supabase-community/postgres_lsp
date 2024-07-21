@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '$.g ? (exists (@.x ? (@ == 14)))'::jsonpath;"
+---
+SelectStmt@0..52
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..51
+    TypeCast@7..51
+      AConst@7..41
+        Sconst@7..41 "'$.g ? (exists (@.x ? ..."
+      Typecast@41..43 "::"
+      TypeName@43..51
+        Ident@43..51 "jsonpath"
+  Ascii59@51..52 ";"
+

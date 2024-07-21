@@ -8,6 +8,7 @@ use pg_lexer::SyntaxKind;
 use super::ast::{builder::AstBuilder, AST};
 use super::cst::CST;
 
+#[derive(Debug)]
 pub struct Syntax {
     /// The abstract syntax tree with resolved ranges for each node
     pub ast: AST,

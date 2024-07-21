@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: DELETE FROM t3 USING t1 table1 WHERE t3.x = table1.a;
+---
+DeleteStmt@0..53
+  DeleteP@0..6 "DELETE"
+  Whitespace@6..7 " "
+  From@7..11 "FROM"
+  Whitespace@11..12 " "
+  RangeVar@12..14
+    Ident@12..14 "t3"
+  Whitespace@14..15 " "
+  Using@15..20 "USING"
+  Whitespace@20..21 " "
+  RangeVar@21..30
+    Ident@21..23 "t1"
+    Whitespace@23..24 " "
+    Alias@24..30
+      Ident@24..30 "table1"
+  Whitespace@30..31 " "
+  Where@31..36 "WHERE"
+  Whitespace@36..37 " "
+  AExpr@37..52
+    ColumnRef@37..41
+      Ident@37..39 "t3"
+      Ascii46@39..40 "."
+      Ident@40..41 "x"
+    Whitespace@41..42 " "
+    Ascii61@42..43 "="
+    Whitespace@43..44 " "
+    ColumnRef@44..52
+      Ident@44..50 "table1"
+      Ascii46@50..51 "."
+      Ident@51..52 "a"
+  Ascii59@52..53 ";"
+

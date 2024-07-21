@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT strip('base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'::tsvector);"
+---
+SelectStmt@0..87
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..85
+    FuncCall@7..85
+      StripP@7..12 "strip"
+      Ascii40@12..13 "("
+      TypeCast@13..85
+        AConst@13..75
+          Sconst@13..75 "'base:7 hidden:6 rebe ..."
+        Typecast@75..77 "::"
+        TypeName@77..85
+          Ident@77..85 "tsvector"
+  Ascii41@85..86 ")"
+  Ascii59@86..87 ";"
+

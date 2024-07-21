@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function pg_temp.mysin(float8) returns float8 language plpgsql\nas 'begin return sin($1); end';"
+---
+CreateFunctionStmt@0..101
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..23 "pg_temp"
+  Ascii46@23..24 "."
+  Ident@24..29 "mysin"
+  Ascii40@29..30 "("
+  FunctionParameter@30..36
+    TypeName@30..36
+      Ident@30..36 "float8"
+  Ascii41@36..37 ")"
+  Whitespace@37..38 " "
+  Returns@38..45 "returns"
+  Whitespace@45..46 " "
+  TypeName@46..52
+    Ident@46..52 "float8"
+  Whitespace@52..53 " "
+  DefElem@53..69
+    Language@53..61 "language"
+    Whitespace@61..62 " "
+    Ident@62..69 "plpgsql"
+  Newline@69..70 "\n"
+  DefElem@70..100
+    As@70..72 "as"
+    Whitespace@72..73 " "
+    List@73..100
+      Sconst@73..100 "'begin return sin($1) ..."
+  Ascii59@100..101 ";"
+

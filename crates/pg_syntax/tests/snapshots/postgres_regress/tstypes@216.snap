@@ -1,0 +1,38 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT lexeme, positions[1] from unnest('base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'::tsvector);"
+---
+SelectStmt@0..114
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..13
+    ColumnRef@7..13
+      Ident@7..13 "lexeme"
+  Ascii44@13..14 ","
+  Whitespace@14..15 " "
+  ResTarget@15..26
+    AIndirection@15..26
+      ColumnRef@15..24
+        Ident@15..24 "positions"
+      Ascii91@24..25 "["
+      AIndices@25..26
+        AConst@25..26
+          Iconst@25..26 "1"
+  Ascii93@26..27 "]"
+  Whitespace@27..28 " "
+  From@28..32 "from"
+  Whitespace@32..33 " "
+  RangeFunction@33..112
+    List@33..112
+      FuncCall@33..112
+        Ident@33..39 "unnest"
+        Ascii40@39..40 "("
+        TypeCast@40..112
+          AConst@40..102
+            Sconst@40..102 "'base:7 hidden:6 rebe ..."
+          Typecast@102..104 "::"
+          TypeName@104..112
+            Ident@104..112 "tsvector"
+  Ascii41@112..113 ")"
+  Ascii59@113..114 ";"
+

@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT jsonb_path_query_first('[{\"a\": 1}, {\"a\": 2}, {}]', 'strict $[*].a', silent => true);"
+---
+SelectStmt@0..91
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..89
+    FuncCall@7..89
+      Ident@7..29 "jsonb_path_query_first"
+      Ascii40@29..30 "("
+      AConst@30..56
+        Sconst@30..56 "'[{\"a\": 1}, {\"a\": 2}, ..."
+      Ascii44@56..57 ","
+      Whitespace@57..58 " "
+      AConst@58..73
+        Sconst@58..73 "'strict $[*].a'"
+      Ascii44@73..74 ","
+      Whitespace@74..75 " "
+      NamedArgExpr@75..89
+        Ident@75..81 "silent"
+        Whitespace@81..82 " "
+        EqualsGreater@82..84 "=>"
+        Whitespace@84..85 " "
+        AConst@85..89
+          TrueP@85..89 "true"
+  Ascii41@89..90 ")"
+  Ascii59@90..91 ";"
+

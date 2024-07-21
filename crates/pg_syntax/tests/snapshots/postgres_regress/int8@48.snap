@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT 37 - q1 AS minus4 FROM INT8_TBL;
+---
+SelectStmt@0..39
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..24
+    AExpr@7..14
+      AConst@7..9
+        Iconst@7..9 "37"
+      Whitespace@9..10 " "
+      Ascii45@10..11 "-"
+      Whitespace@11..12 " "
+      ColumnRef@12..14
+        Ident@12..14 "q1"
+    Whitespace@14..15 " "
+    As@15..17 "AS"
+    Whitespace@17..18 " "
+    Ident@18..24 "minus4"
+  Whitespace@24..25 " "
+  From@25..29 "FROM"
+  Whitespace@29..30 " "
+  RangeVar@30..38
+    Ident@30..38 "INT8_TBL"
+  Ascii59@38..39 ";"
+

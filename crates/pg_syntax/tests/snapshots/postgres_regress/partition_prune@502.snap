@@ -1,0 +1,33 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table pp_recpart (a pp_rectype) partition by list (a);
+---
+CreateStmt@0..61
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..23
+    Ident@13..23 "pp_recpart"
+  Whitespace@23..24 " "
+  Ascii40@24..25 "("
+  ColumnDef@25..37
+    Ident@25..26 "a"
+    Whitespace@26..27 " "
+    TypeName@27..37
+      Ident@27..37 "pp_rectype"
+  Ascii41@37..38 ")"
+  Whitespace@38..39 " "
+  PartitionSpec@39..59
+    Partition@39..48 "partition"
+    Whitespace@48..49 " "
+    By@49..51 "by"
+    Whitespace@51..52 " "
+    Ident@52..56 "list"
+    Whitespace@56..57 " "
+    Ascii40@57..58 "("
+    PartitionElem@58..59
+      Ident@58..59 "a"
+  Ascii41@59..60 ")"
+  Ascii59@60..61 ";"
+

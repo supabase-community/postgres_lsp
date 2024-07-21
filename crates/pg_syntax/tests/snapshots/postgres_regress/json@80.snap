@@ -1,0 +1,38 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT json_agg(q ORDER BY x, y)\n  FROM rows q;"
+---
+SelectStmt@0..47
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..31
+    FuncCall@7..31
+      Ident@7..15 "json_agg"
+      Ascii40@15..16 "("
+      ColumnRef@16..17
+        Ident@16..17 "q"
+      Whitespace@17..18 " "
+      SortBy@18..28
+        Order@18..23 "ORDER"
+        Whitespace@23..24 " "
+        By@24..26 "BY"
+        Whitespace@26..27 " "
+        ColumnRef@27..28
+          Ident@27..28 "x"
+      Ascii44@28..29 ","
+      Whitespace@29..30 " "
+      SortBy@30..31
+        ColumnRef@30..31
+          Ident@30..31 "y"
+  Ascii41@31..32 ")"
+  Newline@32..33 "\n"
+  Whitespace@33..35 "  "
+  From@35..39 "FROM"
+  Whitespace@39..40 " "
+  RangeVar@40..46
+    Rows@40..44 "rows"
+    Whitespace@44..45 " "
+    Alias@45..46
+      Ident@45..46 "q"
+  Ascii59@46..47 ";"
+

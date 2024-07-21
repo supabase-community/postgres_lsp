@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 'foo & bar'::tsquery && 'asd | fg';"
+---
+SelectStmt@0..42
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..41
+    AExpr@7..41
+      TypeCast@7..27
+        AConst@7..18
+          Sconst@7..18 "'foo & bar'"
+        Typecast@18..20 "::"
+        TypeName@20..27
+          Ident@20..27 "tsquery"
+      Whitespace@27..28 " "
+      Op@28..30 "&&"
+      Whitespace@30..31 " "
+      AConst@31..41
+        Sconst@31..41 "'asd | fg'"
+  Ascii59@41..42 ";"
+

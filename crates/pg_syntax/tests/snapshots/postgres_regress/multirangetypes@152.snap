@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '{[1,5), [8,9)}'::nummultirange @> '{[1,5)}';"
+---
+SelectStmt@0..52
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..51
+    AExpr@7..51
+      TypeCast@7..38
+        AConst@7..23
+          Sconst@7..23 "'{[1,5), [8,9)}'"
+        Typecast@23..25 "::"
+        TypeName@25..38
+          Ident@25..38 "nummultirange"
+      Whitespace@38..39 " "
+      Op@39..41 "@>"
+      Whitespace@41..42 " "
+      AConst@42..51
+        Sconst@42..51 "'{[1,5)}'"
+  Ascii59@51..52 ";"
+

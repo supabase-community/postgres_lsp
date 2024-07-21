@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select current_setting('nosuch.setting', true);"
+---
+SelectStmt@0..47
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..45
+    FuncCall@7..45
+      Ident@7..22 "current_setting"
+      Ascii40@22..23 "("
+      AConst@23..39
+        Sconst@23..39 "'nosuch.setting'"
+      Ascii44@39..40 ","
+      Whitespace@40..41 " "
+      AConst@41..45
+        TrueP@41..45 "true"
+  Ascii41@45..46 ")"
+  Ascii59@46..47 ";"
+

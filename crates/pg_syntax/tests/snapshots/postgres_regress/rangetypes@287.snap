@@ -1,0 +1,37 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into test_range_elem select i from generate_series(1,100) i;"
+---
+InsertStmt@0..67
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "test_range_elem"
+  Whitespace@27..28 " "
+  SelectStmt@28..66
+    Select@28..34 "select"
+    Whitespace@34..35 " "
+    ResTarget@35..36
+      ColumnRef@35..36
+        Ident@35..36 "i"
+    Whitespace@36..37 " "
+    From@37..41 "from"
+    Whitespace@41..42 " "
+    RangeFunction@42..66
+      List@42..63
+        FuncCall@42..63
+          Ident@42..57 "generate_series"
+          Ascii40@57..58 "("
+          AConst@58..59
+            Iconst@58..59 "1"
+          Ascii44@59..60 ","
+          AConst@60..63
+            Iconst@60..63 "100"
+      Ascii41@63..64 ")"
+      Whitespace@64..65 " "
+      Alias@65..66
+        Ident@65..66 "i"
+  Ascii59@66..67 ";"
+

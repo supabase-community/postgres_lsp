@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT m * 2::int2 FROM money_data;"
+---
+SelectStmt@0..35
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..18
+    AExpr@7..18
+      ColumnRef@7..8
+        Ident@7..8 "m"
+      Whitespace@8..9 " "
+      Ascii42@9..10 "*"
+      Whitespace@10..11 " "
+      TypeCast@11..18
+        AConst@11..12
+          Iconst@11..12 "2"
+        Typecast@12..14 "::"
+        TypeName@14..18
+          Ident@14..18 "int2"
+  Whitespace@18..19 " "
+  From@19..23 "FROM"
+  Whitespace@23..24 " "
+  RangeVar@24..34
+    Ident@24..34 "money_data"
+  Ascii59@34..35 ";"
+

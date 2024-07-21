@@ -1,0 +1,38 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO parallel_vacuum_table SELECT i from generate_series(1, 10000) i;"
+---
+InsertStmt@0..76
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..33
+    Ident@12..33 "parallel_vacuum_table"
+  Whitespace@33..34 " "
+  SelectStmt@34..75
+    Select@34..40 "SELECT"
+    Whitespace@40..41 " "
+    ResTarget@41..42
+      ColumnRef@41..42
+        Ident@41..42 "i"
+    Whitespace@42..43 " "
+    From@43..47 "from"
+    Whitespace@47..48 " "
+    RangeFunction@48..75
+      List@48..72
+        FuncCall@48..72
+          Ident@48..63 "generate_series"
+          Ascii40@63..64 "("
+          AConst@64..65
+            Iconst@64..65 "1"
+          Ascii44@65..66 ","
+          Whitespace@66..67 " "
+          AConst@67..72
+            Iconst@67..72 "10000"
+      Ascii41@72..73 ")"
+      Whitespace@73..74 " "
+      Alias@74..75
+        Ident@74..75 "i"
+  Ascii59@75..76 ";"
+

@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select regexp_match('fooba', '(?:..)*');"
+---
+SelectStmt@0..40
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..38
+    FuncCall@7..38
+      Ident@7..19 "regexp_match"
+      Ascii40@19..20 "("
+      AConst@20..27
+        Sconst@20..27 "'fooba'"
+      Ascii44@27..28 ","
+      Whitespace@28..29 " "
+      AConst@29..38
+        Sconst@29..38 "'(?:..)*'"
+  Ascii41@38..39 ")"
+  Ascii59@39..40 ";"
+

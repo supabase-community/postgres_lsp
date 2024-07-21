@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index gist_pointidx on gist_point_tbl using gist(p);
+---
+IndexStmt@0..59
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..26 "gist_pointidx"
+  Whitespace@26..27 " "
+  On@27..29 "on"
+  Whitespace@29..30 " "
+  RangeVar@30..44
+    Ident@30..44 "gist_point_tbl"
+  Whitespace@44..45 " "
+  Using@45..50 "using"
+  Whitespace@50..51 " "
+  Ident@51..55 "gist"
+  Ascii40@55..56 "("
+  IndexElem@56..57
+    Ident@56..57 "p"
+  Ascii41@57..58 ")"
+  Ascii59@58..59 ";"
+

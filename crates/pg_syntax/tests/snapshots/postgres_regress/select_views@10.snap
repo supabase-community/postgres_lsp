@@ -1,0 +1,63 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO credit_card\n       VALUES (101, '1111-2222-3333-4444', 4000),\n              (102, '5555-6666-7777-8888', 3000),\n              (103, '9801-2345-6789-0123', 2000);"
+---
+InsertStmt@0..173
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "credit_card"
+  Newline@23..24 "\n"
+  Whitespace@24..31 "       "
+  SelectStmt@31..171
+    Values@31..37 "VALUES"
+    Whitespace@37..38 " "
+    Ascii40@38..39 "("
+    List@39..71
+      AConst@39..42
+        Iconst@39..42 "101"
+      Ascii44@42..43 ","
+      Whitespace@43..44 " "
+      AConst@44..65
+        Sconst@44..65 "'1111-2222-3333-4444'"
+      Ascii44@65..66 ","
+      Whitespace@66..67 " "
+      AConst@67..71
+        Iconst@67..71 "4000"
+    Ascii41@71..72 ")"
+    Ascii44@72..73 ","
+    Newline@73..74 "\n"
+    Whitespace@74..88 "              "
+    Ascii40@88..89 "("
+    List@89..121
+      AConst@89..92
+        Iconst@89..92 "102"
+      Ascii44@92..93 ","
+      Whitespace@93..94 " "
+      AConst@94..115
+        Sconst@94..115 "'5555-6666-7777-8888'"
+      Ascii44@115..116 ","
+      Whitespace@116..117 " "
+      AConst@117..121
+        Iconst@117..121 "3000"
+    Ascii41@121..122 ")"
+    Ascii44@122..123 ","
+    Newline@123..124 "\n"
+    Whitespace@124..138 "              "
+    Ascii40@138..139 "("
+    List@139..171
+      AConst@139..142
+        Iconst@139..142 "103"
+      Ascii44@142..143 ","
+      Whitespace@143..144 " "
+      AConst@144..165
+        Sconst@144..165 "'9801-2345-6789-0123'"
+      Ascii44@165..166 ","
+      Whitespace@166..167 " "
+      AConst@167..171
+        Iconst@167..171 "2000"
+  Ascii41@171..172 ")"
+  Ascii59@172..173 ";"
+

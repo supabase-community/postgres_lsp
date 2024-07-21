@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO point_gist_tbl SELECT '(0,0)' FROM generate_series(0,1000);"
+---
+InsertStmt@0..71
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..26
+    Ident@12..26 "point_gist_tbl"
+  Whitespace@26..27 " "
+  SelectStmt@27..69
+    Select@27..33 "SELECT"
+    Whitespace@33..34 " "
+    ResTarget@34..41
+      AConst@34..41
+        Sconst@34..41 "'(0,0)'"
+    Whitespace@41..42 " "
+    From@42..46 "FROM"
+    Whitespace@46..47 " "
+    RangeFunction@47..69
+      List@47..69
+        FuncCall@47..69
+          Ident@47..62 "generate_series"
+          Ascii40@62..63 "("
+          AConst@63..64
+            Iconst@63..64 "0"
+          Ascii44@64..65 ","
+          AConst@65..69
+            Iconst@65..69 "1000"
+  Ascii41@69..70 ")"
+  Ascii59@70..71 ";"
+

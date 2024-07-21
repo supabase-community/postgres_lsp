@@ -1,0 +1,44 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT json_build_object('turbines',json_object_agg(serial_num,json_build_object('name',name,'type',type)))\nFROM foo;"
+---
+SelectStmt@0..117
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..104
+    FuncCall@7..104
+      Ident@7..24 "json_build_object"
+      Ascii40@24..25 "("
+      AConst@25..35
+        Sconst@25..35 "'turbines'"
+      Ascii44@35..36 ","
+      FuncCall@36..104
+        Ident@36..51 "json_object_agg"
+        Ascii40@51..52 "("
+        ColumnRef@52..62
+          Ident@52..62 "serial_num"
+        Ascii44@62..63 ","
+        FuncCall@63..104
+          Ident@63..80 "json_build_object"
+          Ascii40@80..81 "("
+          AConst@81..87
+            Sconst@81..87 "'name'"
+          Ascii44@87..88 ","
+          ColumnRef@88..92
+            NameP@88..92 "name"
+          Ascii44@92..93 ","
+          AConst@93..99
+            Sconst@93..99 "'type'"
+          Ascii44@99..100 ","
+          ColumnRef@100..104
+            TypeP@100..104 "type"
+  Ascii41@104..105 ")"
+  Ascii41@105..106 ")"
+  Ascii41@106..107 ")"
+  Newline@107..108 "\n"
+  From@108..112 "FROM"
+  Whitespace@112..113 " "
+  RangeVar@113..116
+    Ident@113..116 "foo"
+  Ascii59@116..117 ";"
+

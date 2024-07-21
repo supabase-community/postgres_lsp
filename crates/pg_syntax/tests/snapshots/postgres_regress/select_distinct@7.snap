@@ -1,0 +1,48 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT count(*) FROM\n  (SELECT DISTINCT two, four, two FROM tenk1) ss;"
+---
+SelectStmt@0..70
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "FROM"
+  Newline@20..21 "\n"
+  Whitespace@21..23 "  "
+  Ascii40@23..24 "("
+  RangeSubselect@24..69
+    SelectStmt@24..65
+      Select@24..30 "SELECT"
+      Whitespace@30..31 " "
+      Distinct@31..39 "DISTINCT"
+      Whitespace@39..40 " "
+      ResTarget@40..43
+        ColumnRef@40..43
+          Ident@40..43 "two"
+      Ascii44@43..44 ","
+      Whitespace@44..45 " "
+      ResTarget@45..49
+        ColumnRef@45..49
+          Ident@45..49 "four"
+      Ascii44@49..50 ","
+      Whitespace@50..51 " "
+      ResTarget@51..54
+        ColumnRef@51..54
+          Ident@51..54 "two"
+      Whitespace@54..55 " "
+      From@55..59 "FROM"
+      Whitespace@59..60 " "
+      RangeVar@60..65
+        Ident@60..65 "tenk1"
+    Ascii41@65..66 ")"
+    Whitespace@66..67 " "
+    Alias@67..69
+      Ident@67..69 "ss"
+  Ascii59@69..70 ";"
+

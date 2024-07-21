@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '0/16AE7F7' < '0/16AE7F8'::pg_lsn;"
+---
+SelectStmt@0..41
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..40
+    AExpr@7..40
+      AConst@7..18
+        Sconst@7..18 "'0/16AE7F7'"
+      Whitespace@18..19 " "
+      Ascii60@19..20 "<"
+      Whitespace@20..21 " "
+      TypeCast@21..40
+        AConst@21..32
+          Sconst@21..32 "'0/16AE7F8'"
+        Typecast@32..34 "::"
+        TypeName@34..40
+          Ident@34..40 "pg_lsn"
+  Ascii59@40..41 ";"
+

@@ -1,0 +1,57 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT\n  CASE WHEN i >= 3 THEN (i + i)\n       ELSE i\n  END AS \"Simplest Math\"\n  FROM CASE_TBL;"
+---
+SelectStmt@0..94
+  Select@0..6 "SELECT"
+  Newline@6..7 "\n"
+  Whitespace@7..9 "  "
+  ResTarget@9..77
+    CaseExpr@9..58
+      Case@9..13 "CASE"
+      Whitespace@13..14 " "
+      CaseWhen@14..37
+        When@14..18 "WHEN"
+        Whitespace@18..19 " "
+        AExpr@19..25
+          ColumnRef@19..20
+            Ident@19..20 "i"
+          Whitespace@20..21 " "
+          GreaterEquals@21..23 ">="
+          Whitespace@23..24 " "
+          AConst@24..25
+            Iconst@24..25 "3"
+        Whitespace@25..26 " "
+        Then@26..30 "THEN"
+        Whitespace@30..31 " "
+        Ascii40@31..32 "("
+        AExpr@32..37
+          ColumnRef@32..33
+            Ident@32..33 "i"
+          Whitespace@33..34 " "
+          Ascii43@34..35 "+"
+          Whitespace@35..36 " "
+          ColumnRef@36..37
+            Ident@36..37 "i"
+      Ascii41@37..38 ")"
+      Newline@38..39 "\n"
+      Whitespace@39..46 "       "
+      Else@46..50 "ELSE"
+      Whitespace@50..51 " "
+      ColumnRef@51..52
+        Ident@51..52 "i"
+      Newline@52..53 "\n"
+      Whitespace@53..55 "  "
+      EndP@55..58 "END"
+    Whitespace@58..59 " "
+    As@59..61 "AS"
+    Whitespace@61..62 " "
+    Ident@62..77 "\"Simplest Math\""
+  Newline@77..78 "\n"
+  Whitespace@78..80 "  "
+  From@80..84 "FROM"
+  Whitespace@84..85 " "
+  RangeVar@85..93
+    Ident@85..93 "CASE_TBL"
+  Ascii59@93..94 ";"
+

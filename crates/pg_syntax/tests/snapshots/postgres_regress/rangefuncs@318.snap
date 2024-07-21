@@ -1,0 +1,57 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from array_to_set(array['one', 'two']) as t(f1 numeric(4,2),f2 text);"
+---
+SelectStmt@0..78
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..76
+    List@14..45
+      FuncCall@14..45
+        Ident@14..26 "array_to_set"
+        Ascii40@26..27 "("
+        AArrayExpr@27..45
+          Array@27..32 "array"
+          Ascii91@32..33 "["
+          AConst@33..38
+            Sconst@33..38 "'one'"
+          Ascii44@38..39 ","
+          Whitespace@39..40 " "
+          AConst@40..45
+            Sconst@40..45 "'two'"
+    Ascii93@45..46 "]"
+    Ascii41@46..47 ")"
+    Whitespace@47..48 " "
+    Alias@48..52
+      As@48..50 "as"
+      Whitespace@50..51 " "
+      Ident@51..52 "t"
+    Ascii40@52..53 "("
+    ColumnDef@53..67
+      Ident@53..55 "f1"
+      Whitespace@55..56 " "
+      TypeName@56..67
+        Numeric@56..63 "numeric"
+        Ascii40@63..64 "("
+        AConst@64..65
+          Iconst@64..65 "4"
+        Ascii44@65..66 ","
+        AConst@66..67
+          Iconst@66..67 "2"
+    Ascii41@67..68 ")"
+    Ascii44@68..69 ","
+    ColumnDef@69..76
+      Ident@69..71 "f2"
+      Whitespace@71..72 " "
+      TypeName@72..76
+        TextP@72..76 "text"
+  Ascii41@76..77 ")"
+  Ascii59@77..78 ";"
+

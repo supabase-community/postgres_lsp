@@ -1,0 +1,193 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE INDEX brinidx ON brintest USING brin (\n\tbyteacol,\n\tcharcol,\n\tnamecol,\n\tint8col,\n\tint2col,\n\tint4col,\n\ttextcol,\n\toidcol,\n\ttidcol,\n\tfloat4col,\n\tfloat8col,\n\tmacaddrcol,\n\tinetcol inet_inclusion_ops,\n\tinetcol inet_minmax_ops,\n\tcidrcol inet_inclusion_ops,\n\tcidrcol inet_minmax_ops,\n\tbpcharcol,\n\tdatecol,\n\ttimecol,\n\ttimestampcol,\n\ttimestamptzcol,\n\tintervalcol,\n\ttimetzcol,\n\tbitcol,\n\tvarbitcol,\n\tnumericcol,\n\tuuidcol,\n\tint4rangecol,\n\tlsncol,\n\tboxcol\n) with (pages_per_range = 1);"
+---
+IndexStmt@0..477
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..20 "brinidx"
+  Whitespace@20..21 " "
+  On@21..23 "ON"
+  Whitespace@23..24 " "
+  RangeVar@24..32
+    Ident@24..32 "brintest"
+  Whitespace@32..33 " "
+  Using@33..38 "USING"
+  Whitespace@38..39 " "
+  Ident@39..43 "brin"
+  Whitespace@43..44 " "
+  Ascii40@44..45 "("
+  Newline@45..46 "\n"
+  Newline@46..47 "\t"
+  IndexElem@47..55
+    Ident@47..55 "byteacol"
+  Ascii44@55..56 ","
+  Newline@56..57 "\n"
+  Newline@57..58 "\t"
+  IndexElem@58..65
+    Ident@58..65 "charcol"
+  Ascii44@65..66 ","
+  Newline@66..67 "\n"
+  Newline@67..68 "\t"
+  IndexElem@68..75
+    Ident@68..75 "namecol"
+  Ascii44@75..76 ","
+  Newline@76..77 "\n"
+  Newline@77..78 "\t"
+  IndexElem@78..85
+    Ident@78..85 "int8col"
+  Ascii44@85..86 ","
+  Newline@86..87 "\n"
+  Newline@87..88 "\t"
+  IndexElem@88..95
+    Ident@88..95 "int2col"
+  Ascii44@95..96 ","
+  Newline@96..97 "\n"
+  Newline@97..98 "\t"
+  IndexElem@98..105
+    Ident@98..105 "int4col"
+  Ascii44@105..106 ","
+  Newline@106..107 "\n"
+  Newline@107..108 "\t"
+  IndexElem@108..115
+    Ident@108..115 "textcol"
+  Ascii44@115..116 ","
+  Newline@116..117 "\n"
+  Newline@117..118 "\t"
+  IndexElem@118..124
+    Ident@118..124 "oidcol"
+  Ascii44@124..125 ","
+  Newline@125..126 "\n"
+  Newline@126..127 "\t"
+  IndexElem@127..133
+    Ident@127..133 "tidcol"
+  Ascii44@133..134 ","
+  Newline@134..135 "\n"
+  Newline@135..136 "\t"
+  IndexElem@136..145
+    Ident@136..145 "float4col"
+  Ascii44@145..146 ","
+  Newline@146..147 "\n"
+  Newline@147..148 "\t"
+  IndexElem@148..157
+    Ident@148..157 "float8col"
+  Ascii44@157..158 ","
+  Newline@158..159 "\n"
+  Newline@159..160 "\t"
+  IndexElem@160..170
+    Ident@160..170 "macaddrcol"
+  Ascii44@170..171 ","
+  Newline@171..172 "\n"
+  Newline@172..173 "\t"
+  IndexElem@173..199
+    Ident@173..180 "inetcol"
+    Whitespace@180..181 " "
+    Ident@181..199 "inet_inclusion_ops"
+  Ascii44@199..200 ","
+  Newline@200..201 "\n"
+  Newline@201..202 "\t"
+  IndexElem@202..225
+    Ident@202..209 "inetcol"
+    Whitespace@209..210 " "
+    Ident@210..225 "inet_minmax_ops"
+  Ascii44@225..226 ","
+  Newline@226..227 "\n"
+  Newline@227..228 "\t"
+  IndexElem@228..254
+    Ident@228..235 "cidrcol"
+    Whitespace@235..236 " "
+    Ident@236..254 "inet_inclusion_ops"
+  Ascii44@254..255 ","
+  Newline@255..256 "\n"
+  Newline@256..257 "\t"
+  IndexElem@257..280
+    Ident@257..264 "cidrcol"
+    Whitespace@264..265 " "
+    Ident@265..280 "inet_minmax_ops"
+  Ascii44@280..281 ","
+  Newline@281..282 "\n"
+  Newline@282..283 "\t"
+  IndexElem@283..292
+    Ident@283..292 "bpcharcol"
+  Ascii44@292..293 ","
+  Newline@293..294 "\n"
+  Newline@294..295 "\t"
+  IndexElem@295..302
+    Ident@295..302 "datecol"
+  Ascii44@302..303 ","
+  Newline@303..304 "\n"
+  Newline@304..305 "\t"
+  IndexElem@305..312
+    Ident@305..312 "timecol"
+  Ascii44@312..313 ","
+  Newline@313..314 "\n"
+  Newline@314..315 "\t"
+  IndexElem@315..327
+    Ident@315..327 "timestampcol"
+  Ascii44@327..328 ","
+  Newline@328..329 "\n"
+  Newline@329..330 "\t"
+  IndexElem@330..344
+    Ident@330..344 "timestamptzcol"
+  Ascii44@344..345 ","
+  Newline@345..346 "\n"
+  Newline@346..347 "\t"
+  IndexElem@347..358
+    Ident@347..358 "intervalcol"
+  Ascii44@358..359 ","
+  Newline@359..360 "\n"
+  Newline@360..361 "\t"
+  IndexElem@361..370
+    Ident@361..370 "timetzcol"
+  Ascii44@370..371 ","
+  Newline@371..372 "\n"
+  Newline@372..373 "\t"
+  IndexElem@373..379
+    Ident@373..379 "bitcol"
+  Ascii44@379..380 ","
+  Newline@380..381 "\n"
+  Newline@381..382 "\t"
+  IndexElem@382..391
+    Ident@382..391 "varbitcol"
+  Ascii44@391..392 ","
+  Newline@392..393 "\n"
+  Newline@393..394 "\t"
+  IndexElem@394..404
+    Ident@394..404 "numericcol"
+  Ascii44@404..405 ","
+  Newline@405..406 "\n"
+  Newline@406..407 "\t"
+  IndexElem@407..414
+    Ident@407..414 "uuidcol"
+  Ascii44@414..415 ","
+  Newline@415..416 "\n"
+  Newline@416..417 "\t"
+  IndexElem@417..429
+    Ident@417..429 "int4rangecol"
+  Ascii44@429..430 ","
+  Newline@430..431 "\n"
+  Newline@431..432 "\t"
+  IndexElem@432..438
+    Ident@432..438 "lsncol"
+  Ascii44@438..439 ","
+  Newline@439..440 "\n"
+  Newline@440..441 "\t"
+  IndexElem@441..447
+    Ident@441..447 "boxcol"
+  Newline@447..448 "\n"
+  Ascii41@448..449 ")"
+  Whitespace@449..450 " "
+  With@450..454 "with"
+  Whitespace@454..455 " "
+  Ascii40@455..456 "("
+  DefElem@456..475
+    Ident@456..471 "pages_per_range"
+    Whitespace@471..472 " "
+    Ascii61@472..473 "="
+    Whitespace@473..474 " "
+    Iconst@474..475 "1"
+  Ascii41@475..476 ")"
+  Ascii59@476..477 ";"
+

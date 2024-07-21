@@ -1,0 +1,51 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table rlp5 partition of rlp for values from (31) to (maxvalue) partition by range (a);
+---
+CreateStmt@0..93
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..17
+    Ident@13..17 "rlp5"
+  Whitespace@17..18 " "
+  Partition@18..27 "partition"
+  Whitespace@27..28 " "
+  Of@28..30 "of"
+  Whitespace@30..31 " "
+  RangeVar@31..34
+    Ident@31..34 "rlp"
+  Whitespace@34..35 " "
+  For@35..38 "for"
+  Whitespace@38..39 " "
+  Values@39..45 "values"
+  Whitespace@45..46 " "
+  PartitionBoundSpec@46..68
+    From@46..50 "from"
+    Whitespace@50..51 " "
+    Ascii40@51..52 "("
+    AConst@52..54
+      Iconst@52..54 "31"
+    Ascii41@54..55 ")"
+    Whitespace@55..56 " "
+    To@56..58 "to"
+    Whitespace@58..59 " "
+    Ascii40@59..60 "("
+    ColumnRef@60..68
+      Maxvalue@60..68 "maxvalue"
+  Ascii41@68..69 ")"
+  Whitespace@69..70 " "
+  PartitionSpec@70..91
+    Partition@70..79 "partition"
+    Whitespace@79..80 " "
+    By@80..82 "by"
+    Whitespace@82..83 " "
+    Range@83..88 "range"
+    Whitespace@88..89 " "
+    Ascii40@89..90 "("
+    PartitionElem@90..91
+      Ident@90..91 "a"
+  Ascii41@91..92 ")"
+  Ascii59@92..93 ";"
+

@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT q2, float8(q2) FROM INT8_TBL;"
+---
+SelectStmt@0..36
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..9
+    ColumnRef@7..9
+      Ident@7..9 "q2"
+  Ascii44@9..10 ","
+  Whitespace@10..11 " "
+  ResTarget@11..20
+    FuncCall@11..20
+      Ident@11..17 "float8"
+      Ascii40@17..18 "("
+      ColumnRef@18..20
+        Ident@18..20 "q2"
+  Ascii41@20..21 ")"
+  Whitespace@21..22 " "
+  From@22..26 "FROM"
+  Whitespace@26..27 " "
+  RangeVar@27..35
+    Ident@27..35 "INT8_TBL"
+  Ascii59@35..36 ";"
+

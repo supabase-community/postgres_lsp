@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT * FROM INT8_TBL WHERE q2 < 4567890123456789;
+---
+SelectStmt@0..51
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..22
+    Ident@14..22 "INT8_TBL"
+  Whitespace@22..23 " "
+  Where@23..28 "WHERE"
+  Whitespace@28..29 " "
+  AExpr@29..50
+    ColumnRef@29..31
+      Ident@29..31 "q2"
+    Whitespace@31..32 " "
+    Ascii60@32..33 "<"
+    Whitespace@33..34 " "
+    AConst@34..50
+      Fconst@34..50 "4567890123456789"
+  Ascii59@50..51 ";"
+

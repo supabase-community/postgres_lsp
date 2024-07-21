@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT pg_partition_root('ptif_test01');"
+---
+SelectStmt@0..40
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..38
+    FuncCall@7..38
+      Ident@7..24 "pg_partition_root"
+      Ascii40@24..25 "("
+      AConst@25..38
+        Sconst@25..38 "'ptif_test01'"
+  Ascii41@38..39 ")"
+  Ascii59@39..40 ";"
+

@@ -1,0 +1,94 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT CASE make_ad(1,2)\n  WHEN array[2,4]::arrdomain THEN 'wrong'\n  WHEN array[2,5]::arrdomain THEN 'still wrong'\n  WHEN array[1,2]::arrdomain THEN 'right'\n  END;"
+---
+SelectStmt@0..163
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..162
+    CaseExpr@7..162
+      Case@7..11 "CASE"
+      Whitespace@11..12 " "
+      FuncCall@12..23
+        Ident@12..19 "make_ad"
+        Ascii40@19..20 "("
+        AConst@20..21
+          Iconst@20..21 "1"
+        Ascii44@21..22 ","
+        AConst@22..23
+          Iconst@22..23 "2"
+      Ascii41@23..24 ")"
+      Newline@24..25 "\n"
+      Whitespace@25..27 "  "
+      CaseWhen@27..66
+        When@27..31 "WHEN"
+        Whitespace@31..32 " "
+        TypeCast@32..53
+          AArrayExpr@32..41
+            Array@32..37 "array"
+            Ascii91@37..38 "["
+            AConst@38..39
+              Iconst@38..39 "2"
+            Ascii44@39..40 ","
+            AConst@40..41
+              Iconst@40..41 "4"
+          Ascii93@41..42 "]"
+          Typecast@42..44 "::"
+          TypeName@44..53
+            Ident@44..53 "arrdomain"
+        Whitespace@53..54 " "
+        Then@54..58 "THEN"
+        Whitespace@58..59 " "
+        AConst@59..66
+          Sconst@59..66 "'wrong'"
+      Newline@66..67 "\n"
+      Whitespace@67..69 "  "
+      CaseWhen@69..114
+        When@69..73 "WHEN"
+        Whitespace@73..74 " "
+        TypeCast@74..95
+          AArrayExpr@74..83
+            Array@74..79 "array"
+            Ascii91@79..80 "["
+            AConst@80..81
+              Iconst@80..81 "2"
+            Ascii44@81..82 ","
+            AConst@82..83
+              Iconst@82..83 "5"
+          Ascii93@83..84 "]"
+          Typecast@84..86 "::"
+          TypeName@86..95
+            Ident@86..95 "arrdomain"
+        Whitespace@95..96 " "
+        Then@96..100 "THEN"
+        Whitespace@100..101 " "
+        AConst@101..114
+          Sconst@101..114 "'still wrong'"
+      Newline@114..115 "\n"
+      Whitespace@115..117 "  "
+      CaseWhen@117..156
+        When@117..121 "WHEN"
+        Whitespace@121..122 " "
+        TypeCast@122..143
+          AArrayExpr@122..131
+            Array@122..127 "array"
+            Ascii91@127..128 "["
+            AConst@128..129
+              Iconst@128..129 "1"
+            Ascii44@129..130 ","
+            AConst@130..131
+              Iconst@130..131 "2"
+          Ascii93@131..132 "]"
+          Typecast@132..134 "::"
+          TypeName@134..143
+            Ident@134..143 "arrdomain"
+        Whitespace@143..144 " "
+        Then@144..148 "THEN"
+        Whitespace@148..149 " "
+        AConst@149..156
+          Sconst@149..156 "'right'"
+      Newline@156..157 "\n"
+      Whitespace@157..159 "  "
+      EndP@159..162 "END"
+  Ascii59@162..163 ";"
+

@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE TABLE flt (f float);
+---
+CreateStmt@0..27
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..16
+    Ident@13..16 "flt"
+  Whitespace@16..17 " "
+  Ascii40@17..18 "("
+  ColumnDef@18..25
+    Ident@18..19 "f"
+    Whitespace@19..20 " "
+    TypeName@20..25
+      FloatP@20..25 "float"
+  Ascii41@25..26 ")"
+  Ascii59@26..27 ";"
+

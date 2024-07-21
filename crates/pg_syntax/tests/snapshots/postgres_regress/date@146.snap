@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT date '01-08-99';"
+---
+SelectStmt@0..23
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..23
+    Ident@7..11 "date"
+    Whitespace@11..12 " "
+    TypeCast@12..23
+      AConst@12..22
+        Sconst@12..22 "'01-08-99'"
+      Ascii59@22..23 ";"
+

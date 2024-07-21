@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE PROCEDURE test_ambiguous_procname(text) as $$ begin end; $$ language plpgsql;
+---
+CreateFunctionStmt@0..84
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Procedure@7..16 "PROCEDURE"
+  Whitespace@16..17 " "
+  Ident@17..40 "test_ambiguous_procname"
+  Ascii40@40..41 "("
+  FunctionParameter@41..45
+    TypeName@41..45
+      TextP@41..45 "text"
+  Ascii41@45..46 ")"
+  Whitespace@46..47 " "
+  DefElem@47..66
+    As@47..49 "as"
+    Whitespace@49..50 " "
+    List@50..66
+      Sconst@50..66 "$$ begin end; $$"
+  Whitespace@66..67 " "
+  DefElem@67..83
+    Language@67..75 "language"
+    Whitespace@75..76 " "
+    Ident@76..83 "plpgsql"
+  Ascii59@83..84 ";"
+

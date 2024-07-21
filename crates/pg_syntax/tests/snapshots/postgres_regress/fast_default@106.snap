@@ -1,0 +1,43 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "ALTER TABLE T ALTER COLUMN c_text SET DEFAULT 'world',\n              ALTER COLUMN c_int  SET DEFAULT 1;"
+---
+AlterTableStmt@0..103
+  Alter@0..5 "ALTER"
+  Whitespace@5..6 " "
+  Table@6..11 "TABLE"
+  Whitespace@11..12 " "
+  RangeVar@12..13
+    Ident@12..13 "T"
+  Whitespace@13..14 " "
+  AlterTableCmd@14..53
+    Alter@14..19 "ALTER"
+    Whitespace@19..20 " "
+    Column@20..26 "COLUMN"
+    Whitespace@26..27 " "
+    Ident@27..33 "c_text"
+    Whitespace@33..34 " "
+    Set@34..37 "SET"
+    Whitespace@37..38 " "
+    Default@38..45 "DEFAULT"
+    Whitespace@45..46 " "
+    AConst@46..53
+      Sconst@46..53 "'world'"
+  Ascii44@53..54 ","
+  Newline@54..55 "\n"
+  Whitespace@55..69 "              "
+  AlterTableCmd@69..102
+    Alter@69..74 "ALTER"
+    Whitespace@74..75 " "
+    Column@75..81 "COLUMN"
+    Whitespace@81..82 " "
+    Ident@82..87 "c_int"
+    Whitespace@87..89 "  "
+    Set@89..92 "SET"
+    Whitespace@92..93 " "
+    Default@93..100 "DEFAULT"
+    Whitespace@100..101 " "
+    AConst@101..102
+      Iconst@101..102 "1"
+  Ascii59@102..103 ";"
+

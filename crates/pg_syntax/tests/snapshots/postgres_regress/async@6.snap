@@ -1,0 +1,19 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT pg_notify('notify_async_channel_name_too_long______________________________','sample_message1');"
+---
+SelectStmt@0..103
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..101
+    FuncCall@7..101
+      Ident@7..16 "pg_notify"
+      Ascii40@16..17 "("
+      AConst@17..83
+        Sconst@17..83 "'notify_async_channel ..."
+      Ascii44@83..84 ","
+      AConst@84..101
+        Sconst@84..101 "'sample_message1'"
+  Ascii41@101..102 ")"
+  Ascii59@102..103 ";"
+

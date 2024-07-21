@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION getfoo(int) RETURNS SETOF users AS $$SELECT * FROM \\\"users\\\" WHERE users.id = $1;$$ LANGUAGE sql;"
+---
+CreateFunctionStmt@0..113
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..22 "getfoo"
+  Ascii40@22..23 "("
+  FunctionParameter@23..26
+    TypeName@23..26
+      IntP@23..26 "int"
+  Ascii41@26..27 ")"
+  Whitespace@27..28 " "
+  Returns@28..35 "RETURNS"
+  Whitespace@35..36 " "
+  Setof@36..41 "SETOF"
+  Whitespace@41..42 " "
+  TypeName@42..47
+    Ident@42..47 "users"
+  Whitespace@47..48 " "
+  DefElem@48..99
+    As@48..50 "AS"
+    Whitespace@50..51 " "
+    List@51..99
+      Sconst@51..99 "$$SELECT * FROM \\\"use ..."
+  Whitespace@99..100 " "
+  DefElem@100..112
+    Language@100..108 "LANGUAGE"
+    Whitespace@108..109 " "
+    SqlP@109..112 "sql"
+  Ascii59@112..113 ";"
+

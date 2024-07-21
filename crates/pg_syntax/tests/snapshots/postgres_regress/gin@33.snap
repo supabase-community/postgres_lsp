@@ -1,0 +1,37 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function execute_text_query_heap(query_sql text)\nreturns setof text\nlanguage plpgsql\nas\n$$\nbegin\n  set enable_seqscan = on;\n  set enable_bitmapscan = off;\n  return query execute query_sql;\nend;\n$$;"
+---
+CreateFunctionStmt@0..204
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..39 "execute_text_query_heap"
+  Ascii40@39..40 "("
+  FunctionParameter@40..54
+    Ident@40..49 "query_sql"
+    Whitespace@49..50 " "
+    TypeName@50..54
+      TextP@50..54 "text"
+  Ascii41@54..55 ")"
+  Newline@55..56 "\n"
+  Returns@56..63 "returns"
+  Whitespace@63..64 " "
+  Setof@64..69 "setof"
+  Whitespace@69..70 " "
+  TypeName@70..74
+    TextP@70..74 "text"
+  Newline@74..75 "\n"
+  DefElem@75..91
+    Language@75..83 "language"
+    Whitespace@83..84 " "
+    Ident@84..91 "plpgsql"
+  Newline@91..92 "\n"
+  DefElem@92..203
+    As@92..94 "as"
+    Newline@94..95 "\n"
+    List@95..203
+      Sconst@95..203 "$$\nbegin\n  set enable ..."
+  Ascii59@203..204 ";"
+

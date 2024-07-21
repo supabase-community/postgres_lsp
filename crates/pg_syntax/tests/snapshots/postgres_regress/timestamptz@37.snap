@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO TIMESTAMPTZ_TBL VALUES ('1997-02-10 17:32:01-08');"
+---
+InsertStmt@0..62
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "TIMESTAMPTZ_TBL"
+  Whitespace@27..28 " "
+  SelectStmt@28..60
+    Values@28..34 "VALUES"
+    Whitespace@34..35 " "
+    Ascii40@35..36 "("
+    List@36..60
+      AConst@36..60
+        Sconst@36..60 "'1997-02-10 17:32:01-08'"
+  Ascii41@60..61 ")"
+  Ascii59@61..62 ";"
+

@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: INSERT INTO delete_test (a) VALUES (10);
+---
+InsertStmt@0..40
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "delete_test"
+  Whitespace@23..24 " "
+  Ascii40@24..25 "("
+  ResTarget@25..26
+    Ident@25..26 "a"
+  Ascii41@26..27 ")"
+  Whitespace@27..28 " "
+  SelectStmt@28..38
+    Values@28..34 "VALUES"
+    Whitespace@34..35 " "
+    Ascii40@35..36 "("
+    List@36..38
+      AConst@36..38
+        Iconst@36..38 "10"
+  Ascii41@38..39 ")"
+  Ascii59@39..40 ";"
+

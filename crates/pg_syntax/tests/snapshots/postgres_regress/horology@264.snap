@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_timestamp('2000 -10', 'YYYY  TZH');"
+---
+SelectStmt@0..45
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..43
+    FuncCall@7..43
+      Ident@7..19 "to_timestamp"
+      Ascii40@19..20 "("
+      AConst@20..30
+        Sconst@20..30 "'2000 -10'"
+      Ascii44@30..31 ","
+      Whitespace@31..32 " "
+      AConst@32..43
+        Sconst@32..43 "'YYYY  TZH'"
+  Ascii41@43..44 ")"
+  Ascii59@44..45 ";"
+

@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into tc values(2,2);"
+---
+InsertStmt@0..27
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..14
+    Ident@12..14 "tc"
+  Whitespace@14..15 " "
+  SelectStmt@15..25
+    Values@15..21 "values"
+    Ascii40@21..22 "("
+    List@22..25
+      AConst@22..23
+        Iconst@22..23 "2"
+      Ascii44@23..24 ","
+      AConst@24..25
+        Iconst@24..25 "2"
+  Ascii41@25..26 ")"
+  Ascii59@26..27 ";"
+

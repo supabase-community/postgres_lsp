@@ -1,0 +1,59 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO t1c VALUES ('v', 'w'), ('c', 'd'), ('m', 'n'), ('e', 'f');"
+---
+InsertStmt@0..70
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..15
+    Ident@12..15 "t1c"
+  Whitespace@15..16 " "
+  SelectStmt@16..68
+    Values@16..22 "VALUES"
+    Whitespace@22..23 " "
+    Ascii40@23..24 "("
+    List@24..32
+      AConst@24..27
+        Sconst@24..27 "'v'"
+      Ascii44@27..28 ","
+      Whitespace@28..29 " "
+      AConst@29..32
+        Sconst@29..32 "'w'"
+    Ascii41@32..33 ")"
+    Ascii44@33..34 ","
+    Whitespace@34..35 " "
+    Ascii40@35..36 "("
+    List@36..44
+      AConst@36..39
+        Sconst@36..39 "'c'"
+      Ascii44@39..40 ","
+      Whitespace@40..41 " "
+      AConst@41..44
+        Sconst@41..44 "'d'"
+    Ascii41@44..45 ")"
+    Ascii44@45..46 ","
+    Whitespace@46..47 " "
+    Ascii40@47..48 "("
+    List@48..56
+      AConst@48..51
+        Sconst@48..51 "'m'"
+      Ascii44@51..52 ","
+      Whitespace@52..53 " "
+      AConst@53..56
+        Sconst@53..56 "'n'"
+    Ascii41@56..57 ")"
+    Ascii44@57..58 ","
+    Whitespace@58..59 " "
+    Ascii40@59..60 "("
+    List@60..68
+      AConst@60..63
+        Sconst@60..63 "'e'"
+      Ascii44@63..64 ","
+      Whitespace@64..65 " "
+      AConst@65..68
+        Sconst@65..68 "'f'"
+  Ascii41@68..69 ")"
+  Ascii59@69..70 ";"
+

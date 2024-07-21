@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table lp_ad partition of lp for values in ('a', 'd');"
+---
+CreateStmt@0..60
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..18
+    Ident@13..18 "lp_ad"
+  Whitespace@18..19 " "
+  Partition@19..28 "partition"
+  Whitespace@28..29 " "
+  Of@29..31 "of"
+  Whitespace@31..32 " "
+  RangeVar@32..34
+    Ident@32..34 "lp"
+  Whitespace@34..35 " "
+  For@35..38 "for"
+  Whitespace@38..39 " "
+  Values@39..45 "values"
+  Whitespace@45..46 " "
+  PartitionBoundSpec@46..58
+    InP@46..48 "in"
+    Whitespace@48..49 " "
+    Ascii40@49..50 "("
+    AConst@50..53
+      Sconst@50..53 "'a'"
+    Ascii44@53..54 ","
+    Whitespace@54..55 " "
+    AConst@55..58
+      Sconst@55..58 "'d'"
+  Ascii41@58..59 ")"
+  Ascii59@59..60 ";"
+

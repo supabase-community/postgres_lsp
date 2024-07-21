@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select array_to_set(array['one', 'two']);"
+---
+SelectStmt@0..41
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..38
+    FuncCall@7..38
+      Ident@7..19 "array_to_set"
+      Ascii40@19..20 "("
+      AArrayExpr@20..38
+        Array@20..25 "array"
+        Ascii91@25..26 "["
+        AConst@26..31
+          Sconst@26..31 "'one'"
+        Ascii44@31..32 ","
+        Whitespace@32..33 " "
+        AConst@33..38
+          Sconst@33..38 "'two'"
+  Ascii93@38..39 "]"
+  Ascii41@39..40 ")"
+  Ascii59@40..41 ";"
+

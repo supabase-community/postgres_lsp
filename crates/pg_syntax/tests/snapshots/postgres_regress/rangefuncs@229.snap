@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT rngfunc(42);
+---
+SelectStmt@0..19
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..17
+    FuncCall@7..17
+      Ident@7..14 "rngfunc"
+      Ascii40@14..15 "("
+      AConst@15..17
+        Iconst@15..17 "42"
+  Ascii41@17..18 ")"
+  Ascii59@18..19 ";"
+

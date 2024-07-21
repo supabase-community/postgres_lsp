@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT f1 AS \"timestamp\"\n  FROM TEMP_TIMESTAMP\n  ORDER BY \"timestamp\";"
+---
+SelectStmt@0..70
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..24
+    ColumnRef@7..9
+      Ident@7..9 "f1"
+    Whitespace@9..10 " "
+    As@10..12 "AS"
+    Whitespace@12..13 " "
+    Ident@13..24 "\"timestamp\""
+  Newline@24..25 "\n"
+  Whitespace@25..27 "  "
+  From@27..31 "FROM"
+  Whitespace@31..32 " "
+  RangeVar@32..46
+    Ident@32..46 "TEMP_TIMESTAMP"
+  Newline@46..47 "\n"
+  Whitespace@47..49 "  "
+  SortBy@49..69
+    Order@49..54 "ORDER"
+    Whitespace@54..55 " "
+    By@55..57 "BY"
+    Whitespace@57..58 " "
+    ColumnRef@58..69
+      Ident@58..69 "\"timestamp\""
+  Ascii59@69..70 ";"
+

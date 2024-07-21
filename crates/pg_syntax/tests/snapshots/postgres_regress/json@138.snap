@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT json_array_length('4');"
+---
+SelectStmt@0..30
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..28
+    FuncCall@7..28
+      Ident@7..24 "json_array_length"
+      Ascii40@24..25 "("
+      AConst@25..28
+        Sconst@25..28 "'4'"
+  Ascii41@28..29 ")"
+  Ascii59@29..30 ";"
+

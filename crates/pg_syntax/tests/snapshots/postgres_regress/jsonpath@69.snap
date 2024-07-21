@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '$.datetime(\"datetime template\")'::jsonpath;"
+---
+SelectStmt@0..51
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..50
+    TypeCast@7..50
+      AConst@7..40
+        Sconst@7..40 "'$.datetime(\"datetime ..."
+      Typecast@40..42 "::"
+      TypeName@42..50
+        Ident@42..50 "jsonpath"
+  Ascii59@50..51 ";"
+

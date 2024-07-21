@@ -1,0 +1,186 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select nt3.id\nfrom nt3 as nt3\n  left join\n    (select nt2.*, (nt2.b1 and ss1.a3) AS b3\n     from nt2 as nt2\n       left join\n         (select nt1.*, (nt1.id is not null) as a3 from nt1) as ss1\n         on ss1.id = nt2.nt1_id\n    ) as ss2\n    on ss2.id = nt3.nt2_id\nwhere nt3.id = 1 and ss2.b3;"
+---
+SelectStmt@0..293
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..13
+    ColumnRef@7..13
+      Ident@7..10 "nt3"
+      Ascii46@10..11 "."
+      Ident@11..13 "id"
+  Newline@13..14 "\n"
+  From@14..18 "from"
+  Whitespace@18..19 " "
+  JoinExpr@19..264
+    RangeVar@19..29
+      Ident@19..22 "nt3"
+      Whitespace@22..23 " "
+      Alias@23..29
+        As@23..25 "as"
+        Whitespace@25..26 " "
+        Ident@26..29 "nt3"
+    Newline@29..30 "\n"
+    Whitespace@30..32 "  "
+    Left@32..36 "left"
+    Whitespace@36..37 " "
+    Join@37..41 "join"
+    Newline@41..42 "\n"
+    Whitespace@42..46 "    "
+    Ascii40@46..47 "("
+    RangeSubselect@47..237
+      SelectStmt@47..224
+        Select@47..53 "select"
+        Whitespace@53..54 " "
+        ResTarget@54..59
+          ColumnRef@54..59
+            Ident@54..57 "nt2"
+            Ascii46@57..58 "."
+            AStar@58..59
+              Ascii42@58..59 "*"
+        Ascii44@59..60 ","
+        Whitespace@60..61 " "
+        ResTarget@61..86
+          Ascii40@61..62 "("
+          BoolExpr@62..79
+            ColumnRef@62..68
+              Ident@62..65 "nt2"
+              Ascii46@65..66 "."
+              Ident@66..68 "b1"
+            Whitespace@68..69 " "
+            And@69..72 "and"
+            Whitespace@72..73 " "
+            ColumnRef@73..79
+              Ident@73..76 "ss1"
+              Ascii46@76..77 "."
+              Ident@77..79 "a3"
+          Ascii41@79..80 ")"
+          Whitespace@80..81 " "
+          As@81..83 "AS"
+          Whitespace@83..84 " "
+          Ident@84..86 "b3"
+        Newline@86..87 "\n"
+        Whitespace@87..92 "     "
+        From@92..96 "from"
+        Whitespace@96..97 " "
+        JoinExpr@97..224
+          RangeVar@97..107
+            Ident@97..100 "nt2"
+            Whitespace@100..101 " "
+            Alias@101..107
+              As@101..103 "as"
+              Whitespace@103..104 " "
+              Ident@104..107 "nt2"
+          Newline@107..108 "\n"
+          Whitespace@108..115 "       "
+          Left@115..119 "left"
+          Whitespace@119..120 " "
+          Join@120..124 "join"
+          Newline@124..125 "\n"
+          Whitespace@125..134 "         "
+          Ascii40@134..135 "("
+          RangeSubselect@135..192
+            SelectStmt@135..184
+              Select@135..141 "select"
+              Whitespace@141..142 " "
+              ResTarget@142..147
+                ColumnRef@142..147
+                  Ident@142..145 "nt1"
+                  Ascii46@145..146 "."
+                  AStar@146..147
+                    Ascii42@146..147 "*"
+              Ascii44@147..148 ","
+              Whitespace@148..149 " "
+              ResTarget@149..175
+                Ascii40@149..150 "("
+                NullTest@150..168
+                  ColumnRef@150..156
+                    Ident@150..153 "nt1"
+                    Ascii46@153..154 "."
+                    Ident@154..156 "id"
+                  Whitespace@156..157 " "
+                  Is@157..159 "is"
+                  Whitespace@159..160 " "
+                  Not@160..163 "not"
+                  Whitespace@163..164 " "
+                  NullP@164..168 "null"
+                Ascii41@168..169 ")"
+                Whitespace@169..170 " "
+                As@170..172 "as"
+                Whitespace@172..173 " "
+                Ident@173..175 "a3"
+              Whitespace@175..176 " "
+              From@176..180 "from"
+              Whitespace@180..181 " "
+              RangeVar@181..184
+                Ident@181..184 "nt1"
+            Ascii41@184..185 ")"
+            Whitespace@185..186 " "
+            Alias@186..192
+              As@186..188 "as"
+              Whitespace@188..189 " "
+              Ident@189..192 "ss1"
+          Newline@192..193 "\n"
+          Whitespace@193..202 "         "
+          On@202..204 "on"
+          Whitespace@204..205 " "
+          AExpr@205..224
+            ColumnRef@205..211
+              Ident@205..208 "ss1"
+              Ascii46@208..209 "."
+              Ident@209..211 "id"
+            Whitespace@211..212 " "
+            Ascii61@212..213 "="
+            Whitespace@213..214 " "
+            ColumnRef@214..224
+              Ident@214..217 "nt2"
+              Ascii46@217..218 "."
+              Ident@218..224 "nt1_id"
+      Newline@224..225 "\n"
+      Whitespace@225..229 "    "
+      Ascii41@229..230 ")"
+      Whitespace@230..231 " "
+      Alias@231..237
+        As@231..233 "as"
+        Whitespace@233..234 " "
+        Ident@234..237 "ss2"
+    Newline@237..238 "\n"
+    Whitespace@238..242 "    "
+    On@242..244 "on"
+    Whitespace@244..245 " "
+    AExpr@245..264
+      ColumnRef@245..251
+        Ident@245..248 "ss2"
+        Ascii46@248..249 "."
+        Ident@249..251 "id"
+      Whitespace@251..252 " "
+      Ascii61@252..253 "="
+      Whitespace@253..254 " "
+      ColumnRef@254..264
+        Ident@254..257 "nt3"
+        Ascii46@257..258 "."
+        Ident@258..264 "nt2_id"
+  Newline@264..265 "\n"
+  Where@265..270 "where"
+  Whitespace@270..271 " "
+  BoolExpr@271..292
+    AExpr@271..281
+      ColumnRef@271..277
+        Ident@271..274 "nt3"
+        Ascii46@274..275 "."
+        Ident@275..277 "id"
+      Whitespace@277..278 " "
+      Ascii61@278..279 "="
+      Whitespace@279..280 " "
+      AConst@280..281
+        Iconst@280..281 "1"
+    Whitespace@281..282 " "
+    And@282..285 "and"
+    Whitespace@285..286 " "
+    ColumnRef@286..292
+      Ident@286..289 "ss2"
+      Ascii46@289..290 "."
+      Ident@290..292 "b3"
+  Ascii59@292..293 ";"
+

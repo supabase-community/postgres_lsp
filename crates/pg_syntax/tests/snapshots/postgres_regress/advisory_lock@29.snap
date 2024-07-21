@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT count(*) FROM pg_locks WHERE locktype = 'advisory';"
+---
+SelectStmt@0..58
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "FROM"
+  Whitespace@20..21 " "
+  RangeVar@21..29
+    Ident@21..29 "pg_locks"
+  Whitespace@29..30 " "
+  Where@30..35 "WHERE"
+  Whitespace@35..36 " "
+  AExpr@36..57
+    ColumnRef@36..44
+      Ident@36..44 "locktype"
+    Whitespace@44..45 " "
+    Ascii61@45..46 "="
+    Whitespace@46..47 " "
+    AConst@47..57
+      Sconst@47..57 "'advisory'"
+  Ascii59@57..58 ";"
+

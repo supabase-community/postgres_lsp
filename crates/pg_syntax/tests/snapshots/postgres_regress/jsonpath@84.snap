@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '($ < 1) || $.a.b <= $x'::jsonpath;"
+---
+SelectStmt@0..42
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..41
+    TypeCast@7..41
+      AConst@7..31
+        Sconst@7..31 "'($ < 1) || $.a.b <= $x'"
+      Typecast@31..33 "::"
+      TypeName@33..41
+        Ident@33..41 "jsonpath"
+  Ascii59@41..42 ";"
+

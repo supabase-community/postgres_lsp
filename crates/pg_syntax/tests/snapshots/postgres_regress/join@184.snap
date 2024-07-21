@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index tt3i on tt3(f1);
+---
+IndexStmt@0..29
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..17 "tt3i"
+  Whitespace@17..18 " "
+  On@18..20 "on"
+  Whitespace@20..21 " "
+  RangeVar@21..24
+    Ident@21..24 "tt3"
+  Ascii40@24..25 "("
+  IndexElem@25..27
+    Ident@25..27 "f1"
+  Ascii41@27..28 ")"
+  Ascii59@28..29 ";"
+

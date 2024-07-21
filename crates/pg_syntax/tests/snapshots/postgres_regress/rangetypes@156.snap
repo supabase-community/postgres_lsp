@@ -1,0 +1,49 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into test_range_gist select int4range(g, g+10000) from generate_series(1,1000) g;"
+---
+InsertStmt@0..88
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "test_range_gist"
+  Whitespace@27..28 " "
+  SelectStmt@28..87
+    Select@28..34 "select"
+    Whitespace@34..35 " "
+    ResTarget@35..55
+      FuncCall@35..55
+        Ident@35..44 "int4range"
+        Ascii40@44..45 "("
+        ColumnRef@45..46
+          Ident@45..46 "g"
+        Ascii44@46..47 ","
+        Whitespace@47..48 " "
+        AExpr@48..55
+          ColumnRef@48..49
+            Ident@48..49 "g"
+          Ascii43@49..50 "+"
+          AConst@50..55
+            Iconst@50..55 "10000"
+    Ascii41@55..56 ")"
+    Whitespace@56..57 " "
+    From@57..61 "from"
+    Whitespace@61..62 " "
+    RangeFunction@62..87
+      List@62..84
+        FuncCall@62..84
+          Ident@62..77 "generate_series"
+          Ascii40@77..78 "("
+          AConst@78..79
+            Iconst@78..79 "1"
+          Ascii44@79..80 ","
+          AConst@80..84
+            Iconst@80..84 "1000"
+      Ascii41@84..85 ")"
+      Whitespace@85..86 " "
+      Alias@86..87
+        Ident@86..87 "g"
+  Ascii59@87..88 ";"
+

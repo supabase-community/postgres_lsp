@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select format('>>%-10s<<', '');"
+---
+SelectStmt@0..31
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..29
+    FuncCall@7..29
+      Ident@7..13 "format"
+      Ascii40@13..14 "("
+      AConst@14..25
+        Sconst@14..25 "'>>%-10s<<'"
+      Ascii44@25..26 ","
+      Whitespace@26..27 " "
+      AConst@27..29
+        Sconst@27..29 "''"
+  Ascii41@29..30 ")"
+  Ascii59@30..31 ";"
+

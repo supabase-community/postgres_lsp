@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select regexp_match('xyz', repeat('.', 260));"
+---
+SelectStmt@0..45
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..42
+    FuncCall@7..42
+      Ident@7..19 "regexp_match"
+      Ascii40@19..20 "("
+      AConst@20..25
+        Sconst@20..25 "'xyz'"
+      Ascii44@25..26 ","
+      Whitespace@26..27 " "
+      FuncCall@27..42
+        Ident@27..33 "repeat"
+        Ascii40@33..34 "("
+        AConst@34..37
+          Sconst@34..37 "'.'"
+        Ascii44@37..38 ","
+        Whitespace@38..39 " "
+        AConst@39..42
+          Iconst@39..42 "260"
+  Ascii41@42..43 ")"
+  Ascii41@43..44 ")"
+  Ascii59@44..45 ";"
+

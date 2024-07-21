@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_char(q2, E'99999 \"text\" 9999 \"9999\" 999 \"\\\\\"text between quote marks\\\\\"\" 9999') FROM INT8_TBL;"
+---
+SelectStmt@0..104
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..88
+    FuncCall@7..88
+      Ident@7..14 "to_char"
+      Ascii40@14..15 "("
+      ColumnRef@15..17
+        Ident@15..17 "q2"
+      Ascii44@17..18 ","
+      Whitespace@18..19 " "
+      AConst@19..88
+        Sconst@19..88 "E'99999 \"text\" 9999 \" ..."
+  Ascii41@88..89 ")"
+  Whitespace@89..90 " "
+  From@90..94 "FROM"
+  Whitespace@94..95 " "
+  RangeVar@95..103
+    Ident@95..103 "INT8_TBL"
+  Ascii59@103..104 ";"
+

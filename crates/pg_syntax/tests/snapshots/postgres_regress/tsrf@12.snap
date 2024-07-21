@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT unnest(ARRAY[1, 2]) FROM few WHERE false;"
+---
+SelectStmt@0..48
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..24
+    FuncCall@7..24
+      Ident@7..13 "unnest"
+      Ascii40@13..14 "("
+      AArrayExpr@14..24
+        Array@14..19 "ARRAY"
+        Ascii91@19..20 "["
+        AConst@20..21
+          Iconst@20..21 "1"
+        Ascii44@21..22 ","
+        Whitespace@22..23 " "
+        AConst@23..24
+          Iconst@23..24 "2"
+  Ascii93@24..25 "]"
+  Ascii41@25..26 ")"
+  Whitespace@26..27 " "
+  From@27..31 "FROM"
+  Whitespace@31..32 " "
+  RangeVar@32..35
+    Ident@32..35 "few"
+  Whitespace@35..36 " "
+  Where@36..41 "WHERE"
+  Whitespace@41..42 " "
+  AConst@42..47
+    FalseP@42..47 "false"
+  Ascii59@47..48 ";"
+

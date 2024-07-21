@@ -1,0 +1,13 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: delete from t;
+---
+DeleteStmt@0..14
+  DeleteP@0..6 "delete"
+  Whitespace@6..7 " "
+  From@7..11 "from"
+  Whitespace@11..12 " "
+  RangeVar@12..13
+    Ident@12..13 "t"
+  Ascii59@13..14 ";"
+

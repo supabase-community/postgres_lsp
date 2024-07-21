@@ -1,0 +1,50 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function outparam2_succeed(r anyrange, out lu anyarray, out ul anyarray)\n  as $$ select array[lower($1), upper($1)], array[upper($1), lower($1)] $$\n  language sql;"
+---
+CreateFunctionStmt@0..170
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..33 "outparam2_succeed"
+  Ascii40@33..34 "("
+  FunctionParameter@34..44
+    Ident@34..35 "r"
+    Whitespace@35..36 " "
+    TypeName@36..44
+      Ident@36..44 "anyrange"
+  Ascii44@44..45 ","
+  Whitespace@45..46 " "
+  FunctionParameter@46..61
+    OutP@46..49 "out"
+    Whitespace@49..50 " "
+    Ident@50..52 "lu"
+    Whitespace@52..53 " "
+    TypeName@53..61
+      Ident@53..61 "anyarray"
+  Ascii44@61..62 ","
+  Whitespace@62..63 " "
+  FunctionParameter@63..78
+    OutP@63..66 "out"
+    Whitespace@66..67 " "
+    Ident@67..69 "ul"
+    Whitespace@69..70 " "
+    TypeName@70..78
+      Ident@70..78 "anyarray"
+  Ascii41@78..79 ")"
+  Newline@79..80 "\n"
+  Whitespace@80..82 "  "
+  DefElem@82..154
+    As@82..84 "as"
+    Whitespace@84..85 " "
+    List@85..154
+      Sconst@85..154 "$$ select array[lower ..."
+  Newline@154..155 "\n"
+  Whitespace@155..157 "  "
+  DefElem@157..169
+    Language@157..165 "language"
+    Whitespace@165..166 " "
+    SqlP@166..169 "sql"
+  Ascii59@169..170 ";"
+

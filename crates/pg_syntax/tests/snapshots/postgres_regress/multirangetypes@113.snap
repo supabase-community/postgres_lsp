@@ -1,0 +1,33 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM nummultirange_test WHERE nmr @> '{[4.0,4.2), [6.0, 8.0)}'::nummultirange;"
+---
+SelectStmt@0..87
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..32
+    Ident@14..32 "nummultirange_test"
+  Whitespace@32..33 " "
+  Where@33..38 "WHERE"
+  Whitespace@38..39 " "
+  AExpr@39..86
+    ColumnRef@39..42
+      Ident@39..42 "nmr"
+    Whitespace@42..43 " "
+    Op@43..45 "@>"
+    Whitespace@45..46 " "
+    TypeCast@46..86
+      AConst@46..71
+        Sconst@46..71 "'{[4.0,4.2), [6.0, 8. ..."
+      Typecast@71..73 "::"
+      TypeName@73..86
+        Ident@73..86 "nummultirange"
+  Ascii59@86..87 ";"
+

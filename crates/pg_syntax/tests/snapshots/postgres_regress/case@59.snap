@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TYPE casetestenum AS ENUM ('e', 'f', 'g');"
+---
+CreateEnumStmt@0..49
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  TypeP@7..11 "TYPE"
+  Whitespace@11..12 " "
+  Ident@12..24 "casetestenum"
+  Whitespace@24..25 " "
+  As@25..27 "AS"
+  Whitespace@27..28 " "
+  EnumP@28..32 "ENUM"
+  Whitespace@32..33 " "
+  Ascii40@33..34 "("
+  Sconst@34..37 "'e'"
+  Ascii44@37..38 ","
+  Whitespace@38..39 " "
+  Sconst@39..42 "'f'"
+  Ascii44@42..43 ","
+  Whitespace@43..44 " "
+  Sconst@44..47 "'g'"
+  Ascii41@47..48 ")"
+  Ascii59@48..49 ";"
+

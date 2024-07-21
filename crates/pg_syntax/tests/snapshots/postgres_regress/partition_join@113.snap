@@ -1,0 +1,46 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE plt2 (a int, b int, c text) PARTITION BY LIST(c);"
+---
+CreateStmt@0..62
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..17
+    Ident@13..17 "plt2"
+  Whitespace@17..18 " "
+  Ascii40@18..19 "("
+  ColumnDef@19..24
+    Ident@19..20 "a"
+    Whitespace@20..21 " "
+    TypeName@21..24
+      IntP@21..24 "int"
+  Ascii44@24..25 ","
+  Whitespace@25..26 " "
+  ColumnDef@26..31
+    Ident@26..27 "b"
+    Whitespace@27..28 " "
+    TypeName@28..31
+      IntP@28..31 "int"
+  Ascii44@31..32 ","
+  Whitespace@32..33 " "
+  ColumnDef@33..39
+    Ident@33..34 "c"
+    Whitespace@34..35 " "
+    TypeName@35..39
+      TextP@35..39 "text"
+  Ascii41@39..40 ")"
+  Whitespace@40..41 " "
+  PartitionSpec@41..60
+    Partition@41..50 "PARTITION"
+    Whitespace@50..51 " "
+    By@51..53 "BY"
+    Whitespace@53..54 " "
+    Ident@54..58 "LIST"
+    Ascii40@58..59 "("
+    PartitionElem@59..60
+      Ident@59..60 "c"
+  Ascii41@60..61 ")"
+  Ascii59@61..62 ";"
+

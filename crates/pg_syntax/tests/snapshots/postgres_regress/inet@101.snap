@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '127::1'::inet - '127::2'::inet;"
+---
+SelectStmt@0..39
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..38
+    AExpr@7..38
+      TypeCast@7..21
+        AConst@7..15
+          Sconst@7..15 "'127::1'"
+        Typecast@15..17 "::"
+        TypeName@17..21
+          Ident@17..21 "inet"
+      Whitespace@21..22 " "
+      Ascii45@22..23 "-"
+      Whitespace@23..24 " "
+      TypeCast@24..38
+        AConst@24..32
+          Sconst@24..32 "'127::2'"
+        Typecast@32..34 "::"
+        TypeName@34..38
+          Ident@34..38 "inet"
+  Ascii59@38..39 ";"
+

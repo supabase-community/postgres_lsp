@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_regtype('pg_catalog.int4');"
+---
+SelectStmt@0..37
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..35
+    FuncCall@7..35
+      Ident@7..17 "to_regtype"
+      Ascii40@17..18 "("
+      AConst@18..35
+        Sconst@18..35 "'pg_catalog.int4'"
+  Ascii41@35..36 ")"
+  Ascii59@36..37 ";"
+

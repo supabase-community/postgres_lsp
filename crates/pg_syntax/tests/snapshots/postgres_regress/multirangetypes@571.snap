@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from mr_outparam_succeed(int4multirange(int4range(1,2)));"
+---
+SelectStmt@0..66
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..62
+    List@14..62
+      FuncCall@14..62
+        Ident@14..33 "mr_outparam_succeed"
+        Ascii40@33..34 "("
+        FuncCall@34..62
+          Ident@34..48 "int4multirange"
+          Ascii40@48..49 "("
+          FuncCall@49..62
+            Ident@49..58 "int4range"
+            Ascii40@58..59 "("
+            AConst@59..60
+              Iconst@59..60 "1"
+            Ascii44@60..61 ","
+            AConst@61..62
+              Iconst@61..62 "2"
+  Ascii41@62..63 ")"
+  Ascii41@63..64 ")"
+  Ascii41@64..65 ")"
+  Ascii59@65..66 ";"
+

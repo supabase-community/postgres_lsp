@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_query('[1,2,3]', 'strict $[*].a');"
+---
+SelectStmt@0..52
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..50
+    FuncCall@7..50
+      Ident@7..23 "jsonb_path_query"
+      Ascii40@23..24 "("
+      AConst@24..33
+        Sconst@24..33 "'[1,2,3]'"
+      Ascii44@33..34 ","
+      Whitespace@34..35 " "
+      AConst@35..50
+        Sconst@35..50 "'strict $[*].a'"
+  Ascii41@50..51 ")"
+  Ascii59@51..52 ";"
+

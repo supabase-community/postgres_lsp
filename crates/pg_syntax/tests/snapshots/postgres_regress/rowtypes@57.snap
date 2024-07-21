@@ -1,0 +1,73 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select thousand, tenthous, four from tenk1\nwhere (thousand, tenthous, four) > (998, 5000, 3)\norder by thousand, tenthous;"
+---
+SelectStmt@0..121
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..15
+    ColumnRef@7..15
+      Ident@7..15 "thousand"
+  Ascii44@15..16 ","
+  Whitespace@16..17 " "
+  ResTarget@17..25
+    ColumnRef@17..25
+      Ident@17..25 "tenthous"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..31
+    ColumnRef@27..31
+      Ident@27..31 "four"
+  Whitespace@31..32 " "
+  From@32..36 "from"
+  Whitespace@36..37 " "
+  RangeVar@37..42
+    Ident@37..42 "tenk1"
+  Newline@42..43 "\n"
+  Where@43..48 "where"
+  Whitespace@48..49 " "
+  AExpr@49..91
+    RowExpr@49..74
+      Ascii40@49..50 "("
+      ColumnRef@50..58
+        Ident@50..58 "thousand"
+      Ascii44@58..59 ","
+      Whitespace@59..60 " "
+      ColumnRef@60..68
+        Ident@60..68 "tenthous"
+      Ascii44@68..69 ","
+      Whitespace@69..70 " "
+      ColumnRef@70..74
+        Ident@70..74 "four"
+    Ascii41@74..75 ")"
+    Whitespace@75..76 " "
+    Ascii62@76..77 ">"
+    Whitespace@77..78 " "
+    RowExpr@78..91
+      Ascii40@78..79 "("
+      AConst@79..82
+        Iconst@79..82 "998"
+      Ascii44@82..83 ","
+      Whitespace@83..84 " "
+      AConst@84..88
+        Iconst@84..88 "5000"
+      Ascii44@88..89 ","
+      Whitespace@89..90 " "
+      AConst@90..91
+        Iconst@90..91 "3"
+  Ascii41@91..92 ")"
+  Newline@92..93 "\n"
+  SortBy@93..110
+    Order@93..98 "order"
+    Whitespace@98..99 " "
+    By@99..101 "by"
+    Whitespace@101..102 " "
+    ColumnRef@102..110
+      Ident@102..110 "thousand"
+  Ascii44@110..111 ","
+  Whitespace@111..112 " "
+  SortBy@112..120
+    ColumnRef@112..120
+      Ident@112..120 "tenthous"
+  Ascii59@120..121 ";"
+

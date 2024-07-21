@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select count(*), generate_series(1,2) from tenk1 group by twenty;"
+---
+SelectStmt@0..65
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Ascii44@15..16 ","
+  Whitespace@16..17 " "
+  ResTarget@17..36
+    FuncCall@17..36
+      Ident@17..32 "generate_series"
+      Ascii40@32..33 "("
+      AConst@33..34
+        Iconst@33..34 "1"
+      Ascii44@34..35 ","
+      AConst@35..36
+        Iconst@35..36 "2"
+  Ascii41@36..37 ")"
+  Whitespace@37..38 " "
+  From@38..42 "from"
+  Whitespace@42..43 " "
+  RangeVar@43..48
+    Ident@43..48 "tenk1"
+  Whitespace@48..49 " "
+  GroupP@49..54 "group"
+  Whitespace@54..55 " "
+  By@55..57 "by"
+  Whitespace@57..58 " "
+  ColumnRef@58..64
+    Ident@58..64 "twenty"
+  Ascii59@64..65 ";"
+

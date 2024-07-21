@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE UNIQUE INDEX title_idx ON films (title);
+---
+IndexStmt@0..47
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Unique@7..13 "UNIQUE"
+  Whitespace@13..14 " "
+  Index@14..19 "INDEX"
+  Whitespace@19..20 " "
+  Ident@20..29 "title_idx"
+  Whitespace@29..30 " "
+  On@30..32 "ON"
+  Whitespace@32..33 " "
+  RangeVar@33..38
+    Ident@33..38 "films"
+  Whitespace@38..39 " "
+  Ascii40@39..40 "("
+  IndexElem@40..45
+    Ident@40..45 "title"
+  Ascii41@45..46 ")"
+  Ascii59@46..47 ";"
+

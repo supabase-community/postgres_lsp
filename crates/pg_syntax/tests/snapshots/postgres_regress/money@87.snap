@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 1234567890::int4::money;"
+---
+SelectStmt@0..31
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..30
+    TypeCast@7..30
+      TypeCast@7..23
+        AConst@7..17
+          Iconst@7..17 "1234567890"
+        Typecast@17..19 "::"
+        TypeName@19..23
+          Ident@19..23 "int4"
+      Typecast@23..25 "::"
+      TypeName@25..30
+        Ident@25..30 "money"
+  Ascii59@30..31 ";"
+

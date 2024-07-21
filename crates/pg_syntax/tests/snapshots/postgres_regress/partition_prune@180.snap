@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table rp2 partition of rp for values from (2) to (maxvalue);
+---
+CreateStmt@0..67
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..16
+    Ident@13..16 "rp2"
+  Whitespace@16..17 " "
+  Partition@17..26 "partition"
+  Whitespace@26..27 " "
+  Of@27..29 "of"
+  Whitespace@29..30 " "
+  RangeVar@30..32
+    Ident@30..32 "rp"
+  Whitespace@32..33 " "
+  For@33..36 "for"
+  Whitespace@36..37 " "
+  Values@37..43 "values"
+  Whitespace@43..44 " "
+  PartitionBoundSpec@44..65
+    From@44..48 "from"
+    Whitespace@48..49 " "
+    Ascii40@49..50 "("
+    AConst@50..51
+      Iconst@50..51 "2"
+    Ascii41@51..52 ")"
+    Whitespace@52..53 " "
+    To@53..55 "to"
+    Whitespace@55..56 " "
+    Ascii40@56..57 "("
+    ColumnRef@57..65
+      Maxvalue@57..65 "maxvalue"
+  Ascii41@65..66 ")"
+  Ascii59@66..67 ";"
+

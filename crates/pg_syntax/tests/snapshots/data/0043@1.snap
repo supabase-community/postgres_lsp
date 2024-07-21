@@ -1,0 +1,58 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE UNLOGGED TABLE cities (name text, population real, altitude double, identifier smallint, postal_code int, foreign_id bigint);"
+---
+CreateStmt@0..132
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Unlogged@7..15 "UNLOGGED"
+  Whitespace@15..16 " "
+  Table@16..21 "TABLE"
+  Whitespace@21..22 " "
+  RangeVar@22..28
+    Ident@22..28 "cities"
+  Whitespace@28..29 " "
+  Ascii40@29..30 "("
+  ColumnDef@30..39
+    NameP@30..34 "name"
+    Whitespace@34..35 " "
+    TypeName@35..39
+      TextP@35..39 "text"
+  Ascii44@39..40 ","
+  Whitespace@40..41 " "
+  ColumnDef@41..56
+    Ident@41..51 "population"
+    Whitespace@51..52 " "
+    TypeName@52..56
+      Real@52..56 "real"
+  Ascii44@56..57 ","
+  Whitespace@57..58 " "
+  ColumnDef@58..73
+    Ident@58..66 "altitude"
+    Whitespace@66..67 " "
+    TypeName@67..73
+      DoubleP@67..73 "double"
+  Ascii44@73..74 ","
+  Whitespace@74..75 " "
+  ColumnDef@75..94
+    Ident@75..85 "identifier"
+    Whitespace@85..86 " "
+    TypeName@86..94
+      Smallint@86..94 "smallint"
+  Ascii44@94..95 ","
+  Whitespace@95..96 " "
+  ColumnDef@96..111
+    Ident@96..107 "postal_code"
+    Whitespace@107..108 " "
+    TypeName@108..111
+      IntP@108..111 "int"
+  Ascii44@111..112 ","
+  Whitespace@112..113 " "
+  ColumnDef@113..130
+    Ident@113..123 "foreign_id"
+    Whitespace@123..124 " "
+    TypeName@124..130
+      Bigint@124..130 "bigint"
+  Ascii41@130..131 ")"
+  Ascii59@131..132 ";"
+

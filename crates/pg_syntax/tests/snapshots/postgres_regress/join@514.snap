@@ -1,0 +1,42 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table fkest (x integer, x10 integer, x10b integer, x100 integer);"
+---
+CreateStmt@0..72
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..18
+    Ident@13..18 "fkest"
+  Whitespace@18..19 " "
+  Ascii40@19..20 "("
+  ColumnDef@20..29
+    Ident@20..21 "x"
+    Whitespace@21..22 " "
+    TypeName@22..29
+      Integer@22..29 "integer"
+  Ascii44@29..30 ","
+  Whitespace@30..31 " "
+  ColumnDef@31..42
+    Ident@31..34 "x10"
+    Whitespace@34..35 " "
+    TypeName@35..42
+      Integer@35..42 "integer"
+  Ascii44@42..43 ","
+  Whitespace@43..44 " "
+  ColumnDef@44..56
+    Ident@44..48 "x10b"
+    Whitespace@48..49 " "
+    TypeName@49..56
+      Integer@49..56 "integer"
+  Ascii44@56..57 ","
+  Whitespace@57..58 " "
+  ColumnDef@58..70
+    Ident@58..62 "x100"
+    Whitespace@62..63 " "
+    TypeName@63..70
+      Integer@63..70 "integer"
+  Ascii41@70..71 ")"
+  Ascii59@71..72 ";"
+

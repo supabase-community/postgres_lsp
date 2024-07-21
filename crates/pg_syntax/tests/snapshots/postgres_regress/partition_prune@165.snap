@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE TABLE part_p2 PARTITION OF part DEFAULT PARTITION BY RANGE(a);
+---
+CreateStmt@0..69
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..20
+    Ident@13..20 "part_p2"
+  Whitespace@20..21 " "
+  Partition@21..30 "PARTITION"
+  Whitespace@30..31 " "
+  Of@31..33 "OF"
+  Whitespace@33..34 " "
+  RangeVar@34..38
+    Ident@34..38 "part"
+  Whitespace@38..39 " "
+  PartitionBoundSpec@39..46
+    Default@39..46 "DEFAULT"
+  Whitespace@46..47 " "
+  PartitionSpec@47..67
+    Partition@47..56 "PARTITION"
+    Whitespace@56..57 " "
+    By@57..59 "BY"
+    Whitespace@59..60 " "
+    Range@60..65 "RANGE"
+    Ascii40@65..66 "("
+    PartitionElem@66..67
+      Ident@66..67 "a"
+  Ascii41@67..68 ")"
+  Ascii59@68..69 ";"
+

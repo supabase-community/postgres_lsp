@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT ts_lexize('ispell', 'footballyklubber');"
+---
+SelectStmt@0..47
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..45
+    FuncCall@7..45
+      Ident@7..16 "ts_lexize"
+      Ascii40@16..17 "("
+      AConst@17..25
+        Sconst@17..25 "'ispell'"
+      Ascii44@25..26 ","
+      Whitespace@26..27 " "
+      AConst@27..45
+        Sconst@27..45 "'footballyklubber'"
+  Ascii41@45..46 ")"
+  Ascii59@46..47 ";"
+

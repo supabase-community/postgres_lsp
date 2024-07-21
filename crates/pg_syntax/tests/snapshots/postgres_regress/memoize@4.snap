@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT explain_memoize('\nSELECT COUNT(*),AVG(t1.unique1) FROM tenk1 t1\nINNER JOIN tenk1 t2 ON t1.unique1 = t2.twenty\nWHERE t2.unique1 < 1000;', false);"
+---
+SelectStmt@0..151
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..149
+    FuncCall@7..149
+      Ident@7..22 "explain_memoize"
+      Ascii40@22..23 "("
+      AConst@23..142
+        Sconst@23..142 "'\nSELECT COUNT(*),AVG ..."
+      Ascii44@142..143 ","
+      Whitespace@143..144 " "
+      AConst@144..149
+        FalseP@144..149 "false"
+  Ascii41@149..150 ")"
+  Ascii59@150..151 ";"
+

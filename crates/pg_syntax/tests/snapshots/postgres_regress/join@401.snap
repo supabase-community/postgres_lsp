@@ -1,0 +1,71 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT * FROM b LEFT JOIN a ON (b.a_id = a.id) WHERE (a.id IS NULL OR a.id > 0);
+---
+SelectStmt@0..80
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  JoinExpr@14..45
+    RangeVar@14..15
+      Ident@14..15 "b"
+    Whitespace@15..16 " "
+    Left@16..20 "LEFT"
+    Whitespace@20..21 " "
+    Join@21..25 "JOIN"
+    Whitespace@25..26 " "
+    RangeVar@26..27
+      Ident@26..27 "a"
+    Whitespace@27..28 " "
+    On@28..30 "ON"
+    Whitespace@30..31 " "
+    Ascii40@31..32 "("
+    AExpr@32..45
+      ColumnRef@32..38
+        Ident@32..33 "b"
+        Ascii46@33..34 "."
+        Ident@34..38 "a_id"
+      Whitespace@38..39 " "
+      Ascii61@39..40 "="
+      Whitespace@40..41 " "
+      ColumnRef@41..45
+        Ident@41..42 "a"
+        Ascii46@42..43 "."
+        Ident@43..45 "id"
+  Ascii41@45..46 ")"
+  Whitespace@46..47 " "
+  Where@47..52 "WHERE"
+  Whitespace@52..53 " "
+  Ascii40@53..54 "("
+  BoolExpr@54..78
+    NullTest@54..66
+      ColumnRef@54..58
+        Ident@54..55 "a"
+        Ascii46@55..56 "."
+        Ident@56..58 "id"
+      Whitespace@58..59 " "
+      Is@59..61 "IS"
+      Whitespace@61..62 " "
+      NullP@62..66 "NULL"
+    Whitespace@66..67 " "
+    Or@67..69 "OR"
+    Whitespace@69..70 " "
+    AExpr@70..78
+      ColumnRef@70..74
+        Ident@70..71 "a"
+        Ascii46@71..72 "."
+        Ident@72..74 "id"
+      Whitespace@74..75 " "
+      Ascii62@75..76 ">"
+      Whitespace@76..77 " "
+      AConst@77..78
+        Iconst@77..78 "0"
+  Ascii41@78..79 ")"
+  Ascii59@79..80 ";"
+

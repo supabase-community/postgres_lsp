@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT dup(22);
+---
+SelectStmt@0..15
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..13
+    FuncCall@7..13
+      Ident@7..10 "dup"
+      Ascii40@10..11 "("
+      AConst@11..13
+        Iconst@11..13 "22"
+  Ascii41@13..14 ")"
+  Ascii59@14..15 ";"
+

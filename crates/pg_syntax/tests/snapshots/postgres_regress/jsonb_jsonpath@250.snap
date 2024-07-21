@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb '{\"a\": 1, \"b\": [1, 2]}' @? 'lax $.keyvalue()';"
+---
+SelectStmt@0..59
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..58
+    Ident@7..12 "jsonb"
+    Whitespace@12..13 " "
+    AExpr@13..58
+      TypeCast@13..36
+        AConst@13..36
+          Sconst@13..36 "'{\"a\": 1, \"b\": [1, 2]}'"
+      Whitespace@36..37 " "
+      Op@37..39 "@?"
+      Whitespace@39..40 " "
+      AConst@40..58
+        Sconst@40..58 "'lax $.keyvalue()'"
+  Ascii59@58..59 ";"
+

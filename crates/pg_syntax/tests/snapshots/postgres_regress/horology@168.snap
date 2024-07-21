@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT d1 AS us_postgres FROM TIMESTAMP_TBL;
+---
+SelectStmt@0..44
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..24
+    ColumnRef@7..9
+      Ident@7..9 "d1"
+    Whitespace@9..10 " "
+    As@10..12 "AS"
+    Whitespace@12..13 " "
+    Ident@13..24 "us_postgres"
+  Whitespace@24..25 " "
+  From@25..29 "FROM"
+  Whitespace@29..30 " "
+  RangeVar@30..43
+    Ident@30..43 "TIMESTAMP_TBL"
+  Ascii59@43..44 ";"
+

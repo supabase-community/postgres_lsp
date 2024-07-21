@@ -1,0 +1,53 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT f.f1, f.f1 - '-10' AS x FROM FLOAT4_TBL f\n   WHERE f.f1 > '0.0';"
+---
+SelectStmt@0..71
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      Ident@7..8 "f"
+      Ascii46@8..9 "."
+      Ident@9..11 "f1"
+  Ascii44@11..12 ","
+  Whitespace@12..13 " "
+  ResTarget@13..30
+    AExpr@13..25
+      ColumnRef@13..17
+        Ident@13..14 "f"
+        Ascii46@14..15 "."
+        Ident@15..17 "f1"
+      Whitespace@17..18 " "
+      Ascii45@18..19 "-"
+      Whitespace@19..20 " "
+      AConst@20..25
+        Sconst@20..25 "'-10'"
+    Whitespace@25..26 " "
+    As@26..28 "AS"
+    Whitespace@28..29 " "
+    Ident@29..30 "x"
+  Whitespace@30..31 " "
+  From@31..35 "FROM"
+  Whitespace@35..36 " "
+  RangeVar@36..48
+    Ident@36..46 "FLOAT4_TBL"
+    Whitespace@46..47 " "
+    Alias@47..48
+      Ident@47..48 "f"
+  Newline@48..49 "\n"
+  Whitespace@49..52 "   "
+  Where@52..57 "WHERE"
+  Whitespace@57..58 " "
+  AExpr@58..70
+    ColumnRef@58..62
+      Ident@58..59 "f"
+      Ascii46@59..60 "."
+      Ident@60..62 "f1"
+    Whitespace@62..63 " "
+    Ascii62@63..64 ">"
+    Whitespace@64..65 " "
+    AConst@65..70
+      Sconst@65..70 "'0.0'"
+  Ascii59@70..71 ";"
+

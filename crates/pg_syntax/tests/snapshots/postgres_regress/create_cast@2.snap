@@ -1,0 +1,42 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION casttesttype_in(cstring)\n   RETURNS casttesttype\n   AS 'textin'\n   LANGUAGE internal STRICT IMMUTABLE;"
+---
+CreateFunctionStmt@0..118
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..31 "casttesttype_in"
+  Ascii40@31..32 "("
+  FunctionParameter@32..39
+    TypeName@32..39
+      Ident@32..39 "cstring"
+  Ascii41@39..40 ")"
+  Newline@40..41 "\n"
+  Whitespace@41..44 "   "
+  Returns@44..51 "RETURNS"
+  Whitespace@51..52 " "
+  TypeName@52..64
+    Ident@52..64 "casttesttype"
+  Newline@64..65 "\n"
+  Whitespace@65..68 "   "
+  DefElem@68..79
+    As@68..70 "AS"
+    Whitespace@70..71 " "
+    List@71..79
+      Sconst@71..79 "'textin'"
+  Newline@79..80 "\n"
+  Whitespace@80..83 "   "
+  DefElem@83..100
+    Language@83..91 "LANGUAGE"
+    Whitespace@91..92 " "
+    Ident@92..100 "internal"
+  Whitespace@100..101 " "
+  DefElem@101..107
+    StrictP@101..107 "STRICT"
+  Whitespace@107..108 " "
+  DefElem@108..117
+    Immutable@108..117 "IMMUTABLE"
+  Ascii59@117..118 ";"
+

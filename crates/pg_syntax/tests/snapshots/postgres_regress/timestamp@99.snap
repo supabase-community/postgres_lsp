@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '294277-01-01 00:00:00'::timestamp;"
+---
+SelectStmt@0..42
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..41
+    TypeCast@7..41
+      AConst@7..30
+        Sconst@7..30 "'294277-01-01 00:00:00'"
+      Typecast@30..32 "::"
+      TypeName@32..41
+        Timestamp@32..41 "timestamp"
+  Ascii59@41..42 ";"
+

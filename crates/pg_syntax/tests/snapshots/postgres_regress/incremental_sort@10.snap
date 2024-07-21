@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create or replace function explain_analyze_inc_sort_nodes_verify_invariants(query text)\nreturns bool language plpgsql\nas\n$$\ndeclare\n  node jsonb;\n  group_stats jsonb;\n  group_key text;\n  space_key text;\nbegin\n  for node in select * from jsonb_array_elements(explain_analyze_inc_sort_nodes(query)) t loop\n    for group_key in select unnest(array['Full-sort Groups', 'Pre-sorted Groups']::text[]) t loop\n      group_stats := node->group_key;\n      for space_key in select unnest(array['Sort Space Memory', 'Sort Space Disk']::text[]) t loop\n        if (group_stats->space_key->'Peak Sort Space Used')::bigint < (group_stats->space_key->'Peak Sort Space Used')::bigint then\n          raise exception '% has invalid max space < average space', group_key;\n        end if;\n      end loop;\n    end loop;\n  end loop;\n  return true;\nend;\n$$;"
+---
+CreateFunctionStmt@0..832
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Or@7..9 "or"
+  Whitespace@9..10 " "
+  Replace@10..17 "replace"
+  Whitespace@17..18 " "
+  Function@18..26 "function"
+  Whitespace@26..27 " "
+  Ident@27..75 "explain_analyze_inc_s ..."
+  Ascii40@75..76 "("
+  FunctionParameter@76..86
+    Ident@76..81 "query"
+    Whitespace@81..82 " "
+    TypeName@82..86
+      TextP@82..86 "text"
+  Ascii41@86..87 ")"
+  Newline@87..88 "\n"
+  Returns@88..95 "returns"
+  Whitespace@95..96 " "
+  TypeName@96..100
+    Ident@96..100 "bool"
+  Whitespace@100..101 " "
+  DefElem@101..117
+    Language@101..109 "language"
+    Whitespace@109..110 " "
+    Ident@110..117 "plpgsql"
+  Newline@117..118 "\n"
+  DefElem@118..831
+    As@118..120 "as"
+    Newline@120..121 "\n"
+    List@121..831
+      Sconst@121..831 "$$\ndeclare\n  node jso ..."
+  Ascii59@831..832 ";"
+

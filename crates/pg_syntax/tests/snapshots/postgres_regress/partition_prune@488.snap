@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select tableoid::regclass, * from pph_arrpart order by 1;"
+---
+SelectStmt@0..57
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..25
+    TypeCast@7..25
+      ColumnRef@7..15
+        Ident@7..15 "tableoid"
+      Typecast@15..17 "::"
+      TypeName@17..25
+        Ident@17..25 "regclass"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..28
+    ColumnRef@27..28
+      AStar@27..28
+        Ascii42@27..28 "*"
+  Whitespace@28..29 " "
+  From@29..33 "from"
+  Whitespace@33..34 " "
+  RangeVar@34..45
+    Ident@34..45 "pph_arrpart"
+  Whitespace@45..46 " "
+  SortBy@46..56
+    Order@46..51 "order"
+    Whitespace@51..52 " "
+    By@52..54 "by"
+    Whitespace@54..55 " "
+    AConst@55..56
+      Iconst@55..56 "1"
+  Ascii59@56..57 ";"
+

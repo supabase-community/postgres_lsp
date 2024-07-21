@@ -1,0 +1,143 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO quad_box_tbl\n  SELECT (x - 1) * 100 + y, box(point(x * 10, y * 10), point(x * 10 + 5, y * 10 + 5))\n  FROM generate_series(1, 100) x,\n       generate_series(1, 100) y;"
+---
+InsertStmt@0..178
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..24
+    Ident@12..24 "quad_box_tbl"
+  Newline@24..25 "\n"
+  Whitespace@25..27 "  "
+  SelectStmt@27..177
+    Select@27..33 "SELECT"
+    Whitespace@33..34 " "
+    ResTarget@34..51
+      Ascii40@34..35 "("
+      AExpr@35..51
+        AExpr@35..47
+          AExpr@35..40
+            ColumnRef@35..36
+              Ident@35..36 "x"
+            Whitespace@36..37 " "
+            Ascii45@37..38 "-"
+            Whitespace@38..39 " "
+            AConst@39..40
+              Iconst@39..40 "1"
+          Ascii41@40..41 ")"
+          Whitespace@41..42 " "
+          Ascii42@42..43 "*"
+          Whitespace@43..44 " "
+          AConst@44..47
+            Iconst@44..47 "100"
+        Whitespace@47..48 " "
+        Ascii43@48..49 "+"
+        Whitespace@49..50 " "
+        ColumnRef@50..51
+          Ident@50..51 "y"
+    Ascii44@51..52 ","
+    Whitespace@52..53 " "
+    ResTarget@53..108
+      FuncCall@53..108
+        Ident@53..56 "box"
+        Ascii40@56..57 "("
+        FuncCall@57..77
+          Ident@57..62 "point"
+          Ascii40@62..63 "("
+          AExpr@63..69
+            ColumnRef@63..64
+              Ident@63..64 "x"
+            Whitespace@64..65 " "
+            Ascii42@65..66 "*"
+            Whitespace@66..67 " "
+            AConst@67..69
+              Iconst@67..69 "10"
+          Ascii44@69..70 ","
+          Whitespace@70..71 " "
+          AExpr@71..77
+            ColumnRef@71..72
+              Ident@71..72 "y"
+            Whitespace@72..73 " "
+            Ascii42@73..74 "*"
+            Whitespace@74..75 " "
+            AConst@75..77
+              Iconst@75..77 "10"
+        Ascii41@77..78 ")"
+        Ascii44@78..79 ","
+        Whitespace@79..80 " "
+        FuncCall@80..108
+          Ident@80..85 "point"
+          Ascii40@85..86 "("
+          AExpr@86..96
+            AExpr@86..92
+              ColumnRef@86..87
+                Ident@86..87 "x"
+              Whitespace@87..88 " "
+              Ascii42@88..89 "*"
+              Whitespace@89..90 " "
+              AConst@90..92
+                Iconst@90..92 "10"
+            Whitespace@92..93 " "
+            Ascii43@93..94 "+"
+            Whitespace@94..95 " "
+            AConst@95..96
+              Iconst@95..96 "5"
+          Ascii44@96..97 ","
+          Whitespace@97..98 " "
+          AExpr@98..108
+            AExpr@98..104
+              ColumnRef@98..99
+                Ident@98..99 "y"
+              Whitespace@99..100 " "
+              Ascii42@100..101 "*"
+              Whitespace@101..102 " "
+              AConst@102..104
+                Iconst@102..104 "10"
+            Whitespace@104..105 " "
+            Ascii43@105..106 "+"
+            Whitespace@106..107 " "
+            AConst@107..108
+              Iconst@107..108 "5"
+    Ascii41@108..109 ")"
+    Ascii41@109..110 ")"
+    Newline@110..111 "\n"
+    Whitespace@111..113 "  "
+    From@113..117 "FROM"
+    Whitespace@117..118 " "
+    RangeFunction@118..143
+      List@118..140
+        FuncCall@118..140
+          Ident@118..133 "generate_series"
+          Ascii40@133..134 "("
+          AConst@134..135
+            Iconst@134..135 "1"
+          Ascii44@135..136 ","
+          Whitespace@136..137 " "
+          AConst@137..140
+            Iconst@137..140 "100"
+      Ascii41@140..141 ")"
+      Whitespace@141..142 " "
+      Alias@142..143
+        Ident@142..143 "x"
+    Ascii44@143..144 ","
+    Newline@144..145 "\n"
+    Whitespace@145..152 "       "
+    RangeFunction@152..177
+      List@152..174
+        FuncCall@152..174
+          Ident@152..167 "generate_series"
+          Ascii40@167..168 "("
+          AConst@168..169
+            Iconst@168..169 "1"
+          Ascii44@169..170 ","
+          Whitespace@170..171 " "
+          AConst@171..174
+            Iconst@171..174 "100"
+      Ascii41@174..175 ")"
+      Whitespace@175..176 " "
+      Alias@176..177
+        Ident@176..177 "y"
+  Ascii59@177..178 ";"
+

@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '1&(2&(4&(5|6)))'::tsquery;"
+---
+SelectStmt@0..34
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..33
+    TypeCast@7..33
+      AConst@7..24
+        Sconst@7..24 "'1&(2&(4&(5|6)))'"
+      Typecast@24..26 "::"
+      TypeName@26..33
+        Ident@26..33 "tsquery"
+  Ascii59@33..34 ";"
+

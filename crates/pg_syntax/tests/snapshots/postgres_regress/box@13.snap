@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT b.*, area(b.f1) as barea\n   FROM BOX_TBL b;"
+---
+SelectStmt@0..50
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..10
+    ColumnRef@7..10
+      Ident@7..8 "b"
+      Ascii46@8..9 "."
+      AStar@9..10
+        Ascii42@9..10 "*"
+  Ascii44@10..11 ","
+  Whitespace@11..12 " "
+  ResTarget@12..31
+    FuncCall@12..21
+      Ident@12..16 "area"
+      Ascii40@16..17 "("
+      ColumnRef@17..21
+        Ident@17..18 "b"
+        Ascii46@18..19 "."
+        Ident@19..21 "f1"
+    Ascii41@21..22 ")"
+    Whitespace@22..23 " "
+    As@23..25 "as"
+    Whitespace@25..26 " "
+    Ident@26..31 "barea"
+  Newline@31..32 "\n"
+  Whitespace@32..35 "   "
+  From@35..39 "FROM"
+  Whitespace@39..40 " "
+  RangeVar@40..49
+    Ident@40..47 "BOX_TBL"
+    Whitespace@47..48 " "
+    Alias@48..49
+      Ident@48..49 "b"
+  Ascii59@49..50 ";"
+

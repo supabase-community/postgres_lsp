@@ -1,0 +1,53 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT CASE WHEN min(employees) > 0\n            THEN avg(expenses / employees)\n       END\n    FROM departments;"
+---
+SelectStmt@0..111
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..89
+    CaseExpr@7..89
+      Case@7..11 "CASE"
+      Whitespace@11..12 " "
+      CaseWhen@12..77
+        When@12..16 "WHEN"
+        Whitespace@16..17 " "
+        AExpr@17..35
+          FuncCall@17..30
+            Ident@17..20 "min"
+            Ascii40@20..21 "("
+            ColumnRef@21..30
+              Ident@21..30 "employees"
+          Ascii41@30..31 ")"
+          Whitespace@31..32 " "
+          Ascii62@32..33 ">"
+          Whitespace@33..34 " "
+          AConst@34..35
+            Iconst@34..35 "0"
+        Newline@35..36 "\n"
+        Whitespace@36..48 "            "
+        Then@48..52 "THEN"
+        Whitespace@52..53 " "
+        FuncCall@53..77
+          Ident@53..56 "avg"
+          Ascii40@56..57 "("
+          AExpr@57..77
+            ColumnRef@57..65
+              Ident@57..65 "expenses"
+            Whitespace@65..66 " "
+            Ascii47@66..67 "/"
+            Whitespace@67..68 " "
+            ColumnRef@68..77
+              Ident@68..77 "employees"
+      Ascii41@77..78 ")"
+      Newline@78..79 "\n"
+      Whitespace@79..86 "       "
+      EndP@86..89 "END"
+  Newline@89..90 "\n"
+  Whitespace@90..94 "    "
+  From@94..98 "FROM"
+  Whitespace@98..99 " "
+  RangeVar@99..110
+    Ident@99..110 "departments"
+  Ascii59@110..111 ";"
+

@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '-9223372036854780000'::float8::int8;"
+---
+SelectStmt@0..44
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..43
+    TypeCast@7..43
+      TypeCast@7..37
+        AConst@7..29
+          Sconst@7..29 "'-9223372036854780000'"
+        Typecast@29..31 "::"
+        TypeName@31..37
+          Ident@31..37 "float8"
+      Typecast@37..39 "::"
+      TypeName@39..43
+        Ident@39..43 "int8"
+  Ascii59@43..44 ";"
+

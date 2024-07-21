@@ -1,0 +1,57 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE trunc_trigger_log (tgop text, tglevel text, tgwhen text,\n        tgargv text, tgtable name, rowcount bigint);"
+---
+CreateStmt@0..122
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..30
+    Ident@13..30 "trunc_trigger_log"
+  Whitespace@30..31 " "
+  Ascii40@31..32 "("
+  ColumnDef@32..41
+    Ident@32..36 "tgop"
+    Whitespace@36..37 " "
+    TypeName@37..41
+      TextP@37..41 "text"
+  Ascii44@41..42 ","
+  Whitespace@42..43 " "
+  ColumnDef@43..55
+    Ident@43..50 "tglevel"
+    Whitespace@50..51 " "
+    TypeName@51..55
+      TextP@51..55 "text"
+  Ascii44@55..56 ","
+  Whitespace@56..57 " "
+  ColumnDef@57..68
+    Ident@57..63 "tgwhen"
+    Whitespace@63..64 " "
+    TypeName@64..68
+      TextP@64..68 "text"
+  Ascii44@68..69 ","
+  Newline@69..70 "\n"
+  Whitespace@70..78 "        "
+  ColumnDef@78..89
+    Ident@78..84 "tgargv"
+    Whitespace@84..85 " "
+    TypeName@85..89
+      TextP@85..89 "text"
+  Ascii44@89..90 ","
+  Whitespace@90..91 " "
+  ColumnDef@91..103
+    Ident@91..98 "tgtable"
+    Whitespace@98..99 " "
+    TypeName@99..103
+      NameP@99..103 "name"
+  Ascii44@103..104 ","
+  Whitespace@104..105 " "
+  ColumnDef@105..120
+    Ident@105..113 "rowcount"
+    Whitespace@113..114 " "
+    TypeName@114..120
+      Bigint@114..120 "bigint"
+  Ascii41@120..121 ")"
+  Ascii59@121..122 ";"
+

@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_timestamp('1985 FMMonth 12', 'YYYY \"FMMonth\" DD');"
+---
+SelectStmt@0..60
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..58
+    FuncCall@7..58
+      Ident@7..19 "to_timestamp"
+      Ascii40@19..20 "("
+      AConst@20..37
+        Sconst@20..37 "'1985 FMMonth 12'"
+      Ascii44@37..38 ","
+      Whitespace@38..39 " "
+      AConst@39..58
+        Sconst@39..58 "'YYYY \"FMMonth\" DD'"
+  Ascii41@58..59 ")"
+  Ascii59@59..60 ";"
+

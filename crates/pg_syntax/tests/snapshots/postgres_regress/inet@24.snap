@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT c AS cidr, i AS inet FROM INET_TBL;"
+---
+SelectStmt@0..42
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..16
+    ColumnRef@7..8
+      Ident@7..8 "c"
+    Whitespace@8..9 " "
+    As@9..11 "AS"
+    Whitespace@11..12 " "
+    Ident@12..16 "cidr"
+  Ascii44@16..17 ","
+  Whitespace@17..18 " "
+  ResTarget@18..27
+    ColumnRef@18..19
+      Ident@18..19 "i"
+    Whitespace@19..20 " "
+    As@20..22 "AS"
+    Whitespace@22..23 " "
+    Ident@23..27 "inet"
+  Whitespace@27..28 " "
+  From@28..32 "FROM"
+  Whitespace@32..33 " "
+  RangeVar@33..41
+    Ident@33..41 "INET_TBL"
+  Ascii59@41..42 ";"
+

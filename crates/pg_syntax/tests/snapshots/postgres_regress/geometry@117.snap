@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT circle(f1)\n   FROM BOX_TBL;"
+---
+SelectStmt@0..34
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..16
+    FuncCall@7..16
+      Ident@7..13 "circle"
+      Ascii40@13..14 "("
+      ColumnRef@14..16
+        Ident@14..16 "f1"
+  Ascii41@16..17 ")"
+  Newline@17..18 "\n"
+  Whitespace@18..21 "   "
+  From@21..25 "FROM"
+  Whitespace@25..26 " "
+  RangeVar@26..33
+    Ident@26..33 "BOX_TBL"
+  Ascii59@33..34 ";"
+

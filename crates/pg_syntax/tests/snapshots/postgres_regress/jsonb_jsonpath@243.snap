@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_query('[{},1]', '$[*].keyvalue()', silent => true);"
+---
+SelectStmt@0..69
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..67
+    FuncCall@7..67
+      Ident@7..23 "jsonb_path_query"
+      Ascii40@23..24 "("
+      AConst@24..32
+        Sconst@24..32 "'[{},1]'"
+      Ascii44@32..33 ","
+      Whitespace@33..34 " "
+      AConst@34..51
+        Sconst@34..51 "'$[*].keyvalue()'"
+      Ascii44@51..52 ","
+      Whitespace@52..53 " "
+      NamedArgExpr@53..67
+        Ident@53..59 "silent"
+        Whitespace@59..60 " "
+        EqualsGreater@60..62 "=>"
+        Whitespace@62..63 " "
+        AConst@63..67
+          TrueP@63..67 "true"
+  Ascii41@67..68 ")"
+  Ascii59@68..69 ";"
+

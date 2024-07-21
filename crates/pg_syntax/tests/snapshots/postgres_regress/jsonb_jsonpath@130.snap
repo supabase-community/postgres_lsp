@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_query('{\"a\": {\"c\": {\"b\": 1}}}', 'lax $.**{1 to last}.b ? (@ > 0)');"
+---
+SelectStmt@0..85
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..83
+    FuncCall@7..83
+      Ident@7..23 "jsonb_path_query"
+      Ascii40@23..24 "("
+      AConst@24..48
+        Sconst@24..48 "'{\"a\": {\"c\": {\"b\": 1}}}'"
+      Ascii44@48..49 ","
+      Whitespace@49..50 " "
+      AConst@50..83
+        Sconst@50..83 "'lax $.**{1 to last}. ..."
+  Ascii41@83..84 ")"
+  Ascii59@84..85 ";"
+

@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT COUNT(*) FROM point_gist_tbl WHERE f1 <@ '(0.0000009,0.0000009),(0.0000009,0.0000009)'::box;"
+---
+SelectStmt@0..99
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "COUNT"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "FROM"
+  Whitespace@20..21 " "
+  RangeVar@21..35
+    Ident@21..35 "point_gist_tbl"
+  Whitespace@35..36 " "
+  Where@36..41 "WHERE"
+  Whitespace@41..42 " "
+  AExpr@42..98
+    ColumnRef@42..44
+      Ident@42..44 "f1"
+    Whitespace@44..45 " "
+    Op@45..47 "<@"
+    Whitespace@47..48 " "
+    TypeCast@48..98
+      AConst@48..93
+        Sconst@48..93 "'(0.0000009,0.0000009 ..."
+      Typecast@93..95 "::"
+      TypeName@95..98
+        Ident@95..98 "box"
+  Ascii59@98..99 ";"
+

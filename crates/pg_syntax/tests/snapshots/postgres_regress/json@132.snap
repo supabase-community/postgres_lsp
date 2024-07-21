@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '{\"a\": \"c\", \"b\": null}'::json ->> 'b';"
+---
+SelectStmt@0..45
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..44
+    AExpr@7..44
+      TypeCast@7..36
+        AConst@7..30
+          Sconst@7..30 "'{\"a\": \"c\", \"b\": null}'"
+        Typecast@30..32 "::"
+        TypeName@32..36
+          Ident@32..36 "json"
+      Whitespace@36..37 " "
+      Op@37..40 "->>"
+      Whitespace@40..41 " "
+      AConst@41..44
+        Sconst@41..44 "'b'"
+  Ascii59@44..45 ";"
+

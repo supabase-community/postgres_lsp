@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '127.0.0.2'::inet  - ('127.0.0.2'::inet - 500);"
+---
+SelectStmt@0..54
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..52
+    AExpr@7..52
+      TypeCast@7..24
+        AConst@7..18
+          Sconst@7..18 "'127.0.0.2'"
+        Typecast@18..20 "::"
+        TypeName@20..24
+          Ident@20..24 "inet"
+      Whitespace@24..26 "  "
+      Ascii45@26..27 "-"
+      Whitespace@27..28 " "
+      Ascii40@28..29 "("
+      AExpr@29..52
+        TypeCast@29..46
+          AConst@29..40
+            Sconst@29..40 "'127.0.0.2'"
+          Typecast@40..42 "::"
+          TypeName@42..46
+            Ident@42..46 "inet"
+        Whitespace@46..47 " "
+        Ascii45@47..48 "-"
+        Whitespace@48..49 " "
+        AConst@49..52
+          Iconst@49..52 "500"
+  Ascii41@52..53 ")"
+  Ascii59@53..54 ";"
+

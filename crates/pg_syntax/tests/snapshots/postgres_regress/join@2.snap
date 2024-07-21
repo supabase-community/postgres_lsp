@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE J2_TBL (\n  i integer,\n  k integer\n);"
+---
+CreateStmt@0..49
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..19
+    Ident@13..19 "J2_TBL"
+  Whitespace@19..20 " "
+  Ascii40@20..21 "("
+  Newline@21..22 "\n"
+  Whitespace@22..24 "  "
+  ColumnDef@24..33
+    Ident@24..25 "i"
+    Whitespace@25..26 " "
+    TypeName@26..33
+      Integer@26..33 "integer"
+  Ascii44@33..34 ","
+  Newline@34..35 "\n"
+  Whitespace@35..37 "  "
+  ColumnDef@37..46
+    Ident@37..38 "k"
+    Whitespace@38..39 " "
+    TypeName@39..46
+      Integer@39..46 "integer"
+  Newline@46..47 "\n"
+  Ascii41@47..48 ")"
+  Ascii59@48..49 ";"
+

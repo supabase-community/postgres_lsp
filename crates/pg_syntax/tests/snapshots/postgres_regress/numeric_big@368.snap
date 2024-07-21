@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO num_exp_mul VALUES (8,6,'398823655.819545574205652791249227663407026876411660299394659390409794761643751582473390322547798567169668246138880832642141417531427935520467563318363116897177899262525720710134129529640376020947774470933902793259531840625444267816319963200');"
+---
+InsertStmt@0..281
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "num_exp_mul"
+  Whitespace@23..24 " "
+  SelectStmt@24..279
+    Values@24..30 "VALUES"
+    Whitespace@30..31 " "
+    Ascii40@31..32 "("
+    List@32..279
+      AConst@32..33
+        Iconst@32..33 "8"
+      Ascii44@33..34 ","
+      AConst@34..35
+        Iconst@34..35 "6"
+      Ascii44@35..36 ","
+      AConst@36..279
+        Sconst@36..279 "'398823655.8195455742 ..."
+  Ascii41@279..280 ")"
+  Ascii59@280..281 ";"
+

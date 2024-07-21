@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX CONCURRENTLY sales_quantity_index ON sales_table (quantity);
+---
+IndexStmt@0..73
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Concurrently@13..25 "CONCURRENTLY"
+  Whitespace@25..26 " "
+  Ident@26..46 "sales_quantity_index"
+  Whitespace@46..47 " "
+  On@47..49 "ON"
+  Whitespace@49..50 " "
+  RangeVar@50..61
+    Ident@50..61 "sales_table"
+  Whitespace@61..62 " "
+  Ascii40@62..63 "("
+  IndexElem@63..71
+    Ident@63..71 "quantity"
+  Ascii41@71..72 ")"
+  Ascii59@72..73 ";"
+

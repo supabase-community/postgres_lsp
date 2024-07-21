@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT ctid FROM tidrangescan WHERE '(2,8)' < ctid;"
+---
+SelectStmt@0..51
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      Ident@7..11 "ctid"
+  Whitespace@11..12 " "
+  From@12..16 "FROM"
+  Whitespace@16..17 " "
+  RangeVar@17..29
+    Ident@17..29 "tidrangescan"
+  Whitespace@29..30 " "
+  Where@30..35 "WHERE"
+  Whitespace@35..36 " "
+  AExpr@36..50
+    AConst@36..43
+      Sconst@36..43 "'(2,8)'"
+    Whitespace@43..44 " "
+    Ascii60@44..45 "<"
+    Whitespace@45..46 " "
+    ColumnRef@46..50
+      Ident@46..50 "ctid"
+  Ascii59@50..51 ";"
+

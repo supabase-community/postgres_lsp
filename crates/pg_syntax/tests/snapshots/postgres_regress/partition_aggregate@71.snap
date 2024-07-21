@@ -1,0 +1,47 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE pagg_tab_m_p3 PARTITION OF pagg_tab_m FOR VALUES FROM (22, 22) TO (30, 30);"
+---
+CreateStmt@0..88
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..26
+    Ident@13..26 "pagg_tab_m_p3"
+  Whitespace@26..27 " "
+  Partition@27..36 "PARTITION"
+  Whitespace@36..37 " "
+  Of@37..39 "OF"
+  Whitespace@39..40 " "
+  RangeVar@40..50
+    Ident@40..50 "pagg_tab_m"
+  Whitespace@50..51 " "
+  For@51..54 "FOR"
+  Whitespace@54..55 " "
+  Values@55..61 "VALUES"
+  Whitespace@61..62 " "
+  PartitionBoundSpec@62..86
+    From@62..66 "FROM"
+    Whitespace@66..67 " "
+    Ascii40@67..68 "("
+    AConst@68..70
+      Iconst@68..70 "22"
+    Ascii44@70..71 ","
+    Whitespace@71..72 " "
+    AConst@72..74
+      Iconst@72..74 "22"
+    Ascii41@74..75 ")"
+    Whitespace@75..76 " "
+    To@76..78 "TO"
+    Whitespace@78..79 " "
+    Ascii40@79..80 "("
+    AConst@80..82
+      Iconst@80..82 "30"
+    Ascii44@82..83 ","
+    Whitespace@83..84 " "
+    AConst@84..86
+      Iconst@84..86 "30"
+  Ascii41@86..87 ")"
+  Ascii59@87..88 ";"
+

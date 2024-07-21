@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index test_range_spgist_idx on test_range_spgist using spgist (ir);
+---
+IndexStmt@0..74
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..34 "test_range_spgist_idx"
+  Whitespace@34..35 " "
+  On@35..37 "on"
+  Whitespace@37..38 " "
+  RangeVar@38..55
+    Ident@38..55 "test_range_spgist"
+  Whitespace@55..56 " "
+  Using@56..61 "using"
+  Whitespace@61..62 " "
+  Ident@62..68 "spgist"
+  Whitespace@68..69 " "
+  Ascii40@69..70 "("
+  IndexElem@70..72
+    Ident@70..72 "ir"
+  Ascii41@72..73 ")"
+  Ascii59@73..74 ";"
+

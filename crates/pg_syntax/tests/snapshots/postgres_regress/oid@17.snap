@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO OID_TBL(f1) VALUES (' - 500');"
+---
+InsertStmt@0..42
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..19
+    Ident@12..19 "OID_TBL"
+  Ascii40@19..20 "("
+  ResTarget@20..22
+    Ident@20..22 "f1"
+  Ascii41@22..23 ")"
+  Whitespace@23..24 " "
+  SelectStmt@24..40
+    Values@24..30 "VALUES"
+    Whitespace@30..31 " "
+    Ascii40@31..32 "("
+    List@32..40
+      AConst@32..40
+        Sconst@32..40 "' - 500'"
+  Ascii41@40..41 ")"
+  Ascii59@41..42 ";"
+

@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create index on t_gin_test_tbl using gin (i, j);"
+---
+IndexStmt@0..48
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  On@13..15 "on"
+  Whitespace@15..16 " "
+  RangeVar@16..30
+    Ident@16..30 "t_gin_test_tbl"
+  Whitespace@30..31 " "
+  Using@31..36 "using"
+  Whitespace@36..37 " "
+  Ident@37..40 "gin"
+  Whitespace@40..41 " "
+  Ascii40@41..42 "("
+  IndexElem@42..43
+    Ident@42..43 "i"
+  Ascii44@43..44 ","
+  Whitespace@44..45 " "
+  IndexElem@45..46
+    Ident@45..46 "j"
+  Ascii41@46..47 ")"
+  Ascii59@47..48 ";"
+

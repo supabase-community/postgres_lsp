@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select range_intersect_agg(nmr) from (values ('{[1,2]}'::nummultirange)) t(nmr);"
+---
+SelectStmt@0..80
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..30
+    FuncCall@7..30
+      Ident@7..26 "range_intersect_agg"
+      Ascii40@26..27 "("
+      ColumnRef@27..30
+        Ident@27..30 "nmr"
+  Ascii41@30..31 ")"
+  Whitespace@31..32 " "
+  From@32..36 "from"
+  Whitespace@36..37 " "
+  Ascii40@37..38 "("
+  RangeSubselect@38..78
+    SelectStmt@38..70
+      Values@38..44 "values"
+      Whitespace@44..45 " "
+      Ascii40@45..46 "("
+      List@46..70
+        TypeCast@46..70
+          AConst@46..55
+            Sconst@46..55 "'{[1,2]}'"
+          Typecast@55..57 "::"
+          TypeName@57..70
+            Ident@57..70 "nummultirange"
+    Ascii41@70..71 ")"
+    Ascii41@71..72 ")"
+    Whitespace@72..73 " "
+    Alias@73..78
+      Ident@73..74 "t"
+      Ascii40@74..75 "("
+      Ident@75..78 "nmr"
+  Ascii41@78..79 ")"
+  Ascii59@79..80 ";"
+

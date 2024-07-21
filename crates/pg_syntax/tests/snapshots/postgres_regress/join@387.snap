@@ -1,0 +1,37 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into child values (1, 100), (4, 400);"
+---
+InsertStmt@0..44
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..17
+    Ident@12..17 "child"
+  Whitespace@17..18 " "
+  SelectStmt@18..42
+    Values@18..24 "values"
+    Whitespace@24..25 " "
+    Ascii40@25..26 "("
+    List@26..32
+      AConst@26..27
+        Iconst@26..27 "1"
+      Ascii44@27..28 ","
+      Whitespace@28..29 " "
+      AConst@29..32
+        Iconst@29..32 "100"
+    Ascii41@32..33 ")"
+    Ascii44@33..34 ","
+    Whitespace@34..35 " "
+    Ascii40@35..36 "("
+    List@36..42
+      AConst@36..37
+        Iconst@36..37 "4"
+      Ascii44@37..38 ","
+      Whitespace@38..39 " "
+      AConst@39..42
+        Iconst@39..42 "400"
+  Ascii41@42..43 ")"
+  Ascii59@43..44 ";"
+

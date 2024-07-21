@@ -1,0 +1,50 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into gin_test_tbl select array[1, 2, g] from generate_series(1, 20000) g;"
+---
+InsertStmt@0..80
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..24
+    Ident@12..24 "gin_test_tbl"
+  Whitespace@24..25 " "
+  SelectStmt@25..79
+    Select@25..31 "select"
+    Whitespace@31..32 " "
+    ResTarget@32..45
+      AArrayExpr@32..45
+        Array@32..37 "array"
+        Ascii91@37..38 "["
+        AConst@38..39
+          Iconst@38..39 "1"
+        Ascii44@39..40 ","
+        Whitespace@40..41 " "
+        AConst@41..42
+          Iconst@41..42 "2"
+        Ascii44@42..43 ","
+        Whitespace@43..44 " "
+        ColumnRef@44..45
+          Ident@44..45 "g"
+    Ascii93@45..46 "]"
+    Whitespace@46..47 " "
+    From@47..51 "from"
+    Whitespace@51..52 " "
+    RangeFunction@52..79
+      List@52..76
+        FuncCall@52..76
+          Ident@52..67 "generate_series"
+          Ascii40@67..68 "("
+          AConst@68..69
+            Iconst@68..69 "1"
+          Ascii44@69..70 ","
+          Whitespace@70..71 " "
+          AConst@71..76
+            Iconst@71..76 "20000"
+      Ascii41@76..77 ")"
+      Whitespace@77..78 " "
+      Alias@78..79
+        Ident@78..79 "g"
+  Ascii59@79..80 ";"
+

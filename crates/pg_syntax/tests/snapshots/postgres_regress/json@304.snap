@@ -1,0 +1,44 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from json_populate_recordset(row('def',99,null)::jpop,'[{\"a\":\"blurfl\",\"x\":43.2},{\"b\":3,\"c\":\"2012-01-20 10:42:53\"}]') q;"
+---
+SelectStmt@0..128
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..127
+    List@14..124
+      FuncCall@14..124
+        Ident@14..37 "json_populate_recordset"
+        Ascii40@37..38 "("
+        TypeCast@38..62
+          RowExpr@38..55
+            Row@38..41 "row"
+            Ascii40@41..42 "("
+            AConst@42..47
+              Sconst@42..47 "'def'"
+            Ascii44@47..48 ","
+            AConst@48..50
+              Iconst@48..50 "99"
+            Ascii44@50..51 ","
+            AConst@51..55
+              NullP@51..55 "null"
+          Ascii41@55..56 ")"
+          Typecast@56..58 "::"
+          TypeName@58..62
+            Ident@58..62 "jpop"
+        Ascii44@62..63 ","
+        AConst@63..124
+          Sconst@63..124 "'[{\"a\":\"blurfl\",\"x\":4 ..."
+    Ascii41@124..125 ")"
+    Whitespace@125..126 " "
+    Alias@126..127
+      Ident@126..127 "q"
+  Ascii59@127..128 ";"
+

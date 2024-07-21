@@ -1,0 +1,118 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from\n  (select *, 0 as x from int8_tbl a\n   union all\n   select *, 1 as x from int8_tbl b) ss\nwhere (x = 0) or (q1 >= q2 and q1 <= q2);"
+---
+SelectStmt@0..144
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Newline@13..14 "\n"
+  Whitespace@14..16 "  "
+  Ascii40@16..17 "("
+  RangeSubselect@17..102
+    SelectStmt@17..98
+      Select@17..23 "select"
+      Whitespace@23..24 " "
+      SelectStmt@24..49
+        ResTarget@24..25
+          ColumnRef@24..25
+            AStar@24..25
+              Ascii42@24..25 "*"
+        Ascii44@25..26 ","
+        Whitespace@26..27 " "
+        ResTarget@27..33
+          AConst@27..28
+            Iconst@27..28 "0"
+          Whitespace@28..29 " "
+          As@29..31 "as"
+          Whitespace@31..32 " "
+          Ident@32..33 "x"
+        Whitespace@33..34 " "
+        From@34..38 "from"
+        Whitespace@38..39 " "
+        RangeVar@39..49
+          Ident@39..47 "int8_tbl"
+          Whitespace@47..48 " "
+          Alias@48..49
+            Ident@48..49 "a"
+      Newline@49..50 "\n"
+      Whitespace@50..53 "   "
+      Union@53..58 "union"
+      Whitespace@58..59 " "
+      All@59..62 "all"
+      Newline@62..63 "\n"
+      Whitespace@63..66 "   "
+      SelectStmt@66..98
+        Select@66..72 "select"
+        Whitespace@72..73 " "
+        ResTarget@73..74
+          ColumnRef@73..74
+            AStar@73..74
+              Ascii42@73..74 "*"
+        Ascii44@74..75 ","
+        Whitespace@75..76 " "
+        ResTarget@76..82
+          AConst@76..77
+            Iconst@76..77 "1"
+          Whitespace@77..78 " "
+          As@78..80 "as"
+          Whitespace@80..81 " "
+          Ident@81..82 "x"
+        Whitespace@82..83 " "
+        From@83..87 "from"
+        Whitespace@87..88 " "
+        RangeVar@88..98
+          Ident@88..96 "int8_tbl"
+          Whitespace@96..97 " "
+          Alias@97..98
+            Ident@97..98 "b"
+    Ascii41@98..99 ")"
+    Whitespace@99..100 " "
+    Alias@100..102
+      Ident@100..102 "ss"
+  Newline@102..103 "\n"
+  Where@103..108 "where"
+  Whitespace@108..109 " "
+  Ascii40@109..110 "("
+  BoolExpr@110..142
+    AExpr@110..115
+      ColumnRef@110..111
+        Ident@110..111 "x"
+      Whitespace@111..112 " "
+      Ascii61@112..113 "="
+      Whitespace@113..114 " "
+      AConst@114..115
+        Iconst@114..115 "0"
+    Ascii41@115..116 ")"
+    Whitespace@116..117 " "
+    Or@117..119 "or"
+    Whitespace@119..120 " "
+    Ascii40@120..121 "("
+    BoolExpr@121..142
+      AExpr@121..129
+        ColumnRef@121..123
+          Ident@121..123 "q1"
+        Whitespace@123..124 " "
+        GreaterEquals@124..126 ">="
+        Whitespace@126..127 " "
+        ColumnRef@127..129
+          Ident@127..129 "q2"
+      Whitespace@129..130 " "
+      And@130..133 "and"
+      Whitespace@133..134 " "
+      AExpr@134..142
+        ColumnRef@134..136
+          Ident@134..136 "q1"
+        Whitespace@136..137 " "
+        LessEquals@137..139 "<="
+        Whitespace@139..140 " "
+        ColumnRef@140..142
+          Ident@140..142 "q2"
+  Ascii41@142..143 ")"
+  Ascii59@143..144 ";"
+

@@ -1,0 +1,72 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select b from gist_tbl where b <@ box(point(5,5), point(6,6))\norder by point(5.2, 5.91) <-> b;"
+---
+SelectStmt@0..94
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      Ident@7..8 "b"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeVar@14..22
+    Ident@14..22 "gist_tbl"
+  Whitespace@22..23 " "
+  Where@23..28 "where"
+  Whitespace@28..29 " "
+  AExpr@29..59
+    ColumnRef@29..30
+      Ident@29..30 "b"
+    Whitespace@30..31 " "
+    Op@31..33 "<@"
+    Whitespace@33..34 " "
+    FuncCall@34..59
+      Ident@34..37 "box"
+      Ascii40@37..38 "("
+      FuncCall@38..47
+        Ident@38..43 "point"
+        Ascii40@43..44 "("
+        AConst@44..45
+          Iconst@44..45 "5"
+        Ascii44@45..46 ","
+        AConst@46..47
+          Iconst@46..47 "5"
+      Ascii41@47..48 ")"
+      Ascii44@48..49 ","
+      Whitespace@49..50 " "
+      FuncCall@50..59
+        Ident@50..55 "point"
+        Ascii40@55..56 "("
+        AConst@56..57
+          Iconst@56..57 "6"
+        Ascii44@57..58 ","
+        AConst@58..59
+          Iconst@58..59 "6"
+  Ascii41@59..60 ")"
+  Ascii41@60..61 ")"
+  Newline@61..62 "\n"
+  SortBy@62..93
+    Order@62..67 "order"
+    Whitespace@67..68 " "
+    By@68..70 "by"
+    Whitespace@70..71 " "
+    AExpr@71..93
+      FuncCall@71..86
+        Ident@71..76 "point"
+        Ascii40@76..77 "("
+        AConst@77..80
+          Fconst@77..80 "5.2"
+        Ascii44@80..81 ","
+        Whitespace@81..82 " "
+        AConst@82..86
+          Fconst@82..86 "5.91"
+      Ascii41@86..87 ")"
+      Whitespace@87..88 " "
+      Op@88..91 "<->"
+      Whitespace@91..92 " "
+      ColumnRef@92..93
+        Ident@92..93 "b"
+  Ascii59@93..94 ";"
+

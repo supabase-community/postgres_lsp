@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '{[1,4), [7,10)}'::nummultirange * '{[0,2), [3,8), [9,12)}'::nummultirange;"
+---
+SelectStmt@0..82
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..81
+    AExpr@7..81
+      TypeCast@7..39
+        AConst@7..24
+          Sconst@7..24 "'{[1,4), [7,10)}'"
+        Typecast@24..26 "::"
+        TypeName@26..39
+          Ident@26..39 "nummultirange"
+      Whitespace@39..40 " "
+      Ascii42@40..41 "*"
+      Whitespace@41..42 " "
+      TypeCast@42..81
+        AConst@42..66
+          Sconst@42..66 "'{[0,2), [3,8), [9,12)}'"
+        Typecast@66..68 "::"
+        TypeName@68..81
+          Ident@68..81 "nummultirange"
+  Ascii59@81..82 ";"
+

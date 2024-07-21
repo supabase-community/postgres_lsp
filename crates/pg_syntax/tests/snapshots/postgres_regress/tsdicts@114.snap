@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_tsvector('synonym_tst', 'Indexes or indices - Which is right plural form of index?');"
+---
+SelectStmt@0..95
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..93
+    FuncCall@7..93
+      Ident@7..18 "to_tsvector"
+      Ascii40@18..19 "("
+      AConst@19..32
+        Sconst@19..32 "'synonym_tst'"
+      Ascii44@32..33 ","
+      Whitespace@33..34 " "
+      AConst@34..93
+        Sconst@34..93 "'Indexes or indices - ..."
+  Ascii41@93..94 ")"
+  Ascii59@94..95 ";"
+

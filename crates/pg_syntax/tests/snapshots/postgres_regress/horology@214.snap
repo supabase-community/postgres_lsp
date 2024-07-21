@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_timestamp('05527', 'IYIWID');"
+---
+SelectStmt@0..39
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..37
+    FuncCall@7..37
+      Ident@7..19 "to_timestamp"
+      Ascii40@19..20 "("
+      AConst@20..27
+        Sconst@20..27 "'05527'"
+      Ascii44@27..28 ","
+      Whitespace@28..29 " "
+      AConst@29..37
+        Sconst@29..37 "'IYIWID'"
+  Ascii41@37..38 ")"
+  Ascii59@38..39 ";"
+

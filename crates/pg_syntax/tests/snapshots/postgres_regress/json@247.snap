@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT ia2d FROM json_populate_record(NULL::jsrec, '{\"ia2d\": [[1, \"2\", 3], [null, 5, 6]]}') q;"
+---
+SelectStmt@0..94
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      Ident@7..11 "ia2d"
+  Whitespace@11..12 " "
+  From@12..16 "FROM"
+  Whitespace@16..17 " "
+  RangeFunction@17..93
+    List@17..90
+      FuncCall@17..90
+        Ident@17..37 "json_populate_record"
+        Ascii40@37..38 "("
+        TypeCast@38..49
+          AConst@38..42
+            NullP@38..42 "NULL"
+          Typecast@42..44 "::"
+          TypeName@44..49
+            Ident@44..49 "jsrec"
+        Ascii44@49..50 ","
+        Whitespace@50..51 " "
+        AConst@51..90
+          Sconst@51..90 "'{\"ia2d\": [[1, \"2\", 3 ..."
+    Ascii41@90..91 ")"
+    Whitespace@91..92 " "
+    Alias@92..93
+      Ident@92..93 "q"
+  Ascii59@93..94 ";"
+

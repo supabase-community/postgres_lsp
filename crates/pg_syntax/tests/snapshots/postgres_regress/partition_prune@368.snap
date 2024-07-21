@@ -1,0 +1,64 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into tprt values (10), (20), (501), (502), (505), (1001), (4500);"
+---
+InsertStmt@0..72
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..16
+    Ident@12..16 "tprt"
+  Whitespace@16..17 " "
+  SelectStmt@17..70
+    Values@17..23 "values"
+    Whitespace@23..24 " "
+    Ascii40@24..25 "("
+    List@25..27
+      AConst@25..27
+        Iconst@25..27 "10"
+    Ascii41@27..28 ")"
+    Ascii44@28..29 ","
+    Whitespace@29..30 " "
+    Ascii40@30..31 "("
+    List@31..33
+      AConst@31..33
+        Iconst@31..33 "20"
+    Ascii41@33..34 ")"
+    Ascii44@34..35 ","
+    Whitespace@35..36 " "
+    Ascii40@36..37 "("
+    List@37..40
+      AConst@37..40
+        Iconst@37..40 "501"
+    Ascii41@40..41 ")"
+    Ascii44@41..42 ","
+    Whitespace@42..43 " "
+    Ascii40@43..44 "("
+    List@44..47
+      AConst@44..47
+        Iconst@44..47 "502"
+    Ascii41@47..48 ")"
+    Ascii44@48..49 ","
+    Whitespace@49..50 " "
+    Ascii40@50..51 "("
+    List@51..54
+      AConst@51..54
+        Iconst@51..54 "505"
+    Ascii41@54..55 ")"
+    Ascii44@55..56 ","
+    Whitespace@56..57 " "
+    Ascii40@57..58 "("
+    List@58..62
+      AConst@58..62
+        Iconst@58..62 "1001"
+    Ascii41@62..63 ")"
+    Ascii44@63..64 ","
+    Whitespace@64..65 " "
+    Ascii40@65..66 "("
+    List@66..70
+      AConst@66..70
+        Iconst@66..70 "4500"
+  Ascii41@70..71 ")"
+  Ascii59@71..72 ";"
+

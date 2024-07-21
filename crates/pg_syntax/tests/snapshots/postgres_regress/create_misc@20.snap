@@ -1,0 +1,60 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO d_star (class, a, b, d)\n   VALUES ('d', 9, 'rumble'::text, '1.1'::float8);"
+---
+InsertStmt@0..86
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "d_star"
+  Whitespace@18..19 " "
+  Ascii40@19..20 "("
+  ResTarget@20..25
+    Class@20..25 "class"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..28
+    Ident@27..28 "a"
+  Ascii44@28..29 ","
+  Whitespace@29..30 " "
+  ResTarget@30..31
+    Ident@30..31 "b"
+  Ascii44@31..32 ","
+  Whitespace@32..33 " "
+  ResTarget@33..34
+    Ident@33..34 "d"
+  Ascii41@34..35 ")"
+  Newline@35..36 "\n"
+  Whitespace@36..39 "   "
+  SelectStmt@39..84
+    Values@39..45 "VALUES"
+    Whitespace@45..46 " "
+    Ascii40@46..47 "("
+    List@47..84
+      AConst@47..50
+        Sconst@47..50 "'d'"
+      Ascii44@50..51 ","
+      Whitespace@51..52 " "
+      AConst@52..53
+        Iconst@52..53 "9"
+      Ascii44@53..54 ","
+      Whitespace@54..55 " "
+      TypeCast@55..69
+        AConst@55..63
+          Sconst@55..63 "'rumble'"
+        Typecast@63..65 "::"
+        TypeName@65..69
+          TextP@65..69 "text"
+      Ascii44@69..70 ","
+      Whitespace@70..71 " "
+      TypeCast@71..84
+        AConst@71..76
+          Sconst@71..76 "'1.1'"
+        Typecast@76..78 "::"
+        TypeName@78..84
+          Ident@78..84 "float8"
+  Ascii41@84..85 ")"
+  Ascii59@85..86 ";"
+

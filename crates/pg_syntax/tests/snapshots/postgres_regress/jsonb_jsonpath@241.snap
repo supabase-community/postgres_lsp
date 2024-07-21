@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_query('[0, 1, -2, -3.4, 5.6]', '$[*].ceiling().abs().type()');"
+---
+SelectStmt@0..80
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..78
+    FuncCall@7..78
+      Ident@7..23 "jsonb_path_query"
+      Ascii40@23..24 "("
+      AConst@24..47
+        Sconst@24..47 "'[0, 1, -2, -3.4, 5.6]'"
+      Ascii44@47..48 ","
+      Whitespace@48..49 " "
+      AConst@49..78
+        Sconst@49..78 "'$[*].ceiling().abs() ..."
+  Ascii41@78..79 ")"
+  Ascii59@79..80 ";"
+

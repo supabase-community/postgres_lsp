@@ -1,0 +1,60 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO e_star (class, a, c, e)\n   VALUES ('e', 15, 'hi carol'::name, '-1'::int2);"
+---
+InsertStmt@0..86
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "e_star"
+  Whitespace@18..19 " "
+  Ascii40@19..20 "("
+  ResTarget@20..25
+    Class@20..25 "class"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..28
+    Ident@27..28 "a"
+  Ascii44@28..29 ","
+  Whitespace@29..30 " "
+  ResTarget@30..31
+    Ident@30..31 "c"
+  Ascii44@31..32 ","
+  Whitespace@32..33 " "
+  ResTarget@33..34
+    Ident@33..34 "e"
+  Ascii41@34..35 ")"
+  Newline@35..36 "\n"
+  Whitespace@36..39 "   "
+  SelectStmt@39..84
+    Values@39..45 "VALUES"
+    Whitespace@45..46 " "
+    Ascii40@46..47 "("
+    List@47..84
+      AConst@47..50
+        Sconst@47..50 "'e'"
+      Ascii44@50..51 ","
+      Whitespace@51..52 " "
+      AConst@52..54
+        Iconst@52..54 "15"
+      Ascii44@54..55 ","
+      Whitespace@55..56 " "
+      TypeCast@56..72
+        AConst@56..66
+          Sconst@56..66 "'hi carol'"
+        Typecast@66..68 "::"
+        TypeName@68..72
+          NameP@68..72 "name"
+      Ascii44@72..73 ","
+      Whitespace@73..74 " "
+      TypeCast@74..84
+        AConst@74..78
+          Sconst@74..78 "'-1'"
+        Typecast@78..80 "::"
+        TypeName@80..84
+          Ident@80..84 "int2"
+  Ascii41@84..85 ")"
+  Ascii59@85..86 ";"
+

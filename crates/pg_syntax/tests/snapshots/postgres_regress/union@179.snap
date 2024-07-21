@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index t3i on t3 (expensivefunc(x));
+---
+IndexStmt@0..42
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..16 "t3i"
+  Whitespace@16..17 " "
+  On@17..19 "on"
+  Whitespace@19..20 " "
+  RangeVar@20..22
+    Ident@20..22 "t3"
+  Whitespace@22..23 " "
+  Ascii40@23..24 "("
+  IndexElem@24..39
+    FuncCall@24..39
+      Ident@24..37 "expensivefunc"
+      Ascii40@37..38 "("
+      ColumnRef@38..39
+        Ident@38..39 "x"
+  Ascii41@39..40 ")"
+  Ascii41@40..41 ")"
+  Ascii59@41..42 ";"
+

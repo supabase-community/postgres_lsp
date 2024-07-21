@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM nummultirange_test WHERE nmr < '{[1000.0, 1001.0]}';"
+---
+SelectStmt@0..66
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..32
+    Ident@14..32 "nummultirange_test"
+  Whitespace@32..33 " "
+  Where@33..38 "WHERE"
+  Whitespace@38..39 " "
+  AExpr@39..65
+    ColumnRef@39..42
+      Ident@39..42 "nmr"
+    Whitespace@42..43 " "
+    Ascii60@43..44 "<"
+    Whitespace@44..45 " "
+    AConst@45..65
+      Sconst@45..65 "'{[1000.0, 1001.0]}'"
+  Ascii59@65..66 ";"
+

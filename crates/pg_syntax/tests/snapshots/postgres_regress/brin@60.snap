@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX brinidx_unlogged ON brintest_unlogged USING brin (n);
+---
+IndexStmt@0..66
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..29 "brinidx_unlogged"
+  Whitespace@29..30 " "
+  On@30..32 "ON"
+  Whitespace@32..33 " "
+  RangeVar@33..50
+    Ident@33..50 "brintest_unlogged"
+  Whitespace@50..51 " "
+  Using@51..56 "USING"
+  Whitespace@56..57 " "
+  Ident@57..61 "brin"
+  Whitespace@61..62 " "
+  Ascii40@62..63 "("
+  IndexElem@63..64
+    Ident@63..64 "n"
+  Ascii41@64..65 ")"
+  Ascii59@65..66 ";"
+

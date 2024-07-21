@@ -1,0 +1,51 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT nummultirange(numrange(1,2), numrange(4,5)) + nummultirange(numrange(2,4));"
+---
+SelectStmt@0..82
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..79
+    AExpr@7..79
+      FuncCall@7..48
+        Ident@7..20 "nummultirange"
+        Ascii40@20..21 "("
+        FuncCall@21..33
+          Ident@21..29 "numrange"
+          Ascii40@29..30 "("
+          AConst@30..31
+            Iconst@30..31 "1"
+          Ascii44@31..32 ","
+          AConst@32..33
+            Iconst@32..33 "2"
+        Ascii41@33..34 ")"
+        Ascii44@34..35 ","
+        Whitespace@35..36 " "
+        FuncCall@36..48
+          Ident@36..44 "numrange"
+          Ascii40@44..45 "("
+          AConst@45..46
+            Iconst@45..46 "4"
+          Ascii44@46..47 ","
+          AConst@47..48
+            Iconst@47..48 "5"
+      Ascii41@48..49 ")"
+      Ascii41@49..50 ")"
+      Whitespace@50..51 " "
+      Ascii43@51..52 "+"
+      Whitespace@52..53 " "
+      FuncCall@53..79
+        Ident@53..66 "nummultirange"
+        Ascii40@66..67 "("
+        FuncCall@67..79
+          Ident@67..75 "numrange"
+          Ascii40@75..76 "("
+          AConst@76..77
+            Iconst@76..77 "2"
+          Ascii44@77..78 ","
+          AConst@78..79
+            Iconst@78..79 "4"
+  Ascii41@79..80 ")"
+  Ascii41@80..81 ")"
+  Ascii59@81..82 ";"
+

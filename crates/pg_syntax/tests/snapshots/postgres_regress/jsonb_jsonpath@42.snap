@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_exists('[{\"a\": 1}, {\"a\": 2}, 3]', 'lax $[*].a', silent => true);"
+---
+SelectStmt@0..82
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..80
+    FuncCall@7..80
+      Ident@7..24 "jsonb_path_exists"
+      Ascii40@24..25 "("
+      AConst@25..50
+        Sconst@25..50 "'[{\"a\": 1}, {\"a\": 2}, ..."
+      Ascii44@50..51 ","
+      Whitespace@51..52 " "
+      AConst@52..64
+        Sconst@52..64 "'lax $[*].a'"
+      Ascii44@64..65 ","
+      Whitespace@65..66 " "
+      NamedArgExpr@66..80
+        Ident@66..72 "silent"
+        Whitespace@72..73 " "
+        EqualsGreater@73..75 "=>"
+        Whitespace@75..76 " "
+        AConst@76..80
+          TrueP@76..80 "true"
+  Ascii41@80..81 ")"
+  Ascii59@81..82 ";"
+

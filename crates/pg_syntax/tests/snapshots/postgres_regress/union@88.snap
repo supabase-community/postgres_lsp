@@ -1,0 +1,124 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select x from (values (row(100::money)::ct1), (row(200::money)::ct1)) _(x) union select x from (values (row(100::money)::ct1), (row(300::money)::ct1)) _(x);"
+---
+SelectStmt@0..156
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  SelectStmt@7..73
+    ResTarget@7..8
+      ColumnRef@7..8
+        Ident@7..8 "x"
+    Whitespace@8..9 " "
+    From@9..13 "from"
+    Whitespace@13..14 " "
+    Ascii40@14..15 "("
+    RangeSubselect@15..73
+      SelectStmt@15..67
+        Values@15..21 "values"
+        Whitespace@21..22 " "
+        Ascii40@22..23 "("
+        List@23..43
+          TypeCast@23..43
+            RowExpr@23..37
+              Row@23..26 "row"
+              Ascii40@26..27 "("
+              TypeCast@27..37
+                AConst@27..30
+                  Iconst@27..30 "100"
+                Typecast@30..32 "::"
+                TypeName@32..37
+                  Ident@32..37 "money"
+            Ascii41@37..38 ")"
+            Typecast@38..40 "::"
+            TypeName@40..43
+              Ident@40..43 "ct1"
+        Ascii41@43..44 ")"
+        Ascii44@44..45 ","
+        Whitespace@45..46 " "
+        Ascii40@46..47 "("
+        List@47..67
+          TypeCast@47..67
+            RowExpr@47..61
+              Row@47..50 "row"
+              Ascii40@50..51 "("
+              TypeCast@51..61
+                AConst@51..54
+                  Iconst@51..54 "200"
+                Typecast@54..56 "::"
+                TypeName@56..61
+                  Ident@56..61 "money"
+            Ascii41@61..62 ")"
+            Typecast@62..64 "::"
+            TypeName@64..67
+              Ident@64..67 "ct1"
+      Ascii41@67..68 ")"
+      Ascii41@68..69 ")"
+      Whitespace@69..70 " "
+      Alias@70..73
+        Ident@70..71 "_"
+        Ascii40@71..72 "("
+        Ident@72..73 "x"
+  Ascii41@73..74 ")"
+  Whitespace@74..75 " "
+  Union@75..80 "union"
+  Whitespace@80..81 " "
+  SelectStmt@81..154
+    Select@81..87 "select"
+    Whitespace@87..88 " "
+    ResTarget@88..89
+      ColumnRef@88..89
+        Ident@88..89 "x"
+    Whitespace@89..90 " "
+    From@90..94 "from"
+    Whitespace@94..95 " "
+    Ascii40@95..96 "("
+    RangeSubselect@96..154
+      SelectStmt@96..148
+        Values@96..102 "values"
+        Whitespace@102..103 " "
+        Ascii40@103..104 "("
+        List@104..124
+          TypeCast@104..124
+            RowExpr@104..118
+              Row@104..107 "row"
+              Ascii40@107..108 "("
+              TypeCast@108..118
+                AConst@108..111
+                  Iconst@108..111 "100"
+                Typecast@111..113 "::"
+                TypeName@113..118
+                  Ident@113..118 "money"
+            Ascii41@118..119 ")"
+            Typecast@119..121 "::"
+            TypeName@121..124
+              Ident@121..124 "ct1"
+        Ascii41@124..125 ")"
+        Ascii44@125..126 ","
+        Whitespace@126..127 " "
+        Ascii40@127..128 "("
+        List@128..148
+          TypeCast@128..148
+            RowExpr@128..142
+              Row@128..131 "row"
+              Ascii40@131..132 "("
+              TypeCast@132..142
+                AConst@132..135
+                  Iconst@132..135 "300"
+                Typecast@135..137 "::"
+                TypeName@137..142
+                  Ident@137..142 "money"
+            Ascii41@142..143 ")"
+            Typecast@143..145 "::"
+            TypeName@145..148
+              Ident@145..148 "ct1"
+      Ascii41@148..149 ")"
+      Ascii41@149..150 ")"
+      Whitespace@150..151 " "
+      Alias@151..154
+        Ident@151..152 "_"
+        Ascii40@152..153 "("
+        Ident@153..154 "x"
+  Ascii41@154..155 ")"
+  Ascii59@155..156 ";"
+

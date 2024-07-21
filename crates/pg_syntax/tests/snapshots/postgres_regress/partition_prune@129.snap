@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table boolpart_default partition of boolpart default;
+---
+CreateStmt@0..60
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..29
+    Ident@13..29 "boolpart_default"
+  Whitespace@29..30 " "
+  Partition@30..39 "partition"
+  Whitespace@39..40 " "
+  Of@40..42 "of"
+  Whitespace@42..43 " "
+  RangeVar@43..51
+    Ident@43..51 "boolpart"
+  Whitespace@51..52 " "
+  PartitionBoundSpec@52..59
+    Default@52..59 "default"
+  Ascii59@59..60 ";"
+

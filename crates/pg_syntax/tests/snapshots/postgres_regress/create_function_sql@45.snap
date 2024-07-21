@@ -1,0 +1,43 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION functest_F_2(int) RETURNS bool LANGUAGE 'sql'\n       CALLED ON NULL INPUT AS 'SELECT $1 = 50';"
+---
+CreateFunctionStmt@0..110
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..28 "functest_F_2"
+  Ascii40@28..29 "("
+  FunctionParameter@29..32
+    TypeName@29..32
+      IntP@29..32 "int"
+  Ascii41@32..33 ")"
+  Whitespace@33..34 " "
+  Returns@34..41 "RETURNS"
+  Whitespace@41..42 " "
+  TypeName@42..46
+    Ident@42..46 "bool"
+  Whitespace@46..47 " "
+  DefElem@47..61
+    Language@47..55 "LANGUAGE"
+    Whitespace@55..56 " "
+    Sconst@56..61 "'sql'"
+  Newline@61..62 "\n"
+  Whitespace@62..69 "       "
+  DefElem@69..75
+    Called@69..75 "CALLED"
+  Whitespace@75..76 " "
+  On@76..78 "ON"
+  Whitespace@78..79 " "
+  NullP@79..83 "NULL"
+  Whitespace@83..84 " "
+  InputP@84..89 "INPUT"
+  Whitespace@89..90 " "
+  DefElem@90..109
+    As@90..92 "AS"
+    Whitespace@92..93 " "
+    List@93..109
+      Sconst@93..109 "'SELECT $1 = 50'"
+  Ascii59@109..110 ";"
+

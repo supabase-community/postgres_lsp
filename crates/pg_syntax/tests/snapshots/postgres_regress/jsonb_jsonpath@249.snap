@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_query('[{\"a\": 1, \"b\": [1, 2]}, {\"c\": {\"a\": \"bbb\"}}]', 'strict $.keyvalue().a');"
+---
+SelectStmt@0..97
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..95
+    FuncCall@7..95
+      Ident@7..23 "jsonb_path_query"
+      Ascii40@23..24 "("
+      AConst@24..70
+        Sconst@24..70 "'[{\"a\": 1, \"b\": [1, 2 ..."
+      Ascii44@70..71 ","
+      Whitespace@71..72 " "
+      AConst@72..95
+        Sconst@72..95 "'strict $.keyvalue().a'"
+  Ascii41@95..96 ")"
+  Ascii59@96..97 ";"
+

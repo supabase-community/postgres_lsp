@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function range_add_bounds(anyrange)\n  returns anyelement as 'select lower($1) + upper($1)' language sql;"
+---
+CreateFunctionStmt@0..111
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..32 "range_add_bounds"
+  Ascii40@32..33 "("
+  FunctionParameter@33..41
+    TypeName@33..41
+      Ident@33..41 "anyrange"
+  Ascii41@41..42 ")"
+  Newline@42..43 "\n"
+  Whitespace@43..45 "  "
+  Returns@45..52 "returns"
+  Whitespace@52..53 " "
+  TypeName@53..63
+    Ident@53..63 "anyelement"
+  Whitespace@63..64 " "
+  DefElem@64..97
+    As@64..66 "as"
+    Whitespace@66..67 " "
+    List@67..97
+      Sconst@67..97 "'select lower($1) + u ..."
+  Whitespace@97..98 " "
+  DefElem@98..110
+    Language@98..106 "language"
+    Whitespace@106..107 " "
+    SqlP@107..110 "sql"
+  Ascii59@110..111 ";"
+

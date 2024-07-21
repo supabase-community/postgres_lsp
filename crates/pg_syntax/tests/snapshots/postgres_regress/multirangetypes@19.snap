@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select textrange('\\\\\\\\', repeat('a', 200))::textmultirange;"
+---
+SelectStmt@0..59
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..58
+    TypeCast@7..58
+      FuncCall@7..40
+        Ident@7..16 "textrange"
+        Ascii40@16..17 "("
+        AConst@17..23
+          Sconst@17..23 "'\\\\\\\\'"
+        Ascii44@23..24 ","
+        Whitespace@24..25 " "
+        FuncCall@25..40
+          Ident@25..31 "repeat"
+          Ascii40@31..32 "("
+          AConst@32..35
+            Sconst@32..35 "'a'"
+          Ascii44@35..36 ","
+          Whitespace@36..37 " "
+          AConst@37..40
+            Iconst@37..40 "200"
+      Ascii41@40..41 ")"
+      Ascii41@41..42 ")"
+      Typecast@42..44 "::"
+      TypeName@44..58
+        Ident@44..58 "textmultirange"
+  Ascii59@58..59 ";"
+

@@ -1,0 +1,83 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT d1.f1 AS timestamp1, d2.f1 AS timestamp2, d1.f1 - d2.f1 AS difference\n  FROM TEMP_TIMESTAMP d1, TEMP_TIMESTAMP d2\n  ORDER BY timestamp1, timestamp2, difference;"
+---
+SelectStmt@0..167
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..26
+    ColumnRef@7..12
+      Ident@7..9 "d1"
+      Ascii46@9..10 "."
+      Ident@10..12 "f1"
+    Whitespace@12..13 " "
+    As@13..15 "AS"
+    Whitespace@15..16 " "
+    Ident@16..26 "timestamp1"
+  Ascii44@26..27 ","
+  Whitespace@27..28 " "
+  ResTarget@28..47
+    ColumnRef@28..33
+      Ident@28..30 "d2"
+      Ascii46@30..31 "."
+      Ident@31..33 "f1"
+    Whitespace@33..34 " "
+    As@34..36 "AS"
+    Whitespace@36..37 " "
+    Ident@37..47 "timestamp2"
+  Ascii44@47..48 ","
+  Whitespace@48..49 " "
+  ResTarget@49..76
+    AExpr@49..62
+      ColumnRef@49..54
+        Ident@49..51 "d1"
+        Ascii46@51..52 "."
+        Ident@52..54 "f1"
+      Whitespace@54..55 " "
+      Ascii45@55..56 "-"
+      Whitespace@56..57 " "
+      ColumnRef@57..62
+        Ident@57..59 "d2"
+        Ascii46@59..60 "."
+        Ident@60..62 "f1"
+    Whitespace@62..63 " "
+    As@63..65 "AS"
+    Whitespace@65..66 " "
+    Ident@66..76 "difference"
+  Newline@76..77 "\n"
+  Whitespace@77..79 "  "
+  From@79..83 "FROM"
+  Whitespace@83..84 " "
+  RangeVar@84..101
+    Ident@84..98 "TEMP_TIMESTAMP"
+    Whitespace@98..99 " "
+    Alias@99..101
+      Ident@99..101 "d1"
+  Ascii44@101..102 ","
+  Whitespace@102..103 " "
+  RangeVar@103..120
+    Ident@103..117 "TEMP_TIMESTAMP"
+    Whitespace@117..118 " "
+    Alias@118..120
+      Ident@118..120 "d2"
+  Newline@120..121 "\n"
+  Whitespace@121..123 "  "
+  SortBy@123..142
+    Order@123..128 "ORDER"
+    Whitespace@128..129 " "
+    By@129..131 "BY"
+    Whitespace@131..132 " "
+    ColumnRef@132..142
+      Ident@132..142 "timestamp1"
+  Ascii44@142..143 ","
+  Whitespace@143..144 " "
+  SortBy@144..154
+    ColumnRef@144..154
+      Ident@144..154 "timestamp2"
+  Ascii44@154..155 ","
+  Whitespace@155..156 " "
+  SortBy@156..166
+    ColumnRef@156..166
+      Ident@156..166 "difference"
+  Ascii59@166..167 ";"
+

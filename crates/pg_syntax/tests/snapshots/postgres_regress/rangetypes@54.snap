@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from numrange_test where nr > 'empty';"
+---
+SelectStmt@0..47
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeVar@14..27
+    Ident@14..27 "numrange_test"
+  Whitespace@27..28 " "
+  Where@28..33 "where"
+  Whitespace@33..34 " "
+  AExpr@34..46
+    ColumnRef@34..36
+      Ident@34..36 "nr"
+    Whitespace@36..37 " "
+    Ascii62@37..38 ">"
+    Whitespace@38..39 " "
+    AConst@39..46
+      Sconst@39..46 "'empty'"
+  Ascii59@46..47 ";"
+

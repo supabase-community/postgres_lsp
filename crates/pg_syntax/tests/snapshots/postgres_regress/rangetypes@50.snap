@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from numrange_test where nr < numrange(0.0, 1.0,'[]');"
+---
+SelectStmt@0..63
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeVar@14..27
+    Ident@14..27 "numrange_test"
+  Whitespace@27..28 " "
+  Where@28..33 "where"
+  Whitespace@33..34 " "
+  AExpr@34..61
+    ColumnRef@34..36
+      Ident@34..36 "nr"
+    Whitespace@36..37 " "
+    Ascii60@37..38 "<"
+    Whitespace@38..39 " "
+    FuncCall@39..61
+      Ident@39..47 "numrange"
+      Ascii40@47..48 "("
+      AConst@48..51
+        Fconst@48..51 "0.0"
+      Ascii44@51..52 ","
+      Whitespace@52..53 " "
+      AConst@53..56
+        Fconst@53..56 "1.0"
+      Ascii44@56..57 ","
+      AConst@57..61
+        Sconst@57..61 "'[]'"
+  Ascii41@61..62 ")"
+  Ascii59@62..63 ";"
+

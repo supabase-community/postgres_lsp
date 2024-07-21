@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function fcompos1(v compos) returns void as $$\ninsert into compos values (v.*);\n$$ language sql;"
+---
+CreateFunctionStmt@0..103
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..24 "fcompos1"
+  Ascii40@24..25 "("
+  FunctionParameter@25..33
+    Ident@25..26 "v"
+    Whitespace@26..27 " "
+    TypeName@27..33
+      Ident@27..33 "compos"
+  Ascii41@33..34 ")"
+  Whitespace@34..35 " "
+  Returns@35..42 "returns"
+  Whitespace@42..43 " "
+  TypeName@43..47
+    Ident@43..47 "void"
+  Whitespace@47..48 " "
+  DefElem@48..89
+    As@48..50 "as"
+    Whitespace@50..51 " "
+    List@51..89
+      Sconst@51..89 "$$\ninsert into compos ..."
+  Whitespace@89..90 " "
+  DefElem@90..102
+    Language@90..98 "language"
+    Whitespace@98..99 " "
+    SqlP@99..102 "sql"
+  Ascii59@102..103 ";"
+

@@ -1,0 +1,55 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table boolrangep_ft partition of boolrangep for values from ('false', 'true', 0) to ('false', 'true', 100);"
+---
+CreateStmt@0..114
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..26
+    Ident@13..26 "boolrangep_ft"
+  Whitespace@26..27 " "
+  Partition@27..36 "partition"
+  Whitespace@36..37 " "
+  Of@37..39 "of"
+  Whitespace@39..40 " "
+  RangeVar@40..50
+    Ident@40..50 "boolrangep"
+  Whitespace@50..51 " "
+  For@51..54 "for"
+  Whitespace@54..55 " "
+  Values@55..61 "values"
+  Whitespace@61..62 " "
+  PartitionBoundSpec@62..112
+    From@62..66 "from"
+    Whitespace@66..67 " "
+    Ascii40@67..68 "("
+    AConst@68..75
+      Sconst@68..75 "'false'"
+    Ascii44@75..76 ","
+    Whitespace@76..77 " "
+    AConst@77..83
+      Sconst@77..83 "'true'"
+    Ascii44@83..84 ","
+    Whitespace@84..85 " "
+    AConst@85..86
+      Iconst@85..86 "0"
+    Ascii41@86..87 ")"
+    Whitespace@87..88 " "
+    To@88..90 "to"
+    Whitespace@90..91 " "
+    Ascii40@91..92 "("
+    AConst@92..99
+      Sconst@92..99 "'false'"
+    Ascii44@99..100 ","
+    Whitespace@100..101 " "
+    AConst@101..107
+      Sconst@101..107 "'true'"
+    Ascii44@107..108 ","
+    Whitespace@108..109 " "
+    AConst@109..112
+      Iconst@109..112 "100"
+  Ascii41@112..113 ")"
+  Ascii59@113..114 ";"
+

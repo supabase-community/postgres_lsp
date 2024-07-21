@@ -1,0 +1,38 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO brintest_unlogged VALUES (numrange(0, 2^1000::numeric));"
+---
+InsertStmt@0..68
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..29
+    Ident@12..29 "brintest_unlogged"
+  Whitespace@29..30 " "
+  SelectStmt@30..65
+    Values@30..36 "VALUES"
+    Whitespace@36..37 " "
+    Ascii40@37..38 "("
+    List@38..65
+      FuncCall@38..65
+        Ident@38..46 "numrange"
+        Ascii40@46..47 "("
+        AConst@47..48
+          Iconst@47..48 "0"
+        Ascii44@48..49 ","
+        Whitespace@49..50 " "
+        AExpr@50..65
+          AConst@50..51
+            Iconst@50..51 "2"
+          Ascii94@51..52 "^"
+          TypeCast@52..65
+            AConst@52..56
+              Iconst@52..56 "1000"
+            Typecast@56..58 "::"
+            TypeName@58..65
+              Numeric@58..65 "numeric"
+  Ascii41@65..66 ")"
+  Ascii41@66..67 ")"
+  Ascii59@67..68 ";"
+

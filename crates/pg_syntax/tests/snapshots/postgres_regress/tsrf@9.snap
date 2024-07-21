@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE few(id int, dataa text, datab text);"
+---
+CreateStmt@0..49
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..16
+    Ident@13..16 "few"
+  Ascii40@16..17 "("
+  ColumnDef@17..23
+    Ident@17..19 "id"
+    Whitespace@19..20 " "
+    TypeName@20..23
+      IntP@20..23 "int"
+  Ascii44@23..24 ","
+  Whitespace@24..25 " "
+  ColumnDef@25..35
+    Ident@25..30 "dataa"
+    Whitespace@30..31 " "
+    TypeName@31..35
+      TextP@31..35 "text"
+  Ascii44@35..36 ","
+  Whitespace@36..37 " "
+  ColumnDef@37..47
+    Ident@37..42 "datab"
+    Whitespace@42..43 " "
+    TypeName@43..47
+      TextP@43..47 "text"
+  Ascii41@47..48 ")"
+  Ascii59@48..49 ";"
+

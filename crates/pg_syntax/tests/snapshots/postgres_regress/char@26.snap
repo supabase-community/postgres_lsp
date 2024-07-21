@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '\\000'::\"char\"::text;"
+---
+SelectStmt@0..28
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..27
+    TypeCast@7..27
+      TypeCast@7..21
+        AConst@7..13
+          Sconst@7..13 "'\\000'"
+        Typecast@13..15 "::"
+        TypeName@15..21
+          Ident@15..21 "\"char\""
+      Typecast@21..23 "::"
+      TypeName@23..27
+        TextP@23..27 "text"
+  Ascii59@27..28 ";"
+

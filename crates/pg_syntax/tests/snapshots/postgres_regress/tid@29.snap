@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT currtid2('tid_view_with_ctid'::text, '(0,1)'::tid);"
+---
+SelectStmt@0..58
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..56
+    FuncCall@7..56
+      Ident@7..15 "currtid2"
+      Ascii40@15..16 "("
+      TypeCast@16..42
+        AConst@16..36
+          Sconst@16..36 "'tid_view_with_ctid'"
+        Typecast@36..38 "::"
+        TypeName@38..42
+          TextP@38..42 "text"
+      Ascii44@42..43 ","
+      Whitespace@43..44 " "
+      TypeCast@44..56
+        AConst@44..51
+          Sconst@44..51 "'(0,1)'"
+        Typecast@51..53 "::"
+        TypeName@53..56
+          Ident@53..56 "tid"
+  Ascii41@56..57 ")"
+  Ascii59@57..58 ";"
+

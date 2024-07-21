@@ -1,0 +1,99 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT\n\tpg_advisory_unlock(1), pg_advisory_unlock(1),\n\tpg_advisory_unlock_shared(2), pg_advisory_unlock_shared(2),\n\tpg_advisory_unlock(1, 1), pg_advisory_unlock(1, 1),\n\tpg_advisory_unlock_shared(2, 2), pg_advisory_unlock_shared(2, 2);"
+---
+SelectStmt@0..234
+  Select@0..6 "SELECT"
+  Newline@6..7 "\n"
+  Newline@7..8 "\t"
+  ResTarget@8..28
+    FuncCall@8..28
+      Ident@8..26 "pg_advisory_unlock"
+      Ascii40@26..27 "("
+      AConst@27..28
+        Iconst@27..28 "1"
+  Ascii41@28..29 ")"
+  Ascii44@29..30 ","
+  Whitespace@30..31 " "
+  ResTarget@31..51
+    FuncCall@31..51
+      Ident@31..49 "pg_advisory_unlock"
+      Ascii40@49..50 "("
+      AConst@50..51
+        Iconst@50..51 "1"
+  Ascii41@51..52 ")"
+  Ascii44@52..53 ","
+  Newline@53..54 "\n"
+  Newline@54..55 "\t"
+  ResTarget@55..82
+    FuncCall@55..82
+      Ident@55..80 "pg_advisory_unlock_sh ..."
+      Ascii40@80..81 "("
+      AConst@81..82
+        Iconst@81..82 "2"
+  Ascii41@82..83 ")"
+  Ascii44@83..84 ","
+  Whitespace@84..85 " "
+  ResTarget@85..112
+    FuncCall@85..112
+      Ident@85..110 "pg_advisory_unlock_sh ..."
+      Ascii40@110..111 "("
+      AConst@111..112
+        Iconst@111..112 "2"
+  Ascii41@112..113 ")"
+  Ascii44@113..114 ","
+  Newline@114..115 "\n"
+  Newline@115..116 "\t"
+  ResTarget@116..139
+    FuncCall@116..139
+      Ident@116..134 "pg_advisory_unlock"
+      Ascii40@134..135 "("
+      AConst@135..136
+        Iconst@135..136 "1"
+      Ascii44@136..137 ","
+      Whitespace@137..138 " "
+      AConst@138..139
+        Iconst@138..139 "1"
+  Ascii41@139..140 ")"
+  Ascii44@140..141 ","
+  Whitespace@141..142 " "
+  ResTarget@142..165
+    FuncCall@142..165
+      Ident@142..160 "pg_advisory_unlock"
+      Ascii40@160..161 "("
+      AConst@161..162
+        Iconst@161..162 "1"
+      Ascii44@162..163 ","
+      Whitespace@163..164 " "
+      AConst@164..165
+        Iconst@164..165 "1"
+  Ascii41@165..166 ")"
+  Ascii44@166..167 ","
+  Newline@167..168 "\n"
+  Newline@168..169 "\t"
+  ResTarget@169..199
+    FuncCall@169..199
+      Ident@169..194 "pg_advisory_unlock_sh ..."
+      Ascii40@194..195 "("
+      AConst@195..196
+        Iconst@195..196 "2"
+      Ascii44@196..197 ","
+      Whitespace@197..198 " "
+      AConst@198..199
+        Iconst@198..199 "2"
+  Ascii41@199..200 ")"
+  Ascii44@200..201 ","
+  Whitespace@201..202 " "
+  ResTarget@202..232
+    FuncCall@202..232
+      Ident@202..227 "pg_advisory_unlock_sh ..."
+      Ascii40@227..228 "("
+      AConst@228..229
+        Iconst@228..229 "2"
+      Ascii44@229..230 ","
+      Whitespace@230..231 " "
+      AConst@231..232
+        Iconst@231..232 "2"
+  Ascii41@232..233 ")"
+  Ascii59@233..234 ";"
+

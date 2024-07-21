@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: INSERT INTO combocidtest VALUES (1);
+---
+InsertStmt@0..36
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..24
+    Ident@12..24 "combocidtest"
+  Whitespace@24..25 " "
+  SelectStmt@25..34
+    Values@25..31 "VALUES"
+    Whitespace@31..32 " "
+    Ascii40@32..33 "("
+    List@33..34
+      AConst@33..34
+        Iconst@33..34 "1"
+  Ascii41@34..35 ")"
+  Ascii59@35..36 ";"
+

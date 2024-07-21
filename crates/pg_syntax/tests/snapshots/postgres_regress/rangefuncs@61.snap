@@ -1,0 +1,46 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE rngfunc (rngfuncid int, rngfuncsubid int, rngfuncname text, primary key(rngfuncid,rngfuncsubid));"
+---
+CreateStmt@0..110
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..20
+    Ident@13..20 "rngfunc"
+  Whitespace@20..21 " "
+  Ascii40@21..22 "("
+  ColumnDef@22..35
+    Ident@22..31 "rngfuncid"
+    Whitespace@31..32 " "
+    TypeName@32..35
+      IntP@32..35 "int"
+  Ascii44@35..36 ","
+  Whitespace@36..37 " "
+  ColumnDef@37..53
+    Ident@37..49 "rngfuncsubid"
+    Whitespace@49..50 " "
+    TypeName@50..53
+      IntP@50..53 "int"
+  Ascii44@53..54 ","
+  Whitespace@54..55 " "
+  ColumnDef@55..71
+    Ident@55..66 "rngfuncname"
+    Whitespace@66..67 " "
+    TypeName@67..71
+      TextP@67..71 "text"
+  Ascii44@71..72 ","
+  Whitespace@72..73 " "
+  Constraint@73..107
+    Primary@73..80 "primary"
+    Whitespace@80..81 " "
+    Key@81..84 "key"
+    Ascii40@84..85 "("
+    Ident@85..94 "rngfuncid"
+    Ascii44@94..95 ","
+    Ident@95..107 "rngfuncsubid"
+  Ascii41@107..108 ")"
+  Ascii41@108..109 ")"
+  Ascii59@109..110 ";"
+

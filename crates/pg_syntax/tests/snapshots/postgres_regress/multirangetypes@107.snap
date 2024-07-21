@@ -1,0 +1,53 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM nummultirange_test WHERE nmr && nummultirange(numrange(6.0, 7.0), numrange(8.0, 9.0));"
+---
+SelectStmt@0..100
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..32
+    Ident@14..32 "nummultirange_test"
+  Whitespace@32..33 " "
+  Where@33..38 "WHERE"
+  Whitespace@38..39 " "
+  AExpr@39..97
+    ColumnRef@39..42
+      Ident@39..42 "nmr"
+    Whitespace@42..43 " "
+    Op@43..45 "&&"
+    Whitespace@45..46 " "
+    FuncCall@46..97
+      Ident@46..59 "nummultirange"
+      Ascii40@59..60 "("
+      FuncCall@60..77
+        Ident@60..68 "numrange"
+        Ascii40@68..69 "("
+        AConst@69..72
+          Fconst@69..72 "6.0"
+        Ascii44@72..73 ","
+        Whitespace@73..74 " "
+        AConst@74..77
+          Fconst@74..77 "7.0"
+      Ascii41@77..78 ")"
+      Ascii44@78..79 ","
+      Whitespace@79..80 " "
+      FuncCall@80..97
+        Ident@80..88 "numrange"
+        Ascii40@88..89 "("
+        AConst@89..92
+          Fconst@89..92 "8.0"
+        Ascii44@92..93 ","
+        Whitespace@93..94 " "
+        AConst@94..97
+          Fconst@94..97 "9.0"
+  Ascii41@97..98 ")"
+  Ascii41@98..99 ")"
+  Ascii59@99..100 ";"
+

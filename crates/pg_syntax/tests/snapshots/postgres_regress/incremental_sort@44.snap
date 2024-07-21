@@ -1,0 +1,114 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from t left join (select * from (select * from t order by a) v order by a, b) s on s.a = t.a where t.a in (1, 2);"
+---
+SelectStmt@0..122
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  JoinExpr@14..101
+    RangeVar@14..15
+      Ident@14..15 "t"
+    Whitespace@15..16 " "
+    Left@16..20 "left"
+    Whitespace@20..21 " "
+    Join@21..25 "join"
+    Whitespace@25..26 " "
+    Ascii40@26..27 "("
+    RangeSubselect@27..88
+      SelectStmt@27..85
+        Select@27..33 "select"
+        Whitespace@33..34 " "
+        ResTarget@34..35
+          ColumnRef@34..35
+            AStar@34..35
+              Ascii42@34..35 "*"
+        Whitespace@35..36 " "
+        From@36..40 "from"
+        Whitespace@40..41 " "
+        Ascii40@41..42 "("
+        RangeSubselect@42..71
+          SelectStmt@42..68
+            Select@42..48 "select"
+            Whitespace@48..49 " "
+            ResTarget@49..50
+              ColumnRef@49..50
+                AStar@49..50
+                  Ascii42@49..50 "*"
+            Whitespace@50..51 " "
+            From@51..55 "from"
+            Whitespace@55..56 " "
+            RangeVar@56..57
+              Ident@56..57 "t"
+            Whitespace@57..58 " "
+            SortBy@58..68
+              Order@58..63 "order"
+              Whitespace@63..64 " "
+              By@64..66 "by"
+              Whitespace@66..67 " "
+              ColumnRef@67..68
+                Ident@67..68 "a"
+          Ascii41@68..69 ")"
+          Whitespace@69..70 " "
+          Alias@70..71
+            Ident@70..71 "v"
+        Whitespace@71..72 " "
+        SortBy@72..82
+          Order@72..77 "order"
+          Whitespace@77..78 " "
+          By@78..80 "by"
+          Whitespace@80..81 " "
+          ColumnRef@81..82
+            Ident@81..82 "a"
+        Ascii44@82..83 ","
+        Whitespace@83..84 " "
+        SortBy@84..85
+          ColumnRef@84..85
+            Ident@84..85 "b"
+      Ascii41@85..86 ")"
+      Whitespace@86..87 " "
+      Alias@87..88
+        Ident@87..88 "s"
+    Whitespace@88..89 " "
+    On@89..91 "on"
+    Whitespace@91..92 " "
+    AExpr@92..101
+      ColumnRef@92..95
+        Ident@92..93 "s"
+        Ascii46@93..94 "."
+        Ident@94..95 "a"
+      Whitespace@95..96 " "
+      Ascii61@96..97 "="
+      Whitespace@97..98 " "
+      ColumnRef@98..101
+        Ident@98..99 "t"
+        Ascii46@99..100 "."
+        Ident@100..101 "a"
+  Whitespace@101..102 " "
+  Where@102..107 "where"
+  Whitespace@107..108 " "
+  AExpr@108..120
+    ColumnRef@108..111
+      Ident@108..109 "t"
+      Ascii46@109..110 "."
+      Ident@110..111 "a"
+    Whitespace@111..112 " "
+    InP@112..114 "in"
+    Whitespace@114..115 " "
+    Ascii40@115..116 "("
+    List@116..120
+      AConst@116..117
+        Iconst@116..117 "1"
+      Ascii44@117..118 ","
+      Whitespace@118..119 " "
+      AConst@119..120
+        Iconst@119..120 "2"
+  Ascii41@120..121 ")"
+  Ascii59@121..122 ";"
+

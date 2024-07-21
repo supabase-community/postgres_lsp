@@ -1,0 +1,60 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into mc3p values (0, 1, 1), (1, 1, 1), (2, 1, 1);"
+---
+InsertStmt@0..56
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..16
+    Ident@12..16 "mc3p"
+  Whitespace@16..17 " "
+  SelectStmt@17..54
+    Values@17..23 "values"
+    Whitespace@23..24 " "
+    Ascii40@24..25 "("
+    List@25..32
+      AConst@25..26
+        Iconst@25..26 "0"
+      Ascii44@26..27 ","
+      Whitespace@27..28 " "
+      AConst@28..29
+        Iconst@28..29 "1"
+      Ascii44@29..30 ","
+      Whitespace@30..31 " "
+      AConst@31..32
+        Iconst@31..32 "1"
+    Ascii41@32..33 ")"
+    Ascii44@33..34 ","
+    Whitespace@34..35 " "
+    Ascii40@35..36 "("
+    List@36..43
+      AConst@36..37
+        Iconst@36..37 "1"
+      Ascii44@37..38 ","
+      Whitespace@38..39 " "
+      AConst@39..40
+        Iconst@39..40 "1"
+      Ascii44@40..41 ","
+      Whitespace@41..42 " "
+      AConst@42..43
+        Iconst@42..43 "1"
+    Ascii41@43..44 ")"
+    Ascii44@44..45 ","
+    Whitespace@45..46 " "
+    Ascii40@46..47 "("
+    List@47..54
+      AConst@47..48
+        Iconst@47..48 "2"
+      Ascii44@48..49 ","
+      Whitespace@49..50 " "
+      AConst@50..51
+        Iconst@50..51 "1"
+      Ascii44@51..52 ","
+      Whitespace@52..53 " "
+      AConst@53..54
+        Iconst@53..54 "1"
+  Ascii41@54..55 ")"
+  Ascii59@55..56 ";"
+

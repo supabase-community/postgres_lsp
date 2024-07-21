@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE TABLE TEMP_TIMESTAMP (f1 timestamp with time zone);
+---
+CreateStmt@0..58
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..27
+    Ident@13..27 "TEMP_TIMESTAMP"
+  Whitespace@27..28 " "
+  Ascii40@28..29 "("
+  ColumnDef@29..56
+    Ident@29..31 "f1"
+    Whitespace@31..32 " "
+    TypeName@32..56
+      Timestamp@32..41 "timestamp"
+      Whitespace@41..42 " "
+      With@42..46 "with"
+      Whitespace@46..47 " "
+      Time@47..51 "time"
+      Whitespace@51..52 " "
+      Zone@52..56 "zone"
+  Ascii41@56..57 ")"
+  Ascii59@57..58 ";"
+

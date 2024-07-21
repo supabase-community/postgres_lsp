@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT ts_lexize('hunspell', 'foot');"
+---
+SelectStmt@0..37
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..35
+    FuncCall@7..35
+      Ident@7..16 "ts_lexize"
+      Ascii40@16..17 "("
+      AConst@17..27
+        Sconst@17..27 "'hunspell'"
+      Ascii44@27..28 ","
+      Whitespace@28..29 " "
+      AConst@29..35
+        Sconst@29..35 "'foot'"
+  Ascii41@35..36 ")"
+  Ascii59@36..37 ";"
+

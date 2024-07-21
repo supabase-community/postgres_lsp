@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '100'::int4 * '9223372036854775800'::int8;"
+---
+SelectStmt@0..49
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..48
+    AExpr@7..48
+      TypeCast@7..18
+        AConst@7..12
+          Sconst@7..12 "'100'"
+        Typecast@12..14 "::"
+        TypeName@14..18
+          Ident@14..18 "int4"
+      Whitespace@18..19 " "
+      Ascii42@19..20 "*"
+      Whitespace@20..21 " "
+      TypeCast@21..48
+        AConst@21..42
+          Sconst@21..42 "'9223372036854775800'"
+        Typecast@42..44 "::"
+        TypeName@44..48
+          Ident@44..48 "int8"
+  Ascii59@48..49 ";"
+

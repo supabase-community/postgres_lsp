@@ -1,0 +1,49 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select count(*) from tenk1, tenk2 where tenk1.hundred > 1 and tenk2.thousand=0;"
+---
+SelectStmt@0..79
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "from"
+  Whitespace@20..21 " "
+  RangeVar@21..26
+    Ident@21..26 "tenk1"
+  Ascii44@26..27 ","
+  Whitespace@27..28 " "
+  RangeVar@28..33
+    Ident@28..33 "tenk2"
+  Whitespace@33..34 " "
+  Where@34..39 "where"
+  Whitespace@39..40 " "
+  BoolExpr@40..78
+    AExpr@40..57
+      ColumnRef@40..53
+        Ident@40..45 "tenk1"
+        Ascii46@45..46 "."
+        Ident@46..53 "hundred"
+      Whitespace@53..54 " "
+      Ascii62@54..55 ">"
+      Whitespace@55..56 " "
+      AConst@56..57
+        Iconst@56..57 "1"
+    Whitespace@57..58 " "
+    And@58..61 "and"
+    Whitespace@61..62 " "
+    AExpr@62..78
+      ColumnRef@62..76
+        Ident@62..67 "tenk2"
+        Ascii46@67..68 "."
+        Ident@68..76 "thousand"
+      Ascii61@76..77 "="
+      AConst@77..78
+        Iconst@77..78 "0"
+  Ascii59@78..79 ";"
+

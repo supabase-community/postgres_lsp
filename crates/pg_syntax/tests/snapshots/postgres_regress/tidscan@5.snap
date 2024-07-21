@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT ctid, * FROM tidscan WHERE ctid = '(0,1)';"
+---
+SelectStmt@0..49
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      Ident@7..11 "ctid"
+  Ascii44@11..12 ","
+  Whitespace@12..13 " "
+  ResTarget@13..14
+    ColumnRef@13..14
+      AStar@13..14
+        Ascii42@13..14 "*"
+  Whitespace@14..15 " "
+  From@15..19 "FROM"
+  Whitespace@19..20 " "
+  RangeVar@20..27
+    Ident@20..27 "tidscan"
+  Whitespace@27..28 " "
+  Where@28..33 "WHERE"
+  Whitespace@33..34 " "
+  AExpr@34..48
+    ColumnRef@34..38
+      Ident@34..38 "ctid"
+    Whitespace@38..39 " "
+    Ascii61@39..40 "="
+    Whitespace@40..41 " "
+    AConst@41..48
+      Sconst@41..48 "'(0,1)'"
+  Ascii59@48..49 ";"
+

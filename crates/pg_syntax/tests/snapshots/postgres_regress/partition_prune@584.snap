@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table listp_12_1 partition of listp_12 for values in(1);
+---
+CreateStmt@0..63
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..23
+    Ident@13..23 "listp_12_1"
+  Whitespace@23..24 " "
+  Partition@24..33 "partition"
+  Whitespace@33..34 " "
+  Of@34..36 "of"
+  Whitespace@36..37 " "
+  RangeVar@37..45
+    Ident@37..45 "listp_12"
+  Whitespace@45..46 " "
+  For@46..49 "for"
+  Whitespace@49..50 " "
+  Values@50..56 "values"
+  Whitespace@56..57 " "
+  PartitionBoundSpec@57..61
+    InP@57..59 "in"
+    Ascii40@59..60 "("
+    AConst@60..61
+      Iconst@60..61 "1"
+  Ascii41@61..62 ")"
+  Ascii59@62..63 ";"
+

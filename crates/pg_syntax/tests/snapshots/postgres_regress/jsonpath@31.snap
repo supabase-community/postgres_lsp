@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '$.foo\\x50\\u0067\\u{53}\\u{051}\\u{00004C}\\t\\\"bar'::jsonpath;"
+---
+SelectStmt@0..65
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..64
+    TypeCast@7..64
+      AConst@7..54
+        Sconst@7..54 "'$.foo\\x50\\u0067\\u{53 ..."
+      Typecast@54..56 "::"
+      TypeName@56..64
+        Ident@56..64 "jsonpath"
+  Ascii59@64..65 ";"
+

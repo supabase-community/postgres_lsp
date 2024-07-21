@@ -1,0 +1,57 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into dropcol(key, drop1, keep1, drop2, keep2) values(1, 1, '1', '1', 1);"
+---
+InsertStmt@0..79
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..19
+    Ident@12..19 "dropcol"
+  Ascii40@19..20 "("
+  ResTarget@20..23
+    Key@20..23 "key"
+  Ascii44@23..24 ","
+  Whitespace@24..25 " "
+  ResTarget@25..30
+    Ident@25..30 "drop1"
+  Ascii44@30..31 ","
+  Whitespace@31..32 " "
+  ResTarget@32..37
+    Ident@32..37 "keep1"
+  Ascii44@37..38 ","
+  Whitespace@38..39 " "
+  ResTarget@39..44
+    Ident@39..44 "drop2"
+  Ascii44@44..45 ","
+  Whitespace@45..46 " "
+  ResTarget@46..51
+    Ident@46..51 "keep2"
+  Ascii41@51..52 ")"
+  Whitespace@52..53 " "
+  SelectStmt@53..77
+    Values@53..59 "values"
+    Ascii40@59..60 "("
+    List@60..77
+      AConst@60..61
+        Iconst@60..61 "1"
+      Ascii44@61..62 ","
+      Whitespace@62..63 " "
+      AConst@63..64
+        Iconst@63..64 "1"
+      Ascii44@64..65 ","
+      Whitespace@65..66 " "
+      AConst@66..69
+        Sconst@66..69 "'1'"
+      Ascii44@69..70 ","
+      Whitespace@70..71 " "
+      AConst@71..74
+        Sconst@71..74 "'1'"
+      Ascii44@74..75 ","
+      Whitespace@75..76 " "
+      AConst@76..77
+        Iconst@76..77 "1"
+  Ascii41@77..78 ")"
+  Ascii59@78..79 ";"
+

@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table tprt_1 partition of tprt for values from (1) to (501);
+---
+CreateStmt@0..67
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..19
+    Ident@13..19 "tprt_1"
+  Whitespace@19..20 " "
+  Partition@20..29 "partition"
+  Whitespace@29..30 " "
+  Of@30..32 "of"
+  Whitespace@32..33 " "
+  RangeVar@33..37
+    Ident@33..37 "tprt"
+  Whitespace@37..38 " "
+  For@38..41 "for"
+  Whitespace@41..42 " "
+  Values@42..48 "values"
+  Whitespace@48..49 " "
+  PartitionBoundSpec@49..65
+    From@49..53 "from"
+    Whitespace@53..54 " "
+    Ascii40@54..55 "("
+    AConst@55..56
+      Iconst@55..56 "1"
+    Ascii41@56..57 ")"
+    Whitespace@57..58 " "
+    To@58..60 "to"
+    Whitespace@60..61 " "
+    Ascii40@61..62 "("
+    AConst@62..65
+      Iconst@62..65 "501"
+  Ascii41@65..66 ")"
+  Ascii59@66..67 ";"
+

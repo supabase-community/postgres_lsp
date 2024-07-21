@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT regtype('ng_catalog.int4');"
+---
+SelectStmt@0..34
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..32
+    FuncCall@7..32
+      Ident@7..14 "regtype"
+      Ascii40@14..15 "("
+      AConst@15..32
+        Sconst@15..32 "'ng_catalog.int4'"
+  Ascii41@32..33 ")"
+  Ascii59@33..34 ";"
+

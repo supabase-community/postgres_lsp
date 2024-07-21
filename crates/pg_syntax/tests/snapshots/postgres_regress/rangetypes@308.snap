@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table float8range_test(f8r float8range, i int);"
+---
+CreateStmt@0..54
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..29
+    Ident@13..29 "float8range_test"
+  Ascii40@29..30 "("
+  ColumnDef@30..45
+    Ident@30..33 "f8r"
+    Whitespace@33..34 " "
+    TypeName@34..45
+      Ident@34..45 "float8range"
+  Ascii44@45..46 ","
+  Whitespace@46..47 " "
+  ColumnDef@47..52
+    Ident@47..48 "i"
+    Whitespace@48..49 " "
+    TypeName@49..52
+      IntP@49..52 "int"
+  Ascii41@52..53 ")"
+  Ascii59@53..54 ";"
+

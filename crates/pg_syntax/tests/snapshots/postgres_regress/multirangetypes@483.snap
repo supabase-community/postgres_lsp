@@ -1,0 +1,41 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from nummultirange_test2 where nmr = nummultirange(numrange(1.1, 2.2));"
+---
+SelectStmt@0..80
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeVar@14..33
+    Ident@14..33 "nummultirange_test2"
+  Whitespace@33..34 " "
+  Where@34..39 "where"
+  Whitespace@39..40 " "
+  AExpr@40..77
+    ColumnRef@40..43
+      Ident@40..43 "nmr"
+    Whitespace@43..44 " "
+    Ascii61@44..45 "="
+    Whitespace@45..46 " "
+    FuncCall@46..77
+      Ident@46..59 "nummultirange"
+      Ascii40@59..60 "("
+      FuncCall@60..77
+        Ident@60..68 "numrange"
+        Ascii40@68..69 "("
+        AConst@69..72
+          Fconst@69..72 "1.1"
+        Ascii44@72..73 ","
+        Whitespace@73..74 " "
+        AConst@74..77
+          Fconst@74..77 "2.2"
+  Ascii41@77..78 ")"
+  Ascii41@78..79 ")"
+  Ascii59@79..80 ";"
+

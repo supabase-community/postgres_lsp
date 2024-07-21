@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX macaddr8_data_hash ON macaddr8_data USING hash (b);
+---
+IndexStmt@0..64
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..31 "macaddr8_data_hash"
+  Whitespace@31..32 " "
+  On@32..34 "ON"
+  Whitespace@34..35 " "
+  RangeVar@35..48
+    Ident@35..48 "macaddr8_data"
+  Whitespace@48..49 " "
+  Using@49..54 "USING"
+  Whitespace@54..55 " "
+  Ident@55..59 "hash"
+  Whitespace@59..60 " "
+  Ascii40@60..61 "("
+  IndexElem@61..62
+    Ident@61..62 "b"
+  Ascii41@62..63 ")"
+  Ascii59@63..64 ";"
+

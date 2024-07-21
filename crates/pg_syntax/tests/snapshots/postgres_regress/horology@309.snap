@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '2012-12-12 12:00'::timestamptz;"
+---
+SelectStmt@0..39
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..38
+    TypeCast@7..38
+      AConst@7..25
+        Sconst@7..25 "'2012-12-12 12:00'"
+      Typecast@25..27 "::"
+      TypeName@27..38
+        Ident@27..38 "timestamptz"
+  Ascii59@38..39 ";"
+

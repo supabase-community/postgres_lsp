@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT jsonb_path_query_array('[{\"a\": 1}, {\"a\": 2}]', '$[*].a');"
+---
+SelectStmt@0..64
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..62
+    FuncCall@7..62
+      Ident@7..29 "jsonb_path_query_array"
+      Ascii40@29..30 "("
+      AConst@30..52
+        Sconst@30..52 "'[{\"a\": 1}, {\"a\": 2}]'"
+      Ascii44@52..53 ","
+      Whitespace@53..54 " "
+      AConst@54..62
+        Sconst@54..62 "'$[*].a'"
+  Ascii41@62..63 ")"
+  Ascii59@63..64 ";"
+

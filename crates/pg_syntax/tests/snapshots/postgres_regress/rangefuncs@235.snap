@@ -1,0 +1,59 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE OR REPLACE FUNCTION rngfunc(in f1 int, out f2 int, out f3 text)\nRETURNS record\nAS 'select $1+1' LANGUAGE sql;"
+---
+CreateFunctionStmt@0..116
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Or@7..9 "OR"
+  Whitespace@9..10 " "
+  Replace@10..17 "REPLACE"
+  Whitespace@17..18 " "
+  Function@18..26 "FUNCTION"
+  Whitespace@26..27 " "
+  Ident@27..34 "rngfunc"
+  Ascii40@34..35 "("
+  FunctionParameter@35..44
+    InP@35..37 "in"
+    Whitespace@37..38 " "
+    Ident@38..40 "f1"
+    Whitespace@40..41 " "
+    TypeName@41..44
+      IntP@41..44 "int"
+  Ascii44@44..45 ","
+  Whitespace@45..46 " "
+  FunctionParameter@46..56
+    OutP@46..49 "out"
+    Whitespace@49..50 " "
+    Ident@50..52 "f2"
+    Whitespace@52..53 " "
+    TypeName@53..56
+      IntP@53..56 "int"
+  Ascii44@56..57 ","
+  Whitespace@57..58 " "
+  FunctionParameter@58..69
+    OutP@58..61 "out"
+    Whitespace@61..62 " "
+    Ident@62..64 "f3"
+    Whitespace@64..65 " "
+    TypeName@65..69
+      TextP@65..69 "text"
+  Ascii41@69..70 ")"
+  Newline@70..71 "\n"
+  Returns@71..78 "RETURNS"
+  Whitespace@78..79 " "
+  TypeName@79..85
+    Ident@79..85 "record"
+  Newline@85..86 "\n"
+  DefElem@86..102
+    As@86..88 "AS"
+    Whitespace@88..89 " "
+    List@89..102
+      Sconst@89..102 "'select $1+1'"
+  Whitespace@102..103 " "
+  DefElem@103..115
+    Language@103..111 "LANGUAGE"
+    Whitespace@111..112 " "
+    SqlP@112..115 "sql"
+  Ascii59@115..116 ";"
+

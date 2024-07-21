@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select  count(*) from tenk1 where thousand > 95;
+---
+SelectStmt@0..48
+  Select@0..6 "select"
+  Whitespace@6..8 "  "
+  ResTarget@8..15
+    FuncCall@8..15
+      Ident@8..13 "count"
+      Ascii40@13..14 "("
+      Ascii42@14..15 "*"
+  Ascii41@15..16 ")"
+  Whitespace@16..17 " "
+  From@17..21 "from"
+  Whitespace@21..22 " "
+  RangeVar@22..27
+    Ident@22..27 "tenk1"
+  Whitespace@27..28 " "
+  Where@28..33 "where"
+  Whitespace@33..34 " "
+  AExpr@34..47
+    ColumnRef@34..42
+      Ident@34..42 "thousand"
+    Whitespace@42..43 " "
+    Ascii62@43..44 ">"
+    Whitespace@44..45 " "
+    AConst@45..47
+      Iconst@45..47 "95"
+  Ascii59@47..48 ";"
+

@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table pc_list_part_1 partition of pc_list_parted for values in (1);
+---
+CreateStmt@0..74
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..27
+    Ident@13..27 "pc_list_part_1"
+  Whitespace@27..28 " "
+  Partition@28..37 "partition"
+  Whitespace@37..38 " "
+  Of@38..40 "of"
+  Whitespace@40..41 " "
+  RangeVar@41..55
+    Ident@41..55 "pc_list_parted"
+  Whitespace@55..56 " "
+  For@56..59 "for"
+  Whitespace@59..60 " "
+  Values@60..66 "values"
+  Whitespace@66..67 " "
+  PartitionBoundSpec@67..72
+    InP@67..69 "in"
+    Whitespace@69..70 " "
+    Ascii40@70..71 "("
+    AConst@71..72
+      Iconst@71..72 "1"
+  Ascii41@72..73 ")"
+  Ascii59@73..74 ";"
+

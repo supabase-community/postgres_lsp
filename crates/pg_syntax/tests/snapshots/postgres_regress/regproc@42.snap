@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT regclass('pg_classes');"
+---
+SelectStmt@0..30
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..28
+    FuncCall@7..28
+      Ident@7..15 "regclass"
+      Ascii40@15..16 "("
+      AConst@16..28
+        Sconst@16..28 "'pg_classes'"
+  Ascii41@28..29 ")"
+  Ascii59@29..30 ";"
+

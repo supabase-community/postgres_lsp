@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '23:59:59.9999999 PDT'::timetz;"
+---
+SelectStmt@0..38
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..37
+    TypeCast@7..37
+      AConst@7..29
+        Sconst@7..29 "'23:59:59.9999999 PDT'"
+      Typecast@29..31 "::"
+      TypeName@31..37
+        Ident@31..37 "timetz"
+  Ascii59@37..38 ";"
+

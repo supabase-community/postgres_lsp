@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO POLYGON_TBL(f1) VALUES ('(0,1,2,3');"
+---
+InsertStmt@0..48
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "POLYGON_TBL"
+  Ascii40@23..24 "("
+  ResTarget@24..26
+    Ident@24..26 "f1"
+  Ascii41@26..27 ")"
+  Whitespace@27..28 " "
+  SelectStmt@28..46
+    Values@28..34 "VALUES"
+    Whitespace@34..35 " "
+    Ascii40@35..36 "("
+    List@36..46
+      AConst@36..46
+        Sconst@36..46 "'(0,1,2,3'"
+  Ascii41@46..47 ")"
+  Ascii59@47..48 ";"
+

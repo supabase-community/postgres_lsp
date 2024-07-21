@@ -1,0 +1,193 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT i, c,\n  i < c AS lt, i <= c AS le, i = c AS eq,\n  i >= c AS ge, i > c AS gt, i <> c AS ne,\n  i << c AS sb, i <<= c AS sbe,\n  i >> c AS sup, i >>= c AS spe,\n  i && c AS ovr\n  FROM INET_TBL;"
+---
+SelectStmt@0..195
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      Ident@7..8 "i"
+  Ascii44@8..9 ","
+  Whitespace@9..10 " "
+  ResTarget@10..11
+    ColumnRef@10..11
+      Ident@10..11 "c"
+  Ascii44@11..12 ","
+  Newline@12..13 "\n"
+  Whitespace@13..15 "  "
+  ResTarget@15..26
+    AExpr@15..20
+      ColumnRef@15..16
+        Ident@15..16 "i"
+      Whitespace@16..17 " "
+      Ascii60@17..18 "<"
+      Whitespace@18..19 " "
+      ColumnRef@19..20
+        Ident@19..20 "c"
+    Whitespace@20..21 " "
+    As@21..23 "AS"
+    Whitespace@23..24 " "
+    Ident@24..26 "lt"
+  Ascii44@26..27 ","
+  Whitespace@27..28 " "
+  ResTarget@28..40
+    AExpr@28..34
+      ColumnRef@28..29
+        Ident@28..29 "i"
+      Whitespace@29..30 " "
+      LessEquals@30..32 "<="
+      Whitespace@32..33 " "
+      ColumnRef@33..34
+        Ident@33..34 "c"
+    Whitespace@34..35 " "
+    As@35..37 "AS"
+    Whitespace@37..38 " "
+    Ident@38..40 "le"
+  Ascii44@40..41 ","
+  Whitespace@41..42 " "
+  ResTarget@42..53
+    AExpr@42..47
+      ColumnRef@42..43
+        Ident@42..43 "i"
+      Whitespace@43..44 " "
+      Ascii61@44..45 "="
+      Whitespace@45..46 " "
+      ColumnRef@46..47
+        Ident@46..47 "c"
+    Whitespace@47..48 " "
+    As@48..50 "AS"
+    Whitespace@50..51 " "
+    Ident@51..53 "eq"
+  Ascii44@53..54 ","
+  Newline@54..55 "\n"
+  Whitespace@55..57 "  "
+  ResTarget@57..69
+    AExpr@57..63
+      ColumnRef@57..58
+        Ident@57..58 "i"
+      Whitespace@58..59 " "
+      GreaterEquals@59..61 ">="
+      Whitespace@61..62 " "
+      ColumnRef@62..63
+        Ident@62..63 "c"
+    Whitespace@63..64 " "
+    As@64..66 "AS"
+    Whitespace@66..67 " "
+    Ident@67..69 "ge"
+  Ascii44@69..70 ","
+  Whitespace@70..71 " "
+  ResTarget@71..82
+    AExpr@71..76
+      ColumnRef@71..72
+        Ident@71..72 "i"
+      Whitespace@72..73 " "
+      Ascii62@73..74 ">"
+      Whitespace@74..75 " "
+      ColumnRef@75..76
+        Ident@75..76 "c"
+    Whitespace@76..77 " "
+    As@77..79 "AS"
+    Whitespace@79..80 " "
+    Ident@80..82 "gt"
+  Ascii44@82..83 ","
+  Whitespace@83..84 " "
+  ResTarget@84..96
+    AExpr@84..90
+      ColumnRef@84..85
+        Ident@84..85 "i"
+      Whitespace@85..86 " "
+      NotEquals@86..88 "<>"
+      Whitespace@88..89 " "
+      ColumnRef@89..90
+        Ident@89..90 "c"
+    Whitespace@90..91 " "
+    As@91..93 "AS"
+    Whitespace@93..94 " "
+    Ident@94..96 "ne"
+  Ascii44@96..97 ","
+  Newline@97..98 "\n"
+  Whitespace@98..100 "  "
+  ResTarget@100..112
+    AExpr@100..106
+      ColumnRef@100..101
+        Ident@100..101 "i"
+      Whitespace@101..102 " "
+      Op@102..104 "<<"
+      Whitespace@104..105 " "
+      ColumnRef@105..106
+        Ident@105..106 "c"
+    Whitespace@106..107 " "
+    As@107..109 "AS"
+    Whitespace@109..110 " "
+    Ident@110..112 "sb"
+  Ascii44@112..113 ","
+  Whitespace@113..114 " "
+  ResTarget@114..128
+    AExpr@114..121
+      ColumnRef@114..115
+        Ident@114..115 "i"
+      Whitespace@115..116 " "
+      Op@116..119 "<<="
+      Whitespace@119..120 " "
+      ColumnRef@120..121
+        Ident@120..121 "c"
+    Whitespace@121..122 " "
+    As@122..124 "AS"
+    Whitespace@124..125 " "
+    Ident@125..128 "sbe"
+  Ascii44@128..129 ","
+  Newline@129..130 "\n"
+  Whitespace@130..132 "  "
+  ResTarget@132..145
+    AExpr@132..138
+      ColumnRef@132..133
+        Ident@132..133 "i"
+      Whitespace@133..134 " "
+      Op@134..136 ">>"
+      Whitespace@136..137 " "
+      ColumnRef@137..138
+        Ident@137..138 "c"
+    Whitespace@138..139 " "
+    As@139..141 "AS"
+    Whitespace@141..142 " "
+    Ident@142..145 "sup"
+  Ascii44@145..146 ","
+  Whitespace@146..147 " "
+  ResTarget@147..161
+    AExpr@147..154
+      ColumnRef@147..148
+        Ident@147..148 "i"
+      Whitespace@148..149 " "
+      Op@149..152 ">>="
+      Whitespace@152..153 " "
+      ColumnRef@153..154
+        Ident@153..154 "c"
+    Whitespace@154..155 " "
+    As@155..157 "AS"
+    Whitespace@157..158 " "
+    Ident@158..161 "spe"
+  Ascii44@161..162 ","
+  Newline@162..163 "\n"
+  Whitespace@163..165 "  "
+  ResTarget@165..178
+    AExpr@165..171
+      ColumnRef@165..166
+        Ident@165..166 "i"
+      Whitespace@166..167 " "
+      Op@167..169 "&&"
+      Whitespace@169..170 " "
+      ColumnRef@170..171
+        Ident@170..171 "c"
+    Whitespace@171..172 " "
+    As@172..174 "AS"
+    Whitespace@174..175 " "
+    Ident@175..178 "ovr"
+  Newline@178..179 "\n"
+  Whitespace@179..181 "  "
+  From@181..185 "FROM"
+  Whitespace@185..186 " "
+  RangeVar@186..194
+    Ident@186..194 "INET_TBL"
+  Ascii59@194..195 ";"
+

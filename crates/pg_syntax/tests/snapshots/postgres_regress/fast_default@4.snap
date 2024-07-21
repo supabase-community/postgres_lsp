@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO m VALUES (NULL::OID);"
+---
+InsertStmt@0..33
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..13
+    Ident@12..13 "m"
+  Whitespace@13..14 " "
+  SelectStmt@14..31
+    Values@14..20 "VALUES"
+    Whitespace@20..21 " "
+    Ascii40@21..22 "("
+    List@22..31
+      TypeCast@22..31
+        AConst@22..26
+          NullP@22..26 "NULL"
+        Typecast@26..28 "::"
+        TypeName@28..31
+          Ident@28..31 "OID"
+  Ascii41@31..32 ")"
+  Ascii59@32..33 ";"
+

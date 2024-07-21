@@ -1,0 +1,108 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select x from (values (row(1, 2)), (row(1, 3))) _(x) except select x from (values (row(1, 2)), (row(1, 4))) _(x);"
+---
+SelectStmt@0..113
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  SelectStmt@7..51
+    ResTarget@7..8
+      ColumnRef@7..8
+        Ident@7..8 "x"
+    Whitespace@8..9 " "
+    From@9..13 "from"
+    Whitespace@13..14 " "
+    Ascii40@14..15 "("
+    RangeSubselect@15..51
+      SelectStmt@15..44
+        Values@15..21 "values"
+        Whitespace@21..22 " "
+        Ascii40@22..23 "("
+        List@23..31
+          RowExpr@23..31
+            Row@23..26 "row"
+            Ascii40@26..27 "("
+            AConst@27..28
+              Iconst@27..28 "1"
+            Ascii44@28..29 ","
+            Whitespace@29..30 " "
+            AConst@30..31
+              Iconst@30..31 "2"
+        Ascii41@31..32 ")"
+        Ascii41@32..33 ")"
+        Ascii44@33..34 ","
+        Whitespace@34..35 " "
+        Ascii40@35..36 "("
+        List@36..44
+          RowExpr@36..44
+            Row@36..39 "row"
+            Ascii40@39..40 "("
+            AConst@40..41
+              Iconst@40..41 "1"
+            Ascii44@41..42 ","
+            Whitespace@42..43 " "
+            AConst@43..44
+              Iconst@43..44 "3"
+      Ascii41@44..45 ")"
+      Ascii41@45..46 ")"
+      Ascii41@46..47 ")"
+      Whitespace@47..48 " "
+      Alias@48..51
+        Ident@48..49 "_"
+        Ascii40@49..50 "("
+        Ident@50..51 "x"
+  Ascii41@51..52 ")"
+  Whitespace@52..53 " "
+  Except@53..59 "except"
+  Whitespace@59..60 " "
+  SelectStmt@60..111
+    Select@60..66 "select"
+    Whitespace@66..67 " "
+    ResTarget@67..68
+      ColumnRef@67..68
+        Ident@67..68 "x"
+    Whitespace@68..69 " "
+    From@69..73 "from"
+    Whitespace@73..74 " "
+    Ascii40@74..75 "("
+    RangeSubselect@75..111
+      SelectStmt@75..104
+        Values@75..81 "values"
+        Whitespace@81..82 " "
+        Ascii40@82..83 "("
+        List@83..91
+          RowExpr@83..91
+            Row@83..86 "row"
+            Ascii40@86..87 "("
+            AConst@87..88
+              Iconst@87..88 "1"
+            Ascii44@88..89 ","
+            Whitespace@89..90 " "
+            AConst@90..91
+              Iconst@90..91 "2"
+        Ascii41@91..92 ")"
+        Ascii41@92..93 ")"
+        Ascii44@93..94 ","
+        Whitespace@94..95 " "
+        Ascii40@95..96 "("
+        List@96..104
+          RowExpr@96..104
+            Row@96..99 "row"
+            Ascii40@99..100 "("
+            AConst@100..101
+              Iconst@100..101 "1"
+            Ascii44@101..102 ","
+            Whitespace@102..103 " "
+            AConst@103..104
+              Iconst@103..104 "4"
+      Ascii41@104..105 ")"
+      Ascii41@105..106 ")"
+      Ascii41@106..107 ")"
+      Whitespace@107..108 " "
+      Alias@108..111
+        Ident@108..109 "_"
+        Ascii40@109..110 "("
+        Ident@110..111 "x"
+  Ascii41@111..112 ")"
+  Ascii59@112..113 ";"
+

@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO LINE_TBL VALUES ('{0,0,1');"
+---
+InsertStmt@0..39
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "LINE_TBL"
+  Whitespace@20..21 " "
+  SelectStmt@21..37
+    Values@21..27 "VALUES"
+    Whitespace@27..28 " "
+    Ascii40@28..29 "("
+    List@29..37
+      AConst@29..37
+        Sconst@29..37 "'{0,0,1'"
+  Ascii41@37..38 ")"
+  Ascii59@38..39 ";"
+

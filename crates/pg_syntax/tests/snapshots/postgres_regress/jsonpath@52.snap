@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '$.a[$a + 1, ($b[*]) to -($[0] * 2)]'::jsonpath;"
+---
+SelectStmt@0..55
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..54
+    TypeCast@7..54
+      AConst@7..44
+        Sconst@7..44 "'$.a[$a + 1, ($b[*])  ..."
+      Typecast@44..46 "::"
+      TypeName@46..54
+        Ident@46..54 "jsonpath"
+  Ascii59@54..55 ";"
+

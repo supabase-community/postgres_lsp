@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create or replace function explain_analyze_inc_sort_nodes(query text)\nreturns jsonb language plpgsql\nas\n$$\ndeclare\n  elements jsonb;\n  element jsonb;\n  matching_nodes jsonb := '[]'::jsonb;\nbegin\n  execute 'explain (analyze, costs off, summary off, timing off, format ''json'') ' || query into strict elements;\n  while jsonb_array_length(elements) > 0 loop\n    element := elements->0;\n    elements := elements - 0;\n    case jsonb_typeof(element)\n    when 'array' then\n      if jsonb_array_length(element) > 0 then\n        elements := elements || element;\n      end if;\n    when 'object' then\n      if element ? 'Plan' then\n        elements := elements || jsonb_build_array(element->'Plan');\n        element := element - 'Plan';\n      else\n        if element ? 'Plans' then\n          elements := elements || jsonb_build_array(element->'Plans');\n          element := element - 'Plans';\n        end if;\n        if (element->>'Node Type')::text = 'Incremental Sort' then\n          matching_nodes := matching_nodes || element;\n        end if;\n      end if;\n    end case;\n  end loop;\n  return matching_nodes;\nend;\n$$;"
+---
+CreateFunctionStmt@0..1110
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Or@7..9 "or"
+  Whitespace@9..10 " "
+  Replace@10..17 "replace"
+  Whitespace@17..18 " "
+  Function@18..26 "function"
+  Whitespace@26..27 " "
+  Ident@27..57 "explain_analyze_inc_s ..."
+  Ascii40@57..58 "("
+  FunctionParameter@58..68
+    Ident@58..63 "query"
+    Whitespace@63..64 " "
+    TypeName@64..68
+      TextP@64..68 "text"
+  Ascii41@68..69 ")"
+  Newline@69..70 "\n"
+  Returns@70..77 "returns"
+  Whitespace@77..78 " "
+  TypeName@78..83
+    Ident@78..83 "jsonb"
+  Whitespace@83..84 " "
+  DefElem@84..100
+    Language@84..92 "language"
+    Whitespace@92..93 " "
+    Ident@93..100 "plpgsql"
+  Newline@100..101 "\n"
+  DefElem@101..1109
+    As@101..103 "as"
+    Newline@103..104 "\n"
+    List@104..1109
+      Sconst@104..1109 "$$\ndeclare\n  elements ..."
+  Ascii59@1109..1110 ";"
+

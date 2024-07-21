@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TYPE jsrec_i_not_null AS (\n\ti\tjs_int_not_null\n);"
+---
+CompositeTypeStmt@0..55
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  TypeP@7..11 "TYPE"
+  Whitespace@11..12 " "
+  RangeVar@12..28
+    Ident@12..28 "jsrec_i_not_null"
+  Whitespace@28..29 " "
+  As@29..31 "AS"
+  Whitespace@31..32 " "
+  Ascii40@32..33 "("
+  Newline@33..34 "\n"
+  Newline@34..35 "\t"
+  ColumnDef@35..52
+    Ident@35..36 "i"
+    Newline@36..37 "\t"
+    TypeName@37..52
+      Ident@37..52 "js_int_not_null"
+  Newline@52..53 "\n"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

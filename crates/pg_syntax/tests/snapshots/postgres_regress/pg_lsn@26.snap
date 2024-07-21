@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '0/16AE7F7'::pg_lsn + 'NaN'::numeric;"
+---
+SelectStmt@0..44
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..43
+    AExpr@7..43
+      TypeCast@7..26
+        AConst@7..18
+          Sconst@7..18 "'0/16AE7F7'"
+        Typecast@18..20 "::"
+        TypeName@20..26
+          Ident@20..26 "pg_lsn"
+      Whitespace@26..27 " "
+      Ascii43@27..28 "+"
+      Whitespace@28..29 " "
+      TypeCast@29..43
+        AConst@29..34
+          Sconst@29..34 "'NaN'"
+        Typecast@34..36 "::"
+        TypeName@36..43
+          Numeric@36..43 "numeric"
+  Ascii59@43..44 ";"
+

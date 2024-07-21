@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE UNIQUE INDEX num_exp_sqrt_idx ON num_exp_sqrt (id);
+---
+IndexStmt@0..58
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Unique@7..13 "UNIQUE"
+  Whitespace@13..14 " "
+  Index@14..19 "INDEX"
+  Whitespace@19..20 " "
+  Ident@20..36 "num_exp_sqrt_idx"
+  Whitespace@36..37 " "
+  On@37..39 "ON"
+  Whitespace@39..40 " "
+  RangeVar@40..52
+    Ident@40..52 "num_exp_sqrt"
+  Whitespace@52..53 " "
+  Ascii40@53..54 "("
+  IndexElem@54..56
+    Ident@54..56 "id"
+  Ascii41@56..57 ")"
+  Ascii59@57..58 ";"
+

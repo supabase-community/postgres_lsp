@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT polygon(f1)\n   FROM PATH_TBL WHERE isclosed(f1);"
+---
+SelectStmt@0..55
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..17
+    FuncCall@7..17
+      Ident@7..14 "polygon"
+      Ascii40@14..15 "("
+      ColumnRef@15..17
+        Ident@15..17 "f1"
+  Ascii41@17..18 ")"
+  Newline@18..19 "\n"
+  Whitespace@19..22 "   "
+  From@22..26 "FROM"
+  Whitespace@26..27 " "
+  RangeVar@27..35
+    Ident@27..35 "PATH_TBL"
+  Whitespace@35..36 " "
+  Where@36..41 "WHERE"
+  Whitespace@41..42 " "
+  FuncCall@42..53
+    Ident@42..50 "isclosed"
+    Ascii40@50..51 "("
+    ColumnRef@51..53
+      Ident@51..53 "f1"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

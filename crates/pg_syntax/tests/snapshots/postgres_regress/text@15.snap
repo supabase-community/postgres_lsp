@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select reverse('abcde');"
+---
+SelectStmt@0..24
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..22
+    FuncCall@7..22
+      Ident@7..14 "reverse"
+      Ascii40@14..15 "("
+      AConst@15..22
+        Sconst@15..22 "'abcde'"
+  Ascii41@22..23 ")"
+  Ascii59@23..24 ";"
+

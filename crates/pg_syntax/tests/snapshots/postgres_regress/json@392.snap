@@ -1,0 +1,51 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from json_to_recordset('[{\"a\":1,\"b\":\"foo\",\"d\":false},{\"a\":2,\"b\":\"bar\",\"c\":true}]')\n    as x(a int, b text, c boolean);"
+---
+SelectStmt@0..127
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..125
+    List@14..90
+      FuncCall@14..90
+        Ident@14..31 "json_to_recordset"
+        Ascii40@31..32 "("
+        AConst@32..90
+          Sconst@32..90 "'[{\"a\":1,\"b\":\"foo\",\"d ..."
+    Ascii41@90..91 ")"
+    Newline@91..92 "\n"
+    Whitespace@92..96 "    "
+    Alias@96..100
+      As@96..98 "as"
+      Whitespace@98..99 " "
+      Ident@99..100 "x"
+    Ascii40@100..101 "("
+    ColumnDef@101..106
+      Ident@101..102 "a"
+      Whitespace@102..103 " "
+      TypeName@103..106
+        IntP@103..106 "int"
+    Ascii44@106..107 ","
+    Whitespace@107..108 " "
+    ColumnDef@108..114
+      Ident@108..109 "b"
+      Whitespace@109..110 " "
+      TypeName@110..114
+        TextP@110..114 "text"
+    Ascii44@114..115 ","
+    Whitespace@115..116 " "
+    ColumnDef@116..125
+      Ident@116..117 "c"
+      Whitespace@117..118 " "
+      TypeName@118..125
+        BooleanP@118..125 "boolean"
+  Ascii41@125..126 ")"
+  Ascii59@126..127 ";"
+

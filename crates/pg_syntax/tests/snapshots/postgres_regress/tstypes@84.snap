@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 'a b:89  ca:23A,64b d:34c'::tsvector @@ 'd:AC & ca:C' as \"false\";"
+---
+SelectStmt@0..72
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..71
+    AExpr@7..60
+      TypeCast@7..43
+        AConst@7..33
+          Sconst@7..33 "'a b:89  ca:23A,64b d ..."
+        Typecast@33..35 "::"
+        TypeName@35..43
+          Ident@35..43 "tsvector"
+      Whitespace@43..44 " "
+      Op@44..46 "@@"
+      Whitespace@46..47 " "
+      AConst@47..60
+        Sconst@47..60 "'d:AC & ca:C'"
+    Whitespace@60..61 " "
+    As@61..63 "as"
+    Whitespace@63..64 " "
+    Ident@64..71 "\"false\""
+  Ascii59@71..72 ";"
+

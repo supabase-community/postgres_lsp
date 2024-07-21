@@ -1,0 +1,57 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO few VALUES(1, 'a', 'foo'),(2, 'a', 'bar'),(3, 'b', 'bar');"
+---
+InsertStmt@0..70
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..15
+    Ident@12..15 "few"
+  Whitespace@15..16 " "
+  SelectStmt@16..68
+    Values@16..22 "VALUES"
+    Ascii40@22..23 "("
+    List@23..36
+      AConst@23..24
+        Iconst@23..24 "1"
+      Ascii44@24..25 ","
+      Whitespace@25..26 " "
+      AConst@26..29
+        Sconst@26..29 "'a'"
+      Ascii44@29..30 ","
+      Whitespace@30..31 " "
+      AConst@31..36
+        Sconst@31..36 "'foo'"
+    Ascii41@36..37 ")"
+    Ascii44@37..38 ","
+    Ascii40@38..39 "("
+    List@39..52
+      AConst@39..40
+        Iconst@39..40 "2"
+      Ascii44@40..41 ","
+      Whitespace@41..42 " "
+      AConst@42..45
+        Sconst@42..45 "'a'"
+      Ascii44@45..46 ","
+      Whitespace@46..47 " "
+      AConst@47..52
+        Sconst@47..52 "'bar'"
+    Ascii41@52..53 ")"
+    Ascii44@53..54 ","
+    Ascii40@54..55 "("
+    List@55..68
+      AConst@55..56
+        Iconst@55..56 "3"
+      Ascii44@56..57 ","
+      Whitespace@57..58 " "
+      AConst@58..61
+        Sconst@58..61 "'b'"
+      Ascii44@61..62 ","
+      Whitespace@62..63 " "
+      AConst@63..68
+        Sconst@63..68 "'bar'"
+  Ascii41@68..69 ")"
+  Ascii59@69..70 ";"
+

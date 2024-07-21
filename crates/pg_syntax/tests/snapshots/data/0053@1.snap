@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE PUBLICATION mypublication FOR TABLE users, departments;"
+---
+CreatePublicationStmt@0..62
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Publication@7..18 "PUBLICATION"
+  Whitespace@18..19 " "
+  Ident@19..32 "mypublication"
+  Whitespace@32..33 " "
+  For@33..36 "FOR"
+  Whitespace@36..37 " "
+  Table@37..42 "TABLE"
+  Whitespace@42..43 " "
+  PublicationObjSpec@43..48
+    PublicationTable@43..48
+      RangeVar@43..48
+        Ident@43..48 "users"
+  Ascii44@48..49 ","
+  Whitespace@49..50 " "
+  PublicationObjSpec@50..61
+    PublicationTable@50..61
+      RangeVar@50..61
+        Ident@50..61 "departments"
+  Ascii59@61..62 ";"
+

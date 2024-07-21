@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM brintest_3 WHERE b < '0';"
+---
+SelectStmt@0..39
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..24
+    Ident@14..24 "brintest_3"
+  Whitespace@24..25 " "
+  Where@25..30 "WHERE"
+  Whitespace@30..31 " "
+  AExpr@31..38
+    ColumnRef@31..32
+      Ident@31..32 "b"
+    Whitespace@32..33 " "
+    Ascii60@33..34 "<"
+    Whitespace@34..35 " "
+    AConst@35..38
+      Sconst@35..38 "'0'"
+  Ascii59@38..39 ";"
+

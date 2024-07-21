@@ -1,0 +1,61 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE prt2_e (a int, b int, c int) PARTITION BY RANGE(((b + a)/2));"
+---
+CreateStmt@0..74
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..19
+    Ident@13..19 "prt2_e"
+  Whitespace@19..20 " "
+  Ascii40@20..21 "("
+  ColumnDef@21..26
+    Ident@21..22 "a"
+    Whitespace@22..23 " "
+    TypeName@23..26
+      IntP@23..26 "int"
+  Ascii44@26..27 ","
+  Whitespace@27..28 " "
+  ColumnDef@28..33
+    Ident@28..29 "b"
+    Whitespace@29..30 " "
+    TypeName@30..33
+      IntP@30..33 "int"
+  Ascii44@33..34 ","
+  Whitespace@34..35 " "
+  ColumnDef@35..40
+    Ident@35..36 "c"
+    Whitespace@36..37 " "
+    TypeName@37..40
+      IntP@37..40 "int"
+  Ascii41@40..41 ")"
+  Whitespace@41..42 " "
+  PartitionSpec@42..71
+    Partition@42..51 "PARTITION"
+    Whitespace@51..52 " "
+    By@52..54 "BY"
+    Whitespace@54..55 " "
+    Range@55..60 "RANGE"
+    Ascii40@60..61 "("
+    PartitionElem@61..71
+      Ascii40@61..62 "("
+      Ascii40@62..63 "("
+      AExpr@63..71
+        AExpr@63..68
+          ColumnRef@63..64
+            Ident@63..64 "b"
+          Whitespace@64..65 " "
+          Ascii43@65..66 "+"
+          Whitespace@66..67 " "
+          ColumnRef@67..68
+            Ident@67..68 "a"
+        Ascii41@68..69 ")"
+        Ascii47@69..70 "/"
+        AConst@70..71
+          Iconst@70..71 "2"
+  Ascii41@71..72 ")"
+  Ascii41@72..73 ")"
+  Ascii59@73..74 ";"
+

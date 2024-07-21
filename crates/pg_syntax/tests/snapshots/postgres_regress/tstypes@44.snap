@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '1|!2&3'::tsquery;"
+---
+SelectStmt@0..25
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..24
+    TypeCast@7..24
+      AConst@7..15
+        Sconst@7..15 "'1|!2&3'"
+      Typecast@15..17 "::"
+      TypeName@17..24
+        Ident@17..24 "tsquery"
+  Ascii59@24..25 ";"
+

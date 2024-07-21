@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT ((SELECT 2) UNION SELECT 2);
+---
+SelectStmt@0..35
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..33
+    SubLink@7..33
+      SelectStmt@7..33
+        SelectStmt@7..17
+          Ascii40@7..8 "("
+          Ascii40@8..9 "("
+          Select@9..15 "SELECT"
+          Whitespace@15..16 " "
+          ResTarget@16..17
+            AConst@16..17
+              Iconst@16..17 "2"
+        Ascii41@17..18 ")"
+        Whitespace@18..19 " "
+        Union@19..24 "UNION"
+        Whitespace@24..25 " "
+        Select@25..31 "SELECT"
+        Whitespace@31..32 " "
+        SelectStmt@32..33
+          ResTarget@32..33
+            AConst@32..33
+              Iconst@32..33 "2"
+  Ascii41@33..34 ")"
+  Ascii59@34..35 ";"
+

@@ -1,0 +1,46 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT 1.1 AS three UNION SELECT 2 UNION ALL SELECT 2 ORDER BY 1;
+---
+SelectStmt@0..65
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  SelectStmt@7..34
+    SelectStmt@7..19
+      ResTarget@7..19
+        AConst@7..10
+          Fconst@7..10 "1.1"
+        Whitespace@10..11 " "
+        As@11..13 "AS"
+        Whitespace@13..14 " "
+        Ident@14..19 "three"
+    Whitespace@19..20 " "
+    Union@20..25 "UNION"
+    Whitespace@25..26 " "
+    Select@26..32 "SELECT"
+    Whitespace@32..33 " "
+    SelectStmt@33..34
+      ResTarget@33..34
+        AConst@33..34
+          Iconst@33..34 "2"
+  Whitespace@34..35 " "
+  Union@35..40 "UNION"
+  Whitespace@40..41 " "
+  All@41..44 "ALL"
+  Whitespace@44..45 " "
+  SelectStmt@45..53
+    Select@45..51 "SELECT"
+    Whitespace@51..52 " "
+    ResTarget@52..53
+      AConst@52..53
+        Iconst@52..53 "2"
+  Whitespace@53..54 " "
+  SortBy@54..64
+    Order@54..59 "ORDER"
+    Whitespace@59..60 " "
+    By@60..62 "BY"
+    Whitespace@62..63 " "
+    AConst@63..64
+      Iconst@63..64 "1"
+  Ascii59@64..65 ";"
+

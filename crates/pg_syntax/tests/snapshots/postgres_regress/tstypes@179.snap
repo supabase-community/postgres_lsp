@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT ts_rank_cd(' a:1 s:2 d:2A g'::tsvector, 'a <-> s');"
+---
+SelectStmt@0..58
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..56
+    FuncCall@7..56
+      Ident@7..17 "ts_rank_cd"
+      Ascii40@17..18 "("
+      TypeCast@18..45
+        AConst@18..35
+          Sconst@18..35 "' a:1 s:2 d:2A g'"
+        Typecast@35..37 "::"
+        TypeName@37..45
+          Ident@37..45 "tsvector"
+      Ascii44@45..46 ","
+      Whitespace@46..47 " "
+      AConst@47..56
+        Sconst@47..56 "'a <-> s'"
+  Ascii41@56..57 ")"
+  Ascii59@57..58 ";"
+

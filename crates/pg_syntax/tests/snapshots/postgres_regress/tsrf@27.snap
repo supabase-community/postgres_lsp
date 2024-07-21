@@ -1,0 +1,69 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT few.dataa, count(*) FROM few WHERE dataa = 'a' GROUP BY few.dataa, unnest('{1,1,3}'::int[]) ORDER BY 2;"
+---
+SelectStmt@0..110
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..16
+    ColumnRef@7..16
+      Ident@7..10 "few"
+      Ascii46@10..11 "."
+      Ident@11..16 "dataa"
+  Ascii44@16..17 ","
+  Whitespace@17..18 " "
+  ResTarget@18..25
+    FuncCall@18..25
+      Ident@18..23 "count"
+      Ascii40@23..24 "("
+      Ascii42@24..25 "*"
+  Ascii41@25..26 ")"
+  Whitespace@26..27 " "
+  From@27..31 "FROM"
+  Whitespace@31..32 " "
+  RangeVar@32..35
+    Ident@32..35 "few"
+  Whitespace@35..36 " "
+  Where@36..41 "WHERE"
+  Whitespace@41..42 " "
+  AExpr@42..53
+    ColumnRef@42..47
+      Ident@42..47 "dataa"
+    Whitespace@47..48 " "
+    Ascii61@48..49 "="
+    Whitespace@49..50 " "
+    AConst@50..53
+      Sconst@50..53 "'a'"
+  Whitespace@53..54 " "
+  GroupP@54..59 "GROUP"
+  Whitespace@59..60 " "
+  By@60..62 "BY"
+  Whitespace@62..63 " "
+  ColumnRef@63..72
+    Ident@63..66 "few"
+    Ascii46@66..67 "."
+    Ident@67..72 "dataa"
+  Ascii44@72..73 ","
+  Whitespace@73..74 " "
+  FuncCall@74..95
+    Ident@74..80 "unnest"
+    Ascii40@80..81 "("
+    TypeCast@81..95
+      AConst@81..90
+        Sconst@81..90 "'{1,1,3}'"
+      Typecast@90..92 "::"
+      TypeName@92..95
+        IntP@92..95 "int"
+  Ascii91@95..96 "["
+  Ascii93@96..97 "]"
+  Ascii41@97..98 ")"
+  Whitespace@98..99 " "
+  SortBy@99..109
+    Order@99..104 "ORDER"
+    Whitespace@104..105 " "
+    By@105..107 "BY"
+    Whitespace@107..108 " "
+    AConst@108..109
+      Iconst@108..109 "2"
+  Ascii59@109..110 ";"
+

@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TYPE price_key AS (\n    id INTEGER\n);"
+---
+CompositeTypeStmt@0..44
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  TypeP@7..11 "TYPE"
+  Whitespace@11..12 " "
+  RangeVar@12..21
+    Ident@12..21 "price_key"
+  Whitespace@21..22 " "
+  As@22..24 "AS"
+  Whitespace@24..25 " "
+  Ascii40@25..26 "("
+  Newline@26..27 "\n"
+  Whitespace@27..31 "    "
+  ColumnDef@31..41
+    Ident@31..33 "id"
+    Whitespace@33..34 " "
+    TypeName@34..41
+      Integer@34..41 "INTEGER"
+  Newline@41..42 "\n"
+  Ascii41@42..43 ")"
+  Ascii59@43..44 ";"
+

@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT nummultirange() &> nummultirange(numrange(1,2));"
+---
+SelectStmt@0..55
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..52
+    AExpr@7..52
+      FuncCall@7..20
+        Ident@7..20 "nummultirange"
+      Ascii40@20..21 "("
+      Ascii41@21..22 ")"
+      Whitespace@22..23 " "
+      Op@23..25 "&>"
+      Whitespace@25..26 " "
+      FuncCall@26..52
+        Ident@26..39 "nummultirange"
+        Ascii40@39..40 "("
+        FuncCall@40..52
+          Ident@40..48 "numrange"
+          Ascii40@48..49 "("
+          AConst@49..50
+            Iconst@49..50 "1"
+          Ascii44@50..51 ","
+          AConst@51..52
+            Iconst@51..52 "2"
+  Ascii41@52..53 ")"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

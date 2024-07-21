@@ -1,0 +1,51 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select range_intersect_agg(nmr) from (values ('{[1,3]}'::nummultirange), ('{[6,12]}'::nummultirange)) t(nmr);"
+---
+SelectStmt@0..109
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..30
+    FuncCall@7..30
+      Ident@7..26 "range_intersect_agg"
+      Ascii40@26..27 "("
+      ColumnRef@27..30
+        Ident@27..30 "nmr"
+  Ascii41@30..31 ")"
+  Whitespace@31..32 " "
+  From@32..36 "from"
+  Whitespace@36..37 " "
+  Ascii40@37..38 "("
+  RangeSubselect@38..107
+    SelectStmt@38..99
+      Values@38..44 "values"
+      Whitespace@44..45 " "
+      Ascii40@45..46 "("
+      List@46..70
+        TypeCast@46..70
+          AConst@46..55
+            Sconst@46..55 "'{[1,3]}'"
+          Typecast@55..57 "::"
+          TypeName@57..70
+            Ident@57..70 "nummultirange"
+      Ascii41@70..71 ")"
+      Ascii44@71..72 ","
+      Whitespace@72..73 " "
+      Ascii40@73..74 "("
+      List@74..99
+        TypeCast@74..99
+          AConst@74..84
+            Sconst@74..84 "'{[6,12]}'"
+          Typecast@84..86 "::"
+          TypeName@86..99
+            Ident@86..99 "nummultirange"
+    Ascii41@99..100 ")"
+    Ascii41@100..101 ")"
+    Whitespace@101..102 " "
+    Alias@102..107
+      Ident@102..103 "t"
+      Ascii40@103..104 "("
+      Ident@104..107 "nmr"
+  Ascii41@107..108 ")"
+  Ascii59@108..109 ";"
+

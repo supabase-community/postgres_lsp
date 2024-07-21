@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT c.f1 FROM NAME_TBL c WHERE c.f1 = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ABCDEFGHIJKLMNOPQR';"
+---
+SelectStmt@0..108
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      Ident@7..8 "c"
+      Ascii46@8..9 "."
+      Ident@9..11 "f1"
+  Whitespace@11..12 " "
+  From@12..16 "FROM"
+  Whitespace@16..17 " "
+  RangeVar@17..27
+    Ident@17..25 "NAME_TBL"
+    Whitespace@25..26 " "
+    Alias@26..27
+      Ident@26..27 "c"
+  Whitespace@27..28 " "
+  Where@28..33 "WHERE"
+  Whitespace@33..34 " "
+  AExpr@34..107
+    ColumnRef@34..38
+      Ident@34..35 "c"
+      Ascii46@35..36 "."
+      Ident@36..38 "f1"
+    Whitespace@38..39 " "
+    Ascii61@39..40 "="
+    Whitespace@40..41 " "
+    AConst@41..107
+      Sconst@41..107 "'1234567890ABCDEFGHIJ ..."
+  Ascii59@107..108 ";"
+

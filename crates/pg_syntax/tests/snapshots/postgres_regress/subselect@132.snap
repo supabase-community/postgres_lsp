@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into outer_text values ('a', 'a');"
+---
+InsertStmt@0..41
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..22
+    Ident@12..22 "outer_text"
+  Whitespace@22..23 " "
+  SelectStmt@23..39
+    Values@23..29 "values"
+    Whitespace@29..30 " "
+    Ascii40@30..31 "("
+    List@31..39
+      AConst@31..34
+        Sconst@31..34 "'a'"
+      Ascii44@34..35 ","
+      Whitespace@35..36 " "
+      AConst@36..39
+        Sconst@36..39 "'a'"
+  Ascii41@39..40 ")"
+  Ascii59@40..41 ";"
+

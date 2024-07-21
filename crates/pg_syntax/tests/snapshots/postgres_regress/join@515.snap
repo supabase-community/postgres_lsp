@@ -1,0 +1,64 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into fkest select x, x/10, x/10, x/100 from generate_series(1,1000) x;"
+---
+InsertStmt@0..77
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..17
+    Ident@12..17 "fkest"
+  Whitespace@17..18 " "
+  SelectStmt@18..76
+    Select@18..24 "select"
+    Whitespace@24..25 " "
+    ResTarget@25..26
+      ColumnRef@25..26
+        Ident@25..26 "x"
+    Ascii44@26..27 ","
+    Whitespace@27..28 " "
+    ResTarget@28..32
+      AExpr@28..32
+        ColumnRef@28..29
+          Ident@28..29 "x"
+        Ascii47@29..30 "/"
+        AConst@30..32
+          Iconst@30..32 "10"
+    Ascii44@32..33 ","
+    Whitespace@33..34 " "
+    ResTarget@34..38
+      AExpr@34..38
+        ColumnRef@34..35
+          Ident@34..35 "x"
+        Ascii47@35..36 "/"
+        AConst@36..38
+          Iconst@36..38 "10"
+    Ascii44@38..39 ","
+    Whitespace@39..40 " "
+    ResTarget@40..45
+      AExpr@40..45
+        ColumnRef@40..41
+          Ident@40..41 "x"
+        Ascii47@41..42 "/"
+        AConst@42..45
+          Iconst@42..45 "100"
+    Whitespace@45..46 " "
+    From@46..50 "from"
+    Whitespace@50..51 " "
+    RangeFunction@51..76
+      List@51..73
+        FuncCall@51..73
+          Ident@51..66 "generate_series"
+          Ascii40@66..67 "("
+          AConst@67..68
+            Iconst@67..68 "1"
+          Ascii44@68..69 ","
+          AConst@69..73
+            Iconst@69..73 "1000"
+      Ascii41@73..74 ")"
+      Whitespace@74..75 " "
+      Alias@75..76
+        Ident@75..76 "x"
+  Ascii59@76..77 ";"
+

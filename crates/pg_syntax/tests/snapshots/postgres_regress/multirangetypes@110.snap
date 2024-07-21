@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM nummultirange_test WHERE multirange_contains_range(nmr, numrange(4.0, 4.2));"
+---
+SelectStmt@0..90
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..32
+    Ident@14..32 "nummultirange_test"
+  Whitespace@32..33 " "
+  Where@33..38 "WHERE"
+  Whitespace@38..39 " "
+  FuncCall@39..87
+    Ident@39..64 "multirange_contains_r ..."
+    Ascii40@64..65 "("
+    ColumnRef@65..68
+      Ident@65..68 "nmr"
+    Ascii44@68..69 ","
+    Whitespace@69..70 " "
+    FuncCall@70..87
+      Ident@70..78 "numrange"
+      Ascii40@78..79 "("
+      AConst@79..82
+        Fconst@79..82 "4.0"
+      Ascii44@82..83 ","
+      Whitespace@83..84 " "
+      AConst@84..87
+        Fconst@84..87 "4.2"
+  Ascii41@87..88 ")"
+  Ascii41@88..89 ")"
+  Ascii59@89..90 ";"
+

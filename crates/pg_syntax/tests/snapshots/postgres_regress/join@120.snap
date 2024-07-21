@@ -1,0 +1,75 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select aa, bb, unique1, unique1\n  from tenk1 right join b_star on aa = unique1\n  where bb < bb and bb is null;"
+---
+SelectStmt@0..110
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..9
+    ColumnRef@7..9
+      Ident@7..9 "aa"
+  Ascii44@9..10 ","
+  Whitespace@10..11 " "
+  ResTarget@11..13
+    ColumnRef@11..13
+      Ident@11..13 "bb"
+  Ascii44@13..14 ","
+  Whitespace@14..15 " "
+  ResTarget@15..22
+    ColumnRef@15..22
+      Ident@15..22 "unique1"
+  Ascii44@22..23 ","
+  Whitespace@23..24 " "
+  ResTarget@24..31
+    ColumnRef@24..31
+      Ident@24..31 "unique1"
+  Newline@31..32 "\n"
+  Whitespace@32..34 "  "
+  From@34..38 "from"
+  Whitespace@38..39 " "
+  JoinExpr@39..78
+    RangeVar@39..44
+      Ident@39..44 "tenk1"
+    Whitespace@44..45 " "
+    Right@45..50 "right"
+    Whitespace@50..51 " "
+    Join@51..55 "join"
+    Whitespace@55..56 " "
+    RangeVar@56..62
+      Ident@56..62 "b_star"
+    Whitespace@62..63 " "
+    On@63..65 "on"
+    Whitespace@65..66 " "
+    AExpr@66..78
+      ColumnRef@66..68
+        Ident@66..68 "aa"
+      Whitespace@68..69 " "
+      Ascii61@69..70 "="
+      Whitespace@70..71 " "
+      ColumnRef@71..78
+        Ident@71..78 "unique1"
+  Newline@78..79 "\n"
+  Whitespace@79..81 "  "
+  Where@81..86 "where"
+  Whitespace@86..87 " "
+  BoolExpr@87..109
+    AExpr@87..94
+      ColumnRef@87..89
+        Ident@87..89 "bb"
+      Whitespace@89..90 " "
+      Ascii60@90..91 "<"
+      Whitespace@91..92 " "
+      ColumnRef@92..94
+        Ident@92..94 "bb"
+    Whitespace@94..95 " "
+    And@95..98 "and"
+    Whitespace@98..99 " "
+    NullTest@99..109
+      ColumnRef@99..101
+        Ident@99..101 "bb"
+      Whitespace@101..102 " "
+      Is@102..104 "is"
+      Whitespace@104..105 " "
+      NullP@105..109 "null"
+  Ascii59@109..110 ";"
+

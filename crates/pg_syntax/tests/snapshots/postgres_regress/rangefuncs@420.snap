@@ -1,0 +1,66 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select *, row_to_json(u) from unnest(array[null::rngfunc2, (1,'foo')::rngfunc2, null::rngfunc2]) u;"
+---
+SelectStmt@0..99
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Ascii44@8..9 ","
+  Whitespace@9..10 " "
+  ResTarget@10..23
+    FuncCall@10..23
+      Ident@10..21 "row_to_json"
+      Ascii40@21..22 "("
+      ColumnRef@22..23
+        Ident@22..23 "u"
+  Ascii41@23..24 ")"
+  Whitespace@24..25 " "
+  From@25..29 "from"
+  Whitespace@29..30 " "
+  RangeFunction@30..98
+    List@30..94
+      FuncCall@30..94
+        Ident@30..36 "unnest"
+        Ascii40@36..37 "("
+        AArrayExpr@37..94
+          Array@37..42 "array"
+          Ascii91@42..43 "["
+          TypeCast@43..57
+            AConst@43..47
+              NullP@43..47 "null"
+            Typecast@47..49 "::"
+            TypeName@49..57
+              Ident@49..57 "rngfunc2"
+          Ascii44@57..58 ","
+          Whitespace@58..59 " "
+          TypeCast@59..78
+            RowExpr@59..67
+              Ascii40@59..60 "("
+              AConst@60..61
+                Iconst@60..61 "1"
+              Ascii44@61..62 ","
+              AConst@62..67
+                Sconst@62..67 "'foo'"
+            Ascii41@67..68 ")"
+            Typecast@68..70 "::"
+            TypeName@70..78
+              Ident@70..78 "rngfunc2"
+          Ascii44@78..79 ","
+          Whitespace@79..80 " "
+          TypeCast@80..94
+            AConst@80..84
+              NullP@80..84 "null"
+            Typecast@84..86 "::"
+            TypeName@86..94
+              Ident@86..94 "rngfunc2"
+    Ascii93@94..95 "]"
+    Ascii41@95..96 ")"
+    Whitespace@96..97 " "
+    Alias@97..98
+      Ident@97..98 "u"
+  Ascii59@98..99 ";"
+

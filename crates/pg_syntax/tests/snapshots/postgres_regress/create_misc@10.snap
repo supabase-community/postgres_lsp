@@ -1,0 +1,47 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO b_star (class, a, b) VALUES ('b', 3, 'mumble'::text);"
+---
+InsertStmt@0..65
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "b_star"
+  Whitespace@18..19 " "
+  Ascii40@19..20 "("
+  ResTarget@20..25
+    Class@20..25 "class"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..28
+    Ident@27..28 "a"
+  Ascii44@28..29 ","
+  Whitespace@29..30 " "
+  ResTarget@30..31
+    Ident@30..31 "b"
+  Ascii41@31..32 ")"
+  Whitespace@32..33 " "
+  SelectStmt@33..63
+    Values@33..39 "VALUES"
+    Whitespace@39..40 " "
+    Ascii40@40..41 "("
+    List@41..63
+      AConst@41..44
+        Sconst@41..44 "'b'"
+      Ascii44@44..45 ","
+      Whitespace@45..46 " "
+      AConst@46..47
+        Iconst@46..47 "3"
+      Ascii44@47..48 ","
+      Whitespace@48..49 " "
+      TypeCast@49..63
+        AConst@49..57
+          Sconst@49..57 "'mumble'"
+        Typecast@57..59 "::"
+        TypeName@59..63
+          TextP@59..63 "text"
+  Ascii41@63..64 ")"
+  Ascii59@64..65 ";"
+

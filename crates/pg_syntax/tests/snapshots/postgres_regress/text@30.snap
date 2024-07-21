@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select format('Hello %%%%');"
+---
+SelectStmt@0..28
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..26
+    FuncCall@7..26
+      Ident@7..13 "format"
+      Ascii40@13..14 "("
+      AConst@14..26
+        Sconst@14..26 "'Hello %%%%'"
+  Ascii41@26..27 ")"
+  Ascii59@27..28 ";"
+

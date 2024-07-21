@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 'supernova'::tsvector @@ 'super:*'::tsquery AS \"true\";"
+---
+SelectStmt@0..61
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..60
+    AExpr@7..50
+      TypeCast@7..28
+        AConst@7..18
+          Sconst@7..18 "'supernova'"
+        Typecast@18..20 "::"
+        TypeName@20..28
+          Ident@20..28 "tsvector"
+      Whitespace@28..29 " "
+      Op@29..31 "@@"
+      Whitespace@31..32 " "
+      TypeCast@32..50
+        AConst@32..41
+          Sconst@32..41 "'super:*'"
+        Typecast@41..43 "::"
+        TypeName@43..50
+          Ident@43..50 "tsquery"
+    Whitespace@50..51 " "
+    As@51..53 "AS"
+    Whitespace@53..54 " "
+    Ident@54..60 "\"true\""
+  Ascii59@60..61 ";"
+

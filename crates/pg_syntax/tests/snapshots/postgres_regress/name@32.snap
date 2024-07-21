@@ -1,0 +1,53 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT length(a[1]), length(a[2]) from parse_ident('\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\".yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy') as a;"
+---
+SelectStmt@0..766
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..17
+    FuncCall@7..17
+      Ident@7..13 "length"
+      Ascii40@13..14 "("
+      AIndirection@14..17
+        ColumnRef@14..15
+          Ident@14..15 "a"
+        Ascii91@15..16 "["
+        AIndices@16..17
+          AConst@16..17
+            Iconst@16..17 "1"
+  Ascii93@17..18 "]"
+  Ascii41@18..19 ")"
+  Ascii44@19..20 ","
+  Whitespace@20..21 " "
+  ResTarget@21..31
+    FuncCall@21..31
+      Ident@21..27 "length"
+      Ascii40@27..28 "("
+      AIndirection@28..31
+        ColumnRef@28..29
+          Ident@28..29 "a"
+        Ascii91@29..30 "["
+        AIndices@30..31
+          AConst@30..31
+            Iconst@30..31 "2"
+  Ascii93@31..32 "]"
+  Ascii41@32..33 ")"
+  Whitespace@33..34 " "
+  From@34..38 "from"
+  Whitespace@38..39 " "
+  RangeFunction@39..765
+    List@39..759
+      FuncCall@39..759
+        Ident@39..50 "parse_ident"
+        Ascii40@50..51 "("
+        AConst@51..759
+          Sconst@51..759 "'\"xxxxxxxxxxxxxxxxxxx ..."
+    Ascii41@759..760 ")"
+    Whitespace@760..761 " "
+    Alias@761..765
+      As@761..763 "as"
+      Whitespace@763..764 " "
+      Ident@764..765 "a"
+  Ascii59@765..766 ";"
+

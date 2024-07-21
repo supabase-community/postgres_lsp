@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION functest_A_2(text[]) RETURNS int LANGUAGE 'sql'\n       AS 'SELECT $1[1]::int';"
+---
+CreateFunctionStmt@0..94
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..28 "functest_A_2"
+  Ascii40@28..29 "("
+  FunctionParameter@29..33
+    TypeName@29..33
+      TextP@29..33 "text"
+  Ascii91@33..34 "["
+  Ascii93@34..35 "]"
+  Ascii41@35..36 ")"
+  Whitespace@36..37 " "
+  Returns@37..44 "RETURNS"
+  Whitespace@44..45 " "
+  TypeName@45..48
+    IntP@45..48 "int"
+  Whitespace@48..49 " "
+  DefElem@49..63
+    Language@49..57 "LANGUAGE"
+    Whitespace@57..58 " "
+    Sconst@58..63 "'sql'"
+  Newline@63..64 "\n"
+  Whitespace@64..71 "       "
+  DefElem@71..93
+    As@71..73 "AS"
+    Whitespace@73..74 " "
+    List@74..93
+      Sconst@74..93 "'SELECT $1[1]::int'"
+  Ascii59@93..94 ";"
+

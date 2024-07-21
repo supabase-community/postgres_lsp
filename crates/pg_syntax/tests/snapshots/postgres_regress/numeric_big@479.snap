@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO num_data VALUES (7, '-818934540071845742');"
+---
+InsertStmt@0..55
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "num_data"
+  Whitespace@20..21 " "
+  SelectStmt@21..53
+    Values@21..27 "VALUES"
+    Whitespace@27..28 " "
+    Ascii40@28..29 "("
+    List@29..53
+      AConst@29..30
+        Iconst@29..30 "7"
+      Ascii44@30..31 ","
+      Whitespace@31..32 " "
+      AConst@32..53
+        Sconst@32..53 "'-818934540071845742'"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

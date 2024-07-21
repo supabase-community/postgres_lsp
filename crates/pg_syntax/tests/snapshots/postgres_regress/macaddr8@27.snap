@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO macaddr8_data VALUES (5, '0800.2b01.0203');"
+---
+InsertStmt@0..55
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..25
+    Ident@12..25 "macaddr8_data"
+  Whitespace@25..26 " "
+  SelectStmt@26..53
+    Values@26..32 "VALUES"
+    Whitespace@32..33 " "
+    Ascii40@33..34 "("
+    List@34..53
+      AConst@34..35
+        Iconst@34..35 "5"
+      Ascii44@35..36 ","
+      Whitespace@36..37 " "
+      AConst@37..53
+        Sconst@37..53 "'0800.2b01.0203'"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

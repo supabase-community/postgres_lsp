@@ -1,0 +1,11 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: truncate parted_conflict;
+---
+TruncateStmt@0..25
+  Truncate@0..8 "truncate"
+  Whitespace@8..9 " "
+  RangeVar@9..24
+    Ident@9..24 "parted_conflict"
+  Ascii59@24..25 ";"
+

@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select * from listp where b = 1;
+---
+SelectStmt@0..32
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeVar@14..19
+    Ident@14..19 "listp"
+  Whitespace@19..20 " "
+  Where@20..25 "where"
+  Whitespace@25..26 " "
+  AExpr@26..31
+    ColumnRef@26..27
+      Ident@26..27 "b"
+    Whitespace@27..28 " "
+    Ascii61@28..29 "="
+    Whitespace@29..30 " "
+    AConst@30..31
+      Iconst@30..31 "1"
+  Ascii59@31..32 ";"
+

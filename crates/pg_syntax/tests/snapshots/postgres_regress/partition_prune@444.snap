@@ -1,0 +1,33 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table boolp (a bool) partition by list (a);
+---
+CreateStmt@0..50
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..18
+    Ident@13..18 "boolp"
+  Whitespace@18..19 " "
+  Ascii40@19..20 "("
+  ColumnDef@20..26
+    Ident@20..21 "a"
+    Whitespace@21..22 " "
+    TypeName@22..26
+      Ident@22..26 "bool"
+  Ascii41@26..27 ")"
+  Whitespace@27..28 " "
+  PartitionSpec@28..48
+    Partition@28..37 "partition"
+    Whitespace@37..38 " "
+    By@38..40 "by"
+    Whitespace@40..41 " "
+    Ident@41..45 "list"
+    Whitespace@45..46 " "
+    Ascii40@46..47 "("
+    PartitionElem@47..48
+      Ident@47..48 "a"
+  Ascii41@48..49 ")"
+  Ascii59@49..50 ";"
+

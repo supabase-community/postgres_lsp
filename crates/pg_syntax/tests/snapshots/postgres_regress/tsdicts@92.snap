@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_tsvector('ispell_tst', 'Booking the skies after rebookings for footballklubber from a foot');"
+---
+SelectStmt@0..103
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..101
+    FuncCall@7..101
+      Ident@7..18 "to_tsvector"
+      Ascii40@18..19 "("
+      AConst@19..31
+        Sconst@19..31 "'ispell_tst'"
+      Ascii44@31..32 ","
+      Whitespace@32..33 " "
+      AConst@33..101
+        Sconst@33..101 "'Booking the skies af ..."
+  Ascii41@101..102 ")"
+  Ascii59@102..103 ";"
+

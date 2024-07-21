@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT d1 AS us_iso FROM TIMESTAMP_TBL;
+---
+SelectStmt@0..39
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..19
+    ColumnRef@7..9
+      Ident@7..9 "d1"
+    Whitespace@9..10 " "
+    As@10..12 "AS"
+    Whitespace@12..13 " "
+    Ident@13..19 "us_iso"
+  Whitespace@19..20 " "
+  From@20..24 "FROM"
+  Whitespace@24..25 " "
+  RangeVar@25..38
+    Ident@25..38 "TIMESTAMP_TBL"
+  Ascii59@38..39 ";"
+

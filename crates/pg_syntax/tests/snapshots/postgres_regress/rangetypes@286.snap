@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index test_range_elem_idx on test_range_elem (i);
+---
+IndexStmt@0..56
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..32 "test_range_elem_idx"
+  Whitespace@32..33 " "
+  On@33..35 "on"
+  Whitespace@35..36 " "
+  RangeVar@36..51
+    Ident@36..51 "test_range_elem"
+  Whitespace@51..52 " "
+  Ascii40@52..53 "("
+  IndexElem@53..54
+    Ident@53..54 "i"
+  Ascii41@54..55 ")"
+  Ascii59@55..56 ";"
+

@@ -1,0 +1,33 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select x from int8_tbl, extractq2_2_opt(int8_tbl) f(x);"
+---
+SelectStmt@0..55
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      Ident@7..8 "x"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeVar@14..22
+    Ident@14..22 "int8_tbl"
+  Ascii44@22..23 ","
+  Whitespace@23..24 " "
+  RangeFunction@24..53
+    List@24..48
+      FuncCall@24..48
+        Ident@24..39 "extractq2_2_opt"
+        Ascii40@39..40 "("
+        ColumnRef@40..48
+          Ident@40..48 "int8_tbl"
+    Ascii41@48..49 ")"
+    Whitespace@49..50 " "
+    Alias@50..53
+      Ident@50..51 "f"
+      Ascii40@51..52 "("
+      Ident@52..53 "x"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

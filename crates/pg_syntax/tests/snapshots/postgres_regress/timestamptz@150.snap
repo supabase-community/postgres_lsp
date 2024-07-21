@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_char(d1, 'FMY,YYY FMYYYY FMYYY FMYY FMY FMCC FMQ FMMM FMWW FMDDD FMDD FMD FMJ')\n   FROM TIMESTAMPTZ_TBL;"
+---
+SelectStmt@0..114
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..88
+    FuncCall@7..88
+      Ident@7..14 "to_char"
+      Ascii40@14..15 "("
+      ColumnRef@15..17
+        Ident@15..17 "d1"
+      Ascii44@17..18 ","
+      Whitespace@18..19 " "
+      AConst@19..88
+        Sconst@19..88 "'FMY,YYY FMYYYY FMYYY ..."
+  Ascii41@88..89 ")"
+  Newline@89..90 "\n"
+  Whitespace@90..93 "   "
+  From@93..97 "FROM"
+  Whitespace@97..98 " "
+  RangeVar@98..113
+    Ident@98..113 "TIMESTAMPTZ_TBL"
+  Ascii59@113..114 ";"
+

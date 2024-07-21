@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO T SELECT * FROM generate_series(1, 10) a;"
+---
+InsertStmt@0..53
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..13
+    Ident@12..13 "T"
+  Whitespace@13..14 " "
+  SelectStmt@14..52
+    Select@14..20 "SELECT"
+    Whitespace@20..21 " "
+    ResTarget@21..22
+      ColumnRef@21..22
+        AStar@21..22
+          Ascii42@21..22 "*"
+    Whitespace@22..23 " "
+    From@23..27 "FROM"
+    Whitespace@27..28 " "
+    RangeFunction@28..52
+      List@28..49
+        FuncCall@28..49
+          Ident@28..43 "generate_series"
+          Ascii40@43..44 "("
+          AConst@44..45
+            Iconst@44..45 "1"
+          Ascii44@45..46 ","
+          Whitespace@46..47 " "
+          AConst@47..49
+            Iconst@47..49 "10"
+      Ascii41@49..50 ")"
+      Whitespace@50..51 " "
+      Alias@51..52
+        Ident@51..52 "a"
+  Ascii59@52..53 ";"
+

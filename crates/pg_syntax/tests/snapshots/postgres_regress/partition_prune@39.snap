@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table rlp3nullxy partition of rlp3 for values in (null, 'xy');"
+---
+CreateStmt@0..69
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..23
+    Ident@13..23 "rlp3nullxy"
+  Whitespace@23..24 " "
+  Partition@24..33 "partition"
+  Whitespace@33..34 " "
+  Of@34..36 "of"
+  Whitespace@36..37 " "
+  RangeVar@37..41
+    Ident@37..41 "rlp3"
+  Whitespace@41..42 " "
+  For@42..45 "for"
+  Whitespace@45..46 " "
+  Values@46..52 "values"
+  Whitespace@52..53 " "
+  PartitionBoundSpec@53..67
+    InP@53..55 "in"
+    Whitespace@55..56 " "
+    Ascii40@56..57 "("
+    AConst@57..61
+      NullP@57..61 "null"
+    Ascii44@61..62 ","
+    Whitespace@62..63 " "
+    AConst@63..67
+      Sconst@63..67 "'xy'"
+  Ascii41@67..68 ")"
+  Ascii59@68..69 ";"
+

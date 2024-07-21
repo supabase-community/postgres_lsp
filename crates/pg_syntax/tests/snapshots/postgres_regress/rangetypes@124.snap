@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO textrange_test VALUES(textrange('b', 'g'));"
+---
+InsertStmt@0..55
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..26
+    Ident@12..26 "textrange_test"
+  Whitespace@26..27 " "
+  SelectStmt@27..52
+    Values@27..33 "VALUES"
+    Ascii40@33..34 "("
+    List@34..52
+      FuncCall@34..52
+        Ident@34..43 "textrange"
+        Ascii40@43..44 "("
+        AConst@44..47
+          Sconst@44..47 "'b'"
+        Ascii44@47..48 ","
+        Whitespace@48..49 " "
+        AConst@49..52
+          Sconst@49..52 "'g'"
+  Ascii41@52..53 ")"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

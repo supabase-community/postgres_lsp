@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT jsonb_path_match('[{\"a\": 1}, {\"a\": 2}]', '$[*].a > 1');"
+---
+SelectStmt@0..62
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..60
+    FuncCall@7..60
+      Ident@7..23 "jsonb_path_match"
+      Ascii40@23..24 "("
+      AConst@24..46
+        Sconst@24..46 "'[{\"a\": 1}, {\"a\": 2}]'"
+      Ascii44@46..47 ","
+      Whitespace@47..48 " "
+      AConst@48..60
+        Sconst@48..60 "'$[*].a > 1'"
+  Ascii41@60..61 ")"
+  Ascii59@61..62 ";"
+

@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 'a | f | g' < 'b & c'::tsquery as \"false\";"
+---
+SelectStmt@0..49
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..48
+    AExpr@7..37
+      AConst@7..18
+        Sconst@7..18 "'a | f | g'"
+      Whitespace@18..19 " "
+      Ascii60@19..20 "<"
+      Whitespace@20..21 " "
+      TypeCast@21..37
+        AConst@21..28
+          Sconst@21..28 "'b & c'"
+        Typecast@28..30 "::"
+        TypeName@30..37
+          Ident@30..37 "tsquery"
+    Whitespace@37..38 " "
+    As@38..40 "as"
+    Whitespace@40..41 " "
+    Ident@41..48 "\"false\""
+  Ascii59@48..49 ";"
+

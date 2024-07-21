@@ -1,0 +1,73 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from\n  zt2 left join zt3 on (f2 = f3)\n      left join zt1 on (f3 = f1)\nwhere f2 = 53;"
+---
+SelectStmt@0..94
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Newline@13..14 "\n"
+  Whitespace@14..16 "  "
+  JoinExpr@16..78
+    JoinExpr@16..45
+      RangeVar@16..19
+        Ident@16..19 "zt2"
+      Whitespace@19..20 " "
+      Left@20..24 "left"
+      Whitespace@24..25 " "
+      Join@25..29 "join"
+      Whitespace@29..30 " "
+      RangeVar@30..33
+        Ident@30..33 "zt3"
+      Whitespace@33..34 " "
+      On@34..36 "on"
+      Whitespace@36..37 " "
+      Ascii40@37..38 "("
+      AExpr@38..45
+        ColumnRef@38..40
+          Ident@38..40 "f2"
+        Whitespace@40..41 " "
+        Ascii61@41..42 "="
+        Whitespace@42..43 " "
+        ColumnRef@43..45
+          Ident@43..45 "f3"
+    Ascii41@45..46 ")"
+    Newline@46..47 "\n"
+    Whitespace@47..53 "      "
+    Left@53..57 "left"
+    Whitespace@57..58 " "
+    Join@58..62 "join"
+    Whitespace@62..63 " "
+    RangeVar@63..66
+      Ident@63..66 "zt1"
+    Whitespace@66..67 " "
+    On@67..69 "on"
+    Whitespace@69..70 " "
+    Ascii40@70..71 "("
+    AExpr@71..78
+      ColumnRef@71..73
+        Ident@71..73 "f3"
+      Whitespace@73..74 " "
+      Ascii61@74..75 "="
+      Whitespace@75..76 " "
+      ColumnRef@76..78
+        Ident@76..78 "f1"
+  Ascii41@78..79 ")"
+  Newline@79..80 "\n"
+  Where@80..85 "where"
+  Whitespace@85..86 " "
+  AExpr@86..93
+    ColumnRef@86..88
+      Ident@86..88 "f2"
+    Whitespace@88..89 " "
+    Ascii61@89..90 "="
+    Whitespace@90..91 " "
+    AConst@91..93
+      Iconst@91..93 "53"
+  Ascii59@93..94 ";"
+

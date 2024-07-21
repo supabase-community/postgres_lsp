@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select daterange('2000-01-01'::date, 'infinity'::date, '[]');"
+---
+SelectStmt@0..61
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..59
+    FuncCall@7..59
+      Ident@7..16 "daterange"
+      Ascii40@16..17 "("
+      TypeCast@17..35
+        AConst@17..29
+          Sconst@17..29 "'2000-01-01'"
+        Typecast@29..31 "::"
+        TypeName@31..35
+          Ident@31..35 "date"
+      Ascii44@35..36 ","
+      Whitespace@36..37 " "
+      TypeCast@37..53
+        AConst@37..47
+          Sconst@37..47 "'infinity'"
+        Typecast@47..49 "::"
+        TypeName@49..53
+          Ident@49..53 "date"
+      Ascii44@53..54 ","
+      Whitespace@54..55 " "
+      AConst@55..59
+        Sconst@55..59 "'[]'"
+  Ascii41@59..60 ")"
+  Ascii59@60..61 ";"
+

@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE TABLE trunc_a2d PARTITION OF trunc_a2 DEFAULT;
+---
+CreateStmt@0..53
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..22
+    Ident@13..22 "trunc_a2d"
+  Whitespace@22..23 " "
+  Partition@23..32 "PARTITION"
+  Whitespace@32..33 " "
+  Of@33..35 "OF"
+  Whitespace@35..36 " "
+  RangeVar@36..44
+    Ident@36..44 "trunc_a2"
+  Whitespace@44..45 " "
+  PartitionBoundSpec@45..52
+    Default@45..52 "DEFAULT"
+  Ascii59@52..53 ";"
+

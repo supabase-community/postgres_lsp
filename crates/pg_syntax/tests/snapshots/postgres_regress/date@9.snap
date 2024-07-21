@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO DATE_TBL VALUES ('1997-02-29');"
+---
+InsertStmt@0..43
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "DATE_TBL"
+  Whitespace@20..21 " "
+  SelectStmt@21..41
+    Values@21..27 "VALUES"
+    Whitespace@27..28 " "
+    Ascii40@28..29 "("
+    List@29..41
+      AConst@29..41
+        Sconst@29..41 "'1997-02-29'"
+  Ascii41@41..42 ")"
+  Ascii59@42..43 ";"
+

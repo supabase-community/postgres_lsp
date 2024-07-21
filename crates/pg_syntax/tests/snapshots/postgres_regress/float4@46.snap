@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT f.* FROM FLOAT4_TBL f WHERE '1004.3' >= f.f1;"
+---
+SelectStmt@0..52
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..10
+    ColumnRef@7..10
+      Ident@7..8 "f"
+      Ascii46@8..9 "."
+      AStar@9..10
+        Ascii42@9..10 "*"
+  Whitespace@10..11 " "
+  From@11..15 "FROM"
+  Whitespace@15..16 " "
+  RangeVar@16..28
+    Ident@16..26 "FLOAT4_TBL"
+    Whitespace@26..27 " "
+    Alias@27..28
+      Ident@27..28 "f"
+  Whitespace@28..29 " "
+  Where@29..34 "WHERE"
+  Whitespace@34..35 " "
+  AExpr@35..51
+    AConst@35..43
+      Sconst@35..43 "'1004.3'"
+    Whitespace@43..44 " "
+    GreaterEquals@44..46 ">="
+    Whitespace@46..47 " "
+    ColumnRef@47..51
+      Ident@47..48 "f"
+      Ascii46@48..49 "."
+      Ident@49..51 "f1"
+  Ascii59@51..52 ";"
+

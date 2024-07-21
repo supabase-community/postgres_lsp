@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into hp values (null, 'xxx', 3);"
+---
+InsertStmt@0..39
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..14
+    Ident@12..14 "hp"
+  Whitespace@14..15 " "
+  SelectStmt@15..37
+    Values@15..21 "values"
+    Whitespace@21..22 " "
+    Ascii40@22..23 "("
+    List@23..37
+      AConst@23..27
+        NullP@23..27 "null"
+      Ascii44@27..28 ","
+      Whitespace@28..29 " "
+      AConst@29..34
+        Sconst@29..34 "'xxx'"
+      Ascii44@34..35 ","
+      Whitespace@35..36 " "
+      AConst@36..37
+        Iconst@36..37 "3"
+  Ascii41@37..38 ")"
+  Ascii59@38..39 ";"
+

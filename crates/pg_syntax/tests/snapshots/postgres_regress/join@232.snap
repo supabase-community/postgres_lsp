@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index on tidv (idv);
+---
+IndexStmt@0..27
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  On@13..15 "on"
+  Whitespace@15..16 " "
+  RangeVar@16..20
+    Ident@16..20 "tidv"
+  Whitespace@20..21 " "
+  Ascii40@21..22 "("
+  IndexElem@22..25
+    Ident@22..25 "idv"
+  Ascii41@25..26 ")"
+  Ascii59@26..27 ";"
+

@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO testcase VALUES (1, 0);"
+---
+InsertStmt@0..35
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "testcase"
+  Whitespace@20..21 " "
+  SelectStmt@21..33
+    Values@21..27 "VALUES"
+    Whitespace@27..28 " "
+    Ascii40@28..29 "("
+    List@29..33
+      AConst@29..30
+        Iconst@29..30 "1"
+      Ascii44@30..31 ","
+      Whitespace@31..32 " "
+      AConst@32..33
+        Iconst@32..33 "0"
+  Ascii41@33..34 ")"
+  Ascii59@34..35 ";"
+

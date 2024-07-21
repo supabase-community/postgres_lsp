@@ -1,0 +1,12 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create type int8alias2;
+---
+DefineStmt@0..23
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  TypeP@7..11 "type"
+  Whitespace@11..12 " "
+  Ident@12..22 "int8alias2"
+  Ascii59@22..23 ";"
+

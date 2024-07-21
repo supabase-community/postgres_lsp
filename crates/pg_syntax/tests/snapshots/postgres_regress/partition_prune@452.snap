@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table ma_test (a int, b int) partition by range (a);"
+---
+CreateStmt@0..59
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..20
+    Ident@13..20 "ma_test"
+  Whitespace@20..21 " "
+  Ascii40@21..22 "("
+  ColumnDef@22..27
+    Ident@22..23 "a"
+    Whitespace@23..24 " "
+    TypeName@24..27
+      IntP@24..27 "int"
+  Ascii44@27..28 ","
+  Whitespace@28..29 " "
+  ColumnDef@29..34
+    Ident@29..30 "b"
+    Whitespace@30..31 " "
+    TypeName@31..34
+      IntP@31..34 "int"
+  Ascii41@34..35 ")"
+  Whitespace@35..36 " "
+  PartitionSpec@36..57
+    Partition@36..45 "partition"
+    Whitespace@45..46 " "
+    By@46..48 "by"
+    Whitespace@48..49 " "
+    Range@49..54 "range"
+    Whitespace@54..55 " "
+    Ascii40@55..56 "("
+    PartitionElem@56..57
+      Ident@56..57 "a"
+  Ascii41@57..58 ")"
+  Ascii59@58..59 ";"
+

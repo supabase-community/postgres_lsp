@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table coll_pruning_b partition of coll_pruning for values in ('b');"
+---
+CreateStmt@0..74
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..27
+    Ident@13..27 "coll_pruning_b"
+  Whitespace@27..28 " "
+  Partition@28..37 "partition"
+  Whitespace@37..38 " "
+  Of@38..40 "of"
+  Whitespace@40..41 " "
+  RangeVar@41..53
+    Ident@41..53 "coll_pruning"
+  Whitespace@53..54 " "
+  For@54..57 "for"
+  Whitespace@57..58 " "
+  Values@58..64 "values"
+  Whitespace@64..65 " "
+  PartitionBoundSpec@65..72
+    InP@65..67 "in"
+    Whitespace@67..68 " "
+    Ascii40@68..69 "("
+    AConst@69..72
+      Sconst@69..72 "'b'"
+  Ascii41@72..73 ")"
+  Ascii59@73..74 ";"
+

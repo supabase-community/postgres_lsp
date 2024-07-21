@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from jsonb_path_query('[1, \"2\", null]', '$[*] ? (@ == null)');"
+---
+SelectStmt@0..71
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..69
+    List@14..69
+      FuncCall@14..69
+        Ident@14..30 "jsonb_path_query"
+        Ascii40@30..31 "("
+        AConst@31..47
+          Sconst@31..47 "'[1, \"2\", null]'"
+        Ascii44@47..48 ","
+        Whitespace@48..49 " "
+        AConst@49..69
+          Sconst@49..69 "'$[*] ? (@ == null)'"
+  Ascii41@69..70 ")"
+  Ascii59@70..71 ";"
+

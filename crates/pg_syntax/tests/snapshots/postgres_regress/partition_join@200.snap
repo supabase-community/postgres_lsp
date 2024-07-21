@@ -1,0 +1,60 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO prt1_n SELECT i, i, to_char(i, 'FM0000') FROM generate_series(0, 499, 2) i;"
+---
+InsertStmt@0..87
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "prt1_n"
+  Whitespace@18..19 " "
+  SelectStmt@19..86
+    Select@19..25 "SELECT"
+    Whitespace@25..26 " "
+    ResTarget@26..27
+      ColumnRef@26..27
+        Ident@26..27 "i"
+    Ascii44@27..28 ","
+    Whitespace@28..29 " "
+    ResTarget@29..30
+      ColumnRef@29..30
+        Ident@29..30 "i"
+    Ascii44@30..31 ","
+    Whitespace@31..32 " "
+    ResTarget@32..51
+      FuncCall@32..51
+        Ident@32..39 "to_char"
+        Ascii40@39..40 "("
+        ColumnRef@40..41
+          Ident@40..41 "i"
+        Ascii44@41..42 ","
+        Whitespace@42..43 " "
+        AConst@43..51
+          Sconst@43..51 "'FM0000'"
+    Ascii41@51..52 ")"
+    Whitespace@52..53 " "
+    From@53..57 "FROM"
+    Whitespace@57..58 " "
+    RangeFunction@58..86
+      List@58..83
+        FuncCall@58..83
+          Ident@58..73 "generate_series"
+          Ascii40@73..74 "("
+          AConst@74..75
+            Iconst@74..75 "0"
+          Ascii44@75..76 ","
+          Whitespace@76..77 " "
+          AConst@77..80
+            Iconst@77..80 "499"
+          Ascii44@80..81 ","
+          Whitespace@81..82 " "
+          AConst@82..83
+            Iconst@82..83 "2"
+      Ascii41@83..84 ")"
+      Whitespace@84..85 " "
+      Alias@85..86
+        Ident@85..86 "i"
+  Ascii59@86..87 ";"
+

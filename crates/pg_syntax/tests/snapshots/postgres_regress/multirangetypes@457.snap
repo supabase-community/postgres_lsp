@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select range_agg(null::nummultirange) from nummultirange_test;"
+---
+SelectStmt@0..62
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..36
+    FuncCall@7..36
+      Ident@7..16 "range_agg"
+      Ascii40@16..17 "("
+      TypeCast@17..36
+        AConst@17..21
+          NullP@17..21 "null"
+        Typecast@21..23 "::"
+        TypeName@23..36
+          Ident@23..36 "nummultirange"
+  Ascii41@36..37 ")"
+  Whitespace@37..38 " "
+  From@38..42 "from"
+  Whitespace@42..43 " "
+  RangeVar@43..61
+    Ident@43..61 "nummultirange_test"
+  Ascii59@61..62 ";"
+

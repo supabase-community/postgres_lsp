@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT declares_cursor('AB%');"
+---
+SelectStmt@0..30
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..28
+    FuncCall@7..28
+      Ident@7..22 "declares_cursor"
+      Ascii40@22..23 "("
+      AConst@23..28
+        Sconst@23..28 "'AB%'"
+  Ascii41@28..29 ")"
+  Ascii59@29..30 ";"
+

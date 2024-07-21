@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT test_json -> 2\nFROM test_json\nWHERE json_type = 'scalar';"
+---
+SelectStmt@0..64
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..21
+    AExpr@7..21
+      ColumnRef@7..16
+        Ident@7..16 "test_json"
+      Whitespace@16..17 " "
+      Op@17..19 "->"
+      Whitespace@19..20 " "
+      AConst@20..21
+        Iconst@20..21 "2"
+  Newline@21..22 "\n"
+  From@22..26 "FROM"
+  Whitespace@26..27 " "
+  RangeVar@27..36
+    Ident@27..36 "test_json"
+  Newline@36..37 "\n"
+  Where@37..42 "WHERE"
+  Whitespace@42..43 " "
+  AExpr@43..63
+    ColumnRef@43..52
+      Ident@43..52 "json_type"
+    Whitespace@52..53 " "
+    Ascii61@53..54 "="
+    Whitespace@54..55 " "
+    AConst@55..63
+      Sconst@55..63 "'scalar'"
+  Ascii59@63..64 ";"
+

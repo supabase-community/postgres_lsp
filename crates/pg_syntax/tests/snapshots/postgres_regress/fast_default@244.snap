@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: insert into has_fast_default values(1);
+---
+InsertStmt@0..39
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..28
+    Ident@12..28 "has_fast_default"
+  Whitespace@28..29 " "
+  SelectStmt@29..37
+    Values@29..35 "values"
+    Ascii40@35..36 "("
+    List@36..37
+      AConst@36..37
+        Iconst@36..37 "1"
+  Ascii41@37..38 ")"
+  Ascii59@38..39 ";"
+

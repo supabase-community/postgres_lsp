@@ -1,0 +1,96 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from int8_tbl i1 left join (int8_tbl i2 join\n  (select 123 as x) ss on i2.q1 = x) on i1.q2 = i2.q2\norder by 1, 2;"
+---
+SelectStmt@0..122
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  JoinExpr@14..107
+    RangeVar@14..25
+      Ident@14..22 "int8_tbl"
+      Whitespace@22..23 " "
+      Alias@23..25
+        Ident@23..25 "i1"
+    Whitespace@25..26 " "
+    Left@26..30 "left"
+    Whitespace@30..31 " "
+    Join@31..35 "join"
+    Whitespace@35..36 " "
+    Ascii40@36..37 "("
+    JoinExpr@37..89
+      RangeVar@37..48
+        Ident@37..45 "int8_tbl"
+        Whitespace@45..46 " "
+        Alias@46..48
+          Ident@46..48 "i2"
+      Whitespace@48..49 " "
+      Join@49..53 "join"
+      Newline@53..54 "\n"
+      Whitespace@54..56 "  "
+      Ascii40@56..57 "("
+      RangeSubselect@57..76
+        SelectStmt@57..72
+          Select@57..63 "select"
+          Whitespace@63..64 " "
+          ResTarget@64..72
+            AConst@64..67
+              Iconst@64..67 "123"
+            Whitespace@67..68 " "
+            As@68..70 "as"
+            Whitespace@70..71 " "
+            Ident@71..72 "x"
+        Ascii41@72..73 ")"
+        Whitespace@73..74 " "
+        Alias@74..76
+          Ident@74..76 "ss"
+      Whitespace@76..77 " "
+      On@77..79 "on"
+      Whitespace@79..80 " "
+      AExpr@80..89
+        ColumnRef@80..85
+          Ident@80..82 "i2"
+          Ascii46@82..83 "."
+          Ident@83..85 "q1"
+        Whitespace@85..86 " "
+        Ascii61@86..87 "="
+        Whitespace@87..88 " "
+        ColumnRef@88..89
+          Ident@88..89 "x"
+    Ascii41@89..90 ")"
+    Whitespace@90..91 " "
+    On@91..93 "on"
+    Whitespace@93..94 " "
+    AExpr@94..107
+      ColumnRef@94..99
+        Ident@94..96 "i1"
+        Ascii46@96..97 "."
+        Ident@97..99 "q2"
+      Whitespace@99..100 " "
+      Ascii61@100..101 "="
+      Whitespace@101..102 " "
+      ColumnRef@102..107
+        Ident@102..104 "i2"
+        Ascii46@104..105 "."
+        Ident@105..107 "q2"
+  Newline@107..108 "\n"
+  SortBy@108..118
+    Order@108..113 "order"
+    Whitespace@113..114 " "
+    By@114..116 "by"
+    Whitespace@116..117 " "
+    AConst@117..118
+      Iconst@117..118 "1"
+  Ascii44@118..119 ","
+  Whitespace@119..120 " "
+  SortBy@120..121
+    AConst@120..121
+      Iconst@120..121 "2"
+  Ascii59@121..122 ";"
+

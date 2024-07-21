@@ -1,0 +1,53 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select count(*) from\n  ( select unique1 from tenk1 union select fivethous from tenk1 ) ss;"
+---
+SelectStmt@0..90
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "from"
+  Newline@20..21 "\n"
+  Whitespace@21..23 "  "
+  Ascii40@23..24 "("
+  Whitespace@24..25 " "
+  RangeSubselect@25..89
+    SelectStmt@25..84
+      Select@25..31 "select"
+      Whitespace@31..32 " "
+      SelectStmt@32..50
+        ResTarget@32..39
+          ColumnRef@32..39
+            Ident@32..39 "unique1"
+        Whitespace@39..40 " "
+        From@40..44 "from"
+        Whitespace@44..45 " "
+        RangeVar@45..50
+          Ident@45..50 "tenk1"
+      Whitespace@50..51 " "
+      Union@51..56 "union"
+      Whitespace@56..57 " "
+      SelectStmt@57..84
+        Select@57..63 "select"
+        Whitespace@63..64 " "
+        ResTarget@64..73
+          ColumnRef@64..73
+            Ident@64..73 "fivethous"
+        Whitespace@73..74 " "
+        From@74..78 "from"
+        Whitespace@78..79 " "
+        RangeVar@79..84
+          Ident@79..84 "tenk1"
+    Whitespace@84..85 " "
+    Ascii41@85..86 ")"
+    Whitespace@86..87 " "
+    Alias@87..89
+      Ident@87..89 "ss"
+  Ascii59@89..90 ";"
+

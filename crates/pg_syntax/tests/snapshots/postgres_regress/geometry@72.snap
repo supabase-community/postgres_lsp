@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT bound_box(a.f1, b.f1)\n\tFROM BOX_TBL a, BOX_TBL b;"
+---
+SelectStmt@0..56
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..27
+    FuncCall@7..27
+      Ident@7..16 "bound_box"
+      Ascii40@16..17 "("
+      ColumnRef@17..21
+        Ident@17..18 "a"
+        Ascii46@18..19 "."
+        Ident@19..21 "f1"
+      Ascii44@21..22 ","
+      Whitespace@22..23 " "
+      ColumnRef@23..27
+        Ident@23..24 "b"
+        Ascii46@24..25 "."
+        Ident@25..27 "f1"
+  Ascii41@27..28 ")"
+  Newline@28..29 "\n"
+  Newline@29..30 "\t"
+  From@30..34 "FROM"
+  Whitespace@34..35 " "
+  RangeVar@35..44
+    Ident@35..42 "BOX_TBL"
+    Whitespace@42..43 " "
+    Alias@43..44
+      Ident@43..44 "a"
+  Ascii44@44..45 ","
+  Whitespace@45..46 " "
+  RangeVar@46..55
+    Ident@46..53 "BOX_TBL"
+    Whitespace@53..54 " "
+    Alias@54..55
+      Ident@54..55 "b"
+  Ascii59@55..56 ";"
+

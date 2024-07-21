@@ -1,0 +1,85 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select\n  ( select min(tb.id) from tb\n    where tb.aval = (select ta.val from ta where ta.id = tc.aid) ) as min_tb_id\nfrom tc;"
+---
+SelectStmt@0..125
+  Select@0..6 "select"
+  Newline@6..7 "\n"
+  Whitespace@7..9 "  "
+  ResTarget@9..116
+    SubLink@9..100
+      SelectStmt@9..100
+        Ascii40@9..10 "("
+        Whitespace@10..11 " "
+        Select@11..17 "select"
+        Whitespace@17..18 " "
+        ResTarget@18..27
+          FuncCall@18..27
+            Ident@18..21 "min"
+            Ascii40@21..22 "("
+            ColumnRef@22..27
+              Ident@22..24 "tb"
+              Ascii46@24..25 "."
+              Ident@25..27 "id"
+        Ascii41@27..28 ")"
+        Whitespace@28..29 " "
+        From@29..33 "from"
+        Whitespace@33..34 " "
+        RangeVar@34..36
+          Ident@34..36 "tb"
+        Newline@36..37 "\n"
+        Whitespace@37..41 "    "
+        Where@41..46 "where"
+        Whitespace@46..47 " "
+        AExpr@47..100
+          ColumnRef@47..54
+            Ident@47..49 "tb"
+            Ascii46@49..50 "."
+            Ident@50..54 "aval"
+          Whitespace@54..55 " "
+          Ascii61@55..56 "="
+          Whitespace@56..57 " "
+          SubLink@57..100
+            SelectStmt@57..100
+              Ascii40@57..58 "("
+              Select@58..64 "select"
+              Whitespace@64..65 " "
+              ResTarget@65..71
+                ColumnRef@65..71
+                  Ident@65..67 "ta"
+                  Ascii46@67..68 "."
+                  Ident@68..71 "val"
+              Whitespace@71..72 " "
+              From@72..76 "from"
+              Whitespace@76..77 " "
+              RangeVar@77..79
+                Ident@77..79 "ta"
+              Whitespace@79..80 " "
+              Where@80..85 "where"
+              Whitespace@85..86 " "
+              AExpr@86..100
+                ColumnRef@86..91
+                  Ident@86..88 "ta"
+                  Ascii46@88..89 "."
+                  Ident@89..91 "id"
+                Whitespace@91..92 " "
+                Ascii61@92..93 "="
+                Whitespace@93..94 " "
+                ColumnRef@94..100
+                  Ident@94..96 "tc"
+                  Ascii46@96..97 "."
+                  Ident@97..100 "aid"
+    Ascii41@100..101 ")"
+    Whitespace@101..102 " "
+    Ascii41@102..103 ")"
+    Whitespace@103..104 " "
+    As@104..106 "as"
+    Whitespace@106..107 " "
+    Ident@107..116 "min_tb_id"
+  Newline@116..117 "\n"
+  From@117..121 "from"
+  Whitespace@121..122 " "
+  RangeVar@122..124
+    Ident@122..124 "tc"
+  Ascii59@124..125 ";"
+

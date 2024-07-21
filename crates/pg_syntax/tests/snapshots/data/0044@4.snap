@@ -1,0 +1,106 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE VIEW comedies AS SELECT f.*, country_code_to_name(f.country_code) AS country, (SELECT avg(r.rating) FROM user_ratings r WHERE r.film_id = f.id) AS avg_rating FROM films f WHERE f.kind = 'Comedy';"
+---
+ViewStmt@0..202
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  View@7..11 "VIEW"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "comedies"
+  Whitespace@20..21 " "
+  As@21..23 "AS"
+  Whitespace@23..24 " "
+  SelectStmt@24..201
+    Select@24..30 "SELECT"
+    Whitespace@30..31 " "
+    ResTarget@31..34
+      ColumnRef@31..34
+        Ident@31..32 "f"
+        Ascii46@32..33 "."
+        AStar@33..34
+          Ascii42@33..34 "*"
+    Ascii44@34..35 ","
+    Whitespace@35..36 " "
+    ResTarget@36..83
+      FuncCall@36..71
+        Ident@36..56 "country_code_to_name"
+        Ascii40@56..57 "("
+        ColumnRef@57..71
+          Ident@57..58 "f"
+          Ascii46@58..59 "."
+          Ident@59..71 "country_code"
+      Ascii41@71..72 ")"
+      Whitespace@72..73 " "
+      As@73..75 "AS"
+      Whitespace@75..76 " "
+      Ident@76..83 "country"
+    Ascii44@83..84 ","
+    Whitespace@84..85 " "
+    ResTarget@85..164
+      SubLink@85..149
+        SelectStmt@85..149
+          Ascii40@85..86 "("
+          Select@86..92 "SELECT"
+          Whitespace@92..93 " "
+          ResTarget@93..105
+            FuncCall@93..105
+              Ident@93..96 "avg"
+              Ascii40@96..97 "("
+              ColumnRef@97..105
+                Ident@97..98 "r"
+                Ascii46@98..99 "."
+                Ident@99..105 "rating"
+          Ascii41@105..106 ")"
+          Whitespace@106..107 " "
+          From@107..111 "FROM"
+          Whitespace@111..112 " "
+          RangeVar@112..126
+            Ident@112..124 "user_ratings"
+            Whitespace@124..125 " "
+            Alias@125..126
+              Ident@125..126 "r"
+          Whitespace@126..127 " "
+          Where@127..132 "WHERE"
+          Whitespace@132..133 " "
+          AExpr@133..149
+            ColumnRef@133..142
+              Ident@133..134 "r"
+              Ascii46@134..135 "."
+              Ident@135..142 "film_id"
+            Whitespace@142..143 " "
+            Ascii61@143..144 "="
+            Whitespace@144..145 " "
+            ColumnRef@145..149
+              Ident@145..146 "f"
+              Ascii46@146..147 "."
+              Ident@147..149 "id"
+      Ascii41@149..150 ")"
+      Whitespace@150..151 " "
+      As@151..153 "AS"
+      Whitespace@153..154 " "
+      Ident@154..164 "avg_rating"
+    Whitespace@164..165 " "
+    From@165..169 "FROM"
+    Whitespace@169..170 " "
+    RangeVar@170..177
+      Ident@170..175 "films"
+      Whitespace@175..176 " "
+      Alias@176..177
+        Ident@176..177 "f"
+    Whitespace@177..178 " "
+    Where@178..183 "WHERE"
+    Whitespace@183..184 " "
+    AExpr@184..201
+      ColumnRef@184..190
+        Ident@184..185 "f"
+        Ascii46@185..186 "."
+        Ident@186..190 "kind"
+      Whitespace@190..191 " "
+      Ascii61@191..192 "="
+      Whitespace@192..193 " "
+      AConst@193..201
+        Sconst@193..201 "'Comedy'"
+  Ascii59@201..202 ";"
+

@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select regexp_match('abc', 'd') is null;"
+---
+SelectStmt@0..40
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..39
+    NullTest@7..39
+      FuncCall@7..30
+        Ident@7..19 "regexp_match"
+        Ascii40@19..20 "("
+        AConst@20..25
+          Sconst@20..25 "'abc'"
+        Ascii44@25..26 ","
+        Whitespace@26..27 " "
+        AConst@27..30
+          Sconst@27..30 "'d'"
+      Ascii41@30..31 ")"
+      Whitespace@31..32 " "
+      Is@32..34 "is"
+      Whitespace@34..35 " "
+      NullP@35..39 "null"
+  Ascii59@39..40 ";"
+

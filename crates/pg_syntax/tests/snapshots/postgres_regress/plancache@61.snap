@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table pc_list_part_def partition of pc_list_parted default;
+---
+CreateStmt@0..66
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..29
+    Ident@13..29 "pc_list_part_def"
+  Whitespace@29..30 " "
+  Partition@30..39 "partition"
+  Whitespace@39..40 " "
+  Of@40..42 "of"
+  Whitespace@42..43 " "
+  RangeVar@43..57
+    Ident@43..57 "pc_list_parted"
+  Whitespace@57..58 " "
+  PartitionBoundSpec@58..65
+    Default@58..65 "default"
+  Ascii59@65..66 ";"
+

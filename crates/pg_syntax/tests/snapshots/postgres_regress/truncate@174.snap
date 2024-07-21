@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE TABLE trunc_a1 PARTITION OF trunc_a FOR VALUES FROM (0) TO (10);
+---
+CreateStmt@0..71
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..21
+    Ident@13..21 "trunc_a1"
+  Whitespace@21..22 " "
+  Partition@22..31 "PARTITION"
+  Whitespace@31..32 " "
+  Of@32..34 "OF"
+  Whitespace@34..35 " "
+  RangeVar@35..42
+    Ident@35..42 "trunc_a"
+  Whitespace@42..43 " "
+  For@43..46 "FOR"
+  Whitespace@46..47 " "
+  Values@47..53 "VALUES"
+  Whitespace@53..54 " "
+  PartitionBoundSpec@54..69
+    From@54..58 "FROM"
+    Whitespace@58..59 " "
+    Ascii40@59..60 "("
+    AConst@60..61
+      Iconst@60..61 "0"
+    Ascii41@61..62 ")"
+    Whitespace@62..63 " "
+    To@63..65 "TO"
+    Whitespace@65..66 " "
+    Ascii40@66..67 "("
+    AConst@67..69
+      Iconst@67..69 "10"
+  Ascii41@69..70 ")"
+  Ascii59@70..71 ";"
+

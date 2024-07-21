@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '92233720368547758.07'::money;"
+---
+SelectStmt@0..37
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..36
+    TypeCast@7..36
+      AConst@7..29
+        Sconst@7..29 "'92233720368547758.07'"
+      Typecast@29..31 "::"
+      TypeName@31..36
+        Ident@31..36 "money"
+  Ascii59@36..37 ";"
+

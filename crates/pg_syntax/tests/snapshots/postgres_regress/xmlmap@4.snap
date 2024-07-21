@@ -1,0 +1,17 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE DOMAIN testxmldomain AS varchar;
+---
+CreateDomainStmt@0..39
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  DomainP@7..13 "DOMAIN"
+  Whitespace@13..14 " "
+  Ident@14..27 "testxmldomain"
+  Whitespace@27..28 " "
+  As@28..30 "AS"
+  Whitespace@30..31 " "
+  TypeName@31..38
+    Varchar@31..38 "varchar"
+  Ascii59@38..39 ";"
+

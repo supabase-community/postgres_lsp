@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb '{\"a\": [1,2,3], \"b\": [3,4,\"5\"]}' @? 'strict $ ? (@.a[*] >= @.b[*])';"
+---
+SelectStmt@0..81
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..80
+    Ident@7..12 "jsonb"
+    Whitespace@12..13 " "
+    AExpr@13..80
+      TypeCast@13..45
+        AConst@13..45
+          Sconst@13..45 "'{\"a\": [1,2,3], \"b\":  ..."
+      Whitespace@45..46 " "
+      Op@46..48 "@?"
+      Whitespace@48..49 " "
+      AConst@49..80
+        Sconst@49..80 "'strict $ ? (@.a[*] > ..."
+  Ascii59@80..81 ";"
+

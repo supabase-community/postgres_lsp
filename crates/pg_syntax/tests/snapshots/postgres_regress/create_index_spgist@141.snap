@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT count(*) FROM quad_point_tbl;
+---
+SelectStmt@0..36
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "FROM"
+  Whitespace@20..21 " "
+  RangeVar@21..35
+    Ident@21..35 "quad_point_tbl"
+  Ascii59@35..36 ";"
+

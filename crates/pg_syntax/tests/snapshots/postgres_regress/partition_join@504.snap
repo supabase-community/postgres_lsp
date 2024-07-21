@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE TABLE plt2_adv_p2 PARTITION OF plt2_adv FOR VALUES IN (NULL);
+---
+CreateStmt@0..68
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..24
+    Ident@13..24 "plt2_adv_p2"
+  Whitespace@24..25 " "
+  Partition@25..34 "PARTITION"
+  Whitespace@34..35 " "
+  Of@35..37 "OF"
+  Whitespace@37..38 " "
+  RangeVar@38..46
+    Ident@38..46 "plt2_adv"
+  Whitespace@46..47 " "
+  For@47..50 "FOR"
+  Whitespace@50..51 " "
+  Values@51..57 "VALUES"
+  Whitespace@57..58 " "
+  PartitionBoundSpec@58..66
+    InP@58..60 "IN"
+    Whitespace@60..61 " "
+    Ascii40@61..62 "("
+    AConst@62..66
+      NullP@62..66 "NULL"
+  Ascii41@66..67 ")"
+  Ascii59@67..68 ";"
+

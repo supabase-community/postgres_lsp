@@ -1,0 +1,81 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT t1, t2 FROM prt1 t1 LEFT JOIN prt2 t2 ON t1.a = t2.b WHERE t1.b = 0 ORDER BY t1.a, t2.b;"
+---
+SelectStmt@0..95
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..9
+    ColumnRef@7..9
+      Ident@7..9 "t1"
+  Ascii44@9..10 ","
+  Whitespace@10..11 " "
+  ResTarget@11..13
+    ColumnRef@11..13
+      Ident@11..13 "t2"
+  Whitespace@13..14 " "
+  From@14..18 "FROM"
+  Whitespace@18..19 " "
+  JoinExpr@19..59
+    RangeVar@19..26
+      Ident@19..23 "prt1"
+      Whitespace@23..24 " "
+      Alias@24..26
+        Ident@24..26 "t1"
+    Whitespace@26..27 " "
+    Left@27..31 "LEFT"
+    Whitespace@31..32 " "
+    Join@32..36 "JOIN"
+    Whitespace@36..37 " "
+    RangeVar@37..44
+      Ident@37..41 "prt2"
+      Whitespace@41..42 " "
+      Alias@42..44
+        Ident@42..44 "t2"
+    Whitespace@44..45 " "
+    On@45..47 "ON"
+    Whitespace@47..48 " "
+    AExpr@48..59
+      ColumnRef@48..52
+        Ident@48..50 "t1"
+        Ascii46@50..51 "."
+        Ident@51..52 "a"
+      Whitespace@52..53 " "
+      Ascii61@53..54 "="
+      Whitespace@54..55 " "
+      ColumnRef@55..59
+        Ident@55..57 "t2"
+        Ascii46@57..58 "."
+        Ident@58..59 "b"
+  Whitespace@59..60 " "
+  Where@60..65 "WHERE"
+  Whitespace@65..66 " "
+  AExpr@66..74
+    ColumnRef@66..70
+      Ident@66..68 "t1"
+      Ascii46@68..69 "."
+      Ident@69..70 "b"
+    Whitespace@70..71 " "
+    Ascii61@71..72 "="
+    Whitespace@72..73 " "
+    AConst@73..74
+      Iconst@73..74 "0"
+  Whitespace@74..75 " "
+  SortBy@75..88
+    Order@75..80 "ORDER"
+    Whitespace@80..81 " "
+    By@81..83 "BY"
+    Whitespace@83..84 " "
+    ColumnRef@84..88
+      Ident@84..86 "t1"
+      Ascii46@86..87 "."
+      Ident@87..88 "a"
+  Ascii44@88..89 ","
+  Whitespace@89..90 " "
+  SortBy@90..94
+    ColumnRef@90..94
+      Ident@90..92 "t2"
+      Ascii46@92..93 "."
+      Ident@93..94 "b"
+  Ascii59@94..95 ";"
+

@@ -1,0 +1,19 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select insert_tt2('foolish','barrish');"
+---
+SelectStmt@0..39
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..37
+    FuncCall@7..37
+      Ident@7..17 "insert_tt2"
+      Ascii40@17..18 "("
+      AConst@18..27
+        Sconst@18..27 "'foolish'"
+      Ascii44@27..28 ","
+      AConst@28..37
+        Sconst@28..37 "'barrish'"
+  Ascii41@37..38 ")"
+  Ascii59@38..39 ";"
+

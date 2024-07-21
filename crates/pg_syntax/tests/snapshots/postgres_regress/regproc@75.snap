@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_regrole('foo.bar');"
+---
+SelectStmt@0..29
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..27
+    FuncCall@7..27
+      Ident@7..17 "to_regrole"
+      Ascii40@17..18 "("
+      AConst@18..27
+        Sconst@18..27 "'foo.bar'"
+  Ascii41@27..28 ")"
+  Ascii59@28..29 ";"
+

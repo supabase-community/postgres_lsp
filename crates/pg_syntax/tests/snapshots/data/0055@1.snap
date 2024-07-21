@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select 1 union all select 2;
+---
+SelectStmt@0..28
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  SelectStmt@7..8
+    ResTarget@7..8
+      AConst@7..8
+        Iconst@7..8 "1"
+  Whitespace@8..9 " "
+  Union@9..14 "union"
+  Whitespace@14..15 " "
+  All@15..18 "all"
+  Whitespace@18..19 " "
+  SelectStmt@19..27
+    Select@19..25 "select"
+    Whitespace@25..26 " "
+    ResTarget@26..27
+      AConst@26..27
+        Iconst@26..27 "2"
+  Ascii59@27..28 ";"
+

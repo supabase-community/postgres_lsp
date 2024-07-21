@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 'nan'::numeric::float4;"
+---
+SelectStmt@0..30
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..29
+    TypeCast@7..29
+      TypeCast@7..21
+        AConst@7..12
+          Sconst@7..12 "'nan'"
+        Typecast@12..14 "::"
+        TypeName@14..21
+          Numeric@14..21 "numeric"
+      Typecast@21..23 "::"
+      TypeName@23..29
+        Ident@23..29 "float4"
+  Ascii59@29..30 ";"
+

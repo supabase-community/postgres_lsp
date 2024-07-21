@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_tsvector('synonym_tst', 'Postgresql is often called as postgres or pgsql and pronounced as postgre');"
+---
+SelectStmt@0..111
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..109
+    FuncCall@7..109
+      Ident@7..18 "to_tsvector"
+      Ascii40@18..19 "("
+      AConst@19..32
+        Sconst@19..32 "'synonym_tst'"
+      Ascii44@32..33 ","
+      Whitespace@33..34 " "
+      AConst@34..109
+        Sconst@34..109 "'Postgresql is often  ..."
+  Ascii41@109..110 ")"
+  Ascii59@110..111 ";"
+

@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT * FROM rngfunc(42) AS p(x);
+---
+SelectStmt@0..34
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeFunction@14..32
+    List@14..24
+      FuncCall@14..24
+        Ident@14..21 "rngfunc"
+        Ascii40@21..22 "("
+        AConst@22..24
+          Iconst@22..24 "42"
+    Ascii41@24..25 ")"
+    Whitespace@25..26 " "
+    Alias@26..32
+      As@26..28 "AS"
+      Whitespace@28..29 " "
+      Ident@29..30 "p"
+      Ascii40@30..31 "("
+      Ident@31..32 "x"
+  Ascii41@32..33 ")"
+  Ascii59@33..34 ";"
+

@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '-infinity'::date < 'today'::date as t;"
+---
+SelectStmt@0..46
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..45
+    AExpr@7..40
+      TypeCast@7..24
+        AConst@7..18
+          Sconst@7..18 "'-infinity'"
+        Typecast@18..20 "::"
+        TypeName@20..24
+          Ident@20..24 "date"
+      Whitespace@24..25 " "
+      Ascii60@25..26 "<"
+      Whitespace@26..27 " "
+      TypeCast@27..40
+        AConst@27..34
+          Sconst@27..34 "'today'"
+        Typecast@34..36 "::"
+        TypeName@36..40
+          Ident@36..40 "date"
+    Whitespace@40..41 " "
+    As@41..43 "as"
+    Whitespace@43..44 " "
+    Ident@44..45 "t"
+  Ascii59@45..46 ";"
+

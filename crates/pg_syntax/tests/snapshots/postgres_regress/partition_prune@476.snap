@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table pp_arrpart1 partition of pp_arrpart for values in ('{1}');"
+---
+CreateStmt@0..71
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..24
+    Ident@13..24 "pp_arrpart1"
+  Whitespace@24..25 " "
+  Partition@25..34 "partition"
+  Whitespace@34..35 " "
+  Of@35..37 "of"
+  Whitespace@37..38 " "
+  RangeVar@38..48
+    Ident@38..48 "pp_arrpart"
+  Whitespace@48..49 " "
+  For@49..52 "for"
+  Whitespace@52..53 " "
+  Values@53..59 "values"
+  Whitespace@59..60 " "
+  PartitionBoundSpec@60..69
+    InP@60..62 "in"
+    Whitespace@62..63 " "
+    Ascii40@63..64 "("
+    AConst@64..69
+      Sconst@64..69 "'{1}'"
+  Ascii41@69..70 ")"
+  Ascii59@70..71 ";"
+

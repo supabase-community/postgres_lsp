@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '0/16AE7F8'::pg_lsn - '0/16AE7F7'::pg_lsn;"
+---
+SelectStmt@0..49
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..48
+    AExpr@7..48
+      TypeCast@7..26
+        AConst@7..18
+          Sconst@7..18 "'0/16AE7F8'"
+        Typecast@18..20 "::"
+        TypeName@20..26
+          Ident@20..26 "pg_lsn"
+      Whitespace@26..27 " "
+      Ascii45@27..28 "-"
+      Whitespace@28..29 " "
+      TypeCast@29..48
+        AConst@29..40
+          Sconst@29..40 "'0/16AE7F7'"
+        Typecast@40..42 "::"
+        TypeName@42..48
+          Ident@42..48 "pg_lsn"
+  Ascii59@48..49 ";"
+

@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_regoper('||/');"
+---
+SelectStmt@0..25
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..23
+    FuncCall@7..23
+      Ident@7..17 "to_regoper"
+      Ascii40@17..18 "("
+      AConst@18..23
+        Sconst@18..23 "'||/'"
+  Ascii41@23..24 ")"
+  Ascii59@24..25 ";"
+

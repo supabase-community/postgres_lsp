@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select unique2 from onek2 where unique2 = 11 and stringu1 < 'C';"
+---
+SelectStmt@0..64
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    ColumnRef@7..14
+      Ident@7..14 "unique2"
+  Whitespace@14..15 " "
+  From@15..19 "from"
+  Whitespace@19..20 " "
+  RangeVar@20..25
+    Ident@20..25 "onek2"
+  Whitespace@25..26 " "
+  Where@26..31 "where"
+  Whitespace@31..32 " "
+  BoolExpr@32..63
+    AExpr@32..44
+      ColumnRef@32..39
+        Ident@32..39 "unique2"
+      Whitespace@39..40 " "
+      Ascii61@40..41 "="
+      Whitespace@41..42 " "
+      AConst@42..44
+        Iconst@42..44 "11"
+    Whitespace@44..45 " "
+    And@45..48 "and"
+    Whitespace@48..49 " "
+    AExpr@49..63
+      ColumnRef@49..57
+        Ident@49..57 "stringu1"
+      Whitespace@57..58 " "
+      Ascii60@58..59 "<"
+      Whitespace@59..60 " "
+      AConst@60..63
+        Sconst@60..63 "'C'"
+  Ascii59@63..64 ";"
+

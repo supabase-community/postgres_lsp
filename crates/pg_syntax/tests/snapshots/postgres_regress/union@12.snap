@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT 1.1 AS two UNION ALL SELECT 2 ORDER BY 1;
+---
+SelectStmt@0..48
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  SelectStmt@7..17
+    ResTarget@7..17
+      AConst@7..10
+        Fconst@7..10 "1.1"
+      Whitespace@10..11 " "
+      As@11..13 "AS"
+      Whitespace@13..14 " "
+      Ident@14..17 "two"
+  Whitespace@17..18 " "
+  Union@18..23 "UNION"
+  Whitespace@23..24 " "
+  All@24..27 "ALL"
+  Whitespace@27..28 " "
+  SelectStmt@28..36
+    Select@28..34 "SELECT"
+    Whitespace@34..35 " "
+    ResTarget@35..36
+      AConst@35..36
+        Iconst@35..36 "2"
+  Whitespace@36..37 " "
+  SortBy@37..47
+    Order@37..42 "ORDER"
+    Whitespace@42..43 " "
+    By@43..45 "BY"
+    Whitespace@45..46 " "
+    AConst@46..47
+      Iconst@46..47 "1"
+  Ascii59@47..48 ";"
+

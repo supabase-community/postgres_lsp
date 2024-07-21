@@ -1,0 +1,72 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from exists_tbl t1\n  where (exists(select 1 from exists_tbl t2 where t1.c1 = t2.c2) or c3 < 0);"
+---
+SelectStmt@0..104
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeVar@14..27
+    Ident@14..24 "exists_tbl"
+    Whitespace@24..25 " "
+    Alias@25..27
+      Ident@25..27 "t1"
+  Newline@27..28 "\n"
+  Whitespace@28..30 "  "
+  Where@30..35 "where"
+  Whitespace@35..36 " "
+  Ascii40@36..37 "("
+  BoolExpr@37..102
+    SubLink@37..91
+      SelectStmt@37..91
+        Exists@37..43 "exists"
+        Ascii40@43..44 "("
+        Select@44..50 "select"
+        Whitespace@50..51 " "
+        ResTarget@51..52
+          AConst@51..52
+            Iconst@51..52 "1"
+        Whitespace@52..53 " "
+        From@53..57 "from"
+        Whitespace@57..58 " "
+        RangeVar@58..71
+          Ident@58..68 "exists_tbl"
+          Whitespace@68..69 " "
+          Alias@69..71
+            Ident@69..71 "t2"
+        Whitespace@71..72 " "
+        Where@72..77 "where"
+        Whitespace@77..78 " "
+        AExpr@78..91
+          ColumnRef@78..83
+            Ident@78..80 "t1"
+            Ascii46@80..81 "."
+            Ident@81..83 "c1"
+          Whitespace@83..84 " "
+          Ascii61@84..85 "="
+          Whitespace@85..86 " "
+          ColumnRef@86..91
+            Ident@86..88 "t2"
+            Ascii46@88..89 "."
+            Ident@89..91 "c2"
+    Ascii41@91..92 ")"
+    Whitespace@92..93 " "
+    Or@93..95 "or"
+    Whitespace@95..96 " "
+    AExpr@96..102
+      ColumnRef@96..98
+        Ident@96..98 "c3"
+      Whitespace@98..99 " "
+      Ascii60@99..100 "<"
+      Whitespace@100..101 " "
+      AConst@101..102
+        Iconst@101..102 "0"
+  Ascii41@102..103 ")"
+  Ascii59@103..104 ";"
+

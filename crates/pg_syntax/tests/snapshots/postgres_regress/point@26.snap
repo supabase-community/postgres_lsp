@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO point_gist_tbl VALUES ('(0.0000009,0.0000009)');"
+---
+InsertStmt@0..60
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..26
+    Ident@12..26 "point_gist_tbl"
+  Whitespace@26..27 " "
+  SelectStmt@27..58
+    Values@27..33 "VALUES"
+    Whitespace@33..34 " "
+    Ascii40@34..35 "("
+    List@35..58
+      AConst@35..58
+        Sconst@35..58 "'(0.0000009,0.0000009)'"
+  Ascii41@58..59 ")"
+  Ascii59@59..60 ";"
+

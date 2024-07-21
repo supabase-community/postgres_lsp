@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT b <  '08:00:2b:01:02:04' FROM macaddr8_data WHERE a = 1;"
+---
+SelectStmt@0..63
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..31
+    AExpr@7..31
+      ColumnRef@7..8
+        Ident@7..8 "b"
+      Whitespace@8..9 " "
+      Ascii60@9..10 "<"
+      Whitespace@10..12 "  "
+      AConst@12..31
+        Sconst@12..31 "'08:00:2b:01:02:04'"
+  Whitespace@31..32 " "
+  From@32..36 "FROM"
+  Whitespace@36..37 " "
+  RangeVar@37..50
+    Ident@37..50 "macaddr8_data"
+  Whitespace@50..51 " "
+  Where@51..56 "WHERE"
+  Whitespace@56..57 " "
+  AExpr@57..62
+    ColumnRef@57..58
+      Ident@57..58 "a"
+    Whitespace@58..59 " "
+    Ascii61@59..60 "="
+    Whitespace@60..61 " "
+    AConst@61..62
+      Iconst@61..62 "1"
+  Ascii59@62..63 ";"
+

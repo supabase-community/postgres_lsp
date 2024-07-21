@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '42'::float4 / 'Infinity'::float4;"
+---
+SelectStmt@0..41
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..40
+    AExpr@7..40
+      TypeCast@7..19
+        AConst@7..11
+          Sconst@7..11 "'42'"
+        Typecast@11..13 "::"
+        TypeName@13..19
+          Ident@13..19 "float4"
+      Whitespace@19..20 " "
+      Ascii47@20..21 "/"
+      Whitespace@21..22 " "
+      TypeCast@22..40
+        AConst@22..32
+          Sconst@22..32 "'Infinity'"
+        Typecast@32..34 "::"
+        TypeName@34..40
+          Ident@34..40 "float4"
+  Ascii59@40..41 ";"
+

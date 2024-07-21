@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT strip('wa:1A'::tsvector) @@ '!w:*A'::tsquery as \"false\";"
+---
+SelectStmt@0..63
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..62
+    AExpr@7..51
+      FuncCall@7..30
+        StripP@7..12 "strip"
+        Ascii40@12..13 "("
+        TypeCast@13..30
+          AConst@13..20
+            Sconst@13..20 "'wa:1A'"
+          Typecast@20..22 "::"
+          TypeName@22..30
+            Ident@22..30 "tsvector"
+      Ascii41@30..31 ")"
+      Whitespace@31..32 " "
+      Op@32..34 "@@"
+      Whitespace@34..35 " "
+      TypeCast@35..51
+        AConst@35..42
+          Sconst@35..42 "'!w:*A'"
+        Typecast@42..44 "::"
+        TypeName@44..51
+          Ident@44..51 "tsquery"
+    Whitespace@51..52 " "
+    As@52..54 "as"
+    Whitespace@54..55 " "
+    Ident@55..62 "\"false\""
+  Ascii59@62..63 ";"
+

@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT query_to_xml_and_xmlschema('SELECT * FROM testxmlschema.test1', true, true, '');"
+---
+SelectStmt@0..87
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..85
+    FuncCall@7..85
+      Ident@7..33 "query_to_xml_and_xmls ..."
+      Ascii40@33..34 "("
+      AConst@34..69
+        Sconst@34..69 "'SELECT * FROM testxm ..."
+      Ascii44@69..70 ","
+      Whitespace@70..71 " "
+      AConst@71..75
+        TrueP@71..75 "true"
+      Ascii44@75..76 ","
+      Whitespace@76..77 " "
+      AConst@77..81
+        TrueP@77..81 "true"
+      Ascii44@81..82 ","
+      Whitespace@82..83 " "
+      AConst@83..85
+        Sconst@83..85 "''"
+  Ascii41@85..86 ")"
+  Ascii59@86..87 ";"
+

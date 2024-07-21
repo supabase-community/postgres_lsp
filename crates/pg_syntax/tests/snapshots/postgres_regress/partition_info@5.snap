@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT pg_partition_root(NULL);
+---
+SelectStmt@0..31
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..29
+    FuncCall@7..29
+      Ident@7..24 "pg_partition_root"
+      Ascii40@24..25 "("
+      AConst@25..29
+        NullP@25..29 "NULL"
+  Ascii41@29..30 ")"
+  Ascii59@30..31 ";"
+

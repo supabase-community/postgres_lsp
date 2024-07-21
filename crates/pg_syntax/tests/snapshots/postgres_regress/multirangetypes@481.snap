@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO nummultirange_test2 VALUES('{}');"
+---
+InsertStmt@0..45
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..31
+    Ident@12..31 "nummultirange_test2"
+  Whitespace@31..32 " "
+  SelectStmt@32..43
+    Values@32..38 "VALUES"
+    Ascii40@38..39 "("
+    List@39..43
+      AConst@39..43
+        Sconst@39..43 "'{}'"
+  Ascii41@43..44 ")"
+  Ascii59@44..45 ";"
+

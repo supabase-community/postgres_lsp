@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO e_star (class, c)\n   VALUES ('e', 'hi elisa'::name);"
+---
+InsertStmt@0..64
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "e_star"
+  Whitespace@18..19 " "
+  Ascii40@19..20 "("
+  ResTarget@20..25
+    Class@20..25 "class"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..28
+    Ident@27..28 "c"
+  Ascii41@28..29 ")"
+  Newline@29..30 "\n"
+  Whitespace@30..33 "   "
+  SelectStmt@33..62
+    Values@33..39 "VALUES"
+    Whitespace@39..40 " "
+    Ascii40@40..41 "("
+    List@41..62
+      AConst@41..44
+        Sconst@41..44 "'e'"
+      Ascii44@44..45 ","
+      Whitespace@45..46 " "
+      TypeCast@46..62
+        AConst@46..56
+          Sconst@46..56 "'hi elisa'"
+        Typecast@56..58 "::"
+        TypeName@58..62
+          NameP@58..62 "name"
+  Ascii41@62..63 ")"
+  Ascii59@63..64 ";"
+

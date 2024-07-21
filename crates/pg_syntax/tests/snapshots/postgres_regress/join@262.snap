@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into nt1 values (1,true,true);"
+---
+InsertStmt@0..37
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..15
+    Ident@12..15 "nt1"
+  Whitespace@15..16 " "
+  SelectStmt@16..35
+    Values@16..22 "values"
+    Whitespace@22..23 " "
+    Ascii40@23..24 "("
+    List@24..35
+      AConst@24..25
+        Iconst@24..25 "1"
+      Ascii44@25..26 ","
+      AConst@26..30
+        TrueP@26..30 "true"
+      Ascii44@30..31 ","
+      AConst@31..35
+        TrueP@31..35 "true"
+  Ascii41@35..36 ")"
+  Ascii59@36..37 ";"
+

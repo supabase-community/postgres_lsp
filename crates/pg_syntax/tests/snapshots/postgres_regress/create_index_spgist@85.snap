@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT count(*) FROM kd_point_tbl WHERE p |>> '(5000, 4000)';"
+---
+SelectStmt@0..61
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "FROM"
+  Whitespace@20..21 " "
+  RangeVar@21..33
+    Ident@21..33 "kd_point_tbl"
+  Whitespace@33..34 " "
+  Where@34..39 "WHERE"
+  Whitespace@39..40 " "
+  AExpr@40..60
+    ColumnRef@40..41
+      Ident@40..41 "p"
+    Whitespace@41..42 " "
+    Op@42..45 "|>>"
+    Whitespace@45..46 " "
+    AConst@46..60
+      Sconst@46..60 "'(5000, 4000)'"
+  Ascii59@60..61 ";"
+

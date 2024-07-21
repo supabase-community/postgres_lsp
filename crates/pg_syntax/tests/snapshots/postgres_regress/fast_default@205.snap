@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "ALTER TABLE vtype2 ALTER COLUMN b SET DEFAULT 'yyy';"
+---
+AlterTableStmt@0..52
+  Alter@0..5 "ALTER"
+  Whitespace@5..6 " "
+  Table@6..11 "TABLE"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "vtype2"
+  Whitespace@18..19 " "
+  AlterTableCmd@19..51
+    Alter@19..24 "ALTER"
+    Whitespace@24..25 " "
+    Column@25..31 "COLUMN"
+    Whitespace@31..32 " "
+    Ident@32..33 "b"
+    Whitespace@33..34 " "
+    Set@34..37 "SET"
+    Whitespace@37..38 " "
+    Default@38..45 "DEFAULT"
+    Whitespace@45..46 " "
+    AConst@46..51
+      Sconst@46..51 "'yyy'"
+  Ascii59@51..52 ";"
+

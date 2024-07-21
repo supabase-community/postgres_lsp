@@ -1,0 +1,50 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table part_abc_p1 (a int not null, b int not null, c int not null);"
+---
+CreateStmt@0..74
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..24
+    Ident@13..24 "part_abc_p1"
+  Whitespace@24..25 " "
+  Ascii40@25..26 "("
+  ColumnDef@26..40
+    Ident@26..27 "a"
+    Whitespace@27..28 " "
+    TypeName@28..31
+      IntP@28..31 "int"
+    Whitespace@31..32 " "
+    Constraint@32..40
+      Not@32..35 "not"
+      Whitespace@35..36 " "
+      NullP@36..40 "null"
+  Ascii44@40..41 ","
+  Whitespace@41..42 " "
+  ColumnDef@42..56
+    Ident@42..43 "b"
+    Whitespace@43..44 " "
+    TypeName@44..47
+      IntP@44..47 "int"
+    Whitespace@47..48 " "
+    Constraint@48..56
+      Not@48..51 "not"
+      Whitespace@51..52 " "
+      NullP@52..56 "null"
+  Ascii44@56..57 ","
+  Whitespace@57..58 " "
+  ColumnDef@58..72
+    Ident@58..59 "c"
+    Whitespace@59..60 " "
+    TypeName@60..63
+      IntP@60..63 "int"
+    Whitespace@63..64 " "
+    Constraint@64..72
+      Not@64..67 "not"
+      Whitespace@67..68 " "
+      NullP@68..72 "null"
+  Ascii41@72..73 ")"
+  Ascii59@73..74 ";"
+

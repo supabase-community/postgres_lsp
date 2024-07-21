@@ -1,0 +1,48 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO f_star (class, a, c)\n   VALUES ('f', 24, 'hi marc'::name);"
+---
+InsertStmt@0..70
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "f_star"
+  Whitespace@18..19 " "
+  Ascii40@19..20 "("
+  ResTarget@20..25
+    Class@20..25 "class"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..28
+    Ident@27..28 "a"
+  Ascii44@28..29 ","
+  Whitespace@29..30 " "
+  ResTarget@30..31
+    Ident@30..31 "c"
+  Ascii41@31..32 ")"
+  Newline@32..33 "\n"
+  Whitespace@33..36 "   "
+  SelectStmt@36..68
+    Values@36..42 "VALUES"
+    Whitespace@42..43 " "
+    Ascii40@43..44 "("
+    List@44..68
+      AConst@44..47
+        Sconst@44..47 "'f'"
+      Ascii44@47..48 ","
+      Whitespace@48..49 " "
+      AConst@49..51
+        Iconst@49..51 "24"
+      Ascii44@51..52 ","
+      Whitespace@52..53 " "
+      TypeCast@53..68
+        AConst@53..62
+          Sconst@53..62 "'hi marc'"
+        Typecast@62..64 "::"
+        TypeName@64..68
+          NameP@64..68 "name"
+  Ascii41@68..69 ")"
+  Ascii59@69..70 ";"
+

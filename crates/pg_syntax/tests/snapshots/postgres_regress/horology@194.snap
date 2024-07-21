@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_timestamp('15 \"text between quote marks\" 98 54 45',\n                    E'HH24 \"\\\\\"text between quote marks\\\\\"\" YY MI SS');"
+---
+SelectStmt@0..133
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..131
+    FuncCall@7..131
+      Ident@7..19 "to_timestamp"
+      Ascii40@19..20 "("
+      AConst@20..60
+        Sconst@20..60 "'15 \"text between quo ..."
+      Ascii44@60..61 ","
+      Newline@61..62 "\n"
+      Whitespace@62..82 "                    "
+      AConst@82..131
+        Sconst@82..131 "E'HH24 \"\\\\\"text betwe ..."
+  Ascii41@131..132 ")"
+  Ascii59@132..133 ";"
+

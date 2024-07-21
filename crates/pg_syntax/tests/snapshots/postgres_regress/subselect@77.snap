@@ -1,0 +1,67 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into shipped_view (ordnum, partnum, value)\n    values (0, 1, (select cost from parts where partnum = '1'));"
+---
+InsertStmt@0..114
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..24
+    Ident@12..24 "shipped_view"
+  Whitespace@24..25 " "
+  Ascii40@25..26 "("
+  ResTarget@26..32
+    Ident@26..32 "ordnum"
+  Ascii44@32..33 ","
+  Whitespace@33..34 " "
+  ResTarget@34..41
+    Ident@34..41 "partnum"
+  Ascii44@41..42 ","
+  Whitespace@42..43 " "
+  ResTarget@43..48
+    ValueP@43..48 "value"
+  Ascii41@48..49 ")"
+  Newline@49..50 "\n"
+  Whitespace@50..54 "    "
+  SelectStmt@54..111
+    Values@54..60 "values"
+    Whitespace@60..61 " "
+    Ascii40@61..62 "("
+    List@62..111
+      AConst@62..63
+        Iconst@62..63 "0"
+      Ascii44@63..64 ","
+      Whitespace@64..65 " "
+      AConst@65..66
+        Iconst@65..66 "1"
+      Ascii44@66..67 ","
+      Whitespace@67..68 " "
+      SubLink@68..111
+        SelectStmt@68..111
+          Ascii40@68..69 "("
+          Select@69..75 "select"
+          Whitespace@75..76 " "
+          ResTarget@76..80
+            ColumnRef@76..80
+              Cost@76..80 "cost"
+          Whitespace@80..81 " "
+          From@81..85 "from"
+          Whitespace@85..86 " "
+          RangeVar@86..91
+            Ident@86..91 "parts"
+          Whitespace@91..92 " "
+          Where@92..97 "where"
+          Whitespace@97..98 " "
+          AExpr@98..111
+            ColumnRef@98..105
+              Ident@98..105 "partnum"
+            Whitespace@105..106 " "
+            Ascii61@106..107 "="
+            Whitespace@107..108 " "
+            AConst@108..111
+              Sconst@108..111 "'1'"
+  Ascii41@111..112 ")"
+  Ascii41@112..113 ")"
+  Ascii59@113..114 ";"
+

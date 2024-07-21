@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT * FROM get_first_user();
+---
+SelectStmt@0..31
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeFunction@14..28
+    List@14..28
+      FuncCall@14..28
+        Ident@14..28 "get_first_user"
+  Ascii40@28..29 "("
+  Ascii41@29..30 ")"
+  Ascii59@30..31 ";"
+

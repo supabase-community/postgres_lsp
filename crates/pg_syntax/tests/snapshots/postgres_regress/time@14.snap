@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT f1 AS \"Three\" FROM TIME_TBL WHERE f1 < '05:06:07';"
+---
+SelectStmt@0..57
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..20
+    ColumnRef@7..9
+      Ident@7..9 "f1"
+    Whitespace@9..10 " "
+    As@10..12 "AS"
+    Whitespace@12..13 " "
+    Ident@13..20 "\"Three\""
+  Whitespace@20..21 " "
+  From@21..25 "FROM"
+  Whitespace@25..26 " "
+  RangeVar@26..34
+    Ident@26..34 "TIME_TBL"
+  Whitespace@34..35 " "
+  Where@35..40 "WHERE"
+  Whitespace@40..41 " "
+  AExpr@41..56
+    ColumnRef@41..43
+      Ident@41..43 "f1"
+    Whitespace@43..44 " "
+    Ascii60@44..45 "<"
+    Whitespace@45..46 " "
+    AConst@46..56
+      Sconst@46..56 "'05:06:07'"
+  Ascii59@56..57 ";"
+

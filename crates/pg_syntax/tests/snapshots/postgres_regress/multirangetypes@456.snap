@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select range_agg(nmr) from nummultirange_test where false;
+---
+SelectStmt@0..58
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..20
+    FuncCall@7..20
+      Ident@7..16 "range_agg"
+      Ascii40@16..17 "("
+      ColumnRef@17..20
+        Ident@17..20 "nmr"
+  Ascii41@20..21 ")"
+  Whitespace@21..22 " "
+  From@22..26 "from"
+  Whitespace@26..27 " "
+  RangeVar@27..45
+    Ident@27..45 "nummultirange_test"
+  Whitespace@45..46 " "
+  Where@46..51 "where"
+  Whitespace@51..52 " "
+  AConst@52..57
+    FalseP@52..57 "false"
+  Ascii59@57..58 ";"
+

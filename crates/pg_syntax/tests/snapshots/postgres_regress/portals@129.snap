@@ -1,0 +1,33 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function count_tt1_s() returns int8 as\n'select count(*) from tt1' language sql stable;"
+---
+CreateFunctionStmt@0..93
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..27 "count_tt1_s"
+  Ascii40@27..28 "("
+  Ascii41@28..29 ")"
+  Whitespace@29..30 " "
+  Returns@30..37 "returns"
+  Whitespace@37..38 " "
+  TypeName@38..42
+    Ident@38..42 "int8"
+  Whitespace@42..43 " "
+  DefElem@43..72
+    As@43..45 "as"
+    Newline@45..46 "\n"
+    List@46..72
+      Sconst@46..72 "'select count(*) from ..."
+  Whitespace@72..73 " "
+  DefElem@73..85
+    Language@73..81 "language"
+    Whitespace@81..82 " "
+    SqlP@82..85 "sql"
+  Whitespace@85..86 " "
+  DefElem@86..92
+    Stable@86..92 "stable"
+  Ascii59@92..93 ";"
+

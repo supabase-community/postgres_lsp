@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT ts_filter('base hidden rebel spaceship strike'::tsvector, '{a,b,NULL}');"
+---
+SelectStmt@0..79
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..77
+    FuncCall@7..77
+      Ident@7..16 "ts_filter"
+      Ascii40@16..17 "("
+      TypeCast@17..63
+        AConst@17..53
+          Sconst@17..53 "'base hidden rebel sp ..."
+        Typecast@53..55 "::"
+        TypeName@55..63
+          Ident@55..63 "tsvector"
+      Ascii44@63..64 ","
+      Whitespace@64..65 " "
+      AConst@65..77
+        Sconst@65..77 "'{a,b,NULL}'"
+  Ascii41@77..78 ")"
+  Ascii59@78..79 ";"
+

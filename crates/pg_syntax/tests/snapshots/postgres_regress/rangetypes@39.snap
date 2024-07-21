@@ -1,0 +1,44 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT nr, isempty(nr), lower(nr), upper(nr) FROM numrange_test;"
+---
+SelectStmt@0..64
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..9
+    ColumnRef@7..9
+      Ident@7..9 "nr"
+  Ascii44@9..10 ","
+  Whitespace@10..11 " "
+  ResTarget@11..21
+    FuncCall@11..21
+      Ident@11..18 "isempty"
+      Ascii40@18..19 "("
+      ColumnRef@19..21
+        Ident@19..21 "nr"
+  Ascii41@21..22 ")"
+  Ascii44@22..23 ","
+  Whitespace@23..24 " "
+  ResTarget@24..32
+    FuncCall@24..32
+      Ident@24..29 "lower"
+      Ascii40@29..30 "("
+      ColumnRef@30..32
+        Ident@30..32 "nr"
+  Ascii41@32..33 ")"
+  Ascii44@33..34 ","
+  Whitespace@34..35 " "
+  ResTarget@35..43
+    FuncCall@35..43
+      Ident@35..40 "upper"
+      Ascii40@40..41 "("
+      ColumnRef@41..43
+        Ident@41..43 "nr"
+  Ascii41@43..44 ")"
+  Whitespace@44..45 " "
+  From@45..49 "FROM"
+  Whitespace@49..50 " "
+  RangeVar@50..63
+    Ident@50..63 "numrange_test"
+  Ascii59@63..64 ";"
+

@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '{\n\t\t\"one\": 1,\n\t\t\"two\":\"two\",\n\t\t\"averyveryveryveryveryveryveryveryveryverylongfieldname\":}'::json;"
+---
+SelectStmt@0..105
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..104
+    TypeCast@7..104
+      AConst@7..98
+        Sconst@7..98 "'{\n\t\t\"one\": 1,\n\t\t\"two ..."
+      Typecast@98..100 "::"
+      TypeName@100..104
+        Ident@100..104 "json"
+  Ascii59@104..105 ";"
+

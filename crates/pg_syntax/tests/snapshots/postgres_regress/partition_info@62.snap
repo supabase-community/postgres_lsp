@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM pg_partition_tree('ptif_li_child');"
+---
+SelectStmt@0..49
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeFunction@14..47
+    List@14..47
+      FuncCall@14..47
+        Ident@14..31 "pg_partition_tree"
+        Ascii40@31..32 "("
+        AConst@32..47
+          Sconst@32..47 "'ptif_li_child'"
+  Ascii41@47..48 ")"
+  Ascii59@48..49 ";"
+

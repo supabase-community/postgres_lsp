@@ -1,0 +1,60 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from json_populate_recordset(row(1000000000::int,50::int),'[{\"b\":\"2\"},{\"a\":\"3\"}]') q (a text, b text);"
+---
+SelectStmt@0..111
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..109
+    List@14..90
+      FuncCall@14..90
+        Ident@14..37 "json_populate_recordset"
+        Ascii40@37..38 "("
+        RowExpr@38..65
+          Row@38..41 "row"
+          Ascii40@41..42 "("
+          TypeCast@42..57
+            AConst@42..52
+              Iconst@42..52 "1000000000"
+            Typecast@52..54 "::"
+            TypeName@54..57
+              IntP@54..57 "int"
+          Ascii44@57..58 ","
+          TypeCast@58..65
+            AConst@58..60
+              Iconst@58..60 "50"
+            Typecast@60..62 "::"
+            TypeName@62..65
+              IntP@62..65 "int"
+        Ascii41@65..66 ")"
+        Ascii44@66..67 ","
+        AConst@67..90
+          Sconst@67..90 "'[{\"b\":\"2\"},{\"a\":\"3\"}]'"
+    Ascii41@90..91 ")"
+    Whitespace@91..92 " "
+    Alias@92..93
+      Ident@92..93 "q"
+    Whitespace@93..94 " "
+    Ascii40@94..95 "("
+    ColumnDef@95..101
+      Ident@95..96 "a"
+      Whitespace@96..97 " "
+      TypeName@97..101
+        TextP@97..101 "text"
+    Ascii44@101..102 ","
+    Whitespace@102..103 " "
+    ColumnDef@103..109
+      Ident@103..104 "b"
+      Whitespace@104..105 " "
+      TypeName@105..109
+        TextP@105..109 "text"
+  Ascii41@109..110 ")"
+  Ascii59@110..111 ";"
+

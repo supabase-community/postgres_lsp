@@ -1,0 +1,111 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into spgist_box_tbl(b)\nselect box(point(i,j),point(i+s,j+s))\n  from generate_series(1,100,5) i,\n       generate_series(1,100,5) j,\n       generate_series(1,10) s;"
+---
+InsertStmt@0..169
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..26
+    Ident@12..26 "spgist_box_tbl"
+  Ascii40@26..27 "("
+  ResTarget@27..28
+    Ident@27..28 "b"
+  Ascii41@28..29 ")"
+  Newline@29..30 "\n"
+  SelectStmt@30..168
+    Select@30..36 "select"
+    Whitespace@36..37 " "
+    ResTarget@37..65
+      FuncCall@37..65
+        Ident@37..40 "box"
+        Ascii40@40..41 "("
+        FuncCall@41..50
+          Ident@41..46 "point"
+          Ascii40@46..47 "("
+          ColumnRef@47..48
+            Ident@47..48 "i"
+          Ascii44@48..49 ","
+          ColumnRef@49..50
+            Ident@49..50 "j"
+        Ascii41@50..51 ")"
+        Ascii44@51..52 ","
+        FuncCall@52..65
+          Ident@52..57 "point"
+          Ascii40@57..58 "("
+          AExpr@58..61
+            ColumnRef@58..59
+              Ident@58..59 "i"
+            Ascii43@59..60 "+"
+            ColumnRef@60..61
+              Ident@60..61 "s"
+          Ascii44@61..62 ","
+          AExpr@62..65
+            ColumnRef@62..63
+              Ident@62..63 "j"
+            Ascii43@63..64 "+"
+            ColumnRef@64..65
+              Ident@64..65 "s"
+    Ascii41@65..66 ")"
+    Ascii41@66..67 ")"
+    Newline@67..68 "\n"
+    Whitespace@68..70 "  "
+    From@70..74 "from"
+    Whitespace@74..75 " "
+    RangeFunction@75..101
+      List@75..98
+        FuncCall@75..98
+          Ident@75..90 "generate_series"
+          Ascii40@90..91 "("
+          AConst@91..92
+            Iconst@91..92 "1"
+          Ascii44@92..93 ","
+          AConst@93..96
+            Iconst@93..96 "100"
+          Ascii44@96..97 ","
+          AConst@97..98
+            Iconst@97..98 "5"
+      Ascii41@98..99 ")"
+      Whitespace@99..100 " "
+      Alias@100..101
+        Ident@100..101 "i"
+    Ascii44@101..102 ","
+    Newline@102..103 "\n"
+    Whitespace@103..110 "       "
+    RangeFunction@110..136
+      List@110..133
+        FuncCall@110..133
+          Ident@110..125 "generate_series"
+          Ascii40@125..126 "("
+          AConst@126..127
+            Iconst@126..127 "1"
+          Ascii44@127..128 ","
+          AConst@128..131
+            Iconst@128..131 "100"
+          Ascii44@131..132 ","
+          AConst@132..133
+            Iconst@132..133 "5"
+      Ascii41@133..134 ")"
+      Whitespace@134..135 " "
+      Alias@135..136
+        Ident@135..136 "j"
+    Ascii44@136..137 ","
+    Newline@137..138 "\n"
+    Whitespace@138..145 "       "
+    RangeFunction@145..168
+      List@145..165
+        FuncCall@145..165
+          Ident@145..160 "generate_series"
+          Ascii40@160..161 "("
+          AConst@161..162
+            Iconst@161..162 "1"
+          Ascii44@162..163 ","
+          AConst@163..165
+            Iconst@163..165 "10"
+      Ascii41@165..166 ")"
+      Whitespace@166..167 " "
+      Alias@167..168
+        Ident@167..168 "s"
+  Ascii59@168..169 ";"
+

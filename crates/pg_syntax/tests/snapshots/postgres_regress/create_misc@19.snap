@@ -1,0 +1,60 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO d_star (class, a, b, c)\n   VALUES ('d', 8, 'stumble'::text, 'hi koko'::name);"
+---
+InsertStmt@0..89
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "d_star"
+  Whitespace@18..19 " "
+  Ascii40@19..20 "("
+  ResTarget@20..25
+    Class@20..25 "class"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..28
+    Ident@27..28 "a"
+  Ascii44@28..29 ","
+  Whitespace@29..30 " "
+  ResTarget@30..31
+    Ident@30..31 "b"
+  Ascii44@31..32 ","
+  Whitespace@32..33 " "
+  ResTarget@33..34
+    Ident@33..34 "c"
+  Ascii41@34..35 ")"
+  Newline@35..36 "\n"
+  Whitespace@36..39 "   "
+  SelectStmt@39..87
+    Values@39..45 "VALUES"
+    Whitespace@45..46 " "
+    Ascii40@46..47 "("
+    List@47..87
+      AConst@47..50
+        Sconst@47..50 "'d'"
+      Ascii44@50..51 ","
+      Whitespace@51..52 " "
+      AConst@52..53
+        Iconst@52..53 "8"
+      Ascii44@53..54 ","
+      Whitespace@54..55 " "
+      TypeCast@55..70
+        AConst@55..64
+          Sconst@55..64 "'stumble'"
+        Typecast@64..66 "::"
+        TypeName@66..70
+          TextP@66..70 "text"
+      Ascii44@70..71 ","
+      Whitespace@71..72 " "
+      TypeCast@72..87
+        AConst@72..81
+          Sconst@72..81 "'hi koko'"
+        Typecast@81..83 "::"
+        TypeName@83..87
+          NameP@83..87 "name"
+  Ascii41@87..88 ")"
+  Ascii59@88..89 ";"
+

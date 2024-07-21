@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '!(!b)'::tsquery;"
+---
+SelectStmt@0..24
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..23
+    TypeCast@7..23
+      AConst@7..14
+        Sconst@7..14 "'!(!b)'"
+      Typecast@14..16 "::"
+      TypeName@16..23
+        Ident@16..23 "tsquery"
+  Ascii59@23..24 ";"
+

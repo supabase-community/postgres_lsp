@@ -1,0 +1,50 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into tt3 select x, repeat('xyzzy', 100) from generate_series(1,10000) x;"
+---
+InsertStmt@0..79
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..15
+    Ident@12..15 "tt3"
+  Whitespace@15..16 " "
+  SelectStmt@16..78
+    Select@16..22 "select"
+    Whitespace@22..23 " "
+    ResTarget@23..24
+      ColumnRef@23..24
+        Ident@23..24 "x"
+    Ascii44@24..25 ","
+    Whitespace@25..26 " "
+    ResTarget@26..45
+      FuncCall@26..45
+        Ident@26..32 "repeat"
+        Ascii40@32..33 "("
+        AConst@33..40
+          Sconst@33..40 "'xyzzy'"
+        Ascii44@40..41 ","
+        Whitespace@41..42 " "
+        AConst@42..45
+          Iconst@42..45 "100"
+    Ascii41@45..46 ")"
+    Whitespace@46..47 " "
+    From@47..51 "from"
+    Whitespace@51..52 " "
+    RangeFunction@52..78
+      List@52..75
+        FuncCall@52..75
+          Ident@52..67 "generate_series"
+          Ascii40@67..68 "("
+          AConst@68..69
+            Iconst@68..69 "1"
+          Ascii44@69..70 ","
+          AConst@70..75
+            Iconst@70..75 "10000"
+      Ascii41@75..76 ")"
+      Whitespace@76..77 " "
+      Alias@77..78
+        Ident@77..78 "x"
+  Ascii59@78..79 ";"
+

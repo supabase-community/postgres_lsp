@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 'a & !!b'::tsquery;"
+---
+SelectStmt@0..26
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..25
+    TypeCast@7..25
+      AConst@7..16
+        Sconst@7..16 "'a & !!b'"
+      Typecast@16..18 "::"
+      TypeName@18..25
+        Ident@18..25 "tsquery"
+  Ascii59@25..26 ";"
+

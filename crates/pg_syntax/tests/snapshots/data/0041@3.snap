@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE SCHEMA IF NOT EXISTS test AUTHORIZATION joe;
+---
+CreateSchemaStmt@0..51
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Schema@7..13 "SCHEMA"
+  Whitespace@13..14 " "
+  IfP@14..16 "IF"
+  Whitespace@16..17 " "
+  Not@17..20 "NOT"
+  Whitespace@20..21 " "
+  Exists@21..27 "EXISTS"
+  Whitespace@27..28 " "
+  Ident@28..32 "test"
+  Whitespace@32..33 " "
+  Authorization@33..46 "AUTHORIZATION"
+  Whitespace@46..47 " "
+  RoleSpec@47..50
+    Ident@47..50 "joe"
+  Ascii59@50..51 ";"
+

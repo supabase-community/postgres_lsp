@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select 'abc abd abc' ~ '^(\\w+)( \\1)+$' as f;"
+---
+SelectStmt@0..44
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..43
+    AExpr@7..38
+      AConst@7..20
+        Sconst@7..20 "'abc abd abc'"
+      Whitespace@20..21 " "
+      Op@21..22 "~"
+      Whitespace@22..23 " "
+      AConst@23..38
+        Sconst@23..38 "'^(\\w+)( \\1)+$'"
+    Whitespace@38..39 " "
+    As@39..41 "as"
+    Whitespace@41..42 " "
+    Ident@42..43 "f"
+  Ascii59@43..44 ";"
+

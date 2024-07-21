@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into pph_arrpart values ('{1}'), ('{1, 2}'), ('{4, 5}');"
+---
+InsertStmt@0..63
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "pph_arrpart"
+  Whitespace@23..24 " "
+  SelectStmt@24..61
+    Values@24..30 "values"
+    Whitespace@30..31 " "
+    Ascii40@31..32 "("
+    List@32..37
+      AConst@32..37
+        Sconst@32..37 "'{1}'"
+    Ascii41@37..38 ")"
+    Ascii44@38..39 ","
+    Whitespace@39..40 " "
+    Ascii40@40..41 "("
+    List@41..49
+      AConst@41..49
+        Sconst@41..49 "'{1, 2}'"
+    Ascii41@49..50 ")"
+    Ascii44@50..51 ","
+    Whitespace@51..52 " "
+    Ascii40@52..53 "("
+    List@53..61
+      AConst@53..61
+        Sconst@53..61 "'{4, 5}'"
+  Ascii41@61..62 ")"
+  Ascii59@62..63 ";"
+

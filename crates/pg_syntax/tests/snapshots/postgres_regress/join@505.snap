@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table join_pt1p1p1 partition of join_pt1p1 for values from (0) to (100);
+---
+CreateStmt@0..79
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..25
+    Ident@13..25 "join_pt1p1p1"
+  Whitespace@25..26 " "
+  Partition@26..35 "partition"
+  Whitespace@35..36 " "
+  Of@36..38 "of"
+  Whitespace@38..39 " "
+  RangeVar@39..49
+    Ident@39..49 "join_pt1p1"
+  Whitespace@49..50 " "
+  For@50..53 "for"
+  Whitespace@53..54 " "
+  Values@54..60 "values"
+  Whitespace@60..61 " "
+  PartitionBoundSpec@61..77
+    From@61..65 "from"
+    Whitespace@65..66 " "
+    Ascii40@66..67 "("
+    AConst@67..68
+      Iconst@67..68 "0"
+    Ascii41@68..69 ")"
+    Whitespace@69..70 " "
+    To@70..72 "to"
+    Whitespace@72..73 " "
+    Ascii40@73..74 "("
+    AConst@74..77
+      Iconst@74..77 "100"
+  Ascii41@77..78 ")"
+  Ascii59@78..79 ";"
+

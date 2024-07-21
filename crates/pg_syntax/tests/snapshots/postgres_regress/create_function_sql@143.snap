@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION test1 (int) RETURNS int LANGUAGE SQL\n    AS 'SELECT $2;';"
+---
+CreateFunctionStmt@0..73
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..21 "test1"
+  Whitespace@21..22 " "
+  Ascii40@22..23 "("
+  FunctionParameter@23..26
+    TypeName@23..26
+      IntP@23..26 "int"
+  Ascii41@26..27 ")"
+  Whitespace@27..28 " "
+  Returns@28..35 "RETURNS"
+  Whitespace@35..36 " "
+  TypeName@36..39
+    IntP@36..39 "int"
+  Whitespace@39..40 " "
+  DefElem@40..52
+    Language@40..48 "LANGUAGE"
+    Whitespace@48..49 " "
+    SqlP@49..52 "SQL"
+  Newline@52..53 "\n"
+  Whitespace@53..57 "    "
+  DefElem@57..72
+    As@57..59 "AS"
+    Whitespace@59..60 " "
+    List@60..72
+      Sconst@60..72 "'SELECT $2;'"
+  Ascii59@72..73 ";"
+

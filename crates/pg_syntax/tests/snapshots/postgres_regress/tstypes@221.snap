@@ -1,0 +1,33 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT array_to_tsvector(ARRAY['base','hidden','rebel','spaceship', '']);"
+---
+SelectStmt@0..73
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..70
+    FuncCall@7..70
+      Ident@7..24 "array_to_tsvector"
+      Ascii40@24..25 "("
+      AArrayExpr@25..70
+        Array@25..30 "ARRAY"
+        Ascii91@30..31 "["
+        AConst@31..37
+          Sconst@31..37 "'base'"
+        Ascii44@37..38 ","
+        AConst@38..46
+          Sconst@38..46 "'hidden'"
+        Ascii44@46..47 ","
+        AConst@47..54
+          Sconst@47..54 "'rebel'"
+        Ascii44@54..55 ","
+        AConst@55..66
+          Sconst@55..66 "'spaceship'"
+        Ascii44@66..67 ","
+        Whitespace@67..68 " "
+        AConst@68..70
+          Sconst@68..70 "''"
+  Ascii93@70..71 "]"
+  Ascii41@71..72 ")"
+  Ascii59@72..73 ";"
+

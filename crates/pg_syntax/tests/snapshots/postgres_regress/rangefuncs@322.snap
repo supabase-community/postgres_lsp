@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function testrngfunc() returns record as $$\n  insert into rngfunc values (1,2) returning *;\n$$ language sql;"
+---
+CreateFunctionStmt@0..115
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..27 "testrngfunc"
+  Ascii40@27..28 "("
+  Ascii41@28..29 ")"
+  Whitespace@29..30 " "
+  Returns@30..37 "returns"
+  Whitespace@37..38 " "
+  TypeName@38..44
+    Ident@38..44 "record"
+  Whitespace@44..45 " "
+  DefElem@45..101
+    As@45..47 "as"
+    Whitespace@47..48 " "
+    List@48..101
+      Sconst@48..101 "$$\n  insert into rngf ..."
+  Whitespace@101..102 " "
+  DefElem@102..114
+    Language@102..110 "language"
+    Whitespace@110..111 " "
+    SqlP@111..114 "sql"
+  Ascii59@114..115 ";"
+

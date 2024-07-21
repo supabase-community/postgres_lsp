@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table other_events (event_id int primary key);
+---
+CreateStmt@0..53
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..25
+    Ident@13..25 "other_events"
+  Whitespace@25..26 " "
+  Ascii40@26..27 "("
+  ColumnDef@27..51
+    Ident@27..35 "event_id"
+    Whitespace@35..36 " "
+    TypeName@36..39
+      IntP@36..39 "int"
+    Whitespace@39..40 " "
+    Constraint@40..51
+      Primary@40..47 "primary"
+      Whitespace@47..48 " "
+      Key@48..51 "key"
+  Ascii41@51..52 ")"
+  Ascii59@52..53 ";"
+

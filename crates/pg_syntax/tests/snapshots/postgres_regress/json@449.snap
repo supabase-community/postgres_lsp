@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select ts_headline('english', '{\"a\": \"aaa bbb\", \"b\": {\"c\": \"ccc ddd fff\"}, \"d\": [\"ggg hhh\", \"iii jjj\"]}'::json, tsquery('bbb & ddd & hhh'));"
+---
+SelectStmt@0..140
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..137
+    FuncCall@7..137
+      Ident@7..18 "ts_headline"
+      Ascii40@18..19 "("
+      AConst@19..28
+        Sconst@19..28 "'english'"
+      Ascii44@28..29 ","
+      Whitespace@29..30 " "
+      TypeCast@30..110
+        AConst@30..104
+          Sconst@30..104 "'{\"a\": \"aaa bbb\", \"b\" ..."
+        Typecast@104..106 "::"
+        TypeName@106..110
+          Ident@106..110 "json"
+      Ascii44@110..111 ","
+      Whitespace@111..112 " "
+      FuncCall@112..137
+        Ident@112..119 "tsquery"
+        Ascii40@119..120 "("
+        AConst@120..137
+          Sconst@120..137 "'bbb & ddd & hhh'"
+  Ascii41@137..138 ")"
+  Ascii41@138..139 ")"
+  Ascii59@139..140 ";"
+

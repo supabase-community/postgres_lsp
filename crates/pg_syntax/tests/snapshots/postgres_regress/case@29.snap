@@ -1,0 +1,46 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT COALESCE(a.f, b.i, b.j)\n  FROM CASE_TBL a, CASE2_TBL b;"
+---
+SelectStmt@0..62
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..29
+    CoalesceExpr@7..29
+      Coalesce@7..15 "COALESCE"
+      Ascii40@15..16 "("
+      ColumnRef@16..19
+        Ident@16..17 "a"
+        Ascii46@17..18 "."
+        Ident@18..19 "f"
+      Ascii44@19..20 ","
+      Whitespace@20..21 " "
+      ColumnRef@21..24
+        Ident@21..22 "b"
+        Ascii46@22..23 "."
+        Ident@23..24 "i"
+      Ascii44@24..25 ","
+      Whitespace@25..26 " "
+      ColumnRef@26..29
+        Ident@26..27 "b"
+        Ascii46@27..28 "."
+        Ident@28..29 "j"
+  Ascii41@29..30 ")"
+  Newline@30..31 "\n"
+  Whitespace@31..33 "  "
+  From@33..37 "FROM"
+  Whitespace@37..38 " "
+  RangeVar@38..48
+    Ident@38..46 "CASE_TBL"
+    Whitespace@46..47 " "
+    Alias@47..48
+      Ident@47..48 "a"
+  Ascii44@48..49 ","
+  Whitespace@49..50 " "
+  RangeVar@50..61
+    Ident@50..59 "CASE2_TBL"
+    Whitespace@59..60 " "
+    Alias@60..61
+      Ident@60..61 "b"
+  Ascii59@61..62 ";"
+

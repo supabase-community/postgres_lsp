@@ -1,0 +1,43 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select ir from test_range_spgist where ir -|- int4range(10,20) order by ir;"
+---
+SelectStmt@0..75
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..9
+    ColumnRef@7..9
+      Ident@7..9 "ir"
+  Whitespace@9..10 " "
+  From@10..14 "from"
+  Whitespace@14..15 " "
+  RangeVar@15..32
+    Ident@15..32 "test_range_spgist"
+  Whitespace@32..33 " "
+  Where@33..38 "where"
+  Whitespace@38..39 " "
+  AExpr@39..61
+    ColumnRef@39..41
+      Ident@39..41 "ir"
+    Whitespace@41..42 " "
+    Op@42..45 "-|-"
+    Whitespace@45..46 " "
+    FuncCall@46..61
+      Ident@46..55 "int4range"
+      Ascii40@55..56 "("
+      AConst@56..58
+        Iconst@56..58 "10"
+      Ascii44@58..59 ","
+      AConst@59..61
+        Iconst@59..61 "20"
+  Ascii41@61..62 ")"
+  Whitespace@62..63 " "
+  SortBy@63..74
+    Order@63..68 "order"
+    Whitespace@68..69 " "
+    By@69..71 "by"
+    Whitespace@71..72 " "
+    ColumnRef@72..74
+      Ident@72..74 "ir"
+  Ascii59@74..75 ";"
+

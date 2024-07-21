@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT json_build_array('a', NULL);"
+---
+SelectStmt@0..35
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..33
+    FuncCall@7..33
+      Ident@7..23 "json_build_array"
+      Ascii40@23..24 "("
+      AConst@24..27
+        Sconst@24..27 "'a'"
+      Ascii44@27..28 ","
+      Whitespace@28..29 " "
+      AConst@29..33
+        NullP@29..33 "NULL"
+  Ascii41@33..34 ")"
+  Ascii59@34..35 ";"
+

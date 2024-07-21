@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT regclass('ng_catalog.pg_class');"
+---
+SelectStmt@0..39
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..37
+    FuncCall@7..37
+      Ident@7..15 "regclass"
+      Ascii40@15..16 "("
+      AConst@16..37
+        Sconst@16..37 "'ng_catalog.pg_class'"
+  Ascii41@37..38 ")"
+  Ascii59@38..39 ";"
+

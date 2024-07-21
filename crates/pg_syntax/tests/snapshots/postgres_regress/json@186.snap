@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '42'::json #>> '{}';"
+---
+SelectStmt@0..27
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..26
+    AExpr@7..26
+      TypeCast@7..17
+        AConst@7..11
+          Sconst@7..11 "'42'"
+        Typecast@11..13 "::"
+        TypeName@13..17
+          Ident@13..17 "json"
+      Whitespace@17..18 " "
+      Op@18..21 "#>>"
+      Whitespace@21..22 " "
+      AConst@22..26
+        Sconst@22..26 "'{}'"
+  Ascii59@26..27 ";"
+

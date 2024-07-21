@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO trunc_fb VALUES (4, 444);"
+---
+InsertStmt@0..37
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "trunc_fb"
+  Whitespace@20..21 " "
+  SelectStmt@21..35
+    Values@21..27 "VALUES"
+    Whitespace@27..28 " "
+    Ascii40@28..29 "("
+    List@29..35
+      AConst@29..30
+        Iconst@29..30 "4"
+      Ascii44@30..31 ","
+      Whitespace@31..32 " "
+      AConst@32..35
+        Iconst@32..35 "444"
+  Ascii41@35..36 ")"
+  Ascii59@36..37 ";"
+

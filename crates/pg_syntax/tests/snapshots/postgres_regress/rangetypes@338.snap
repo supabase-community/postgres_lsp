@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select rangetypes_sql(numrange(1,10), ARRAY[2,20]);"
+---
+SelectStmt@0..51
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..48
+    FuncCall@7..48
+      Ident@7..21 "rangetypes_sql"
+      Ascii40@21..22 "("
+      FuncCall@22..35
+        Ident@22..30 "numrange"
+        Ascii40@30..31 "("
+        AConst@31..32
+          Iconst@31..32 "1"
+        Ascii44@32..33 ","
+        AConst@33..35
+          Iconst@33..35 "10"
+      Ascii41@35..36 ")"
+      Ascii44@36..37 ","
+      Whitespace@37..38 " "
+      AArrayExpr@38..48
+        Array@38..43 "ARRAY"
+        Ascii91@43..44 "["
+        AConst@44..45
+          Iconst@44..45 "2"
+        Ascii44@45..46 ","
+        AConst@46..48
+          Iconst@46..48 "20"
+  Ascii93@48..49 "]"
+  Ascii41@49..50 ")"
+  Ascii59@50..51 ";"
+

@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO money_data VALUES ('$123.454');"
+---
+InsertStmt@0..43
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..22
+    Ident@12..22 "money_data"
+  Whitespace@22..23 " "
+  SelectStmt@23..41
+    Values@23..29 "VALUES"
+    Whitespace@29..30 " "
+    Ascii40@30..31 "("
+    List@31..41
+      AConst@31..41
+        Sconst@31..41 "'$123.454'"
+  Ascii41@41..42 ")"
+  Ascii59@42..43 ";"
+

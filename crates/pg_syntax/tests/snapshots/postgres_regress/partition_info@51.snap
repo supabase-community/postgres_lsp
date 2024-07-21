@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT relid, parentrelid, level, isleaf\n  FROM pg_partition_tree('ptif_normal_table');"
+---
+SelectStmt@0..87
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..12
+    ColumnRef@7..12
+      Ident@7..12 "relid"
+  Ascii44@12..13 ","
+  Whitespace@13..14 " "
+  ResTarget@14..25
+    ColumnRef@14..25
+      Ident@14..25 "parentrelid"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..32
+    ColumnRef@27..32
+      Level@27..32 "level"
+  Ascii44@32..33 ","
+  Whitespace@33..34 " "
+  ResTarget@34..40
+    ColumnRef@34..40
+      Ident@34..40 "isleaf"
+  Newline@40..41 "\n"
+  Whitespace@41..43 "  "
+  From@43..47 "FROM"
+  Whitespace@47..48 " "
+  RangeFunction@48..85
+    List@48..85
+      FuncCall@48..85
+        Ident@48..65 "pg_partition_tree"
+        Ascii40@65..66 "("
+        AConst@66..85
+          Sconst@66..85 "'ptif_normal_table'"
+  Ascii41@85..86 ")"
+  Ascii59@86..87 ";"
+

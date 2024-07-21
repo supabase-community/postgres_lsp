@@ -1,0 +1,47 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '<NULL>' AS \"One\",\n  CASE\n    WHEN 1 > 2 THEN 3\n  END AS \"Simple default\";"
+---
+SelectStmt@0..81
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..24
+    AConst@7..15
+      Sconst@7..15 "'<NULL>'"
+    Whitespace@15..16 " "
+    As@16..18 "AS"
+    Whitespace@18..19 " "
+    Ident@19..24 "\"One\""
+  Ascii44@24..25 ","
+  Newline@25..26 "\n"
+  Whitespace@26..28 "  "
+  ResTarget@28..80
+    CaseExpr@28..60
+      Case@28..32 "CASE"
+      Newline@32..33 "\n"
+      Whitespace@33..37 "    "
+      CaseWhen@37..54
+        When@37..41 "WHEN"
+        Whitespace@41..42 " "
+        AExpr@42..47
+          AConst@42..43
+            Iconst@42..43 "1"
+          Whitespace@43..44 " "
+          Ascii62@44..45 ">"
+          Whitespace@45..46 " "
+          AConst@46..47
+            Iconst@46..47 "2"
+        Whitespace@47..48 " "
+        Then@48..52 "THEN"
+        Whitespace@52..53 " "
+        AConst@53..54
+          Iconst@53..54 "3"
+      Newline@54..55 "\n"
+      Whitespace@55..57 "  "
+      EndP@57..60 "END"
+    Whitespace@60..61 " "
+    As@61..63 "AS"
+    Whitespace@63..64 " "
+    Ident@64..80 "\"Simple default\""
+  Ascii59@80..81 ";"
+

@@ -1,0 +1,42 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select from generate_series(1,5) union select from generate_series(1,3);"
+---
+SelectStmt@0..72
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  SelectStmt@7..31
+    From@7..11 "from"
+    Whitespace@11..12 " "
+    RangeFunction@12..31
+      List@12..31
+        FuncCall@12..31
+          Ident@12..27 "generate_series"
+          Ascii40@27..28 "("
+          AConst@28..29
+            Iconst@28..29 "1"
+          Ascii44@29..30 ","
+          AConst@30..31
+            Iconst@30..31 "5"
+  Ascii41@31..32 ")"
+  Whitespace@32..33 " "
+  Union@33..38 "union"
+  Whitespace@38..39 " "
+  SelectStmt@39..70
+    Select@39..45 "select"
+    Whitespace@45..46 " "
+    From@46..50 "from"
+    Whitespace@50..51 " "
+    RangeFunction@51..70
+      List@51..70
+        FuncCall@51..70
+          Ident@51..66 "generate_series"
+          Ascii40@66..67 "("
+          AConst@67..68
+            Iconst@67..68 "1"
+          Ascii44@68..69 ","
+          AConst@69..70
+            Iconst@69..70 "3"
+  Ascii41@70..71 ")"
+  Ascii59@71..72 ";"
+

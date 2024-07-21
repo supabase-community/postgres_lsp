@@ -1,0 +1,135 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into t_gin_test_tbl\nvalues\n  (null,    null),\n  ('{}',    null),\n  ('{1}',   null),\n  ('{1,2}', null),\n  (null,    '{}'),\n  (null,    '{10}'),\n  ('{1,2}', '{10}'),\n  ('{2}',   '{10}'),\n  ('{1,3}', '{}'),\n  ('{1,1}', '{10}');"
+---
+InsertStmt@0..231
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..26
+    Ident@12..26 "t_gin_test_tbl"
+  Newline@26..27 "\n"
+  SelectStmt@27..229
+    Values@27..33 "values"
+    Newline@33..34 "\n"
+    Whitespace@34..36 "  "
+    Ascii40@36..37 "("
+    List@37..50
+      AConst@37..41
+        NullP@37..41 "null"
+      Ascii44@41..42 ","
+      Whitespace@42..46 "    "
+      AConst@46..50
+        NullP@46..50 "null"
+    Ascii41@50..51 ")"
+    Ascii44@51..52 ","
+    Newline@52..53 "\n"
+    Whitespace@53..55 "  "
+    Ascii40@55..56 "("
+    List@56..69
+      AConst@56..60
+        Sconst@56..60 "'{}'"
+      Ascii44@60..61 ","
+      Whitespace@61..65 "    "
+      AConst@65..69
+        NullP@65..69 "null"
+    Ascii41@69..70 ")"
+    Ascii44@70..71 ","
+    Newline@71..72 "\n"
+    Whitespace@72..74 "  "
+    Ascii40@74..75 "("
+    List@75..88
+      AConst@75..80
+        Sconst@75..80 "'{1}'"
+      Ascii44@80..81 ","
+      Whitespace@81..84 "   "
+      AConst@84..88
+        NullP@84..88 "null"
+    Ascii41@88..89 ")"
+    Ascii44@89..90 ","
+    Newline@90..91 "\n"
+    Whitespace@91..93 "  "
+    Ascii40@93..94 "("
+    List@94..107
+      AConst@94..101
+        Sconst@94..101 "'{1,2}'"
+      Ascii44@101..102 ","
+      Whitespace@102..103 " "
+      AConst@103..107
+        NullP@103..107 "null"
+    Ascii41@107..108 ")"
+    Ascii44@108..109 ","
+    Newline@109..110 "\n"
+    Whitespace@110..112 "  "
+    Ascii40@112..113 "("
+    List@113..126
+      AConst@113..117
+        NullP@113..117 "null"
+      Ascii44@117..118 ","
+      Whitespace@118..122 "    "
+      AConst@122..126
+        Sconst@122..126 "'{}'"
+    Ascii41@126..127 ")"
+    Ascii44@127..128 ","
+    Newline@128..129 "\n"
+    Whitespace@129..131 "  "
+    Ascii40@131..132 "("
+    List@132..147
+      AConst@132..136
+        NullP@132..136 "null"
+      Ascii44@136..137 ","
+      Whitespace@137..141 "    "
+      AConst@141..147
+        Sconst@141..147 "'{10}'"
+    Ascii41@147..148 ")"
+    Ascii44@148..149 ","
+    Newline@149..150 "\n"
+    Whitespace@150..152 "  "
+    Ascii40@152..153 "("
+    List@153..168
+      AConst@153..160
+        Sconst@153..160 "'{1,2}'"
+      Ascii44@160..161 ","
+      Whitespace@161..162 " "
+      AConst@162..168
+        Sconst@162..168 "'{10}'"
+    Ascii41@168..169 ")"
+    Ascii44@169..170 ","
+    Newline@170..171 "\n"
+    Whitespace@171..173 "  "
+    Ascii40@173..174 "("
+    List@174..189
+      AConst@174..179
+        Sconst@174..179 "'{2}'"
+      Ascii44@179..180 ","
+      Whitespace@180..183 "   "
+      AConst@183..189
+        Sconst@183..189 "'{10}'"
+    Ascii41@189..190 ")"
+    Ascii44@190..191 ","
+    Newline@191..192 "\n"
+    Whitespace@192..194 "  "
+    Ascii40@194..195 "("
+    List@195..208
+      AConst@195..202
+        Sconst@195..202 "'{1,3}'"
+      Ascii44@202..203 ","
+      Whitespace@203..204 " "
+      AConst@204..208
+        Sconst@204..208 "'{}'"
+    Ascii41@208..209 ")"
+    Ascii44@209..210 ","
+    Newline@210..211 "\n"
+    Whitespace@211..213 "  "
+    Ascii40@213..214 "("
+    List@214..229
+      AConst@214..221
+        Sconst@214..221 "'{1,1}'"
+      Ascii44@221..222 ","
+      Whitespace@222..223 " "
+      AConst@223..229
+        Sconst@223..229 "'{10}'"
+  Ascii41@229..230 ")"
+  Ascii59@230..231 ";"
+

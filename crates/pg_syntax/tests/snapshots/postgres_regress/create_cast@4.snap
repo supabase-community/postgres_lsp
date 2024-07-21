@@ -1,0 +1,55 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TYPE casttesttype (\n   internallength = variable,\n   input = casttesttype_in,\n   output = casttesttype_out,\n   alignment = int4\n);"
+---
+DefineStmt@0..137
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  TypeP@7..11 "TYPE"
+  Whitespace@11..12 " "
+  Ident@12..24 "casttesttype"
+  Whitespace@24..25 " "
+  Ascii40@25..26 "("
+  Newline@26..27 "\n"
+  Whitespace@27..30 "   "
+  DefElem@30..55
+    Ident@30..44 "internallength"
+    Whitespace@44..45 " "
+    Ascii61@45..46 "="
+    Whitespace@46..47 " "
+    TypeName@47..55
+      Ident@47..55 "variable"
+  Ascii44@55..56 ","
+  Newline@56..57 "\n"
+  Whitespace@57..60 "   "
+  DefElem@60..83
+    InputP@60..65 "input"
+    Whitespace@65..66 " "
+    Ascii61@66..67 "="
+    Whitespace@67..68 " "
+    TypeName@68..83
+      Ident@68..83 "casttesttype_in"
+  Ascii44@83..84 ","
+  Newline@84..85 "\n"
+  Whitespace@85..88 "   "
+  DefElem@88..113
+    Ident@88..94 "output"
+    Whitespace@94..95 " "
+    Ascii61@95..96 "="
+    Whitespace@96..97 " "
+    TypeName@97..113
+      Ident@97..113 "casttesttype_out"
+  Ascii44@113..114 ","
+  Newline@114..115 "\n"
+  Whitespace@115..118 "   "
+  DefElem@118..134
+    Ident@118..127 "alignment"
+    Whitespace@127..128 " "
+    Ascii61@128..129 "="
+    Whitespace@129..130 " "
+    TypeName@130..134
+      Ident@130..134 "int4"
+  Newline@134..135 "\n"
+  Ascii41@135..136 ")"
+  Ascii59@136..137 ";"
+

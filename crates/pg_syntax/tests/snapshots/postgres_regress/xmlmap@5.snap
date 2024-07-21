@@ -1,0 +1,153 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE testxmlschema.test2 (z int, y varchar(500), x char(6),\n    w numeric(9,2), v smallint, u bigint, t real,\n    s time, stz timetz, r timestamp, rtz timestamptz, q date,\n    p xml, o testxmldomain, n bool, m bytea, aaa text);"
+---
+CreateStmt@0..235
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..32
+    Ident@13..26 "testxmlschema"
+    Ascii46@26..27 "."
+    Ident@27..32 "test2"
+  Whitespace@32..33 " "
+  Ascii40@33..34 "("
+  ColumnDef@34..39
+    Ident@34..35 "z"
+    Whitespace@35..36 " "
+    TypeName@36..39
+      IntP@36..39 "int"
+  Ascii44@39..40 ","
+  Whitespace@40..41 " "
+  ColumnDef@41..54
+    Ident@41..42 "y"
+    Whitespace@42..43 " "
+    TypeName@43..54
+      Varchar@43..50 "varchar"
+      Ascii40@50..51 "("
+      AConst@51..54
+        Iconst@51..54 "500"
+  Ascii41@54..55 ")"
+  Ascii44@55..56 ","
+  Whitespace@56..57 " "
+  ColumnDef@57..65
+    Ident@57..58 "x"
+    Whitespace@58..59 " "
+    TypeName@59..65
+      CharP@59..63 "char"
+      Ascii40@63..64 "("
+      AConst@64..65
+        Iconst@64..65 "6"
+  Ascii41@65..66 ")"
+  Ascii44@66..67 ","
+  Newline@67..68 "\n"
+  Whitespace@68..72 "    "
+  ColumnDef@72..85
+    Ident@72..73 "w"
+    Whitespace@73..74 " "
+    TypeName@74..85
+      Numeric@74..81 "numeric"
+      Ascii40@81..82 "("
+      AConst@82..83
+        Iconst@82..83 "9"
+      Ascii44@83..84 ","
+      AConst@84..85
+        Iconst@84..85 "2"
+  Ascii41@85..86 ")"
+  Ascii44@86..87 ","
+  Whitespace@87..88 " "
+  ColumnDef@88..98
+    Ident@88..89 "v"
+    Whitespace@89..90 " "
+    TypeName@90..98
+      Smallint@90..98 "smallint"
+  Ascii44@98..99 ","
+  Whitespace@99..100 " "
+  ColumnDef@100..108
+    Ident@100..101 "u"
+    Whitespace@101..102 " "
+    TypeName@102..108
+      Bigint@102..108 "bigint"
+  Ascii44@108..109 ","
+  Whitespace@109..110 " "
+  ColumnDef@110..116
+    Ident@110..111 "t"
+    Whitespace@111..112 " "
+    TypeName@112..116
+      Real@112..116 "real"
+  Ascii44@116..117 ","
+  Newline@117..118 "\n"
+  Whitespace@118..122 "    "
+  ColumnDef@122..128
+    Ident@122..123 "s"
+    Whitespace@123..124 " "
+    TypeName@124..128
+      Time@124..128 "time"
+  Ascii44@128..129 ","
+  Whitespace@129..130 " "
+  ColumnDef@130..140
+    Ident@130..133 "stz"
+    Whitespace@133..134 " "
+    TypeName@134..140
+      Ident@134..140 "timetz"
+  Ascii44@140..141 ","
+  Whitespace@141..142 " "
+  ColumnDef@142..153
+    Ident@142..143 "r"
+    Whitespace@143..144 " "
+    TypeName@144..153
+      Timestamp@144..153 "timestamp"
+  Ascii44@153..154 ","
+  Whitespace@154..155 " "
+  ColumnDef@155..170
+    Ident@155..158 "rtz"
+    Whitespace@158..159 " "
+    TypeName@159..170
+      Ident@159..170 "timestamptz"
+  Ascii44@170..171 ","
+  Whitespace@171..172 " "
+  ColumnDef@172..178
+    Ident@172..173 "q"
+    Whitespace@173..174 " "
+    TypeName@174..178
+      Ident@174..178 "date"
+  Ascii44@178..179 ","
+  Newline@179..180 "\n"
+  Whitespace@180..184 "    "
+  ColumnDef@184..189
+    Ident@184..185 "p"
+    Whitespace@185..186 " "
+    TypeName@186..189
+      XmlP@186..189 "xml"
+  Ascii44@189..190 ","
+  Whitespace@190..191 " "
+  ColumnDef@191..206
+    Ident@191..192 "o"
+    Whitespace@192..193 " "
+    TypeName@193..206
+      Ident@193..206 "testxmldomain"
+  Ascii44@206..207 ","
+  Whitespace@207..208 " "
+  ColumnDef@208..214
+    Ident@208..209 "n"
+    Whitespace@209..210 " "
+    TypeName@210..214
+      Ident@210..214 "bool"
+  Ascii44@214..215 ","
+  Whitespace@215..216 " "
+  ColumnDef@216..223
+    Ident@216..217 "m"
+    Whitespace@217..218 " "
+    TypeName@218..223
+      Ident@218..223 "bytea"
+  Ascii44@223..224 ","
+  Whitespace@224..225 " "
+  ColumnDef@225..233
+    Ident@225..228 "aaa"
+    Whitespace@228..229 " "
+    TypeName@229..233
+      TextP@229..233 "text"
+  Ascii41@233..234 ")"
+  Ascii59@234..235 ";"
+

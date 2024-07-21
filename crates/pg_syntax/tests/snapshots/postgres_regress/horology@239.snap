@@ -1,0 +1,49 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT i, to_timestamp('2018-11-02 12:34:56.123456789', 'YYYY-MM-DD HH24:MI:SS.FF' || i) FROM generate_series(1, 6) i;"
+---
+SelectStmt@0..118
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      Ident@7..8 "i"
+  Ascii44@8..9 ","
+  Whitespace@9..10 " "
+  ResTarget@10..87
+    FuncCall@10..87
+      Ident@10..22 "to_timestamp"
+      Ascii40@22..23 "("
+      AConst@23..54
+        Sconst@23..54 "'2018-11-02 12:34:56. ..."
+      Ascii44@54..55 ","
+      Whitespace@55..56 " "
+      AExpr@56..87
+        AConst@56..82
+          Sconst@56..82 "'YYYY-MM-DD HH24:MI:S ..."
+        Whitespace@82..83 " "
+        Op@83..85 "||"
+        Whitespace@85..86 " "
+        ColumnRef@86..87
+          Ident@86..87 "i"
+  Ascii41@87..88 ")"
+  Whitespace@88..89 " "
+  From@89..93 "FROM"
+  Whitespace@93..94 " "
+  RangeFunction@94..117
+    List@94..114
+      FuncCall@94..114
+        Ident@94..109 "generate_series"
+        Ascii40@109..110 "("
+        AConst@110..111
+          Iconst@110..111 "1"
+        Ascii44@111..112 ","
+        Whitespace@112..113 " "
+        AConst@113..114
+          Iconst@113..114 "6"
+    Ascii41@114..115 ")"
+    Whitespace@115..116 " "
+    Alias@116..117
+      Ident@116..117 "i"
+  Ascii59@117..118 ";"
+

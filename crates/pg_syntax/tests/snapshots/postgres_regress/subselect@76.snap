@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into parts (partnum, cost) values (1, 1234.56);"
+---
+InsertStmt@0..54
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..17
+    Ident@12..17 "parts"
+  Whitespace@17..18 " "
+  Ascii40@18..19 "("
+  ResTarget@19..26
+    Ident@19..26 "partnum"
+  Ascii44@26..27 ","
+  Whitespace@27..28 " "
+  ResTarget@28..32
+    Cost@28..32 "cost"
+  Ascii41@32..33 ")"
+  Whitespace@33..34 " "
+  SelectStmt@34..52
+    Values@34..40 "values"
+    Whitespace@40..41 " "
+    Ascii40@41..42 "("
+    List@42..52
+      AConst@42..43
+        Iconst@42..43 "1"
+      Ascii44@43..44 ","
+      Whitespace@44..45 " "
+      AConst@45..52
+        Fconst@45..52 "1234.56"
+  Ascii41@52..53 ")"
+  Ascii59@53..54 ";"
+

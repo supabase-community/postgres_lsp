@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_tsvector('thesaurus_tst', 'Booking tickets is looking like a booking a tickets');"
+---
+SelectStmt@0..91
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..89
+    FuncCall@7..89
+      Ident@7..18 "to_tsvector"
+      Ascii40@18..19 "("
+      AConst@19..34
+        Sconst@19..34 "'thesaurus_tst'"
+      Ascii44@34..35 ","
+      Whitespace@35..36 " "
+      AConst@36..89
+        Sconst@36..89 "'Booking tickets is l ..."
+  Ascii41@89..90 ")"
+  Ascii59@90..91 ";"
+

@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index test_range_gist_idx on test_range_gist using gist (ir);
+---
+IndexStmt@0..68
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..32 "test_range_gist_idx"
+  Whitespace@32..33 " "
+  On@33..35 "on"
+  Whitespace@35..36 " "
+  RangeVar@36..51
+    Ident@36..51 "test_range_gist"
+  Whitespace@51..52 " "
+  Using@52..57 "using"
+  Whitespace@57..58 " "
+  Ident@58..62 "gist"
+  Whitespace@62..63 " "
+  Ascii40@63..64 "("
+  IndexElem@64..66
+    Ident@64..66 "ir"
+  Ascii41@66..67 ")"
+  Ascii59@67..68 ";"
+

@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '$ ? (@ starts with $var)'::jsonpath;"
+---
+SelectStmt@0..44
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..43
+    TypeCast@7..43
+      AConst@7..33
+        Sconst@7..33 "'$ ? (@ starts with $ ..."
+      Typecast@33..35 "::"
+      TypeName@35..43
+        Ident@35..43 "jsonpath"
+  Ascii59@43..44 ";"
+

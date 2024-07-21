@@ -1,0 +1,72 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_char(d, 'FF1 FF2 FF3 FF4 FF5 FF6  ff1 ff2 ff3 ff4 ff5 ff6  MS US')\n   FROM (VALUES\n       ('2018-11-02 12:34:56'::timestamptz),\n       ('2018-11-02 12:34:56.78'),\n       ('2018-11-02 12:34:56.78901'),\n       ('2018-11-02 12:34:56.78901234')\n   ) d(d);"
+---
+SelectStmt@0..261
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..75
+    FuncCall@7..75
+      Ident@7..14 "to_char"
+      Ascii40@14..15 "("
+      ColumnRef@15..16
+        Ident@15..16 "d"
+      Ascii44@16..17 ","
+      Whitespace@17..18 " "
+      AConst@18..75
+        Sconst@18..75 "'FF1 FF2 FF3 FF4 FF5  ..."
+  Ascii41@75..76 ")"
+  Newline@76..77 "\n"
+  Whitespace@77..80 "   "
+  From@80..84 "FROM"
+  Whitespace@84..85 " "
+  Ascii40@85..86 "("
+  RangeSubselect@86..259
+    SelectStmt@86..249
+      Values@86..92 "VALUES"
+      Newline@92..93 "\n"
+      Whitespace@93..100 "       "
+      Ascii40@100..101 "("
+      List@101..135
+        TypeCast@101..135
+          AConst@101..122
+            Sconst@101..122 "'2018-11-02 12:34:56'"
+          Typecast@122..124 "::"
+          TypeName@124..135
+            Ident@124..135 "timestamptz"
+      Ascii41@135..136 ")"
+      Ascii44@136..137 ","
+      Newline@137..138 "\n"
+      Whitespace@138..145 "       "
+      Ascii40@145..146 "("
+      List@146..170
+        AConst@146..170
+          Sconst@146..170 "'2018-11-02 12:34:56.78'"
+      Ascii41@170..171 ")"
+      Ascii44@171..172 ","
+      Newline@172..173 "\n"
+      Whitespace@173..180 "       "
+      Ascii40@180..181 "("
+      List@181..208
+        AConst@181..208
+          Sconst@181..208 "'2018-11-02 12:34:56. ..."
+      Ascii41@208..209 ")"
+      Ascii44@209..210 ","
+      Newline@210..211 "\n"
+      Whitespace@211..218 "       "
+      Ascii40@218..219 "("
+      List@219..249
+        AConst@219..249
+          Sconst@219..249 "'2018-11-02 12:34:56. ..."
+    Ascii41@249..250 ")"
+    Newline@250..251 "\n"
+    Whitespace@251..254 "   "
+    Ascii41@254..255 ")"
+    Whitespace@255..256 " "
+    Alias@256..259
+      Ident@256..257 "d"
+      Ascii40@257..258 "("
+      Ident@258..259 "d"
+  Ascii41@259..260 ")"
+  Ascii59@260..261 ";"
+

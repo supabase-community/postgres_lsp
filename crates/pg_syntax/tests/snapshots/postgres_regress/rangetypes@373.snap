@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from table_succeed(int4range(1,11));"
+---
+SelectStmt@0..45
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..42
+    List@14..42
+      FuncCall@14..42
+        Ident@14..27 "table_succeed"
+        Ascii40@27..28 "("
+        FuncCall@28..42
+          Ident@28..37 "int4range"
+          Ascii40@37..38 "("
+          AConst@38..39
+            Iconst@38..39 "1"
+          Ascii44@39..40 ","
+          AConst@40..42
+            Iconst@40..42 "11"
+  Ascii41@42..43 ")"
+  Ascii41@43..44 ")"
+  Ascii59@44..45 ";"
+

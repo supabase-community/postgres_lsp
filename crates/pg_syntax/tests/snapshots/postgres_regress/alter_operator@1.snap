@@ -1,0 +1,41 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION alter_op_test_fn(boolean, boolean)\nRETURNS boolean AS $$ SELECT NULL::BOOLEAN; $$ LANGUAGE sql IMMUTABLE;"
+---
+CreateFunctionStmt@0..121
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..32 "alter_op_test_fn"
+  Ascii40@32..33 "("
+  FunctionParameter@33..40
+    TypeName@33..40
+      BooleanP@33..40 "boolean"
+  Ascii44@40..41 ","
+  Whitespace@41..42 " "
+  FunctionParameter@42..49
+    TypeName@42..49
+      BooleanP@42..49 "boolean"
+  Ascii41@49..50 ")"
+  Newline@50..51 "\n"
+  Returns@51..58 "RETURNS"
+  Whitespace@58..59 " "
+  TypeName@59..66
+    BooleanP@59..66 "boolean"
+  Whitespace@66..67 " "
+  DefElem@67..97
+    As@67..69 "AS"
+    Whitespace@69..70 " "
+    List@70..97
+      Sconst@70..97 "$$ SELECT NULL::BOOLE ..."
+  Whitespace@97..98 " "
+  DefElem@98..110
+    Language@98..106 "LANGUAGE"
+    Whitespace@106..107 " "
+    SqlP@107..110 "sql"
+  Whitespace@110..111 " "
+  DefElem@111..120
+    Immutable@111..120 "IMMUTABLE"
+  Ascii59@120..121 ";"
+

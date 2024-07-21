@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: INSERT INTO foo VALUES (1);
+---
+InsertStmt@0..27
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..15
+    Ident@12..15 "foo"
+  Whitespace@15..16 " "
+  SelectStmt@16..25
+    Values@16..22 "VALUES"
+    Whitespace@22..23 " "
+    Ascii40@23..24 "("
+    List@24..25
+      AConst@24..25
+        Iconst@24..25 "1"
+  Ascii41@25..26 ")"
+  Ascii59@26..27 ";"
+

@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: INSERT INTO vtype VALUES (1);
+---
+InsertStmt@0..29
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..17
+    Ident@12..17 "vtype"
+  Whitespace@17..18 " "
+  SelectStmt@18..27
+    Values@18..24 "VALUES"
+    Whitespace@24..25 " "
+    Ascii40@25..26 "("
+    List@26..27
+      AConst@26..27
+        Iconst@26..27 "1"
+  Ascii41@27..28 ")"
+  Ascii59@28..29 ";"
+

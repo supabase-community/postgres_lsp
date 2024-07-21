@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO truncparted VALUES (1, 'a');"
+---
+InsertStmt@0..40
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "truncparted"
+  Whitespace@23..24 " "
+  SelectStmt@24..38
+    Values@24..30 "VALUES"
+    Whitespace@30..31 " "
+    Ascii40@31..32 "("
+    List@32..38
+      AConst@32..33
+        Iconst@32..33 "1"
+      Ascii44@33..34 ","
+      Whitespace@34..35 " "
+      AConst@35..38
+        Sconst@35..38 "'a'"
+  Ascii41@38..39 ")"
+  Ascii59@39..40 ";"
+

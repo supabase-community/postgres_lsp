@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create type intr as range(subtype=int);
+---
+CreateRangeStmt@0..39
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  TypeP@7..11 "type"
+  Whitespace@11..12 " "
+  Ident@12..16 "intr"
+  Whitespace@16..17 " "
+  As@17..19 "as"
+  Whitespace@19..20 " "
+  Range@20..25 "range"
+  Ascii40@25..26 "("
+  DefElem@26..37
+    Ident@26..33 "subtype"
+    Ascii61@33..34 "="
+    TypeName@34..37
+      IntP@34..37 "int"
+  Ascii41@37..38 ")"
+  Ascii59@38..39 ";"
+

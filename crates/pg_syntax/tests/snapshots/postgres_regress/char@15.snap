@@ -1,0 +1,38 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT c.*\n   FROM CHAR_TBL c\n   WHERE c.f1 <= 'a';"
+---
+SelectStmt@0..51
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..10
+    ColumnRef@7..10
+      Ident@7..8 "c"
+      Ascii46@8..9 "."
+      AStar@9..10
+        Ascii42@9..10 "*"
+  Newline@10..11 "\n"
+  Whitespace@11..14 "   "
+  From@14..18 "FROM"
+  Whitespace@18..19 " "
+  RangeVar@19..29
+    Ident@19..27 "CHAR_TBL"
+    Whitespace@27..28 " "
+    Alias@28..29
+      Ident@28..29 "c"
+  Newline@29..30 "\n"
+  Whitespace@30..33 "   "
+  Where@33..38 "WHERE"
+  Whitespace@38..39 " "
+  AExpr@39..50
+    ColumnRef@39..43
+      Ident@39..40 "c"
+      Ascii46@40..41 "."
+      Ident@41..43 "f1"
+    Whitespace@43..44 " "
+    LessEquals@44..46 "<="
+    Whitespace@46..47 " "
+    AConst@47..50
+      Sconst@47..50 "'a'"
+  Ascii59@50..51 ";"
+

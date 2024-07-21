@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_query('\"12:34:56\"', '$.datetime().type()');"
+---
+SelectStmt@0..61
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..59
+    FuncCall@7..59
+      Ident@7..23 "jsonb_path_query"
+      Ascii40@23..24 "("
+      AConst@24..36
+        Sconst@24..36 "'\"12:34:56\"'"
+      Ascii44@36..37 ","
+      Whitespace@37..38 " "
+      AConst@38..59
+        Sconst@38..59 "'$.datetime().type()'"
+  Ascii41@59..60 ")"
+  Ascii59@60..61 ";"
+

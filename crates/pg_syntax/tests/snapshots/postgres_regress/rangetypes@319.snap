@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '[4,50)'::restrictedrange @> 7;"
+---
+SelectStmt@0..38
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..37
+    AExpr@7..37
+      TypeCast@7..32
+        AConst@7..15
+          Sconst@7..15 "'[4,50)'"
+        Typecast@15..17 "::"
+        TypeName@17..32
+          Ident@17..32 "restrictedrange"
+      Whitespace@32..33 " "
+      Op@33..35 "@>"
+      Whitespace@35..36 " "
+      AConst@36..37
+        Iconst@36..37 "7"
+  Ascii59@37..38 ";"
+

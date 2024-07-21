@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_date('2458872', 'J');"
+---
+SelectStmt@0..31
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..29
+    FuncCall@7..29
+      Ident@7..14 "to_date"
+      Ascii40@14..15 "("
+      AConst@15..24
+        Sconst@15..24 "'2458872'"
+      Ascii44@24..25 ","
+      Whitespace@25..26 " "
+      AConst@26..29
+        Sconst@26..29 "'J'"
+  Ascii41@29..30 ")"
+  Ascii59@30..31 ";"
+

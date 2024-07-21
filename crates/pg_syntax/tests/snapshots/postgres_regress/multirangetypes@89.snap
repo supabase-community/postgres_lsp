@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM nummultirange_test WHERE nmr >= '{}';"
+---
+SelectStmt@0..51
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..32
+    Ident@14..32 "nummultirange_test"
+  Whitespace@32..33 " "
+  Where@33..38 "WHERE"
+  Whitespace@38..39 " "
+  AExpr@39..50
+    ColumnRef@39..42
+      Ident@39..42 "nmr"
+    Whitespace@42..43 " "
+    GreaterEquals@43..45 ">="
+    Whitespace@45..46 " "
+    AConst@46..50
+      Sconst@46..50 "'{}'"
+  Ascii59@50..51 ";"
+

@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index spgist_point_idx on spgist_point_tbl using spgist(p) with (fillfactor = 75);
+---
+IndexStmt@0..89
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..29 "spgist_point_idx"
+  Whitespace@29..30 " "
+  On@30..32 "on"
+  Whitespace@32..33 " "
+  RangeVar@33..49
+    Ident@33..49 "spgist_point_tbl"
+  Whitespace@49..50 " "
+  Using@50..55 "using"
+  Whitespace@55..56 " "
+  Ident@56..62 "spgist"
+  Ascii40@62..63 "("
+  IndexElem@63..64
+    Ident@63..64 "p"
+  Ascii41@64..65 ")"
+  Whitespace@65..66 " "
+  With@66..70 "with"
+  Whitespace@70..71 " "
+  Ascii40@71..72 "("
+  DefElem@72..87
+    Ident@72..82 "fillfactor"
+    Whitespace@82..83 " "
+    Ascii61@83..84 "="
+    Whitespace@84..85 " "
+    Iconst@85..87 "75"
+  Ascii41@87..88 ")"
+  Ascii59@88..89 ";"
+

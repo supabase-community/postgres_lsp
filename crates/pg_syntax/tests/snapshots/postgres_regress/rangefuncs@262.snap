@@ -1,0 +1,54 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT *, pg_typeof(f3), pg_typeof(f4) FROM dup(22, array[44::bigint]);"
+---
+SelectStmt@0..71
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Ascii44@8..9 ","
+  Whitespace@9..10 " "
+  ResTarget@10..22
+    FuncCall@10..22
+      Ident@10..19 "pg_typeof"
+      Ascii40@19..20 "("
+      ColumnRef@20..22
+        Ident@20..22 "f3"
+  Ascii41@22..23 ")"
+  Ascii44@23..24 ","
+  Whitespace@24..25 " "
+  ResTarget@25..37
+    FuncCall@25..37
+      Ident@25..34 "pg_typeof"
+      Ascii40@34..35 "("
+      ColumnRef@35..37
+        Ident@35..37 "f4"
+  Ascii41@37..38 ")"
+  Whitespace@38..39 " "
+  From@39..43 "FROM"
+  Whitespace@43..44 " "
+  RangeFunction@44..68
+    List@44..68
+      FuncCall@44..68
+        Ident@44..47 "dup"
+        Ascii40@47..48 "("
+        AConst@48..50
+          Iconst@48..50 "22"
+        Ascii44@50..51 ","
+        Whitespace@51..52 " "
+        AArrayExpr@52..68
+          Array@52..57 "array"
+          Ascii91@57..58 "["
+          TypeCast@58..68
+            AConst@58..60
+              Iconst@58..60 "44"
+            Typecast@60..62 "::"
+            TypeName@62..68
+              Bigint@62..68 "bigint"
+  Ascii93@68..69 "]"
+  Ascii41@69..70 ")"
+  Ascii59@70..71 ";"
+

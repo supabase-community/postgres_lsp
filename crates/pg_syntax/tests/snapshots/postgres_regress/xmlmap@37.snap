@@ -1,0 +1,17 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE DOMAIN testdatexmldomain AS date;
+---
+CreateDomainStmt@0..40
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  DomainP@7..13 "DOMAIN"
+  Whitespace@13..14 " "
+  Ident@14..31 "testdatexmldomain"
+  Whitespace@31..32 " "
+  As@32..34 "AS"
+  Whitespace@34..35 " "
+  TypeName@35..39
+    Ident@35..39 "date"
+  Ascii59@39..40 ";"
+

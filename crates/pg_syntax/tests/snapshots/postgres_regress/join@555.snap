@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table j2 (id1 int, id2 int, primary key(id1,id2));"
+---
+CreateStmt@0..57
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..15
+    Ident@13..15 "j2"
+  Whitespace@15..16 " "
+  Ascii40@16..17 "("
+  ColumnDef@17..24
+    Ident@17..20 "id1"
+    Whitespace@20..21 " "
+    TypeName@21..24
+      IntP@21..24 "int"
+  Ascii44@24..25 ","
+  Whitespace@25..26 " "
+  ColumnDef@26..33
+    Ident@26..29 "id2"
+    Whitespace@29..30 " "
+    TypeName@30..33
+      IntP@30..33 "int"
+  Ascii44@33..34 ","
+  Whitespace@34..35 " "
+  Constraint@35..54
+    Primary@35..42 "primary"
+    Whitespace@42..43 " "
+    Key@43..46 "key"
+    Ascii40@46..47 "("
+    Ident@47..50 "id1"
+    Ascii44@50..51 ","
+    Ident@51..54 "id2"
+  Ascii41@54..55 ")"
+  Ascii41@55..56 ")"
+  Ascii59@56..57 ";"
+

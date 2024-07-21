@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select f1, q.c1 from quadtable;"
+---
+SelectStmt@0..31
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..9
+    ColumnRef@7..9
+      Ident@7..9 "f1"
+  Ascii44@9..10 ","
+  Whitespace@10..11 " "
+  ResTarget@11..15
+    ColumnRef@11..15
+      Ident@11..12 "q"
+      Ascii46@12..13 "."
+      Ident@13..15 "c1"
+  Whitespace@15..16 " "
+  From@16..20 "from"
+  Whitespace@20..21 " "
+  RangeVar@21..30
+    Ident@21..30 "quadtable"
+  Ascii59@30..31 ";"
+

@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '(4294967296,1)'::tid;"
+---
+SelectStmt@0..29
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..28
+    TypeCast@7..28
+      AConst@7..23
+        Sconst@7..23 "'(4294967296,1)'"
+      Typecast@23..25 "::"
+      TypeName@25..28
+        Ident@25..28 "tid"
+  Ascii59@28..29 ";"
+

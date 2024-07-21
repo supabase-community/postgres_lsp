@@ -1,0 +1,90 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from\n  (select count(unique1) from tenk1 where hundred > 10) ss\n  right join (values (1),(2),(3)) v(x) on true;"
+---
+SelectStmt@0..120
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Newline@13..14 "\n"
+  Whitespace@14..16 "  "
+  Ascii40@16..17 "("
+  JoinExpr@17..119
+    RangeSubselect@17..72
+      SelectStmt@17..68
+        Select@17..23 "select"
+        Whitespace@23..24 " "
+        ResTarget@24..37
+          FuncCall@24..37
+            Ident@24..29 "count"
+            Ascii40@29..30 "("
+            ColumnRef@30..37
+              Ident@30..37 "unique1"
+        Ascii41@37..38 ")"
+        Whitespace@38..39 " "
+        From@39..43 "from"
+        Whitespace@43..44 " "
+        RangeVar@44..49
+          Ident@44..49 "tenk1"
+        Whitespace@49..50 " "
+        Where@50..55 "where"
+        Whitespace@55..56 " "
+        AExpr@56..68
+          ColumnRef@56..63
+            Ident@56..63 "hundred"
+          Whitespace@63..64 " "
+          Ascii62@64..65 ">"
+          Whitespace@65..66 " "
+          AConst@66..68
+            Iconst@66..68 "10"
+      Ascii41@68..69 ")"
+      Whitespace@69..70 " "
+      Alias@70..72
+        Ident@70..72 "ss"
+    Newline@72..73 "\n"
+    Whitespace@73..75 "  "
+    Right@75..80 "right"
+    Whitespace@80..81 " "
+    Join@81..85 "join"
+    Whitespace@85..86 " "
+    Ascii40@86..87 "("
+    RangeSubselect@87..110
+      SelectStmt@87..104
+        Values@87..93 "values"
+        Whitespace@93..94 " "
+        Ascii40@94..95 "("
+        List@95..96
+          AConst@95..96
+            Iconst@95..96 "1"
+        Ascii41@96..97 ")"
+        Ascii44@97..98 ","
+        Ascii40@98..99 "("
+        List@99..100
+          AConst@99..100
+            Iconst@99..100 "2"
+        Ascii41@100..101 ")"
+        Ascii44@101..102 ","
+        Ascii40@102..103 "("
+        List@103..104
+          AConst@103..104
+            Iconst@103..104 "3"
+      Ascii41@104..105 ")"
+      Ascii41@105..106 ")"
+      Whitespace@106..107 " "
+      Alias@107..110
+        Ident@107..108 "v"
+        Ascii40@108..109 "("
+        Ident@109..110 "x"
+    Ascii41@110..111 ")"
+    Whitespace@111..112 " "
+    On@112..114 "on"
+    Whitespace@114..115 " "
+    AConst@115..119
+      TrueP@115..119 "true"
+  Ascii59@119..120 ";"
+

@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX brinidx_2 ON brintest_2 USING brin (n);
+---
+IndexStmt@0..52
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..22 "brinidx_2"
+  Whitespace@22..23 " "
+  On@23..25 "ON"
+  Whitespace@25..26 " "
+  RangeVar@26..36
+    Ident@26..36 "brintest_2"
+  Whitespace@36..37 " "
+  Using@37..42 "USING"
+  Whitespace@42..43 " "
+  Ident@43..47 "brin"
+  Whitespace@47..48 " "
+  Ascii40@48..49 "("
+  IndexElem@49..50
+    Ident@49..50 "n"
+  Ascii41@50..51 ")"
+  Ascii59@51..52 ";"
+

@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table lp_g partition of lp for values in ('g');"
+---
+CreateStmt@0..54
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..17
+    Ident@13..17 "lp_g"
+  Whitespace@17..18 " "
+  Partition@18..27 "partition"
+  Whitespace@27..28 " "
+  Of@28..30 "of"
+  Whitespace@30..31 " "
+  RangeVar@31..33
+    Ident@31..33 "lp"
+  Whitespace@33..34 " "
+  For@34..37 "for"
+  Whitespace@37..38 " "
+  Values@38..44 "values"
+  Whitespace@44..45 " "
+  PartitionBoundSpec@45..52
+    InP@45..47 "in"
+    Whitespace@47..48 " "
+    Ascii40@48..49 "("
+    AConst@49..52
+      Sconst@49..52 "'g'"
+  Ascii41@52..53 ")"
+  Ascii59@53..54 ";"
+

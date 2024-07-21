@@ -1,0 +1,52 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select row_to_json(ss) from\n  (select q1 as a, q2 as b from int8_tbl) as ss;"
+---
+SelectStmt@0..76
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..21
+    FuncCall@7..21
+      Ident@7..18 "row_to_json"
+      Ascii40@18..19 "("
+      ColumnRef@19..21
+        Ident@19..21 "ss"
+  Ascii41@21..22 ")"
+  Whitespace@22..23 " "
+  From@23..27 "from"
+  Newline@27..28 "\n"
+  Whitespace@28..30 "  "
+  Ascii40@30..31 "("
+  RangeSubselect@31..75
+    SelectStmt@31..68
+      Select@31..37 "select"
+      Whitespace@37..38 " "
+      ResTarget@38..45
+        ColumnRef@38..40
+          Ident@38..40 "q1"
+        Whitespace@40..41 " "
+        As@41..43 "as"
+        Whitespace@43..44 " "
+        Ident@44..45 "a"
+      Ascii44@45..46 ","
+      Whitespace@46..47 " "
+      ResTarget@47..54
+        ColumnRef@47..49
+          Ident@47..49 "q2"
+        Whitespace@49..50 " "
+        As@50..52 "as"
+        Whitespace@52..53 " "
+        Ident@53..54 "b"
+      Whitespace@54..55 " "
+      From@55..59 "from"
+      Whitespace@59..60 " "
+      RangeVar@60..68
+        Ident@60..68 "int8_tbl"
+    Ascii41@68..69 ")"
+    Whitespace@69..70 " "
+    Alias@70..75
+      As@70..72 "as"
+      Whitespace@72..73 " "
+      Ident@73..75 "ss"
+  Ascii59@75..76 ";"
+

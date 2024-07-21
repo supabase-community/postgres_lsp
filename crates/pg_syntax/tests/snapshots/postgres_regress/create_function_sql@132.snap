@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT voidtest3(17);
+---
+SelectStmt@0..21
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..19
+    FuncCall@7..19
+      Ident@7..16 "voidtest3"
+      Ascii40@16..17 "("
+      AConst@17..19
+        Iconst@17..19 "17"
+  Ascii41@19..20 ")"
+  Ascii59@20..21 ";"
+

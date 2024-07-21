@@ -1,0 +1,46 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create index gin_test_idx on gin_test_tbl using gin (i)\n  with (fastupdate = on, gin_pending_list_limit = 4096);"
+---
+IndexStmt@0..112
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..25 "gin_test_idx"
+  Whitespace@25..26 " "
+  On@26..28 "on"
+  Whitespace@28..29 " "
+  RangeVar@29..41
+    Ident@29..41 "gin_test_tbl"
+  Whitespace@41..42 " "
+  Using@42..47 "using"
+  Whitespace@47..48 " "
+  Ident@48..51 "gin"
+  Whitespace@51..52 " "
+  Ascii40@52..53 "("
+  IndexElem@53..54
+    Ident@53..54 "i"
+  Ascii41@54..55 ")"
+  Newline@55..56 "\n"
+  Whitespace@56..58 "  "
+  With@58..62 "with"
+  Whitespace@62..63 " "
+  Ascii40@63..64 "("
+  DefElem@64..79
+    Ident@64..74 "fastupdate"
+    Whitespace@74..75 " "
+    Ascii61@75..76 "="
+    Whitespace@76..77 " "
+    On@77..79 "on"
+  Ascii44@79..80 ","
+  Whitespace@80..81 " "
+  DefElem@81..110
+    Ident@81..103 "gin_pending_list_limit"
+    Whitespace@103..104 " "
+    Ascii61@104..105 "="
+    Whitespace@105..106 " "
+    Iconst@106..110 "4096"
+  Ascii41@110..111 ")"
+  Ascii59@111..112 ";"
+

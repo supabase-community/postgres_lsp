@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into parted_conflict values (40, 'forty');"
+---
+InsertStmt@0..49
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "parted_conflict"
+  Whitespace@27..28 " "
+  SelectStmt@28..47
+    Values@28..34 "values"
+    Whitespace@34..35 " "
+    Ascii40@35..36 "("
+    List@36..47
+      AConst@36..38
+        Iconst@36..38 "40"
+      Ascii44@38..39 ","
+      Whitespace@39..40 " "
+      AConst@40..47
+        Sconst@40..47 "'forty'"
+  Ascii41@47..48 ")"
+  Ascii59@48..49 ";"
+

@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO t3 VALUES ( 'dd', 33 );"
+---
+InsertStmt@0..35
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..14
+    Ident@12..14 "t3"
+  Whitespace@14..15 " "
+  SelectStmt@15..32
+    Values@15..21 "VALUES"
+    Whitespace@21..22 " "
+    Ascii40@22..23 "("
+    Whitespace@23..24 " "
+    List@24..32
+      AConst@24..28
+        Sconst@24..28 "'dd'"
+      Ascii44@28..29 ","
+      Whitespace@29..30 " "
+      AConst@30..32
+        Iconst@30..32 "33"
+  Whitespace@32..33 " "
+  Ascii41@33..34 ")"
+  Ascii59@34..35 ";"
+

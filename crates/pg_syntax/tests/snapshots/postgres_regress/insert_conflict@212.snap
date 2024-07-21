@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table parted_conflict_test_4_1 partition of parted_conflict_test_4 for values in (5);
+---
+CreateStmt@0..92
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..37
+    Ident@13..37 "parted_conflict_test_4_1"
+  Whitespace@37..38 " "
+  Partition@38..47 "partition"
+  Whitespace@47..48 " "
+  Of@48..50 "of"
+  Whitespace@50..51 " "
+  RangeVar@51..73
+    Ident@51..73 "parted_conflict_test_4"
+  Whitespace@73..74 " "
+  For@74..77 "for"
+  Whitespace@77..78 " "
+  Values@78..84 "values"
+  Whitespace@84..85 " "
+  PartitionBoundSpec@85..90
+    InP@85..87 "in"
+    Whitespace@87..88 " "
+    Ascii40@88..89 "("
+    AConst@89..90
+      Iconst@89..90 "5"
+  Ascii41@90..91 ")"
+  Ascii59@91..92 ";"
+

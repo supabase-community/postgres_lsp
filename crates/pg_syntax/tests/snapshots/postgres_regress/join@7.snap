@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO J1_TBL VALUES (5, 0, 'five');"
+---
+InsertStmt@0..41
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "J1_TBL"
+  Whitespace@18..19 " "
+  SelectStmt@19..39
+    Values@19..25 "VALUES"
+    Whitespace@25..26 " "
+    Ascii40@26..27 "("
+    List@27..39
+      AConst@27..28
+        Iconst@27..28 "5"
+      Ascii44@28..29 ","
+      Whitespace@29..30 " "
+      AConst@30..31
+        Iconst@30..31 "0"
+      Ascii44@31..32 ","
+      Whitespace@32..33 " "
+      AConst@33..39
+        Sconst@33..39 "'five'"
+  Ascii41@39..40 ")"
+  Ascii59@40..41 ";"
+

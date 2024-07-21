@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select  count(*) from tenk1, tenk2 where tenk1.unique1 = tenk2.unique1;"
+---
+SelectStmt@0..71
+  Select@0..6 "select"
+  Whitespace@6..8 "  "
+  ResTarget@8..15
+    FuncCall@8..15
+      Ident@8..13 "count"
+      Ascii40@13..14 "("
+      Ascii42@14..15 "*"
+  Ascii41@15..16 ")"
+  Whitespace@16..17 " "
+  From@17..21 "from"
+  Whitespace@21..22 " "
+  RangeVar@22..27
+    Ident@22..27 "tenk1"
+  Ascii44@27..28 ","
+  Whitespace@28..29 " "
+  RangeVar@29..34
+    Ident@29..34 "tenk2"
+  Whitespace@34..35 " "
+  Where@35..40 "where"
+  Whitespace@40..41 " "
+  AExpr@41..70
+    ColumnRef@41..54
+      Ident@41..46 "tenk1"
+      Ascii46@46..47 "."
+      Ident@47..54 "unique1"
+    Whitespace@54..55 " "
+    Ascii61@55..56 "="
+    Whitespace@56..57 " "
+    ColumnRef@57..70
+      Ident@57..62 "tenk2"
+      Ascii46@62..63 "."
+      Ident@63..70 "unique1"
+  Ascii59@70..71 ";"
+

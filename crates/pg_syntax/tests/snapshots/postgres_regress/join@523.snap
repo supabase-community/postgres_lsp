@@ -1,0 +1,49 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table fkest (a int, b int, c int unique, primary key(a,b));"
+---
+CreateStmt@0..66
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..18
+    Ident@13..18 "fkest"
+  Whitespace@18..19 " "
+  Ascii40@19..20 "("
+  ColumnDef@20..25
+    Ident@20..21 "a"
+    Whitespace@21..22 " "
+    TypeName@22..25
+      IntP@22..25 "int"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ColumnDef@27..32
+    Ident@27..28 "b"
+    Whitespace@28..29 " "
+    TypeName@29..32
+      IntP@29..32 "int"
+  Ascii44@32..33 ","
+  Whitespace@33..34 " "
+  ColumnDef@34..46
+    Ident@34..35 "c"
+    Whitespace@35..36 " "
+    TypeName@36..39
+      IntP@36..39 "int"
+    Whitespace@39..40 " "
+    Constraint@40..46
+      Unique@40..46 "unique"
+  Ascii44@46..47 ","
+  Whitespace@47..48 " "
+  Constraint@48..63
+    Primary@48..55 "primary"
+    Whitespace@55..56 " "
+    Key@56..59 "key"
+    Ascii40@59..60 "("
+    Ident@60..61 "a"
+    Ascii44@61..62 ","
+    Ident@62..63 "b"
+  Ascii41@63..64 ")"
+  Ascii41@64..65 ")"
+  Ascii59@65..66 ";"
+

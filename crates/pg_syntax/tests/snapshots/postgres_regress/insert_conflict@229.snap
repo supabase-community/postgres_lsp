@@ -1,0 +1,51 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table parted_conflict_1 partition of parted_conflict for values from (0) to (1000) partition by range (a);
+---
+CreateStmt@0..113
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..30
+    Ident@13..30 "parted_conflict_1"
+  Whitespace@30..31 " "
+  Partition@31..40 "partition"
+  Whitespace@40..41 " "
+  Of@41..43 "of"
+  Whitespace@43..44 " "
+  RangeVar@44..59
+    Ident@44..59 "parted_conflict"
+  Whitespace@59..60 " "
+  For@60..63 "for"
+  Whitespace@63..64 " "
+  Values@64..70 "values"
+  Whitespace@70..71 " "
+  PartitionBoundSpec@71..88
+    From@71..75 "from"
+    Whitespace@75..76 " "
+    Ascii40@76..77 "("
+    AConst@77..78
+      Iconst@77..78 "0"
+    Ascii41@78..79 ")"
+    Whitespace@79..80 " "
+    To@80..82 "to"
+    Whitespace@82..83 " "
+    Ascii40@83..84 "("
+    AConst@84..88
+      Iconst@84..88 "1000"
+  Ascii41@88..89 ")"
+  Whitespace@89..90 " "
+  PartitionSpec@90..111
+    Partition@90..99 "partition"
+    Whitespace@99..100 " "
+    By@100..102 "by"
+    Whitespace@102..103 " "
+    Range@103..108 "range"
+    Whitespace@108..109 " "
+    Ascii40@109..110 "("
+    PartitionElem@110..111
+      Ident@110..111 "a"
+  Ascii41@111..112 ")"
+  Ascii59@112..113 ";"
+

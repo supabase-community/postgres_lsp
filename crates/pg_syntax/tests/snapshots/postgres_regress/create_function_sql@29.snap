@@ -1,0 +1,37 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION functest_E_2(int) RETURNS bool LANGUAGE 'sql'\n       LEAKPROOF AS 'SELECT $1 > 100';"
+---
+CreateFunctionStmt@0..100
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..28 "functest_E_2"
+  Ascii40@28..29 "("
+  FunctionParameter@29..32
+    TypeName@29..32
+      IntP@29..32 "int"
+  Ascii41@32..33 ")"
+  Whitespace@33..34 " "
+  Returns@34..41 "RETURNS"
+  Whitespace@41..42 " "
+  TypeName@42..46
+    Ident@42..46 "bool"
+  Whitespace@46..47 " "
+  DefElem@47..61
+    Language@47..55 "LANGUAGE"
+    Whitespace@55..56 " "
+    Sconst@56..61 "'sql'"
+  Newline@61..62 "\n"
+  Whitespace@62..69 "       "
+  DefElem@69..78
+    Leakproof@69..78 "LEAKPROOF"
+  Whitespace@78..79 " "
+  DefElem@79..99
+    As@79..81 "AS"
+    Whitespace@81..82 " "
+    List@82..99
+      Sconst@82..99 "'SELECT $1 > 100'"
+  Ascii59@99..100 ";"
+

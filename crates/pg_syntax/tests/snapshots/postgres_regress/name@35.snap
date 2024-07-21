@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT parse_ident(E'\"c\".X XXXX\\002XXXXXX');"
+---
+SelectStmt@0..44
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..42
+    FuncCall@7..42
+      Ident@7..18 "parse_ident"
+      Ascii40@18..19 "("
+      AConst@19..42
+        Sconst@19..42 "E'\"c\".X XXXX\\002XXXXXX'"
+  Ascii41@42..43 ")"
+  Ascii59@43..44 ";"
+

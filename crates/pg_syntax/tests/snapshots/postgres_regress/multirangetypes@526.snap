@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select multirange_of_text(textrange2('a','Z'));"
+---
+SelectStmt@0..47
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..44
+    FuncCall@7..44
+      Ident@7..25 "multirange_of_text"
+      Ascii40@25..26 "("
+      FuncCall@26..44
+        Ident@26..36 "textrange2"
+        Ascii40@36..37 "("
+        AConst@37..40
+          Sconst@37..40 "'a'"
+        Ascii44@40..41 ","
+        AConst@41..44
+          Sconst@41..44 "'Z'"
+  Ascii41@44..45 ")"
+  Ascii41@45..46 ")"
+  Ascii59@46..47 ";"
+

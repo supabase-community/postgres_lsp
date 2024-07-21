@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION inline_eq(foodomain, foodomain) returns boolean as\n  'SELECT CASE $2::text WHEN $1::text THEN true ELSE false END' language sql;"
+---
+CreateFunctionStmt@0..144
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..25 "inline_eq"
+  Ascii40@25..26 "("
+  FunctionParameter@26..35
+    TypeName@26..35
+      Ident@26..35 "foodomain"
+  Ascii44@35..36 ","
+  Whitespace@36..37 " "
+  FunctionParameter@37..46
+    TypeName@37..46
+      Ident@37..46 "foodomain"
+  Ascii41@46..47 ")"
+  Whitespace@47..48 " "
+  Returns@48..55 "returns"
+  Whitespace@55..56 " "
+  TypeName@56..63
+    BooleanP@56..63 "boolean"
+  Whitespace@63..64 " "
+  DefElem@64..130
+    As@64..66 "as"
+    Newline@66..67 "\n"
+    Whitespace@67..69 "  "
+    List@69..130
+      Sconst@69..130 "'SELECT CASE $2::text ..."
+  Whitespace@130..131 " "
+  DefElem@131..143
+    Language@131..139 "language"
+    Whitespace@139..140 " "
+    SqlP@140..143 "sql"
+  Ascii59@143..144 ";"
+

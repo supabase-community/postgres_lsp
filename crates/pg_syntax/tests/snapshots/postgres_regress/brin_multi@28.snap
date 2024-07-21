@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO brin_large_range SELECT i FROM generate_series(1,10000) s(i);"
+---
+InsertStmt@0..73
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..28
+    Ident@12..28 "brin_large_range"
+  Whitespace@28..29 " "
+  SelectStmt@29..71
+    Select@29..35 "SELECT"
+    Whitespace@35..36 " "
+    ResTarget@36..37
+      ColumnRef@36..37
+        Ident@36..37 "i"
+    Whitespace@37..38 " "
+    From@38..42 "FROM"
+    Whitespace@42..43 " "
+    RangeFunction@43..71
+      List@43..66
+        FuncCall@43..66
+          Ident@43..58 "generate_series"
+          Ascii40@58..59 "("
+          AConst@59..60
+            Iconst@59..60 "1"
+          Ascii44@60..61 ","
+          AConst@61..66
+            Iconst@61..66 "10000"
+      Ascii41@66..67 ")"
+      Whitespace@67..68 " "
+      Alias@68..71
+        Ident@68..69 "s"
+        Ascii40@69..70 "("
+        Ident@70..71 "i"
+  Ascii41@71..72 ")"
+  Ascii59@72..73 ";"
+

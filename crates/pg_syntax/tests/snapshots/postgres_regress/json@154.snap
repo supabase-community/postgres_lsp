@@ -1,0 +1,31 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select json_extract_path_text('{\"f2\":{\"f3\":1},\"f4\":[0,1,2,null]}','f4','3') is null as expect_true;"
+---
+SelectStmt@0..99
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..98
+    NullTest@7..83
+      FuncCall@7..74
+        Ident@7..29 "json_extract_path_text"
+        Ascii40@29..30 "("
+        AConst@30..65
+          Sconst@30..65 "'{\"f2\":{\"f3\":1},\"f4\": ..."
+        Ascii44@65..66 ","
+        AConst@66..70
+          Sconst@66..70 "'f4'"
+        Ascii44@70..71 ","
+        AConst@71..74
+          Sconst@71..74 "'3'"
+      Ascii41@74..75 ")"
+      Whitespace@75..76 " "
+      Is@76..78 "is"
+      Whitespace@78..79 " "
+      NullP@79..83 "null"
+    Whitespace@83..84 " "
+    As@84..86 "as"
+    Whitespace@86..87 " "
+    Ident@87..98 "expect_true"
+  Ascii59@98..99 ";"
+

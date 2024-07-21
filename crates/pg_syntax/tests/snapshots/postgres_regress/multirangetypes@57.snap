@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select textrange('a', 'c')::textmultirange;"
+---
+SelectStmt@0..43
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..42
+    TypeCast@7..42
+      FuncCall@7..25
+        Ident@7..16 "textrange"
+        Ascii40@16..17 "("
+        AConst@17..20
+          Sconst@17..20 "'a'"
+        Ascii44@20..21 ","
+        Whitespace@21..22 " "
+        AConst@22..25
+          Sconst@22..25 "'c'"
+      Ascii41@25..26 ")"
+      Typecast@26..28 "::"
+      TypeName@28..42
+        Ident@28..42 "textmultirange"
+  Ascii59@42..43 ";"
+

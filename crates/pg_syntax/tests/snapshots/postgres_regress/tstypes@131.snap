@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select to_tsvector('simple', 'x y z') @@ '(x | y <-> z) <-> q' AS \"false\";"
+---
+SelectStmt@0..74
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..73
+    AExpr@7..62
+      FuncCall@7..36
+        Ident@7..18 "to_tsvector"
+        Ascii40@18..19 "("
+        AConst@19..27
+          Sconst@19..27 "'simple'"
+        Ascii44@27..28 ","
+        Whitespace@28..29 " "
+        AConst@29..36
+          Sconst@29..36 "'x y z'"
+      Ascii41@36..37 ")"
+      Whitespace@37..38 " "
+      Op@38..40 "@@"
+      Whitespace@40..41 " "
+      AConst@41..62
+        Sconst@41..62 "'(x | y <-> z) <-> q'"
+    Whitespace@62..63 " "
+    As@63..65 "AS"
+    Whitespace@65..66 " "
+    Ident@66..73 "\"false\""
+  Ascii59@73..74 ";"
+

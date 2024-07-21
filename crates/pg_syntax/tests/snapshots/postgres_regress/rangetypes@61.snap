@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select range_adjacent(numrange(2.0, 3.0), numrange(3.1, null));"
+---
+SelectStmt@0..63
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..60
+    FuncCall@7..60
+      Ident@7..21 "range_adjacent"
+      Ascii40@21..22 "("
+      FuncCall@22..39
+        Ident@22..30 "numrange"
+        Ascii40@30..31 "("
+        AConst@31..34
+          Fconst@31..34 "2.0"
+        Ascii44@34..35 ","
+        Whitespace@35..36 " "
+        AConst@36..39
+          Fconst@36..39 "3.0"
+      Ascii41@39..40 ")"
+      Ascii44@40..41 ","
+      Whitespace@41..42 " "
+      FuncCall@42..60
+        Ident@42..50 "numrange"
+        Ascii40@50..51 "("
+        AConst@51..54
+          Fconst@51..54 "3.1"
+        Ascii44@54..55 ","
+        Whitespace@55..56 " "
+        AConst@56..60
+          NullP@56..60 "null"
+  Ascii41@60..61 ")"
+  Ascii41@61..62 ")"
+  Ascii59@62..63 ";"
+

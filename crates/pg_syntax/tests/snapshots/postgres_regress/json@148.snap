@@ -1,0 +1,19 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select json_extract_path_text('{\"f2\":{\"f3\":1},\"f4\":{\"f5\":99,\"f6\":\"stringy\"}}','f2');"
+---
+SelectStmt@0..84
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..82
+    FuncCall@7..82
+      Ident@7..29 "json_extract_path_text"
+      Ascii40@29..30 "("
+      AConst@30..77
+        Sconst@30..77 "'{\"f2\":{\"f3\":1},\"f4\": ..."
+      Ascii44@77..78 ","
+      AConst@78..82
+        Sconst@78..82 "'f2'"
+  Ascii41@82..83 ")"
+  Ascii59@83..84 ";"
+

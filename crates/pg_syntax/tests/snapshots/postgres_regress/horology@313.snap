@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_char('2012-12-12 12:00'::timestamptz, 'YYYY-MM-DD SSSSS');"
+---
+SelectStmt@0..68
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..66
+    FuncCall@7..66
+      Ident@7..14 "to_char"
+      Ascii40@14..15 "("
+      TypeCast@15..46
+        AConst@15..33
+          Sconst@15..33 "'2012-12-12 12:00'"
+        Typecast@33..35 "::"
+        TypeName@35..46
+          Ident@35..46 "timestamptz"
+      Ascii44@46..47 ","
+      Whitespace@47..48 " "
+      AConst@48..66
+        Sconst@48..66 "'YYYY-MM-DD SSSSS'"
+  Ascii41@66..67 ")"
+  Ascii59@67..68 ";"
+

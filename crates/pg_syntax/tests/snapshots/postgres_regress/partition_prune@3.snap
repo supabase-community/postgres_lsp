@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table lp_default partition of lp default;
+---
+CreateStmt@0..48
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..23
+    Ident@13..23 "lp_default"
+  Whitespace@23..24 " "
+  Partition@24..33 "partition"
+  Whitespace@33..34 " "
+  Of@34..36 "of"
+  Whitespace@36..37 " "
+  RangeVar@37..39
+    Ident@37..39 "lp"
+  Whitespace@39..40 " "
+  PartitionBoundSpec@40..47
+    Default@40..47 "default"
+  Ascii59@47..48 ";"
+

@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO VARCHAR_TBL (f1) VALUES ('c     ');"
+---
+InsertStmt@0..47
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "VARCHAR_TBL"
+  Whitespace@23..24 " "
+  Ascii40@24..25 "("
+  ResTarget@25..27
+    Ident@25..27 "f1"
+  Ascii41@27..28 ")"
+  Whitespace@28..29 " "
+  SelectStmt@29..45
+    Values@29..35 "VALUES"
+    Whitespace@35..36 " "
+    Ascii40@36..37 "("
+    List@37..45
+      AConst@37..45
+        Sconst@37..45 "'c     '"
+  Ascii41@45..46 ")"
+  Ascii59@46..47 ";"
+

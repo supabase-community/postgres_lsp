@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '90000000000000099.00'::money / 10::smallint;"
+---
+SelectStmt@0..52
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..51
+    AExpr@7..51
+      TypeCast@7..36
+        AConst@7..29
+          Sconst@7..29 "'90000000000000099.00'"
+        Typecast@29..31 "::"
+        TypeName@31..36
+          Ident@31..36 "money"
+      Whitespace@36..37 " "
+      Ascii47@37..38 "/"
+      Whitespace@38..39 " "
+      TypeCast@39..51
+        AConst@39..41
+          Iconst@39..41 "10"
+        Typecast@41..43 "::"
+        TypeName@43..51
+          Smallint@43..51 "smallint"
+  Ascii59@51..52 ";"
+

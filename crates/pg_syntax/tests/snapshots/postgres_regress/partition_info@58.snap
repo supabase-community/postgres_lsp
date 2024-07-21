@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE TABLE ptif_li_child () INHERITS (ptif_li_parent);
+---
+CreateStmt@0..56
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..26
+    Ident@13..26 "ptif_li_child"
+  Whitespace@26..27 " "
+  Ascii40@27..28 "("
+  Ascii41@28..29 ")"
+  Whitespace@29..30 " "
+  Inherits@30..38 "INHERITS"
+  Whitespace@38..39 " "
+  Ascii40@39..40 "("
+  RangeVar@40..54
+    Ident@40..54 "ptif_li_parent"
+  Ascii41@54..55 ")"
+  Ascii59@55..56 ";"
+

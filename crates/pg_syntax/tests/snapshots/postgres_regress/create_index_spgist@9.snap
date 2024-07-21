@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO radix_text_tbl VALUES ('P0123456789abcde');"
+---
+InsertStmt@0..55
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..26
+    Ident@12..26 "radix_text_tbl"
+  Whitespace@26..27 " "
+  SelectStmt@27..53
+    Values@27..33 "VALUES"
+    Whitespace@33..34 " "
+    Ascii40@34..35 "("
+    List@35..53
+      AConst@35..53
+        Sconst@35..53 "'P0123456789abcde'"
+  Ascii41@53..54 ")"
+  Ascii59@54..55 ";"
+

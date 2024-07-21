@@ -1,0 +1,257 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select t1.unique2, t1.stringu1, t2.unique1, t2.stringu2 from\n  tenk1 t1\n  inner join int4_tbl i1\n    left join (select v1.x2, v2.y1, 11 AS d1\n               from (values(1,0)) v1(x1,x2)\n               left join (values(3,1)) v2(y1,y2)\n               on v1.x1 = v2.y2) subq1\n    on (i1.f1 = subq1.x2)\n  on (t1.unique2 = subq1.d1)\n  left join tenk1 t2\n  on (subq1.y1 = t2.unique1)\nwhere t1.unique2 < 42 and t1.stringu1 > t2.stringu2;"
+---
+SelectStmt@0..431
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..17
+    ColumnRef@7..17
+      Ident@7..9 "t1"
+      Ascii46@9..10 "."
+      Ident@10..17 "unique2"
+  Ascii44@17..18 ","
+  Whitespace@18..19 " "
+  ResTarget@19..30
+    ColumnRef@19..30
+      Ident@19..21 "t1"
+      Ascii46@21..22 "."
+      Ident@22..30 "stringu1"
+  Ascii44@30..31 ","
+  Whitespace@31..32 " "
+  ResTarget@32..42
+    ColumnRef@32..42
+      Ident@32..34 "t2"
+      Ascii46@34..35 "."
+      Ident@35..42 "unique1"
+  Ascii44@42..43 ","
+  Whitespace@43..44 " "
+  ResTarget@44..55
+    ColumnRef@44..55
+      Ident@44..46 "t2"
+      Ascii46@46..47 "."
+      Ident@47..55 "stringu2"
+  Whitespace@55..56 " "
+  From@56..60 "from"
+  Newline@60..61 "\n"
+  Whitespace@61..63 "  "
+  JoinExpr@63..377
+    JoinExpr@63..327
+      RangeVar@63..71
+        Ident@63..68 "tenk1"
+        Whitespace@68..69 " "
+        Alias@69..71
+          Ident@69..71 "t1"
+      Newline@71..72 "\n"
+      Whitespace@72..74 "  "
+      InnerP@74..79 "inner"
+      Whitespace@79..80 " "
+      Join@80..84 "join"
+      Whitespace@84..85 " "
+      JoinExpr@85..298
+        RangeVar@85..96
+          Ident@85..93 "int4_tbl"
+          Whitespace@93..94 " "
+          Alias@94..96
+            Ident@94..96 "i1"
+        Newline@96..97 "\n"
+        Whitespace@97..101 "    "
+        Left@101..105 "left"
+        Whitespace@105..106 " "
+        Join@106..110 "join"
+        Whitespace@110..111 " "
+        Ascii40@111..112 "("
+        RangeSubselect@112..273
+          SelectStmt@112..266
+            Select@112..118 "select"
+            Whitespace@118..119 " "
+            ResTarget@119..124
+              ColumnRef@119..124
+                Ident@119..121 "v1"
+                Ascii46@121..122 "."
+                Ident@122..124 "x2"
+            Ascii44@124..125 ","
+            Whitespace@125..126 " "
+            ResTarget@126..131
+              ColumnRef@126..131
+                Ident@126..128 "v2"
+                Ascii46@128..129 "."
+                Ident@129..131 "y1"
+            Ascii44@131..132 ","
+            Whitespace@132..133 " "
+            ResTarget@133..141
+              AConst@133..135
+                Iconst@133..135 "11"
+              Whitespace@135..136 " "
+              As@136..138 "AS"
+              Whitespace@138..139 " "
+              Ident@139..141 "d1"
+            Newline@141..142 "\n"
+            Whitespace@142..157 "               "
+            From@157..161 "from"
+            Whitespace@161..162 " "
+            Ascii40@162..163 "("
+            JoinExpr@163..266
+              RangeSubselect@163..184
+                SelectStmt@163..173
+                  Values@163..169 "values"
+                  Ascii40@169..170 "("
+                  List@170..173
+                    AConst@170..171
+                      Iconst@170..171 "1"
+                    Ascii44@171..172 ","
+                    AConst@172..173
+                      Iconst@172..173 "0"
+                Ascii41@173..174 ")"
+                Ascii41@174..175 ")"
+                Whitespace@175..176 " "
+                Alias@176..184
+                  Ident@176..178 "v1"
+                  Ascii40@178..179 "("
+                  Ident@179..181 "x1"
+                  Ascii44@181..182 ","
+                  Ident@182..184 "x2"
+              Ascii41@184..185 ")"
+              Newline@185..186 "\n"
+              Whitespace@186..201 "               "
+              Left@201..205 "left"
+              Whitespace@205..206 " "
+              Join@206..210 "join"
+              Whitespace@210..211 " "
+              Ascii40@211..212 "("
+              RangeSubselect@212..233
+                SelectStmt@212..222
+                  Values@212..218 "values"
+                  Ascii40@218..219 "("
+                  List@219..222
+                    AConst@219..220
+                      Iconst@219..220 "3"
+                    Ascii44@220..221 ","
+                    AConst@221..222
+                      Iconst@221..222 "1"
+                Ascii41@222..223 ")"
+                Ascii41@223..224 ")"
+                Whitespace@224..225 " "
+                Alias@225..233
+                  Ident@225..227 "v2"
+                  Ascii40@227..228 "("
+                  Ident@228..230 "y1"
+                  Ascii44@230..231 ","
+                  Ident@231..233 "y2"
+              Ascii41@233..234 ")"
+              Newline@234..235 "\n"
+              Whitespace@235..250 "               "
+              On@250..252 "on"
+              Whitespace@252..253 " "
+              AExpr@253..266
+                ColumnRef@253..258
+                  Ident@253..255 "v1"
+                  Ascii46@255..256 "."
+                  Ident@256..258 "x1"
+                Whitespace@258..259 " "
+                Ascii61@259..260 "="
+                Whitespace@260..261 " "
+                ColumnRef@261..266
+                  Ident@261..263 "v2"
+                  Ascii46@263..264 "."
+                  Ident@264..266 "y2"
+          Ascii41@266..267 ")"
+          Whitespace@267..268 " "
+          Alias@268..273
+            Ident@268..273 "subq1"
+        Newline@273..274 "\n"
+        Whitespace@274..278 "    "
+        On@278..280 "on"
+        Whitespace@280..281 " "
+        Ascii40@281..282 "("
+        AExpr@282..298
+          ColumnRef@282..287
+            Ident@282..284 "i1"
+            Ascii46@284..285 "."
+            Ident@285..287 "f1"
+          Whitespace@287..288 " "
+          Ascii61@288..289 "="
+          Whitespace@289..290 " "
+          ColumnRef@290..298
+            Ident@290..295 "subq1"
+            Ascii46@295..296 "."
+            Ident@296..298 "x2"
+      Ascii41@298..299 ")"
+      Newline@299..300 "\n"
+      Whitespace@300..302 "  "
+      On@302..304 "on"
+      Whitespace@304..305 " "
+      Ascii40@305..306 "("
+      AExpr@306..327
+        ColumnRef@306..316
+          Ident@306..308 "t1"
+          Ascii46@308..309 "."
+          Ident@309..316 "unique2"
+        Whitespace@316..317 " "
+        Ascii61@317..318 "="
+        Whitespace@318..319 " "
+        ColumnRef@319..327
+          Ident@319..324 "subq1"
+          Ascii46@324..325 "."
+          Ident@325..327 "d1"
+    Ascii41@327..328 ")"
+    Newline@328..329 "\n"
+    Whitespace@329..331 "  "
+    Left@331..335 "left"
+    Whitespace@335..336 " "
+    Join@336..340 "join"
+    Whitespace@340..341 " "
+    RangeVar@341..349
+      Ident@341..346 "tenk1"
+      Whitespace@346..347 " "
+      Alias@347..349
+        Ident@347..349 "t2"
+    Newline@349..350 "\n"
+    Whitespace@350..352 "  "
+    On@352..354 "on"
+    Whitespace@354..355 " "
+    Ascii40@355..356 "("
+    AExpr@356..377
+      ColumnRef@356..364
+        Ident@356..361 "subq1"
+        Ascii46@361..362 "."
+        Ident@362..364 "y1"
+      Whitespace@364..365 " "
+      Ascii61@365..366 "="
+      Whitespace@366..367 " "
+      ColumnRef@367..377
+        Ident@367..369 "t2"
+        Ascii46@369..370 "."
+        Ident@370..377 "unique1"
+  Ascii41@377..378 ")"
+  Newline@378..379 "\n"
+  Where@379..384 "where"
+  Whitespace@384..385 " "
+  BoolExpr@385..430
+    AExpr@385..400
+      ColumnRef@385..395
+        Ident@385..387 "t1"
+        Ascii46@387..388 "."
+        Ident@388..395 "unique2"
+      Whitespace@395..396 " "
+      Ascii60@396..397 "<"
+      Whitespace@397..398 " "
+      AConst@398..400
+        Iconst@398..400 "42"
+    Whitespace@400..401 " "
+    And@401..404 "and"
+    Whitespace@404..405 " "
+    AExpr@405..430
+      ColumnRef@405..416
+        Ident@405..407 "t1"
+        Ascii46@407..408 "."
+        Ident@408..416 "stringu1"
+      Whitespace@416..417 " "
+      Ascii62@417..418 ">"
+      Whitespace@418..419 " "
+      ColumnRef@419..430
+        Ident@419..421 "t2"
+        Ascii46@421..422 "."
+        Ident@422..430 "stringu2"
+  Ascii59@430..431 ";"
+

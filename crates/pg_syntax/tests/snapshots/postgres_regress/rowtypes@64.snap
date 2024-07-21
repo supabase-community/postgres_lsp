@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into test_table select 'a', null from generate_series(1,1000);"
+---
+InsertStmt@0..69
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..22
+    Ident@12..22 "test_table"
+  Whitespace@22..23 " "
+  SelectStmt@23..67
+    Select@23..29 "select"
+    Whitespace@29..30 " "
+    ResTarget@30..33
+      AConst@30..33
+        Sconst@30..33 "'a'"
+    Ascii44@33..34 ","
+    Whitespace@34..35 " "
+    ResTarget@35..39
+      AConst@35..39
+        NullP@35..39 "null"
+    Whitespace@39..40 " "
+    From@40..44 "from"
+    Whitespace@44..45 " "
+    RangeFunction@45..67
+      List@45..67
+        FuncCall@45..67
+          Ident@45..60 "generate_series"
+          Ascii40@60..61 "("
+          AConst@61..62
+            Iconst@61..62 "1"
+          Ascii44@62..63 ","
+          AConst@63..67
+            Iconst@63..67 "1000"
+  Ascii41@67..68 ")"
+  Ascii59@68..69 ";"
+

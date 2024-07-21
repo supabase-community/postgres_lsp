@@ -1,0 +1,93 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM\n  (SELECT 1 AS t, generate_series(1,10) AS x\n   UNION\n   SELECT 2 AS t, 4 AS x) ss\nWHERE x < 4\nORDER BY x;"
+---
+SelectStmt@0..120
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Newline@13..14 "\n"
+  Whitespace@14..16 "  "
+  Ascii40@16..17 "("
+  RangeSubselect@17..96
+    SelectStmt@17..92
+      Select@17..23 "SELECT"
+      Whitespace@23..24 " "
+      SelectStmt@24..58
+        ResTarget@24..30
+          AConst@24..25
+            Iconst@24..25 "1"
+          Whitespace@25..26 " "
+          As@26..28 "AS"
+          Whitespace@28..29 " "
+          Ident@29..30 "t"
+        Ascii44@30..31 ","
+        Whitespace@31..32 " "
+        ResTarget@32..58
+          FuncCall@32..52
+            Ident@32..47 "generate_series"
+            Ascii40@47..48 "("
+            AConst@48..49
+              Iconst@48..49 "1"
+            Ascii44@49..50 ","
+            AConst@50..52
+              Iconst@50..52 "10"
+          Ascii41@52..53 ")"
+          Whitespace@53..54 " "
+          As@54..56 "AS"
+          Whitespace@56..57 " "
+          Ident@57..58 "x"
+      Newline@58..59 "\n"
+      Whitespace@59..62 "   "
+      Union@62..67 "UNION"
+      Newline@67..68 "\n"
+      Whitespace@68..71 "   "
+      SelectStmt@71..92
+        Select@71..77 "SELECT"
+        Whitespace@77..78 " "
+        ResTarget@78..84
+          AConst@78..79
+            Iconst@78..79 "2"
+          Whitespace@79..80 " "
+          As@80..82 "AS"
+          Whitespace@82..83 " "
+          Ident@83..84 "t"
+        Ascii44@84..85 ","
+        Whitespace@85..86 " "
+        ResTarget@86..92
+          AConst@86..87
+            Iconst@86..87 "4"
+          Whitespace@87..88 " "
+          As@88..90 "AS"
+          Whitespace@90..91 " "
+          Ident@91..92 "x"
+    Ascii41@92..93 ")"
+    Whitespace@93..94 " "
+    Alias@94..96
+      Ident@94..96 "ss"
+  Newline@96..97 "\n"
+  Where@97..102 "WHERE"
+  Whitespace@102..103 " "
+  AExpr@103..108
+    ColumnRef@103..104
+      Ident@103..104 "x"
+    Whitespace@104..105 " "
+    Ascii60@105..106 "<"
+    Whitespace@106..107 " "
+    AConst@107..108
+      Iconst@107..108 "4"
+  Newline@108..109 "\n"
+  SortBy@109..119
+    Order@109..114 "ORDER"
+    Whitespace@114..115 " "
+    By@115..117 "BY"
+    Whitespace@117..118 " "
+    ColumnRef@118..119
+      Ident@118..119 "x"
+  Ascii59@119..120 ";"
+

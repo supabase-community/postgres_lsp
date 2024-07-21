@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT setval('rngfunc_rescan_seq1',1,false),setval('rngfunc_rescan_seq2',1,false);"
+---
+SelectStmt@0..83
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..43
+    FuncCall@7..43
+      Ident@7..13 "setval"
+      Ascii40@13..14 "("
+      AConst@14..35
+        Sconst@14..35 "'rngfunc_rescan_seq1'"
+      Ascii44@35..36 ","
+      AConst@36..37
+        Iconst@36..37 "1"
+      Ascii44@37..38 ","
+      AConst@38..43
+        FalseP@38..43 "false"
+  Ascii41@43..44 ")"
+  Ascii44@44..45 ","
+  ResTarget@45..81
+    FuncCall@45..81
+      Ident@45..51 "setval"
+      Ascii40@51..52 "("
+      AConst@52..73
+        Sconst@52..73 "'rngfunc_rescan_seq2'"
+      Ascii44@73..74 ","
+      AConst@74..75
+        Iconst@74..75 "1"
+      Ascii44@75..76 ","
+      AConst@76..81
+        FalseP@76..81 "false"
+  Ascii41@81..82 ")"
+  Ascii59@82..83 ";"
+

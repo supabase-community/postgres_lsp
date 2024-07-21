@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT E'''1 \\\\''2''3'::tsvector;"
+---
+SelectStmt@0..33
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..32
+    TypeCast@7..32
+      AConst@7..22
+        Sconst@7..22 "E'''1 \\\\''2''3'"
+      Typecast@22..24 "::"
+      TypeName@24..32
+        Ident@24..32 "tsvector"
+  Ascii59@32..33 ";"
+

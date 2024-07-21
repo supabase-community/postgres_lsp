@@ -1,0 +1,165 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select col, prop, pg_index_column_has_property(o, col, prop)\n  from (values ('fooindex'::regclass)) v1(o),\n       (values (1,'orderable'),(2,'asc'),(3,'desc'),\n               (4,'nulls_first'),(5,'nulls_last'),\n               (6, 'bogus')) v2(idx,prop),\n       generate_series(1,4) col\n order by col, idx;"
+---
+SelectStmt@0..305
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..10
+    ColumnRef@7..10
+      Ident@7..10 "col"
+  Ascii44@10..11 ","
+  Whitespace@11..12 " "
+  ResTarget@12..16
+    ColumnRef@12..16
+      Ident@12..16 "prop"
+  Ascii44@16..17 ","
+  Whitespace@17..18 " "
+  ResTarget@18..59
+    FuncCall@18..59
+      Ident@18..46 "pg_index_column_has_p ..."
+      Ascii40@46..47 "("
+      ColumnRef@47..48
+        Ident@47..48 "o"
+      Ascii44@48..49 ","
+      Whitespace@49..50 " "
+      ColumnRef@50..53
+        Ident@50..53 "col"
+      Ascii44@53..54 ","
+      Whitespace@54..55 " "
+      ColumnRef@55..59
+        Ident@55..59 "prop"
+  Ascii41@59..60 ")"
+  Newline@60..61 "\n"
+  Whitespace@61..63 "  "
+  From@63..67 "from"
+  Whitespace@67..68 " "
+  Ascii40@68..69 "("
+  RangeSubselect@69..104
+    SelectStmt@69..97
+      Values@69..75 "values"
+      Whitespace@75..76 " "
+      Ascii40@76..77 "("
+      List@77..97
+        TypeCast@77..97
+          AConst@77..87
+            Sconst@77..87 "'fooindex'"
+          Typecast@87..89 "::"
+          TypeName@89..97
+            Ident@89..97 "regclass"
+    Ascii41@97..98 ")"
+    Ascii41@98..99 ")"
+    Whitespace@99..100 " "
+    Alias@100..104
+      Ident@100..102 "v1"
+      Ascii40@102..103 "("
+      Ident@103..104 "o"
+  Ascii41@104..105 ")"
+  Ascii44@105..106 ","
+  Newline@106..107 "\n"
+  Whitespace@107..114 "       "
+  Ascii40@114..115 "("
+  RangeSubselect@115..251
+    SelectStmt@115..237
+      Values@115..121 "values"
+      Whitespace@121..122 " "
+      Ascii40@122..123 "("
+      List@123..136
+        AConst@123..124
+          Iconst@123..124 "1"
+        Ascii44@124..125 ","
+        AConst@125..136
+          Sconst@125..136 "'orderable'"
+      Ascii41@136..137 ")"
+      Ascii44@137..138 ","
+      Ascii40@138..139 "("
+      List@139..146
+        AConst@139..140
+          Iconst@139..140 "2"
+        Ascii44@140..141 ","
+        AConst@141..146
+          Sconst@141..146 "'asc'"
+      Ascii41@146..147 ")"
+      Ascii44@147..148 ","
+      Ascii40@148..149 "("
+      List@149..157
+        AConst@149..150
+          Iconst@149..150 "3"
+        Ascii44@150..151 ","
+        AConst@151..157
+          Sconst@151..157 "'desc'"
+      Ascii41@157..158 ")"
+      Ascii44@158..159 ","
+      Newline@159..160 "\n"
+      Whitespace@160..175 "               "
+      Ascii40@175..176 "("
+      List@176..191
+        AConst@176..177
+          Iconst@176..177 "4"
+        Ascii44@177..178 ","
+        AConst@178..191
+          Sconst@178..191 "'nulls_first'"
+      Ascii41@191..192 ")"
+      Ascii44@192..193 ","
+      Ascii40@193..194 "("
+      List@194..208
+        AConst@194..195
+          Iconst@194..195 "5"
+        Ascii44@195..196 ","
+        AConst@196..208
+          Sconst@196..208 "'nulls_last'"
+      Ascii41@208..209 ")"
+      Ascii44@209..210 ","
+      Newline@210..211 "\n"
+      Whitespace@211..226 "               "
+      Ascii40@226..227 "("
+      List@227..237
+        AConst@227..228
+          Iconst@227..228 "6"
+        Ascii44@228..229 ","
+        Whitespace@229..230 " "
+        AConst@230..237
+          Sconst@230..237 "'bogus'"
+    Ascii41@237..238 ")"
+    Ascii41@238..239 ")"
+    Whitespace@239..240 " "
+    Alias@240..251
+      Ident@240..242 "v2"
+      Ascii40@242..243 "("
+      Ident@243..246 "idx"
+      Ascii44@246..247 ","
+      Ident@247..251 "prop"
+  Ascii41@251..252 ")"
+  Ascii44@252..253 ","
+  Newline@253..254 "\n"
+  Whitespace@254..261 "       "
+  RangeFunction@261..285
+    List@261..280
+      FuncCall@261..280
+        Ident@261..276 "generate_series"
+        Ascii40@276..277 "("
+        AConst@277..278
+          Iconst@277..278 "1"
+        Ascii44@278..279 ","
+        AConst@279..280
+          Iconst@279..280 "4"
+    Ascii41@280..281 ")"
+    Whitespace@281..282 " "
+    Alias@282..285
+      Ident@282..285 "col"
+  Newline@285..286 "\n"
+  Whitespace@286..287 " "
+  SortBy@287..299
+    Order@287..292 "order"
+    Whitespace@292..293 " "
+    By@293..295 "by"
+    Whitespace@295..296 " "
+    ColumnRef@296..299
+      Ident@296..299 "col"
+  Ascii44@299..300 ","
+  Whitespace@300..301 " "
+  SortBy@301..304
+    ColumnRef@301..304
+      Ident@301..304 "idx"
+  Ascii59@304..305 ";"
+

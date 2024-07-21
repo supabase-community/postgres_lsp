@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT jsb FROM json_populate_record(NULL::jsrec, '{\"jsb\": 123.45}') q;"
+---
+SelectStmt@0..71
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..10
+    ColumnRef@7..10
+      Ident@7..10 "jsb"
+  Whitespace@10..11 " "
+  From@11..15 "FROM"
+  Whitespace@15..16 " "
+  RangeFunction@16..70
+    List@16..67
+      FuncCall@16..67
+        Ident@16..36 "json_populate_record"
+        Ascii40@36..37 "("
+        TypeCast@37..48
+          AConst@37..41
+            NullP@37..41 "NULL"
+          Typecast@41..43 "::"
+          TypeName@43..48
+            Ident@43..48 "jsrec"
+        Ascii44@48..49 ","
+        Whitespace@49..50 " "
+        AConst@50..67
+          Sconst@50..67 "'{\"jsb\": 123.45}'"
+    Ascii41@67..68 ")"
+    Whitespace@68..69 " "
+    Alias@69..70
+      Ident@69..70 "q"
+  Ascii59@70..71 ";"
+

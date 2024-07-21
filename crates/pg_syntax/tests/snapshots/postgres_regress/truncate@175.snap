@@ -1,0 +1,52 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE trunc_a2 PARTITION OF trunc_a FOR VALUES FROM (10) TO (20)\n  PARTITION BY RANGE (a);"
+---
+CreateStmt@0..97
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..21
+    Ident@13..21 "trunc_a2"
+  Whitespace@21..22 " "
+  Partition@22..31 "PARTITION"
+  Whitespace@31..32 " "
+  Of@32..34 "OF"
+  Whitespace@34..35 " "
+  RangeVar@35..42
+    Ident@35..42 "trunc_a"
+  Whitespace@42..43 " "
+  For@43..46 "FOR"
+  Whitespace@46..47 " "
+  Values@47..53 "VALUES"
+  Whitespace@53..54 " "
+  PartitionBoundSpec@54..70
+    From@54..58 "FROM"
+    Whitespace@58..59 " "
+    Ascii40@59..60 "("
+    AConst@60..62
+      Iconst@60..62 "10"
+    Ascii41@62..63 ")"
+    Whitespace@63..64 " "
+    To@64..66 "TO"
+    Whitespace@66..67 " "
+    Ascii40@67..68 "("
+    AConst@68..70
+      Iconst@68..70 "20"
+  Ascii41@70..71 ")"
+  Newline@71..72 "\n"
+  Whitespace@72..74 "  "
+  PartitionSpec@74..95
+    Partition@74..83 "PARTITION"
+    Whitespace@83..84 " "
+    By@84..86 "BY"
+    Whitespace@86..87 " "
+    Range@87..92 "RANGE"
+    Whitespace@92..93 " "
+    Ascii40@93..94 "("
+    PartitionElem@94..95
+      Ident@94..95 "a"
+  Ascii41@95..96 ")"
+  Ascii59@96..97 ";"
+

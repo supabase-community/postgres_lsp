@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: alter table users drop column moredrop;
+---
+AlterTableStmt@0..39
+  Alter@0..5 "alter"
+  Whitespace@5..6 " "
+  Table@6..11 "table"
+  Whitespace@11..12 " "
+  RangeVar@12..17
+    Ident@12..17 "users"
+  Whitespace@17..18 " "
+  AlterTableCmd@18..38
+    Drop@18..22 "drop"
+    Whitespace@22..23 " "
+    Column@23..29 "column"
+    Whitespace@29..30 " "
+    Ident@30..38 "moredrop"
+  Ascii59@38..39 ";"
+

@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select numrange(1.0, 2.0) << numrange(3.0, 4.0);"
+---
+SelectStmt@0..48
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..46
+    AExpr@7..46
+      FuncCall@7..24
+        Ident@7..15 "numrange"
+        Ascii40@15..16 "("
+        AConst@16..19
+          Fconst@16..19 "1.0"
+        Ascii44@19..20 ","
+        Whitespace@20..21 " "
+        AConst@21..24
+          Fconst@21..24 "2.0"
+      Ascii41@24..25 ")"
+      Whitespace@25..26 " "
+      Op@26..28 "<<"
+      Whitespace@28..29 " "
+      FuncCall@29..46
+        Ident@29..37 "numrange"
+        Ascii40@37..38 "("
+        AConst@38..41
+          Fconst@38..41 "3.0"
+        Ascii44@41..42 ","
+        Whitespace@42..43 " "
+        AConst@43..46
+          Fconst@43..46 "4.0"
+  Ascii41@46..47 ")"
+  Ascii59@47..48 ";"
+

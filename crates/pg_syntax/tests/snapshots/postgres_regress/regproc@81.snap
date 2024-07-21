@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_regnamespace('foo.bar');"
+---
+SelectStmt@0..34
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..32
+    FuncCall@7..32
+      Ident@7..22 "to_regnamespace"
+      Ascii40@22..23 "("
+      AConst@23..32
+        Sconst@23..32 "'foo.bar'"
+  Ascii41@32..33 ")"
+  Ascii59@33..34 ";"
+

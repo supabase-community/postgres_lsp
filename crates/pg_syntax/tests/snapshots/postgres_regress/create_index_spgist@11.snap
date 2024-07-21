@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX sp_radix_ind ON radix_text_tbl USING spgist (t);
+---
+IndexStmt@0..61
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..25 "sp_radix_ind"
+  Whitespace@25..26 " "
+  On@26..28 "ON"
+  Whitespace@28..29 " "
+  RangeVar@29..43
+    Ident@29..43 "radix_text_tbl"
+  Whitespace@43..44 " "
+  Using@44..49 "USING"
+  Whitespace@49..50 " "
+  Ident@50..56 "spgist"
+  Whitespace@56..57 " "
+  Ascii40@57..58 "("
+  IndexElem@58..59
+    Ident@58..59 "t"
+  Ascii41@59..60 ")"
+  Ascii59@60..61 ";"
+

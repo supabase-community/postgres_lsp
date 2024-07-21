@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_timestamp('NaN'::float);"
+---
+SelectStmt@0..34
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..32
+    FuncCall@7..32
+      Ident@7..19 "to_timestamp"
+      Ascii40@19..20 "("
+      TypeCast@20..32
+        AConst@20..25
+          Sconst@20..25 "'NaN'"
+        Typecast@25..27 "::"
+        TypeName@27..32
+          FloatP@27..32 "float"
+  Ascii41@32..33 ")"
+  Ascii59@33..34 ";"
+

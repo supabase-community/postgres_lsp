@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT dup(22, array[44]);"
+---
+SelectStmt@0..26
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..23
+    FuncCall@7..23
+      Ident@7..10 "dup"
+      Ascii40@10..11 "("
+      AConst@11..13
+        Iconst@11..13 "22"
+      Ascii44@13..14 ","
+      Whitespace@14..15 " "
+      AArrayExpr@15..23
+        Array@15..20 "array"
+        Ascii91@20..21 "["
+        AConst@21..23
+          Iconst@21..23 "44"
+  Ascii93@23..24 "]"
+  Ascii41@24..25 ")"
+  Ascii59@25..26 ";"
+

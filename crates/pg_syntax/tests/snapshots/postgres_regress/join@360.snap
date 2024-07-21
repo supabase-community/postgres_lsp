@@ -1,0 +1,86 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select a.q2, b.q1\n  from int8_tbl a left join int8_tbl b on a.q2 = coalesce(b.q1, 1)\n  where coalesce(b.q1, 1) > 0;"
+---
+SelectStmt@0..115
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      Ident@7..8 "a"
+      Ascii46@8..9 "."
+      Ident@9..11 "q2"
+  Ascii44@11..12 ","
+  Whitespace@12..13 " "
+  ResTarget@13..17
+    ColumnRef@13..17
+      Ident@13..14 "b"
+      Ascii46@14..15 "."
+      Ident@15..17 "q1"
+  Newline@17..18 "\n"
+  Whitespace@18..20 "  "
+  From@20..24 "from"
+  Whitespace@24..25 " "
+  JoinExpr@25..83
+    RangeVar@25..35
+      Ident@25..33 "int8_tbl"
+      Whitespace@33..34 " "
+      Alias@34..35
+        Ident@34..35 "a"
+    Whitespace@35..36 " "
+    Left@36..40 "left"
+    Whitespace@40..41 " "
+    Join@41..45 "join"
+    Whitespace@45..46 " "
+    RangeVar@46..56
+      Ident@46..54 "int8_tbl"
+      Whitespace@54..55 " "
+      Alias@55..56
+        Ident@55..56 "b"
+    Whitespace@56..57 " "
+    On@57..59 "on"
+    Whitespace@59..60 " "
+    AExpr@60..83
+      ColumnRef@60..64
+        Ident@60..61 "a"
+        Ascii46@61..62 "."
+        Ident@62..64 "q2"
+      Whitespace@64..65 " "
+      Ascii61@65..66 "="
+      Whitespace@66..67 " "
+      CoalesceExpr@67..83
+        Coalesce@67..75 "coalesce"
+        Ascii40@75..76 "("
+        ColumnRef@76..80
+          Ident@76..77 "b"
+          Ascii46@77..78 "."
+          Ident@78..80 "q1"
+        Ascii44@80..81 ","
+        Whitespace@81..82 " "
+        AConst@82..83
+          Iconst@82..83 "1"
+  Ascii41@83..84 ")"
+  Newline@84..85 "\n"
+  Whitespace@85..87 "  "
+  Where@87..92 "where"
+  Whitespace@92..93 " "
+  AExpr@93..114
+    CoalesceExpr@93..109
+      Coalesce@93..101 "coalesce"
+      Ascii40@101..102 "("
+      ColumnRef@102..106
+        Ident@102..103 "b"
+        Ascii46@103..104 "."
+        Ident@104..106 "q1"
+      Ascii44@106..107 ","
+      Whitespace@107..108 " "
+      AConst@108..109
+        Iconst@108..109 "1"
+    Ascii41@109..110 ")"
+    Whitespace@110..111 " "
+    Ascii62@111..112 ">"
+    Whitespace@112..113 " "
+    AConst@113..114
+      Iconst@113..114 "0"
+  Ascii59@114..115 ";"
+

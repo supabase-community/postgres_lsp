@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT table_to_xmlschema('testxmlschema.test2', false, false, '');"
+---
+SelectStmt@0..67
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..65
+    FuncCall@7..65
+      Ident@7..25 "table_to_xmlschema"
+      Ascii40@25..26 "("
+      AConst@26..47
+        Sconst@26..47 "'testxmlschema.test2'"
+      Ascii44@47..48 ","
+      Whitespace@48..49 " "
+      AConst@49..54
+        FalseP@49..54 "false"
+      Ascii44@54..55 ","
+      Whitespace@55..56 " "
+      AConst@56..61
+        FalseP@56..61 "false"
+      Ascii44@61..62 ","
+      Whitespace@62..63 " "
+      AConst@63..65
+        Sconst@63..65 "''"
+  Ascii41@65..66 ")"
+  Ascii59@66..67 ";"
+

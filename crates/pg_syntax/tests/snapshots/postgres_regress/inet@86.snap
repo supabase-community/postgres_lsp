@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT i, i - 500 AS \"i-500\" FROM inet_tbl;"
+---
+SelectStmt@0..43
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      Ident@7..8 "i"
+  Ascii44@8..9 ","
+  Whitespace@9..10 " "
+  ResTarget@10..28
+    AExpr@10..17
+      ColumnRef@10..11
+        Ident@10..11 "i"
+      Whitespace@11..12 " "
+      Ascii45@12..13 "-"
+      Whitespace@13..14 " "
+      AConst@14..17
+        Iconst@14..17 "500"
+    Whitespace@17..18 " "
+    As@18..20 "AS"
+    Whitespace@20..21 " "
+    Ident@21..28 "\"i-500\""
+  Whitespace@28..29 " "
+  From@29..33 "FROM"
+  Whitespace@33..34 " "
+  RangeVar@34..42
+    Ident@34..42 "inet_tbl"
+  Ascii59@42..43 ";"
+

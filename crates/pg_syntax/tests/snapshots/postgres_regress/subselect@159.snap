@@ -1,0 +1,73 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select count(*) from tenk1 t\nwhere (exists(select 1 from tenk1 k where k.unique1 = t.unique2) or ten < 0);"
+---
+SelectStmt@0..106
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "from"
+  Whitespace@20..21 " "
+  RangeVar@21..28
+    Ident@21..26 "tenk1"
+    Whitespace@26..27 " "
+    Alias@27..28
+      Ident@27..28 "t"
+  Newline@28..29 "\n"
+  Where@29..34 "where"
+  Whitespace@34..35 " "
+  Ascii40@35..36 "("
+  BoolExpr@36..104
+    SubLink@36..92
+      SelectStmt@36..92
+        Exists@36..42 "exists"
+        Ascii40@42..43 "("
+        Select@43..49 "select"
+        Whitespace@49..50 " "
+        ResTarget@50..51
+          AConst@50..51
+            Iconst@50..51 "1"
+        Whitespace@51..52 " "
+        From@52..56 "from"
+        Whitespace@56..57 " "
+        RangeVar@57..64
+          Ident@57..62 "tenk1"
+          Whitespace@62..63 " "
+          Alias@63..64
+            Ident@63..64 "k"
+        Whitespace@64..65 " "
+        Where@65..70 "where"
+        Whitespace@70..71 " "
+        AExpr@71..92
+          ColumnRef@71..80
+            Ident@71..72 "k"
+            Ascii46@72..73 "."
+            Ident@73..80 "unique1"
+          Whitespace@80..81 " "
+          Ascii61@81..82 "="
+          Whitespace@82..83 " "
+          ColumnRef@83..92
+            Ident@83..84 "t"
+            Ascii46@84..85 "."
+            Ident@85..92 "unique2"
+    Ascii41@92..93 ")"
+    Whitespace@93..94 " "
+    Or@94..96 "or"
+    Whitespace@96..97 " "
+    AExpr@97..104
+      ColumnRef@97..100
+        Ident@97..100 "ten"
+      Whitespace@100..101 " "
+      Ascii60@101..102 "<"
+      Whitespace@102..103 " "
+      AConst@103..104
+        Iconst@103..104 "0"
+  Ascii41@104..105 ")"
+  Ascii59@105..106 ";"
+

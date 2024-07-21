@@ -1,0 +1,23 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: insert into s1.abc values(123);
+---
+InsertStmt@0..31
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..14 "s1"
+    Ascii46@14..15 "."
+    Ident@15..18 "abc"
+  Whitespace@18..19 " "
+  SelectStmt@19..29
+    Values@19..25 "values"
+    Ascii40@25..26 "("
+    List@26..29
+      AConst@26..29
+        Iconst@26..29 "123"
+  Ascii41@29..30 ")"
+  Ascii59@30..31 ";"
+

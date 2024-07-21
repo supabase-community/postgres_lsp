@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO num_exp_add VALUES (6,0,'.0469370721950711508944806393077762204079964905145503836835397203739563036579760026190241480514409364');"
+---
+InsertStmt@0..141
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "num_exp_add"
+  Whitespace@23..24 " "
+  SelectStmt@24..139
+    Values@24..30 "VALUES"
+    Whitespace@30..31 " "
+    Ascii40@31..32 "("
+    List@32..139
+      AConst@32..33
+        Iconst@32..33 "6"
+      Ascii44@33..34 ","
+      AConst@34..35
+        Iconst@34..35 "0"
+      Ascii44@35..36 ","
+      AConst@36..139
+        Sconst@36..139 "'.0469370721950711508 ..."
+  Ascii41@139..140 ")"
+  Ascii59@140..141 ";"
+

@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select make_time(10, 55, 100.1);"
+---
+SelectStmt@0..32
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..30
+    FuncCall@7..30
+      Ident@7..16 "make_time"
+      Ascii40@16..17 "("
+      AConst@17..19
+        Iconst@17..19 "10"
+      Ascii44@19..20 ","
+      Whitespace@20..21 " "
+      AConst@21..23
+        Iconst@21..23 "55"
+      Ascii44@23..24 ","
+      Whitespace@24..25 " "
+      AConst@25..30
+        Fconst@25..30 "100.1"
+  Ascii41@30..31 ")"
+  Ascii59@31..32 ";"
+

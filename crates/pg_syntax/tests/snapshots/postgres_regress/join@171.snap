@@ -1,0 +1,51 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select tt1.*, tt2.* from tt2 right join tt1 on tt1.joincol = tt2.joincol;"
+---
+SelectStmt@0..73
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..12
+    ColumnRef@7..12
+      Ident@7..10 "tt1"
+      Ascii46@10..11 "."
+      AStar@11..12
+        Ascii42@11..12 "*"
+  Ascii44@12..13 ","
+  Whitespace@13..14 " "
+  ResTarget@14..19
+    ColumnRef@14..19
+      Ident@14..17 "tt2"
+      Ascii46@17..18 "."
+      AStar@18..19
+        Ascii42@18..19 "*"
+  Whitespace@19..20 " "
+  From@20..24 "from"
+  Whitespace@24..25 " "
+  JoinExpr@25..72
+    RangeVar@25..28
+      Ident@25..28 "tt2"
+    Whitespace@28..29 " "
+    Right@29..34 "right"
+    Whitespace@34..35 " "
+    Join@35..39 "join"
+    Whitespace@39..40 " "
+    RangeVar@40..43
+      Ident@40..43 "tt1"
+    Whitespace@43..44 " "
+    On@44..46 "on"
+    Whitespace@46..47 " "
+    AExpr@47..72
+      ColumnRef@47..58
+        Ident@47..50 "tt1"
+        Ascii46@50..51 "."
+        Ident@51..58 "joincol"
+      Whitespace@58..59 " "
+      Ascii61@59..60 "="
+      Whitespace@60..61 " "
+      ColumnRef@61..72
+        Ident@61..64 "tt2"
+        Ascii46@64..65 "."
+        Ident@65..72 "joincol"
+  Ascii59@72..73 ";"
+

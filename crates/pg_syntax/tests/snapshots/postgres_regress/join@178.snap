@@ -1,0 +1,68 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select count(*) from tenk1 a, tenk1 b\n  where a.hundred = b.thousand and (b.fivethous % 10) < 10;"
+---
+SelectStmt@0..97
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "from"
+  Whitespace@20..21 " "
+  RangeVar@21..28
+    Ident@21..26 "tenk1"
+    Whitespace@26..27 " "
+    Alias@27..28
+      Ident@27..28 "a"
+  Ascii44@28..29 ","
+  Whitespace@29..30 " "
+  RangeVar@30..37
+    Ident@30..35 "tenk1"
+    Whitespace@35..36 " "
+    Alias@36..37
+      Ident@36..37 "b"
+  Newline@37..38 "\n"
+  Whitespace@38..40 "  "
+  Where@40..45 "where"
+  Whitespace@45..46 " "
+  BoolExpr@46..96
+    AExpr@46..68
+      ColumnRef@46..55
+        Ident@46..47 "a"
+        Ascii46@47..48 "."
+        Ident@48..55 "hundred"
+      Whitespace@55..56 " "
+      Ascii61@56..57 "="
+      Whitespace@57..58 " "
+      ColumnRef@58..68
+        Ident@58..59 "b"
+        Ascii46@59..60 "."
+        Ident@60..68 "thousand"
+    Whitespace@68..69 " "
+    And@69..72 "and"
+    Whitespace@72..73 " "
+    Ascii40@73..74 "("
+    AExpr@74..96
+      AExpr@74..90
+        ColumnRef@74..85
+          Ident@74..75 "b"
+          Ascii46@75..76 "."
+          Ident@76..85 "fivethous"
+        Whitespace@85..86 " "
+        Ascii37@86..87 "%"
+        Whitespace@87..88 " "
+        AConst@88..90
+          Iconst@88..90 "10"
+      Ascii41@90..91 ")"
+      Whitespace@91..92 " "
+      Ascii60@92..93 "<"
+      Whitespace@93..94 " "
+      AConst@94..96
+        Iconst@94..96 "10"
+  Ascii59@96..97 ";"
+

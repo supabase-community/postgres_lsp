@@ -1,0 +1,261 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into reservations values\n-- 1: has a meets and a gap\n(1, daterange('2018-07-01', '2018-07-07')),\n(1, daterange('2018-07-07', '2018-07-14')),\n(1, daterange('2018-07-20', '2018-07-22')),\n-- 2: just a single row\n(2, daterange('2018-07-01', '2018-07-03')),\n-- 3: one null range\n(3, NULL),\n-- 4: two null ranges\n(4, NULL),\n(4, NULL),\n-- 5: a null range and a non-null range\n(5, NULL),\n(5, daterange('2018-07-01', '2018-07-03')),\n-- 6: has overlap\n(6, daterange('2018-07-01', '2018-07-07')),\n(6, daterange('2018-07-05', '2018-07-10')),\n-- 7: two ranges that meet: no gap or overlap\n(7, daterange('2018-07-01', '2018-07-07')),\n(7, daterange('2018-07-07', '2018-07-14')),\n-- 8: an empty range\n(8, 'empty'::daterange);"
+---
+InsertStmt@0..716
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..24
+    Ident@12..24 "reservations"
+  Whitespace@24..25 " "
+  SelectStmt@25..714
+    Values@25..31 "values"
+    Newline@31..32 "\n"
+    SqlComment@32..59 "-- 1: has a meets and ..."
+    Newline@59..60 "\n"
+    Ascii40@60..61 "("
+    List@61..100
+      AConst@61..62
+        Iconst@61..62 "1"
+      Ascii44@62..63 ","
+      Whitespace@63..64 " "
+      FuncCall@64..100
+        Ident@64..73 "daterange"
+        Ascii40@73..74 "("
+        AConst@74..86
+          Sconst@74..86 "'2018-07-01'"
+        Ascii44@86..87 ","
+        Whitespace@87..88 " "
+        AConst@88..100
+          Sconst@88..100 "'2018-07-07'"
+    Ascii41@100..101 ")"
+    Ascii41@101..102 ")"
+    Ascii44@102..103 ","
+    Newline@103..104 "\n"
+    Ascii40@104..105 "("
+    List@105..144
+      AConst@105..106
+        Iconst@105..106 "1"
+      Ascii44@106..107 ","
+      Whitespace@107..108 " "
+      FuncCall@108..144
+        Ident@108..117 "daterange"
+        Ascii40@117..118 "("
+        AConst@118..130
+          Sconst@118..130 "'2018-07-07'"
+        Ascii44@130..131 ","
+        Whitespace@131..132 " "
+        AConst@132..144
+          Sconst@132..144 "'2018-07-14'"
+    Ascii41@144..145 ")"
+    Ascii41@145..146 ")"
+    Ascii44@146..147 ","
+    Newline@147..148 "\n"
+    Ascii40@148..149 "("
+    List@149..188
+      AConst@149..150
+        Iconst@149..150 "1"
+      Ascii44@150..151 ","
+      Whitespace@151..152 " "
+      FuncCall@152..188
+        Ident@152..161 "daterange"
+        Ascii40@161..162 "("
+        AConst@162..174
+          Sconst@162..174 "'2018-07-20'"
+        Ascii44@174..175 ","
+        Whitespace@175..176 " "
+        AConst@176..188
+          Sconst@176..188 "'2018-07-22'"
+    Ascii41@188..189 ")"
+    Ascii41@189..190 ")"
+    Ascii44@190..191 ","
+    Newline@191..192 "\n"
+    SqlComment@192..215 "-- 2: just a single row"
+    Newline@215..216 "\n"
+    Ascii40@216..217 "("
+    List@217..256
+      AConst@217..218
+        Iconst@217..218 "2"
+      Ascii44@218..219 ","
+      Whitespace@219..220 " "
+      FuncCall@220..256
+        Ident@220..229 "daterange"
+        Ascii40@229..230 "("
+        AConst@230..242
+          Sconst@230..242 "'2018-07-01'"
+        Ascii44@242..243 ","
+        Whitespace@243..244 " "
+        AConst@244..256
+          Sconst@244..256 "'2018-07-03'"
+    Ascii41@256..257 ")"
+    Ascii41@257..258 ")"
+    Ascii44@258..259 ","
+    Newline@259..260 "\n"
+    SqlComment@260..280 "-- 3: one null range"
+    Newline@280..281 "\n"
+    Ascii40@281..282 "("
+    List@282..289
+      AConst@282..283
+        Iconst@282..283 "3"
+      Ascii44@283..284 ","
+      Whitespace@284..285 " "
+      AConst@285..289
+        NullP@285..289 "NULL"
+    Ascii41@289..290 ")"
+    Ascii44@290..291 ","
+    Newline@291..292 "\n"
+    SqlComment@292..313 "-- 4: two null ranges"
+    Newline@313..314 "\n"
+    Ascii40@314..315 "("
+    List@315..322
+      AConst@315..316
+        Iconst@315..316 "4"
+      Ascii44@316..317 ","
+      Whitespace@317..318 " "
+      AConst@318..322
+        NullP@318..322 "NULL"
+    Ascii41@322..323 ")"
+    Ascii44@323..324 ","
+    Newline@324..325 "\n"
+    Ascii40@325..326 "("
+    List@326..333
+      AConst@326..327
+        Iconst@326..327 "4"
+      Ascii44@327..328 ","
+      Whitespace@328..329 " "
+      AConst@329..333
+        NullP@329..333 "NULL"
+    Ascii41@333..334 ")"
+    Ascii44@334..335 ","
+    Newline@335..336 "\n"
+    SqlComment@336..375 "-- 5: a null range an ..."
+    Newline@375..376 "\n"
+    Ascii40@376..377 "("
+    List@377..384
+      AConst@377..378
+        Iconst@377..378 "5"
+      Ascii44@378..379 ","
+      Whitespace@379..380 " "
+      AConst@380..384
+        NullP@380..384 "NULL"
+    Ascii41@384..385 ")"
+    Ascii44@385..386 ","
+    Newline@386..387 "\n"
+    Ascii40@387..388 "("
+    List@388..427
+      AConst@388..389
+        Iconst@388..389 "5"
+      Ascii44@389..390 ","
+      Whitespace@390..391 " "
+      FuncCall@391..427
+        Ident@391..400 "daterange"
+        Ascii40@400..401 "("
+        AConst@401..413
+          Sconst@401..413 "'2018-07-01'"
+        Ascii44@413..414 ","
+        Whitespace@414..415 " "
+        AConst@415..427
+          Sconst@415..427 "'2018-07-03'"
+    Ascii41@427..428 ")"
+    Ascii41@428..429 ")"
+    Ascii44@429..430 ","
+    Newline@430..431 "\n"
+    SqlComment@431..448 "-- 6: has overlap"
+    Newline@448..449 "\n"
+    Ascii40@449..450 "("
+    List@450..489
+      AConst@450..451
+        Iconst@450..451 "6"
+      Ascii44@451..452 ","
+      Whitespace@452..453 " "
+      FuncCall@453..489
+        Ident@453..462 "daterange"
+        Ascii40@462..463 "("
+        AConst@463..475
+          Sconst@463..475 "'2018-07-01'"
+        Ascii44@475..476 ","
+        Whitespace@476..477 " "
+        AConst@477..489
+          Sconst@477..489 "'2018-07-07'"
+    Ascii41@489..490 ")"
+    Ascii41@490..491 ")"
+    Ascii44@491..492 ","
+    Newline@492..493 "\n"
+    Ascii40@493..494 "("
+    List@494..533
+      AConst@494..495
+        Iconst@494..495 "6"
+      Ascii44@495..496 ","
+      Whitespace@496..497 " "
+      FuncCall@497..533
+        Ident@497..506 "daterange"
+        Ascii40@506..507 "("
+        AConst@507..519
+          Sconst@507..519 "'2018-07-05'"
+        Ascii44@519..520 ","
+        Whitespace@520..521 " "
+        AConst@521..533
+          Sconst@521..533 "'2018-07-10'"
+    Ascii41@533..534 ")"
+    Ascii41@534..535 ")"
+    Ascii44@535..536 ","
+    Newline@536..537 "\n"
+    SqlComment@537..582 "-- 7: two ranges that ..."
+    Newline@582..583 "\n"
+    Ascii40@583..584 "("
+    List@584..623
+      AConst@584..585
+        Iconst@584..585 "7"
+      Ascii44@585..586 ","
+      Whitespace@586..587 " "
+      FuncCall@587..623
+        Ident@587..596 "daterange"
+        Ascii40@596..597 "("
+        AConst@597..609
+          Sconst@597..609 "'2018-07-01'"
+        Ascii44@609..610 ","
+        Whitespace@610..611 " "
+        AConst@611..623
+          Sconst@611..623 "'2018-07-07'"
+    Ascii41@623..624 ")"
+    Ascii41@624..625 ")"
+    Ascii44@625..626 ","
+    Newline@626..627 "\n"
+    Ascii40@627..628 "("
+    List@628..667
+      AConst@628..629
+        Iconst@628..629 "7"
+      Ascii44@629..630 ","
+      Whitespace@630..631 " "
+      FuncCall@631..667
+        Ident@631..640 "daterange"
+        Ascii40@640..641 "("
+        AConst@641..653
+          Sconst@641..653 "'2018-07-07'"
+        Ascii44@653..654 ","
+        Whitespace@654..655 " "
+        AConst@655..667
+          Sconst@655..667 "'2018-07-14'"
+    Ascii41@667..668 ")"
+    Ascii41@668..669 ")"
+    Ascii44@669..670 ","
+    Newline@670..671 "\n"
+    SqlComment@671..691 "-- 8: an empty range"
+    Newline@691..692 "\n"
+    Ascii40@692..693 "("
+    List@693..714
+      AConst@693..694
+        Iconst@693..694 "8"
+      Ascii44@694..695 ","
+      Whitespace@695..696 " "
+      TypeCast@696..714
+        AConst@696..703
+          Sconst@696..703 "'empty'"
+        Typecast@703..705 "::"
+        TypeName@705..714
+          Ident@705..714 "daterange"
+  Ascii41@714..715 ")"
+  Ascii59@715..716 ";"
+

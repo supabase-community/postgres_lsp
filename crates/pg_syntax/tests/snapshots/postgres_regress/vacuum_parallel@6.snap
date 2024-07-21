@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX typically_sized_index ON parallel_vacuum_table(a);
+---
+IndexStmt@0..63
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..34 "typically_sized_index"
+  Whitespace@34..35 " "
+  On@35..37 "ON"
+  Whitespace@37..38 " "
+  RangeVar@38..59
+    Ident@38..59 "parallel_vacuum_table"
+  Ascii40@59..60 "("
+  IndexElem@60..61
+    Ident@60..61 "a"
+  Ascii41@61..62 ")"
+  Ascii59@62..63 ";"
+

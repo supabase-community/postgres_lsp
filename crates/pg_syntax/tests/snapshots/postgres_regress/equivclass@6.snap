@@ -1,0 +1,40 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function int8alias2in(cstring) returns int8alias2\n  strict immutable language internal as 'int8in';"
+---
+CreateFunctionStmt@0..106
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..28 "int8alias2in"
+  Ascii40@28..29 "("
+  FunctionParameter@29..36
+    TypeName@29..36
+      Ident@29..36 "cstring"
+  Ascii41@36..37 ")"
+  Whitespace@37..38 " "
+  Returns@38..45 "returns"
+  Whitespace@45..46 " "
+  TypeName@46..56
+    Ident@46..56 "int8alias2"
+  Newline@56..57 "\n"
+  Whitespace@57..59 "  "
+  DefElem@59..65
+    StrictP@59..65 "strict"
+  Whitespace@65..66 " "
+  DefElem@66..75
+    Immutable@66..75 "immutable"
+  Whitespace@75..76 " "
+  DefElem@76..93
+    Language@76..84 "language"
+    Whitespace@84..85 " "
+    Ident@85..93 "internal"
+  Whitespace@93..94 " "
+  DefElem@94..105
+    As@94..96 "as"
+    Whitespace@96..97 " "
+    List@97..105
+      Sconst@97..105 "'int8in'"
+  Ascii59@105..106 ";"
+

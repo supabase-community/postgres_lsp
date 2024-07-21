@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create or replace function get_users() returns setof users as\n$$ SELECT * FROM users ORDER BY userid; $$\nlanguage sql stable;"
+---
+CreateFunctionStmt@0..125
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Or@7..9 "or"
+  Whitespace@9..10 " "
+  Replace@10..17 "replace"
+  Whitespace@17..18 " "
+  Function@18..26 "function"
+  Whitespace@26..27 " "
+  Ident@27..36 "get_users"
+  Ascii40@36..37 "("
+  Ascii41@37..38 ")"
+  Whitespace@38..39 " "
+  Returns@39..46 "returns"
+  Whitespace@46..47 " "
+  Setof@47..52 "setof"
+  Whitespace@52..53 " "
+  TypeName@53..58
+    Ident@53..58 "users"
+  Whitespace@58..59 " "
+  DefElem@59..104
+    As@59..61 "as"
+    Newline@61..62 "\n"
+    List@62..104
+      Sconst@62..104 "$$ SELECT * FROM user ..."
+  Newline@104..105 "\n"
+  DefElem@105..117
+    Language@105..113 "language"
+    Whitespace@113..114 " "
+    SqlP@114..117 "sql"
+  Whitespace@117..118 " "
+  DefElem@118..124
+    Stable@118..124 "stable"
+  Ascii59@124..125 ";"
+

@@ -1,0 +1,48 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '7' AS \"None\",\n   CASE WHEN random() < 0 THEN 1\n   END AS \"NULL on no matches\";"
+---
+SelectStmt@0..86
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..20
+    AConst@7..10
+      Sconst@7..10 "'7'"
+    Whitespace@10..11 " "
+    As@11..13 "AS"
+    Whitespace@13..14 " "
+    Ident@14..20 "\"None\""
+  Ascii44@20..21 ","
+  Newline@21..22 "\n"
+  Whitespace@22..25 "   "
+  ResTarget@25..85
+    CaseExpr@25..61
+      Case@25..29 "CASE"
+      Whitespace@29..30 " "
+      CaseWhen@30..54
+        When@30..34 "WHEN"
+        Whitespace@34..35 " "
+        AExpr@35..47
+          FuncCall@35..41
+            Ident@35..41 "random"
+          Ascii40@41..42 "("
+          Ascii41@42..43 ")"
+          Whitespace@43..44 " "
+          Ascii60@44..45 "<"
+          Whitespace@45..46 " "
+          AConst@46..47
+            Iconst@46..47 "0"
+        Whitespace@47..48 " "
+        Then@48..52 "THEN"
+        Whitespace@52..53 " "
+        AConst@53..54
+          Iconst@53..54 "1"
+      Newline@54..55 "\n"
+      Whitespace@55..58 "   "
+      EndP@58..61 "END"
+    Whitespace@61..62 " "
+    As@62..64 "AS"
+    Whitespace@64..65 " "
+    Ident@65..85 "\"NULL on no matches\""
+  Ascii59@85..86 ";"
+

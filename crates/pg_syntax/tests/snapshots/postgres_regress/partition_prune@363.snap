@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index tprt2_idx on tprt_2 (col1);
+---
+IndexStmt@0..40
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..22 "tprt2_idx"
+  Whitespace@22..23 " "
+  On@23..25 "on"
+  Whitespace@25..26 " "
+  RangeVar@26..32
+    Ident@26..32 "tprt_2"
+  Whitespace@32..33 " "
+  Ascii40@33..34 "("
+  IndexElem@34..38
+    Ident@34..38 "col1"
+  Ascii41@38..39 ")"
+  Ascii59@39..40 ";"
+

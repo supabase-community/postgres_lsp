@@ -1,0 +1,92 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select t1.q2, count(t2.*)\nfrom int8_tbl t1 left join (select * from int8_tbl) t2 on (t1.q2 = t2.q1)\ngroup by t1.q2 order by 1;"
+---
+SelectStmt@0..126
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..12
+    ColumnRef@7..12
+      Ident@7..9 "t1"
+      Ascii46@9..10 "."
+      Ident@10..12 "q2"
+  Ascii44@12..13 ","
+  Whitespace@13..14 " "
+  ResTarget@14..24
+    FuncCall@14..24
+      Ident@14..19 "count"
+      Ascii40@19..20 "("
+      ColumnRef@20..24
+        Ident@20..22 "t2"
+        Ascii46@22..23 "."
+        AStar@23..24
+          Ascii42@23..24 "*"
+  Ascii41@24..25 ")"
+  Newline@25..26 "\n"
+  From@26..30 "from"
+  Whitespace@30..31 " "
+  JoinExpr@31..98
+    RangeVar@31..42
+      Ident@31..39 "int8_tbl"
+      Whitespace@39..40 " "
+      Alias@40..42
+        Ident@40..42 "t1"
+    Whitespace@42..43 " "
+    Left@43..47 "left"
+    Whitespace@47..48 " "
+    Join@48..52 "join"
+    Whitespace@52..53 " "
+    Ascii40@53..54 "("
+    RangeSubselect@54..80
+      SelectStmt@54..76
+        Select@54..60 "select"
+        Whitespace@60..61 " "
+        ResTarget@61..62
+          ColumnRef@61..62
+            AStar@61..62
+              Ascii42@61..62 "*"
+        Whitespace@62..63 " "
+        From@63..67 "from"
+        Whitespace@67..68 " "
+        RangeVar@68..76
+          Ident@68..76 "int8_tbl"
+      Ascii41@76..77 ")"
+      Whitespace@77..78 " "
+      Alias@78..80
+        Ident@78..80 "t2"
+    Whitespace@80..81 " "
+    On@81..83 "on"
+    Whitespace@83..84 " "
+    Ascii40@84..85 "("
+    AExpr@85..98
+      ColumnRef@85..90
+        Ident@85..87 "t1"
+        Ascii46@87..88 "."
+        Ident@88..90 "q2"
+      Whitespace@90..91 " "
+      Ascii61@91..92 "="
+      Whitespace@92..93 " "
+      ColumnRef@93..98
+        Ident@93..95 "t2"
+        Ascii46@95..96 "."
+        Ident@96..98 "q1"
+  Ascii41@98..99 ")"
+  Newline@99..100 "\n"
+  GroupP@100..105 "group"
+  Whitespace@105..106 " "
+  By@106..108 "by"
+  Whitespace@108..109 " "
+  ColumnRef@109..114
+    Ident@109..111 "t1"
+    Ascii46@111..112 "."
+    Ident@112..114 "q2"
+  Whitespace@114..115 " "
+  SortBy@115..125
+    Order@115..120 "order"
+    Whitespace@120..121 " "
+    By@121..123 "by"
+    Whitespace@123..124 " "
+    AConst@124..125
+      Iconst@124..125 "1"
+  Ascii59@125..126 ";"
+

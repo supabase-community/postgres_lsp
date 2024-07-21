@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create function testrngfunc() returns setof rngfunc_type as $$\n  select 7.136178319899999964, 7.136178319899999964;\n$$ language sql immutable;"
+---
+CreateFunctionStmt@0..142
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Function@7..15 "function"
+  Whitespace@15..16 " "
+  Ident@16..27 "testrngfunc"
+  Ascii40@27..28 "("
+  Ascii41@28..29 ")"
+  Whitespace@29..30 " "
+  Returns@30..37 "returns"
+  Whitespace@37..38 " "
+  Setof@38..43 "setof"
+  Whitespace@43..44 " "
+  TypeName@44..56
+    Ident@44..56 "rngfunc_type"
+  Whitespace@56..57 " "
+  DefElem@57..118
+    As@57..59 "as"
+    Whitespace@59..60 " "
+    List@60..118
+      Sconst@60..118 "$$\n  select 7.1361783 ..."
+  Whitespace@118..119 " "
+  DefElem@119..131
+    Language@119..127 "language"
+    Whitespace@127..128 " "
+    SqlP@128..131 "sql"
+  Whitespace@131..132 " "
+  DefElem@132..141
+    Immutable@132..141 "immutable"
+  Ascii59@141..142 ";"
+

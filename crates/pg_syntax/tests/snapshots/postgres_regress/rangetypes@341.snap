@@ -1,0 +1,34 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select anycompatiblearray_anycompatiblerange_func(ARRAY[1,2], numrange(10,20));"
+---
+SelectStmt@0..79
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..76
+    FuncCall@7..76
+      Ident@7..49 "anycompatiblearray_an ..."
+      Ascii40@49..50 "("
+      AArrayExpr@50..59
+        Array@50..55 "ARRAY"
+        Ascii91@55..56 "["
+        AConst@56..57
+          Iconst@56..57 "1"
+        Ascii44@57..58 ","
+        AConst@58..59
+          Iconst@58..59 "2"
+      Ascii93@59..60 "]"
+      Ascii44@60..61 ","
+      Whitespace@61..62 " "
+      FuncCall@62..76
+        Ident@62..70 "numrange"
+        Ascii40@70..71 "("
+        AConst@71..73
+          Iconst@71..73 "10"
+        Ascii44@73..74 ","
+        AConst@74..76
+          Iconst@74..76 "20"
+  Ascii41@76..77 ")"
+  Ascii41@77..78 ")"
+  Ascii59@78..79 ";"
+

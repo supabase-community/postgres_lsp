@@ -1,0 +1,37 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION volfoo(text) returns foodomain as\n  'begin return $1::foodomain; end' language plpgsql volatile;"
+---
+CreateFunctionStmt@0..112
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..22 "volfoo"
+  Ascii40@22..23 "("
+  FunctionParameter@23..27
+    TypeName@23..27
+      TextP@23..27 "text"
+  Ascii41@27..28 ")"
+  Whitespace@28..29 " "
+  Returns@29..36 "returns"
+  Whitespace@36..37 " "
+  TypeName@37..46
+    Ident@37..46 "foodomain"
+  Whitespace@46..47 " "
+  DefElem@47..85
+    As@47..49 "as"
+    Newline@49..50 "\n"
+    Whitespace@50..52 "  "
+    List@52..85
+      Sconst@52..85 "'begin return $1::foo ..."
+  Whitespace@85..86 " "
+  DefElem@86..102
+    Language@86..94 "language"
+    Whitespace@94..95 " "
+    Ident@95..102 "plpgsql"
+  Whitespace@102..103 " "
+  DefElem@103..111
+    Volatile@103..111 "volatile"
+  Ascii59@111..112 ";"
+

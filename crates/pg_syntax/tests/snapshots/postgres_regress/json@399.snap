@@ -1,0 +1,36 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from json_to_record('{\"ia\": [[1, 2], [3, 4]]}') as x(ia _int4);"
+---
+SelectStmt@0..72
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..70
+    List@14..55
+      FuncCall@14..55
+        Ident@14..28 "json_to_record"
+        Ascii40@28..29 "("
+        AConst@29..55
+          Sconst@29..55 "'{\"ia\": [[1, 2], [3,  ..."
+    Ascii41@55..56 ")"
+    Whitespace@56..57 " "
+    Alias@57..61
+      As@57..59 "as"
+      Whitespace@59..60 " "
+      Ident@60..61 "x"
+    Ascii40@61..62 "("
+    ColumnDef@62..70
+      Ident@62..64 "ia"
+      Whitespace@64..65 " "
+      TypeName@65..70
+        Ident@65..70 "_int4"
+  Ascii41@70..71 ")"
+  Ascii59@71..72 ";"
+

@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '4714-11-24 BC'::timestamp < '2020-10-05'::timestamptz as t;"
+---
+SelectStmt@0..67
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..66
+    AExpr@7..61
+      TypeCast@7..33
+        AConst@7..22
+          Sconst@7..22 "'4714-11-24 BC'"
+        Typecast@22..24 "::"
+        TypeName@24..33
+          Timestamp@24..33 "timestamp"
+      Whitespace@33..34 " "
+      Ascii60@34..35 "<"
+      Whitespace@35..36 " "
+      TypeCast@36..61
+        AConst@36..48
+          Sconst@36..48 "'2020-10-05'"
+        Typecast@48..50 "::"
+        TypeName@50..61
+          Ident@50..61 "timestamptz"
+    Whitespace@61..62 " "
+    As@62..64 "as"
+    Whitespace@64..65 " "
+    Ident@65..66 "t"
+  Ascii59@66..67 ";"
+

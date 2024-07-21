@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table rlp2 partition of rlp for values from (1) to (10);
+---
+CreateStmt@0..63
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..17
+    Ident@13..17 "rlp2"
+  Whitespace@17..18 " "
+  Partition@18..27 "partition"
+  Whitespace@27..28 " "
+  Of@28..30 "of"
+  Whitespace@30..31 " "
+  RangeVar@31..34
+    Ident@31..34 "rlp"
+  Whitespace@34..35 " "
+  For@35..38 "for"
+  Whitespace@38..39 " "
+  Values@39..45 "values"
+  Whitespace@45..46 " "
+  PartitionBoundSpec@46..61
+    From@46..50 "from"
+    Whitespace@50..51 " "
+    Ascii40@51..52 "("
+    AConst@52..53
+      Iconst@52..53 "1"
+    Ascii41@53..54 ")"
+    Whitespace@54..55 " "
+    To@55..57 "to"
+    Whitespace@57..58 " "
+    Ascii40@58..59 "("
+    AConst@59..61
+      Iconst@59..61 "10"
+  Ascii41@61..62 ")"
+  Ascii59@62..63 ";"
+

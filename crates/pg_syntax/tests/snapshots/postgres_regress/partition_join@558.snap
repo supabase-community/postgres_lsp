@@ -1,0 +1,51 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE beta_pos PARTITION OF beta FOR VALUES FROM (0) TO ('Infinity') PARTITION BY LIST (c);"
+---
+CreateStmt@0..98
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..21
+    Ident@13..21 "beta_pos"
+  Whitespace@21..22 " "
+  Partition@22..31 "PARTITION"
+  Whitespace@31..32 " "
+  Of@32..34 "OF"
+  Whitespace@34..35 " "
+  RangeVar@35..39
+    Ident@35..39 "beta"
+  Whitespace@39..40 " "
+  For@40..43 "FOR"
+  Whitespace@43..44 " "
+  Values@44..50 "VALUES"
+  Whitespace@50..51 " "
+  PartitionBoundSpec@51..74
+    From@51..55 "FROM"
+    Whitespace@55..56 " "
+    Ascii40@56..57 "("
+    AConst@57..58
+      Iconst@57..58 "0"
+    Ascii41@58..59 ")"
+    Whitespace@59..60 " "
+    To@60..62 "TO"
+    Whitespace@62..63 " "
+    Ascii40@63..64 "("
+    AConst@64..74
+      Sconst@64..74 "'Infinity'"
+  Ascii41@74..75 ")"
+  Whitespace@75..76 " "
+  PartitionSpec@76..96
+    Partition@76..85 "PARTITION"
+    Whitespace@85..86 " "
+    By@86..88 "BY"
+    Whitespace@88..89 " "
+    Ident@89..93 "LIST"
+    Whitespace@93..94 " "
+    Ascii40@94..95 "("
+    PartitionElem@95..96
+      Ident@95..96 "c"
+  Ascii41@96..97 ")"
+  Ascii59@97..98 ";"
+

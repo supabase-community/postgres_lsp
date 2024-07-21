@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX nummultirange_test_btree ON nummultirange_test(nmr);
+---
+IndexStmt@0..65
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..37 "nummultirange_test_btree"
+  Whitespace@37..38 " "
+  On@38..40 "ON"
+  Whitespace@40..41 " "
+  RangeVar@41..59
+    Ident@41..59 "nummultirange_test"
+  Ascii40@59..60 "("
+  IndexElem@60..63
+    Ident@60..63 "nmr"
+  Ascii41@63..64 ")"
+  Ascii59@64..65 ";"
+

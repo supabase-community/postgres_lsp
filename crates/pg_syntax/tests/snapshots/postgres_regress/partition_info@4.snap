@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT * FROM pg_partition_ancestors(0);
+---
+SelectStmt@0..40
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeFunction@14..38
+    List@14..38
+      FuncCall@14..38
+        Ident@14..36 "pg_partition_ancestors"
+        Ascii40@36..37 "("
+        AConst@37..38
+          Iconst@37..38 "0"
+  Ascii41@38..39 ")"
+  Ascii59@39..40 ";"
+

@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into b (a, num) values ('p', 1);"
+---
+InsertStmt@0..39
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..13
+    Ident@12..13 "b"
+  Whitespace@13..14 " "
+  Ascii40@14..15 "("
+  ResTarget@15..16
+    Ident@15..16 "a"
+  Ascii44@16..17 ","
+  Whitespace@17..18 " "
+  ResTarget@18..21
+    Ident@18..21 "num"
+  Ascii41@21..22 ")"
+  Whitespace@22..23 " "
+  SelectStmt@23..37
+    Values@23..29 "values"
+    Whitespace@29..30 " "
+    Ascii40@30..31 "("
+    List@31..37
+      AConst@31..34
+        Sconst@31..34 "'p'"
+      Ascii44@34..35 ","
+      Whitespace@35..36 " "
+      AConst@36..37
+        Iconst@36..37 "1"
+  Ascii41@37..38 ")"
+  Ascii59@38..39 ";"
+

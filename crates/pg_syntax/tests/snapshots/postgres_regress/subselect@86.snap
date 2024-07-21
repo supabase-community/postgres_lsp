@@ -1,0 +1,43 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into numeric_table values (1), (1.000000000000000000001), (2), (3);"
+---
+InsertStmt@0..74
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..25
+    Ident@12..25 "numeric_table"
+  Whitespace@25..26 " "
+  SelectStmt@26..72
+    Values@26..32 "values"
+    Whitespace@32..33 " "
+    Ascii40@33..34 "("
+    List@34..35
+      AConst@34..35
+        Iconst@34..35 "1"
+    Ascii41@35..36 ")"
+    Ascii44@36..37 ","
+    Whitespace@37..38 " "
+    Ascii40@38..39 "("
+    List@39..62
+      AConst@39..62
+        Fconst@39..62 "1.000000000000000000001"
+    Ascii41@62..63 ")"
+    Ascii44@63..64 ","
+    Whitespace@64..65 " "
+    Ascii40@65..66 "("
+    List@66..67
+      AConst@66..67
+        Iconst@66..67 "2"
+    Ascii41@67..68 ")"
+    Ascii44@68..69 ","
+    Whitespace@69..70 " "
+    Ascii40@70..71 "("
+    List@71..72
+      AConst@71..72
+        Iconst@71..72 "3"
+  Ascii41@72..73 ")"
+  Ascii59@73..74 ";"
+

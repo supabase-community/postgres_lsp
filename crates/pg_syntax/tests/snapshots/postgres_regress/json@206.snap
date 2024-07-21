@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from json_array_elements_text('[1,true,[1,[2,3]],null,{\"f1\":1,\"f2\":[7,8,9]},false,\"stringy\"]') q;"
+---
+SelectStmt@0..106
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..105
+    List@14..102
+      FuncCall@14..102
+        Ident@14..38 "json_array_elements_text"
+        Ascii40@38..39 "("
+        AConst@39..102
+          Sconst@39..102 "'[1,true,[1,[2,3]],nu ..."
+    Ascii41@102..103 ")"
+    Whitespace@103..104 " "
+    Alias@104..105
+      Ident@104..105 "q"
+  Ascii59@105..106 ";"
+

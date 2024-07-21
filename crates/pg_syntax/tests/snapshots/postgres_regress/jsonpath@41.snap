@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '$.g ? (@.x >= @[*]?(@.a > \"abc\"))'::jsonpath;"
+---
+SelectStmt@0..53
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..52
+    TypeCast@7..52
+      AConst@7..42
+        Sconst@7..42 "'$.g ? (@.x >= @[*]?( ..."
+      Typecast@42..44 "::"
+      TypeName@44..52
+        Ident@44..52 "jsonpath"
+  Ascii59@52..53 ";"
+

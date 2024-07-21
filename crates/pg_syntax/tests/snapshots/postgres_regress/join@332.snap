@@ -1,0 +1,113 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select f1, unique2, case when unique2 is null then f1 else 0 end\n  from int4_tbl a left join tenk1 b on f1 = unique2\n  where (case when unique2 is null then f1 else 0 end) = 0;"
+---
+SelectStmt@0..176
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..9
+    ColumnRef@7..9
+      Ident@7..9 "f1"
+  Ascii44@9..10 ","
+  Whitespace@10..11 " "
+  ResTarget@11..18
+    ColumnRef@11..18
+      Ident@11..18 "unique2"
+  Ascii44@18..19 ","
+  Whitespace@19..20 " "
+  ResTarget@20..64
+    CaseExpr@20..64
+      Case@20..24 "case"
+      Whitespace@24..25 " "
+      CaseWhen@25..53
+        When@25..29 "when"
+        Whitespace@29..30 " "
+        NullTest@30..45
+          ColumnRef@30..37
+            Ident@30..37 "unique2"
+          Whitespace@37..38 " "
+          Is@38..40 "is"
+          Whitespace@40..41 " "
+          NullP@41..45 "null"
+        Whitespace@45..46 " "
+        Then@46..50 "then"
+        Whitespace@50..51 " "
+        ColumnRef@51..53
+          Ident@51..53 "f1"
+      Whitespace@53..54 " "
+      Else@54..58 "else"
+      Whitespace@58..59 " "
+      AConst@59..60
+        Iconst@59..60 "0"
+      Whitespace@60..61 " "
+      EndP@61..64 "end"
+  Newline@64..65 "\n"
+  Whitespace@65..67 "  "
+  From@67..71 "from"
+  Whitespace@71..72 " "
+  JoinExpr@72..116
+    RangeVar@72..82
+      Ident@72..80 "int4_tbl"
+      Whitespace@80..81 " "
+      Alias@81..82
+        Ident@81..82 "a"
+    Whitespace@82..83 " "
+    Left@83..87 "left"
+    Whitespace@87..88 " "
+    Join@88..92 "join"
+    Whitespace@92..93 " "
+    RangeVar@93..100
+      Ident@93..98 "tenk1"
+      Whitespace@98..99 " "
+      Alias@99..100
+        Ident@99..100 "b"
+    Whitespace@100..101 " "
+    On@101..103 "on"
+    Whitespace@103..104 " "
+    AExpr@104..116
+      ColumnRef@104..106
+        Ident@104..106 "f1"
+      Whitespace@106..107 " "
+      Ascii61@107..108 "="
+      Whitespace@108..109 " "
+      ColumnRef@109..116
+        Ident@109..116 "unique2"
+  Newline@116..117 "\n"
+  Whitespace@117..119 "  "
+  Where@119..124 "where"
+  Whitespace@124..125 " "
+  Ascii40@125..126 "("
+  AExpr@126..175
+    CaseExpr@126..170
+      Case@126..130 "case"
+      Whitespace@130..131 " "
+      CaseWhen@131..159
+        When@131..135 "when"
+        Whitespace@135..136 " "
+        NullTest@136..151
+          ColumnRef@136..143
+            Ident@136..143 "unique2"
+          Whitespace@143..144 " "
+          Is@144..146 "is"
+          Whitespace@146..147 " "
+          NullP@147..151 "null"
+        Whitespace@151..152 " "
+        Then@152..156 "then"
+        Whitespace@156..157 " "
+        ColumnRef@157..159
+          Ident@157..159 "f1"
+      Whitespace@159..160 " "
+      Else@160..164 "else"
+      Whitespace@164..165 " "
+      AConst@165..166
+        Iconst@165..166 "0"
+      Whitespace@166..167 " "
+      EndP@167..170 "end"
+    Ascii41@170..171 ")"
+    Whitespace@171..172 " "
+    Ascii61@172..173 "="
+    Whitespace@173..174 " "
+    AConst@174..175
+      Iconst@174..175 "0"
+  Ascii59@175..176 ";"
+

@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '-32768.4'::float4::int2;"
+---
+SelectStmt@0..32
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..31
+    TypeCast@7..31
+      TypeCast@7..25
+        AConst@7..17
+          Sconst@7..17 "'-32768.4'"
+        Typecast@17..19 "::"
+        TypeName@19..25
+          Ident@19..25 "float4"
+      Typecast@25..27 "::"
+      TypeName@27..31
+        Ident@27..31 "int2"
+  Ascii59@31..32 ";"
+

@@ -1,0 +1,38 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select count(*) from test_range_spgist where ir <@ int4range(10,50);"
+---
+SelectStmt@0..68
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "from"
+  Whitespace@20..21 " "
+  RangeVar@21..38
+    Ident@21..38 "test_range_spgist"
+  Whitespace@38..39 " "
+  Where@39..44 "where"
+  Whitespace@44..45 " "
+  AExpr@45..66
+    ColumnRef@45..47
+      Ident@45..47 "ir"
+    Whitespace@47..48 " "
+    Op@48..50 "<@"
+    Whitespace@50..51 " "
+    FuncCall@51..66
+      Ident@51..60 "int4range"
+      Ascii40@60..61 "("
+      AConst@61..63
+        Iconst@61..63 "10"
+      Ascii44@63..64 ","
+      AConst@64..66
+        Iconst@64..66 "50"
+  Ascii41@66..67 ")"
+  Ascii59@67..68 ";"
+

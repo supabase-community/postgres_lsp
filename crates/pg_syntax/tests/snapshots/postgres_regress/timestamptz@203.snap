@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO TIMESTAMPTZ_TST VALUES(4, '1000000312 23:58:48 IST');"
+---
+InsertStmt@0..65
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "TIMESTAMPTZ_TST"
+  Whitespace@27..28 " "
+  SelectStmt@28..63
+    Values@28..34 "VALUES"
+    Ascii40@34..35 "("
+    List@35..63
+      AConst@35..36
+        Iconst@35..36 "4"
+      Ascii44@36..37 ","
+      Whitespace@37..38 " "
+      AConst@38..63
+        Sconst@38..63 "'1000000312 23:58:48  ..."
+  Ascii41@63..64 ")"
+  Ascii59@64..65 ";"
+

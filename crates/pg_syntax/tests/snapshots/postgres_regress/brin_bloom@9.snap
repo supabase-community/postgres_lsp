@@ -1,0 +1,825 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO brinopers_bloom VALUES\n\t('byteacol', 'bytea',\n\t '{=}',\n\t '{BNAAAABNAAAABNAAAABNAAAABNAAAABNAAAABNAAAABNAAAA}',\n\t '{1}'),\n\t('charcol', '\"char\"',\n\t '{=}',\n\t '{M}',\n\t '{6}'),\n\t('namecol', 'name',\n\t '{=}',\n\t '{MAAAAA}',\n\t '{2}'),\n\t('int2col', 'int2',\n\t '{=}',\n\t '{800}',\n\t '{1}'),\n\t('int4col', 'int4',\n\t '{=}',\n\t '{800}',\n\t '{1}'),\n\t('int8col', 'int8',\n\t '{=}',\n\t '{1257141600}',\n\t '{1}'),\n\t('textcol', 'text',\n\t '{=}',\n\t '{BNAAAABNAAAABNAAAABNAAAABNAAAABNAAAABNAAAABNAAAA}',\n\t '{1}'),\n\t('oidcol', 'oid',\n\t '{=}',\n\t '{8800}',\n\t '{1}'),\n\t('float4col', 'float4',\n\t '{=}',\n\t '{1}',\n\t '{4}'),\n\t('float8col', 'float8',\n\t '{=}',\n\t '{0}',\n\t '{1}'),\n\t('macaddrcol', 'macaddr',\n\t '{=}',\n\t '{2c:00:2d:00:16:00}',\n\t '{2}'),\n\t('inetcol', 'inet',\n\t '{=}',\n\t '{10.2.14.231/24}',\n\t '{1}'),\n\t('inetcol', 'cidr',\n\t '{=}',\n\t '{fe80::6e40:8ff:fea9:8c46}',\n\t '{1}'),\n\t('cidrcol', 'inet',\n\t '{=}',\n\t '{10.2.14/24}',\n\t '{2}'),\n\t('cidrcol', 'inet',\n\t '{=}',\n\t '{fe80::6e40:8ff:fea9:8c46}',\n\t '{1}'),\n\t('cidrcol', 'cidr',\n\t '{=}',\n\t '{10.2.14/24}',\n\t '{2}'),\n\t('cidrcol', 'cidr',\n\t '{=}',\n\t '{fe80::6e40:8ff:fea9:8c46}',\n\t '{1}'),\n\t('bpcharcol', 'bpchar',\n\t '{=}',\n\t '{W}',\n\t '{6}'),\n\t('datecol', 'date',\n\t '{=}',\n\t '{2009-12-01}',\n\t '{1}'),\n\t('timecol', 'time',\n\t '{=}',\n\t '{02:28:57}',\n\t '{1}'),\n\t('timestampcol', 'timestamp',\n\t '{=}',\n\t '{1964-03-24 19:26:45}',\n\t '{1}'),\n\t('timestamptzcol', 'timestamptz',\n\t '{=}',\n\t '{1972-10-19 09:00:00-07}',\n\t '{1}'),\n\t('intervalcol', 'interval',\n\t '{=}',\n\t '{1 mons 13 days 12:24}',\n\t '{1}'),\n\t('timetzcol', 'timetz',\n\t '{=}',\n\t '{01:35:50+02}',\n\t '{2}'),\n\t('numericcol', 'numeric',\n\t '{=}',\n\t '{2268164.347826086956521739130434782609}',\n\t '{1}'),\n\t('uuidcol', 'uuid',\n\t '{=}',\n\t '{52225222-5222-5222-5222-522252225222}',\n\t '{1}'),\n\t('lsncol', 'pg_lsn',\n\t '{=, IS, IS NOT}',\n\t '{44/455222, NULL, NULL}',\n\t '{1, 25, 100}');"
+---
+InsertStmt@0..1848
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..27
+    Ident@12..27 "brinopers_bloom"
+  Whitespace@27..28 " "
+  SelectStmt@28..1846
+    Values@28..34 "VALUES"
+    Newline@34..35 "\n"
+    Newline@35..36 "\t"
+    Ascii40@36..37 "("
+    List@37..130
+      AConst@37..47
+        Sconst@37..47 "'byteacol'"
+      Ascii44@47..48 ","
+      Whitespace@48..49 " "
+      AConst@49..56
+        Sconst@49..56 "'bytea'"
+      Ascii44@56..57 ","
+      Newline@57..58 "\n"
+      Newline@58..59 "\t"
+      Whitespace@59..60 " "
+      AConst@60..65
+        Sconst@60..65 "'{=}'"
+      Ascii44@65..66 ","
+      Newline@66..67 "\n"
+      Newline@67..68 "\t"
+      Whitespace@68..69 " "
+      AConst@69..121
+        Sconst@69..121 "'{BNAAAABNAAAABNAAAAB ..."
+      Ascii44@121..122 ","
+      Newline@122..123 "\n"
+      Newline@123..124 "\t"
+      Whitespace@124..125 " "
+      AConst@125..130
+        Sconst@125..130 "'{1}'"
+    Ascii41@130..131 ")"
+    Ascii44@131..132 ","
+    Newline@132..133 "\n"
+    Newline@133..134 "\t"
+    Ascii40@134..135 "("
+    List@135..181
+      AConst@135..144
+        Sconst@135..144 "'charcol'"
+      Ascii44@144..145 ","
+      Whitespace@145..146 " "
+      AConst@146..154
+        Sconst@146..154 "'\"char\"'"
+      Ascii44@154..155 ","
+      Newline@155..156 "\n"
+      Newline@156..157 "\t"
+      Whitespace@157..158 " "
+      AConst@158..163
+        Sconst@158..163 "'{=}'"
+      Ascii44@163..164 ","
+      Newline@164..165 "\n"
+      Newline@165..166 "\t"
+      Whitespace@166..167 " "
+      AConst@167..172
+        Sconst@167..172 "'{M}'"
+      Ascii44@172..173 ","
+      Newline@173..174 "\n"
+      Newline@174..175 "\t"
+      Whitespace@175..176 " "
+      AConst@176..181
+        Sconst@176..181 "'{6}'"
+    Ascii41@181..182 ")"
+    Ascii44@182..183 ","
+    Newline@183..184 "\n"
+    Newline@184..185 "\t"
+    Ascii40@185..186 "("
+    List@186..235
+      AConst@186..195
+        Sconst@186..195 "'namecol'"
+      Ascii44@195..196 ","
+      Whitespace@196..197 " "
+      AConst@197..203
+        Sconst@197..203 "'name'"
+      Ascii44@203..204 ","
+      Newline@204..205 "\n"
+      Newline@205..206 "\t"
+      Whitespace@206..207 " "
+      AConst@207..212
+        Sconst@207..212 "'{=}'"
+      Ascii44@212..213 ","
+      Newline@213..214 "\n"
+      Newline@214..215 "\t"
+      Whitespace@215..216 " "
+      AConst@216..226
+        Sconst@216..226 "'{MAAAAA}'"
+      Ascii44@226..227 ","
+      Newline@227..228 "\n"
+      Newline@228..229 "\t"
+      Whitespace@229..230 " "
+      AConst@230..235
+        Sconst@230..235 "'{2}'"
+    Ascii41@235..236 ")"
+    Ascii44@236..237 ","
+    Newline@237..238 "\n"
+    Newline@238..239 "\t"
+    Ascii40@239..240 "("
+    List@240..286
+      AConst@240..249
+        Sconst@240..249 "'int2col'"
+      Ascii44@249..250 ","
+      Whitespace@250..251 " "
+      AConst@251..257
+        Sconst@251..257 "'int2'"
+      Ascii44@257..258 ","
+      Newline@258..259 "\n"
+      Newline@259..260 "\t"
+      Whitespace@260..261 " "
+      AConst@261..266
+        Sconst@261..266 "'{=}'"
+      Ascii44@266..267 ","
+      Newline@267..268 "\n"
+      Newline@268..269 "\t"
+      Whitespace@269..270 " "
+      AConst@270..277
+        Sconst@270..277 "'{800}'"
+      Ascii44@277..278 ","
+      Newline@278..279 "\n"
+      Newline@279..280 "\t"
+      Whitespace@280..281 " "
+      AConst@281..286
+        Sconst@281..286 "'{1}'"
+    Ascii41@286..287 ")"
+    Ascii44@287..288 ","
+    Newline@288..289 "\n"
+    Newline@289..290 "\t"
+    Ascii40@290..291 "("
+    List@291..337
+      AConst@291..300
+        Sconst@291..300 "'int4col'"
+      Ascii44@300..301 ","
+      Whitespace@301..302 " "
+      AConst@302..308
+        Sconst@302..308 "'int4'"
+      Ascii44@308..309 ","
+      Newline@309..310 "\n"
+      Newline@310..311 "\t"
+      Whitespace@311..312 " "
+      AConst@312..317
+        Sconst@312..317 "'{=}'"
+      Ascii44@317..318 ","
+      Newline@318..319 "\n"
+      Newline@319..320 "\t"
+      Whitespace@320..321 " "
+      AConst@321..328
+        Sconst@321..328 "'{800}'"
+      Ascii44@328..329 ","
+      Newline@329..330 "\n"
+      Newline@330..331 "\t"
+      Whitespace@331..332 " "
+      AConst@332..337
+        Sconst@332..337 "'{1}'"
+    Ascii41@337..338 ")"
+    Ascii44@338..339 ","
+    Newline@339..340 "\n"
+    Newline@340..341 "\t"
+    Ascii40@341..342 "("
+    List@342..395
+      AConst@342..351
+        Sconst@342..351 "'int8col'"
+      Ascii44@351..352 ","
+      Whitespace@352..353 " "
+      AConst@353..359
+        Sconst@353..359 "'int8'"
+      Ascii44@359..360 ","
+      Newline@360..361 "\n"
+      Newline@361..362 "\t"
+      Whitespace@362..363 " "
+      AConst@363..368
+        Sconst@363..368 "'{=}'"
+      Ascii44@368..369 ","
+      Newline@369..370 "\n"
+      Newline@370..371 "\t"
+      Whitespace@371..372 " "
+      AConst@372..386
+        Sconst@372..386 "'{1257141600}'"
+      Ascii44@386..387 ","
+      Newline@387..388 "\n"
+      Newline@388..389 "\t"
+      Whitespace@389..390 " "
+      AConst@390..395
+        Sconst@390..395 "'{1}'"
+    Ascii41@395..396 ")"
+    Ascii44@396..397 ","
+    Newline@397..398 "\n"
+    Newline@398..399 "\t"
+    Ascii40@399..400 "("
+    List@400..491
+      AConst@400..409
+        Sconst@400..409 "'textcol'"
+      Ascii44@409..410 ","
+      Whitespace@410..411 " "
+      AConst@411..417
+        Sconst@411..417 "'text'"
+      Ascii44@417..418 ","
+      Newline@418..419 "\n"
+      Newline@419..420 "\t"
+      Whitespace@420..421 " "
+      AConst@421..426
+        Sconst@421..426 "'{=}'"
+      Ascii44@426..427 ","
+      Newline@427..428 "\n"
+      Newline@428..429 "\t"
+      Whitespace@429..430 " "
+      AConst@430..482
+        Sconst@430..482 "'{BNAAAABNAAAABNAAAAB ..."
+      Ascii44@482..483 ","
+      Newline@483..484 "\n"
+      Newline@484..485 "\t"
+      Whitespace@485..486 " "
+      AConst@486..491
+        Sconst@486..491 "'{1}'"
+    Ascii41@491..492 ")"
+    Ascii44@492..493 ","
+    Newline@493..494 "\n"
+    Newline@494..495 "\t"
+    Ascii40@495..496 "("
+    List@496..541
+      AConst@496..504
+        Sconst@496..504 "'oidcol'"
+      Ascii44@504..505 ","
+      Whitespace@505..506 " "
+      AConst@506..511
+        Sconst@506..511 "'oid'"
+      Ascii44@511..512 ","
+      Newline@512..513 "\n"
+      Newline@513..514 "\t"
+      Whitespace@514..515 " "
+      AConst@515..520
+        Sconst@515..520 "'{=}'"
+      Ascii44@520..521 ","
+      Newline@521..522 "\n"
+      Newline@522..523 "\t"
+      Whitespace@523..524 " "
+      AConst@524..532
+        Sconst@524..532 "'{8800}'"
+      Ascii44@532..533 ","
+      Newline@533..534 "\n"
+      Newline@534..535 "\t"
+      Whitespace@535..536 " "
+      AConst@536..541
+        Sconst@536..541 "'{1}'"
+    Ascii41@541..542 ")"
+    Ascii44@542..543 ","
+    Newline@543..544 "\n"
+    Newline@544..545 "\t"
+    Ascii40@545..546 "("
+    List@546..594
+      AConst@546..557
+        Sconst@546..557 "'float4col'"
+      Ascii44@557..558 ","
+      Whitespace@558..559 " "
+      AConst@559..567
+        Sconst@559..567 "'float4'"
+      Ascii44@567..568 ","
+      Newline@568..569 "\n"
+      Newline@569..570 "\t"
+      Whitespace@570..571 " "
+      AConst@571..576
+        Sconst@571..576 "'{=}'"
+      Ascii44@576..577 ","
+      Newline@577..578 "\n"
+      Newline@578..579 "\t"
+      Whitespace@579..580 " "
+      AConst@580..585
+        Sconst@580..585 "'{1}'"
+      Ascii44@585..586 ","
+      Newline@586..587 "\n"
+      Newline@587..588 "\t"
+      Whitespace@588..589 " "
+      AConst@589..594
+        Sconst@589..594 "'{4}'"
+    Ascii41@594..595 ")"
+    Ascii44@595..596 ","
+    Newline@596..597 "\n"
+    Newline@597..598 "\t"
+    Ascii40@598..599 "("
+    List@599..647
+      AConst@599..610
+        Sconst@599..610 "'float8col'"
+      Ascii44@610..611 ","
+      Whitespace@611..612 " "
+      AConst@612..620
+        Sconst@612..620 "'float8'"
+      Ascii44@620..621 ","
+      Newline@621..622 "\n"
+      Newline@622..623 "\t"
+      Whitespace@623..624 " "
+      AConst@624..629
+        Sconst@624..629 "'{=}'"
+      Ascii44@629..630 ","
+      Newline@630..631 "\n"
+      Newline@631..632 "\t"
+      Whitespace@632..633 " "
+      AConst@633..638
+        Sconst@633..638 "'{0}'"
+      Ascii44@638..639 ","
+      Newline@639..640 "\n"
+      Newline@640..641 "\t"
+      Whitespace@641..642 " "
+      AConst@642..647
+        Sconst@642..647 "'{1}'"
+    Ascii41@647..648 ")"
+    Ascii44@648..649 ","
+    Newline@649..650 "\n"
+    Newline@650..651 "\t"
+    Ascii40@651..652 "("
+    List@652..718
+      AConst@652..664
+        Sconst@652..664 "'macaddrcol'"
+      Ascii44@664..665 ","
+      Whitespace@665..666 " "
+      AConst@666..675
+        Sconst@666..675 "'macaddr'"
+      Ascii44@675..676 ","
+      Newline@676..677 "\n"
+      Newline@677..678 "\t"
+      Whitespace@678..679 " "
+      AConst@679..684
+        Sconst@679..684 "'{=}'"
+      Ascii44@684..685 ","
+      Newline@685..686 "\n"
+      Newline@686..687 "\t"
+      Whitespace@687..688 " "
+      AConst@688..709
+        Sconst@688..709 "'{2c:00:2d:00:16:00}'"
+      Ascii44@709..710 ","
+      Newline@710..711 "\n"
+      Newline@711..712 "\t"
+      Whitespace@712..713 " "
+      AConst@713..718
+        Sconst@713..718 "'{2}'"
+    Ascii41@718..719 ")"
+    Ascii44@719..720 ","
+    Newline@720..721 "\n"
+    Newline@721..722 "\t"
+    Ascii40@722..723 "("
+    List@723..780
+      AConst@723..732
+        Sconst@723..732 "'inetcol'"
+      Ascii44@732..733 ","
+      Whitespace@733..734 " "
+      AConst@734..740
+        Sconst@734..740 "'inet'"
+      Ascii44@740..741 ","
+      Newline@741..742 "\n"
+      Newline@742..743 "\t"
+      Whitespace@743..744 " "
+      AConst@744..749
+        Sconst@744..749 "'{=}'"
+      Ascii44@749..750 ","
+      Newline@750..751 "\n"
+      Newline@751..752 "\t"
+      Whitespace@752..753 " "
+      AConst@753..771
+        Sconst@753..771 "'{10.2.14.231/24}'"
+      Ascii44@771..772 ","
+      Newline@772..773 "\n"
+      Newline@773..774 "\t"
+      Whitespace@774..775 " "
+      AConst@775..780
+        Sconst@775..780 "'{1}'"
+    Ascii41@780..781 ")"
+    Ascii44@781..782 ","
+    Newline@782..783 "\n"
+    Newline@783..784 "\t"
+    Ascii40@784..785 "("
+    List@785..852
+      AConst@785..794
+        Sconst@785..794 "'inetcol'"
+      Ascii44@794..795 ","
+      Whitespace@795..796 " "
+      AConst@796..802
+        Sconst@796..802 "'cidr'"
+      Ascii44@802..803 ","
+      Newline@803..804 "\n"
+      Newline@804..805 "\t"
+      Whitespace@805..806 " "
+      AConst@806..811
+        Sconst@806..811 "'{=}'"
+      Ascii44@811..812 ","
+      Newline@812..813 "\n"
+      Newline@813..814 "\t"
+      Whitespace@814..815 " "
+      AConst@815..843
+        Sconst@815..843 "'{fe80::6e40:8ff:fea9 ..."
+      Ascii44@843..844 ","
+      Newline@844..845 "\n"
+      Newline@845..846 "\t"
+      Whitespace@846..847 " "
+      AConst@847..852
+        Sconst@847..852 "'{1}'"
+    Ascii41@852..853 ")"
+    Ascii44@853..854 ","
+    Newline@854..855 "\n"
+    Newline@855..856 "\t"
+    Ascii40@856..857 "("
+    List@857..910
+      AConst@857..866
+        Sconst@857..866 "'cidrcol'"
+      Ascii44@866..867 ","
+      Whitespace@867..868 " "
+      AConst@868..874
+        Sconst@868..874 "'inet'"
+      Ascii44@874..875 ","
+      Newline@875..876 "\n"
+      Newline@876..877 "\t"
+      Whitespace@877..878 " "
+      AConst@878..883
+        Sconst@878..883 "'{=}'"
+      Ascii44@883..884 ","
+      Newline@884..885 "\n"
+      Newline@885..886 "\t"
+      Whitespace@886..887 " "
+      AConst@887..901
+        Sconst@887..901 "'{10.2.14/24}'"
+      Ascii44@901..902 ","
+      Newline@902..903 "\n"
+      Newline@903..904 "\t"
+      Whitespace@904..905 " "
+      AConst@905..910
+        Sconst@905..910 "'{2}'"
+    Ascii41@910..911 ")"
+    Ascii44@911..912 ","
+    Newline@912..913 "\n"
+    Newline@913..914 "\t"
+    Ascii40@914..915 "("
+    List@915..982
+      AConst@915..924
+        Sconst@915..924 "'cidrcol'"
+      Ascii44@924..925 ","
+      Whitespace@925..926 " "
+      AConst@926..932
+        Sconst@926..932 "'inet'"
+      Ascii44@932..933 ","
+      Newline@933..934 "\n"
+      Newline@934..935 "\t"
+      Whitespace@935..936 " "
+      AConst@936..941
+        Sconst@936..941 "'{=}'"
+      Ascii44@941..942 ","
+      Newline@942..943 "\n"
+      Newline@943..944 "\t"
+      Whitespace@944..945 " "
+      AConst@945..973
+        Sconst@945..973 "'{fe80::6e40:8ff:fea9 ..."
+      Ascii44@973..974 ","
+      Newline@974..975 "\n"
+      Newline@975..976 "\t"
+      Whitespace@976..977 " "
+      AConst@977..982
+        Sconst@977..982 "'{1}'"
+    Ascii41@982..983 ")"
+    Ascii44@983..984 ","
+    Newline@984..985 "\n"
+    Newline@985..986 "\t"
+    Ascii40@986..987 "("
+    List@987..1040
+      AConst@987..996
+        Sconst@987..996 "'cidrcol'"
+      Ascii44@996..997 ","
+      Whitespace@997..998 " "
+      AConst@998..1004
+        Sconst@998..1004 "'cidr'"
+      Ascii44@1004..1005 ","
+      Newline@1005..1006 "\n"
+      Newline@1006..1007 "\t"
+      Whitespace@1007..1008 " "
+      AConst@1008..1013
+        Sconst@1008..1013 "'{=}'"
+      Ascii44@1013..1014 ","
+      Newline@1014..1015 "\n"
+      Newline@1015..1016 "\t"
+      Whitespace@1016..1017 " "
+      AConst@1017..1031
+        Sconst@1017..1031 "'{10.2.14/24}'"
+      Ascii44@1031..1032 ","
+      Newline@1032..1033 "\n"
+      Newline@1033..1034 "\t"
+      Whitespace@1034..1035 " "
+      AConst@1035..1040
+        Sconst@1035..1040 "'{2}'"
+    Ascii41@1040..1041 ")"
+    Ascii44@1041..1042 ","
+    Newline@1042..1043 "\n"
+    Newline@1043..1044 "\t"
+    Ascii40@1044..1045 "("
+    List@1045..1112
+      AConst@1045..1054
+        Sconst@1045..1054 "'cidrcol'"
+      Ascii44@1054..1055 ","
+      Whitespace@1055..1056 " "
+      AConst@1056..1062
+        Sconst@1056..1062 "'cidr'"
+      Ascii44@1062..1063 ","
+      Newline@1063..1064 "\n"
+      Newline@1064..1065 "\t"
+      Whitespace@1065..1066 " "
+      AConst@1066..1071
+        Sconst@1066..1071 "'{=}'"
+      Ascii44@1071..1072 ","
+      Newline@1072..1073 "\n"
+      Newline@1073..1074 "\t"
+      Whitespace@1074..1075 " "
+      AConst@1075..1103
+        Sconst@1075..1103 "'{fe80::6e40:8ff:fea9 ..."
+      Ascii44@1103..1104 ","
+      Newline@1104..1105 "\n"
+      Newline@1105..1106 "\t"
+      Whitespace@1106..1107 " "
+      AConst@1107..1112
+        Sconst@1107..1112 "'{1}'"
+    Ascii41@1112..1113 ")"
+    Ascii44@1113..1114 ","
+    Newline@1114..1115 "\n"
+    Newline@1115..1116 "\t"
+    Ascii40@1116..1117 "("
+    List@1117..1165
+      AConst@1117..1128
+        Sconst@1117..1128 "'bpcharcol'"
+      Ascii44@1128..1129 ","
+      Whitespace@1129..1130 " "
+      AConst@1130..1138
+        Sconst@1130..1138 "'bpchar'"
+      Ascii44@1138..1139 ","
+      Newline@1139..1140 "\n"
+      Newline@1140..1141 "\t"
+      Whitespace@1141..1142 " "
+      AConst@1142..1147
+        Sconst@1142..1147 "'{=}'"
+      Ascii44@1147..1148 ","
+      Newline@1148..1149 "\n"
+      Newline@1149..1150 "\t"
+      Whitespace@1150..1151 " "
+      AConst@1151..1156
+        Sconst@1151..1156 "'{W}'"
+      Ascii44@1156..1157 ","
+      Newline@1157..1158 "\n"
+      Newline@1158..1159 "\t"
+      Whitespace@1159..1160 " "
+      AConst@1160..1165
+        Sconst@1160..1165 "'{6}'"
+    Ascii41@1165..1166 ")"
+    Ascii44@1166..1167 ","
+    Newline@1167..1168 "\n"
+    Newline@1168..1169 "\t"
+    Ascii40@1169..1170 "("
+    List@1170..1223
+      AConst@1170..1179
+        Sconst@1170..1179 "'datecol'"
+      Ascii44@1179..1180 ","
+      Whitespace@1180..1181 " "
+      AConst@1181..1187
+        Sconst@1181..1187 "'date'"
+      Ascii44@1187..1188 ","
+      Newline@1188..1189 "\n"
+      Newline@1189..1190 "\t"
+      Whitespace@1190..1191 " "
+      AConst@1191..1196
+        Sconst@1191..1196 "'{=}'"
+      Ascii44@1196..1197 ","
+      Newline@1197..1198 "\n"
+      Newline@1198..1199 "\t"
+      Whitespace@1199..1200 " "
+      AConst@1200..1214
+        Sconst@1200..1214 "'{2009-12-01}'"
+      Ascii44@1214..1215 ","
+      Newline@1215..1216 "\n"
+      Newline@1216..1217 "\t"
+      Whitespace@1217..1218 " "
+      AConst@1218..1223
+        Sconst@1218..1223 "'{1}'"
+    Ascii41@1223..1224 ")"
+    Ascii44@1224..1225 ","
+    Newline@1225..1226 "\n"
+    Newline@1226..1227 "\t"
+    Ascii40@1227..1228 "("
+    List@1228..1279
+      AConst@1228..1237
+        Sconst@1228..1237 "'timecol'"
+      Ascii44@1237..1238 ","
+      Whitespace@1238..1239 " "
+      AConst@1239..1245
+        Sconst@1239..1245 "'time'"
+      Ascii44@1245..1246 ","
+      Newline@1246..1247 "\n"
+      Newline@1247..1248 "\t"
+      Whitespace@1248..1249 " "
+      AConst@1249..1254
+        Sconst@1249..1254 "'{=}'"
+      Ascii44@1254..1255 ","
+      Newline@1255..1256 "\n"
+      Newline@1256..1257 "\t"
+      Whitespace@1257..1258 " "
+      AConst@1258..1270
+        Sconst@1258..1270 "'{02:28:57}'"
+      Ascii44@1270..1271 ","
+      Newline@1271..1272 "\n"
+      Newline@1272..1273 "\t"
+      Whitespace@1273..1274 " "
+      AConst@1274..1279
+        Sconst@1274..1279 "'{1}'"
+    Ascii41@1279..1280 ")"
+    Ascii44@1280..1281 ","
+    Newline@1281..1282 "\n"
+    Newline@1282..1283 "\t"
+    Ascii40@1283..1284 "("
+    List@1284..1356
+      AConst@1284..1298
+        Sconst@1284..1298 "'timestampcol'"
+      Ascii44@1298..1299 ","
+      Whitespace@1299..1300 " "
+      AConst@1300..1311
+        Sconst@1300..1311 "'timestamp'"
+      Ascii44@1311..1312 ","
+      Newline@1312..1313 "\n"
+      Newline@1313..1314 "\t"
+      Whitespace@1314..1315 " "
+      AConst@1315..1320
+        Sconst@1315..1320 "'{=}'"
+      Ascii44@1320..1321 ","
+      Newline@1321..1322 "\n"
+      Newline@1322..1323 "\t"
+      Whitespace@1323..1324 " "
+      AConst@1324..1347
+        Sconst@1324..1347 "'{1964-03-24 19:26:45}'"
+      Ascii44@1347..1348 ","
+      Newline@1348..1349 "\n"
+      Newline@1349..1350 "\t"
+      Whitespace@1350..1351 " "
+      AConst@1351..1356
+        Sconst@1351..1356 "'{1}'"
+    Ascii41@1356..1357 ")"
+    Ascii44@1357..1358 ","
+    Newline@1358..1359 "\n"
+    Newline@1359..1360 "\t"
+    Ascii40@1360..1361 "("
+    List@1361..1440
+      AConst@1361..1377
+        Sconst@1361..1377 "'timestamptzcol'"
+      Ascii44@1377..1378 ","
+      Whitespace@1378..1379 " "
+      AConst@1379..1392
+        Sconst@1379..1392 "'timestamptz'"
+      Ascii44@1392..1393 ","
+      Newline@1393..1394 "\n"
+      Newline@1394..1395 "\t"
+      Whitespace@1395..1396 " "
+      AConst@1396..1401
+        Sconst@1396..1401 "'{=}'"
+      Ascii44@1401..1402 ","
+      Newline@1402..1403 "\n"
+      Newline@1403..1404 "\t"
+      Whitespace@1404..1405 " "
+      AConst@1405..1431
+        Sconst@1405..1431 "'{1972-10-19 09:00:00 ..."
+      Ascii44@1431..1432 ","
+      Newline@1432..1433 "\n"
+      Newline@1433..1434 "\t"
+      Whitespace@1434..1435 " "
+      AConst@1435..1440
+        Sconst@1435..1440 "'{1}'"
+    Ascii41@1440..1441 ")"
+    Ascii44@1441..1442 ","
+    Newline@1442..1443 "\n"
+    Newline@1443..1444 "\t"
+    Ascii40@1444..1445 "("
+    List@1445..1516
+      AConst@1445..1458
+        Sconst@1445..1458 "'intervalcol'"
+      Ascii44@1458..1459 ","
+      Whitespace@1459..1460 " "
+      AConst@1460..1470
+        Sconst@1460..1470 "'interval'"
+      Ascii44@1470..1471 ","
+      Newline@1471..1472 "\n"
+      Newline@1472..1473 "\t"
+      Whitespace@1473..1474 " "
+      AConst@1474..1479
+        Sconst@1474..1479 "'{=}'"
+      Ascii44@1479..1480 ","
+      Newline@1480..1481 "\n"
+      Newline@1481..1482 "\t"
+      Whitespace@1482..1483 " "
+      AConst@1483..1507
+        Sconst@1483..1507 "'{1 mons 13 days 12:24}'"
+      Ascii44@1507..1508 ","
+      Newline@1508..1509 "\n"
+      Newline@1509..1510 "\t"
+      Whitespace@1510..1511 " "
+      AConst@1511..1516
+        Sconst@1511..1516 "'{1}'"
+    Ascii41@1516..1517 ")"
+    Ascii44@1517..1518 ","
+    Newline@1518..1519 "\n"
+    Newline@1519..1520 "\t"
+    Ascii40@1520..1521 "("
+    List@1521..1579
+      AConst@1521..1532
+        Sconst@1521..1532 "'timetzcol'"
+      Ascii44@1532..1533 ","
+      Whitespace@1533..1534 " "
+      AConst@1534..1542
+        Sconst@1534..1542 "'timetz'"
+      Ascii44@1542..1543 ","
+      Newline@1543..1544 "\n"
+      Newline@1544..1545 "\t"
+      Whitespace@1545..1546 " "
+      AConst@1546..1551
+        Sconst@1546..1551 "'{=}'"
+      Ascii44@1551..1552 ","
+      Newline@1552..1553 "\n"
+      Newline@1553..1554 "\t"
+      Whitespace@1554..1555 " "
+      AConst@1555..1570
+        Sconst@1555..1570 "'{01:35:50+02}'"
+      Ascii44@1570..1571 ","
+      Newline@1571..1572 "\n"
+      Newline@1572..1573 "\t"
+      Whitespace@1573..1574 " "
+      AConst@1574..1579
+        Sconst@1574..1579 "'{2}'"
+    Ascii41@1579..1580 ")"
+    Ascii44@1580..1581 ","
+    Newline@1581..1582 "\n"
+    Newline@1582..1583 "\t"
+    Ascii40@1583..1584 "("
+    List@1584..1671
+      AConst@1584..1596
+        Sconst@1584..1596 "'numericcol'"
+      Ascii44@1596..1597 ","
+      Whitespace@1597..1598 " "
+      AConst@1598..1607
+        Sconst@1598..1607 "'numeric'"
+      Ascii44@1607..1608 ","
+      Newline@1608..1609 "\n"
+      Newline@1609..1610 "\t"
+      Whitespace@1610..1611 " "
+      AConst@1611..1616
+        Sconst@1611..1616 "'{=}'"
+      Ascii44@1616..1617 ","
+      Newline@1617..1618 "\n"
+      Newline@1618..1619 "\t"
+      Whitespace@1619..1620 " "
+      AConst@1620..1662
+        Sconst@1620..1662 "'{2268164.34782608695 ..."
+      Ascii44@1662..1663 ","
+      Newline@1663..1664 "\n"
+      Newline@1664..1665 "\t"
+      Whitespace@1665..1666 " "
+      AConst@1666..1671
+        Sconst@1666..1671 "'{1}'"
+    Ascii41@1671..1672 ")"
+    Ascii44@1672..1673 ","
+    Newline@1673..1674 "\n"
+    Newline@1674..1675 "\t"
+    Ascii40@1675..1676 "("
+    List@1676..1755
+      AConst@1676..1685
+        Sconst@1676..1685 "'uuidcol'"
+      Ascii44@1685..1686 ","
+      Whitespace@1686..1687 " "
+      AConst@1687..1693
+        Sconst@1687..1693 "'uuid'"
+      Ascii44@1693..1694 ","
+      Newline@1694..1695 "\n"
+      Newline@1695..1696 "\t"
+      Whitespace@1696..1697 " "
+      AConst@1697..1702
+        Sconst@1697..1702 "'{=}'"
+      Ascii44@1702..1703 ","
+      Newline@1703..1704 "\n"
+      Newline@1704..1705 "\t"
+      Whitespace@1705..1706 " "
+      AConst@1706..1746
+        Sconst@1706..1746 "'{52225222-5222-5222- ..."
+      Ascii44@1746..1747 ","
+      Newline@1747..1748 "\n"
+      Newline@1748..1749 "\t"
+      Whitespace@1749..1750 " "
+      AConst@1750..1755
+        Sconst@1750..1755 "'{1}'"
+    Ascii41@1755..1756 ")"
+    Ascii44@1756..1757 ","
+    Newline@1757..1758 "\n"
+    Newline@1758..1759 "\t"
+    Ascii40@1759..1760 "("
+    List@1760..1846
+      AConst@1760..1768
+        Sconst@1760..1768 "'lsncol'"
+      Ascii44@1768..1769 ","
+      Whitespace@1769..1770 " "
+      AConst@1770..1778
+        Sconst@1770..1778 "'pg_lsn'"
+      Ascii44@1778..1779 ","
+      Newline@1779..1780 "\n"
+      Newline@1780..1781 "\t"
+      Whitespace@1781..1782 " "
+      AConst@1782..1799
+        Sconst@1782..1799 "'{=, IS, IS NOT}'"
+      Ascii44@1799..1800 ","
+      Newline@1800..1801 "\n"
+      Newline@1801..1802 "\t"
+      Whitespace@1802..1803 " "
+      AConst@1803..1828
+        Sconst@1803..1828 "'{44/455222, NULL, NU ..."
+      Ascii44@1828..1829 ","
+      Newline@1829..1830 "\n"
+      Newline@1830..1831 "\t"
+      Whitespace@1831..1832 " "
+      AConst@1832..1846
+        Sconst@1832..1846 "'{1, 25, 100}'"
+  Ascii41@1846..1847 ")"
+  Ascii59@1847..1848 ";"
+

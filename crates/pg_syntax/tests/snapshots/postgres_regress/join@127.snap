@@ -1,0 +1,97 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from\n  j1_tbl full join\n  (select * from j2_tbl order by j2_tbl.i desc, j2_tbl.k asc) j2_tbl\n  on j1_tbl.i = j2_tbl.i and j1_tbl.i = j2_tbl.k;"
+---
+SelectStmt@0..151
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Newline@13..14 "\n"
+  Whitespace@14..16 "  "
+  JoinExpr@16..150
+    RangeVar@16..22
+      Ident@16..22 "j1_tbl"
+    Whitespace@22..23 " "
+    Full@23..27 "full"
+    Whitespace@27..28 " "
+    Join@28..32 "join"
+    Newline@32..33 "\n"
+    Whitespace@33..35 "  "
+    Ascii40@35..36 "("
+    RangeSubselect@36..101
+      SelectStmt@36..93
+        Select@36..42 "select"
+        Whitespace@42..43 " "
+        ResTarget@43..44
+          ColumnRef@43..44
+            AStar@43..44
+              Ascii42@43..44 "*"
+        Whitespace@44..45 " "
+        From@45..49 "from"
+        Whitespace@49..50 " "
+        RangeVar@50..56
+          Ident@50..56 "j2_tbl"
+        Whitespace@56..57 " "
+        SortBy@57..79
+          Order@57..62 "order"
+          Whitespace@62..63 " "
+          By@63..65 "by"
+          Whitespace@65..66 " "
+          ColumnRef@66..74
+            Ident@66..72 "j2_tbl"
+            Ascii46@72..73 "."
+            Ident@73..74 "i"
+          Whitespace@74..75 " "
+          Desc@75..79 "desc"
+        Ascii44@79..80 ","
+        Whitespace@80..81 " "
+        SortBy@81..93
+          ColumnRef@81..89
+            Ident@81..87 "j2_tbl"
+            Ascii46@87..88 "."
+            Ident@88..89 "k"
+          Whitespace@89..90 " "
+          Asc@90..93 "asc"
+      Ascii41@93..94 ")"
+      Whitespace@94..95 " "
+      Alias@95..101
+        Ident@95..101 "j2_tbl"
+    Newline@101..102 "\n"
+    Whitespace@102..104 "  "
+    On@104..106 "on"
+    Whitespace@106..107 " "
+    BoolExpr@107..150
+      AExpr@107..126
+        ColumnRef@107..115
+          Ident@107..113 "j1_tbl"
+          Ascii46@113..114 "."
+          Ident@114..115 "i"
+        Whitespace@115..116 " "
+        Ascii61@116..117 "="
+        Whitespace@117..118 " "
+        ColumnRef@118..126
+          Ident@118..124 "j2_tbl"
+          Ascii46@124..125 "."
+          Ident@125..126 "i"
+      Whitespace@126..127 " "
+      And@127..130 "and"
+      Whitespace@130..131 " "
+      AExpr@131..150
+        ColumnRef@131..139
+          Ident@131..137 "j1_tbl"
+          Ascii46@137..138 "."
+          Ident@138..139 "i"
+        Whitespace@139..140 " "
+        Ascii61@140..141 "="
+        Whitespace@141..142 " "
+        ColumnRef@142..150
+          Ident@142..148 "j2_tbl"
+          Ascii46@148..149 "."
+          Ident@149..150 "k"
+  Ascii59@150..151 ";"
+

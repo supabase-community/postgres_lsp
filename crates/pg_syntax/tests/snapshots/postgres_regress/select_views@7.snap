@@ -1,0 +1,49 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE credit_card (\n       cid      int references customer(cid),\n       cnum     text,\n       climit   int\n);"
+---
+CreateStmt@0..117
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..24
+    Ident@13..24 "credit_card"
+  Whitespace@24..25 " "
+  Ascii40@25..26 "("
+  Newline@26..27 "\n"
+  Whitespace@27..34 "       "
+  ColumnDef@34..70
+    Ident@34..37 "cid"
+    Whitespace@37..43 "      "
+    TypeName@43..46
+      IntP@43..46 "int"
+    Whitespace@46..47 " "
+    Constraint@47..70
+      References@47..57 "references"
+      Whitespace@57..58 " "
+      RangeVar@58..66
+        Ident@58..66 "customer"
+      Ascii40@66..67 "("
+      Ident@67..70 "cid"
+  Ascii41@70..71 ")"
+  Ascii44@71..72 ","
+  Newline@72..73 "\n"
+  Whitespace@73..80 "       "
+  ColumnDef@80..93
+    Ident@80..84 "cnum"
+    Whitespace@84..89 "     "
+    TypeName@89..93
+      TextP@89..93 "text"
+  Ascii44@93..94 ","
+  Newline@94..95 "\n"
+  Whitespace@95..102 "       "
+  ColumnDef@102..114
+    Ident@102..108 "climit"
+    Whitespace@108..111 "   "
+    TypeName@111..114
+      IntP@111..114 "int"
+  Newline@114..115 "\n"
+  Ascii41@115..116 ")"
+  Ascii59@116..117 ";"
+

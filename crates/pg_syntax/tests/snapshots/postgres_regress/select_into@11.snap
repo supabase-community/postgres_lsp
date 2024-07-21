@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: INSERT INTO selinto_schema.tbl_withdata1 VALUES (4);
+---
+InsertStmt@0..52
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..40
+    Ident@12..26 "selinto_schema"
+    Ascii46@26..27 "."
+    Ident@27..40 "tbl_withdata1"
+  Whitespace@40..41 " "
+  SelectStmt@41..50
+    Values@41..47 "VALUES"
+    Whitespace@47..48 " "
+    Ascii40@48..49 "("
+    List@49..50
+      AConst@49..50
+        Iconst@49..50 "4"
+  Ascii41@50..51 ")"
+  Ascii59@51..52 ";"
+

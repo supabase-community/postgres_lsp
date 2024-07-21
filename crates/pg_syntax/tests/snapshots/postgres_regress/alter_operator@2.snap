@@ -1,0 +1,54 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION customcontsel(internal, oid, internal, integer)\nRETURNS float8 AS 'contsel' LANGUAGE internal STABLE STRICT;"
+---
+CreateFunctionStmt@0..124
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..29 "customcontsel"
+  Ascii40@29..30 "("
+  FunctionParameter@30..38
+    TypeName@30..38
+      Ident@30..38 "internal"
+  Ascii44@38..39 ","
+  Whitespace@39..40 " "
+  FunctionParameter@40..43
+    TypeName@40..43
+      Ident@40..43 "oid"
+  Ascii44@43..44 ","
+  Whitespace@44..45 " "
+  FunctionParameter@45..53
+    TypeName@45..53
+      Ident@45..53 "internal"
+  Ascii44@53..54 ","
+  Whitespace@54..55 " "
+  FunctionParameter@55..62
+    TypeName@55..62
+      Integer@55..62 "integer"
+  Ascii41@62..63 ")"
+  Newline@63..64 "\n"
+  Returns@64..71 "RETURNS"
+  Whitespace@71..72 " "
+  TypeName@72..78
+    Ident@72..78 "float8"
+  Whitespace@78..79 " "
+  DefElem@79..91
+    As@79..81 "AS"
+    Whitespace@81..82 " "
+    List@82..91
+      Sconst@82..91 "'contsel'"
+  Whitespace@91..92 " "
+  DefElem@92..109
+    Language@92..100 "LANGUAGE"
+    Whitespace@100..101 " "
+    Ident@101..109 "internal"
+  Whitespace@109..110 " "
+  DefElem@110..116
+    Stable@110..116 "STABLE"
+  Whitespace@116..117 " "
+  DefElem@117..123
+    StrictP@117..123 "STRICT"
+  Ascii59@123..124 ";"
+

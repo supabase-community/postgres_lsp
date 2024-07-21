@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table rparted_by_int2_16384 partition of rparted_by_int2 for values from (10) to (16384);
+---
+CreateStmt@0..96
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..34
+    Ident@13..34 "rparted_by_int2_16384"
+  Whitespace@34..35 " "
+  Partition@35..44 "partition"
+  Whitespace@44..45 " "
+  Of@45..47 "of"
+  Whitespace@47..48 " "
+  RangeVar@48..63
+    Ident@48..63 "rparted_by_int2"
+  Whitespace@63..64 " "
+  For@64..67 "for"
+  Whitespace@67..68 " "
+  Values@68..74 "values"
+  Whitespace@74..75 " "
+  PartitionBoundSpec@75..94
+    From@75..79 "from"
+    Whitespace@79..80 " "
+    Ascii40@80..81 "("
+    AConst@81..83
+      Iconst@81..83 "10"
+    Ascii41@83..84 ")"
+    Whitespace@84..85 " "
+    To@85..87 "to"
+    Whitespace@87..88 " "
+    Ascii40@88..89 "("
+    AConst@89..94
+      Iconst@89..94 "16384"
+  Ascii41@94..95 ")"
+  Ascii59@95..96 ";"
+

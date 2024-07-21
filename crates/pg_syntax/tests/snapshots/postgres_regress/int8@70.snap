@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_char(q2, 'L9999999999999999.000')  FROM INT8_TBL;"
+---
+SelectStmt@0..59
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..42
+    FuncCall@7..42
+      Ident@7..14 "to_char"
+      Ascii40@14..15 "("
+      ColumnRef@15..17
+        Ident@15..17 "q2"
+      Ascii44@17..18 ","
+      Whitespace@18..19 " "
+      AConst@19..42
+        Sconst@19..42 "'L9999999999999999.000'"
+  Ascii41@42..43 ")"
+  Whitespace@43..45 "  "
+  From@45..49 "FROM"
+  Whitespace@49..50 " "
+  RangeVar@50..58
+    Ident@50..58 "INT8_TBL"
+  Ascii59@58..59 ";"
+

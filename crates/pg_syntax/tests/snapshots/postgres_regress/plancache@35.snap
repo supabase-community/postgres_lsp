@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create schema s2\n  create table abc (f1 int);"
+---
+CreateSchemaStmt@0..45
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Schema@7..13 "schema"
+  Whitespace@13..14 " "
+  Ident@14..16 "s2"
+  Newline@16..17 "\n"
+  Whitespace@17..19 "  "
+  CreateStmt@19..43
+    Create@19..25 "create"
+    Whitespace@25..26 " "
+    Table@26..31 "table"
+    Whitespace@31..32 " "
+    RangeVar@32..35
+      Ident@32..35 "abc"
+    Whitespace@35..36 " "
+    Ascii40@36..37 "("
+    ColumnDef@37..43
+      Ident@37..39 "f1"
+      Whitespace@39..40 " "
+      TypeName@40..43
+        IntP@40..43 "int"
+  Ascii41@43..44 ")"
+  Ascii59@44..45 ";"
+

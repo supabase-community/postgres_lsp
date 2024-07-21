@@ -1,0 +1,49 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into toasted_data\n  select array_agg(i) from generate_series(12345678, 12345678 + 1000) i;"
+---
+InsertStmt@0..97
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..24
+    Ident@12..24 "toasted_data"
+  Newline@24..25 "\n"
+  Whitespace@25..27 "  "
+  SelectStmt@27..96
+    Select@27..33 "select"
+    Whitespace@33..34 " "
+    ResTarget@34..45
+      FuncCall@34..45
+        Ident@34..43 "array_agg"
+        Ascii40@43..44 "("
+        ColumnRef@44..45
+          Ident@44..45 "i"
+    Ascii41@45..46 ")"
+    Whitespace@46..47 " "
+    From@47..51 "from"
+    Whitespace@51..52 " "
+    RangeFunction@52..96
+      List@52..93
+        FuncCall@52..93
+          Ident@52..67 "generate_series"
+          Ascii40@67..68 "("
+          AConst@68..76
+            Iconst@68..76 "12345678"
+          Ascii44@76..77 ","
+          Whitespace@77..78 " "
+          AExpr@78..93
+            AConst@78..86
+              Iconst@78..86 "12345678"
+            Whitespace@86..87 " "
+            Ascii43@87..88 "+"
+            Whitespace@88..89 " "
+            AConst@89..93
+              Iconst@89..93 "1000"
+      Ascii41@93..94 ")"
+      Whitespace@94..95 " "
+      Alias@95..96
+        Ident@95..96 "i"
+  Ascii59@96..97 ";"
+

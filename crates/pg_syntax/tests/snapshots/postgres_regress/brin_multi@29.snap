@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE INDEX brin_large_range_idx ON brin_large_range USING brin (a int4_minmax_multi_ops);
+---
+IndexStmt@0..91
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Index@7..12 "INDEX"
+  Whitespace@12..13 " "
+  Ident@13..33 "brin_large_range_idx"
+  Whitespace@33..34 " "
+  On@34..36 "ON"
+  Whitespace@36..37 " "
+  RangeVar@37..53
+    Ident@37..53 "brin_large_range"
+  Whitespace@53..54 " "
+  Using@54..59 "USING"
+  Whitespace@59..60 " "
+  Ident@60..64 "brin"
+  Whitespace@64..65 " "
+  Ascii40@65..66 "("
+  IndexElem@66..89
+    Ident@66..67 "a"
+    Whitespace@67..68 " "
+    Ident@68..89 "int4_minmax_multi_ops"
+  Ascii41@89..90 ")"
+  Ascii59@90..91 ";"
+

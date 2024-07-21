@@ -1,0 +1,43 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO t2c VALUES ('vw'), ('cd'), ('mn'), ('ef');"
+---
+InsertStmt@0..54
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..15
+    Ident@12..15 "t2c"
+  Whitespace@15..16 " "
+  SelectStmt@16..52
+    Values@16..22 "VALUES"
+    Whitespace@22..23 " "
+    Ascii40@23..24 "("
+    List@24..28
+      AConst@24..28
+        Sconst@24..28 "'vw'"
+    Ascii41@28..29 ")"
+    Ascii44@29..30 ","
+    Whitespace@30..31 " "
+    Ascii40@31..32 "("
+    List@32..36
+      AConst@32..36
+        Sconst@32..36 "'cd'"
+    Ascii41@36..37 ")"
+    Ascii44@37..38 ","
+    Whitespace@38..39 " "
+    Ascii40@39..40 "("
+    List@40..44
+      AConst@40..44
+        Sconst@40..44 "'mn'"
+    Ascii41@44..45 ")"
+    Ascii44@45..46 ","
+    Whitespace@46..47 " "
+    Ascii40@47..48 "("
+    List@48..52
+      AConst@48..52
+        Sconst@48..52 "'ef'"
+  Ascii41@52..53 ")"
+  Ascii59@53..54 ";"
+

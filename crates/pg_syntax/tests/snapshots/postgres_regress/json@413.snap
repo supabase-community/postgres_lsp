@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select json_strip_nulls('\"a string\"');"
+---
+SelectStmt@0..38
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..36
+    FuncCall@7..36
+      Ident@7..23 "json_strip_nulls"
+      Ascii40@23..24 "("
+      AConst@24..36
+        Sconst@24..36 "'\"a string\"'"
+  Ascii41@36..37 ")"
+  Ascii59@37..38 ";"
+

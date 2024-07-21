@@ -1,0 +1,19 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT pg_notify('notify_async1','');"
+---
+SelectStmt@0..37
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..35
+    FuncCall@7..35
+      Ident@7..16 "pg_notify"
+      Ascii40@16..17 "("
+      AConst@17..32
+        Sconst@17..32 "'notify_async1'"
+      Ascii44@32..33 ","
+      AConst@33..35
+        Sconst@33..35 "''"
+  Ascii41@35..36 ")"
+  Ascii59@36..37 ";"
+

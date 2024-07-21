@@ -1,0 +1,38 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT * FROM numrange_test WHERE range_contains(nr, numrange(1.9,1.91));"
+---
+SelectStmt@0..73
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "FROM"
+  Whitespace@13..14 " "
+  RangeVar@14..27
+    Ident@14..27 "numrange_test"
+  Whitespace@27..28 " "
+  Where@28..33 "WHERE"
+  Whitespace@33..34 " "
+  FuncCall@34..70
+    Ident@34..48 "range_contains"
+    Ascii40@48..49 "("
+    ColumnRef@49..51
+      Ident@49..51 "nr"
+    Ascii44@51..52 ","
+    Whitespace@52..53 " "
+    FuncCall@53..70
+      Ident@53..61 "numrange"
+      Ascii40@61..62 "("
+      AConst@62..65
+        Fconst@62..65 "1.9"
+      Ascii44@65..66 ","
+      AConst@66..70
+        Fconst@66..70 "1.91"
+  Ascii41@70..71 ")"
+  Ascii41@71..72 ")"
+  Ascii59@72..73 ";"
+

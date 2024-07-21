@@ -1,0 +1,49 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select count(*) from test_range_elem where int4range(i,i+10) <@ int4range(10,30);"
+---
+SelectStmt@0..81
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "from"
+  Whitespace@20..21 " "
+  RangeVar@21..36
+    Ident@21..36 "test_range_elem"
+  Whitespace@36..37 " "
+  Where@37..42 "where"
+  Whitespace@42..43 " "
+  AExpr@43..79
+    FuncCall@43..59
+      Ident@43..52 "int4range"
+      Ascii40@52..53 "("
+      ColumnRef@53..54
+        Ident@53..54 "i"
+      Ascii44@54..55 ","
+      AExpr@55..59
+        ColumnRef@55..56
+          Ident@55..56 "i"
+        Ascii43@56..57 "+"
+        AConst@57..59
+          Iconst@57..59 "10"
+    Ascii41@59..60 ")"
+    Whitespace@60..61 " "
+    Op@61..63 "<@"
+    Whitespace@63..64 " "
+    FuncCall@64..79
+      Ident@64..73 "int4range"
+      Ascii40@73..74 "("
+      AConst@74..76
+        Iconst@74..76 "10"
+      Ascii44@76..77 ","
+      AConst@77..79
+        Iconst@77..79 "30"
+  Ascii41@79..80 ")"
+  Ascii59@80..81 ";"
+

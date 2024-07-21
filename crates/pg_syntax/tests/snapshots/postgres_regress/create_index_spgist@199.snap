@@ -1,0 +1,33 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT count(*) FROM radix_text_tbl WHERE starts_with(t, 'Worth');"
+---
+SelectStmt@0..66
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "FROM"
+  Whitespace@20..21 " "
+  RangeVar@21..35
+    Ident@21..35 "radix_text_tbl"
+  Whitespace@35..36 " "
+  Where@36..41 "WHERE"
+  Whitespace@41..42 " "
+  FuncCall@42..64
+    Ident@42..53 "starts_with"
+    Ascii40@53..54 "("
+    ColumnRef@54..55
+      Ident@54..55 "t"
+    Ascii44@55..56 ","
+    Whitespace@56..57 " "
+    AConst@57..64
+      Sconst@57..64 "'Worth'"
+  Ascii41@64..65 ")"
+  Ascii59@65..66 ";"
+

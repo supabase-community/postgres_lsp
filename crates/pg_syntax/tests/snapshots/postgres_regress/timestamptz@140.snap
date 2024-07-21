@@ -1,0 +1,115 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT d1 as timestamptz,\n   date_part( 'isoyear', d1) AS isoyear, date_part( 'week', d1) AS week,\n   date_part( 'isodow', d1) AS isodow, date_part( 'dow', d1) AS dow,\n   date_part( 'doy', d1) AS doy\n   FROM TIMESTAMPTZ_TBL;"
+---
+SelectStmt@0..224
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..24
+    ColumnRef@7..9
+      Ident@7..9 "d1"
+    Whitespace@9..10 " "
+    As@10..12 "as"
+    Whitespace@12..13 " "
+    Ident@13..24 "timestamptz"
+  Ascii44@24..25 ","
+  Newline@25..26 "\n"
+  Whitespace@26..29 "   "
+  ResTarget@29..65
+    FuncCall@29..53
+      Ident@29..38 "date_part"
+      Ascii40@38..39 "("
+      Whitespace@39..40 " "
+      AConst@40..49
+        Sconst@40..49 "'isoyear'"
+      Ascii44@49..50 ","
+      Whitespace@50..51 " "
+      ColumnRef@51..53
+        Ident@51..53 "d1"
+    Ascii41@53..54 ")"
+    Whitespace@54..55 " "
+    As@55..57 "AS"
+    Whitespace@57..58 " "
+    Ident@58..65 "isoyear"
+  Ascii44@65..66 ","
+  Whitespace@66..67 " "
+  ResTarget@67..97
+    FuncCall@67..88
+      Ident@67..76 "date_part"
+      Ascii40@76..77 "("
+      Whitespace@77..78 " "
+      AConst@78..84
+        Sconst@78..84 "'week'"
+      Ascii44@84..85 ","
+      Whitespace@85..86 " "
+      ColumnRef@86..88
+        Ident@86..88 "d1"
+    Ascii41@88..89 ")"
+    Whitespace@89..90 " "
+    As@90..92 "AS"
+    Whitespace@92..93 " "
+    Ident@93..97 "week"
+  Ascii44@97..98 ","
+  Newline@98..99 "\n"
+  Whitespace@99..102 "   "
+  ResTarget@102..136
+    FuncCall@102..125
+      Ident@102..111 "date_part"
+      Ascii40@111..112 "("
+      Whitespace@112..113 " "
+      AConst@113..121
+        Sconst@113..121 "'isodow'"
+      Ascii44@121..122 ","
+      Whitespace@122..123 " "
+      ColumnRef@123..125
+        Ident@123..125 "d1"
+    Ascii41@125..126 ")"
+    Whitespace@126..127 " "
+    As@127..129 "AS"
+    Whitespace@129..130 " "
+    Ident@130..136 "isodow"
+  Ascii44@136..137 ","
+  Whitespace@137..138 " "
+  ResTarget@138..166
+    FuncCall@138..158
+      Ident@138..147 "date_part"
+      Ascii40@147..148 "("
+      Whitespace@148..149 " "
+      AConst@149..154
+        Sconst@149..154 "'dow'"
+      Ascii44@154..155 ","
+      Whitespace@155..156 " "
+      ColumnRef@156..158
+        Ident@156..158 "d1"
+    Ascii41@158..159 ")"
+    Whitespace@159..160 " "
+    As@160..162 "AS"
+    Whitespace@162..163 " "
+    Ident@163..166 "dow"
+  Ascii44@166..167 ","
+  Newline@167..168 "\n"
+  Whitespace@168..171 "   "
+  ResTarget@171..199
+    FuncCall@171..191
+      Ident@171..180 "date_part"
+      Ascii40@180..181 "("
+      Whitespace@181..182 " "
+      AConst@182..187
+        Sconst@182..187 "'doy'"
+      Ascii44@187..188 ","
+      Whitespace@188..189 " "
+      ColumnRef@189..191
+        Ident@189..191 "d1"
+    Ascii41@191..192 ")"
+    Whitespace@192..193 " "
+    As@193..195 "AS"
+    Whitespace@195..196 " "
+    Ident@196..199 "doy"
+  Newline@199..200 "\n"
+  Whitespace@200..203 "   "
+  From@203..207 "FROM"
+  Whitespace@207..208 " "
+  RangeVar@208..223
+    Ident@208..223 "TIMESTAMPTZ_TBL"
+  Ascii59@223..224 ";"
+

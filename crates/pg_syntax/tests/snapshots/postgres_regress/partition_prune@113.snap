@@ -1,0 +1,47 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table mc2p0 partition of mc2p for values from (minvalue, minvalue) to (1, minvalue);"
+---
+CreateStmt@0..91
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..18
+    Ident@13..18 "mc2p0"
+  Whitespace@18..19 " "
+  Partition@19..28 "partition"
+  Whitespace@28..29 " "
+  Of@29..31 "of"
+  Whitespace@31..32 " "
+  RangeVar@32..36
+    Ident@32..36 "mc2p"
+  Whitespace@36..37 " "
+  For@37..40 "for"
+  Whitespace@40..41 " "
+  Values@41..47 "values"
+  Whitespace@47..48 " "
+  PartitionBoundSpec@48..89
+    From@48..52 "from"
+    Whitespace@52..53 " "
+    Ascii40@53..54 "("
+    ColumnRef@54..62
+      Minvalue@54..62 "minvalue"
+    Ascii44@62..63 ","
+    Whitespace@63..64 " "
+    ColumnRef@64..72
+      Minvalue@64..72 "minvalue"
+    Ascii41@72..73 ")"
+    Whitespace@73..74 " "
+    To@74..76 "to"
+    Whitespace@76..77 " "
+    Ascii40@77..78 "("
+    AConst@78..79
+      Iconst@78..79 "1"
+    Ascii44@79..80 ","
+    Whitespace@80..81 " "
+    ColumnRef@81..89
+      Minvalue@81..89 "minvalue"
+  Ascii41@89..90 ")"
+  Ascii59@90..91 ";"
+

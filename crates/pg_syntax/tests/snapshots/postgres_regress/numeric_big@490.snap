@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE UNIQUE INDEX num_exp_power_10_ln_idx ON num_exp_power_10_ln (id);
+---
+IndexStmt@0..72
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Unique@7..13 "UNIQUE"
+  Whitespace@13..14 " "
+  Index@14..19 "INDEX"
+  Whitespace@19..20 " "
+  Ident@20..43 "num_exp_power_10_ln_idx"
+  Whitespace@43..44 " "
+  On@44..46 "ON"
+  Whitespace@46..47 " "
+  RangeVar@47..66
+    Ident@47..66 "num_exp_power_10_ln"
+  Whitespace@66..67 " "
+  Ascii40@67..68 "("
+  IndexElem@68..70
+    Ident@68..70 "id"
+  Ascii41@70..71 ")"
+  Ascii59@71..72 ";"
+

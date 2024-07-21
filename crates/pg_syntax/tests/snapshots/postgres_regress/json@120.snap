@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '[{\"b\": \"c\"}, {\"b\": \"cc\"}]'::json -> 'z';"
+---
+SelectStmt@0..48
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..47
+    AExpr@7..47
+      TypeCast@7..40
+        AConst@7..34
+          Sconst@7..34 "'[{\"b\": \"c\"}, {\"b\": \" ..."
+        Typecast@34..36 "::"
+        TypeName@36..40
+          Ident@36..40 "json"
+      Whitespace@40..41 " "
+      Op@41..43 "->"
+      Whitespace@43..44 " "
+      AConst@44..47
+        Sconst@44..47 "'z'"
+  Ascii59@47..48 ";"
+

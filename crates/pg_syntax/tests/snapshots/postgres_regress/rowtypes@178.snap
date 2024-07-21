@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select (row('Jim', 'Beam'))::text;"
+---
+SelectStmt@0..34
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..33
+    Ascii40@7..8 "("
+    TypeCast@8..33
+      RowExpr@8..25
+        Row@8..11 "row"
+        Ascii40@11..12 "("
+        AConst@12..17
+          Sconst@12..17 "'Jim'"
+        Ascii44@17..18 ","
+        Whitespace@18..19 " "
+        AConst@19..25
+          Sconst@19..25 "'Beam'"
+      Ascii41@25..26 ")"
+      Ascii41@26..27 ")"
+      Typecast@27..29 "::"
+      TypeName@29..33
+        TextP@29..33 "text"
+  Ascii59@33..34 ";"
+

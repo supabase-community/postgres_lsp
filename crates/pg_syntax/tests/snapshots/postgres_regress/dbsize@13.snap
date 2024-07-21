@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT pg_size_bytes('1e100');"
+---
+SelectStmt@0..30
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..28
+    FuncCall@7..28
+      Ident@7..20 "pg_size_bytes"
+      Ascii40@20..21 "("
+      AConst@21..28
+        Sconst@21..28 "'1e100'"
+  Ascii41@28..29 ")"
+  Ascii59@29..30 ";"
+

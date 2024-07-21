@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT 'Wed Jul 11 10:51:14 GMT+4 2001'::timestamptz;"
+---
+SelectStmt@0..53
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..52
+    TypeCast@7..52
+      AConst@7..39
+        Sconst@7..39 "'Wed Jul 11 10:51:14  ..."
+      Typecast@39..41 "::"
+      TypeName@41..52
+        Ident@41..52 "timestamptz"
+  Ascii59@52..53 ";"
+

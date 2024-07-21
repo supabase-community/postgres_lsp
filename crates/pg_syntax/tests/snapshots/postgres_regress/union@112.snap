@@ -1,0 +1,13 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select except select;
+---
+SelectStmt@0..21
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  Except@7..13 "except"
+  Whitespace@13..14 " "
+  SelectStmt@14..20
+    Select@14..20 "select"
+  Ascii59@20..21 ";"
+

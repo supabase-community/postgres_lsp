@@ -1,0 +1,81 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from\n  (select * from t3 a union all select * from t3 b) ss\n  join int4_tbl on f1 = expensivefunc(x);"
+---
+SelectStmt@0..110
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Newline@13..14 "\n"
+  Whitespace@14..16 "  "
+  Ascii40@16..17 "("
+  JoinExpr@17..108
+    RangeSubselect@17..68
+      SelectStmt@17..64
+        Select@17..23 "select"
+        Whitespace@23..24 " "
+        SelectStmt@24..35
+          ResTarget@24..25
+            ColumnRef@24..25
+              AStar@24..25
+                Ascii42@24..25 "*"
+          Whitespace@25..26 " "
+          From@26..30 "from"
+          Whitespace@30..31 " "
+          RangeVar@31..35
+            Ident@31..33 "t3"
+            Whitespace@33..34 " "
+            Alias@34..35
+              Ident@34..35 "a"
+        Whitespace@35..36 " "
+        Union@36..41 "union"
+        Whitespace@41..42 " "
+        All@42..45 "all"
+        Whitespace@45..46 " "
+        SelectStmt@46..64
+          Select@46..52 "select"
+          Whitespace@52..53 " "
+          ResTarget@53..54
+            ColumnRef@53..54
+              AStar@53..54
+                Ascii42@53..54 "*"
+          Whitespace@54..55 " "
+          From@55..59 "from"
+          Whitespace@59..60 " "
+          RangeVar@60..64
+            Ident@60..62 "t3"
+            Whitespace@62..63 " "
+            Alias@63..64
+              Ident@63..64 "b"
+      Ascii41@64..65 ")"
+      Whitespace@65..66 " "
+      Alias@66..68
+        Ident@66..68 "ss"
+    Newline@68..69 "\n"
+    Whitespace@69..71 "  "
+    Join@71..75 "join"
+    Whitespace@75..76 " "
+    RangeVar@76..84
+      Ident@76..84 "int4_tbl"
+    Whitespace@84..85 " "
+    On@85..87 "on"
+    Whitespace@87..88 " "
+    AExpr@88..108
+      ColumnRef@88..90
+        Ident@88..90 "f1"
+      Whitespace@90..91 " "
+      Ascii61@91..92 "="
+      Whitespace@92..93 " "
+      FuncCall@93..108
+        Ident@93..106 "expensivefunc"
+        Ascii40@106..107 "("
+        ColumnRef@107..108
+          Ident@107..108 "x"
+  Ascii41@108..109 ")"
+  Ascii59@109..110 ";"
+

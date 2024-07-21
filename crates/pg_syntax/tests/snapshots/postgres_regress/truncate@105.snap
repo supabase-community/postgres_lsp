@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT count(*) as \"Row count in test table\" FROM trunc_trigger_test;"
+---
+SelectStmt@0..69
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..44
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+    Ascii41@14..15 ")"
+    Whitespace@15..16 " "
+    As@16..18 "as"
+    Whitespace@18..19 " "
+    Ident@19..44 "\"Row count in test ta ..."
+  Whitespace@44..45 " "
+  From@45..49 "FROM"
+  Whitespace@49..50 " "
+  RangeVar@50..68
+    Ident@50..68 "trunc_trigger_test"
+  Ascii59@68..69 ";"
+

@@ -1,0 +1,21 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "insert into cc values('(\"(1,2)\",3)');"
+---
+InsertStmt@0..37
+  Insert@0..6 "insert"
+  Whitespace@6..7 " "
+  Into@7..11 "into"
+  Whitespace@11..12 " "
+  RangeVar@12..14
+    Ident@12..14 "cc"
+  Whitespace@14..15 " "
+  SelectStmt@15..35
+    Values@15..21 "values"
+    Ascii40@21..22 "("
+    List@22..35
+      AConst@22..35
+        Sconst@22..35 "'(\"(1,2)\",3)'"
+  Ascii41@35..36 ")"
+  Ascii59@36..37 ";"
+

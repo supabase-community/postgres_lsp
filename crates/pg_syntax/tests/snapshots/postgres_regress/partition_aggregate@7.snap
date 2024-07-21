@@ -1,0 +1,44 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE pagg_tab_p2 PARTITION OF pagg_tab FOR VALUES IN ('0005', '0006', '0007', '0008');"
+---
+CreateStmt@0..94
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..24
+    Ident@13..24 "pagg_tab_p2"
+  Whitespace@24..25 " "
+  Partition@25..34 "PARTITION"
+  Whitespace@34..35 " "
+  Of@35..37 "OF"
+  Whitespace@37..38 " "
+  RangeVar@38..46
+    Ident@38..46 "pagg_tab"
+  Whitespace@46..47 " "
+  For@47..50 "FOR"
+  Whitespace@50..51 " "
+  Values@51..57 "VALUES"
+  Whitespace@57..58 " "
+  PartitionBoundSpec@58..92
+    InP@58..60 "IN"
+    Whitespace@60..61 " "
+    Ascii40@61..62 "("
+    AConst@62..68
+      Sconst@62..68 "'0005'"
+    Ascii44@68..69 ","
+    Whitespace@69..70 " "
+    AConst@70..76
+      Sconst@70..76 "'0006'"
+    Ascii44@76..77 ","
+    Whitespace@77..78 " "
+    AConst@78..84
+      Sconst@78..84 "'0007'"
+    Ascii44@84..85 ","
+    Whitespace@85..86 " "
+    AConst@86..92
+      Sconst@86..92 "'0008'"
+  Ascii41@92..93 ")"
+  Ascii59@93..94 ";"
+

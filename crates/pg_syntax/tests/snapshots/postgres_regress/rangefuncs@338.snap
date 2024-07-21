@@ -1,0 +1,37 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create or replace function testrngfunc() returns rngfunc_type as $$\n  select 7.136178319899999964, 7.136178319899999964;\n$$ language sql volatile;"
+---
+CreateFunctionStmt@0..146
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Or@7..9 "or"
+  Whitespace@9..10 " "
+  Replace@10..17 "replace"
+  Whitespace@17..18 " "
+  Function@18..26 "function"
+  Whitespace@26..27 " "
+  Ident@27..38 "testrngfunc"
+  Ascii40@38..39 "("
+  Ascii41@39..40 ")"
+  Whitespace@40..41 " "
+  Returns@41..48 "returns"
+  Whitespace@48..49 " "
+  TypeName@49..61
+    Ident@49..61 "rngfunc_type"
+  Whitespace@61..62 " "
+  DefElem@62..123
+    As@62..64 "as"
+    Whitespace@64..65 " "
+    List@65..123
+      Sconst@65..123 "$$\n  select 7.1361783 ..."
+  Whitespace@123..124 " "
+  DefElem@124..136
+    Language@124..132 "language"
+    Whitespace@132..133 " "
+    SqlP@133..136 "sql"
+  Whitespace@136..137 " "
+  DefElem@137..145
+    Volatile@137..145 "volatile"
+  Ascii59@145..146 ";"
+

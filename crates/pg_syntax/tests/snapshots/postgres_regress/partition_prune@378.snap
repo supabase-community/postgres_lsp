@@ -1,0 +1,66 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select tbl1.col1, tprt.col1 from tbl1\ninner join tprt on tbl1.col1 > tprt.col1\norder by tbl1.col1, tprt.col1;"
+---
+SelectStmt@0..109
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..16
+    ColumnRef@7..16
+      Ident@7..11 "tbl1"
+      Ascii46@11..12 "."
+      Ident@12..16 "col1"
+  Ascii44@16..17 ","
+  Whitespace@17..18 " "
+  ResTarget@18..27
+    ColumnRef@18..27
+      Ident@18..22 "tprt"
+      Ascii46@22..23 "."
+      Ident@23..27 "col1"
+  Whitespace@27..28 " "
+  From@28..32 "from"
+  Whitespace@32..33 " "
+  JoinExpr@33..78
+    RangeVar@33..37
+      Ident@33..37 "tbl1"
+    Newline@37..38 "\n"
+    InnerP@38..43 "inner"
+    Whitespace@43..44 " "
+    Join@44..48 "join"
+    Whitespace@48..49 " "
+    RangeVar@49..53
+      Ident@49..53 "tprt"
+    Whitespace@53..54 " "
+    On@54..56 "on"
+    Whitespace@56..57 " "
+    AExpr@57..78
+      ColumnRef@57..66
+        Ident@57..61 "tbl1"
+        Ascii46@61..62 "."
+        Ident@62..66 "col1"
+      Whitespace@66..67 " "
+      Ascii62@67..68 ">"
+      Whitespace@68..69 " "
+      ColumnRef@69..78
+        Ident@69..73 "tprt"
+        Ascii46@73..74 "."
+        Ident@74..78 "col1"
+  Newline@78..79 "\n"
+  SortBy@79..97
+    Order@79..84 "order"
+    Whitespace@84..85 " "
+    By@85..87 "by"
+    Whitespace@87..88 " "
+    ColumnRef@88..97
+      Ident@88..92 "tbl1"
+      Ascii46@92..93 "."
+      Ident@93..97 "col1"
+  Ascii44@97..98 ","
+  Whitespace@98..99 " "
+  SortBy@99..108
+    ColumnRef@99..108
+      Ident@99..103 "tprt"
+      Ascii46@103..104 "."
+      Ident@104..108 "col1"
+  Ascii59@108..109 ";"
+

@@ -1,0 +1,28 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO num_exp_sub VALUES (0,6,'-.0469370721950711508944806393077762204079964905145503836835397203739563036579760026190241480514409364');"
+---
+InsertStmt@0..142
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "num_exp_sub"
+  Whitespace@23..24 " "
+  SelectStmt@24..140
+    Values@24..30 "VALUES"
+    Whitespace@30..31 " "
+    Ascii40@31..32 "("
+    List@32..140
+      AConst@32..33
+        Iconst@32..33 "0"
+      Ascii44@33..34 ","
+      AConst@34..35
+        Iconst@34..35 "6"
+      Ascii44@35..36 ","
+      AConst@36..140
+        Sconst@36..140 "'-.046937072195071150 ..."
+  Ascii41@140..141 ")"
+  Ascii59@141..142 ";"
+

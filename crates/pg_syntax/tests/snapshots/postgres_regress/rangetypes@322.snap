@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create type textrange2 as range(subtype=text, collation=\"C\");"
+---
+CreateRangeStmt@0..61
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  TypeP@7..11 "type"
+  Whitespace@11..12 " "
+  Ident@12..22 "textrange2"
+  Whitespace@22..23 " "
+  As@23..25 "as"
+  Whitespace@25..26 " "
+  Range@26..31 "range"
+  Ascii40@31..32 "("
+  DefElem@32..44
+    Ident@32..39 "subtype"
+    Ascii61@39..40 "="
+    TypeName@40..44
+      TextP@40..44 "text"
+  Ascii44@44..45 ","
+  Whitespace@45..46 " "
+  DefElem@46..59
+    Collation@46..55 "collation"
+    Ascii61@55..56 "="
+    TypeName@56..59
+      Ident@56..59 "\"C\""
+  Ascii41@59..60 ")"
+  Ascii59@60..61 ";"
+

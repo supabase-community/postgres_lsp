@@ -1517,8 +1517,10 @@ name = "pg_syntax"
 version = "0.0.0"
 dependencies = [
  "cstree",
+ "insta",
  "petgraph",
  "pg_lexer",
+ "pg_query",
  "pg_query_ext",
  "text-size",
 ]

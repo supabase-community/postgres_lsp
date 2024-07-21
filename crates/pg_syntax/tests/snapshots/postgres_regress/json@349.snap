@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT json_build_object('{a,b,c}'::text[]);"
+---
+SelectStmt@0..44
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..40
+    FuncCall@7..40
+      Ident@7..24 "json_build_object"
+      Ascii40@24..25 "("
+      TypeCast@25..40
+        AConst@25..34
+          Sconst@25..34 "'{a,b,c}'"
+        Typecast@34..36 "::"
+        TypeName@36..40
+          TextP@36..40 "text"
+  Ascii91@40..41 "["
+  Ascii93@41..42 "]"
+  Ascii41@42..43 ")"
+  Ascii59@43..44 ";"
+

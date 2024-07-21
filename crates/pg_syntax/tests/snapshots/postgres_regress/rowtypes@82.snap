@@ -1,0 +1,19 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select ROW() IS NULL;
+---
+SelectStmt@0..21
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..20
+    NullTest@7..20
+      RowExpr@7..10
+        Row@7..10 "ROW"
+      Ascii40@10..11 "("
+      Ascii41@11..12 ")"
+      Whitespace@12..13 " "
+      Is@13..15 "IS"
+      Whitespace@15..16 " "
+      NullP@16..20 "NULL"
+  Ascii59@20..21 ";"
+

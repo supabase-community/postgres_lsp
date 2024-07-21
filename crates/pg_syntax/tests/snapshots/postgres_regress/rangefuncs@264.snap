@@ -1,0 +1,58 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION dup (f1 anycompatiblerange, f2 out anycompatible, f3 out anycompatiblearray, f4 out anycompatiblerange)\nAS 'select lower($1), array[lower($1), upper($1)], $1' LANGUAGE sql;"
+---
+CreateFunctionStmt@0..188
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..19 "dup"
+  Whitespace@19..20 " "
+  Ascii40@20..21 "("
+  FunctionParameter@21..42
+    Ident@21..23 "f1"
+    Whitespace@23..24 " "
+    TypeName@24..42
+      Ident@24..42 "anycompatiblerange"
+  Ascii44@42..43 ","
+  Whitespace@43..44 " "
+  FunctionParameter@44..64
+    Ident@44..46 "f2"
+    Whitespace@46..47 " "
+    OutP@47..50 "out"
+    Whitespace@50..51 " "
+    TypeName@51..64
+      Ident@51..64 "anycompatible"
+  Ascii44@64..65 ","
+  Whitespace@65..66 " "
+  FunctionParameter@66..91
+    Ident@66..68 "f3"
+    Whitespace@68..69 " "
+    OutP@69..72 "out"
+    Whitespace@72..73 " "
+    TypeName@73..91
+      Ident@73..91 "anycompatiblearray"
+  Ascii44@91..92 ","
+  Whitespace@92..93 " "
+  FunctionParameter@93..118
+    Ident@93..95 "f4"
+    Whitespace@95..96 " "
+    OutP@96..99 "out"
+    Whitespace@99..100 " "
+    TypeName@100..118
+      Ident@100..118 "anycompatiblerange"
+  Ascii41@118..119 ")"
+  Newline@119..120 "\n"
+  DefElem@120..174
+    As@120..122 "AS"
+    Whitespace@122..123 " "
+    List@123..174
+      Sconst@123..174 "'select lower($1), ar ..."
+  Whitespace@174..175 " "
+  DefElem@175..187
+    Language@175..183 "LANGUAGE"
+    Whitespace@183..184 " "
+    SqlP@184..187 "sql"
+  Ascii59@187..188 ";"
+

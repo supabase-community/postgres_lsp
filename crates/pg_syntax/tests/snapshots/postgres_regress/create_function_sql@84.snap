@@ -1,0 +1,29 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO functest3 VALUES (1), (2);"
+---
+InsertStmt@0..38
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..21
+    Ident@12..21 "functest3"
+  Whitespace@21..22 " "
+  SelectStmt@22..36
+    Values@22..28 "VALUES"
+    Whitespace@28..29 " "
+    Ascii40@29..30 "("
+    List@30..31
+      AConst@30..31
+        Iconst@30..31 "1"
+    Ascii41@31..32 ")"
+    Ascii44@32..33 ","
+    Whitespace@33..34 " "
+    Ascii40@34..35 "("
+    List@35..36
+      AConst@35..36
+        Iconst@35..36 "2"
+  Ascii41@36..37 ")"
+  Ascii59@37..38 ";"
+

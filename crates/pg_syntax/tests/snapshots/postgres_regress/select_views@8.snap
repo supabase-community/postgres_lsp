@@ -1,0 +1,49 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE credit_usage (\n       cid      int references customer(cid),\n       ymd      date,\n       usage    int\n);"
+---
+CreateStmt@0..118
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..25
+    Ident@13..25 "credit_usage"
+  Whitespace@25..26 " "
+  Ascii40@26..27 "("
+  Newline@27..28 "\n"
+  Whitespace@28..35 "       "
+  ColumnDef@35..71
+    Ident@35..38 "cid"
+    Whitespace@38..44 "      "
+    TypeName@44..47
+      IntP@44..47 "int"
+    Whitespace@47..48 " "
+    Constraint@48..71
+      References@48..58 "references"
+      Whitespace@58..59 " "
+      RangeVar@59..67
+        Ident@59..67 "customer"
+      Ascii40@67..68 "("
+      Ident@68..71 "cid"
+  Ascii41@71..72 ")"
+  Ascii44@72..73 ","
+  Newline@73..74 "\n"
+  Whitespace@74..81 "       "
+  ColumnDef@81..94
+    Ident@81..84 "ymd"
+    Whitespace@84..90 "      "
+    TypeName@90..94
+      Ident@90..94 "date"
+  Ascii44@94..95 ","
+  Newline@95..96 "\n"
+  Whitespace@96..103 "       "
+  ColumnDef@103..115
+    Ident@103..108 "usage"
+    Whitespace@108..112 "    "
+    TypeName@112..115
+      IntP@112..115 "int"
+  Newline@115..116 "\n"
+  Ascii41@116..117 ")"
+  Ascii59@117..118 ";"
+

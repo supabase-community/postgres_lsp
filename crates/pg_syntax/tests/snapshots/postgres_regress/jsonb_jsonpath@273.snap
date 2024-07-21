@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select jsonb_path_query('\"1.2\"', '$.ceiling()');"
+---
+SelectStmt@0..48
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..46
+    FuncCall@7..46
+      Ident@7..23 "jsonb_path_query"
+      Ascii40@23..24 "("
+      AConst@24..31
+        Sconst@24..31 "'\"1.2\"'"
+      Ascii44@31..32 ","
+      Whitespace@32..33 " "
+      AConst@33..46
+        Sconst@33..46 "'$.ceiling()'"
+  Ascii41@46..47 ")"
+  Ascii59@47..48 ";"
+

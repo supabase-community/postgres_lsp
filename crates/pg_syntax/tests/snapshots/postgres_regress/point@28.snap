@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SET enable_indexscan TO false;
+---
+VariableSetStmt@0..30
+  Set@0..3 "SET"
+  Whitespace@3..4 " "
+  Ident@4..20 "enable_indexscan"
+  Whitespace@20..21 " "
+  To@21..23 "TO"
+  Whitespace@23..24 " "
+  AConst@24..29
+    FalseP@24..29 "false"
+  Ascii59@29..30 ";"
+

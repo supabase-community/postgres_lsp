@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_timestamp('97/Feb/16', 'FXYY/Mon/DD');"
+---
+SelectStmt@0..48
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..46
+    FuncCall@7..46
+      Ident@7..19 "to_timestamp"
+      Ascii40@19..20 "("
+      AConst@20..31
+        Sconst@20..31 "'97/Feb/16'"
+      Ascii44@31..32 ","
+      Whitespace@32..33 " "
+      AConst@33..46
+        Sconst@33..46 "'FXYY/Mon/DD'"
+  Ascii41@46..47 ")"
+  Ascii59@47..48 ";"
+

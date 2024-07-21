@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT name, statement, parameter_types FROM pg_prepared_statements;"
+---
+SelectStmt@0..68
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      NameP@7..11 "name"
+  Ascii44@11..12 ","
+  Whitespace@12..13 " "
+  ResTarget@13..22
+    ColumnRef@13..22
+      Statement@13..22 "statement"
+  Ascii44@22..23 ","
+  Whitespace@23..24 " "
+  ResTarget@24..39
+    ColumnRef@24..39
+      Ident@24..39 "parameter_types"
+  Whitespace@39..40 " "
+  From@40..44 "FROM"
+  Whitespace@44..45 " "
+  RangeVar@45..67
+    Ident@45..67 "pg_prepared_statements"
+  Ascii59@67..68 ";"
+

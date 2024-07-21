@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO ucchild values(100, 'hundred');"
+---
+InsertStmt@0..43
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..19
+    Ident@12..19 "ucchild"
+  Whitespace@19..20 " "
+  SelectStmt@20..41
+    Values@20..26 "values"
+    Ascii40@26..27 "("
+    List@27..41
+      AConst@27..30
+        Iconst@27..30 "100"
+      Ascii44@30..31 ","
+      Whitespace@31..32 " "
+      AConst@32..41
+        Sconst@32..41 "'hundred'"
+  Ascii41@41..42 ")"
+  Ascii59@42..43 ";"
+

@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from hash_join_batches(\n$$\n  select count(*) from simple r join extremely_skewed s using (id);\n$$);"
+---
+SelectStmt@0..108
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..106
+    List@14..106
+      FuncCall@14..106
+        Ident@14..31 "hash_join_batches"
+        Ascii40@31..32 "("
+        Newline@32..33 "\n"
+        AConst@33..106
+          Sconst@33..106 "$$\n  select count(*)  ..."
+  Ascii41@106..107 ")"
+  Ascii59@107..108 ";"
+

@@ -1,0 +1,18 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select 'zyy' ~ '(?<=[xy])yy+';"
+---
+SelectStmt@0..30
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..29
+    AExpr@7..29
+      AConst@7..12
+        Sconst@7..12 "'zyy'"
+      Whitespace@12..13 " "
+      Op@13..14 "~"
+      Whitespace@14..15 " "
+      AConst@15..29
+        Sconst@15..29 "'(?<=[xy])yy+'"
+  Ascii59@29..30 ";"
+

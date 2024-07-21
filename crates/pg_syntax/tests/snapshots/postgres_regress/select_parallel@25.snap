@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: set enable_parallel_append to off;
+---
+VariableSetStmt@0..34
+  Set@0..3 "set"
+  Whitespace@3..4 " "
+  Ident@4..26 "enable_parallel_append"
+  Whitespace@26..27 " "
+  To@27..29 "to"
+  Whitespace@29..30 " "
+  AConst@30..33
+    Off@30..33 "off"
+  Ascii59@33..34 ";"
+

@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select to_tsvector('simple', '') @@ '!foo' AS \"true\";"
+---
+SelectStmt@0..53
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..52
+    AExpr@7..42
+      FuncCall@7..31
+        Ident@7..18 "to_tsvector"
+        Ascii40@18..19 "("
+        AConst@19..27
+          Sconst@19..27 "'simple'"
+        Ascii44@27..28 ","
+        Whitespace@28..29 " "
+        AConst@29..31
+          Sconst@29..31 "''"
+      Ascii41@31..32 ")"
+      Whitespace@32..33 " "
+      Op@33..35 "@@"
+      Whitespace@35..36 " "
+      AConst@36..42
+        Sconst@36..42 "'!foo'"
+    Whitespace@42..43 " "
+    As@43..45 "AS"
+    Whitespace@45..46 " "
+    Ident@46..52 "\"true\""
+  Ascii59@52..53 ";"
+

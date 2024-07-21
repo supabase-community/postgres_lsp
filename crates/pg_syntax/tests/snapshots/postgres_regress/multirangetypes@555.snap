@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create table i8mr_array (f1 int, f2 int8multirange[]);"
+---
+CreateStmt@0..54
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..23
+    Ident@13..23 "i8mr_array"
+  Whitespace@23..24 " "
+  Ascii40@24..25 "("
+  ColumnDef@25..31
+    Ident@25..27 "f1"
+    Whitespace@27..28 " "
+    TypeName@28..31
+      IntP@28..31 "int"
+  Ascii44@31..32 ","
+  Whitespace@32..33 " "
+  ColumnDef@33..50
+    Ident@33..35 "f2"
+    Whitespace@35..36 " "
+    TypeName@36..50
+      Ident@36..50 "int8multirange"
+  Ascii91@50..51 "["
+  Ascii93@51..52 "]"
+  Ascii41@52..53 ")"
+  Ascii59@53..54 ";"
+

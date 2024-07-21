@@ -1,0 +1,49 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT make_record(x) FROM (SELECT generate_series(1, 5) x) ss ORDER BY x;"
+---
+SelectStmt@0..74
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..20
+    FuncCall@7..20
+      Ident@7..18 "make_record"
+      Ascii40@18..19 "("
+      ColumnRef@19..20
+        Ident@19..20 "x"
+  Ascii41@20..21 ")"
+  Whitespace@21..22 " "
+  From@22..26 "FROM"
+  Whitespace@26..27 " "
+  Ascii40@27..28 "("
+  RangeSubselect@28..62
+    SelectStmt@28..58
+      Select@28..34 "SELECT"
+      Whitespace@34..35 " "
+      ResTarget@35..58
+        FuncCall@35..55
+          Ident@35..50 "generate_series"
+          Ascii40@50..51 "("
+          AConst@51..52
+            Iconst@51..52 "1"
+          Ascii44@52..53 ","
+          Whitespace@53..54 " "
+          AConst@54..55
+            Iconst@54..55 "5"
+        Ascii41@55..56 ")"
+        Whitespace@56..57 " "
+        Ident@57..58 "x"
+    Ascii41@58..59 ")"
+    Whitespace@59..60 " "
+    Alias@60..62
+      Ident@60..62 "ss"
+  Whitespace@62..63 " "
+  SortBy@63..73
+    Order@63..68 "ORDER"
+    Whitespace@68..69 " "
+    By@69..71 "BY"
+    Whitespace@71..72 " "
+    ColumnRef@72..73
+      Ident@72..73 "x"
+  Ascii59@73..74 ";"
+

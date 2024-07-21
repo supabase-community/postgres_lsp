@@ -1,0 +1,52 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TABLE ptif_test0 PARTITION OF ptif_test\n  FOR VALUES FROM (minvalue) TO (0) PARTITION BY list (b);"
+---
+CreateStmt@0..105
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..23
+    Ident@13..23 "ptif_test0"
+  Whitespace@23..24 " "
+  Partition@24..33 "PARTITION"
+  Whitespace@33..34 " "
+  Of@34..36 "OF"
+  Whitespace@36..37 " "
+  RangeVar@37..46
+    Ident@37..46 "ptif_test"
+  Newline@46..47 "\n"
+  Whitespace@47..49 "  "
+  For@49..52 "FOR"
+  Whitespace@52..53 " "
+  Values@53..59 "VALUES"
+  Whitespace@59..60 " "
+  PartitionBoundSpec@60..81
+    From@60..64 "FROM"
+    Whitespace@64..65 " "
+    Ascii40@65..66 "("
+    ColumnRef@66..74
+      Minvalue@66..74 "minvalue"
+    Ascii41@74..75 ")"
+    Whitespace@75..76 " "
+    To@76..78 "TO"
+    Whitespace@78..79 " "
+    Ascii40@79..80 "("
+    AConst@80..81
+      Iconst@80..81 "0"
+  Ascii41@81..82 ")"
+  Whitespace@82..83 " "
+  PartitionSpec@83..103
+    Partition@83..92 "PARTITION"
+    Whitespace@92..93 " "
+    By@93..95 "BY"
+    Whitespace@95..96 " "
+    Ident@96..100 "list"
+    Whitespace@100..101 " "
+    Ascii40@101..102 "("
+    PartitionElem@102..103
+      Ident@102..103 "b"
+  Ascii41@103..104 ")"
+  Ascii59@104..105 ";"
+

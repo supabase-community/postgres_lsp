@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO INT8_TBL(q1) VALUES ('-1204982019841029840928340329840934');"
+---
+InsertStmt@0..72
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "INT8_TBL"
+  Ascii40@20..21 "("
+  ResTarget@21..23
+    Ident@21..23 "q1"
+  Ascii41@23..24 ")"
+  Whitespace@24..25 " "
+  SelectStmt@25..70
+    Values@25..31 "VALUES"
+    Whitespace@31..32 " "
+    Ascii40@32..33 "("
+    List@33..70
+      AConst@33..70
+        Sconst@33..70 "'-1204982019841029840 ..."
+  Ascii41@70..71 ")"
+  Ascii59@71..72 ";"
+

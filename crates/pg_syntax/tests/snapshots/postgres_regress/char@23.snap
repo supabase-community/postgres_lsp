@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT '\\377'::\"char\";"
+---
+SelectStmt@0..22
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..21
+    TypeCast@7..21
+      AConst@7..13
+        Sconst@7..13 "'\\377'"
+      Typecast@13..15 "::"
+      TypeName@15..21
+        Ident@15..21 "\"char\""
+  Ascii59@21..22 ";"
+

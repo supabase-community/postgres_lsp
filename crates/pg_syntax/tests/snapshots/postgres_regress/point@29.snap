@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SET enable_bitmapscan TO false;
+---
+VariableSetStmt@0..31
+  Set@0..3 "SET"
+  Whitespace@3..4 " "
+  Ident@4..21 "enable_bitmapscan"
+  Whitespace@21..22 " "
+  To@22..24 "TO"
+  Whitespace@24..25 " "
+  AConst@25..30
+    FalseP@25..30 "false"
+  Ascii59@30..31 ";"
+

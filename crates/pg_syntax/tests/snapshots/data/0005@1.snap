@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "DELETE FROM weather WHERE city = 'Hayward';"
+---
+DeleteStmt@0..43
+  DeleteP@0..6 "DELETE"
+  Whitespace@6..7 " "
+  From@7..11 "FROM"
+  Whitespace@11..12 " "
+  RangeVar@12..19
+    Ident@12..19 "weather"
+  Whitespace@19..20 " "
+  Where@20..25 "WHERE"
+  Whitespace@25..26 " "
+  AExpr@26..42
+    ColumnRef@26..30
+      Ident@26..30 "city"
+    Whitespace@30..31 " "
+    Ascii61@31..32 "="
+    Whitespace@32..33 " "
+    AConst@33..42
+      Sconst@33..42 "'Hayward'"
+  Ascii59@42..43 ";"
+

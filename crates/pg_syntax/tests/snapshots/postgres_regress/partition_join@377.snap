@@ -1,0 +1,147 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT t1.a, t1.c, t2.a, t2.c FROM plt1_adv t1 FULL JOIN plt2_adv t2 ON (t1.a = t2.a AND t1.c = t2.c) WHERE coalesce(t1.b, 0) < 10 AND coalesce(t2.b, 0) < 10 ORDER BY t1.a, t2.a;"
+---
+SelectStmt@0..178
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      Ident@7..9 "t1"
+      Ascii46@9..10 "."
+      Ident@10..11 "a"
+  Ascii44@11..12 ","
+  Whitespace@12..13 " "
+  ResTarget@13..17
+    ColumnRef@13..17
+      Ident@13..15 "t1"
+      Ascii46@15..16 "."
+      Ident@16..17 "c"
+  Ascii44@17..18 ","
+  Whitespace@18..19 " "
+  ResTarget@19..23
+    ColumnRef@19..23
+      Ident@19..21 "t2"
+      Ascii46@21..22 "."
+      Ident@22..23 "a"
+  Ascii44@23..24 ","
+  Whitespace@24..25 " "
+  ResTarget@25..29
+    ColumnRef@25..29
+      Ident@25..27 "t2"
+      Ascii46@27..28 "."
+      Ident@28..29 "c"
+  Whitespace@29..30 " "
+  From@30..34 "FROM"
+  Whitespace@34..35 " "
+  JoinExpr@35..100
+    RangeVar@35..46
+      Ident@35..43 "plt1_adv"
+      Whitespace@43..44 " "
+      Alias@44..46
+        Ident@44..46 "t1"
+    Whitespace@46..47 " "
+    Full@47..51 "FULL"
+    Whitespace@51..52 " "
+    Join@52..56 "JOIN"
+    Whitespace@56..57 " "
+    RangeVar@57..68
+      Ident@57..65 "plt2_adv"
+      Whitespace@65..66 " "
+      Alias@66..68
+        Ident@66..68 "t2"
+    Whitespace@68..69 " "
+    On@69..71 "ON"
+    Whitespace@71..72 " "
+    Ascii40@72..73 "("
+    BoolExpr@73..100
+      AExpr@73..84
+        ColumnRef@73..77
+          Ident@73..75 "t1"
+          Ascii46@75..76 "."
+          Ident@76..77 "a"
+        Whitespace@77..78 " "
+        Ascii61@78..79 "="
+        Whitespace@79..80 " "
+        ColumnRef@80..84
+          Ident@80..82 "t2"
+          Ascii46@82..83 "."
+          Ident@83..84 "a"
+      Whitespace@84..85 " "
+      And@85..88 "AND"
+      Whitespace@88..89 " "
+      AExpr@89..100
+        ColumnRef@89..93
+          Ident@89..91 "t1"
+          Ascii46@91..92 "."
+          Ident@92..93 "c"
+        Whitespace@93..94 " "
+        Ascii61@94..95 "="
+        Whitespace@95..96 " "
+        ColumnRef@96..100
+          Ident@96..98 "t2"
+          Ascii46@98..99 "."
+          Ident@99..100 "c"
+  Ascii41@100..101 ")"
+  Whitespace@101..102 " "
+  Where@102..107 "WHERE"
+  Whitespace@107..108 " "
+  BoolExpr@108..157
+    AExpr@108..130
+      CoalesceExpr@108..124
+        Coalesce@108..116 "coalesce"
+        Ascii40@116..117 "("
+        ColumnRef@117..121
+          Ident@117..119 "t1"
+          Ascii46@119..120 "."
+          Ident@120..121 "b"
+        Ascii44@121..122 ","
+        Whitespace@122..123 " "
+        AConst@123..124
+          Iconst@123..124 "0"
+      Ascii41@124..125 ")"
+      Whitespace@125..126 " "
+      Ascii60@126..127 "<"
+      Whitespace@127..128 " "
+      AConst@128..130
+        Iconst@128..130 "10"
+    Whitespace@130..131 " "
+    And@131..134 "AND"
+    Whitespace@134..135 " "
+    AExpr@135..157
+      CoalesceExpr@135..151
+        Coalesce@135..143 "coalesce"
+        Ascii40@143..144 "("
+        ColumnRef@144..148
+          Ident@144..146 "t2"
+          Ascii46@146..147 "."
+          Ident@147..148 "b"
+        Ascii44@148..149 ","
+        Whitespace@149..150 " "
+        AConst@150..151
+          Iconst@150..151 "0"
+      Ascii41@151..152 ")"
+      Whitespace@152..153 " "
+      Ascii60@153..154 "<"
+      Whitespace@154..155 " "
+      AConst@155..157
+        Iconst@155..157 "10"
+  Whitespace@157..158 " "
+  SortBy@158..171
+    Order@158..163 "ORDER"
+    Whitespace@163..164 " "
+    By@164..166 "BY"
+    Whitespace@166..167 " "
+    ColumnRef@167..171
+      Ident@167..169 "t1"
+      Ascii46@169..170 "."
+      Ident@170..171 "a"
+  Ascii44@171..172 ","
+  Whitespace@172..173 " "
+  SortBy@173..177
+    ColumnRef@173..177
+      Ident@173..175 "t2"
+      Ascii46@175..176 "."
+      Ident@176..177 "a"
+  Ascii59@177..178 ";"
+

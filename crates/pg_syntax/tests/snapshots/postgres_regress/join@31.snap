@@ -1,0 +1,70 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT t1.a, t2.e\n  FROM J1_TBL t1 (a, b, c), J2_TBL t2 (d, e)\n  WHERE t1.a = t2.d;"
+---
+SelectStmt@0..83
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      Ident@7..9 "t1"
+      Ascii46@9..10 "."
+      Ident@10..11 "a"
+  Ascii44@11..12 ","
+  Whitespace@12..13 " "
+  ResTarget@13..17
+    ColumnRef@13..17
+      Ident@13..15 "t2"
+      Ascii46@15..16 "."
+      Ident@16..17 "e"
+  Newline@17..18 "\n"
+  Whitespace@18..20 "  "
+  From@20..24 "FROM"
+  Whitespace@24..25 " "
+  RangeVar@25..43
+    Ident@25..31 "J1_TBL"
+    Whitespace@31..32 " "
+    Alias@32..43
+      Ident@32..34 "t1"
+      Whitespace@34..35 " "
+      Ascii40@35..36 "("
+      Ident@36..37 "a"
+      Ascii44@37..38 ","
+      Whitespace@38..39 " "
+      Ident@39..40 "b"
+      Ascii44@40..41 ","
+      Whitespace@41..42 " "
+      Ident@42..43 "c"
+  Ascii41@43..44 ")"
+  Ascii44@44..45 ","
+  Whitespace@45..46 " "
+  RangeVar@46..61
+    Ident@46..52 "J2_TBL"
+    Whitespace@52..53 " "
+    Alias@53..61
+      Ident@53..55 "t2"
+      Whitespace@55..56 " "
+      Ascii40@56..57 "("
+      Ident@57..58 "d"
+      Ascii44@58..59 ","
+      Whitespace@59..60 " "
+      Ident@60..61 "e"
+  Ascii41@61..62 ")"
+  Newline@62..63 "\n"
+  Whitespace@63..65 "  "
+  Where@65..70 "WHERE"
+  Whitespace@70..71 " "
+  AExpr@71..82
+    ColumnRef@71..75
+      Ident@71..73 "t1"
+      Ascii46@73..74 "."
+      Ident@74..75 "a"
+    Whitespace@75..76 " "
+    Ascii61@76..77 "="
+    Whitespace@77..78 " "
+    ColumnRef@78..82
+      Ident@78..80 "t2"
+      Ascii46@80..81 "."
+      Ident@81..82 "d"
+  Ascii59@82..83 ";"
+

@@ -1,0 +1,33 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table rparted_by_int2 (a smallint) partition by range (a);
+---
+CreateStmt@0..65
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..28
+    Ident@13..28 "rparted_by_int2"
+  Whitespace@28..29 " "
+  Ascii40@29..30 "("
+  ColumnDef@30..40
+    Ident@30..31 "a"
+    Whitespace@31..32 " "
+    TypeName@32..40
+      Smallint@32..40 "smallint"
+  Ascii41@40..41 ")"
+  Whitespace@41..42 " "
+  PartitionSpec@42..63
+    Partition@42..51 "partition"
+    Whitespace@51..52 " "
+    By@52..54 "by"
+    Whitespace@54..55 " "
+    Range@55..60 "range"
+    Whitespace@60..61 " "
+    Ascii40@61..62 "("
+    PartitionElem@62..63
+      Ident@62..63 "a"
+  Ascii41@63..64 ")"
+  Ascii59@64..65 ";"
+

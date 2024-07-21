@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select count(*) from test_multirange_gist where mr -|- '{}'::int4multirange;"
+---
+SelectStmt@0..76
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..14
+    FuncCall@7..14
+      Ident@7..12 "count"
+      Ascii40@12..13 "("
+      Ascii42@13..14 "*"
+  Ascii41@14..15 ")"
+  Whitespace@15..16 " "
+  From@16..20 "from"
+  Whitespace@20..21 " "
+  RangeVar@21..41
+    Ident@21..41 "test_multirange_gist"
+  Whitespace@41..42 " "
+  Where@42..47 "where"
+  Whitespace@47..48 " "
+  AExpr@48..75
+    ColumnRef@48..50
+      Ident@48..50 "mr"
+    Whitespace@50..51 " "
+    Op@51..54 "-|-"
+    Whitespace@54..55 " "
+    TypeCast@55..75
+      AConst@55..59
+        Sconst@55..59 "'{}'"
+      Typecast@59..61 "::"
+      TypeName@61..75
+        Ident@61..75 "int4multirange"
+  Ascii59@75..76 ";"
+

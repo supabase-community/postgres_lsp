@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create table part_pa_test_p1 partition of part_pa_test for values from (minvalue) to (0);
+---
+CreateStmt@0..89
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Table@7..12 "table"
+  Whitespace@12..13 " "
+  RangeVar@13..28
+    Ident@13..28 "part_pa_test_p1"
+  Whitespace@28..29 " "
+  Partition@29..38 "partition"
+  Whitespace@38..39 " "
+  Of@39..41 "of"
+  Whitespace@41..42 " "
+  RangeVar@42..54
+    Ident@42..54 "part_pa_test"
+  Whitespace@54..55 " "
+  For@55..58 "for"
+  Whitespace@58..59 " "
+  Values@59..65 "values"
+  Whitespace@65..66 " "
+  PartitionBoundSpec@66..87
+    From@66..70 "from"
+    Whitespace@70..71 " "
+    Ascii40@71..72 "("
+    ColumnRef@72..80
+      Minvalue@72..80 "minvalue"
+    Ascii41@80..81 ")"
+    Whitespace@81..82 " "
+    To@82..84 "to"
+    Whitespace@84..85 " "
+    Ascii40@85..86 "("
+    AConst@86..87
+      Iconst@86..87 "0"
+  Ascii41@87..88 ")"
+  Ascii59@88..89 ";"
+

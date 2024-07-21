@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT pg_size_bytes('1 AB A');"
+---
+SelectStmt@0..31
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..29
+    FuncCall@7..29
+      Ident@7..20 "pg_size_bytes"
+      Ascii40@20..21 "("
+      AConst@21..29
+        Sconst@21..29 "'1 AB A'"
+  Ascii41@29..30 ")"
+  Ascii59@30..31 ";"
+

@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select pg_get_viewdef('vw_rngfunc');"
+---
+SelectStmt@0..36
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..34
+    FuncCall@7..34
+      Ident@7..21 "pg_get_viewdef"
+      Ascii40@21..22 "("
+      AConst@22..34
+        Sconst@22..34 "'vw_rngfunc'"
+  Ascii41@34..35 ")"
+  Ascii59@35..36 ";"
+

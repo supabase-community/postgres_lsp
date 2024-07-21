@@ -1,0 +1,22 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select explain_filter_to_json('explain (settings, format json) select * from int8_tbl i8') #> '{0,Settings,plan_cache_mode}';"
+---
+SelectStmt@0..125
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..124
+    AExpr@7..124
+      FuncCall@7..89
+        Ident@7..29 "explain_filter_to_json"
+        Ascii40@29..30 "("
+        AConst@30..89
+          Sconst@30..89 "'explain (settings, f ..."
+      Ascii41@89..90 ")"
+      Whitespace@90..91 " "
+      Op@91..93 "#>"
+      Whitespace@93..94 " "
+      AConst@94..124
+        Sconst@94..124 "'{0,Settings,plan_cac ..."
+  Ascii59@124..125 ";"
+

@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT E'''1 \\\\''2'''::tsquery;"
+---
+SelectStmt@0..31
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..30
+    TypeCast@7..30
+      AConst@7..21
+        Sconst@7..21 "E'''1 \\\\''2'''"
+      Typecast@21..23 "::"
+      TypeName@23..30
+        Ident@23..30 "tsquery"
+  Ascii59@30..31 ";"
+

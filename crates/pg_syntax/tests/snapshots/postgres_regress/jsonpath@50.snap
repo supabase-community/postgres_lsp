@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select '$.g ? (@.zip == $zip)'::jsonpath;"
+---
+SelectStmt@0..41
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..40
+    TypeCast@7..40
+      AConst@7..30
+        Sconst@7..30 "'$.g ? (@.zip == $zip)'"
+      Typecast@30..32 "::"
+      TypeName@32..40
+        Ident@32..40 "jsonpath"
+  Ascii59@40..41 ";"
+

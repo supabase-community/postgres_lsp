@@ -1,0 +1,25 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: create index spgist_domain_idx on spgist_domain_tbl using spgist(f1);
+---
+IndexStmt@0..69
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Index@7..12 "index"
+  Whitespace@12..13 " "
+  Ident@13..30 "spgist_domain_idx"
+  Whitespace@30..31 " "
+  On@31..33 "on"
+  Whitespace@33..34 " "
+  RangeVar@34..51
+    Ident@34..51 "spgist_domain_tbl"
+  Whitespace@51..52 " "
+  Using@52..57 "using"
+  Whitespace@57..58 " "
+  Ident@58..64 "spgist"
+  Ascii40@64..65 "("
+  IndexElem@65..67
+    Ident@65..67 "f1"
+  Ascii41@67..68 ")"
+  Ascii59@68..69 ";"
+

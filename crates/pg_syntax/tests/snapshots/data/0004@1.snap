@@ -1,0 +1,50 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE VIEW myview AS\n    SELECT name, location\n        FROM weather, cities\n        WHERE city = name;"
+---
+ViewStmt@0..103
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  View@7..11 "VIEW"
+  Whitespace@11..12 " "
+  RangeVar@12..18
+    Ident@12..18 "myview"
+  Whitespace@18..19 " "
+  As@19..21 "AS"
+  Newline@21..22 "\n"
+  Whitespace@22..26 "    "
+  SelectStmt@26..102
+    Select@26..32 "SELECT"
+    Whitespace@32..33 " "
+    ResTarget@33..37
+      ColumnRef@33..37
+        NameP@33..37 "name"
+    Ascii44@37..38 ","
+    Whitespace@38..39 " "
+    ResTarget@39..47
+      ColumnRef@39..47
+        Location@39..47 "location"
+    Newline@47..48 "\n"
+    Whitespace@48..56 "        "
+    From@56..60 "FROM"
+    Whitespace@60..61 " "
+    RangeVar@61..68
+      Ident@61..68 "weather"
+    Ascii44@68..69 ","
+    Whitespace@69..70 " "
+    RangeVar@70..76
+      Ident@70..76 "cities"
+    Newline@76..77 "\n"
+    Whitespace@77..85 "        "
+    Where@85..90 "WHERE"
+    Whitespace@90..91 " "
+    AExpr@91..102
+      ColumnRef@91..95
+        Ident@91..95 "city"
+      Whitespace@95..96 " "
+      Ascii61@96..97 "="
+      Whitespace@97..98 " "
+      ColumnRef@98..102
+        NameP@98..102 "name"
+  Ascii59@102..103 ";"
+

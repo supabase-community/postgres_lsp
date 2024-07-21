@@ -1,0 +1,20 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT pg_get_functiondef('functest_F_2'::regproc);"
+---
+SelectStmt@0..51
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..49
+    FuncCall@7..49
+      Ident@7..25 "pg_get_functiondef"
+      Ascii40@25..26 "("
+      TypeCast@26..49
+        AConst@26..40
+          Sconst@26..40 "'functest_F_2'"
+        Typecast@40..42 "::"
+        TypeName@42..49
+          Ident@42..49 "regproc"
+  Ascii41@49..50 ")"
+  Ascii59@50..51 ";"
+

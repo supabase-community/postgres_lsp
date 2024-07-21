@@ -1,0 +1,27 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select * from json_each('{\"f1\":[1,2,3],\"f2\":{\"f3\":1},\"f4\":null,\"f5\":99,\"f6\":\"stringy\"}') q;"
+---
+SelectStmt@0..91
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  RangeFunction@14..90
+    List@14..87
+      FuncCall@14..87
+        Ident@14..23 "json_each"
+        Ascii40@23..24 "("
+        AConst@24..87
+          Sconst@24..87 "'{\"f1\":[1,2,3],\"f2\":{ ..."
+    Ascii41@87..88 ")"
+    Whitespace@88..89 " "
+    Alias@89..90
+      Ident@89..90 "q"
+  Ascii59@90..91 ";"
+

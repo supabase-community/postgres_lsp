@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SET max_parallel_maintenance_workers TO 4;
+---
+VariableSetStmt@0..42
+  Set@0..3 "SET"
+  Whitespace@3..4 " "
+  Ident@4..36 "max_parallel_maintena ..."
+  Whitespace@36..37 " "
+  To@37..39 "TO"
+  Whitespace@39..40 " "
+  AConst@40..41
+    Iconst@40..41 "4"
+  Ascii59@41..42 ";"
+

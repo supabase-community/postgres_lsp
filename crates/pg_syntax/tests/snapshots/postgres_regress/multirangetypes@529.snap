@@ -1,0 +1,33 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select _textrange1(textrange2('a','z')) @> 'b'::text;"
+---
+SelectStmt@0..53
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..52
+    AExpr@7..52
+      FuncCall@7..37
+        Ident@7..18 "_textrange1"
+        Ascii40@18..19 "("
+        FuncCall@19..37
+          Ident@19..29 "textrange2"
+          Ascii40@29..30 "("
+          AConst@30..33
+            Sconst@30..33 "'a'"
+          Ascii44@33..34 ","
+          AConst@34..37
+            Sconst@34..37 "'z'"
+      Ascii41@37..38 ")"
+      Ascii41@38..39 ")"
+      Whitespace@39..40 " "
+      Op@40..42 "@>"
+      Whitespace@42..43 " "
+      TypeCast@43..52
+        AConst@43..46
+          Sconst@43..46 "'b'"
+        Typecast@46..48 "::"
+        TypeName@48..52
+          TextP@48..52 "text"
+  Ascii59@52..53 ";"
+

@@ -1,0 +1,60 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select thousand, hundred from tenk1\nwhere (998, 5000) < (thousand, hundred)\norder by thousand, hundred;"
+---
+SelectStmt@0..103
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..15
+    ColumnRef@7..15
+      Ident@7..15 "thousand"
+  Ascii44@15..16 ","
+  Whitespace@16..17 " "
+  ResTarget@17..24
+    ColumnRef@17..24
+      Ident@17..24 "hundred"
+  Whitespace@24..25 " "
+  From@25..29 "from"
+  Whitespace@29..30 " "
+  RangeVar@30..35
+    Ident@30..35 "tenk1"
+  Newline@35..36 "\n"
+  Where@36..41 "where"
+  Whitespace@41..42 " "
+  AExpr@42..74
+    RowExpr@42..52
+      Ascii40@42..43 "("
+      AConst@43..46
+        Iconst@43..46 "998"
+      Ascii44@46..47 ","
+      Whitespace@47..48 " "
+      AConst@48..52
+        Iconst@48..52 "5000"
+    Ascii41@52..53 ")"
+    Whitespace@53..54 " "
+    Ascii60@54..55 "<"
+    Whitespace@55..56 " "
+    RowExpr@56..74
+      Ascii40@56..57 "("
+      ColumnRef@57..65
+        Ident@57..65 "thousand"
+      Ascii44@65..66 ","
+      Whitespace@66..67 " "
+      ColumnRef@67..74
+        Ident@67..74 "hundred"
+  Ascii41@74..75 ")"
+  Newline@75..76 "\n"
+  SortBy@76..93
+    Order@76..81 "order"
+    Whitespace@81..82 " "
+    By@82..84 "by"
+    Whitespace@84..85 " "
+    ColumnRef@85..93
+      Ident@85..93 "thousand"
+  Ascii44@93..94 ","
+  Whitespace@94..95 " "
+  SortBy@95..102
+    ColumnRef@95..102
+      Ident@95..102 "hundred"
+  Ascii59@102..103 ";"
+

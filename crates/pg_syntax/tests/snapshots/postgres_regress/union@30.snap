@@ -1,0 +1,42 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: SELECT q2 FROM int8_tbl EXCEPT ALL SELECT q1 FROM int8_tbl ORDER BY 1;
+---
+SelectStmt@0..70
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  SelectStmt@7..23
+    ResTarget@7..9
+      ColumnRef@7..9
+        Ident@7..9 "q2"
+    Whitespace@9..10 " "
+    From@10..14 "FROM"
+    Whitespace@14..15 " "
+    RangeVar@15..23
+      Ident@15..23 "int8_tbl"
+  Whitespace@23..24 " "
+  Except@24..30 "EXCEPT"
+  Whitespace@30..31 " "
+  All@31..34 "ALL"
+  Whitespace@34..35 " "
+  SelectStmt@35..58
+    Select@35..41 "SELECT"
+    Whitespace@41..42 " "
+    ResTarget@42..44
+      ColumnRef@42..44
+        Ident@42..44 "q1"
+    Whitespace@44..45 " "
+    From@45..49 "FROM"
+    Whitespace@49..50 " "
+    RangeVar@50..58
+      Ident@50..58 "int8_tbl"
+  Whitespace@58..59 " "
+  SortBy@59..69
+    Order@59..64 "ORDER"
+    Whitespace@64..65 " "
+    By@65..67 "BY"
+    Whitespace@67..68 " "
+    AConst@68..69
+      Iconst@68..69 "1"
+  Ascii59@69..70 ";"
+

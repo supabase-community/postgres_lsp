@@ -1,0 +1,18 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "select 'x' ~ 'x|(?:\\M)+';"
+---
+SelectStmt@0..25
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..24
+    AExpr@7..24
+      AConst@7..10
+        Sconst@7..10 "'x'"
+      Whitespace@10..11 " "
+      Op@11..12 "~"
+      Whitespace@12..13 " "
+      AConst@13..24
+        Sconst@13..24 "'x|(?:\\M)+'"
+  Ascii59@24..25 ";"
+

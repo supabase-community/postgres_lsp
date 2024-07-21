@@ -1,0 +1,52 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: select * from x left join y on (x1 = y1 and y2 is not null);
+---
+SelectStmt@0..60
+  Select@0..6 "select"
+  Whitespace@6..7 " "
+  ResTarget@7..8
+    ColumnRef@7..8
+      AStar@7..8
+        Ascii42@7..8 "*"
+  Whitespace@8..9 " "
+  From@9..13 "from"
+  Whitespace@13..14 " "
+  JoinExpr@14..58
+    RangeVar@14..15
+      Ident@14..15 "x"
+    Whitespace@15..16 " "
+    Left@16..20 "left"
+    Whitespace@20..21 " "
+    Join@21..25 "join"
+    Whitespace@25..26 " "
+    RangeVar@26..27
+      Ident@26..27 "y"
+    Whitespace@27..28 " "
+    On@28..30 "on"
+    Whitespace@30..31 " "
+    Ascii40@31..32 "("
+    BoolExpr@32..58
+      AExpr@32..39
+        ColumnRef@32..34
+          Ident@32..34 "x1"
+        Whitespace@34..35 " "
+        Ascii61@35..36 "="
+        Whitespace@36..37 " "
+        ColumnRef@37..39
+          Ident@37..39 "y1"
+      Whitespace@39..40 " "
+      And@40..43 "and"
+      Whitespace@43..44 " "
+      NullTest@44..58
+        ColumnRef@44..46
+          Ident@44..46 "y2"
+        Whitespace@46..47 " "
+        Is@47..49 "is"
+        Whitespace@49..50 " "
+        Not@50..53 "not"
+        Whitespace@53..54 " "
+        NullP@54..58 "null"
+  Ascii41@58..59 ")"
+  Ascii59@59..60 ";"
+

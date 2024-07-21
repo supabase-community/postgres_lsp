@@ -1,0 +1,39 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE TABLE prt1_p3 PARTITION OF prt1 FOR VALUES FROM (500) TO (600);
+---
+CreateStmt@0..70
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..20
+    Ident@13..20 "prt1_p3"
+  Whitespace@20..21 " "
+  Partition@21..30 "PARTITION"
+  Whitespace@30..31 " "
+  Of@31..33 "OF"
+  Whitespace@33..34 " "
+  RangeVar@34..38
+    Ident@34..38 "prt1"
+  Whitespace@38..39 " "
+  For@39..42 "FOR"
+  Whitespace@42..43 " "
+  Values@43..49 "VALUES"
+  Whitespace@49..50 " "
+  PartitionBoundSpec@50..68
+    From@50..54 "FROM"
+    Whitespace@54..55 " "
+    Ascii40@55..56 "("
+    AConst@56..59
+      Iconst@56..59 "500"
+    Ascii41@59..60 ")"
+    Whitespace@60..61 " "
+    To@61..63 "TO"
+    Whitespace@63..64 " "
+    Ascii40@64..65 "("
+    AConst@65..68
+      Iconst@65..68 "600"
+  Ascii41@68..69 ")"
+  Ascii59@69..70 ";"
+

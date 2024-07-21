@@ -1,0 +1,35 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION set(tabname name) RETURNS VOID\nAS $$\nBEGIN\n  UPDATE m\n  SET id = (SELECT c.relfilenode\n            FROM pg_class AS c, pg_namespace AS s\n            WHERE c.relname = tabname\n                AND c.relnamespace = s.oid\n                AND s.nspname = 'fast_default');\nEND;\n$$ LANGUAGE 'plpgsql';"
+---
+CreateFunctionStmt@0..310
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Set@16..19 "set"
+  Ascii40@19..20 "("
+  FunctionParameter@20..32
+    Ident@20..27 "tabname"
+    Whitespace@27..28 " "
+    TypeName@28..32
+      NameP@28..32 "name"
+  Ascii41@32..33 ")"
+  Whitespace@33..34 " "
+  Returns@34..41 "RETURNS"
+  Whitespace@41..42 " "
+  TypeName@42..46
+    Ident@42..46 "VOID"
+  Newline@46..47 "\n"
+  DefElem@47..290
+    As@47..49 "AS"
+    Whitespace@49..50 " "
+    List@50..290
+      Sconst@50..290 "$$\nBEGIN\n  UPDATE m\n  ..."
+  Whitespace@290..291 " "
+  DefElem@291..309
+    Language@291..299 "LANGUAGE"
+    Whitespace@299..300 " "
+    Sconst@300..309 "'plpgsql'"
+  Ascii59@309..310 ";"
+

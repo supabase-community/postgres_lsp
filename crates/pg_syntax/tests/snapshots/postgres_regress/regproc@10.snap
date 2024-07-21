@@ -1,0 +1,16 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT to_regoperator('+(int4,int4)');"
+---
+SelectStmt@0..38
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..36
+    FuncCall@7..36
+      Ident@7..21 "to_regoperator"
+      Ascii40@21..22 "("
+      AConst@22..36
+        Sconst@22..36 "'+(int4,int4)'"
+  Ascii41@36..37 ")"
+  Ascii59@37..38 ";"
+

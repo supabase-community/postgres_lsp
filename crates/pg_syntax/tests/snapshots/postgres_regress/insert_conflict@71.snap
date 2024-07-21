@@ -1,0 +1,41 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "create unique index tricky_expr_comp_key_index on insertconflicttest(key, lower(fruit), upper(fruit));"
+---
+IndexStmt@0..102
+  Create@0..6 "create"
+  Whitespace@6..7 " "
+  Unique@7..13 "unique"
+  Whitespace@13..14 " "
+  Index@14..19 "index"
+  Whitespace@19..20 " "
+  Ident@20..46 "tricky_expr_comp_key_ ..."
+  Whitespace@46..47 " "
+  On@47..49 "on"
+  Whitespace@49..50 " "
+  RangeVar@50..68
+    Ident@50..68 "insertconflicttest"
+  Ascii40@68..69 "("
+  IndexElem@69..72
+    Key@69..72 "key"
+  Ascii44@72..73 ","
+  Whitespace@73..74 " "
+  IndexElem@74..85
+    FuncCall@74..85
+      Ident@74..79 "lower"
+      Ascii40@79..80 "("
+      ColumnRef@80..85
+        Ident@80..85 "fruit"
+  Ascii41@85..86 ")"
+  Ascii44@86..87 ","
+  Whitespace@87..88 " "
+  IndexElem@88..99
+    FuncCall@88..99
+      Ident@88..93 "upper"
+      Ascii40@93..94 "("
+      ColumnRef@94..99
+        Ident@94..99 "fruit"
+  Ascii41@99..100 ")"
+  Ascii41@100..101 ")"
+  Ascii59@101..102 ";"
+
