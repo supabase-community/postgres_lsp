@@ -47,7 +47,7 @@ impl Workspace {
         let mut doc = self
             .documents
             .entry(url.clone())
-            .or_insert(Document::new_empty(url));
+            .or_insert(Document::new(url, None));
 
         change.apply(doc.value_mut());
 
@@ -387,7 +387,7 @@ mod tests {
             Diagnostic {
                 message: "Dropping a column may break existing clients.".to_string(),
                 description: None,
-                severity: diagnostics::Severity::Warning,
+                severity: pg_diagnostics::Severity::Warning,
                 source: "lint".to_string(),
                 range: TextRange::new(TextSize::new(50), TextSize::new(64)),
             }

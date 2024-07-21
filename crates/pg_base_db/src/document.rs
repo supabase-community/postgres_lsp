@@ -7,18 +7,17 @@ use crate::PgLspPath;
 
 extern crate test;
 
-#[derive(Debug)]
-pub struct DocumentParams {
-    pub url: PgLspPath,
-    pub text: String,
-}
-
+/// Represents a sql source file, and contains a list of statements represented by their ranges
 pub struct Document {
+    /// The url of the document
     pub url: PgLspPath,
+    /// The text of the document
     pub text: String,
+    /// The version of the document
     pub version: i32,
-    // vector of statements sorted by range.start()
+    /// List of statements sorted by range.start()
     pub statement_ranges: Vec<TextRange>,
+    /// Line index for the document
     pub line_index: LineIndex,
 }
 
@@ -28,6 +27,10 @@ impl Hash for Document {
     }
 }
 
+/// Represents a reference to a sql statement. This is the primary data structure that is used by higher-level crates to save and retrieve information about a statement.
+/// This needs to be optimised by removing the text from the struct and making it a reference to the text in the document.
+///
+/// Note that the ref must include all information needed to uniquely identify the statement, so that it can be used as a key in a hashmap.
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub struct StatementRef {
     pub document_url: PgLspPath,
@@ -37,31 +40,28 @@ pub struct StatementRef {
 }
 
 impl Document {
-    pub fn new_empty(url: PgLspPath) -> Document {
+    /// Create a new document
+    pub fn new(url: PgLspPath, text: Option<String>) -> Document {
         Document {
             version: 0,
-            statement_ranges: Vec::new(),
-            line_index: LineIndex::new(""),
-            text: "".to_string(),
+            line_index: LineIndex::new(&text.as_ref().unwrap_or(&"".to_string())),
+            // TODO: use errors returned by split
+            statement_ranges: text.as_ref().map_or_else(
+                || Vec::new(),
+                |f| {
+                    pg_statement_splitter::split(&f)
+                        .ranges
+                        .iter()
+                        .map(|range| range.clone())
+                        .collect()
+                },
+            ),
+            text: text.unwrap_or("".to_string()),
             url,
         }
     }
 
-    pub fn new(params: DocumentParams) -> Document {
-        Document {
-            version: 0,
-            // todo: use errors returned by split
-            statement_ranges: pg_statement_splitter::split(&params.text)
-                .ranges
-                .iter()
-                .map(|range| range.clone())
-                .collect(),
-            line_index: LineIndex::new(&params.text),
-            text: params.text,
-            url: params.url,
-        }
-    }
-
+    /// Returns the statement at the given offset
     pub fn statement_at_offset(&self, offset: &TextSize) -> Option<StatementRef> {
         self.statement_ranges
             .iter()
@@ -69,6 +69,7 @@ impl Document {
             .map(|idx| self.statement_ref(idx))
     }
 
+    /// Returns the statements at the given range
     pub fn statements_at_range(&self, range: &TextRange) -> Vec<StatementRef> {
         self.statement_ranges
             .iter()
@@ -80,6 +81,7 @@ impl Document {
             .collect()
     }
 
+    /// Returns the statement at the given offset with its range in the document
     pub fn statement_at_offset_with_range(
         &self,
         offset: &TextSize,
@@ -90,7 +92,8 @@ impl Document {
             .map(|idx| self.statement_ref_with_range(idx))
     }
 
-    pub fn drain_statements(&mut self) -> Vec<StatementRef> {
+    /// Drains the statements from the document
+    pub(crate) fn drain_statements(&mut self) -> Vec<StatementRef> {
         self.statement_ranges
             .drain(..)
             .enumerate()
@@ -102,6 +105,7 @@ impl Document {
             .collect()
     }
 
+    /// Returns all statements with their ranges in the document
     pub fn statement_refs_with_range(&self) -> Vec<(TextRange, StatementRef)> {
         self.statement_ranges
             .iter()
@@ -119,6 +123,7 @@ impl Document {
             .collect()
     }
 
+    /// Returns all statements in the document
     pub fn statement_refs(&self) -> Vec<StatementRef> {
         self.statement_ranges
             .iter()
@@ -131,6 +136,7 @@ impl Document {
             .collect()
     }
 
+    /// Returns the statement with the given index, throws an error if the index is out of bounds
     pub fn statement_ref(&self, pos: usize) -> StatementRef {
         self.statement_ranges
             .get(pos)
@@ -142,6 +148,7 @@ impl Document {
             .unwrap()
     }
 
+    /// Returns the statement with the given index and its range in the document
     pub fn statement_ref_with_range(&self, pos: usize) -> (TextRange, StatementRef) {
         self.statement_ranges
             .get(pos)
@@ -164,16 +171,17 @@ mod tests {
 
     use text_size::{TextRange, TextSize};
 
-    use crate::{Document, DocumentParams, PgLspPath};
+    use crate::{Document, PgLspPath};
 
     #[test]
     fn test_statements_at_range() {
         let url = PgLspPath::new("test.sql");
 
-        let doc = Document::new(DocumentParams {
+        let doc = Document::new(
             url,
-            text: "select unknown from contact;\n\nselect 12345;\n\nalter table test drop column id;\n".to_string()
-        });
+            Some("select unknown from contact;\n\nselect 12345;\n\nalter table test drop column id;\n"
+                .to_string()),
+        );
 
         let x = doc.statements_at_range(&TextRange::new(TextSize::from(2), TextSize::from(5)));
 

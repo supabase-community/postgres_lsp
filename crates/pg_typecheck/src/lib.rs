@@ -85,7 +85,6 @@ pub async fn check_sql<'a>(params: TypecheckerParams<'a>) -> Vec<TypeError> {
 #[cfg(test)]
 mod tests {
     use async_std::task::block_on;
-    use sql_parser::parse_ast;
     use sqlx::PgPool;
 
     use crate::{check_sql, TypecheckerParams};
@@ -98,8 +97,8 @@ mod tests {
 
         let pool = block_on(PgPool::connect(conn_string.as_str())).unwrap();
 
-        let root = sql_parser::parse_sql_statement(input).unwrap();
-        let ast = parse_ast(input, &root).ast;
+        let root = pg_query_ext::parse(input).unwrap();
+        let ast = pg_syntax::parse_syntax(input, &root).ast;
 
         let errs = block_on(check_sql(TypecheckerParams {
             conn: &pool,

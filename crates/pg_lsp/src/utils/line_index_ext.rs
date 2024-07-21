@@ -54,19 +54,19 @@ impl LineIndexExt for LineIndex {
 
 #[cfg(test)]
 mod tests {
-    use base_db::{Document, DocumentParams, PgLspPath};
-    use cstree::text::{TextRange, TextSize};
+    use pg_base_db::{Document, PgLspPath};
+    use text_size::{TextRange, TextSize};
 
-    use super::LineIndexExt;
+    use crate::utils::line_index_ext::LineIndexExt;
 
     #[test]
     fn test_line_col_lsp_range() {
         let url = PgLspPath::new("test.sql");
 
-        let d = Document::new(DocumentParams {
+        let d = Document::new(
             url,
-            text: "select 1 from contact;\nselect 1;\nalter table test drop column id;".to_string(),
-        });
+            Some("select 1 from contact;\nselect 1;\nalter table test drop column id;".to_string()),
+        );
 
         println!(
             "{:#?}",

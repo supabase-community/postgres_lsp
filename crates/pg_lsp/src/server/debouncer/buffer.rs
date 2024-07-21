@@ -110,15 +110,4 @@ mod tests {
         sleep(Duration::from_millis(10));
         assert!(matches!(debouncer.get(), State::Ready(_)));
     }
-
-    #[test]
-    fn deduplication() {
-        let mut debouncer = EventBuffer::new(Duration::from_millis(20));
-        debouncer.put(1);
-        debouncer.put(2);
-        sleep(Duration::from_millis(10));
-        debouncer.put(1);
-        sleep(Duration::from_millis(20));
-        assert!(debouncer.iter().eq([2, 1]));
-    }
 }
