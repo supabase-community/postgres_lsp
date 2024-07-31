@@ -1,3 +1,9 @@
+//! # pg_hover
+//!
+//! This crate implements the hover feature. Essentially, it takes a position in a sql statement, and checks what node is located at that position. If the node is a valid hover result type, it resolves the type from the schema cache and returns it. The consumer of this crate is responsible for rendering the data.
+//!
+//! Note that we have two ways of resolving the hover result. We first try to resolve it from the enriched AST, and if that fails, we try to resolve it from the tree-sitter CST. This is because the enriched AST is more accurate, but the tree-sitter CST is more reliable.
+
 mod resolve;
 
 use pg_schema_cache::SchemaCache;
