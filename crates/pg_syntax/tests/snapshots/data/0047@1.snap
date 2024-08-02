@@ -1,0 +1,24 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE DATABASE x OWNER abc CONNECTION LIMIT 5;
+---
+CreatedbStmt@0..47
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Database@7..15 "DATABASE"
+  Whitespace@15..16 " "
+  Ident@16..17 "x"
+  Whitespace@17..18 " "
+  DefElem@18..27
+    Owner@18..23 "OWNER"
+    Whitespace@23..24 " "
+    Ident@24..27 "abc"
+  Whitespace@27..28 " "
+  DefElem@28..46
+    Connection@28..38 "CONNECTION"
+    Whitespace@38..39 " "
+    Limit@39..44 "LIMIT"
+    Whitespace@44..45 " "
+    Iconst@45..46 "5"
+  Ascii59@46..47 ";"
+

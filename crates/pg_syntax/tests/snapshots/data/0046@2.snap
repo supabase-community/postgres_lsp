@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TYPE type1 AS (attr1 int4, attr2 bool);"
+---
+CompositeTypeStmt@0..46
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  TypeP@7..11 "TYPE"
+  Whitespace@11..12 " "
+  RangeVar@12..17
+    Ident@12..17 "type1"
+  Whitespace@17..18 " "
+  As@18..20 "AS"
+  Whitespace@20..21 " "
+  Ascii40@21..22 "("
+  ColumnDef@22..32
+    Ident@22..27 "attr1"
+    Whitespace@27..28 " "
+    TypeName@28..32
+      Ident@28..32 "int4"
+  Ascii44@32..33 ","
+  Whitespace@33..34 " "
+  ColumnDef@34..44
+    Ident@34..39 "attr2"
+    Whitespace@39..40 " "
+    TypeName@40..44
+      Ident@40..44 "bool"
+  Ascii41@44..45 ")"
+  Ascii59@45..46 ";"
+

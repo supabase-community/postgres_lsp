@@ -1,0 +1,30 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "ALTER TABLE products ADD CHECK (name <> '');"
+---
+AlterTableStmt@0..44
+  Alter@0..5 "ALTER"
+  Whitespace@5..6 " "
+  Table@6..11 "TABLE"
+  Whitespace@11..12 " "
+  RangeVar@12..20
+    Ident@12..20 "products"
+  Whitespace@20..21 " "
+  AlterTableCmd@21..42
+    AddP@21..24 "ADD"
+    Whitespace@24..25 " "
+    Constraint@25..42
+      Check@25..30 "CHECK"
+      Whitespace@30..31 " "
+      Ascii40@31..32 "("
+      AExpr@32..42
+        ColumnRef@32..36
+          NameP@32..36 "name"
+        Whitespace@36..37 " "
+        NotEquals@37..39 "<>"
+        Whitespace@39..40 " "
+        AConst@40..42
+          Sconst@40..42 "''"
+  Ascii41@42..43 ")"
+  Ascii59@43..44 ";"
+

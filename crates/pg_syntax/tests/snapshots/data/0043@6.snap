@@ -1,0 +1,32 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE TABLE capitals (state char(2)) INHERITS (cities);
+---
+CreateStmt@0..56
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Table@7..12 "TABLE"
+  Whitespace@12..13 " "
+  RangeVar@13..21
+    Ident@13..21 "capitals"
+  Whitespace@21..22 " "
+  Ascii40@22..23 "("
+  ColumnDef@23..35
+    Ident@23..28 "state"
+    Whitespace@28..29 " "
+    TypeName@29..35
+      CharP@29..33 "char"
+      Ascii40@33..34 "("
+      AConst@34..35
+        Iconst@34..35 "2"
+  Ascii41@35..36 ")"
+  Ascii41@36..37 ")"
+  Whitespace@37..38 " "
+  Inherits@38..46 "INHERITS"
+  Whitespace@46..47 " "
+  Ascii40@47..48 "("
+  RangeVar@48..54
+    Ident@48..54 "cities"
+  Ascii41@54..55 ")"
+  Ascii59@55..56 ";"
+

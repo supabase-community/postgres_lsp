@@ -1,0 +1,50 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE FUNCTION dup(in int, out f1 int, out f2 text)\n    AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$\n    LANGUAGE SQL;"
+---
+CreateFunctionStmt@0..125
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Function@7..15 "FUNCTION"
+  Whitespace@15..16 " "
+  Ident@16..19 "dup"
+  Ascii40@19..20 "("
+  FunctionParameter@20..26
+    InP@20..22 "in"
+    Whitespace@22..23 " "
+    TypeName@23..26
+      IntP@23..26 "int"
+  Ascii44@26..27 ","
+  Whitespace@27..28 " "
+  FunctionParameter@28..38
+    OutP@28..31 "out"
+    Whitespace@31..32 " "
+    Ident@32..34 "f1"
+    Whitespace@34..35 " "
+    TypeName@35..38
+      IntP@35..38 "int"
+  Ascii44@38..39 ","
+  Whitespace@39..40 " "
+  FunctionParameter@40..51
+    OutP@40..43 "out"
+    Whitespace@43..44 " "
+    Ident@44..46 "f2"
+    Whitespace@46..47 " "
+    TypeName@47..51
+      TextP@47..51 "text"
+  Ascii41@51..52 ")"
+  Newline@52..53 "\n"
+  Whitespace@53..57 "    "
+  DefElem@57..107
+    As@57..59 "AS"
+    Whitespace@59..60 " "
+    List@60..107
+      Sconst@60..107 "$$ SELECT $1, CAST($1 ..."
+  Newline@107..108 "\n"
+  Whitespace@108..112 "    "
+  DefElem@112..124
+    Language@112..120 "LANGUAGE"
+    Whitespace@120..121 " "
+    SqlP@121..124 "SQL"
+  Ascii59@124..125 ";"
+

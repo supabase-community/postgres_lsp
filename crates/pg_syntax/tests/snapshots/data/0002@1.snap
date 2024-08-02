@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "COPY weather FROM '/home/user/weather.txt';"
+---
+CopyStmt@0..43
+  Copy@0..4 "COPY"
+  Whitespace@4..5 " "
+  RangeVar@5..12
+    Ident@5..12 "weather"
+  Whitespace@12..13 " "
+  From@13..17 "FROM"
+  Whitespace@17..18 " "
+  Sconst@18..42 "'/home/user/weather.txt'"
+  Ascii59@42..43 ";"
+

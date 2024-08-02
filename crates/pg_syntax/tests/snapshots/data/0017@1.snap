@@ -1,0 +1,54 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SELECT name, (SELECT max(pop) FROM cities WHERE cities.state = states.name)\n    FROM states;"
+---
+SelectStmt@0..92
+  Select@0..6 "SELECT"
+  Whitespace@6..7 " "
+  ResTarget@7..11
+    ColumnRef@7..11
+      NameP@7..11 "name"
+  Ascii44@11..12 ","
+  Whitespace@12..13 " "
+  ResTarget@13..74
+    SubLink@13..74
+      SelectStmt@13..74
+        Ascii40@13..14 "("
+        Select@14..20 "SELECT"
+        Whitespace@20..21 " "
+        ResTarget@21..28
+          FuncCall@21..28
+            Ident@21..24 "max"
+            Ascii40@24..25 "("
+            ColumnRef@25..28
+              Ident@25..28 "pop"
+        Ascii41@28..29 ")"
+        Whitespace@29..30 " "
+        From@30..34 "FROM"
+        Whitespace@34..35 " "
+        RangeVar@35..41
+          Ident@35..41 "cities"
+        Whitespace@41..42 " "
+        Where@42..47 "WHERE"
+        Whitespace@47..48 " "
+        AExpr@48..74
+          ColumnRef@48..60
+            Ident@48..54 "cities"
+            Ascii46@54..55 "."
+            Ident@55..60 "state"
+          Whitespace@60..61 " "
+          Ascii61@61..62 "="
+          Whitespace@62..63 " "
+          ColumnRef@63..74
+            Ident@63..69 "states"
+            Ascii46@69..70 "."
+            NameP@70..74 "name"
+  Ascii41@74..75 ")"
+  Newline@75..76 "\n"
+  Whitespace@76..80 "    "
+  From@80..84 "FROM"
+  Whitespace@84..85 " "
+  RangeVar@85..91
+    Ident@85..91 "states"
+  Ascii59@91..92 ";"
+

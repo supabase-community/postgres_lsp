@@ -1,0 +1,26 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE TYPE type1 AS ENUM ('value1', 'value2', 'value3');"
+---
+CreateEnumStmt@0..57
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  TypeP@7..11 "TYPE"
+  Whitespace@11..12 " "
+  Ident@12..17 "type1"
+  Whitespace@17..18 " "
+  As@18..20 "AS"
+  Whitespace@20..21 " "
+  EnumP@21..25 "ENUM"
+  Whitespace@25..26 " "
+  Ascii40@26..27 "("
+  Sconst@27..35 "'value1'"
+  Ascii44@35..36 ","
+  Whitespace@36..37 " "
+  Sconst@37..45 "'value2'"
+  Ascii44@45..46 ","
+  Whitespace@46..47 " "
+  Sconst@47..55 "'value3'"
+  Ascii41@55..56 ")"
+  Ascii59@56..57 ";"
+

@@ -1,0 +1,14 @@
+[package]
+name = "pg_lexer_codegen"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+proc-macro2 = "1.0.66"
+quote = "1.0.33"
+pg_query_proto_parser.workspace = true
+
+[lib]
+doctest = false
+proc-macro = true
+

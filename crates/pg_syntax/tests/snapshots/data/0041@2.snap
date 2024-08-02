@@ -1,0 +1,15 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE SCHEMA AUTHORIZATION joe;
+---
+CreateSchemaStmt@0..32
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Schema@7..13 "SCHEMA"
+  Whitespace@13..14 " "
+  Authorization@14..27 "AUTHORIZATION"
+  Whitespace@27..28 " "
+  RoleSpec@28..31
+    Ident@28..31 "joe"
+  Ascii59@31..32 ";"
+

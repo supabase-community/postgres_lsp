@@ -1,0 +1,52 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "INSERT INTO weather (date, city, temp_hi, temp_lo)\n    VALUES ('1994-11-29', 'Hayward', 54, 37);"
+---
+InsertStmt@0..96
+  Insert@0..6 "INSERT"
+  Whitespace@6..7 " "
+  Into@7..11 "INTO"
+  Whitespace@11..12 " "
+  RangeVar@12..19
+    Ident@12..19 "weather"
+  Whitespace@19..20 " "
+  Ascii40@20..21 "("
+  ResTarget@21..25
+    Ident@21..25 "date"
+  Ascii44@25..26 ","
+  Whitespace@26..27 " "
+  ResTarget@27..31
+    Ident@27..31 "city"
+  Ascii44@31..32 ","
+  Whitespace@32..33 " "
+  ResTarget@33..40
+    Ident@33..40 "temp_hi"
+  Ascii44@40..41 ","
+  Whitespace@41..42 " "
+  ResTarget@42..49
+    Ident@42..49 "temp_lo"
+  Ascii41@49..50 ")"
+  Newline@50..51 "\n"
+  Whitespace@51..55 "    "
+  SelectStmt@55..94
+    Values@55..61 "VALUES"
+    Whitespace@61..62 " "
+    Ascii40@62..63 "("
+    List@63..94
+      AConst@63..75
+        Sconst@63..75 "'1994-11-29'"
+      Ascii44@75..76 ","
+      Whitespace@76..77 " "
+      AConst@77..86
+        Sconst@77..86 "'Hayward'"
+      Ascii44@86..87 ","
+      Whitespace@87..88 " "
+      AConst@88..90
+        Iconst@88..90 "54"
+      Ascii44@90..91 ","
+      Whitespace@91..92 " "
+      AConst@92..94
+        Iconst@92..94 "37"
+  Ascii41@94..95 ")"
+  Ascii59@95..96 ";"
+

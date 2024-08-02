@@ -1,0 +1,17 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE DATABASE x ENCODING \"SQL_ASCII\";"
+---
+CreatedbStmt@0..39
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Database@7..15 "DATABASE"
+  Whitespace@15..16 " "
+  Ident@16..17 "x"
+  Whitespace@17..18 " "
+  DefElem@18..38
+    Encoding@18..26 "ENCODING"
+    Whitespace@26..27 " "
+    Ident@27..38 "\"SQL_ASCII\""
+  Ascii59@38..39 ";"
+

@@ -1,0 +1,10 @@
+[package]
+name = "line_index"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+text-size = "1.1.1"
+
+[lib]
+doctest = false

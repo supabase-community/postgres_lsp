@@ -1,0 +1,47 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE VIEW pg_comedies AS SELECT * FROM comedies WHERE classification = 'PG' WITH CASCADED CHECK OPTION;"
+---
+ViewStmt@0..105
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  View@7..11 "VIEW"
+  Whitespace@11..12 " "
+  RangeVar@12..23
+    Ident@12..23 "pg_comedies"
+  Whitespace@23..24 " "
+  As@24..26 "AS"
+  Whitespace@26..27 " "
+  SelectStmt@27..77
+    Select@27..33 "SELECT"
+    Whitespace@33..34 " "
+    ResTarget@34..35
+      ColumnRef@34..35
+        AStar@34..35
+          Ascii42@34..35 "*"
+    Whitespace@35..36 " "
+    From@36..40 "FROM"
+    Whitespace@40..41 " "
+    RangeVar@41..49
+      Ident@41..49 "comedies"
+    Whitespace@49..50 " "
+    Where@50..55 "WHERE"
+    Whitespace@55..56 " "
+    AExpr@56..77
+      ColumnRef@56..70
+        Ident@56..70 "classification"
+      Whitespace@70..71 " "
+      Ascii61@71..72 "="
+      Whitespace@72..73 " "
+      AConst@73..77
+        Sconst@73..77 "'PG'"
+  Whitespace@77..78 " "
+  With@78..82 "WITH"
+  Whitespace@82..83 " "
+  Cascaded@83..91 "CASCADED"
+  Whitespace@91..92 " "
+  Check@92..97 "CHECK"
+  Whitespace@97..98 " "
+  Option@98..104 "OPTION"
+  Ascii59@104..105 ";"
+

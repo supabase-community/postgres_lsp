@@ -27,6 +27,9 @@ jobs:
         ports:
           - 5432:5432
 
+    env:
+      DB_CONNECTION_STRING: postgresql://postgres:postgres@localhost:5432/postgres
+
     steps:
       - name: 🏗 Setup repository
         uses: actions/checkout@v3
@@ -37,6 +40,9 @@ jobs:
         uses: ./.github/actions/setup-monorepo
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run test migrations
+        run: psql -f test-db/seed.sql postgresql://postgres:postgres@localhost:5432/postgres
 
       - name: 📦 Build
         id: build

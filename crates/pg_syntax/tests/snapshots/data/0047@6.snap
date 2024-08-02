@@ -1,0 +1,17 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: CREATE DATABASE x TEMPLATE TRUE;
+---
+CreatedbStmt@0..32
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Database@7..15 "DATABASE"
+  Whitespace@15..16 " "
+  Ident@16..17 "x"
+  Whitespace@17..18 " "
+  DefElem@18..31
+    Template@18..26 "TEMPLATE"
+    Whitespace@26..27 " "
+    TrueP@27..31 "TRUE"
+  Ascii59@31..32 ";"
+

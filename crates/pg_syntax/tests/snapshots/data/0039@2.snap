@@ -1,0 +1,43 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "CREATE AGGREGATE aggregate1 (int4, bool) (sfunc = sfunc1, stype = stype1);"
+---
+DefineStmt@0..74
+  Create@0..6 "CREATE"
+  Whitespace@6..7 " "
+  Aggregate@7..16 "AGGREGATE"
+  Whitespace@16..17 " "
+  Ident@17..27 "aggregate1"
+  Whitespace@27..28 " "
+  Ascii40@28..29 "("
+  List@29..39
+    FunctionParameter@29..33
+      TypeName@29..33
+        Ident@29..33 "int4"
+    Ascii44@33..34 ","
+    Whitespace@34..35 " "
+    FunctionParameter@35..39
+      TypeName@35..39
+        Ident@35..39 "bool"
+  Ascii41@39..40 ")"
+  Whitespace@40..41 " "
+  Ascii40@41..42 "("
+  DefElem@42..56
+    Ident@42..47 "sfunc"
+    Whitespace@47..48 " "
+    Ascii61@48..49 "="
+    Whitespace@49..50 " "
+    TypeName@50..56
+      Ident@50..56 "sfunc1"
+  Ascii44@56..57 ","
+  Whitespace@57..58 " "
+  DefElem@58..72
+    Ident@58..63 "stype"
+    Whitespace@63..64 " "
+    Ascii61@64..65 "="
+    Whitespace@65..66 " "
+    TypeName@66..72
+      Ident@66..72 "stype1"
+  Ascii41@72..73 ")"
+  Ascii59@73..74 ";"
+

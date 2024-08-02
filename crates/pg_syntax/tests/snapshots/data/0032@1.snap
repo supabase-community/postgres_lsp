@@ -1,0 +1,18 @@
+---
+source: crates/pg_syntax/tests/pg_syntax_tests.rs
+description: "SET search_path TO myschema,public;"
+---
+VariableSetStmt@0..35
+  Set@0..3 "SET"
+  Whitespace@3..4 " "
+  Ident@4..15 "search_path"
+  Whitespace@15..16 " "
+  To@16..18 "TO"
+  Whitespace@18..19 " "
+  AConst@19..27
+    Ident@19..27 "myschema"
+  Ascii44@27..28 ","
+  AConst@28..34
+    Ident@28..34 "public"
+  Ascii59@34..35 ";"
+
