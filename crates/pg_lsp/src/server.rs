@@ -99,10 +99,7 @@ impl Server {
 
         connection.initialize_finish(id, serde_json::to_value(result)?)?;
 
-        let client_flags = Arc::new(from_proto::client_flags(
-            params.capabilities,
-            params.client_info,
-        ));
+        let client_flags = Arc::new(from_proto::client_flags(params.capabilities));
 
         let pool = Arc::new(threadpool::Builder::new().build());
 
