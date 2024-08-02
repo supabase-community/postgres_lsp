@@ -4,9 +4,8 @@
 
 A Language Server for Postgres. Not SQL with flavors, just Postgres.
 
-## Status
-
-🚧 This is in active development and is only ready for collaborators. You can find the current roadmap and opportunities to contribute in https://github.com/supabase-community/postgres_lsp/issues/136.
+> [!WARNING]
+> This is in active development and is only ready for collaborators. But we are getting there! You can find the current roadmap and opportunities to contribute in https://github.com/supabase-community/postgres_lsp/issues/136.
 
 ## Features
 
