@@ -17,7 +17,7 @@ impl NotificationDispatcher {
         N::Params: DeserializeOwned,
         F: FnOnce(N::Params) -> Result<()>,
     {
-        if let Some(not) = self.not {
+        if let Some(_not) = self.not {
             match not.extract::<N::Params>(N::METHOD) {
                 Ok(params) => {
                     handler(params)?;

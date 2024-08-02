@@ -27,29 +27,8 @@ pub trait Get: Sized {
     /// Attemtps to get the next element out of a buffer. If an element is
     /// [State::Ready] it's removed from the buffer.
     fn get(&mut self) -> State<Self::Data>;
-
-    /// Returns an iterator over all [State::Ready] elements of the buffer.
-    /// Stops when either the next element is in [State::Wait] or the buffer
-    /// is [State::Empty].
-    fn iter(&mut self) -> BufferIter<Self> {
-        BufferIter(self)
-    }
 }
 
-/// Wraps a mutable reference to a buffer and implements an [Iterator] returning
-/// elements in [State::Ready]. Commonly instantiated by [Get::iter()].
-pub struct BufferIter<'a, B: Get>(&'a mut B);
-
-impl<'a, B: Get> Iterator for BufferIter<'a, B> {
-    type Item = B::Data;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.0.get() {
-            State::Ready(data) => Some(data),
-            _ => None,
-        }
-    }
-}
 /// Debouncing buffer with a common delay for all events. Accepts events via
 /// [EventBuffer::put()] which tracks the time of events and de-duplicates them
 /// against the current buffer content. Subsequent call to [EventBuffer::get

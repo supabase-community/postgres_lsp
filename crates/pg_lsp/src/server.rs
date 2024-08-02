@@ -258,7 +258,6 @@ impl Server {
         let new_conn = DbConnection::new(connection_string.unwrap().as_str()).await;
 
         if new_conn.is_err() {
-            let err = new_conn.unwrap_err();
             return;
         }
 
@@ -777,8 +776,6 @@ impl Server {
                                 return Ok(());
                             }
 
-                            let c = self.client.clone();
-
                             if let Some(response) = dispatch::RequestDispatcher::new(request)
                                 .on::<InlayHintRequest, _>(|id, params| self.inlay_hint(id, params))?
                                 .on::<HoverRequest, _>(|id, params| self.hover(id, params))?
@@ -855,7 +852,7 @@ impl Server {
 
                     sender.send(InternalMessage::SetOptions(options)).unwrap();
                 }
-                Err(why) => {
+                Err(_why) => {
                     // log::error!("Retrieving configuration failed: {}", why);
                 }
             };
@@ -876,7 +873,7 @@ impl Server {
 
             let client = self.client.clone();
             self.pool.execute(move || {
-                if let Err(why) = client.send_request::<RegisterCapability>(params) {
+                if let Err(_why) = client.send_request::<RegisterCapability>(params) {
                     // log::error!(
                     //     "Failed to register \"{}\" notification: {}",
                     //     DidChangeConfiguration::METHOD,

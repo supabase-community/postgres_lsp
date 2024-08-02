@@ -18,10 +18,7 @@ pub fn content_changes(
         .collect()
 }
 
-pub fn client_flags(
-    capabilities: lsp_types::ClientCapabilities,
-    info: Option<lsp_types::ClientInfo>,
-) -> ClientFlags {
+pub fn client_flags(capabilities: lsp_types::ClientCapabilities) -> ClientFlags {
     let configuration_pull = capabilities
         .workspace
         .as_ref()
