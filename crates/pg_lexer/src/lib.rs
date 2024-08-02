@@ -1,5 +1,3 @@
-#![feature(lazy_cell)]
-
 mod codegen;
 
 use pg_query::protobuf::{KeywordKind, ScanToken};

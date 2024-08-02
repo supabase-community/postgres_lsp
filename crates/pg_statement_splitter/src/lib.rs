@@ -1,5 +1,3 @@
-#![feature(lazy_cell)]
-
 ///! Postgres Statement Splitter
 ///!
 ///! This crate provides a function to split a SQL source string into individual statements.

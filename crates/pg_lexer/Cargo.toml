@@ -18,5 +18,3 @@ insta = "1.31.0"
 [lib]
 doctest = false
 
-[features]
-lazy_cell = []

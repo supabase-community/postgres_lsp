@@ -11,7 +11,7 @@
 //! I am not yet 100% happy with this, because when we create a `StatementRef`, the text is cloned from `Document` and included in the Hash. This must be improved by leaving the text in the `Document`, and making the `StatementRef` and actual reference to the text in the `Document`. This will make the `StatementRef` smaller and faster to compare.
 //! Additionally, the errors returned by the `pg_statement_splitter::split` are not exposed yet. This must be done to show syntax errors to the user.
 
-#![feature(extract_if, lazy_cell, test)]
+#![feature(extract_if, test)]
 
 mod change;
 mod document;
