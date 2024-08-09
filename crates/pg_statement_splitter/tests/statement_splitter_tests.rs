@@ -38,28 +38,18 @@ fn test_postgres_regress() {
 
         let libpg_query_split = pg_query::split_with_parser(&contents).unwrap();
 
-        let parser_split = pg_statement_splitter::split(&contents);
-
-        assert_eq!(
-            parser_split.errors.len(),
-            0,
-            "Unexpected errors when parsing file {}:\n{:#?}",
-            test_name,
-            parser_split.errors
-        );
+        let parser_ranges = pg_statement_splitter::split(&contents);
 
         assert_eq!(
             libpg_query_split.len(),
-            parser_split.ranges.len(),
+            parser_ranges.len(),
             "Mismatch in statement count for file {}: Expected {} statements, got {}",
             test_name,
             libpg_query_split.len(),
-            parser_split.ranges.len()
+            parser_ranges.len()
         );
 
-        for (libpg_query_stmt, parser_range) in
-            libpg_query_split.iter().zip(parser_split.ranges.iter())
-        {
+        for (libpg_query_stmt, parser_range) in libpg_query_split.iter().zip(parser_ranges.iter()) {
             let parser_stmt = &contents[parser_range.clone()].trim();
 
             let libpg_query_stmt = if libpg_query_stmt.ends_with(';') {
@@ -100,15 +90,15 @@ fn test_statement_splitter() {
 
         let contents = fs::read_to_string(&path).unwrap();
 
-        let split = pg_statement_splitter::split(&contents);
+        let ranges = pg_statement_splitter::split(&contents);
 
         assert_eq!(
-            split.ranges.len(),
+            ranges.len(),
             expected_count,
             "Mismatch in statement count for file {}: Expected {} statements, got {}",
             test_name,
             expected_count,
-            split.ranges.len()
+            ranges.len()
         );
     }
 }
