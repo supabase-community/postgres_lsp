@@ -4,13 +4,13 @@ use text_size::{TextRange, TextSize};
 use crate::{
     data::{STATEMENT_BRIDGE_DEFINITIONS, STATEMENT_DEFINITIONS},
     parser::Parser,
-    statement_tracker::StatementTracker,
+    tracker::Tracker,
 };
 
 pub(crate) struct StatementSplitter<'a> {
     parser: Parser,
-    tracked_statements: Vec<StatementTracker<'a>>,
-    active_bridges: Vec<StatementTracker<'a>>,
+    tracked_statements: Vec<Tracker<'a>>,
+    active_bridges: Vec<Tracker<'a>>,
     sub_trx_depth: usize,
     sub_stmt_depth: usize,
 }
@@ -57,7 +57,7 @@ impl<'a> StatementSplitter<'a> {
                                 if self.active_bridges.iter().any(|b| b.def.stmt == stmt.stmt) {
                                     None
                                 } else {
-                                    Some(StatementTracker::new_at(stmt, self.parser.pos))
+                                    Some(Tracker::new_at(stmt, self.parser.pos))
                                 }
                             })
                             .collect(),
@@ -72,7 +72,7 @@ impl<'a> StatementSplitter<'a> {
                 self.active_bridges.append(
                     &mut bridges
                         .iter()
-                        .map(|stmt| StatementTracker::new_at(stmt, self.parser.pos))
+                        .map(|stmt| Tracker::new_at(stmt, self.parser.pos))
                         .collect(),
                 );
             }
@@ -299,5 +299,59 @@ mod tests {
         assert_eq!("select 1 from contact", input[ranges[0]].to_string());
         assert_eq!("select 1", input[ranges[1]].to_string());
         assert_eq!("select 4", input[ranges[2]].to_string());
+    }
+
+    #[test]
+    fn test_explain() {
+        let input = "explain select 1 from contact\nselect 1\nselect 4";
+
+        let ranges = StatementSplitter::new(input).run();
+
+        assert_eq!(ranges.len(), 3);
+        assert_eq!(
+            "explain select 1 from contact",
+            input[ranges[0]].to_string()
+        );
+        assert_eq!("select 1", input[ranges[1]].to_string());
+        assert_eq!("select 4", input[ranges[2]].to_string());
+    }
+
+    #[test]
+    fn test_explain_analyze() {
+        let input = "explain analyze select 1 from contact\nselect 1\nselect 4";
+
+        let ranges = StatementSplitter::new(input).run();
+
+        assert_eq!(ranges.len(), 3);
+        assert_eq!(
+            "explain analyze select 1 from contact",
+            input[ranges[0]].to_string()
+        );
+        assert_eq!("select 1", input[ranges[1]].to_string());
+        assert_eq!("select 4", input[ranges[2]].to_string());
+    }
+
+    #[test]
+    fn test_cast() {
+        let input = "SELECT CAST(42 AS float8);\nselect 1";
+
+        let ranges = StatementSplitter::new(input).run();
+
+        assert_eq!(ranges.len(), 2);
+        assert_eq!("SELECT CAST(42 AS float8);", input[ranges[0]].to_string());
+        assert_eq!("select 1", input[ranges[1]].to_string());
+    }
+
+    #[test]
+    fn test_create_conversion() {
+        let input = "CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM myfunc;";
+
+        let ranges = StatementSplitter::new(input).run();
+
+        assert_eq!(ranges.len(), 1);
+        assert_eq!(
+            "CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM myfunc;",
+            input[ranges[0]].to_string()
+        );
     }
 }

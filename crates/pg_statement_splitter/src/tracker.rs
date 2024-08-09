@@ -3,7 +3,7 @@ use pg_lexer::{SyntaxKind, WHITESPACE_TOKENS};
 use crate::data::{StatementDefinition, SyntaxDefinition};
 
 #[derive(Debug)]
-pub struct StatementTracker<'a> {
+pub struct Tracker<'a> {
     pub def: &'a StatementDefinition,
 
     /// position in the definition
@@ -13,7 +13,7 @@ pub struct StatementTracker<'a> {
     pub started_at: usize,
 }
 
-impl<'a> StatementTracker<'a> {
+impl<'a> Tracker<'a> {
     pub fn new_at(def: &'a StatementDefinition, at: usize) -> Self {
         Self {
             def,
