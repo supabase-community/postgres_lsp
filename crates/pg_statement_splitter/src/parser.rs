@@ -67,17 +67,6 @@ impl Parser {
         }
     }
 
-    pub fn start_stmt(&mut self) {
-        assert!(self.current_stmt_start.is_none());
-        self.current_stmt_start = Some(self.pos);
-    }
-
-    pub fn close_stmt(&mut self) {
-        assert!(self.current_stmt_start.is_some());
-        self.ranges
-            .push((self.current_stmt_start.take().unwrap(), self.pos));
-    }
-
     /// collects an SyntaxError with an `error` message at `pos`
     pub fn error_at_pos(&mut self, error: String, pos: usize) {
         self.errors.push(SyntaxError::new_at_offset(
@@ -93,7 +82,8 @@ impl Parser {
     /// applies token and advances
     pub fn advance(&mut self) {
         assert!(!self.eof());
-        if self.nth(0, false).kind == SyntaxKind::Whitespace {
+        let token = self.nth(0, false);
+        if token.kind == SyntaxKind::Whitespace {
             if self.whitespace_token_buffer.is_none() {
                 self.whitespace_token_buffer = Some(self.pos);
             }
