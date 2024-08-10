@@ -1507,6 +1507,7 @@ dependencies = [
 name = "pg_statement_splitter"
 version = "0.0.0"
 dependencies = [
+ "insta",
  "pg_lexer",
  "pg_query",
  "text-size",

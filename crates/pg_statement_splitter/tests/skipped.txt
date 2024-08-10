@@ -10,3 +10,4 @@ drop_operator
 replica_identity
 unicode
 xmlmap
+aggregates

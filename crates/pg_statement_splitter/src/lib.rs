@@ -15,13 +15,19 @@ mod statement_splitter;
 mod syntax_error;
 mod tracker;
 
-use statement_splitter::StatementSplitter;
+use statement_splitter::{StatementPosition, StatementSplitter};
 use text_size::TextRange;
 
-// TODO check that the data defintiion stmt matches the real one in tests
-// TODO we might want to expose the stmt type for testing purposes or via a second api
-
 pub fn split(sql: &str) -> Vec<TextRange> {
+    StatementSplitter::new(sql)
+        .run()
+        .iter()
+        .map(|x| x.range)
+        .collect()
+}
+
+/// mostly used for testing
+pub fn statements(sql: &str) -> Vec<StatementPosition> {
     StatementSplitter::new(sql).run()
 }
 
@@ -34,6 +40,7 @@ mod tests {
         let input = "select 1 from contact;\nselect 1;\nalter table test drop column id;";
 
         let res = split(input);
+
         assert_eq!(res.len(), 3);
         assert_eq!("select 1 from contact;", input[res[0]].to_string());
         assert_eq!("select 1;", input[res[1]].to_string());

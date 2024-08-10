@@ -2,12 +2,12 @@ use pg_lexer::{SyntaxKind, WHITESPACE_TOKENS};
 
 use crate::data::{StatementDefinition, SyntaxDefinition};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Tracker<'a> {
     pub def: &'a StatementDefinition,
 
     /// position in the definition
-    current_pos: usize,
+    pub current_pos: usize,
 
     /// position in the global token stream
     pub started_at: usize,
@@ -67,14 +67,8 @@ impl<'a> Tracker<'a> {
                     self.next_possible_tokens().iter().find(|x| x.1 == *kind)
                 {
                     self.current_pos = next_token.0 + 1;
-                } else if self.def.tokens.len() - 1 == self.current_pos {
-                    // if the optional token is the last one and the previous one is not optional
-                    // we must be at the end of the statement
-                    if let SyntaxDefinition::RequiredToken(_) =
-                        self.def.tokens.get(self.current_pos - 1).unwrap()
-                    {
-                        return false;
-                    }
+                } else {
+                    return false;
                 }
 
                 true
@@ -122,6 +116,7 @@ impl<'a> Tracker<'a> {
             .find(|x| match x {
                 SyntaxDefinition::RequiredToken(_) => true,
                 SyntaxDefinition::OneOf(_) => true,
+                SyntaxDefinition::AnyToken => true,
                 _ => false,
             })
     }
