@@ -673,6 +673,19 @@ DROP ROLE IF EXISTS regress_alter_generic_user1;";
     }
 
     #[test]
+    fn test_only_incomplete_statement_semicolon() {
+        let input = "create;\nselect 1;";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 2);
+        assert_eq!("create", input[result[0].range].to_string());
+        assert_eq!(SyntaxKind::Any, result[0].kind);
+        assert_eq!("select 1;", input[result[1].range].to_string());
+        assert_eq!(SyntaxKind::SelectStmt, result[1].kind);
+    }
+
+    #[test]
     fn test_only_incomplete_statement() {
         let input = "   create    ";
 
