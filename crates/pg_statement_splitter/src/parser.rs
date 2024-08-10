@@ -127,6 +127,38 @@ impl Parser {
         self.pos == self.tokens.len()
     }
 
+    /// lookbehind method.
+    ///
+    /// if `ignore_whitespace` is true, it will skip all whitespace tokens
+    pub fn lookbehind(&self, lookbehind: usize, ignore_whitespace: bool) -> Option<&Token> {
+        if ignore_whitespace {
+            let mut idx = 0;
+            let mut non_whitespace_token_ctr = 0;
+            loop {
+                match self.tokens.get(self.pos - idx) {
+                    Some(token) => {
+                        if !WHITESPACE_TOKENS.contains(&token.kind) {
+                            non_whitespace_token_ctr += 1;
+                            if non_whitespace_token_ctr == lookbehind {
+                                return Some(token);
+                            }
+                        }
+                        idx += 1;
+                    }
+                    None => {
+                        if (self.pos - idx) > 0 {
+                            idx += 1;
+                        } else {
+                            return None;
+                        }
+                    }
+                }
+            }
+        } else {
+            self.tokens.get(self.pos - lookbehind)
+        }
+    }
+
     /// lookahead method.
     ///
     /// if `ignore_whitespace` is true, it will skip all whitespace tokens

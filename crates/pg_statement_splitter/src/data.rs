@@ -624,7 +624,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             stmt: SyntaxKind::CreateSchemaStmt,
             tokens: vec![
                 SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-                SyntaxDefinition::OptionalToken(SyntaxKind::Schema),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Schema),
             ],
         });
 
