@@ -11,3 +11,4 @@ replica_identity
 unicode
 xmlmap
 aggregates
+comments

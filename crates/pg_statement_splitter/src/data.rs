@@ -95,6 +95,11 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 SyntaxDefinition::RequiredToken(SyntaxKind::Insert),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Into),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                // the minimum required tokens for an insert statement are DEFAULT VALUES
+                // this is important to not conflict with a SELECT statement
+                // when within an insert into table select ...
+                SyntaxDefinition::AnyToken,
+                SyntaxDefinition::AnyToken,
             ],
         });
 
@@ -114,6 +119,9 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 SyntaxDefinition::RequiredToken(SyntaxKind::Update),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Only),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Set),
+                SyntaxDefinition::AnyToken,
             ],
         });
 
@@ -131,12 +139,25 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             stmt: SyntaxKind::AlterTableStmt,
             tokens: vec![
                 SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-                SyntaxDefinition::RequiredToken(SyntaxKind::Table),
+                SyntaxDefinition::OneOf(vec![SyntaxKind::Table, SyntaxKind::Index]),
                 SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Only),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
                 SyntaxDefinition::AnyToken,
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::RenameStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Rename),
+                SyntaxDefinition::RequiredToken(SyntaxKind::To),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
             ],
         });
 
@@ -199,21 +220,210 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 SyntaxDefinition::OptionalToken(SyntaxKind::Temporary),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Temp),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Unlogged),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Table),
                 SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Not),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-                SyntaxDefinition::RequiredToken(SyntaxKind::Table),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
             ],
         });
 
         m.push(StatementDefinition {
             stmt: SyntaxKind::DefineStmt,
             tokens: vec![
-                SyntaxDefinition::RequiredToken(SyntaxKind::Execute),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Create),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Or),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Aggregate),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::CreateOpClassStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Create),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Class),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Default),
+                SyntaxDefinition::RequiredToken(SyntaxKind::For),
+                SyntaxDefinition::RequiredToken(SyntaxKind::TypeP),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Using),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DropStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Foreign),
+                SyntaxDefinition::RequiredToken(SyntaxKind::DataP),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Wrapper),
+                SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DropStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Table),
+                SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DropStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Index),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Concurrently),
+                SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DropStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
+                SyntaxDefinition::RequiredToken(SyntaxKind::TypeP),
+                SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DropStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
+                SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
+                SyntaxDefinition::OneOf(vec![SyntaxKind::Op, SyntaxKind::Ident]),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DropStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Function),
+                SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DropStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Schema),
+                SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DropStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Procedural),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Language),
+                SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::OneOf(vec![SyntaxKind::Cascade, SyntaxKind::Restrict]),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DropStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Family),
+                SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Using),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        // CREATE TEXT SEARCH DICTIONARY alt_ts_dict1 (template=simple);
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DefineStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Create),
+                SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Search),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Dictionary),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DefineStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Create),
+                SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Search),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Configuration),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DefineStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Create),
+                SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Search),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Template),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DefineStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Create),
+                SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Search),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Parser),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
             ],
         });
 
@@ -222,6 +432,20 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             tokens: vec![
                 SyntaxDefinition::RequiredToken(SyntaxKind::Create),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DefineStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Create),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Or),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Aggregate),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
             ],
         });
 
@@ -267,7 +491,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
         });
 
         m.push(StatementDefinition {
-            stmt: SyntaxKind::Truncate,
+            stmt: SyntaxKind::TruncateStmt,
             tokens: vec![
                 SyntaxDefinition::RequiredToken(SyntaxKind::Truncate),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Table),
@@ -294,12 +518,16 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
         });
 
         m.push(StatementDefinition {
+            stmt: SyntaxKind::VacuumStmt,
+            tokens: vec![SyntaxDefinition::RequiredToken(SyntaxKind::Analyze)],
+        });
+
+        m.push(StatementDefinition {
             stmt: SyntaxKind::IndexStmt,
             tokens: vec![
                 SyntaxDefinition::RequiredToken(SyntaxKind::Create),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Unique),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Index),
-                SyntaxDefinition::OptionalToken(SyntaxKind::Concurrently),
                 SyntaxDefinition::AnyTokens,
                 SyntaxDefinition::RequiredToken(SyntaxKind::On),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Only),
@@ -332,7 +560,12 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
 
         m.push(StatementDefinition {
             stmt: SyntaxKind::DoStmt,
-            tokens: vec![SyntaxDefinition::RequiredToken(SyntaxKind::Do)],
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Do),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Language),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Ident),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Sconst),
+            ],
         });
 
         m.push(StatementDefinition {
@@ -379,6 +612,29 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             ],
         });
 
+        // DECLARE c CURSOR FOR SELECT ctid,cmin,* FROM combocidtest
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::DeclareCursorStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Declare),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Cursor),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::For),
+                SyntaxDefinition::OneOf(vec![SyntaxKind::Select, SyntaxKind::With]),
+                SyntaxDefinition::AnyToken,
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::TransactionStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Savepoint),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
         m.push(StatementDefinition {
             stmt: SyntaxKind::TransactionStmt,
             tokens: vec![SyntaxDefinition::RequiredToken(SyntaxKind::BeginP)],
@@ -391,7 +647,22 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
 
         m.push(StatementDefinition {
             stmt: SyntaxKind::TransactionStmt,
-            tokens: vec![SyntaxDefinition::RequiredToken(SyntaxKind::Rollback)],
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Rollback),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::To),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Savepoint),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::TransactionStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Rollback),
+                // FIXME: without the ";", this would conflict with ROLLBACK TO SAVEPOINT
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ascii59),
+            ],
         });
 
         m.push(StatementDefinition {
@@ -466,6 +737,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 SyntaxDefinition::AnyTokens,
                 SyntaxDefinition::RequiredToken(SyntaxKind::As),
                 SyntaxDefinition::OneOf(vec![SyntaxKind::With, SyntaxKind::Select]),
+                SyntaxDefinition::AnyToken,
             ],
         });
 
@@ -510,6 +782,52 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        // RESET SESSION AUTHORIZATION
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::VariableSetStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Reset),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Session),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Authorization),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::VariableSetStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Set),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Role),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::VariableSetStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Reset),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Role),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::VariableSetStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Reset),
+                SyntaxDefinition::OneOf(vec![SyntaxKind::All, SyntaxKind::Ident]),
+            ],
+        });
+
+        // ref: https://www.postgresql.org/docs/current/sql-set-session-authorization.html
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::VariableSetStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Set),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Session),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Authorization),
+                SyntaxDefinition::OneOf(vec![SyntaxKind::Ident, SyntaxKind::Sconst]),
             ],
         });
 
@@ -568,6 +886,16 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             ],
         });
 
+        // this is not a mistake - a create user statement is the same as a create role statement
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::CreateRoleStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Create),
+                SyntaxDefinition::RequiredToken(SyntaxKind::User),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
         m.push(StatementDefinition {
             stmt: SyntaxKind::AlterRoleStmt,
             tokens: vec![
@@ -581,7 +909,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             stmt: SyntaxKind::DropRoleStmt,
             tokens: vec![
                 SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-                SyntaxDefinition::RequiredToken(SyntaxKind::Role),
+                SyntaxDefinition::OneOf(vec![SyntaxKind::Role, SyntaxKind::User]),
                 SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
@@ -714,9 +1042,15 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Family),
-                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                // for schemas, this should be put into all definitions...
+                // SyntaxDefinition::OptionalToken(SyntaxKind::Ident),
+                // SyntaxDefinition::OptionalToken(SyntaxKind::Ascii46),
+                SyntaxDefinition::AnyTokens,
+                // SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Using),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+                // this is important to not conflict with RenameStmt
+                SyntaxDefinition::OneOf(vec![SyntaxKind::Drop, SyntaxKind::AddP]),
             ],
         });
 
@@ -1100,6 +1434,77 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 SyntaxDefinition::RequiredToken(SyntaxKind::Subscription),
                 SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
                 SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        // GRANT ALL ON SCHEMA alt_nsp1, alt_nsp2 TO public;
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::GrantStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Grant),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::On),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::To),
+            ],
+        });
+
+        // REVOKE ALL ON SCHEMA alt_nsp6 FROM regress_alter_generic_user6;
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::GrantStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Revoke),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::On),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::AlterOwnerStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Owner),
+                SyntaxDefinition::RequiredToken(SyntaxKind::To),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        // ALTER AGGREGATE alt_func1(int) SET SCHEMA alt_nsp2;
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::AlterObjectSchemaStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::Set),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Schema),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::CreatePlangStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Create),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Or),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Trusted),
+                SyntaxDefinition::OptionalToken(SyntaxKind::Procedural),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Language),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
+            ],
+        });
+
+        m.push(StatementDefinition {
+            stmt: SyntaxKind::CreateStatsStmt,
+            tokens: vec![
+                SyntaxDefinition::RequiredToken(SyntaxKind::Create),
+                SyntaxDefinition::RequiredToken(SyntaxKind::Statistics),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::On),
+                SyntaxDefinition::AnyTokens,
+                SyntaxDefinition::RequiredToken(SyntaxKind::From),
                 SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
             ],
         });

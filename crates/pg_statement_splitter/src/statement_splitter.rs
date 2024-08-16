@@ -112,6 +112,16 @@ impl<'a> StatementSplitter<'a> {
                         .any(|s| s.could_be_complete()))
             {
                 if let Some(stmts) = STATEMENT_DEFINITIONS.get(&at_token.kind) {
+                    println!(
+                        "adding stmts: {:?}, completed are {:?}",
+                        stmts.iter().map(|s| s.stmt).collect::<Vec<_>>(),
+                        self.tracked_statements
+                            .iter()
+                            .filter(|s| s.could_be_complete())
+                            .map(|s| s.def.stmt)
+                            .collect::<Vec<_>>()
+                    );
+
                     self.tracked_statements.append(
                         &mut stmts
                             .iter()
@@ -408,7 +418,7 @@ impl<'a> StatementSplitter<'a> {
 
 #[cfg(test)]
 mod tests {
-    use pg_lexer::SyntaxKind;
+    use pg_lexer::{lex, SyntaxKind};
 
     use crate::statement_splitter::StatementSplitter;
 
@@ -694,5 +704,480 @@ DROP ROLE IF EXISTS regress_alter_generic_user1;";
         assert_eq!(result.len(), 1);
         assert_eq!("create", input[result[0].range].to_string());
         assert_eq!(SyntaxKind::Any, result[0].kind);
+    }
+
+    #[test]
+    fn test_reset() {
+        let input = "
+DROP ROLE IF EXISTS regress_alter_generic_user3;
+
+RESET client_min_messages;
+
+CREATE USER regress_alter_generic_user3;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 3);
+        assert_eq!(SyntaxKind::DropRoleStmt, result[0].kind);
+        assert_eq!(SyntaxKind::VariableSetStmt, result[1].kind);
+        assert_eq!(SyntaxKind::CreateRoleStmt, result[2].kind);
+    }
+
+    #[test]
+    fn test_grant_and_set_session_auth() {
+        let input = "
+CREATE SCHEMA alt_nsp2;
+
+GRANT ALL ON SCHEMA alt_nsp1, alt_nsp2 TO public;
+
+SET search_path = alt_nsp1, public;
+
+SET SESSION AUTHORIZATION regress_alter_generic_user1;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 4);
+        assert_eq!(SyntaxKind::CreateSchemaStmt, result[0].kind);
+        assert_eq!(SyntaxKind::GrantStmt, result[1].kind);
+        assert_eq!(SyntaxKind::VariableSetStmt, result[2].kind);
+        assert_eq!(SyntaxKind::VariableSetStmt, result[3].kind);
+    }
+
+    #[test]
+    fn test_create_fn_and_agg() {
+        let input = "
+CREATE FUNCTION alt_func1(int) RETURNS int LANGUAGE sql
+  AS 'SELECT $1 + 1';
+CREATE FUNCTION alt_func2(int) RETURNS int LANGUAGE sql
+  AS 'SELECT $1 - 1';
+CREATE AGGREGATE alt_agg1 (
+  sfunc1 = int4pl, basetype = int4, stype1 = int4, initcond = 0
+);
+CREATE AGGREGATE alt_agg2 (
+  sfunc1 = int4mi, basetype = int4, stype1 = int4, initcond = 0
+);
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 4);
+        assert_eq!(SyntaxKind::CreateFunctionStmt, result[0].kind);
+        assert_eq!(SyntaxKind::CreateFunctionStmt, result[1].kind);
+        assert_eq!(SyntaxKind::DefineStmt, result[2].kind);
+        assert_eq!(SyntaxKind::DefineStmt, result[3].kind);
+    }
+
+    #[test]
+    fn test_create_alter_agg() {
+        let input = "
+CREATE AGGREGATE alt_agg2 (
+  sfunc1 = int4mi, basetype = int4, stype1 = int4, initcond = 0
+);
+ALTER AGGREGATE alt_func1(int) RENAME TO alt_func3;
+ALTER AGGREGATE alt_func1(int) OWNER TO regress_alter_generic_user3;
+ALTER AGGREGATE alt_func1(int) SET SCHEMA alt_nsp2;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 4);
+        assert_eq!(SyntaxKind::DefineStmt, result[0].kind);
+        assert_eq!(SyntaxKind::RenameStmt, result[1].kind);
+        assert_eq!(SyntaxKind::AlterOwnerStmt, result[2].kind);
+        assert_eq!(SyntaxKind::AlterObjectSchemaStmt, result[3].kind);
+    }
+
+    #[test]
+    fn test_reset_session() {
+        let input = "
+ALTER AGGREGATE alt_agg2(int) SET SCHEMA alt_nsp2;
+
+RESET SESSION AUTHORIZATION;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 2);
+        assert_eq!(SyntaxKind::AlterObjectSchemaStmt, result[0].kind);
+        assert_eq!(SyntaxKind::VariableSetStmt, result[1].kind);
+    }
+
+    #[test]
+    fn test_rename_fdw() {
+        let input = "
+CREATE SERVER alt_fserv2 FOREIGN DATA WRAPPER alt_fdw2;
+
+ALTER FOREIGN DATA WRAPPER alt_fdw1 RENAME TO alt_fdw2;
+ALTER FOREIGN DATA WRAPPER alt_fdw1 RENAME TO alt_fdw3;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 3);
+        assert_eq!(SyntaxKind::CreateForeignServerStmt, result[0].kind);
+        assert_eq!(SyntaxKind::RenameStmt, result[1].kind);
+        assert_eq!(SyntaxKind::RenameStmt, result[2].kind);
+    }
+
+    #[test]
+    fn test_ops() {
+        let input = "
+ALTER OPERATOR FAMILY alt_opf4 USING btree DROP
+  -- int4 vs int2
+  OPERATOR 1 (int4, int2) ,
+  OPERATOR 2 (int4, int2) ,
+  OPERATOR 3 (int4, int2) ,
+  OPERATOR 4 (int4, int2) ,
+  OPERATOR 5 (int4, int2) ,
+  FUNCTION 1 (int4, int2) ;
+DROP OPERATOR FAMILY alt_opf4 USING btree;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 2);
+        assert_eq!(SyntaxKind::AlterOpFamilyStmt, result[0].kind);
+        assert_eq!(SyntaxKind::DropStmt, result[1].kind);
+    }
+
+    #[test]
+    fn test_temp_table() {
+        let input = "
+CREATE TEMP TABLE foo (f1 int, f2 int, f3 int, f4 int);
+
+CREATE INDEX fooindex ON foo (f1 desc, f2 asc, f3 nulls first, f4 nulls last);
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 2);
+        assert_eq!(SyntaxKind::CreateStmt, result[0].kind);
+        assert_eq!(SyntaxKind::IndexStmt, result[1].kind);
+    }
+
+    #[test]
+    fn test_create_table_as() {
+        let input = "
+CREATE TEMP TABLE point_tbl AS SELECT * FROM public.point_tbl;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::CreateTableAsStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_analyze() {
+        let input = "
+ANALYZE array_op_test;
+INSERT INTO arrtest (a[1:5], b[1:1][1:2][1:2], c, d, f, g)
+   VALUES ('{1,2,3,4,5}', '{{{0,0},{1,2}}}', '{}', '{}', '{}', '{}');
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 2);
+        assert_eq!(SyntaxKind::VacuumStmt, result[0].kind);
+        assert_eq!(SyntaxKind::InsertStmt, result[1].kind);
+    }
+
+    #[test]
+    fn test_drop_operator() {
+        let input = "
+DROP OPERATOR === (boolean, boolean);
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::DropStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_language() {
+        let input = "
+CREATE LANGUAGE alt_lang1 HANDLER plpgsql_call_handler;
+CREATE LANGUAGE alt_lang2 HANDLER plpgsql_call_handler;
+
+ALTER LANGUAGE alt_lang1 OWNER TO regress_alter_generic_user1;
+ALTER LANGUAGE alt_lang2 OWNER TO regress_alter_generic_user2;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 4);
+        assert_eq!(SyntaxKind::CreatePlangStmt, result[0].kind);
+        assert_eq!(SyntaxKind::CreatePlangStmt, result[1].kind);
+        assert_eq!(SyntaxKind::AlterOwnerStmt, result[2].kind);
+        assert_eq!(SyntaxKind::AlterOwnerStmt, result[3].kind);
+    }
+
+    #[test]
+    fn test_alter_op_family() {
+        let input = "
+ALTER OPERATOR FAMILY alt_opf1 USING hash OWNER TO regress_alter_generic_user1;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::AlterOwnerStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_drop_op_family() {
+        let input = "
+DROP OPERATOR FAMILY alt_opf4 USING btree;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::DropStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_set_role() {
+        let input = "
+SET ROLE regress_alter_generic_user5;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::VariableSetStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_revoke() {
+        let input = "
+CREATE ROLE regress_alter_generic_user6;
+CREATE SCHEMA alt_nsp6;
+REVOKE ALL ON SCHEMA alt_nsp6 FROM regress_alter_generic_user6;
+CREATE OPERATOR FAMILY alt_nsp6.alt_opf6 USING btree;
+SET ROLE regress_alter_generic_user6;
+ALTER OPERATOR FAMILY alt_nsp6.alt_opf6 USING btree ADD OPERATOR 1 < (int4, int2);
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 6);
+        assert_eq!(SyntaxKind::CreateRoleStmt, result[0].kind);
+        assert_eq!(SyntaxKind::CreateSchemaStmt, result[1].kind);
+        assert_eq!(SyntaxKind::GrantStmt, result[2].kind);
+        assert_eq!(SyntaxKind::CreateOpFamilyStmt, result[3].kind);
+        assert_eq!(SyntaxKind::VariableSetStmt, result[4].kind);
+        assert_eq!(SyntaxKind::AlterOpFamilyStmt, result[5].kind);
+    }
+
+    #[test]
+    fn test_alter_op_family_2() {
+        let input = "
+CREATE OPERATOR FAMILY alt_opf4 USING btree;
+ALTER OPERATOR FAMILY schema.alt_opf4 USING btree ADD
+  -- int4 vs int2
+  OPERATOR 1 < (int4, int2) ,
+  OPERATOR 2 <= (int4, int2) ,
+  OPERATOR 3 = (int4, int2) ,
+  OPERATOR 4 >= (int4, int2) ,
+  OPERATOR 5 > (int4, int2) ,
+  FUNCTION 1 btint42cmp(int4, int2);
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 2);
+        assert_eq!(SyntaxKind::CreateOpFamilyStmt, result[0].kind);
+        assert_eq!(SyntaxKind::AlterOpFamilyStmt, result[1].kind);
+    }
+
+    #[test]
+    fn test_create_stat() {
+        let input = "
+CREATE STATISTICS alt_stat1 ON a, b FROM alt_regress_1;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::CreateStatsStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_create_text_search_dictionary() {
+        let input = "
+CREATE TEXT SEARCH DICTIONARY alt_ts_dict1 (template=simple);
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::DefineStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_create_text_search_configuration() {
+        let input = "
+CREATE TEXT SEARCH CONFIGURATION alt_ts_conf1 (copy=english);
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::DefineStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_alter_operator() {
+        let input = "
+ALTER OPERATOR === (boolean, boolean) SET (RESTRICT = NONE);
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::AlterOperatorStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_drop_fdw() {
+        let input = "
+DROP FOREIGN DATA WRAPPER alt_fdw2 CASCADE;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::DropStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_insert_select() {
+        let input = "
+insert into src select string_agg(random()::text,'') from generate_series(1,10000);
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::InsertStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_on_conflict() {
+        let input = "
+insert into arr_pk_tbl values (1, '{3,4,5}') on conflict (pk)\n  do update set f1[1] = excluded.f1[1], f1[3] = excluded.f1[3]\n  returning pk, f1;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::InsertStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_alter_index() {
+        let input = "
+ALTER INDEX btree_tall_idx2 ALTER COLUMN id SET (n_distinct=100);
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::AlterTableStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_update_set() {
+        let input = "
+UPDATE CASE_TBL\n  SET i = CASE WHEN i >= 3 THEN (- i)\n                ELSE (2 * i) END;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::UpdateStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_savepoint() {
+        let input = "
+SAVEPOINT s1;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::TransactionStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_declare_cursor() {
+        let input = "
+DECLARE c CURSOR FOR SELECT ctid,cmin,* FROM combocidtest;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::DeclareCursorStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_create_empty_table() {
+        let input = "
+CREATE TABLE IF NOT EXISTS testcase(
+);
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::CreateStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_rollback_to() {
+        let input = "
+ROLLBACK TO SAVEPOINT subxact;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::TransactionStmt, result[0].kind);
+    }
+
+    #[allow(clippy::must_use)]
+    fn debug(input: &str) {
+        for s in input.split(';').filter_map(|s| {
+            if s.trim().is_empty() {
+                None
+            } else {
+                Some(s.trim())
+            }
+        }) {
+            println!("Statement: '{:?}'", s);
+
+            let res = pg_query::parse(s)
+                .map(|parsed| {
+                    parsed
+                        .protobuf
+                        .nodes()
+                        .iter()
+                        .find(|n| n.1 == 1)
+                        .unwrap()
+                        .0
+                        .to_enum()
+                })
+                .unwrap();
+            println!("Result: {:?}", res);
+        }
+
+        let result = StatementSplitter::new(input).run();
+
+        for r in &result {
+            println!("{:?} {:?}", r.kind, input[r.range].to_string());
+        }
+
+        assert!(false);
     }
 }
