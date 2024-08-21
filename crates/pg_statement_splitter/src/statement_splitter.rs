@@ -2,7 +2,7 @@ use pg_lexer::{SyntaxKind, WHITESPACE_TOKENS};
 use text_size::{TextRange, TextSize};
 
 use crate::{
-    data::{SPECIAL_TOKENS, STATEMENT_BRIDGE_DEFINITIONS, STATEMENT_DEFINITIONS},
+    data::{STATEMENT_BRIDGE_DEFINITIONS, STATEMENT_DEFINITIONS},
     parser::Parser,
     tracker::Tracker,
 };
@@ -99,12 +99,8 @@ impl<'a> StatementSplitter<'a> {
                 });
             }
 
-            // we already moved, so we need to lookbehind 2
-            let lookbehind = self.parser.lookbehind(2, true);
-
             if self.sub_trx_depth == 0
                 && self.sub_stmt_depth == 0 && self.is_within_atomic_block == false
-                    && (lookbehind.is_none() || !SPECIAL_TOKENS.contains(&lookbehind.unwrap().kind))
                     // it onyl makes sense to start tracking new statements if at least one of the
                     // currently tracked statements could be complete. or if none are tracked yet.
                     // this is important for statements such as `explain select 1;` where `select 1`
@@ -132,6 +128,13 @@ impl<'a> StatementSplitter<'a> {
                             .iter()
                             .filter_map(|stmt| {
                                 if self.active_bridges.iter().any(|b| b.def.stmt == stmt.stmt) {
+                                    None
+                                } else if self.tracked_statements.iter().any(|s| {
+                                    s.could_be_complete()
+                                        && s.def
+                                            .prohibited_following_statements
+                                            .contains(&stmt.stmt)
+                                }) {
                                     None
                                 } else {
                                     Some(Tracker::new_at(stmt, self.parser.pos))
@@ -186,7 +189,7 @@ impl<'a> StatementSplitter<'a> {
                             s.started_at == earliest_complete_stmt_started_at
                                 && s.could_be_complete()
                         })
-                        .max_by_key(|stmt| stmt.current_pos)
+                        .max_by_key(|stmt| stmt.max_pos())
                         .unwrap();
 
                     assert_eq!(
@@ -196,7 +199,9 @@ impl<'a> StatementSplitter<'a> {
                             .filter(|s| {
                                 s.started_at == earliest_complete_stmt_started_at
                                     && s.could_be_complete()
-                                    && s.current_pos == earliest_complete_stmt.current_pos
+                                    && s.current_positions().iter().any(|i| {
+                                        earliest_complete_stmt.current_positions().contains(i)
+                                    })
                             })
                             .count(),
                         "multiple complete statements at the same position"
@@ -256,7 +261,7 @@ impl<'a> StatementSplitter<'a> {
                             s.started_at == latest_complete_before_started_at
                                 && s.could_be_complete()
                         })
-                        .max_by_key(|stmt| stmt.current_pos)
+                        .max_by_key(|stmt| stmt.max_pos())
                         .cloned()
                         .unwrap();
 
@@ -267,7 +272,9 @@ impl<'a> StatementSplitter<'a> {
                             .filter(|s| {
                                 s.started_at == latest_complete_before_started_at
                                     && s.could_be_complete()
-                                    && s.current_pos == latest_complete_before.current_pos
+                                    && s.current_positions().iter().any(|i| {
+                                        latest_complete_before.current_positions().contains(i)
+                                    })
                             })
                             .count(),
                         "multiple complete statements at the same position"
@@ -344,7 +351,7 @@ impl<'a> StatementSplitter<'a> {
                 .filter(|s| {
                     s.started_at == earliest_complete_stmt_started_at && s.could_be_complete()
                 })
-                .max_by_key(|stmt| stmt.current_pos)
+                .max_by_key(|stmt| stmt.max_pos())
                 .unwrap();
 
             assert_eq!(
@@ -354,7 +361,9 @@ impl<'a> StatementSplitter<'a> {
                     .filter(|s| {
                         s.started_at == earliest_complete_stmt_started_at
                             && s.could_be_complete()
-                            && s.current_pos == earliest_complete_stmt.current_pos
+                            && s.current_positions()
+                                .iter()
+                                .any(|i| earliest_complete_stmt.current_positions().contains(i))
                     })
                     .count(),
                 "multiple complete statements at the same position"
@@ -451,6 +460,39 @@ mod tests {
         assert_eq!(SyntaxKind::CreateTrigStmt, result[0].kind);
         assert_eq!("execute test;", input[result[1].range].to_string());
         assert_eq!(SyntaxKind::ExecuteStmt, result[1].kind);
+    }
+
+    #[test]
+    fn test_prohibited_follow_up() {
+        let input =
+            "insert into public.test (id) select 1 from other.test where id = 2;\nselect 4;";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 2);
+        assert_eq!(
+            "insert into public.test (id) select 1 from other.test where id = 2;",
+            input[result[0].range].to_string()
+        );
+        assert_eq!(SyntaxKind::InsertStmt, result[0].kind);
+        assert_eq!("select 4;", input[result[1].range].to_string());
+        assert_eq!(SyntaxKind::SelectStmt, result[1].kind);
+    }
+
+    #[test]
+    fn test_schema() {
+        let input = "delete from public.table where id = 2;\nselect 4;";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 2);
+        assert_eq!(
+            "delete from public.table where id = 2;",
+            input[result[0].range].to_string()
+        );
+        assert_eq!(SyntaxKind::DeleteStmt, result[0].kind);
+        assert_eq!("select 4;", input[result[1].range].to_string());
+        assert_eq!(SyntaxKind::SelectStmt, result[1].kind);
     }
 
     #[test]

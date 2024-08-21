@@ -3,11 +3,47 @@ use pg_lexer::{SyntaxKind, WHITESPACE_TOKENS};
 use crate::data::{StatementDefinition, SyntaxDefinition};
 
 #[derive(Debug, Clone)]
+pub struct Position {
+    idx: usize,
+    group_idx: Option<usize>,
+}
+
+impl Position {
+    fn new(idx: usize) -> Self {
+        Self {
+            idx,
+            group_idx: None,
+        }
+    }
+
+    fn new_with_group(idx: usize) -> Self {
+        Self {
+            idx,
+            group_idx: Some(1),
+        }
+    }
+
+    fn start_group(&mut self) {
+        self.group_idx = Some(0);
+    }
+
+    fn advance(&mut self) {
+        self.idx += 1;
+    }
+
+    fn advance_group(&mut self) {
+        assert!(self.group_idx.is_some());
+        self.group_idx = Some(self.group_idx.unwrap() + 1);
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Tracker<'a> {
     pub def: &'a StatementDefinition,
 
-    /// position in the definition
-    pub current_pos: usize,
+    /// position in the definition, and for each position we track the current token for that
+    /// position. required for groups.
+    pub positions: Vec<Position>,
 
     /// position in the global token stream
     pub started_at: usize,
@@ -17,37 +53,64 @@ impl<'a> Tracker<'a> {
     pub fn new_at(def: &'a StatementDefinition, at: usize) -> Self {
         Self {
             def,
-            current_pos: 1,
+            positions: vec![Position {
+                idx: 1,
+                group_idx: None,
+            }],
             started_at: at,
         }
     }
 
-    fn next_possible_tokens(&self) -> Vec<(usize, SyntaxKind)> {
-        let mut tokens = Vec::new();
+    pub fn max_pos(&self) -> usize {
+        self.positions.iter().max_by_key(|p| p.idx).unwrap().idx
+    }
 
-        for (pos, token) in self.def.tokens.iter().enumerate().skip(self.current_pos) {
+    pub fn current_positions(&self) -> Vec<usize> {
+        self.positions.iter().map(|x| x.idx).collect()
+    }
+
+    fn next_possible_positions_from_with(
+        def: &StatementDefinition,
+        pos: &Position,
+        kind: &SyntaxKind,
+    ) -> Vec<Position> {
+        let mut positions = Vec::new();
+
+        for (pos, token) in def.tokens.iter().enumerate().skip(pos.idx.to_owned()) {
             match token {
                 SyntaxDefinition::RequiredToken(k) => {
-                    tokens.push((pos, *k));
+                    if k == kind {
+                        positions.push(Position::new(pos + 1));
+                    }
                     break;
                 }
                 SyntaxDefinition::OptionalToken(k) => {
-                    tokens.push((pos, *k));
+                    if k == kind {
+                        positions.push(Position::new(pos + 1));
+                    }
                 }
-                SyntaxDefinition::AnyTokens => {
+                SyntaxDefinition::AnyTokens(_) => {
                     //
                 }
                 SyntaxDefinition::AnyToken => {
                     //
                 }
                 SyntaxDefinition::OneOf(kinds) => {
-                    tokens.extend(kinds.iter().map(|x| (pos, *x)));
+                    if kinds.iter().any(|x| x == kind) {
+                        positions.push(Position::new(pos + 1));
+                    }
                     break;
+                }
+                SyntaxDefinition::OptionalGroup(t) => {
+                    let first_token = t.first().unwrap();
+                    if first_token == kind {
+                        positions.push(Position::new_with_group(pos + 1));
+                    }
                 }
             }
         }
 
-        tokens
+        positions
     }
 
     pub fn advance_with(&mut self, kind: &SyntaxKind) -> bool {
@@ -55,69 +118,100 @@ impl<'a> Tracker<'a> {
             return true;
         }
 
-        let is_valid = match self.def.tokens.get(self.current_pos) {
-            Some(SyntaxDefinition::RequiredToken(k)) => {
-                self.current_pos += 1;
-                k == kind
-            }
-            Some(SyntaxDefinition::OptionalToken(k)) => {
-                if k == kind {
-                    self.current_pos += 1;
-                } else if let Some(next_token) =
-                    self.next_possible_tokens().iter().find(|x| x.1 == *kind)
-                {
-                    self.current_pos = next_token.0 + 1;
-                } else {
-                    return false;
+        let mut new_positions = Vec::with_capacity(self.positions.len());
+
+        for mut pos in self.positions.drain(..) {
+            match self.def.tokens.get(pos.idx) {
+                Some(SyntaxDefinition::RequiredToken(k)) => {
+                    pos.advance();
+                    if k == kind {
+                        new_positions.push(pos);
+                    }
                 }
-
-                true
-            }
-            Some(SyntaxDefinition::AnyTokens) => {
-                assert!(self.next_possible_tokens().len() > 0);
-
-                if let Some(next_token) = self.next_possible_tokens().iter().find(|x| x.1 == *kind)
-                {
-                    self.current_pos = next_token.0 + 1;
+                Some(SyntaxDefinition::AnyToken) => {
+                    pos.advance();
+                    new_positions.push(pos);
                 }
-
-                true
-            }
-            Some(SyntaxDefinition::AnyToken) => {
-                self.current_pos += 1;
-                true
-            }
-            Some(SyntaxDefinition::OneOf(kinds)) => {
-                if kinds.iter().any(|x| x == kind) {
-                    self.current_pos += 1;
-                    true
-                } else {
-                    false
+                Some(SyntaxDefinition::OneOf(kinds)) => {
+                    if kinds.iter().any(|x| x == kind) {
+                        pos.advance();
+                        new_positions.push(pos);
+                    }
                 }
-            }
-            None => true,
-        };
+                Some(SyntaxDefinition::OptionalToken(k)) => {
+                    if k == kind {
+                        pos.advance();
+                        new_positions.push(pos);
+                    } else {
+                        new_positions.extend(Tracker::next_possible_positions_from_with(
+                            self.def, &pos, kind,
+                        ));
+                    }
+                }
+                Some(SyntaxDefinition::AnyTokens(maybe_tokens)) => {
+                    let next_positions =
+                        Tracker::next_possible_positions_from_with(self.def, &pos, kind);
 
-        is_valid
+                    if next_positions.is_empty() {
+                        // we only keep the current position if we either dont care about the
+                        // tokens or the token is in the list of possible tokens
+                        if let Some(tokens) = maybe_tokens {
+                            if tokens.iter().any(|x| x == kind) {
+                                new_positions.push(pos);
+                            }
+                        } else {
+                            new_positions.push(pos);
+                        }
+                    } else {
+                        new_positions.extend(next_positions);
+                    }
+                }
+                Some(SyntaxDefinition::OptionalGroup(tokens)) => {
+                    // the token in the group is stored in the group_idx
+                    if pos.group_idx.is_none() {
+                        pos.start_group();
+                    }
+                    let token = tokens.get(pos.group_idx.unwrap()).unwrap();
+                    if token == kind {
+                        pos.advance_group();
+
+                        // if we reached the end of the group, we advance the position
+                        if pos.group_idx.unwrap() == tokens.len() {
+                            pos.advance();
+                        }
+
+                        new_positions.push(pos);
+                    }
+                }
+                None => {
+                    // if we reached the end of the definition, we do nothing but keep the position
+                    new_positions.push(pos);
+                }
+            };
+        }
+
+        self.positions = new_positions;
+
+        self.positions.len() != 0
     }
 
     pub fn could_be_complete(&self) -> bool {
-        self.next_required_token().is_none()
-    }
-
-    /// returns the next "required" token we are expecting
-    ///
-    /// None if we are no required tokens left
-    fn next_required_token(&self) -> Option<&SyntaxDefinition> {
         self.def
             .tokens
             .iter()
-            .skip(self.current_pos)
-            .find(|x| match x {
-                SyntaxDefinition::RequiredToken(_) => true,
-                SyntaxDefinition::OneOf(_) => true,
-                SyntaxDefinition::AnyToken => true,
-                _ => false,
+            .skip(
+                self.positions
+                    .iter()
+                    .max_by_key(|p| p.idx)
+                    .unwrap()
+                    .to_owned()
+                    .idx,
+            )
+            .all(|x| match x {
+                SyntaxDefinition::RequiredToken(_) => false,
+                SyntaxDefinition::OneOf(_) => false,
+                SyntaxDefinition::AnyToken => false,
+                _ => true,
             })
     }
 }
