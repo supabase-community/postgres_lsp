@@ -2,7 +2,7 @@ use pg_lexer::{SyntaxKind, WHITESPACE_TOKENS};
 use text_size::{TextRange, TextSize};
 
 use crate::{
-    data::{STATEMENT_BRIDGE_DEFINITIONS, STATEMENT_DEFINITIONS},
+    data::{SPECIAL_TOKENS, STATEMENT_BRIDGE_DEFINITIONS, STATEMENT_DEFINITIONS},
     parser::Parser,
     tracker::Tracker,
 };
@@ -13,6 +13,7 @@ pub(crate) struct StatementSplitter<'a> {
     active_bridges: Vec<Tracker<'a>>,
     sub_trx_depth: usize,
     sub_stmt_depth: usize,
+    is_within_atomic_block: bool,
 }
 
 #[derive(Debug)]
@@ -29,6 +30,7 @@ impl<'a> StatementSplitter<'a> {
             active_bridges: Vec::new(),
             sub_trx_depth: 0,
             sub_stmt_depth: 0,
+            is_within_atomic_block: false,
         }
     }
 
@@ -47,16 +49,23 @@ impl<'a> StatementSplitter<'a> {
             );
             // TODO rename vars and add helpers to make distinciton between pos and text pos clear
 
+            // TODO handle BEGIN ATOMIC ... END here
             if at_token.kind == SyntaxKind::BeginP {
                 // self.sub_trx_depth += 1;
             } else if at_token.kind == SyntaxKind::EndP {
                 // self.sub_trx_depth -= 1;
+
+                self.is_within_atomic_block = false;
             } else if at_token.kind == SyntaxKind::Ascii40 {
                 // "("
                 self.sub_stmt_depth += 1;
             } else if at_token.kind == SyntaxKind::Ascii41 {
                 // ")"
                 self.sub_stmt_depth -= 1;
+            } else if at_token.kind == SyntaxKind::Atomic
+                && self.parser.lookbehind(2, true).map(|t| t.kind) == Some(SyntaxKind::BeginP)
+            {
+                self.is_within_atomic_block = true;
             }
 
             let mut removed_items = Vec::new();
@@ -90,16 +99,12 @@ impl<'a> StatementSplitter<'a> {
                 });
             }
 
-            println!(
-                "tracked stmts after advance {:?}",
-                self.tracked_statements
-                    .iter()
-                    .map(|s| s.def.stmt)
-                    .collect::<Vec<_>>()
-            );
+            // we already moved, so we need to lookbehind 2
+            let lookbehind = self.parser.lookbehind(2, true);
 
             if self.sub_trx_depth == 0
-                && self.sub_stmt_depth == 0
+                && self.sub_stmt_depth == 0 && self.is_within_atomic_block == false
+                    && (lookbehind.is_none() || !SPECIAL_TOKENS.contains(&lookbehind.unwrap().kind))
                     // it onyl makes sense to start tracking new statements if at least one of the
                     // currently tracked statements could be complete. or if none are tracked yet.
                     // this is important for statements such as `explain select 1;` where `select 1`
@@ -157,7 +162,14 @@ impl<'a> StatementSplitter<'a> {
                     .collect::<Vec<_>>()
             );
 
-            if at_token.kind == SyntaxKind::Ascii59 {
+            // i didnt believe it myself at first, but there are statements where a ";" is valid
+            // within a sub statement, e.g.:
+            // "create rule qqq as on insert to copydml_test do instead (delete from copydml_test; delete from copydml_test);"
+            // so we need to check for sub statement depth here
+            if at_token.kind == SyntaxKind::Ascii59
+                && self.sub_stmt_depth == 0
+                && self.is_within_atomic_block == false
+            {
                 // ;
                 // get earliest statement
                 if let Some(earliest_complete_stmt_started_at) = self
@@ -1146,6 +1158,96 @@ ROLLBACK TO SAVEPOINT subxact;
         assert_eq!(SyntaxKind::TransactionStmt, result[0].kind);
     }
 
+    #[test]
+    fn test_rule_delete_from() {
+        let input = "
+create rule qqq as on insert to copydml_test do also delete from copydml_test;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::RuleStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_create_cast() {
+        let input = "
+CREATE CAST (text AS casttesttype) WITHOUT FUNCTION;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::CreateCastStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_begin_atomic() {
+        let input = "
+CREATE PROCEDURE ptest1s(x text)\nLANGUAGE SQL\nBEGIN ATOMIC\n  INSERT INTO cp_test VALUES (1, x);\nEND;\nselect 1;
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 2);
+        assert_eq!(SyntaxKind::CreateFunctionStmt, result[0].kind);
+        assert_eq!(SyntaxKind::SelectStmt, result[1].kind);
+    }
+
+    #[test]
+    fn test_drop_procedure() {
+        let input = "
+CREATE PROCEDURE ptest4b(INOUT b int, INOUT a int)
+LANGUAGE SQL
+AS $$
+CALL ptest4a(a, b)
+$$;
+
+DROP PROCEDURE ptest4a;
+
+CREATE OR REPLACE PROCEDURE ptest5(a int, b text, c int default 100)
+LANGUAGE SQL
+AS $$
+INSERT INTO cp_test VALUES(a, b)
+$$;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 3);
+        assert_eq!(SyntaxKind::CreateFunctionStmt, result[0].kind);
+        assert_eq!(SyntaxKind::DropStmt, result[1].kind);
+        assert_eq!(SyntaxKind::CreateFunctionStmt, result[2].kind);
+    }
+
+    #[test]
+    fn test_call_version() {
+        let input = "
+CALL version();
+CALL sum(1);
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 2);
+        assert_eq!(SyntaxKind::CallStmt, result[0].kind);
+        assert_eq!(SyntaxKind::CallStmt, result[1].kind);
+    }
+
+    #[test]
+    fn test_drop_lang() {
+        let input = "
+DROP OPERATOR @#@ (int8, int8);
+DROP LANGUAGE test_language_exists;
+DROP LANGUAGE IF EXISTS test_language_exists;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 3);
+        assert_eq!(SyntaxKind::DropStmt, result[0].kind);
+        assert_eq!(SyntaxKind::DropStmt, result[1].kind);
+        assert_eq!(SyntaxKind::DropStmt, result[2].kind);
+    }
+
     #[allow(clippy::must_use)]
     fn debug(input: &str) {
         for s in input.split(';').filter_map(|s| {
@@ -1176,6 +1278,10 @@ ROLLBACK TO SAVEPOINT subxact;
 
         for r in &result {
             println!("{:?} {:?}", r.kind, input[r.range].to_string());
+        }
+
+        for t in lex(input) {
+            println!("{:?}", t.kind);
         }
 
         assert!(false);

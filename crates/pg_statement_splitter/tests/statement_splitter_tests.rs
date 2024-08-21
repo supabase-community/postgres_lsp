@@ -101,29 +101,31 @@ fn test_postgres_regress() {
             let libpg_query_stmt_trimmed = libpg_query_stmt.trim();
             let parser_stmt_trimmed = parser_stmt.trim();
 
+            let root = pg_query::parse(libpg_query_stmt_trimmed)
+                .map(|parsed| {
+                    parsed
+                        .protobuf
+                        .nodes()
+                        .iter()
+                        .find(|n| n.1 == 1)
+                        .unwrap()
+                        .0
+                        .to_enum()
+                })
+                .expect("Failed to parse statement");
+
             assert_eq!(
                 libpg_query_stmt_trimmed, parser_stmt_trimmed,
-                "[{}] Mismatch in statement:\nlibg_query: '{}'\nsplitter:   '{}'",
-                test_name, libpg_query_stmt_trimmed, parser_stmt_trimmed
+                "[{}] Mismatch in statement:\nlibg_query: '{}'\nsplitter:   '{}'\n Root Node: {:?}",
+                test_name, libpg_query_stmt_trimmed, parser_stmt_trimmed, root
             );
 
-            let root = pg_query::parse(libpg_query_stmt_trimmed).map(|parsed| {
-                parsed
-                    .protobuf
-                    .nodes()
-                    .iter()
-                    .find(|n| n.1 == 1)
-                    .unwrap()
-                    .0
-                    .to_enum()
-            });
-
-            let syntax_kind = SyntaxKind::from(&root.expect("Failed to parse statement"));
+            let syntax_kind = SyntaxKind::from(&root);
 
             assert_eq!(
                 syntax_kind, parser_result.kind,
-                "[{}] Mismatch in statement type. Expected {:?}, got {:?} for statement '{}'",
-                test_name, syntax_kind, parser_result.kind, parser_stmt_trimmed
+                "[{}] Mismatch in statement type. Expected {:?}, got {:?} for statement '{}'. Root Node: {:?}",
+                test_name, syntax_kind, parser_result.kind, parser_stmt_trimmed, root
             );
 
             println!("[{}] Matched {}", test_name, parser_stmt_trimmed);

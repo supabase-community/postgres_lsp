@@ -12,3 +12,6 @@ unicode
 xmlmap
 aggregates
 comments
+dependency
+drop_if_exists
+

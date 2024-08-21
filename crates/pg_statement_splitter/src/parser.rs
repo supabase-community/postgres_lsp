@@ -135,6 +135,9 @@ impl Parser {
             let mut idx = 0;
             let mut non_whitespace_token_ctr = 0;
             loop {
+                if idx > self.pos {
+                    return None;
+                }
                 match self.tokens.get(self.pos - idx) {
                     Some(token) => {
                         if !WHITESPACE_TOKENS.contains(&token.kind) {
