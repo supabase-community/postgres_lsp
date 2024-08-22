@@ -29,6 +29,7 @@ impl Position {
 
     fn advance(&mut self) {
         self.idx += 1;
+        self.group_idx = None;
     }
 
     fn advance_group(&mut self) {
@@ -181,6 +182,12 @@ impl<'a> Tracker<'a> {
                         }
 
                         new_positions.push(pos);
+                    } else if pos.group_idx.unwrap() == 0 {
+                        // if the first token in the group does not match, we move to the next
+                        // possible tokens
+                        new_positions.extend(Tracker::next_possible_positions_from_with(
+                            self.def, &pos, kind,
+                        ));
                     }
                 }
                 None => {

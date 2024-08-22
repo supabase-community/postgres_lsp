@@ -152,6 +152,7 @@ impl<'a> StatementSplitter<'a> {
     }
 
     fn close_stmt_with_semicolon(&mut self) {
+        println!("closing stmt with semicolon");
         let at_token = self.parser.nth(0, false);
         assert_eq!(at_token.kind, SyntaxKind::Ascii59);
 
@@ -160,6 +161,7 @@ impl<'a> StatementSplitter<'a> {
         // "create rule qqq as on insert to copydml_test do instead (delete from copydml_test; delete from copydml_test);"
         // so we need to check for sub statement depth here
         if self.sub_stmt_depth != 0 || self.is_within_atomic_block {
+            println!("sub stmt depth != 0 or within atomic block");
             return;
         }
 
@@ -171,6 +173,10 @@ impl<'a> StatementSplitter<'a> {
             .min_by_key(|stmt| stmt.started_at)
             .map(|stmt| stmt.started_at)
         {
+            println!(
+                "earliest complete stmt started at: {:?}",
+                earliest_complete_stmt_started_at
+            );
             let earliest_complete_stmt = self
                 .tracked_statements
                 .iter()
@@ -359,10 +365,21 @@ impl<'a> StatementSplitter<'a> {
 
         // we reached eof; add any remaining statements
 
+        println!(
+            "tracked stmts after eof {:?}",
+            self.tracked_statements
+                .iter()
+                .map(|s| s.def.stmt)
+                .collect::<Vec<_>>()
+        );
         // get the earliest statement that is complete
         if let Some(earliest_complete_stmt_started_at) =
             self.find_earliest_complete_statement_start_pos()
         {
+            println!(
+                "earliest complete stmt started at: {:?}",
+                earliest_complete_stmt_started_at
+            );
             let earliest_complete_stmt =
                 self.find_highest_positioned_complete_statement(earliest_complete_stmt_started_at);
 
@@ -385,6 +402,7 @@ impl<'a> StatementSplitter<'a> {
         }
 
         if let Some(earliest_stmt_started_at) = self.find_earliest_statement_start_pos() {
+            println!("earliest stmt started at: {:?}", earliest_stmt_started_at);
             let start_pos = self.token_range(earliest_stmt_started_at).start();
 
             // end position is last non-whitespace token before or at the current position
