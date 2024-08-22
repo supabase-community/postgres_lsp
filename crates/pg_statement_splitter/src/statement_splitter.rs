@@ -41,14 +41,15 @@ impl<'a> StatementSplitter<'a> {
         match self.parser.nth(0, false).kind {
             SyntaxKind::Ascii40 => {
                 // "("
-                self.sub_trx_depth += 1;
+                self.sub_stmt_depth += 1;
             }
             SyntaxKind::Ascii41 => {
                 // ")"
-                self.sub_trx_depth -= 1;
+                self.sub_stmt_depth -= 1;
             }
             SyntaxKind::Atomic => {
-                if self.parser.lookbehind(2, true).map(|t| t.kind) == Some(SyntaxKind::BeginP) {
+                if self.parser.lookbehind(2, true, None).map(|t| t.kind) == Some(SyntaxKind::BeginP)
+                {
                     self.is_within_atomic_block = true;
                 }
             }
@@ -88,7 +89,7 @@ impl<'a> StatementSplitter<'a> {
             kind: SyntaxKind::Any,
             range: TextRange::new(
                 self.token_range(started_at.unwrap()).start(),
-                self.parser.lookbehind(2, true).unwrap().span.end(),
+                self.parser.lookbehind(2, true, None).unwrap().span.end(),
             ),
         });
     }
@@ -115,23 +116,23 @@ impl<'a> StatementSplitter<'a> {
         let new_stmts = STATEMENT_DEFINITIONS.get(&self.parser.nth(0, false).kind);
 
         if let Some(new_stmts) = new_stmts {
-            self.tracked_statements.append(
-                &mut new_stmts
-                    .iter()
-                    .filter_map(|stmt| {
-                        if self.active_bridges.iter().any(|b| b.def.stmt == stmt.stmt) {
-                            None
-                        } else if self.tracked_statements.iter().any(|s| {
-                            s.could_be_complete()
-                                && s.def.prohibited_following_statements.contains(&stmt.stmt)
-                        }) {
-                            None
-                        } else {
-                            Some(Tracker::new_at(stmt, self.parser.pos))
-                        }
-                    })
-                    .collect(),
-            );
+            let to_add = &mut new_stmts
+                .iter()
+                .filter_map(|stmt| {
+                    if self.active_bridges.iter().any(|b| b.def.stmt == stmt.stmt) {
+                        None
+                    } else if self
+                        .tracked_statements
+                        .iter_mut()
+                        .any(|s| !s.can_start_stmt_after(&stmt.stmt))
+                    {
+                        None
+                    } else {
+                        Some(Tracker::new_at(stmt, self.parser.pos))
+                    }
+                })
+                .collect();
+            self.tracked_statements.append(to_add);
         }
     }
 
@@ -283,7 +284,11 @@ impl<'a> StatementSplitter<'a> {
 
     pub fn run(mut self) -> Vec<StatementPosition> {
         while !self.parser.eof() {
-            println!("{:?}", self.parser.nth(0, false).kind);
+            println!(
+                "#{:?}: {:?}",
+                self.parser.pos,
+                self.parser.nth(0, false).kind
+            );
             println!(
                 "tracked stmts before {:?}",
                 self.tracked_statements
@@ -342,12 +347,12 @@ impl<'a> StatementSplitter<'a> {
 
                     // the end position is the end() of the last non-whitespace token before the start
                     // of the latest complete statement
-                    let latest_non_whitespace_token = self
-                        .parser
-                        .lookbehind(self.parser.pos - latest_completed_stmt_started_at + 1, true);
+                    let latest_non_whitespace_token = self.parser.lookbehind(
+                        2,
+                        true,
+                        Some(self.parser.pos - latest_completed_stmt_started_at),
+                    );
                     let end_pos = latest_non_whitespace_token.unwrap().span.end();
-
-                    println!("adding stmt: {:?}", stmt_kind);
 
                     self.ranges.push(StatementPosition {
                         kind: stmt_kind,
@@ -365,13 +370,6 @@ impl<'a> StatementSplitter<'a> {
 
         // we reached eof; add any remaining statements
 
-        println!(
-            "tracked stmts after eof {:?}",
-            self.tracked_statements
-                .iter()
-                .map(|s| s.def.stmt)
-                .collect::<Vec<_>>()
-        );
         // get the earliest statement that is complete
         if let Some(earliest_complete_stmt_started_at) =
             self.find_earliest_complete_statement_start_pos()
@@ -387,7 +385,7 @@ impl<'a> StatementSplitter<'a> {
 
             let start_pos = self.token_range(earliest_complete_stmt_started_at).start();
 
-            let end_token = self.parser.lookbehind(1, true).unwrap();
+            let end_token = self.parser.lookbehind(1, true, None).unwrap();
             let end_pos = end_token.span.end();
 
             println!("adding stmt at end: {:?}", earliest_complete_stmt.def.stmt);
@@ -406,7 +404,7 @@ impl<'a> StatementSplitter<'a> {
             let start_pos = self.token_range(earliest_stmt_started_at).start();
 
             // end position is last non-whitespace token before or at the current position
-            let end_pos = self.parser.lookbehind(1, true).unwrap().span.end();
+            let end_pos = self.parser.lookbehind(1, true, None).unwrap().span.end();
 
             println!("adding any stmt at end");
             self.ranges.push(StatementPosition {
@@ -424,6 +422,37 @@ mod tests {
     use pg_lexer::{lex, SyntaxKind};
 
     use crate::statement_splitter::StatementSplitter;
+
+    #[test]
+    fn test_simple_select() {
+        let input = "
+select id, name, test1231234123, unknown from co;
+
+select 14433313331333
+
+alter table test drop column id;
+
+select lower('test');
+";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 4);
+        assert_eq!(
+            "select id, name, test1231234123, unknown from co;",
+            input[result[0].range].to_string()
+        );
+        assert_eq!(SyntaxKind::SelectStmt, result[0].kind);
+        assert_eq!("select 14433313331333", input[result[1].range].to_string());
+        assert_eq!(SyntaxKind::SelectStmt, result[1].kind);
+        assert_eq!(SyntaxKind::AlterTableStmt, result[2].kind);
+        assert_eq!(
+            "alter table test drop column id;",
+            input[result[2].range].to_string()
+        );
+        assert_eq!(SyntaxKind::SelectStmt, result[3].kind);
+        assert_eq!("select lower('test');", input[result[3].range].to_string());
+    }
 
     #[test]
     fn test_create_or_replace() {
@@ -586,19 +615,19 @@ mod tests {
 
     #[test]
     fn test_explain_analyze() {
-        let input = "explain analyze select 1 from contact\nselect 1\nselect 4";
+        let input = "explain analyze select 1 from contact;\nselect 1;\nselect 4;";
 
         let result = StatementSplitter::new(input).run();
 
         assert_eq!(result.len(), 3);
         assert_eq!(
-            "explain analyze select 1 from contact",
+            "explain analyze select 1 from contact;",
             input[result[0].range].to_string()
         );
         assert_eq!(SyntaxKind::ExplainStmt, result[0].kind);
-        assert_eq!("select 1", input[result[1].range].to_string());
+        assert_eq!("select 1;", input[result[1].range].to_string());
         assert_eq!(SyntaxKind::SelectStmt, result[1].kind);
-        assert_eq!("select 4", input[result[2].range].to_string());
+        assert_eq!("select 4;", input[result[2].range].to_string());
         assert_eq!(SyntaxKind::SelectStmt, result[2].kind);
     }
 
@@ -693,10 +722,6 @@ DROP ROLE IF EXISTS regress_alter_generic_user1;";
         let input = "create\nselect 1;";
 
         let result = StatementSplitter::new(input).run();
-
-        for r in &result {
-            println!("{:?} {:?}", r.kind, input[r.range].to_string());
-        }
 
         assert_eq!(result.len(), 2);
         assert_eq!("create", input[result[0].range].to_string());
@@ -1008,7 +1033,7 @@ ALTER OPERATOR FAMILY alt_nsp6.alt_opf6 USING btree ADD OPERATOR 1 < (int4, int2
     fn test_alter_op_family_2() {
         let input = "
 CREATE OPERATOR FAMILY alt_opf4 USING btree;
-ALTER OPERATOR FAMILY schema.alt_opf4 USING btree ADD
+ALTER OPERATOR FAMILY test.alt_opf4 USING btree ADD
   -- int4 vs int2
   OPERATOR 1 < (int4, int2) ,
   OPERATOR 2 <= (int4, int2) ,

@@ -5,36 +5,25 @@ use crate::data::{StatementDefinition, SyntaxDefinition};
 #[derive(Debug, Clone)]
 pub struct Position {
     idx: usize,
-    group_idx: Option<usize>,
+    group_idx: usize,
 }
 
 impl Position {
     fn new(idx: usize) -> Self {
-        Self {
-            idx,
-            group_idx: None,
-        }
+        Self { idx, group_idx: 0 }
     }
 
     fn new_with_group(idx: usize) -> Self {
-        Self {
-            idx,
-            group_idx: Some(1),
-        }
-    }
-
-    fn start_group(&mut self) {
-        self.group_idx = Some(0);
+        Self { idx, group_idx: 1 }
     }
 
     fn advance(&mut self) {
         self.idx += 1;
-        self.group_idx = None;
+        self.group_idx = 0;
     }
 
     fn advance_group(&mut self) {
-        assert!(self.group_idx.is_some());
-        self.group_idx = Some(self.group_idx.unwrap() + 1);
+        self.group_idx += 1;
     }
 }
 
@@ -48,18 +37,35 @@ pub struct Tracker<'a> {
 
     /// position in the global token stream
     pub started_at: usize,
+
+    used_prohibited_statements: Vec<SyntaxKind>,
 }
 
 impl<'a> Tracker<'a> {
     pub fn new_at(def: &'a StatementDefinition, at: usize) -> Self {
         Self {
             def,
-            positions: vec![Position {
-                idx: 1,
-                group_idx: None,
-            }],
+            positions: vec![Position::new(1)],
             started_at: at,
+            used_prohibited_statements: Vec::new(),
         }
+    }
+
+    pub fn can_start_stmt_after(&mut self, kind: &SyntaxKind) -> bool {
+        if self.used_prohibited_statements.contains(&kind) {
+            // we already used this prohibited statement, we we can start a new statement
+            return true;
+        }
+
+        let res =
+            self.could_be_complete() && self.def.prohibited_following_statements.contains(kind);
+
+        if res {
+            self.used_prohibited_statements.push(kind.clone());
+            return false;
+        }
+
+        true
     }
 
     pub fn max_pos(&self) -> usize {
@@ -168,26 +174,25 @@ impl<'a> Tracker<'a> {
                     }
                 }
                 Some(SyntaxDefinition::OptionalGroup(tokens)) => {
-                    // the token in the group is stored in the group_idx
-                    if pos.group_idx.is_none() {
-                        pos.start_group();
+                    if pos.group_idx == 0 {
+                        // if we are at the beginning of the group, we also need to spawn new
+                        // trackers for every possible next token
+                        new_positions.extend(Tracker::next_possible_positions_from_with(
+                            self.def, &pos, kind,
+                        ));
                     }
-                    let token = tokens.get(pos.group_idx.unwrap()).unwrap();
+
+                    // advance group
+                    let token = tokens.get(pos.group_idx).unwrap();
                     if token == kind {
                         pos.advance_group();
 
                         // if we reached the end of the group, we advance the position
-                        if pos.group_idx.unwrap() == tokens.len() {
+                        if pos.group_idx == tokens.len() {
                             pos.advance();
                         }
 
                         new_positions.push(pos);
-                    } else if pos.group_idx.unwrap() == 0 {
-                        // if the first token in the group does not match, we move to the next
-                        // possible tokens
-                        new_positions.extend(Tracker::next_possible_positions_from_with(
-                            self.def, &pos, kind,
-                        ));
                     }
                 }
                 None => {

@@ -422,7 +422,6 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             SyntaxBuilder::new()
                 .required_token(SyntaxKind::Drop)
                 .one_of(vec![SyntaxKind::Rule, SyntaxKind::Trigger])
-                .required_token(SyntaxKind::Trigger)
                 .optional_if_exists_group()
                 .required_token(SyntaxKind::Ident)
                 .required_token(SyntaxKind::On)
@@ -501,7 +500,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .required_token(SyntaxKind::Operator)
                 .optional_if_exists_group()
                 .optional_schema_name_group()
-                .one_of(vec![SyntaxKind::Ident, SyntaxKind::Operator])
+                .one_of(vec![SyntaxKind::Ident, SyntaxKind::Op])
                 .required_token(SyntaxKind::Ascii40)
                 .any_tokens(None)
                 .required_token(SyntaxKind::Ascii41),
@@ -658,18 +657,21 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .required_token(SyntaxKind::Ident),
         ));
 
-        m.push(StatementDefinition::new(
-            SyntaxKind::CreateFunctionStmt,
-            SyntaxBuilder::new()
-                .required_token(SyntaxKind::Create)
-                .optional_token(SyntaxKind::Or)
-                .optional_token(SyntaxKind::Replace)
-                .one_of(vec![SyntaxKind::Function, SyntaxKind::Procedure])
-                .any_tokens(None)
-                .required_token(SyntaxKind::Ascii40)
-                .any_tokens(None)
-                .required_token(SyntaxKind::Ascii41),
-        ));
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::CreateFunctionStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Create)
+                    .optional_token(SyntaxKind::Or)
+                    .optional_token(SyntaxKind::Replace)
+                    .one_of(vec![SyntaxKind::Function, SyntaxKind::Procedure])
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::Ascii40)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::Ascii41),
+            )
+            .with_prohibited_following_statements(vec![SyntaxKind::TransactionStmt]),
+        );
 
         m.push(StatementDefinition::new(
             SyntaxKind::AlterFunctionStmt,
@@ -768,12 +770,15 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .any_token(),
         ));
 
-        m.push(StatementDefinition::new(
-            SyntaxKind::TransactionStmt,
-            SyntaxBuilder::new()
-                .required_token(SyntaxKind::Savepoint)
-                .required_token(SyntaxKind::Ident),
-        ));
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::TransactionStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Savepoint)
+                    .required_token(SyntaxKind::Ident),
+            )
+            .with_prohibited_following_statements(vec![SyntaxKind::TransactionStmt]),
+        );
 
         m.push(StatementDefinition::new(
             SyntaxKind::TransactionStmt,
@@ -792,21 +797,26 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             SyntaxBuilder::new().required_token(SyntaxKind::Commit),
         ));
 
-        m.push(StatementDefinition::new(
-            SyntaxKind::TransactionStmt,
-            SyntaxBuilder::new()
-                .required_token(SyntaxKind::Rollback)
-                .any_tokens(None)
-                .required_token(SyntaxKind::To)
-                .optional_token(SyntaxKind::Savepoint)
-                .required_token(SyntaxKind::Ident),
-        ));
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::TransactionStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Rollback)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::To)
+                    .optional_token(SyntaxKind::Savepoint)
+                    .required_token(SyntaxKind::Ident),
+            )
+            .with_prohibited_following_statements(vec![SyntaxKind::TransactionStmt]),
+        );
 
-        m.push(StatementDefinition::new(
-            SyntaxKind::TransactionStmt,
-            // FIXME: conflicts with ROLLBACK TO SAVEPOINT?
-            SyntaxBuilder::new().required_token(SyntaxKind::Rollback),
-        ));
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::TransactionStmt,
+                SyntaxBuilder::new().required_token(SyntaxKind::Rollback),
+            )
+            .with_prohibited_following_statements(vec![SyntaxKind::TransactionStmt]),
+        );
 
         m.push(
             StatementDefinition::new(
@@ -926,6 +936,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 SyntaxBuilder::new().required_token(SyntaxKind::Explain),
             )
             .with_prohibited_following_statements(vec![
+                SyntaxKind::VacuumStmt,
                 SyntaxKind::SelectStmt,
                 SyntaxKind::InsertStmt,
                 SyntaxKind::DeleteStmt,
@@ -1175,13 +1186,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .required_token(SyntaxKind::Ident)
                 .required_token(SyntaxKind::Using)
                 .required_token(SyntaxKind::Ident)
-                .one_of(vec![
-                    SyntaxKind::Drop,
-                    SyntaxKind::AddP,
-                    SyntaxKind::Rename,
-                    SyntaxKind::Owner,
-                    SyntaxKind::Set,
-                ]),
+                .one_of(vec![SyntaxKind::Drop, SyntaxKind::AddP, SyntaxKind::Rename]),
         ));
 
         m.push(
