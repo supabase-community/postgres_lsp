@@ -1,4 +1,4 @@
-use pg_lexer::{SyntaxKind, WHITESPACE_TOKENS};
+use pg_lexer::SyntaxKind;
 use text_size::{TextRange, TextSize};
 
 use crate::{

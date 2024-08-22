@@ -46,6 +46,18 @@ impl SyntaxBuilder {
         self.optional_group(vec![SyntaxKind::Ident, SyntaxKind::Ascii46])
     }
 
+    pub fn optional_if_exists_group(self) -> Self {
+        self.optional_group(vec![SyntaxKind::IfP, SyntaxKind::Exists])
+    }
+
+    pub fn optional_if_not_exists_group(self) -> Self {
+        self.optional_group(vec![SyntaxKind::IfP, SyntaxKind::Not, SyntaxKind::Exists])
+    }
+
+    pub fn optional_or_replace_group(self) -> Self {
+        self.optional_group(vec![SyntaxKind::Or, SyntaxKind::Replace])
+    }
+
     pub fn one_of(mut self, tokens: Vec<SyntaxKind>) -> Self {
         self.parts.push(SyntaxDefinition::OneOf(tokens));
         self
@@ -130,24 +142,25 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
     LazyLock::new(|| {
         let mut m: Vec<StatementDefinition> = Vec::new();
 
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateTrigStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Or),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Constraint),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Trigger),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Execute),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Function, SyntaxKind::Procedure]),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateTrigStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .optional_token(SyntaxKind::Or)
+                .optional_token(SyntaxKind::Replace)
+                .optional_token(SyntaxKind::Constraint)
+                .required_token(SyntaxKind::Trigger)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .any_tokens(None)
+                .required_token(SyntaxKind::On)
+                .required_token(SyntaxKind::Ident)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Execute)
+                .one_of(vec![SyntaxKind::Function, SyntaxKind::Procedure])
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
 
         m.push(StatementDefinition::new(
             SyntaxKind::SelectStmt,
@@ -190,1707 +203,1419 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .any_token(),
         ));
 
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::MergeStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Merge),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Into),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Only),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterTableStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Materialized),
-        //         SyntaxDefinition::OneOf(vec![
-        //             SyntaxKind::Table,
-        //             SyntaxKind::Index,
-        //             SyntaxKind::View,
-        //         ]),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Only),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyToken,
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::RenameStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Rename),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::To),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::RenameStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Table),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Only),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Rename),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterDomainStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::DomainP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CallStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Call),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Ident, SyntaxKind::VersionP]),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterDefaultPrivilegesStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Default),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Privileges),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::ClusterStmt,
-        //     tokens: vec![SyntaxDefinition::RequiredToken(SyntaxKind::Cluster)],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CopyStmt,
-        //     tokens: vec![SyntaxDefinition::RequiredToken(SyntaxKind::Copy)],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::ExecuteStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Execute),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // // TODO we might need to add new types to handle this properly
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Global),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Local),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temporary),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temp),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Unlogged),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Table),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Not),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DefineStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Or),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Aggregate),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateOpClassStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Class),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Default),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::For),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TypeP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Using),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Class),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Using),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Access),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Method),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Server),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Trigger),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Collation),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::ConversionP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Search),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Parser),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Search),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Dictionary),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Search),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Template),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Search),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Configuration),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Extension),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Aggregate),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::DomainP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Sequence),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Foreign),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Table),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Cast),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::As),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Foreign),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::DataP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Wrapper),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Table),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Index),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Concurrently),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Rule),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TypeP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Op, SyntaxKind::Ident]),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Routine),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Procedure),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Function),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Schema),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::View),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Language),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Procedural),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Language),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Cascade, SyntaxKind::Restrict]),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Family),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Using),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // // CREATE TEXT SEARCH DICTIONARY alt_ts_dict1 (template=simple);
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DefineStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Search),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Dictionary),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DefineStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Search),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Configuration),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DefineStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Search),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Template),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DefineStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TextP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Search),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Parser),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DefineStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DefineStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Or),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Aggregate),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DefineStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TypeP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CompositeTypeStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TypeP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::As),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateEnumStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TypeP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::As),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::EnumP),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateRangeStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TypeP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::As),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Range),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::TruncateStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Truncate),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Table),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Only),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CommentStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Comment),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::FetchStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Fetch),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::VacuumStmt,
-        //     tokens: vec![SyntaxDefinition::RequiredToken(SyntaxKind::Analyze)],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::IndexStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Unique),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Index),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Only),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateFunctionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Or),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Function, SyntaxKind::Procedure]),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterFunctionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Function, SyntaxKind::Procedure]),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DoStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Do),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Language),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Sconst),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::RuleStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Or),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Rule),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::As),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //         SyntaxDefinition::OneOf(vec![
-        //             SyntaxKind::Select,
-        //             SyntaxKind::Insert,
-        //             SyntaxKind::Update,
-        //             SyntaxKind::DeleteP,
-        //         ]),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::To),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Do),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::NotifyStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Notify),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::ListenStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Listen),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::UnlistenStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Unlisten),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Ident, SyntaxKind::Ascii42]),
-        //     ],
-        // });
-        //
-        // // DECLARE c CURSOR FOR SELECT ctid,cmin,* FROM combocidtest
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DeclareCursorStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Declare),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Cursor),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::For),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Select, SyntaxKind::With]),
-        //         SyntaxDefinition::AnyToken,
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::TransactionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Savepoint),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::TransactionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::BeginP),
-        //         // FIXME: without the ";", this would conflict with BEGIN ATOMIC
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii59),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::TransactionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::BeginP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Transaction),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::TransactionStmt,
-        //     tokens: vec![SyntaxDefinition::RequiredToken(SyntaxKind::Commit)],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::TransactionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Rollback),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::To),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Savepoint),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::TransactionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Rollback),
-        //         // FIXME: without the ";", this would conflict with ROLLBACK TO SAVEPOINT
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii59),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::ViewStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Or),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temporary),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temp),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Recursive),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::View),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::As),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::With, SyntaxKind::Select]),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::LoadStmt,
-        //     tokens: vec![SyntaxDefinition::RequiredToken(SyntaxKind::Load)],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateDomainStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::DomainP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreatedbStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Database),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropdbStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Database),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::VacuumStmt,
-        //     tokens: vec![SyntaxDefinition::RequiredToken(SyntaxKind::Vacuum)],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateTableAsStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Global),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Local),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temporary),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temp),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Materialized),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::View),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Not),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::As),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::With, SyntaxKind::Select]),
-        //         SyntaxDefinition::AnyToken,
-        //     ],
-        // });
+        m.push(StatementDefinition::new(
+            SyntaxKind::MergeStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Merge)
+                .required_token(SyntaxKind::Into)
+                .optional_token(SyntaxKind::Only)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
 
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateTableAsStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Global),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Local),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temporary),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temp),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Table),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Not),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::As),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::With, SyntaxKind::Select]),
-        //         SyntaxDefinition::AnyToken,
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::ViewStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Or),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temporary),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temp),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Recursive),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::View),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Not),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::As),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::With, SyntaxKind::Select]),
-        //         SyntaxDefinition::AnyToken,
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::ExplainStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Explain),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::OneOf(vec![
-        //             SyntaxKind::With,
-        //             SyntaxKind::Select,
-        //             SyntaxKind::Insert,
-        //             SyntaxKind::DeleteP,
-        //             SyntaxKind::Update,
-        //             SyntaxKind::Merge,
-        //             SyntaxKind::Execute,
-        //         ]),
-        //         SyntaxDefinition::AnyToken,
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateSeqStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temporary),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Temp),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Unlogged),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Sequence),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Not),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterSeqStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Sequence),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // // RESET SESSION AUTHORIZATION
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::VariableSetStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Reset),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Session),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Authorization),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::VariableSetStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Set),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Role),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::VariableSetStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Reset),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Role),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::VariableSetStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Reset),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::All, SyntaxKind::Ident]),
-        //     ],
-        // });
-        //
-        // // ref: https://www.postgresql.org/docs/current/sql-set-session-authorization.html
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::VariableSetStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Set),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Session),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Authorization),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Ident, SyntaxKind::Sconst]),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::VariableSetStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Set),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Session),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Local),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::To, SyntaxKind::Ascii61]),
-        //         SyntaxDefinition::AnyToken,
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::VariableSetStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Set),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Session),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Local),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Time),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Zone),
-        //         SyntaxDefinition::AnyToken,
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::VariableShowStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Show),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Ident, SyntaxKind::All]),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DiscardStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Discard),
-        //         SyntaxDefinition::OneOf(vec![
-        //             SyntaxKind::All,
-        //             SyntaxKind::Plans,
-        //             SyntaxKind::Sequences,
-        //             SyntaxKind::Temp,
-        //             SyntaxKind::Temporary,
-        //         ]),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateRoleStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OneOf(vec![
-        //             SyntaxKind::Role,
-        //             SyntaxKind::GroupP,
-        //             SyntaxKind::User,
-        //         ]),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterRoleStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Role),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropRoleStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::OneOf(vec![
-        //             SyntaxKind::Role,
-        //             SyntaxKind::User,
-        //             SyntaxKind::GroupP,
-        //         ]),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::LockStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::LockP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Table),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Only),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::ConstraintsSetStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Set),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Constraints),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::ReindexStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Reindex),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Concurrently),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CheckPointStmt,
-        //     tokens: vec![SyntaxDefinition::RequiredToken(SyntaxKind::Checkpoint)],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateSchemaStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Schema),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterDatabaseStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Database),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterDatabaseRefreshCollStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Database),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Refresh),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Collation),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::VersionP),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterDatabaseSetStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Database),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Set),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterDatabaseSetStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Database),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Reset),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateConversionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Default),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::ConversionP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::For),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Sconst),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::To),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Sconst),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::From),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateCastStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Cast),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::As),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateOpFamilyStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Family),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterOpFamilyStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Family),
-        //         // for schemas, this should be put into all definitions...
-        //         // SyntaxDefinition::OptionalToken(SyntaxKind::Ident),
-        //         // SyntaxDefinition::OptionalToken(SyntaxKind::Ascii46),
-        //         SyntaxDefinition::AnyTokens,
-        //         // SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Using),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         // this is important to not conflict with RenameStmt
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Drop, SyntaxKind::AddP]),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::PrepareStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Prepare),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyToken,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::As),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::With, SyntaxKind::Select]),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DeallocateStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Deallocate),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Prepare),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Ident, SyntaxKind::All]),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateTableSpaceStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Tablespace),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Location),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropTableSpaceStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Tablespace),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterOperatorStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Operator),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterTypeStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TypeP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropOwnedStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Owned),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::By),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::ReassignOwnedStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Reassign),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Owned),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::By),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::To),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateFdwStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Foreign),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::DataP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Wrapper),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterFdwStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Foreign),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::DataP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Wrapper),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateForeignServerStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Server),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Not),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Foreign),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::DataP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Wrapper),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterForeignServerStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Server),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateUserMappingStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::User),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Mapping),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Not),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::For),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Server),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterUserMappingStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::User),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Mapping),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::For),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Server),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Options),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropUserMappingStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::User),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Mapping),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::For),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Server),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::SecLabelStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Security),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Label),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::For),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateForeignTableStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Foreign),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Table),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Not),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Server),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::ImportForeignSchemaStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::ImportP),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Foreign),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Schema),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::From),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Server),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Into),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateExtensionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Extension),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Not),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterExtensionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Extension),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateEventTrigStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Event),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Trigger),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Execute),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Function, SyntaxKind::Procedure]),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterEventTrigStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Event),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Trigger),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::RefreshMatViewStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Refresh),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Materialized),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::View),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Concurrently),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterSystemStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::SystemP),
-        //         SyntaxDefinition::OneOf(vec![SyntaxKind::Set, SyntaxKind::Reset]),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreatePolicyStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Policy),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterPolicyStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Policy),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateTransformStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Or),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Transform),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::For),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Language),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii40),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ascii41),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateAmStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Access),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Method),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::TypeP),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreatePublicationStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Publication),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterPublicationStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Publication),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateSubscriptionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Subscription),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Connection),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Sconst),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Publication),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterSubscriptionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Subscription),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::DropSubscriptionStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Drop),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Subscription),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::IfP),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Exists),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // // GRANT ALL ON SCHEMA alt_nsp1, alt_nsp2 TO public;
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::GrantStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Grant),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::To),
-        //     ],
-        // });
-        //
-        // // REVOKE ALL ON SCHEMA alt_nsp6 FROM regress_alter_generic_user6;
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::GrantStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Revoke),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterOwnerStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Owner),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::To),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // // ALTER AGGREGATE alt_func1(int) SET SCHEMA alt_nsp2;
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::AlterObjectSchemaStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Alter),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Set),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Schema),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreatePlangStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Or),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Replace),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Trusted),
-        //         SyntaxDefinition::OptionalToken(SyntaxKind::Procedural),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Language),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
-        //
-        // m.push(StatementDefinition {
-        //     stmt: SyntaxKind::CreateStatsStmt,
-        //     tokens: vec![
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Create),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Statistics),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::On),
-        //         SyntaxDefinition::AnyTokens,
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::From),
-        //         SyntaxDefinition::RequiredToken(SyntaxKind::Ident),
-        //     ],
-        // });
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterTableStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .optional_token(SyntaxKind::Materialized)
+                .one_of(vec![SyntaxKind::Table, SyntaxKind::Index, SyntaxKind::View])
+                .optional_if_exists_group()
+                .optional_token(SyntaxKind::Only)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .any_token(),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::RenameStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .any_tokens(None)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Rename)
+                .required_token(SyntaxKind::To)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::RenameStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Table)
+                .optional_if_exists_group()
+                .optional_token(SyntaxKind::Only)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Rename),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterDomainStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::DomainP)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CallStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Call)
+                .optional_schema_name_group()
+                .one_of(vec![SyntaxKind::Ident, SyntaxKind::VersionP])
+                .required_token(SyntaxKind::Ascii40)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii41),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterDefaultPrivilegesStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Default)
+                .required_token(SyntaxKind::Privileges),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::ClusterStmt,
+            SyntaxBuilder::new().required_token(SyntaxKind::Cluster),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CopyStmt,
+            SyntaxBuilder::new().required_token(SyntaxKind::Copy),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::ExecuteStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Execute)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .any_tokens(Some(vec![
+                    SyntaxKind::Global,
+                    SyntaxKind::Local,
+                    SyntaxKind::Temporary,
+                    SyntaxKind::Temp,
+                    SyntaxKind::Unlogged,
+                ]))
+                .required_token(SyntaxKind::Table)
+                .optional_if_not_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DefineStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .optional_token(SyntaxKind::Or)
+                .optional_token(SyntaxKind::Replace)
+                .required_token(SyntaxKind::Aggregate),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateOpClassStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Operator)
+                .required_token(SyntaxKind::Class)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .optional_token(SyntaxKind::Default)
+                .required_token(SyntaxKind::For)
+                .required_token(SyntaxKind::TypeP)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Using),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .one_of(vec![
+                    SyntaxKind::Server,
+                    SyntaxKind::Collation,
+                    SyntaxKind::ConversionP,
+                    SyntaxKind::Extension,
+                    SyntaxKind::Aggregate,
+                    SyntaxKind::DomainP,
+                    SyntaxKind::Sequence,
+                    SyntaxKind::Table,
+                    SyntaxKind::TypeP,
+                    SyntaxKind::Routine,
+                    SyntaxKind::Procedure,
+                    SyntaxKind::Schema,
+                    SyntaxKind::View,
+                    SyntaxKind::Language,
+                ])
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::TextP)
+                .required_token(SyntaxKind::Search)
+                .one_of(vec![
+                    SyntaxKind::Parser,
+                    SyntaxKind::Dictionary,
+                    SyntaxKind::Template,
+                    SyntaxKind::Configuration,
+                ])
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .optional_token(SyntaxKind::Procedural)
+                .required_token(SyntaxKind::Language)
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Operator)
+                .required_token(SyntaxKind::Class)
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Using)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Access)
+                .required_token(SyntaxKind::Method)
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .one_of(vec![SyntaxKind::Rule, SyntaxKind::Trigger])
+                .required_token(SyntaxKind::Trigger)
+                .optional_if_exists_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::On)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::TextP)
+                .required_token(SyntaxKind::Search)
+                .one_of(vec![
+                    SyntaxKind::Template,
+                    SyntaxKind::Configuration,
+                    SyntaxKind::Parser,
+                    SyntaxKind::Dictionary,
+                ])
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Foreign)
+                .required_token(SyntaxKind::Table)
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Cast)
+                .optional_if_exists_group()
+                .required_token(SyntaxKind::Ascii40)
+                .any_tokens(None)
+                .required_token(SyntaxKind::As)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii41),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Foreign)
+                .required_token(SyntaxKind::DataP)
+                .required_token(SyntaxKind::Wrapper)
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Index)
+                .optional_token(SyntaxKind::Concurrently)
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Operator)
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .one_of(vec![SyntaxKind::Ident, SyntaxKind::Operator])
+                .required_token(SyntaxKind::Ascii40)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii41),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Function)
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Ascii40)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii41),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Operator)
+                .required_token(SyntaxKind::Family)
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Using)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DefineStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::TextP)
+                .required_token(SyntaxKind::Search)
+                .one_of(vec![
+                    SyntaxKind::Dictionary,
+                    SyntaxKind::Configuration,
+                    SyntaxKind::Template,
+                    SyntaxKind::Parser,
+                ])
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Ascii40)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii41),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DefineStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Operator),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DefineStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .optional_or_replace_group()
+                .required_token(SyntaxKind::Aggregate)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Ascii40)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii41),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DefineStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::TypeP)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CompositeTypeStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::TypeP)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::As),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateEnumStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::TypeP)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::As)
+                .required_token(SyntaxKind::EnumP),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateRangeStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::TypeP)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::As)
+                .required_token(SyntaxKind::Range),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::TruncateStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Truncate)
+                .optional_token(SyntaxKind::Table)
+                .optional_token(SyntaxKind::Only)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CommentStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Comment)
+                .required_token(SyntaxKind::On)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Is)
+                .one_of(vec![SyntaxKind::Ident, SyntaxKind::Sconst]),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::FetchStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Fetch)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::VacuumStmt,
+            SyntaxBuilder::new().required_token(SyntaxKind::Analyze),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::IndexStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .optional_token(SyntaxKind::Unique)
+                .required_token(SyntaxKind::Index)
+                .any_tokens(None)
+                .required_token(SyntaxKind::On)
+                .optional_token(SyntaxKind::Only)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateFunctionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .optional_token(SyntaxKind::Or)
+                .optional_token(SyntaxKind::Replace)
+                .one_of(vec![SyntaxKind::Function, SyntaxKind::Procedure])
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii40)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii41),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterFunctionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .one_of(vec![SyntaxKind::Function, SyntaxKind::Procedure])
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DoStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Do)
+                .optional_token(SyntaxKind::Language)
+                .optional_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Sconst),
+        ));
+
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::RuleStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Create)
+                    .optional_token(SyntaxKind::Or)
+                    .optional_token(SyntaxKind::Replace)
+                    .required_token(SyntaxKind::Rule)
+                    .optional_schema_name_group()
+                    .required_token(SyntaxKind::Ident)
+                    .required_token(SyntaxKind::As)
+                    .required_token(SyntaxKind::On)
+                    .one_of(vec![
+                        SyntaxKind::Select,
+                        SyntaxKind::Insert,
+                        SyntaxKind::Update,
+                        SyntaxKind::DeleteP,
+                    ])
+                    .required_token(SyntaxKind::To)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::Do),
+            )
+            .with_prohibited_following_statements(vec![
+                SyntaxKind::SelectStmt,
+                SyntaxKind::InsertStmt,
+                SyntaxKind::UpdateStmt,
+                SyntaxKind::DeleteStmt,
+            ]),
+        );
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::NotifyStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Notify)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::ListenStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Listen)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::UnlistenStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Unlisten)
+                .one_of(vec![SyntaxKind::Ident, SyntaxKind::Ascii42]),
+        ));
+
+        // DECLARE c CURSOR FOR SELECT ctid,cmin,* FROM combocidtest
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::DeclareCursorStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Declare)
+                    .required_token(SyntaxKind::Ident)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::Cursor)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::For),
+            )
+            .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
+        );
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DeclareCursorStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Declare)
+                .required_token(SyntaxKind::Ident)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Cursor)
+                .any_tokens(None)
+                .required_token(SyntaxKind::For)
+                .one_of(vec![SyntaxKind::Select, SyntaxKind::With])
+                .any_token(),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::TransactionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Savepoint)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::TransactionStmt,
+            SyntaxBuilder::new().required_token(SyntaxKind::BeginP),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::TransactionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::BeginP)
+                .required_token(SyntaxKind::Transaction),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::TransactionStmt,
+            SyntaxBuilder::new().required_token(SyntaxKind::Commit),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::TransactionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Rollback)
+                .any_tokens(None)
+                .required_token(SyntaxKind::To)
+                .optional_token(SyntaxKind::Savepoint)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::TransactionStmt,
+            // FIXME: conflicts with ROLLBACK TO SAVEPOINT?
+            SyntaxBuilder::new().required_token(SyntaxKind::Rollback),
+        ));
+
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::ViewStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Create)
+                    .optional_or_replace_group()
+                    .optional_token(SyntaxKind::Temporary)
+                    .optional_token(SyntaxKind::Temp)
+                    .optional_token(SyntaxKind::Recursive)
+                    .required_token(SyntaxKind::View)
+                    .optional_schema_name_group()
+                    .required_token(SyntaxKind::Ident)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::As),
+            )
+            .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
+        );
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::LoadStmt,
+            SyntaxBuilder::new().required_token(SyntaxKind::Load),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateDomainStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::DomainP)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreatedbStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Database)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropdbStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Database)
+                .optional_if_exists_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::VacuumStmt,
+            SyntaxBuilder::new().required_token(SyntaxKind::Vacuum),
+        ));
+
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::CreateTableAsStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Create)
+                    .required_token(SyntaxKind::Materialized)
+                    .required_token(SyntaxKind::View)
+                    .optional_if_not_exists_group()
+                    .optional_schema_name_group()
+                    .required_token(SyntaxKind::Ident)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::As),
+            )
+            .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
+        );
+
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::CreateTableAsStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Create)
+                    .any_tokens(Some(vec![
+                        SyntaxKind::Global,
+                        SyntaxKind::Local,
+                        SyntaxKind::Temporary,
+                        SyntaxKind::Temp,
+                    ]))
+                    .required_token(SyntaxKind::Table)
+                    .optional_if_not_exists_group()
+                    .optional_schema_name_group()
+                    .required_token(SyntaxKind::Ident)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::As)
+                    .any_token(),
+            )
+            .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
+        );
+
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::ViewStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Create)
+                    .optional_token(SyntaxKind::Or)
+                    .optional_token(SyntaxKind::Replace)
+                    .optional_token(SyntaxKind::Temporary)
+                    .optional_token(SyntaxKind::Temp)
+                    .optional_token(SyntaxKind::Recursive)
+                    .required_token(SyntaxKind::View)
+                    .optional_if_not_exists_group()
+                    .optional_schema_name_group()
+                    .required_token(SyntaxKind::Ident)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::As),
+            )
+            .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
+        );
+
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::ExplainStmt,
+                SyntaxBuilder::new().required_token(SyntaxKind::Explain),
+            )
+            .with_prohibited_following_statements(vec![
+                SyntaxKind::SelectStmt,
+                SyntaxKind::InsertStmt,
+                SyntaxKind::DeleteStmt,
+                SyntaxKind::UpdateStmt,
+                SyntaxKind::MergeStmt,
+                SyntaxKind::ExecuteStmt,
+            ]),
+        );
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateSeqStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .any_tokens(Some(vec![
+                    SyntaxKind::Temporary,
+                    SyntaxKind::Temp,
+                    SyntaxKind::Unlogged,
+                ]))
+                .required_token(SyntaxKind::Sequence)
+                .optional_if_not_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterSeqStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Sequence)
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::VariableSetStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Reset)
+                .one_of(vec![SyntaxKind::All, SyntaxKind::Ident, SyntaxKind::Role]),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::VariableSetStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Reset)
+                .required_token(SyntaxKind::Session)
+                .required_token(SyntaxKind::Authorization),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::VariableSetStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Set)
+                .required_token(SyntaxKind::Role)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        // ref: https://www.postgresql.org/docs/current/sql-set-session-authorization.html
+        m.push(StatementDefinition::new(
+            SyntaxKind::VariableSetStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Set)
+                .required_token(SyntaxKind::Session)
+                .required_token(SyntaxKind::Authorization)
+                .one_of(vec![SyntaxKind::Ident, SyntaxKind::Sconst]),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::VariableSetStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Set)
+                .optional_token(SyntaxKind::Session)
+                .optional_token(SyntaxKind::Local)
+                .required_token(SyntaxKind::Ident)
+                .one_of(vec![SyntaxKind::To, SyntaxKind::Ascii61])
+                .any_token(),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::VariableSetStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Set)
+                .optional_token(SyntaxKind::Session)
+                .optional_token(SyntaxKind::Local)
+                .required_token(SyntaxKind::Time)
+                .required_token(SyntaxKind::Zone)
+                .any_token(),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::VariableShowStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Show)
+                .one_of(vec![SyntaxKind::Ident, SyntaxKind::All]),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DiscardStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Discard)
+                .one_of(vec![
+                    SyntaxKind::All,
+                    SyntaxKind::Plans,
+                    SyntaxKind::Sequences,
+                    SyntaxKind::Temp,
+                    SyntaxKind::Temporary,
+                ]),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateRoleStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .one_of(vec![SyntaxKind::Role, SyntaxKind::GroupP, SyntaxKind::User])
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterRoleStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Role)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropRoleStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .one_of(vec![SyntaxKind::Role, SyntaxKind::User, SyntaxKind::GroupP])
+                .optional_token(SyntaxKind::IfP)
+                .optional_token(SyntaxKind::Exists)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::LockStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::LockP)
+                .optional_token(SyntaxKind::Table)
+                .optional_token(SyntaxKind::Only)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::ConstraintsSetStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Set)
+                .required_token(SyntaxKind::Constraints),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::ReindexStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Reindex)
+                .optional_token(SyntaxKind::Concurrently)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CheckPointStmt,
+            SyntaxBuilder::new().required_token(SyntaxKind::Checkpoint),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateSchemaStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Schema),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterDatabaseStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Database)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterDatabaseRefreshCollStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Database)
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Refresh)
+                .required_token(SyntaxKind::Collation)
+                .required_token(SyntaxKind::VersionP),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterDatabaseSetStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Database)
+                .required_token(SyntaxKind::Ident)
+                .one_of(vec![SyntaxKind::Set, SyntaxKind::Reset]),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateConversionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .optional_token(SyntaxKind::Default)
+                .required_token(SyntaxKind::ConversionP)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::For)
+                .required_token(SyntaxKind::Sconst)
+                .required_token(SyntaxKind::To)
+                .required_token(SyntaxKind::Sconst)
+                .required_token(SyntaxKind::From)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateCastStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Cast)
+                .required_token(SyntaxKind::Ascii40)
+                .any_tokens(None)
+                .required_token(SyntaxKind::As)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii41),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateOpFamilyStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Operator)
+                .required_token(SyntaxKind::Family)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterOpFamilyStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Operator)
+                .required_token(SyntaxKind::Family)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Using)
+                .required_token(SyntaxKind::Ident)
+                .one_of(vec![
+                    SyntaxKind::Drop,
+                    SyntaxKind::AddP,
+                    SyntaxKind::Rename,
+                    SyntaxKind::Owner,
+                    SyntaxKind::Set,
+                ]),
+        ));
+
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::PrepareStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Prepare)
+                    .required_token(SyntaxKind::Ident)
+                    .any_token()
+                    .required_token(SyntaxKind::As),
+            )
+            .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
+        );
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DeallocateStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Deallocate)
+                .optional_token(SyntaxKind::Prepare)
+                .one_of(vec![SyntaxKind::Ident, SyntaxKind::All]),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateTableSpaceStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Tablespace)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Location),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropTableSpaceStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Tablespace)
+                .optional_if_exists_group()
+                .optional_token(SyntaxKind::IfP)
+                .optional_token(SyntaxKind::Exists)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterOperatorStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Operator),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterTypeStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::TypeP)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropOwnedStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Owned)
+                .required_token(SyntaxKind::By),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::ReassignOwnedStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Reassign)
+                .required_token(SyntaxKind::Owned)
+                .required_token(SyntaxKind::By)
+                .any_tokens(None)
+                .required_token(SyntaxKind::To),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateFdwStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Foreign)
+                .required_token(SyntaxKind::DataP)
+                .required_token(SyntaxKind::Wrapper)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterFdwStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Foreign)
+                .required_token(SyntaxKind::DataP)
+                .required_token(SyntaxKind::Wrapper)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateForeignServerStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Server)
+                .optional_if_not_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Foreign)
+                .required_token(SyntaxKind::DataP)
+                .required_token(SyntaxKind::Wrapper)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterForeignServerStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Server)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateUserMappingStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::User)
+                .required_token(SyntaxKind::Mapping)
+                .optional_if_not_exists_group()
+                .required_token(SyntaxKind::For)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Server)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterUserMappingStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::User)
+                .required_token(SyntaxKind::Mapping)
+                .optional_token(SyntaxKind::For)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Server)
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Options),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropUserMappingStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::User)
+                .required_token(SyntaxKind::Mapping)
+                .optional_if_exists_group()
+                .optional_token(SyntaxKind::For)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Server)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::SecLabelStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Security)
+                .required_token(SyntaxKind::Label)
+                .optional_token(SyntaxKind::For)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::On),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateForeignTableStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Foreign)
+                .required_token(SyntaxKind::Table)
+                .optional_if_not_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Server)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::ImportForeignSchemaStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::ImportP)
+                .required_token(SyntaxKind::Foreign)
+                .required_token(SyntaxKind::Schema)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .any_tokens(None)
+                .required_token(SyntaxKind::From)
+                .required_token(SyntaxKind::Server)
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Into)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateExtensionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Extension)
+                .optional_if_not_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterExtensionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Extension)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateEventTrigStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Event)
+                .required_token(SyntaxKind::Trigger)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::On)
+                .required_token(SyntaxKind::Ident)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Execute)
+                .one_of(vec![SyntaxKind::Function, SyntaxKind::Procedure])
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Ascii40)
+                .required_token(SyntaxKind::Ascii41),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterEventTrigStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Event)
+                .required_token(SyntaxKind::Trigger)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::RefreshMatViewStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Refresh)
+                .required_token(SyntaxKind::Materialized)
+                .required_token(SyntaxKind::View)
+                .optional_token(SyntaxKind::Concurrently)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterSystemStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::SystemP)
+                .one_of(vec![SyntaxKind::Set, SyntaxKind::Reset]),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreatePolicyStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Policy)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::On)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterPolicyStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Policy)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::On)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateTransformStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .optional_or_replace_group()
+                .required_token(SyntaxKind::Transform)
+                .required_token(SyntaxKind::For)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Language)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Ascii40)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii41),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateAmStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Access)
+                .required_token(SyntaxKind::Method)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::TypeP),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreatePublicationStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Publication)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterPublicationStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Publication)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateSubscriptionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Subscription)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident)
+                .required_token(SyntaxKind::Connection)
+                .required_token(SyntaxKind::Sconst)
+                .required_token(SyntaxKind::Publication)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterSubscriptionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .required_token(SyntaxKind::Subscription)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::DropSubscriptionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Drop)
+                .required_token(SyntaxKind::Subscription)
+                .optional_if_exists_group()
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::GrantStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Grant)
+                .any_tokens(None)
+                .required_token(SyntaxKind::On)
+                .any_tokens(None)
+                .required_token(SyntaxKind::To),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::GrantStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Revoke)
+                .any_tokens(None)
+                .required_token(SyntaxKind::On),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterOwnerStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Owner)
+                .required_token(SyntaxKind::To)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::AlterObjectSchemaStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Alter)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Set)
+                .required_token(SyntaxKind::Schema)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreatePlangStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .optional_or_replace_group()
+                .optional_token(SyntaxKind::Trusted)
+                .optional_token(SyntaxKind::Procedural)
+                .required_token(SyntaxKind::Language)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::CreateStatsStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Create)
+                .required_token(SyntaxKind::Statistics)
+                .any_tokens(None)
+                .required_token(SyntaxKind::On)
+                .any_tokens(None)
+                .required_token(SyntaxKind::From)
+                .optional_schema_name_group()
+                .required_token(SyntaxKind::Ident),
+        ));
 
         let mut stmt_starts: HashMap<SyntaxKind, Vec<StatementDefinition>> = HashMap::new();
 
@@ -1909,27 +1634,3 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
 
         stmt_starts
     });
-
-// TODO: complete the hashmap above with all statements:
-// RETURN statement (inside SQL function body)
-// ReturnStmt,
-// SetOperationStmt,
-//
-// TODO: parsing ambiguity, check docs for solution
-// GrantStmt(super::GrantStmt),
-// GrantRoleStmt(super::GrantRoleStmt),
-// ClosePortalStmt,
-// CreatePlangStmt,
-// AlterRoleSetStmt,
-// DeclareCursorStmt,
-// AlterObjectDependsStmt,
-// AlterObjectSchemaStmt,
-// AlterOwnerStmt,
-// AlterEnumStmt,
-// AlterTsdictionaryStmt,
-// AlterTsconfigurationStmt,
-// AlterTableSpaceOptionsStmt,
-// AlterTableMoveAllStmt,
-// AlterExtensionContentsStmt,
-// ReplicaIdentityStmt,
-//
