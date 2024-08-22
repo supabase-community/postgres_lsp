@@ -11,12 +11,13 @@ pub(crate) struct StatementSplitter<'a> {
     parser: Parser,
     tracked_statements: Vec<Tracker<'a>>,
     active_bridges: Vec<Tracker<'a>>,
+    ranges: Vec<StatementPosition>,
     sub_trx_depth: usize,
     sub_stmt_depth: usize,
     is_within_atomic_block: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StatementPosition {
     pub kind: SyntaxKind,
     pub range: TextRange,
@@ -28,316 +29,141 @@ impl<'a> StatementSplitter<'a> {
             parser: Parser::new(pg_lexer::lex(sql)),
             tracked_statements: Vec::new(),
             active_bridges: Vec::new(),
+            ranges: Vec::new(),
+
             sub_trx_depth: 0,
             sub_stmt_depth: 0,
             is_within_atomic_block: false,
         }
     }
 
-    pub fn run(&mut self) -> Vec<StatementPosition> {
-        let mut ranges = Vec::new();
-
-        while !self.parser.eof() {
-            let at_token = self.parser.nth(0, false);
-            println!("{:?}", at_token.kind);
-            println!(
-                "tracked stmts before {:?}",
-                self.tracked_statements
-                    .iter()
-                    .map(|s| s.def.stmt)
-                    .collect::<Vec<_>>()
-            );
-            // TODO rename vars and add helpers to make distinciton between pos and text pos clear
-
-            // TODO handle BEGIN ATOMIC ... END here
-            if at_token.kind == SyntaxKind::BeginP {
-                // self.sub_trx_depth += 1;
-            } else if at_token.kind == SyntaxKind::EndP {
-                // self.sub_trx_depth -= 1;
-
-                self.is_within_atomic_block = false;
-            } else if at_token.kind == SyntaxKind::Ascii40 {
+    fn track_nesting(&mut self) {
+        match self.parser.nth(0, false).kind {
+            SyntaxKind::Ascii40 => {
                 // "("
-                self.sub_stmt_depth += 1;
-            } else if at_token.kind == SyntaxKind::Ascii41 {
+                self.sub_trx_depth += 1;
+            }
+            SyntaxKind::Ascii41 => {
                 // ")"
-                self.sub_stmt_depth -= 1;
-            } else if at_token.kind == SyntaxKind::Atomic
-                && self.parser.lookbehind(2, true).map(|t| t.kind) == Some(SyntaxKind::BeginP)
-            {
-                self.is_within_atomic_block = true;
+                self.sub_trx_depth -= 1;
             }
-
-            let mut removed_items = Vec::new();
-
-            self.tracked_statements.retain_mut(|stmt| {
-                let keep = stmt.advance_with(&at_token.kind);
-                if !keep {
-                    removed_items.push(stmt.started_at);
-                }
-                keep
-            });
-
-            if self.tracked_statements.len() == 0 && removed_items.len() > 0 {
-                let any_stmt_after = removed_items.iter().min().unwrap();
-                println!("adding any statement: {:?}", any_stmt_after,);
-                ranges.push(StatementPosition {
-                    kind: SyntaxKind::Any,
-                    range: TextRange::new(
-                        TextSize::try_from(
-                            self.parser
-                                .tokens
-                                .get(*any_stmt_after)
-                                .unwrap()
-                                .span
-                                .start(),
-                        )
-                        .unwrap(),
-                        TextSize::try_from(self.parser.lookbehind(2, true).unwrap().span.end())
-                            .unwrap(),
-                    ),
-                });
-            }
-
-            if self.sub_trx_depth == 0
-                && self.sub_stmt_depth == 0 && self.is_within_atomic_block == false
-                    // it onyl makes sense to start tracking new statements if at least one of the
-                    // currently tracked statements could be complete. or if none are tracked yet.
-                    // this is important for statements such as `explain select 1;` where `select 1`
-                    // would mark a completed statement that would move `explain` into completed,
-                    // even though the latter is part of the former.
-                && (self.tracked_statements.len() == 0
-                    || self
-                        .tracked_statements
-                        .iter()
-                        .any(|s| s.could_be_complete()))
-            {
-                if let Some(stmts) = STATEMENT_DEFINITIONS.get(&at_token.kind) {
-                    println!(
-                        "adding stmts: {:?}, completed are {:?}",
-                        stmts.iter().map(|s| s.stmt).collect::<Vec<_>>(),
-                        self.tracked_statements
-                            .iter()
-                            .filter(|s| s.could_be_complete())
-                            .map(|s| s.def.stmt)
-                            .collect::<Vec<_>>()
-                    );
-
-                    self.tracked_statements.append(
-                        &mut stmts
-                            .iter()
-                            .filter_map(|stmt| {
-                                if self.active_bridges.iter().any(|b| b.def.stmt == stmt.stmt) {
-                                    None
-                                } else if self.tracked_statements.iter().any(|s| {
-                                    s.could_be_complete()
-                                        && s.def
-                                            .prohibited_following_statements
-                                            .contains(&stmt.stmt)
-                                }) {
-                                    None
-                                } else {
-                                    Some(Tracker::new_at(stmt, self.parser.pos))
-                                }
-                            })
-                            .collect(),
-                    );
-                };
-            }
-
-            self.active_bridges
-                .retain_mut(|stmt| stmt.advance_with(&at_token.kind));
-
-            if let Some(bridges) = STATEMENT_BRIDGE_DEFINITIONS.get(&at_token.kind) {
-                self.active_bridges.append(
-                    &mut bridges
-                        .iter()
-                        .map(|stmt| Tracker::new_at(stmt, self.parser.pos))
-                        .collect(),
-                );
-            }
-
-            println!(
-                "tracked stmts after {:?}",
-                self.tracked_statements
-                    .iter()
-                    .map(|s| s.def.stmt)
-                    .collect::<Vec<_>>()
-            );
-
-            // i didnt believe it myself at first, but there are statements where a ";" is valid
-            // within a sub statement, e.g.:
-            // "create rule qqq as on insert to copydml_test do instead (delete from copydml_test; delete from copydml_test);"
-            // so we need to check for sub statement depth here
-            if at_token.kind == SyntaxKind::Ascii59
-                && self.sub_stmt_depth == 0
-                && self.is_within_atomic_block == false
-            {
-                // ;
-                // get earliest statement
-                if let Some(earliest_complete_stmt_started_at) = self
-                    .tracked_statements
-                    .iter()
-                    .filter(|s| s.could_be_complete())
-                    .min_by_key(|stmt| stmt.started_at)
-                    .map(|stmt| stmt.started_at)
-                {
-                    let earliest_complete_stmt = self
-                        .tracked_statements
-                        .iter()
-                        .filter(|s| {
-                            s.started_at == earliest_complete_stmt_started_at
-                                && s.could_be_complete()
-                        })
-                        .max_by_key(|stmt| stmt.max_pos())
-                        .unwrap();
-
-                    assert_eq!(
-                        1,
-                        self.tracked_statements
-                            .iter()
-                            .filter(|s| {
-                                s.started_at == earliest_complete_stmt_started_at
-                                    && s.could_be_complete()
-                                    && s.current_positions().iter().any(|i| {
-                                        earliest_complete_stmt.current_positions().contains(i)
-                                    })
-                            })
-                            .count(),
-                        "multiple complete statements at the same position"
-                    );
-
-                    let end_pos = at_token.span.end();
-                    let start_pos = TextSize::try_from(
-                        self.parser
-                            .tokens
-                            .get(earliest_complete_stmt.started_at)
-                            .unwrap()
-                            .span
-                            .start(),
-                    )
-                    .unwrap();
-                    println!(
-                        "adding stmt from ';': {:?}",
-                        earliest_complete_stmt.def.stmt
-                    );
-                    ranges.push(StatementPosition {
-                        kind: earliest_complete_stmt.def.stmt,
-                        range: TextRange::new(start_pos, end_pos),
-                    });
-                }
-
-                self.tracked_statements.clear();
-                self.active_bridges.clear();
-            }
-
-            // if a statement is complete, check if there are any complete statements that start
-            // before the just completed one
-
-            // Step 1: Find the latest completed statement
-            let latest_completed_stmt_started_at = self
-                .tracked_statements
-                .iter()
-                .filter(|s| s.could_be_complete())
-                .max_by_key(|stmt| stmt.started_at)
-                .map(|stmt| stmt.started_at);
-
-            if let Some(latest_completed_stmt_started_at) = latest_completed_stmt_started_at {
-                // Step 2: Find the latest complete statement before the latest completed statement
-                let latest_complete_before_started_at = self
-                    .tracked_statements
-                    .iter()
-                    .filter(|s| {
-                        s.could_be_complete() && s.started_at < latest_completed_stmt_started_at
-                    })
-                    .max_by_key(|stmt| stmt.started_at)
-                    .map(|stmt| stmt.started_at);
-
-                if let Some(latest_complete_before_started_at) = latest_complete_before_started_at {
-                    let latest_complete_before = self
-                        .tracked_statements
-                        .iter()
-                        .filter(|s| {
-                            s.started_at == latest_complete_before_started_at
-                                && s.could_be_complete()
-                        })
-                        .max_by_key(|stmt| stmt.max_pos())
-                        .cloned()
-                        .unwrap();
-
-                    assert_eq!(
-                        1,
-                        self.tracked_statements
-                            .iter()
-                            .filter(|s| {
-                                s.started_at == latest_complete_before_started_at
-                                    && s.could_be_complete()
-                                    && s.current_positions().iter().any(|i| {
-                                        latest_complete_before.current_positions().contains(i)
-                                    })
-                            })
-                            .count(),
-                        "multiple complete statements at the same position"
-                    );
-
-                    // Step 3: save range for the statement
-
-                    // end is the last non-whitespace token before the start of the latest complete
-                    // statement
-
-                    // TODO optimize
-                    let latest_text_pos = self
-                        .parser
-                        .tokens
-                        .get(latest_completed_stmt_started_at)
-                        .unwrap()
-                        .span
-                        .start();
-                    let end_pos = self
-                        .parser
-                        .tokens
-                        .iter()
-                        // .skip(latest_completed_stmt_started_at)
-                        .filter_map(|t| {
-                            if t.span.start() < latest_text_pos
-                                && !WHITESPACE_TOKENS.contains(&t.kind)
-                            {
-                                Some(t.span.end())
-                            } else {
-                                None
-                            }
-                        })
-                        .max()
-                        .unwrap();
-
-                    println!("adding stmt: {:?}", latest_complete_before.def.stmt);
-
-                    ranges.push(StatementPosition {
-                        kind: latest_complete_before.def.stmt,
-                        range: TextRange::new(
-                            TextSize::try_from(
-                                self.parser
-                                    .tokens
-                                    .get(latest_complete_before.started_at)
-                                    .unwrap()
-                                    .span
-                                    .start(),
-                            )
-                            .unwrap(),
-                            end_pos,
-                        ),
-                    });
-
-                    // Step 4: remove all statements that started before or at the position
-                    self.tracked_statements
-                        .retain(|s| s.started_at > latest_complete_before.started_at);
+            SyntaxKind::Atomic => {
+                if self.parser.lookbehind(2, true).map(|t| t.kind) == Some(SyntaxKind::BeginP) {
+                    self.is_within_atomic_block = true;
                 }
             }
+            SyntaxKind::EndP => {
+                self.is_within_atomic_block = false;
+            }
+            _ => {}
+        };
+    }
 
-            self.parser.advance();
+    /// advance all tracked statements and return the earliest started_at value of the removed
+    /// statements
+    fn advance_tracker(&mut self) -> Option<usize> {
+        let mut removed_items = Vec::new();
+
+        self.tracked_statements.retain_mut(|stmt| {
+            let keep = stmt.advance_with(&self.parser.nth(0, false).kind);
+            if !keep {
+                removed_items.push(stmt.started_at);
+            }
+            keep
+        });
+
+        removed_items.iter().min().map(|i| *i)
+    }
+
+    fn token_range(&self, token_pos: usize) -> TextRange {
+        self.parser.tokens.get(token_pos).unwrap().span
+    }
+
+    fn add_incomplete_statement(&mut self, started_at: Option<usize>) {
+        if self.tracked_statements.len() > 0 || started_at.is_none() {
+            return;
         }
 
-        // get the earliest statement that is complete
+        self.ranges.push(StatementPosition {
+            kind: SyntaxKind::Any,
+            range: TextRange::new(
+                self.token_range(started_at.unwrap()).start(),
+                self.parser.lookbehind(2, true).unwrap().span.end(),
+            ),
+        });
+    }
+
+    fn start_new_statements(&mut self) {
+        if self.sub_trx_depth != 0 || self.sub_stmt_depth != 0 || self.is_within_atomic_block {
+            return;
+        }
+
+        // it onyl makes sense to start tracking new statements if at least one of the
+        // currently tracked statements could be complete. or if none are tracked yet.
+        // this is important for statements such as `explain select 1;` where `select 1`
+        // would mark a completed statement that would move `explain` into completed,
+        // even though the latter is part of the former.
+        if self.tracked_statements.len() != 0
+            && self
+                .tracked_statements
+                .iter()
+                .all(|s| !s.could_be_complete())
+        {
+            return;
+        }
+
+        let new_stmts = STATEMENT_DEFINITIONS.get(&self.parser.nth(0, false).kind);
+
+        if let Some(new_stmts) = new_stmts {
+            self.tracked_statements.append(
+                &mut new_stmts
+                    .iter()
+                    .filter_map(|stmt| {
+                        if self.active_bridges.iter().any(|b| b.def.stmt == stmt.stmt) {
+                            None
+                        } else if self.tracked_statements.iter().any(|s| {
+                            s.could_be_complete()
+                                && s.def.prohibited_following_statements.contains(&stmt.stmt)
+                        }) {
+                            None
+                        } else {
+                            Some(Tracker::new_at(stmt, self.parser.pos))
+                        }
+                    })
+                    .collect(),
+            );
+        }
+    }
+
+    fn advance_bridges(&mut self) {
+        self.active_bridges
+            .retain_mut(|stmt| stmt.advance_with(&self.parser.nth(0, false).kind));
+    }
+
+    fn start_new_bridges(&mut self) {
+        if let Some(bridges) = STATEMENT_BRIDGE_DEFINITIONS.get(&self.parser.nth(0, false).kind) {
+            self.active_bridges.append(
+                &mut bridges
+                    .iter()
+                    .map(|stmt| Tracker::new_at(stmt, self.parser.pos))
+                    .collect(),
+            );
+        }
+    }
+
+    fn close_stmt_with_semicolon(&mut self) {
+        let at_token = self.parser.nth(0, false);
+        assert_eq!(at_token.kind, SyntaxKind::Ascii59);
+
+        // i didnt believe it myself at first, but there are statements where a ";" is valid
+        // within a sub statement, e.g.:
+        // "create rule qqq as on insert to copydml_test do instead (delete from copydml_test; delete from copydml_test);"
+        // so we need to check for sub statement depth here
+        if self.sub_stmt_depth != 0 || self.is_within_atomic_block {
+            return;
+        }
+
+        // get earliest statement
         if let Some(earliest_complete_stmt_started_at) = self
             .tracked_statements
             .iter()
@@ -369,27 +195,7 @@ impl<'a> StatementSplitter<'a> {
                 "multiple complete statements at the same position"
             );
 
-            let earliest_text_pos = self
-                .parser
-                .tokens
-                .get(earliest_complete_stmt.started_at)
-                .unwrap()
-                .span
-                .start();
-            let end_pos = self
-                .parser
-                .tokens
-                .iter()
-                .skip(earliest_complete_stmt.started_at)
-                .filter_map(|t| {
-                    if t.span.start() > earliest_text_pos && !WHITESPACE_TOKENS.contains(&t.kind) {
-                        Some(t.span.end())
-                    } else {
-                        None
-                    }
-                })
-                .max()
-                .unwrap();
+            let end_pos = at_token.span.end();
             let start_pos = TextSize::try_from(
                 self.parser
                     .tokens
@@ -399,9 +205,177 @@ impl<'a> StatementSplitter<'a> {
                     .start(),
             )
             .unwrap();
+            println!(
+                "adding stmt from ';': {:?}",
+                earliest_complete_stmt.def.stmt
+            );
+            self.ranges.push(StatementPosition {
+                kind: earliest_complete_stmt.def.stmt,
+                range: TextRange::new(start_pos, end_pos),
+            });
+        }
+
+        self.tracked_statements.clear();
+        self.active_bridges.clear();
+    }
+
+    fn find_earliest_statement_start_pos(&self) -> Option<usize> {
+        self.tracked_statements
+            .iter()
+            .min_by_key(|stmt| stmt.started_at)
+            .map(|stmt| stmt.started_at)
+    }
+
+    fn find_earliest_complete_statement_start_pos(&self) -> Option<usize> {
+        self.tracked_statements
+            .iter()
+            .filter(|s| s.could_be_complete())
+            .min_by_key(|stmt| stmt.started_at)
+            .map(|stmt| stmt.started_at)
+    }
+
+    fn find_latest_complete_statement_start_pos(&self) -> Option<usize> {
+        self.tracked_statements
+            .iter()
+            .filter(|s| s.could_be_complete())
+            .max_by_key(|stmt| stmt.started_at)
+            .map(|stmt| stmt.started_at)
+    }
+
+    fn find_latest_complete_statement_before_start_pos(&self, before: usize) -> Option<usize> {
+        self.tracked_statements
+            .iter()
+            .filter(|s| s.could_be_complete() && s.started_at < before)
+            .max_by_key(|stmt| stmt.started_at)
+            .map(|stmt| stmt.started_at)
+    }
+
+    fn find_highest_positioned_complete_statement(&self, started_at: usize) -> &Tracker<'a> {
+        self.tracked_statements
+            .iter()
+            .filter(|s| s.started_at == started_at && s.could_be_complete())
+            .max_by_key(|stmt| stmt.max_pos())
+            .unwrap()
+    }
+
+    fn assert_single_complete_statement_at_position(&self, tracker: &Tracker<'a>) {
+        assert_eq!(
+            1,
+            self.tracked_statements
+                .iter()
+                .filter(|s| {
+                    s.started_at == tracker.started_at
+                        && s.could_be_complete()
+                        && s.current_positions()
+                            .iter()
+                            .any(|i| tracker.current_positions().contains(i))
+                })
+                .count(),
+            "multiple complete statements at the same position"
+        );
+    }
+
+    pub fn run(mut self) -> Vec<StatementPosition> {
+        while !self.parser.eof() {
+            println!("{:?}", self.parser.nth(0, false).kind);
+            println!(
+                "tracked stmts before {:?}",
+                self.tracked_statements
+                    .iter()
+                    .map(|s| s.def.stmt)
+                    .collect::<Vec<_>>()
+            );
+
+            self.track_nesting();
+
+            let removed_items_min_started_at = self.advance_tracker();
+
+            self.add_incomplete_statement(removed_items_min_started_at);
+
+            self.start_new_statements();
+
+            self.advance_bridges();
+
+            self.start_new_bridges();
+
+            println!(
+                "tracked stmts after {:?}",
+                self.tracked_statements
+                    .iter()
+                    .map(|s| s.def.stmt)
+                    .collect::<Vec<_>>()
+            );
+
+            if self.parser.nth(0, false).kind == SyntaxKind::Ascii59 {
+                self.close_stmt_with_semicolon();
+            }
+
+            // # This is where the actual parsing happens
+
+            // 1. Find the latest complete statement
+            if let Some(latest_completed_stmt_started_at) =
+                self.find_latest_complete_statement_start_pos()
+            {
+                // Step 2: Find the latest complete statement before the latest completed statement
+                if let Some(latest_complete_before_started_at) = self
+                    .find_latest_complete_statement_before_start_pos(
+                        latest_completed_stmt_started_at,
+                    )
+                {
+                    let latest_complete_before = self.find_highest_positioned_complete_statement(
+                        latest_complete_before_started_at,
+                    );
+
+                    self.assert_single_complete_statement_at_position(&latest_complete_before);
+
+                    let stmt_kind = latest_complete_before.def.stmt;
+                    let latest_complete_before_started_at = latest_complete_before.started_at;
+
+                    // Step 3: save range for the statement
+                    let start_pos = self.token_range(latest_complete_before_started_at).start();
+
+                    // the end position is the end() of the last non-whitespace token before the start
+                    // of the latest complete statement
+                    let latest_non_whitespace_token = self
+                        .parser
+                        .lookbehind(self.parser.pos - latest_completed_stmt_started_at + 1, true);
+                    let end_pos = latest_non_whitespace_token.unwrap().span.end();
+
+                    println!("adding stmt: {:?}", stmt_kind);
+
+                    self.ranges.push(StatementPosition {
+                        kind: stmt_kind,
+                        range: TextRange::new(start_pos, end_pos),
+                    });
+
+                    // Step 4: remove all statements that started before or at the position
+                    self.tracked_statements
+                        .retain(|s| s.started_at > latest_complete_before_started_at);
+                }
+            }
+
+            self.parser.advance();
+        }
+
+        // we reached eof; add any remaining statements
+
+        // get the earliest statement that is complete
+        if let Some(earliest_complete_stmt_started_at) =
+            self.find_earliest_complete_statement_start_pos()
+        {
+            let earliest_complete_stmt =
+                self.find_highest_positioned_complete_statement(earliest_complete_stmt_started_at);
+
+            self.assert_single_complete_statement_at_position(earliest_complete_stmt);
+
+            let start_pos = self.token_range(earliest_complete_stmt_started_at).start();
+
+            let end_token = self.parser.lookbehind(1, true).unwrap();
+            let end_pos = end_token.span.end();
+
             println!("adding stmt at end: {:?}", earliest_complete_stmt.def.stmt);
             println!("start: {:?}, end: {:?}", start_pos, end_pos);
-            ranges.push(StatementPosition {
+            self.ranges.push(StatementPosition {
                 kind: earliest_complete_stmt.def.stmt,
                 range: TextRange::new(start_pos, end_pos),
             });
@@ -410,30 +384,20 @@ impl<'a> StatementSplitter<'a> {
                 .retain(|s| s.started_at > earliest_complete_stmt_started_at);
         }
 
-        if let Some(earliest_stmt_started_at) = self
-            .tracked_statements
-            .iter()
-            .min_by_key(|stmt| stmt.started_at)
-            .map(|stmt| stmt.started_at)
-        {
-            let start_pos = TextSize::try_from(
-                self.parser
-                    .tokens
-                    .get(earliest_stmt_started_at)
-                    .unwrap()
-                    .span
-                    .start(),
-            );
+        if let Some(earliest_stmt_started_at) = self.find_earliest_statement_start_pos() {
+            let start_pos = self.token_range(earliest_stmt_started_at).start();
+
             // end position is last non-whitespace token before or at the current position
-            let end_pos = TextSize::try_from(self.parser.lookbehind(1, true).unwrap().span.end());
+            let end_pos = self.parser.lookbehind(1, true).unwrap().span.end();
+
             println!("adding any stmt at end");
-            ranges.push(StatementPosition {
+            self.ranges.push(StatementPosition {
                 kind: SyntaxKind::Any,
-                range: TextRange::new(start_pos.unwrap(), end_pos.unwrap()),
+                range: TextRange::new(start_pos, end_pos),
             });
         }
 
-        ranges
+        self.ranges
     }
 }
 
