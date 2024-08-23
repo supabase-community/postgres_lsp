@@ -75,8 +75,24 @@ impl<'a> Tracker<'a> {
         true
     }
 
+    /// Returns the max idx of all tracked positions while ignoring non-required tokens
     pub fn max_pos(&self) -> usize {
-        self.positions.iter().max_by_key(|p| p.idx).unwrap().idx
+        self.positions
+            .iter()
+            .map(|p| {
+                // substract non-required tokens from the position count
+                (0..p.idx).fold(0, |acc, idx| {
+                    let token = self.def.tokens.get(idx);
+                    match token {
+                        Some(SyntaxDefinition::RequiredToken(_)) => acc + 1,
+                        Some(SyntaxDefinition::OneOf(_)) => acc + 1,
+                        Some(SyntaxDefinition::AnyToken) => acc + 1,
+                        _ => acc,
+                    }
+                })
+            })
+            .max()
+            .unwrap()
     }
 
     pub fn current_positions(&self) -> Vec<usize> {
@@ -130,6 +146,10 @@ impl<'a> Tracker<'a> {
     pub fn advance_with(&mut self, kind: &SyntaxKind) -> bool {
         if WHITESPACE_TOKENS.contains(kind) {
             return true;
+        }
+
+        if self.def.prohibited_tokens.contains(kind) {
+            return false;
         }
 
         let mut new_positions = Vec::with_capacity(self.positions.len());

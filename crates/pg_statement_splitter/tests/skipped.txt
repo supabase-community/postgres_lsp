@@ -15,3 +15,10 @@ comments
 dependency
 drop_if_exists
 groupingsets
+index_including_gist
+inherit
+insert
+insert_conflict
+numeric_big
+opr_sanity
+case

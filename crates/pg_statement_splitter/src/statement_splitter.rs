@@ -37,24 +37,30 @@ impl<'a> StatementSplitter<'a> {
         }
     }
 
-    fn track_nesting(&mut self) {
+    fn end_nesting(&mut self) {
+        match self.parser.nth(0, false).kind {
+            SyntaxKind::Ascii41 => {
+                // ")"
+                self.sub_stmt_depth -= 1;
+            }
+            SyntaxKind::EndP => {
+                self.is_within_atomic_block = false;
+            }
+            _ => {}
+        };
+    }
+
+    fn start_nesting(&mut self) {
         match self.parser.nth(0, false).kind {
             SyntaxKind::Ascii40 => {
                 // "("
                 self.sub_stmt_depth += 1;
-            }
-            SyntaxKind::Ascii41 => {
-                // ")"
-                self.sub_stmt_depth -= 1;
             }
             SyntaxKind::Atomic => {
                 if self.parser.lookbehind(2, true, None).map(|t| t.kind) == Some(SyntaxKind::BeginP)
                 {
                     self.is_within_atomic_block = true;
                 }
-            }
-            SyntaxKind::EndP => {
-                self.is_within_atomic_block = false;
             }
             _ => {}
         };
@@ -177,19 +183,19 @@ impl<'a> StatementSplitter<'a> {
             .min_by_key(|stmt| stmt.started_at)
             .map(|stmt| stmt.started_at)
         {
-            println!(
-                "earliest complete stmt started at: {:?}",
-                earliest_complete_stmt_started_at
-            );
             let earliest_complete_stmt = self
                 .tracked_statements
                 .iter()
                 .filter(|s| {
                     s.started_at == earliest_complete_stmt_started_at && s.could_be_complete()
                 })
-                .max_by_key(|stmt| stmt.max_pos())
+                .max_by_key(|stmt| {
+                    println!("stmt: {:?} max pos: {:?}", stmt.def.stmt, stmt.max_pos());
+                    stmt.max_pos()
+                })
                 .unwrap();
 
+            println!("earliest complete stmt: {:?}", earliest_complete_stmt);
             assert_eq!(
                 1,
                 self.tracked_statements
@@ -304,7 +310,7 @@ impl<'a> StatementSplitter<'a> {
                     .collect::<Vec<_>>()
             );
 
-            self.track_nesting();
+            self.start_nesting();
 
             let removed_items_min_started_at = self.advance_tracker();
 
@@ -327,6 +333,8 @@ impl<'a> StatementSplitter<'a> {
             if self.parser.nth(0, false).kind == SyntaxKind::Ascii59 {
                 self.close_stmt_with_semicolon();
             }
+
+            self.end_nesting();
 
             // # This is where the actual parsing happens
 
@@ -1358,6 +1366,47 @@ DROP LANGUAGE IF EXISTS test_language_exists;
         assert_eq!(SyntaxKind::DropStmt, result[0].kind);
         assert_eq!(SyntaxKind::DropStmt, result[1].kind);
         assert_eq!(SyntaxKind::DropStmt, result[2].kind);
+    }
+
+    #[test]
+    fn alter_mat_view() {
+        let input = "
+ALTER MATERIALIZED VIEW mvtest_tvm SET SCHEMA mvtest_mvschema;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::AlterObjectSchemaStmt, result[0].kind);
+    }
+
+    #[test]
+    fn create_tbl_as_2() {
+        let input = "
+create table simple as
+  select generate_series(1, 20000) AS id, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::CreateTableAsStmt, result[0].kind);
+    }
+
+    #[test]
+    fn create_tbl_as() {
+        let input = "
+CREATE TABLE tab_settings_flags AS SELECT name, category,
+    'EXPLAIN'          = ANY(flags) AS explain,
+    'NO_RESET_ALL'     = ANY(flags) AS no_reset_all,
+    'NO_SHOW_ALL'      = ANY(flags) AS no_show_all,
+    'NOT_IN_SAMPLE'    = ANY(flags) AS not_in_sample,
+    'RUNTIME_COMPUTED' = ANY(flags) AS runtime_computed
+  FROM pg_show_all_settings() AS psas,
+    pg_settings_get_flags(psas.name) AS flags;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::CreateTableAsStmt, result[0].kind);
     }
 
     #[allow(clippy::must_use)]
