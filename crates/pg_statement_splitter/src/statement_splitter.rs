@@ -1,4 +1,4 @@
-use pg_lexer::SyntaxKind;
+use pg_lexer::{SyntaxKind, WHITESPACE_TOKENS};
 use text_size::{TextRange, TextSize};
 
 use crate::{
@@ -73,6 +73,8 @@ impl<'a> StatementSplitter<'a> {
             keep
         });
 
+        println!("removed items: {:?}", removed_items);
+
         removed_items.iter().min().map(|i| *i)
     }
 
@@ -124,7 +126,7 @@ impl<'a> StatementSplitter<'a> {
                     } else if self
                         .tracked_statements
                         .iter_mut()
-                        .any(|s| !s.can_start_stmt_after(&stmt.stmt))
+                        .any(|s| !s.can_start_stmt_after(&stmt.stmt, self.parser.pos))
                     {
                         None
                     } else {
@@ -132,6 +134,7 @@ impl<'a> StatementSplitter<'a> {
                     }
                 })
                 .collect();
+            println!("adding stmt: {:?}", to_add);
             self.tracked_statements.append(to_add);
         }
     }
@@ -284,6 +287,10 @@ impl<'a> StatementSplitter<'a> {
 
     pub fn run(mut self) -> Vec<StatementPosition> {
         while !self.parser.eof() {
+            if WHITESPACE_TOKENS.contains(&self.parser.nth(0, false).kind) {
+                self.parser.advance();
+                continue;
+            }
             println!(
                 "#{:?}: {:?}",
                 self.parser.pos,
@@ -754,6 +761,20 @@ DROP ROLE IF EXISTS regress_alter_generic_user1;";
         assert_eq!(SyntaxKind::Any, result[0].kind);
         assert_eq!("select 1;", input[result[1].range].to_string());
         assert_eq!(SyntaxKind::SelectStmt, result[1].kind);
+    }
+
+    #[test]
+    fn test_set_with_schema() {
+        let input = "SET custom.my_guc = 42;";
+
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(
+            "SET custom.my_guc = 42;",
+            input[result[0].range].to_string()
+        );
+        assert_eq!(SyntaxKind::VariableSetStmt, result[0].kind);
     }
 
     #[test]
@@ -1267,6 +1288,48 @@ $$;
         assert_eq!(SyntaxKind::CreateFunctionStmt, result[0].kind);
         assert_eq!(SyntaxKind::DropStmt, result[1].kind);
         assert_eq!(SyntaxKind::CreateFunctionStmt, result[2].kind);
+    }
+
+    #[test]
+    fn test_prepare_as() {
+        let input = "
+DROP VIEW fdv4;
+
+PREPARE foo AS
+  SELECT id, keywords, title, body, created
+  FROM articles
+  GROUP BY id;
+
+EXECUTE foo;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 3);
+        assert_eq!(SyntaxKind::DropStmt, result[0].kind);
+        assert_eq!(SyntaxKind::PrepareStmt, result[1].kind);
+        assert_eq!(SyntaxKind::ExecuteStmt, result[2].kind);
+    }
+
+    #[test]
+    fn create_function_set() {
+        let input = "
+create function report_guc(text) returns text as\n$$ select current_setting($1) $$ language sql\nset work_mem = '1MB';
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::CreateFunctionStmt, result[0].kind);
+    }
+
+    #[test]
+    fn test_drop_function() {
+        let input = "
+DROP FUNCTION set(name);
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::DropStmt, result[0].kind);
     }
 
     #[test]
