@@ -6,6 +6,7 @@ use crate::functions::Function;
 use crate::schemas::Schema;
 use crate::tables::Table;
 use crate::types::PostgresType;
+use crate::versions::Version;
 
 #[derive(Debug, Clone, Default)]
 pub struct SchemaCache {
@@ -13,6 +14,7 @@ pub struct SchemaCache {
     pub tables: Vec<Table>,
     pub functions: Vec<Function>,
     pub types: Vec<PostgresType>,
+    pub versions: Vec<Version>,
 }
 
 impl SchemaCache {
@@ -21,11 +23,12 @@ impl SchemaCache {
     }
 
     pub async fn load(pool: &PgPool) -> SchemaCache {
-        let (schemas, tables, functions, types) = join!(
+        let (schemas, tables, functions, types, versions) = join!(
             Schema::load(pool),
             Table::load(pool),
             Function::load(pool),
-            PostgresType::load(pool)
+            PostgresType::load(pool),
+            Version::load(pool),
         )
         .await;
 
@@ -34,6 +37,7 @@ impl SchemaCache {
             tables,
             functions,
             types,
+            versions,
         }
     }
 
