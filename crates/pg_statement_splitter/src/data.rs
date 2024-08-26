@@ -27,6 +27,20 @@ impl SyntaxBuilder {
         self
     }
 
+    /// The name of an object is almost always an `Ident` token, but due to naming conflicts it can
+    /// also be a set of other tokens. This function adds those tokens to the list of possible
+    /// tokens.
+    pub fn ident_like(mut self) -> Self {
+        self.parts.push(SyntaxDefinition::OneOf(vec![
+            SyntaxKind::Ident,
+            SyntaxKind::VersionP,
+            SyntaxKind::Cursor,
+            SyntaxKind::Simple,
+            SyntaxKind::Set,
+        ]));
+        self
+    }
+
     pub fn any_tokens(mut self, tokens: Option<Vec<SyntaxKind>>) -> Self {
         self.parts.push(SyntaxDefinition::AnyTokens(tokens));
         self
@@ -183,7 +197,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                     .required_token(SyntaxKind::Insert)
                     .required_token(SyntaxKind::Into)
                     .optional_schema_name_group()
-                    .required_token(SyntaxKind::Ident),
+                    .ident_like(),
             )
             .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
         );
@@ -204,7 +218,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .required_token(SyntaxKind::Update)
                 .optional_token(SyntaxKind::Only)
                 .optional_schema_name_group()
-                .required_token(SyntaxKind::Ident)
+                .ident_like()
                 .any_tokens(None)
                 .required_token(SyntaxKind::Set)
                 .any_token(),
@@ -230,11 +244,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .optional_if_exists_group()
                 .optional_token(SyntaxKind::Only)
                 .optional_schema_name_group()
-                .one_of(vec![
-                    SyntaxKind::Ident,
-                    SyntaxKind::VersionP,
-                    SyntaxKind::Simple,
-                ])
+                .ident_like()
                 .any_token(),
         ));
 
@@ -278,7 +288,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             SyntaxBuilder::new()
                 .required_token(SyntaxKind::Call)
                 .optional_schema_name_group()
-                .one_of(vec![SyntaxKind::Ident, SyntaxKind::VersionP])
+                .ident_like()
                 .required_token(SyntaxKind::Ascii40)
                 .any_tokens(None)
                 .required_token(SyntaxKind::Ascii41),
@@ -328,7 +338,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                     .required_token(SyntaxKind::Table)
                     .optional_if_not_exists_group()
                     .optional_schema_name_group()
-                    .required_token(SyntaxKind::Ident),
+                    .ident_like(),
             )
             .with_prohibited_following_statements(vec![SyntaxKind::TransactionStmt]),
         );
@@ -381,7 +391,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 ])
                 .optional_if_exists_group()
                 .optional_schema_name_group()
-                .required_token(SyntaxKind::Ident),
+                .ident_like(),
         ));
 
         m.push(StatementDefinition::new(
@@ -554,11 +564,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .required_token(SyntaxKind::Function)
                 .optional_if_exists_group()
                 .optional_schema_name_group()
-                .one_of(vec![
-                    SyntaxKind::Ident,
-                    SyntaxKind::VersionP,
-                    SyntaxKind::Set,
-                ])
+                .ident_like()
                 .required_token(SyntaxKind::Ascii40)
                 .any_tokens(None)
                 .required_token(SyntaxKind::Ascii41),
@@ -685,6 +691,14 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
         ));
 
         m.push(StatementDefinition::new(
+            SyntaxKind::FetchStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Move)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ident),
+        ));
+
+        m.push(StatementDefinition::new(
             SyntaxKind::VacuumStmt,
             SyntaxBuilder::new().required_token(SyntaxKind::Analyze),
         ));
@@ -769,6 +783,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 SyntaxKind::InsertStmt,
                 SyntaxKind::UpdateStmt,
                 SyntaxKind::DeleteStmt,
+                SyntaxKind::VariableSetStmt,
             ]),
         );
 
@@ -850,6 +865,14 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
         m.push(StatementDefinition::new(
             SyntaxKind::TransactionStmt,
             SyntaxBuilder::new().required_token(SyntaxKind::EndP),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::TransactionStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Prepare)
+                .required_token(SyntaxKind::Transaction)
+                .required_token(SyntaxKind::Sconst),
         ));
 
         m.push(StatementDefinition::new(
@@ -972,11 +995,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                     .required_token(SyntaxKind::Table)
                     .optional_if_not_exists_group()
                     .optional_schema_name_group()
-                    .one_of(vec![
-                        SyntaxKind::Ident,
-                        SyntaxKind::VersionP,
-                        SyntaxKind::Simple,
-                    ])
+                    .ident_like()
                     .any_tokens(None)
                     .required_token(SyntaxKind::As)
                     .any_token(),
@@ -1019,6 +1038,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                         SyntaxKind::Merge,
                         SyntaxKind::Execute,
                         SyntaxKind::Create,
+                        SyntaxKind::Declare,
                     ]),
             )
             .with_prohibited_following_statements(vec![
@@ -1030,6 +1050,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 SyntaxKind::MergeStmt,
                 SyntaxKind::ExecuteStmt,
                 SyntaxKind::CreateTableAsStmt,
+                SyntaxKind::DeclareCursorStmt,
             ]),
         );
 
@@ -1071,6 +1092,13 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .required_token(SyntaxKind::Reset)
                 .required_token(SyntaxKind::Session)
                 .required_token(SyntaxKind::Authorization),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::VariableSetStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Set)
+                .required_token(SyntaxKind::Transaction),
         ));
 
         m.push(StatementDefinition::new(

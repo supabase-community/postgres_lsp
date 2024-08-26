@@ -22,3 +22,6 @@ insert_conflict
 numeric_big
 opr_sanity
 case
+random
+rangetypes
+regproc

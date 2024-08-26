@@ -1380,6 +1380,17 @@ ALTER MATERIALIZED VIEW mvtest_tvm SET SCHEMA mvtest_mvschema;
     }
 
     #[test]
+    fn move_backward() {
+        let input = "
+MOVE BACKWARD ALL IN c1;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::FetchStmt, result[0].kind);
+    }
+
+    #[test]
     fn create_tbl_as_2() {
         let input = "
 create table simple as
