@@ -25,3 +25,8 @@ case
 random
 rangetypes
 regproc
+rowtypes
+sanity_check
+select_distinct
+text
+union

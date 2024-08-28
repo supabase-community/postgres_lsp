@@ -1,5 +1,8 @@
 use insta::{assert_debug_snapshot, Settings};
-use std::fs::{self};
+use std::{
+    fs::{self},
+    panic,
+};
 
 use pg_lexer::SyntaxKind;
 
@@ -71,7 +74,17 @@ fn test_postgres_regress() {
 
         let libpg_query_split = libpg_query_split_result.unwrap();
 
-        let split = pg_statement_splitter::statements(&contents);
+        let result = panic::catch_unwind(|| pg_statement_splitter::statements(&contents));
+
+        if result.is_err() {
+            panic!(
+                "Failed to split statements for test '{}': {:?}",
+                test_name,
+                result.unwrap_err()
+            );
+        }
+
+        let split = result.unwrap();
 
         // assert_eq!(
         //     libpg_query_split.len(),

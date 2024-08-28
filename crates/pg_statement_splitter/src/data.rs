@@ -37,6 +37,7 @@ impl SyntaxBuilder {
             SyntaxKind::Cursor,
             SyntaxKind::Simple,
             SyntaxKind::Set,
+            SyntaxKind::Leakproof,
         ]));
         self
     }
@@ -93,6 +94,7 @@ pub struct StatementDefinition {
     pub tokens: Vec<SyntaxDefinition>,
     pub prohibited_following_statements: Vec<SyntaxKind>,
     pub prohibited_tokens: Vec<SyntaxKind>,
+    pub ignore_if_prohibited: bool,
 }
 
 impl StatementDefinition {
@@ -102,6 +104,7 @@ impl StatementDefinition {
             tokens: b.build(),
             prohibited_following_statements: Vec::new(),
             prohibited_tokens: Vec::new(),
+            ignore_if_prohibited: false,
         }
     }
 
@@ -112,6 +115,11 @@ impl StatementDefinition {
 
     fn with_prohibited_following_statements(mut self, prohibited: Vec<SyntaxKind>) -> Self {
         self.prohibited_following_statements = prohibited;
+        self
+    }
+
+    fn with_ignore_if_prohibited(mut self) -> Self {
+        self.ignore_if_prohibited = true;
         self
     }
 }
@@ -190,6 +198,35 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .any_token(),
         ));
 
+        // "TABLE t1;"
+        // is syntactic sugar for "SELECT * FROM t1"
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::SelectStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Table)
+                    .optional_schema_name_group()
+                    .ident_like()
+                    // this is polluting too much so we require a ";" for now...
+                    .required_token(SyntaxKind::Ascii59),
+            )
+            // this pollutes the "prohibited following statements" logic too much
+            // so we need to ignore it as a prohibited statement
+            .with_ignore_if_prohibited(),
+        );
+
+        // VALUES is also legal as a standalone query
+        // e.g. VALUES (1,2), (3,4+4), (7,77.7);
+        // todo use repeated group
+        m.push(StatementDefinition::new(
+            SyntaxKind::SelectStmt,
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::Values)
+                .required_token(SyntaxKind::Ascii40)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii41),
+        ));
+
         m.push(
             StatementDefinition::new(
                 SyntaxKind::InsertStmt,
@@ -199,7 +236,10 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                     .optional_schema_name_group()
                     .ident_like(),
             )
-            .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
+            .with_prohibited_following_statements(vec![
+                SyntaxKind::SelectStmt,
+                SyntaxKind::VariableSetStmt,
+            ]),
         );
 
         m.push(StatementDefinition::new(
@@ -234,18 +274,34 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .required_token(SyntaxKind::Ident),
         ));
 
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::AlterTableStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Alter)
+                    .optional_token(SyntaxKind::Materialized)
+                    .optional_token(SyntaxKind::Foreign)
+                    .one_of(vec![SyntaxKind::Table, SyntaxKind::Index, SyntaxKind::View])
+                    .optional_if_exists_group()
+                    .optional_token(SyntaxKind::Only)
+                    .optional_schema_name_group()
+                    .ident_like()
+                    .any_token(),
+            )
+            .with_prohibited_tokens(vec![SyntaxKind::Rename]),
+        );
+
+        // no idea why this is an AlterTableStmt
         m.push(StatementDefinition::new(
             SyntaxKind::AlterTableStmt,
             SyntaxBuilder::new()
                 .required_token(SyntaxKind::Alter)
-                .optional_token(SyntaxKind::Materialized)
-                .optional_token(SyntaxKind::Foreign)
-                .one_of(vec![SyntaxKind::Table, SyntaxKind::Index, SyntaxKind::View])
+                .required_token(SyntaxKind::Sequence)
                 .optional_if_exists_group()
-                .optional_token(SyntaxKind::Only)
                 .optional_schema_name_group()
                 .ident_like()
-                .any_token(),
+                .required_token(SyntaxKind::Set)
+                .one_of(vec![SyntaxKind::Logged, SyntaxKind::Unlogged]),
         ));
 
         m.push(StatementDefinition::new(
@@ -364,7 +420,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .required_token(SyntaxKind::For)
                 .required_token(SyntaxKind::TypeP)
                 .optional_schema_name_group()
-                .required_token(SyntaxKind::Ident)
+                .one_of(vec![SyntaxKind::Ident, SyntaxKind::TextP])
                 .required_token(SyntaxKind::Using),
         ));
 
@@ -679,7 +735,11 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .required_token(SyntaxKind::On)
                 .any_tokens(None)
                 .required_token(SyntaxKind::Is)
-                .one_of(vec![SyntaxKind::Ident, SyntaxKind::Sconst]),
+                .one_of(vec![
+                    SyntaxKind::Ident,
+                    SyntaxKind::Sconst,
+                    SyntaxKind::NullP,
+                ]),
         ));
 
         m.push(StatementDefinition::new(
@@ -878,6 +938,14 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
         m.push(StatementDefinition::new(
             SyntaxKind::TransactionStmt,
             SyntaxBuilder::new()
+                .required_token(SyntaxKind::Start)
+                .required_token(SyntaxKind::Transaction)
+                .any_token(),
+        ));
+
+        m.push(StatementDefinition::new(
+            SyntaxKind::TransactionStmt,
+            SyntaxBuilder::new()
                 .required_token(SyntaxKind::BeginP)
                 .required_token(SyntaxKind::Transaction),
         ));
@@ -998,9 +1066,18 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                     .ident_like()
                     .any_tokens(None)
                     .required_token(SyntaxKind::As)
-                    .any_token(),
+                    .one_of(vec![
+                        SyntaxKind::With,
+                        SyntaxKind::Select,
+                        SyntaxKind::Values,
+                        SyntaxKind::Table,
+                        SyntaxKind::Execute,
+                    ]),
             )
-            .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
+            .with_prohibited_following_statements(vec![
+                SyntaxKind::SelectStmt,
+                SyntaxKind::ExecuteStmt,
+            ]),
         );
 
         m.push(
@@ -1039,18 +1116,22 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                         SyntaxKind::Execute,
                         SyntaxKind::Create,
                         SyntaxKind::Declare,
+                        SyntaxKind::Create,
                     ]),
             )
             .with_prohibited_following_statements(vec![
                 SyntaxKind::VacuumStmt,
                 SyntaxKind::SelectStmt,
+                SyntaxKind::CreateTableAsStmt,
                 SyntaxKind::InsertStmt,
                 SyntaxKind::DeleteStmt,
                 SyntaxKind::UpdateStmt,
                 SyntaxKind::MergeStmt,
                 SyntaxKind::ExecuteStmt,
-                SyntaxKind::CreateTableAsStmt,
+                SyntaxKind::CreateStmt,
                 SyntaxKind::DeclareCursorStmt,
+                // todo remove this again when we include all deps
+                SyntaxKind::VariableSetStmt,
             ]),
         );
 
@@ -1114,6 +1195,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             SyntaxKind::VariableSetStmt,
             SyntaxBuilder::new()
                 .required_token(SyntaxKind::Set)
+                .optional_token(SyntaxKind::Local)
                 .required_token(SyntaxKind::Session)
                 .required_token(SyntaxKind::Authorization)
                 .one_of(vec![SyntaxKind::Ident, SyntaxKind::Sconst]),
@@ -1176,7 +1258,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             SyntaxKind::AlterRoleStmt,
             SyntaxBuilder::new()
                 .required_token(SyntaxKind::Alter)
-                .required_token(SyntaxKind::Role)
+                .one_of(vec![SyntaxKind::Role, SyntaxKind::User])
                 .required_token(SyntaxKind::Ident),
         ));
 
@@ -1258,6 +1340,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             .with_prohibited_following_statements(vec![
                 SyntaxKind::CreateTableAsStmt,
                 SyntaxKind::CreateStmt,
+                SyntaxKind::SelectStmt,
                 SyntaxKind::IndexStmt,
                 SyntaxKind::CreateSeqStmt,
                 SyntaxKind::CreateTrigStmt,
@@ -1742,23 +1825,31 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .required_token(SyntaxKind::To),
         ));
 
-        m.push(StatementDefinition::new(
-            SyntaxKind::GrantStmt,
-            SyntaxBuilder::new()
-                .required_token(SyntaxKind::Revoke)
-                .any_tokens(None)
-                .required_token(SyntaxKind::On),
-        ));
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::GrantStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Revoke)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::On),
+            )
+            .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
+        );
 
-        m.push(StatementDefinition::new(
-            SyntaxKind::AlterOwnerStmt,
-            SyntaxBuilder::new()
-                .required_token(SyntaxKind::Alter)
-                .any_tokens(None)
-                .required_token(SyntaxKind::Owner)
-                .required_token(SyntaxKind::To)
-                .required_token(SyntaxKind::Ident),
-        ));
+        m.push(
+            StatementDefinition::new(
+                SyntaxKind::AlterOwnerStmt,
+                SyntaxBuilder::new()
+                    .required_token(SyntaxKind::Alter)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::Owner)
+                    .required_token(SyntaxKind::To)
+                    .required_token(SyntaxKind::Ident),
+            )
+            // dont ask why, but it seems like tables are special
+            // and altering their owner is an AlterTableStmt
+            .with_prohibited_tokens(vec![SyntaxKind::Table]),
+        );
 
         m.push(StatementDefinition::new(
             SyntaxKind::AlterObjectSchemaStmt,

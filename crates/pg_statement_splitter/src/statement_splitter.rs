@@ -15,6 +15,7 @@ pub(crate) struct StatementSplitter<'a> {
     sub_trx_depth: usize,
     sub_stmt_depth: usize,
     is_within_atomic_block: bool,
+    sub_case_stmt_depth: usize,
 }
 
 #[derive(Debug, Clone)]
@@ -34,6 +35,7 @@ impl<'a> StatementSplitter<'a> {
             sub_trx_depth: 0,
             sub_stmt_depth: 0,
             is_within_atomic_block: false,
+            sub_case_stmt_depth: 0,
         }
     }
 
@@ -45,6 +47,9 @@ impl<'a> StatementSplitter<'a> {
             }
             SyntaxKind::EndP => {
                 self.is_within_atomic_block = false;
+                if self.sub_case_stmt_depth > 0 {
+                    self.sub_case_stmt_depth -= 1;
+                }
             }
             _ => {}
         };
@@ -52,6 +57,9 @@ impl<'a> StatementSplitter<'a> {
 
     fn start_nesting(&mut self) {
         match self.parser.nth(0, false).kind {
+            SyntaxKind::Case => {
+                self.sub_case_stmt_depth += 1;
+            }
             SyntaxKind::Ascii40 => {
                 // "("
                 self.sub_stmt_depth += 1;
@@ -79,8 +87,6 @@ impl<'a> StatementSplitter<'a> {
             keep
         });
 
-        println!("removed items: {:?}", removed_items);
-
         removed_items.iter().min().map(|i| *i)
     }
 
@@ -103,7 +109,11 @@ impl<'a> StatementSplitter<'a> {
     }
 
     fn start_new_statements(&mut self) {
-        if self.sub_trx_depth != 0 || self.sub_stmt_depth != 0 || self.is_within_atomic_block {
+        if self.sub_trx_depth != 0
+            || self.sub_stmt_depth != 0
+            || self.is_within_atomic_block
+            || self.sub_case_stmt_depth != 0
+        {
             return;
         }
 
@@ -129,18 +139,19 @@ impl<'a> StatementSplitter<'a> {
                 .filter_map(|stmt| {
                     if self.active_bridges.iter().any(|b| b.def.stmt == stmt.stmt) {
                         None
-                    } else if self
-                        .tracked_statements
-                        .iter_mut()
-                        .any(|s| !s.can_start_stmt_after(&stmt.stmt, self.parser.pos))
-                    {
+                    } else if self.tracked_statements.iter_mut().any(|s| {
+                        !s.can_start_stmt_after(
+                            &stmt.stmt,
+                            self.parser.pos,
+                            stmt.ignore_if_prohibited,
+                        )
+                    }) {
                         None
                     } else {
                         Some(Tracker::new_at(stmt, self.parser.pos))
                     }
                 })
                 .collect();
-            println!("adding stmt: {:?}", to_add);
             self.tracked_statements.append(to_add);
         }
     }
@@ -162,7 +173,6 @@ impl<'a> StatementSplitter<'a> {
     }
 
     fn close_stmt_with_semicolon(&mut self) {
-        println!("closing stmt with semicolon");
         let at_token = self.parser.nth(0, false);
         assert_eq!(at_token.kind, SyntaxKind::Ascii59);
 
@@ -171,7 +181,6 @@ impl<'a> StatementSplitter<'a> {
         // "create rule qqq as on insert to copydml_test do instead (delete from copydml_test; delete from copydml_test);"
         // so we need to check for sub statement depth here
         if self.sub_stmt_depth != 0 || self.is_within_atomic_block {
-            println!("sub stmt depth != 0 or within atomic block");
             return;
         }
 
@@ -189,27 +198,10 @@ impl<'a> StatementSplitter<'a> {
                 .filter(|s| {
                     s.started_at == earliest_complete_stmt_started_at && s.could_be_complete()
                 })
-                .max_by_key(|stmt| {
-                    println!("stmt: {:?} max pos: {:?}", stmt.def.stmt, stmt.max_pos());
-                    stmt.max_pos()
-                })
+                .max_by_key(|stmt| stmt.max_pos())
                 .unwrap();
 
-            println!("earliest complete stmt: {:?}", earliest_complete_stmt);
-            assert_eq!(
-                1,
-                self.tracked_statements
-                    .iter()
-                    .filter(|s| {
-                        s.started_at == earliest_complete_stmt_started_at
-                            && s.could_be_complete()
-                            && s.current_positions()
-                                .iter()
-                                .any(|i| earliest_complete_stmt.current_positions().contains(i))
-                    })
-                    .count(),
-                "multiple complete statements at the same position"
-            );
+            self.assert_single_complete_statement_at_position(earliest_complete_stmt);
 
             let end_pos = at_token.span.end();
             let start_pos = TextSize::try_from(
@@ -221,10 +213,6 @@ impl<'a> StatementSplitter<'a> {
                     .start(),
             )
             .unwrap();
-            println!(
-                "adding stmt from ';': {:?}",
-                earliest_complete_stmt.def.stmt
-            );
             self.ranges.push(StatementPosition {
                 kind: earliest_complete_stmt.def.stmt,
                 range: TextRange::new(start_pos, end_pos),
@@ -275,19 +263,25 @@ impl<'a> StatementSplitter<'a> {
     }
 
     fn assert_single_complete_statement_at_position(&self, tracker: &Tracker<'a>) {
+        let complete_stmts = self
+            .tracked_statements
+            .iter()
+            .filter(|s| {
+                s.started_at == tracker.started_at
+                    && s.could_be_complete()
+                    && s.current_positions()
+                        .iter()
+                        .any(|i| tracker.current_positions().contains(i))
+            })
+            .collect::<Vec<_>>();
         assert_eq!(
             1,
-            self.tracked_statements
+            complete_stmts.len(),
+            "multiple complete statements at the same position: {:?}",
+            complete_stmts
                 .iter()
-                .filter(|s| {
-                    s.started_at == tracker.started_at
-                        && s.could_be_complete()
-                        && s.current_positions()
-                            .iter()
-                            .any(|i| tracker.current_positions().contains(i))
-                })
-                .count(),
-            "multiple complete statements at the same position"
+                .map(|s| s.def.stmt)
+                .collect::<Vec<_>>()
         );
     }
 
@@ -297,18 +291,6 @@ impl<'a> StatementSplitter<'a> {
                 self.parser.advance();
                 continue;
             }
-            println!(
-                "#{:?}: {:?}",
-                self.parser.pos,
-                self.parser.nth(0, false).kind
-            );
-            println!(
-                "tracked stmts before {:?}",
-                self.tracked_statements
-                    .iter()
-                    .map(|s| s.def.stmt)
-                    .collect::<Vec<_>>()
-            );
 
             self.start_nesting();
 
@@ -321,14 +303,6 @@ impl<'a> StatementSplitter<'a> {
             self.advance_bridges();
 
             self.start_new_bridges();
-
-            println!(
-                "tracked stmts after {:?}",
-                self.tracked_statements
-                    .iter()
-                    .map(|s| s.def.stmt)
-                    .collect::<Vec<_>>()
-            );
 
             if self.parser.nth(0, false).kind == SyntaxKind::Ascii59 {
                 self.close_stmt_with_semicolon();
@@ -389,10 +363,6 @@ impl<'a> StatementSplitter<'a> {
         if let Some(earliest_complete_stmt_started_at) =
             self.find_earliest_complete_statement_start_pos()
         {
-            println!(
-                "earliest complete stmt started at: {:?}",
-                earliest_complete_stmt_started_at
-            );
             let earliest_complete_stmt =
                 self.find_highest_positioned_complete_statement(earliest_complete_stmt_started_at);
 
@@ -403,8 +373,6 @@ impl<'a> StatementSplitter<'a> {
             let end_token = self.parser.lookbehind(1, true, None).unwrap();
             let end_pos = end_token.span.end();
 
-            println!("adding stmt at end: {:?}", earliest_complete_stmt.def.stmt);
-            println!("start: {:?}, end: {:?}", start_pos, end_pos);
             self.ranges.push(StatementPosition {
                 kind: earliest_complete_stmt.def.stmt,
                 range: TextRange::new(start_pos, end_pos),
@@ -415,13 +383,11 @@ impl<'a> StatementSplitter<'a> {
         }
 
         if let Some(earliest_stmt_started_at) = self.find_earliest_statement_start_pos() {
-            println!("earliest stmt started at: {:?}", earliest_stmt_started_at);
             let start_pos = self.token_range(earliest_stmt_started_at).start();
 
             // end position is last non-whitespace token before or at the current position
             let end_pos = self.parser.lookbehind(1, true, None).unwrap().span.end();
 
-            println!("adding any stmt at end");
             self.ranges.push(StatementPosition {
                 kind: SyntaxKind::Any,
                 range: TextRange::new(start_pos, end_pos),
@@ -451,6 +417,11 @@ select lower('test');
 ";
 
         let result = StatementSplitter::new(input).run();
+
+        for r in &result {
+            println!("{:?} {:?}", r.kind, r.range);
+            println!("'{}'", input[r.range].to_string());
+        }
 
         assert_eq!(result.len(), 4);
         assert_eq!(
@@ -1413,6 +1384,97 @@ CREATE TABLE tab_settings_flags AS SELECT name, category,
     'RUNTIME_COMPUTED' = ANY(flags) AS runtime_computed
   FROM pg_show_all_settings() AS psas,
     pg_settings_get_flags(psas.name) AS flags;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::CreateTableAsStmt, result[0].kind);
+    }
+
+    #[test]
+    fn alter_table_owner() {
+        let input = "
+ALTER TABLE seclabel_tbl1 OWNER TO regress_seclabel_user1;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::AlterTableStmt, result[0].kind);
+    }
+
+    #[test]
+    fn alter_table_rename() {
+        let input = "
+ALTER TABLE foo_seq RENAME TO foo_seq_new;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::RenameStmt, result[0].kind);
+    }
+
+    #[test]
+    fn alter_seq() {
+        let input = "
+ALTER SEQUENCE sequence_test_unlogged SET LOGGED;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::AlterTableStmt, result[0].kind);
+    }
+
+    #[test]
+    fn create_op_class() {
+        let input = "
+create operator class part_test_text_ops for type text using hash as
+    operator 1 =,
+    function 2 part_hashtext_length(text, int8);
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::CreateOpClassStmt, result[0].kind);
+    }
+
+    #[test]
+    fn case_end() {
+        let input = "
+SELECT q1, case when q1 > 0 then generate_series(1,3) else 0 end FROM int8_tbl;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::SelectStmt, result[0].kind);
+    }
+
+    #[test]
+    fn just_table() {
+        // wtf?
+        let input = "
+TABLE t1;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::SelectStmt, result[0].kind);
+    }
+
+    #[test]
+    fn explain_create_table() {
+        let input = "
+explain (costs off) create table parallel_write as select length(stringu1) from tenk1 group by length(stringu1);
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::ExplainStmt, result[0].kind);
+    }
+
+    #[test]
+    fn create_table_as_execute() {
+        let input = "
+create table parallel_write as execute prep_stmt;
 ";
         let result = StatementSplitter::new(input).run();
 

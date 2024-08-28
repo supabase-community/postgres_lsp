@@ -51,7 +51,12 @@ impl<'a> Tracker<'a> {
         }
     }
 
-    pub fn can_start_stmt_after(&mut self, kind: &SyntaxKind, at: usize) -> bool {
+    pub fn can_start_stmt_after(
+        &mut self,
+        kind: &SyntaxKind,
+        at: usize,
+        ignore_if_prohibited: bool,
+    ) -> bool {
         if let Some(x) = self
             .used_prohibited_statements
             .iter()
@@ -68,7 +73,9 @@ impl<'a> Tracker<'a> {
             self.could_be_complete() && self.def.prohibited_following_statements.contains(kind);
 
         if res {
-            self.used_prohibited_statements.push((at, kind.clone()));
+            if !ignore_if_prohibited {
+                self.used_prohibited_statements.push((at, kind.clone()));
+            }
             return false;
         }
 
@@ -154,39 +161,25 @@ impl<'a> Tracker<'a> {
 
         let mut new_positions = Vec::with_capacity(self.positions.len());
 
-        println!(
-            "advancing with {:?} and positions {:?}",
-            kind,
-            self.positions
-                .iter()
-                .map(|x| self.def.tokens.get(x.idx))
-                .collect::<Vec<_>>()
-        );
-
         for mut pos in self.positions.drain(..) {
-            println!("advancing pos {:?}", pos);
             match self.def.tokens.get(pos.idx) {
                 Some(SyntaxDefinition::RequiredToken(k)) => {
-                    println!("required token {:?}", k);
                     pos.advance();
                     if k == kind {
                         new_positions.push(pos);
                     }
                 }
                 Some(SyntaxDefinition::AnyToken) => {
-                    println!("any token");
                     pos.advance();
                     new_positions.push(pos);
                 }
                 Some(SyntaxDefinition::OneOf(kinds)) => {
-                    println!("one of {:?}", kinds);
                     if kinds.iter().any(|x| x == kind) {
                         pos.advance();
                         new_positions.push(pos);
                     }
                 }
                 Some(SyntaxDefinition::OptionalToken(k)) => {
-                    println!("optional token {:?}", k);
                     if k == kind {
                         pos.advance();
                         new_positions.push(pos);
@@ -197,7 +190,6 @@ impl<'a> Tracker<'a> {
                     }
                 }
                 Some(SyntaxDefinition::AnyTokens(maybe_tokens)) => {
-                    println!("any tokens {:?}", maybe_tokens);
                     let next_positions =
                         Tracker::next_possible_positions_from_with(self.def, &pos, kind);
 
@@ -216,7 +208,6 @@ impl<'a> Tracker<'a> {
                     }
                 }
                 Some(SyntaxDefinition::OptionalGroup(tokens)) => {
-                    println!("optional group {:?}", tokens);
                     if pos.group_idx == 0 {
                         // if we are at the beginning of the group, we also need to spawn new
                         // trackers for every possible next token
@@ -228,12 +219,10 @@ impl<'a> Tracker<'a> {
                     // advance group
                     let token = tokens.get(pos.group_idx).unwrap();
                     if token == kind {
-                        println!("advancing group");
                         pos.advance_group();
 
                         // if we reached the end of the group, we advance the position
                         if pos.group_idx == tokens.len() {
-                            println!("advancing pos after group");
                             pos.advance();
                         }
 
@@ -248,14 +237,6 @@ impl<'a> Tracker<'a> {
         }
 
         self.positions = new_positions;
-
-        println!(
-            "new positions {:?}",
-            self.positions
-                .iter()
-                .map(|x| self.def.tokens.get(x.idx))
-                .collect::<Vec<_>>()
-        );
 
         self.positions.len() != 0
     }
