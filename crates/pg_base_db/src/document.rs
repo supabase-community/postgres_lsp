@@ -50,7 +50,6 @@ impl Document {
                 || Vec::new(),
                 |f| {
                     pg_statement_splitter::split(&f)
-                        .ranges
                         .iter()
                         .map(|range| range.clone())
                         .collect()
