@@ -4,6 +4,7 @@
 #![feature(future_join)]
 
 mod functions;
+mod versions;
 mod schema_cache;
 mod schemas;
 mod tables;
