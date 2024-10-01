@@ -14,6 +14,7 @@ mod parser;
 mod statement_splitter;
 mod syntax_error;
 mod tracker;
+mod tracker_new;
 
 use statement_splitter::{StatementPosition, StatementSplitter};
 use text_size::TextRange;

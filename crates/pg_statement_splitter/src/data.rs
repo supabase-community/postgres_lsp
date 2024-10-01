@@ -3,23 +3,53 @@ use std::{collections::HashMap, sync::LazyLock};
 
 #[derive(Debug)]
 pub enum SyntaxDefinition {
-    RequiredToken(SyntaxKind),          // A single required token
-    OptionalToken(SyntaxKind),          // A single optional token
+    RequiredToken(SyntaxKind),                    // A single required token
+    OptionalToken(SyntaxKind),                    // A single optional token
     OptionalGroup(Vec<SyntaxKind>), // A group of tokens that are required if the group is present
     AnyToken,                       // Any single token
     AnyTokens(Option<Vec<SyntaxKind>>), // A sequence of 0 or more tokens, of which any can be present
     OneOf(Vec<SyntaxKind>),             // One of the specified tokens
+    OptionalRepeatedGroup(Vec<SyntaxDefinition>), // A group of tokens that can be repeated
+}
+
+impl SyntaxDefinition {
+    pub fn is_group(&self) -> bool {
+        match self {
+            SyntaxDefinition::OptionalGroup(_) => true,
+            SyntaxDefinition::OptionalRepeatedGroup(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn first_required_tokens(&self) -> Vec<&SyntaxKind> {
+        match self {
+            SyntaxDefinition::RequiredToken(k) => vec![k],
+            SyntaxDefinition::OneOf(kinds) => kinds.iter().collect(),
+            _ => vec![],
+        }
+    }
 }
 
 #[derive(Debug)]
 pub struct SyntaxBuilder {
     parts: Vec<SyntaxDefinition>,
+    is_complete: bool,
 }
 
 impl SyntaxBuilder {
     // Start a new builder, which will automatically create a Group
     pub fn new() -> Self {
-        Self { parts: Vec::new() }
+        Self {
+            parts: Vec::new(),
+            is_complete: false,
+        }
+    }
+
+    pub fn new_complete() -> Self {
+        Self {
+            parts: Vec::new(),
+            is_complete: true,
+        }
     }
 
     pub fn any_token(mut self) -> Self {
@@ -83,7 +113,49 @@ impl SyntaxBuilder {
         self
     }
 
-    pub fn build(self) -> Vec<SyntaxDefinition> {
+    pub fn optional_repeated_group(mut self, builder: SyntaxBuilder) -> Self {
+        let res = builder.build();
+        match res.first() {
+            Some(SyntaxDefinition::RequiredToken(_)) => {}
+            Some(SyntaxDefinition::OneOf(_)) => {}
+            _ => panic!("First token in repeated group must be required or one of"),
+        }
+        self.parts
+            .push(SyntaxDefinition::OptionalRepeatedGroup(res));
+        self
+    }
+
+    pub fn cte(mut self) -> Self {
+        self.parts.extend(
+            SyntaxBuilder::new()
+                .required_token(SyntaxKind::With)
+                .optional_token(SyntaxKind::Recursive)
+                .ident_like()
+                .required_token(SyntaxKind::As)
+                .required_token(SyntaxKind::Ascii40)
+                .any_tokens(None)
+                .required_token(SyntaxKind::Ascii41)
+                .optional_repeated_group(
+                    SyntaxBuilder::new()
+                        .required_token(SyntaxKind::Ascii44)
+                        .ident_like()
+                        .required_token(SyntaxKind::As)
+                        .required_token(SyntaxKind::Ascii40)
+                        .any_tokens(None)
+                        .required_token(SyntaxKind::Ascii41),
+                )
+                .build(),
+        );
+        self
+    }
+
+    pub fn build(mut self) -> Vec<SyntaxDefinition> {
+        if !self.is_complete {
+            self.parts.push(SyntaxDefinition::AnyTokens(None));
+        } else {
+            self.parts
+                .push(SyntaxDefinition::OptionalToken(SyntaxKind::Ascii59));
+        }
         self.parts
     }
 }
@@ -198,22 +270,64 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 .any_token(),
         ));
 
-        // "TABLE t1;"
-        // is syntactic sugar for "SELECT * FROM t1"
+        m.push(StatementDefinition::new(
+            SyntaxKind::SelectStmt,
+            SyntaxBuilder::new()
+                .cte()
+                .required_token(SyntaxKind::Select)
+                .any_token(),
+        ));
+
         m.push(
             StatementDefinition::new(
                 SyntaxKind::SelectStmt,
                 SyntaxBuilder::new()
-                    .required_token(SyntaxKind::Table)
-                    .optional_schema_name_group()
-                    .ident_like()
-                    // this is polluting too much so we require a ";" for now...
-                    .required_token(SyntaxKind::Ascii59),
+                    .required_token(SyntaxKind::Ascii40)
+                    .required_token(SyntaxKind::Select)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::Ascii41)
+                    .any_tokens(Some(vec![
+                        SyntaxKind::Union,
+                        SyntaxKind::Except,
+                        SyntaxKind::Intersect,
+                        SyntaxKind::All,
+                    ]))
+                    .required_token(SyntaxKind::Ascii40)
+                    .required_token(SyntaxKind::Select)
+                    .any_tokens(None)
+                    .required_token(SyntaxKind::Ascii41)
+                    .optional_repeated_group(
+                        SyntaxBuilder::new()
+                            .one_of(vec![
+                                SyntaxKind::Union,
+                                SyntaxKind::Except,
+                                SyntaxKind::Intersect,
+                            ])
+                            .optional_token(SyntaxKind::All)
+                            .required_token(SyntaxKind::Ascii40)
+                            .required_token(SyntaxKind::Select)
+                            .any_tokens(None)
+                            .required_token(SyntaxKind::Ascii41),
+                    ),
             )
-            // this pollutes the "prohibited following statements" logic too much
-            // so we need to ignore it as a prohibited statement
             .with_ignore_if_prohibited(),
         );
+
+        // // "TABLE t1;"
+        // // is syntactic sugar for "SELECT * FROM t1"
+        // m.push(
+        //     StatementDefinition::new(
+        //         SyntaxKind::SelectStmt,
+        //         // we use "new_complete" here
+        //         SyntaxBuilder::new_complete()
+        //             .required_token(SyntaxKind::Table)
+        //             .optional_schema_name_group()
+        //             .ident_like(),
+        //     )
+        //     // this pollutes the "prohibited following statements" logic too much
+        //     // so we need to ignore it as a prohibited statement
+        //     .with_ignore_if_prohibited(),
+        // );
 
         // VALUES is also legal as a standalone query
         // e.g. VALUES (1,2), (3,4+4), (7,77.7);
@@ -396,7 +510,8 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                     .optional_schema_name_group()
                     .ident_like(),
             )
-            .with_prohibited_following_statements(vec![SyntaxKind::TransactionStmt]),
+            .with_prohibited_following_statements(vec![SyntaxKind::TransactionStmt])
+            .with_prohibited_tokens(vec![SyntaxKind::As]),
         );
 
         m.push(StatementDefinition::new(
@@ -883,18 +998,18 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
             .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
         );
 
-        m.push(StatementDefinition::new(
-            SyntaxKind::DeclareCursorStmt,
-            SyntaxBuilder::new()
-                .required_token(SyntaxKind::Declare)
-                .required_token(SyntaxKind::Ident)
-                .any_tokens(None)
-                .required_token(SyntaxKind::Cursor)
-                .any_tokens(None)
-                .required_token(SyntaxKind::For)
-                .one_of(vec![SyntaxKind::Select, SyntaxKind::With])
-                .any_token(),
-        ));
+        // m.push(StatementDefinition::new(
+        //     SyntaxKind::DeclareCursorStmt,
+        //     SyntaxBuilder::new()
+        //         .required_token(SyntaxKind::Declare)
+        //         .required_token(SyntaxKind::Ident)
+        //         .any_tokens(None)
+        //         .required_token(SyntaxKind::Cursor)
+        //         .any_tokens(None)
+        //         .required_token(SyntaxKind::For)
+        //         .one_of(vec![SyntaxKind::Select, SyntaxKind::With])
+        //         .any_token(),
+        // ));
 
         m.push(
             StatementDefinition::new(
@@ -958,7 +1073,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
         m.push(
             StatementDefinition::new(
                 SyntaxKind::TransactionStmt,
-                SyntaxBuilder::new()
+                SyntaxBuilder::new_complete()
                     .required_token(SyntaxKind::Rollback)
                     .any_tokens(None)
                     .required_token(SyntaxKind::To)
@@ -971,7 +1086,7 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
         m.push(
             StatementDefinition::new(
                 SyntaxKind::TransactionStmt,
-                SyntaxBuilder::new().required_token(SyntaxKind::Rollback),
+                SyntaxBuilder::new_complete().required_token(SyntaxKind::Rollback),
             )
             .with_prohibited_following_statements(vec![SyntaxKind::TransactionStmt]),
         );
@@ -1046,7 +1161,10 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                     .any_tokens(None)
                     .required_token(SyntaxKind::As),
             )
-            .with_prohibited_following_statements(vec![SyntaxKind::SelectStmt]),
+            .with_prohibited_following_statements(vec![
+                SyntaxKind::SelectStmt,
+                SyntaxKind::ExecuteStmt,
+            ]),
         );
 
         m.push(
@@ -1105,9 +1223,8 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                 SyntaxKind::ExplainStmt,
                 SyntaxBuilder::new()
                     .required_token(SyntaxKind::Explain)
+                    .any_tokens(None)
                     .one_of(vec![
-                        SyntaxKind::Analyze,
-                        SyntaxKind::Ascii40,
                         SyntaxKind::Select,
                         SyntaxKind::Insert,
                         SyntaxKind::Update,
@@ -1120,16 +1237,16 @@ pub static STATEMENT_DEFINITIONS: LazyLock<HashMap<SyntaxKind, Vec<StatementDefi
                     ]),
             )
             .with_prohibited_following_statements(vec![
-                SyntaxKind::VacuumStmt,
-                SyntaxKind::SelectStmt,
-                SyntaxKind::CreateTableAsStmt,
-                SyntaxKind::InsertStmt,
-                SyntaxKind::DeleteStmt,
-                SyntaxKind::UpdateStmt,
-                SyntaxKind::MergeStmt,
-                SyntaxKind::ExecuteStmt,
-                SyntaxKind::CreateStmt,
-                SyntaxKind::DeclareCursorStmt,
+                // SyntaxKind::VacuumStmt,
+                // SyntaxKind::SelectStmt,
+                // SyntaxKind::CreateTableAsStmt,
+                // SyntaxKind::InsertStmt,
+                // SyntaxKind::DeleteStmt,
+                // SyntaxKind::UpdateStmt,
+                // SyntaxKind::MergeStmt,
+                // SyntaxKind::ExecuteStmt,
+                // SyntaxKind::CreateStmt,
+                // SyntaxKind::DeclareCursorStmt,
                 // todo remove this again when we include all deps
                 SyntaxKind::VariableSetStmt,
             ]),

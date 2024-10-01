@@ -4,7 +4,7 @@ use text_size::{TextRange, TextSize};
 use crate::{
     data::{STATEMENT_BRIDGE_DEFINITIONS, STATEMENT_DEFINITIONS},
     parser::Parser,
-    tracker::Tracker,
+    tracker_new::StatementTracker as Tracker,
 };
 
 pub(crate) struct StatementSplitter<'a> {
@@ -80,12 +80,23 @@ impl<'a> StatementSplitter<'a> {
         let mut removed_items = Vec::new();
 
         self.tracked_statements.retain_mut(|stmt| {
+            println!(
+                "started at {:?}, parser pos {:?}",
+                stmt.started_at, self.parser.pos
+            );
+            // dont advace if we started at the current position
+            if stmt.started_at == self.parser.pos {
+                return true;
+            }
+
             let keep = stmt.advance_with(&self.parser.nth(0, false).kind);
             if !keep {
                 removed_items.push(stmt.started_at);
             }
             keep
         });
+
+        println!("removed items: {:?}", removed_items);
 
         removed_items.iter().min().map(|i| *i)
     }
@@ -128,16 +139,31 @@ impl<'a> StatementSplitter<'a> {
                 .iter()
                 .all(|s| !s.could_be_complete())
         {
+            println!("reutning because none could be completed");
             return;
+        } else {
+            println!(
+                "{:?} {:?} could be complete",
+                self.tracked_statements
+                    .iter()
+                    .map(|x| x)
+                    .collect::<Vec<_>>(),
+                self.tracked_statements
+                    .iter()
+                    .map(|x| x.could_be_complete())
+                    .collect::<Vec<_>>()
+            );
         }
 
         let new_stmts = STATEMENT_DEFINITIONS.get(&self.parser.nth(0, false).kind);
+        println!("potential new stmts {:?}", new_stmts);
 
         if let Some(new_stmts) = new_stmts {
             let to_add = &mut new_stmts
                 .iter()
                 .filter_map(|stmt| {
                     if self.active_bridges.iter().any(|b| b.def.stmt == stmt.stmt) {
+                        println!("not adding because of active bridges");
                         None
                     } else if self.tracked_statements.iter_mut().any(|s| {
                         !s.can_start_stmt_after(
@@ -146,8 +172,10 @@ impl<'a> StatementSplitter<'a> {
                             stmt.ignore_if_prohibited,
                         )
                     }) {
+                        println!("not adding because cant start stmt after");
                         None
                     } else {
+                        println!("tracking new statement: {:?}", stmt.stmt);
                         Some(Tracker::new_at(stmt, self.parser.pos))
                     }
                 })
@@ -184,6 +212,11 @@ impl<'a> StatementSplitter<'a> {
             return;
         }
 
+        println!(
+            "closing statement with semicolon {:?}",
+            self.tracked_statements
+        );
+
         // get earliest statement
         if let Some(earliest_complete_stmt_started_at) = self
             .tracked_statements
@@ -192,6 +225,10 @@ impl<'a> StatementSplitter<'a> {
             .min_by_key(|stmt| stmt.started_at)
             .map(|stmt| stmt.started_at)
         {
+            println!(
+                "earliest complete stmt started at: {}",
+                earliest_complete_stmt_started_at
+            );
             let earliest_complete_stmt = self
                 .tracked_statements
                 .iter()
@@ -286,17 +323,27 @@ impl<'a> StatementSplitter<'a> {
     }
 
     pub fn run(mut self) -> Vec<StatementPosition> {
+        println!("parser pos {:?}", self.parser.pos);
         while !self.parser.eof() {
             if WHITESPACE_TOKENS.contains(&self.parser.nth(0, false).kind) {
                 self.parser.advance();
                 continue;
             }
 
-            self.start_nesting();
+            println!(
+                "############ current token: {:?}",
+                self.parser.nth(0, false).kind
+            );
 
-            let removed_items_min_started_at = self.advance_tracker();
+            println!(
+                "current stmts: {:?}",
+                self.tracked_statements
+                    .iter()
+                    .map(|s| s.def.stmt)
+                    .collect::<Vec<_>>()
+            );
 
-            self.add_incomplete_statement(removed_items_min_started_at);
+            // todo start new stmts first, then advance all others
 
             self.start_new_statements();
 
@@ -304,11 +351,19 @@ impl<'a> StatementSplitter<'a> {
 
             self.start_new_bridges();
 
+            let removed_items_min_started_at = self.advance_tracker();
+
+            self.add_incomplete_statement(removed_items_min_started_at);
+
+            self.start_nesting();
+
             if self.parser.nth(0, false).kind == SyntaxKind::Ascii59 {
                 self.close_stmt_with_semicolon();
             }
 
             self.end_nesting();
+
+            println!("stmts after: {:?}", self.tracked_statements);
 
             // # This is where the actual parsing happens
 
@@ -316,6 +371,11 @@ impl<'a> StatementSplitter<'a> {
             if let Some(latest_completed_stmt_started_at) =
                 self.find_latest_complete_statement_start_pos()
             {
+                println!(
+                    "latest_completed_stmt_started_at: {:?}",
+                    latest_completed_stmt_started_at
+                );
+
                 // Step 2: Find the latest complete statement before the latest completed statement
                 if let Some(latest_complete_before_started_at) = self
                     .find_latest_complete_statement_before_start_pos(
@@ -325,6 +385,8 @@ impl<'a> StatementSplitter<'a> {
                     let latest_complete_before = self.find_highest_positioned_complete_statement(
                         latest_complete_before_started_at,
                     );
+
+                    println!("latest_complete_before: {:?}", latest_complete_before);
 
                     self.assert_single_complete_statement_at_position(&latest_complete_before);
 
@@ -343,6 +405,8 @@ impl<'a> StatementSplitter<'a> {
                     );
                     let end_pos = latest_non_whitespace_token.unwrap().span.end();
 
+                    println!("!!!! adding {:?}", stmt_kind);
+
                     self.ranges.push(StatementPosition {
                         kind: stmt_kind,
                         range: TextRange::new(start_pos, end_pos),
@@ -357,6 +421,8 @@ impl<'a> StatementSplitter<'a> {
             self.parser.advance();
         }
 
+        println!("tracked statements: {:?}", self.tracked_statements);
+
         // we reached eof; add any remaining statements
 
         // get the earliest statement that is complete
@@ -366,12 +432,16 @@ impl<'a> StatementSplitter<'a> {
             let earliest_complete_stmt =
                 self.find_highest_positioned_complete_statement(earliest_complete_stmt_started_at);
 
+            println!("earliest complete stmt: {:?}", earliest_complete_stmt);
+
             self.assert_single_complete_statement_at_position(earliest_complete_stmt);
 
             let start_pos = self.token_range(earliest_complete_stmt_started_at).start();
 
             let end_token = self.parser.lookbehind(1, true, None).unwrap();
             let end_pos = end_token.span.end();
+
+            println!("!!!! adding {:?}", earliest_complete_stmt.def.stmt);
 
             self.ranges.push(StatementPosition {
                 kind: earliest_complete_stmt.def.stmt,
@@ -387,6 +457,8 @@ impl<'a> StatementSplitter<'a> {
 
             // end position is last non-whitespace token before or at the current position
             let end_pos = self.parser.lookbehind(1, true, None).unwrap().span.end();
+
+            println!("!!!! adding any");
 
             self.ranges.push(StatementPosition {
                 kind: SyntaxKind::Any,
@@ -586,6 +658,10 @@ select lower('test');
         let input = "explain select 1 from contact\nselect 1\nselect 4";
 
         let result = StatementSplitter::new(input).run();
+
+        for range in &result {
+            println!("Result: '{}'", input[range.range].to_string());
+        }
 
         assert_eq!(result.len(), 3);
         assert_eq!(
@@ -1480,6 +1556,58 @@ create table parallel_write as execute prep_stmt;
 
         assert_eq!(result.len(), 1);
         assert_eq!(SyntaxKind::CreateTableAsStmt, result[0].kind);
+    }
+
+    #[test]
+    fn cte_select() {
+        let input = "
+WITH t1 AS (
+    SELECT * FROM t1
+), t2 AS (
+    SELECT * FROM t2
+)
+SELECT 's';
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::SelectStmt, result[0].kind);
+    }
+
+    #[test]
+    fn cte_select_without_repeated() {
+        let input = "
+WITH t1 AS (
+    SELECT * FROM t1
+)
+SELECT 's';
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::SelectStmt, result[0].kind);
+    }
+
+    #[test]
+    fn union_intersect() {
+        let input = "
+(select 1) union (select 2) except (select 3) intersect (select 4);
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::SelectStmt, result[0].kind);
+    }
+
+    #[test]
+    fn alter_table_cluster_on() {
+        let input = "
+ALTER TABLE clstr_tst CLUSTER ON clstr_tst_b_c;
+";
+        let result = StatementSplitter::new(input).run();
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(SyntaxKind::AlterTableStmt, result[0].kind);
     }
 
     #[allow(clippy::must_use)]

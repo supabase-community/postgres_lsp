@@ -9,6 +9,7 @@ use pg_lexer::SyntaxKind;
 const DATA_DIR_PATH: &str = "tests/data/";
 const POSTGRES_REGRESS_PATH: &str = "../../libpg_query/test/sql/postgres_regress/";
 const SKIPPED_REGRESS_TESTS: &str = include_str!("skipped.txt");
+const SKIPPED_STATEMENTS: &str = include_str!("skipped_statements.txt");
 
 const SNAPSHOTS_PATH: &str = "snapshots/data";
 
@@ -47,8 +48,8 @@ fn test_postgres_regress() {
                     && !l.ends_with("\\gset")
                     && !l.starts_with("--")
                     && !l.contains(":'")
-                    && l.split("\t").count() <= 1
-                    && l != "ALTER INDEX attmp_idx ALTER COLUMN 0 SET STATISTICS 1000;"
+                    && (l.starts_with("\t") || l.split("\t").count() <= 1)
+                    && !SKIPPED_STATEMENTS.contains(l)
                 {
                     if let Some(index) = l.find("--") {
                         Some(l[..index].to_string())
@@ -65,11 +66,10 @@ fn test_postgres_regress() {
         let libpg_query_split_result = pg_query::split_with_parser(&contents);
 
         if libpg_query_split_result.is_err() {
-            eprintln!(
-                "Failed to split statements for test '{}': {:?}",
-                test_name, libpg_query_split_result
+            panic!(
+                "'{}'\nFailed to split statements for test '{}': {:?}",
+                contents, test_name, libpg_query_split_result
             );
-            continue;
         }
 
         let libpg_query_split = libpg_query_split_result.unwrap();

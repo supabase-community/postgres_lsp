@@ -1,3 +1,5 @@
+alter_table
+
 brin
 brin_bloom
 brin_multi

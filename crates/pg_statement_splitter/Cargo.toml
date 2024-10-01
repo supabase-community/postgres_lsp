@@ -10,4 +10,9 @@ text-size = "1.1.1"
 [dev-dependencies]
 pg_query = "0.8"
 insta = "1.31.0"
+criterion = { version = "0.5" }
+
+[[bench]]
+name = "pg_statement_splitter"
+harness = false
 

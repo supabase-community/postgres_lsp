@@ -1,0 +1,2 @@
+alter table atacc1 SET WITH OIDS;
+ALTER INDEX attmp_idx ALTER COLUMN 0 SET STATISTICS 1000;
