@@ -1,0 +1,26 @@
+---
+source: crates/pg_statement_splitter/tests/statement_splitter_tests.rs
+description: "select id, name, test1231234123, unknown from co;\n\nselect 14433313331333\n\nalter table test drop column id;\n\nselect lower('test');\n\n"
+---
+[
+    (
+        SelectStmt,
+        0..49,
+        "select id, name, test1231234123, unknown from co;",
+    ),
+    (
+        SelectStmt,
+        51..72,
+        "select 14433313331333",
+    ),
+    (
+        AlterTableStmt,
+        74..106,
+        "alter table test drop column id;",
+    ),
+    (
+        SelectStmt,
+        108..129,
+        "select lower('test');",
+    ),
+]
