@@ -65,7 +65,7 @@ static PATTERN_LEXER: LazyLock<Regex> =
 fn whitespace_tokens(input: &str) -> VecDeque<Token> {
     let mut tokens = VecDeque::new();
 
-    for cap in PATTERN_LEXER.captures_iter(&input) {
+    for cap in PATTERN_LEXER.captures_iter(input) {
         if let Some(whitespace) = cap.name("whitespace") {
             tokens.push_back(Token {
                 token_type: TokenType::Whitespace,
@@ -139,8 +139,8 @@ pub fn lex(text: &str) -> Vec<Token> {
                 kind: SyntaxKind::from(&pg_query_token),
                 text: token_text,
                 span: TextRange::new(
-                    TextSize::try_from(u32::try_from(pg_query_token.start).unwrap()).unwrap(),
-                    TextSize::try_from(u32::try_from(pg_query_token.end).unwrap()).unwrap(),
+                    TextSize::from(u32::try_from(pg_query_token.start).unwrap()),
+                    TextSize::from(u32::try_from(pg_query_token.end).unwrap()),
                 ),
             });
             pos += len;
