@@ -1,3 +1,9 @@
+mod common;
+mod data;
+mod dml;
+
+pub use common::source;
+
 use std::cmp::min;
 
 use pg_lexer::{SyntaxKind, Token, TokenType, WHITESPACE_TOKENS};
@@ -52,71 +58,88 @@ impl Parser {
                 .iter()
                 .map(|(start, end)| {
                     let from = self.tokens.get(*start);
-                    let to = self.tokens.get(end - 1);
+                    let to = self.tokens.get(*end);
                     // get text range from token range
                     let text_start = from.unwrap().span.start();
                     let text_end = to.unwrap().span.end();
 
-                    TextRange::new(
-                        TextSize::try_from(text_start).unwrap(),
-                        TextSize::try_from(text_end).unwrap(),
-                    )
+                    TextRange::new(text_start, text_end)
                 })
                 .collect(),
             errors: self.errors,
         }
     }
 
+    /// Start statement at next non-whitespace token
     pub fn start_stmt(&mut self) {
         assert!(self.current_stmt_start.is_none());
-        self.current_stmt_start = Some(self.pos);
+
+        if let Some(whitespace_token_buffer) = self.whitespace_token_buffer {
+            self.current_stmt_start = Some(whitespace_token_buffer);
+        } else {
+            while self.nth(0, false).token_type == TokenType::Whitespace {
+                self.advance(false);
+            }
+
+            self.current_stmt_start = Some(self.pos);
+        }
     }
 
+    /// Close statement at last non-whitespace token
     pub fn close_stmt(&mut self) {
         assert!(self.current_stmt_start.is_some());
-        self.ranges
-            .push((self.current_stmt_start.take().unwrap(), self.pos));
-    }
 
-    /// collects an SyntaxError with an `error` message at `pos`
-    pub fn error_at_pos(&mut self, error: String, pos: usize) {
-        self.errors.push(SyntaxError::new_at_offset(
-            error,
-            self.tokens
-                .get(min(self.tokens.len() - 1, pos))
-                .unwrap()
-                .span
-                .start(),
+        println!(
+            "Closing statement {:?} / {:?}: {:?}",
+            self.whitespace_token_buffer,
+            self.pos,
+            self.tokens.get(self.pos)
+        );
+
+        self.ranges.push((
+            self.current_stmt_start.unwrap(),
+            self.whitespace_token_buffer.unwrap_or(self.pos),
         ));
+
+        self.current_stmt_start = None;
     }
 
     /// applies token and advances
-    pub fn advance(&mut self) {
-        assert!(!self.eof());
-        if self.nth(0, false).kind == SyntaxKind::Whitespace {
-            if self.whitespace_token_buffer.is_none() {
-                self.whitespace_token_buffer = Some(self.pos);
+    ///
+    /// if `ignore_whitespace` is true, it will advance the next non-whitespace token
+    pub fn advance(&mut self, ignore_whitespace: bool) {
+        assert!(!self.eof(ignore_whitespace));
+
+        loop {
+            let whitespace = match self.nth(0, false).kind {
+                SyntaxKind::Whitespace => {
+                    if self.whitespace_token_buffer.is_none() {
+                        self.whitespace_token_buffer = Some(self.pos);
+                    }
+
+                    true
+                }
+                _ => {
+                    self.whitespace_token_buffer = None;
+
+                    false
+                }
+            };
+
+            self.pos += 1;
+
+            if !whitespace || !ignore_whitespace {
+                break;
             }
-        } else {
-            self.flush_token_buffer();
         }
-        self.pos += 1;
     }
 
-    /// flush token buffer and applies all tokens
-    pub fn flush_token_buffer(&mut self) {
-        if self.whitespace_token_buffer.is_none() {
-            return;
-        }
-        while self.whitespace_token_buffer.unwrap() < self.pos {
-            self.whitespace_token_buffer = Some(self.whitespace_token_buffer.unwrap() + 1);
-        }
-        self.whitespace_token_buffer = None;
-    }
-
-    pub fn eat(&mut self, kind: SyntaxKind) -> bool {
-        if self.at(kind) {
-            self.advance();
+    /// checks if the current token is of `kind` and advances if true
+    /// returns true if the current token is of `kind`
+    pub fn eat(&mut self, kind: SyntaxKind, ignore_whitespace: bool) -> bool {
+        if self.nth(1, ignore_whitespace).kind == kind {
+            println!("Eating {:?}", kind);
+            self.advance(ignore_whitespace);
             true
         } else {
             false
@@ -127,14 +150,36 @@ impl Parser {
         self.nth(0, false).kind == SyntaxKind::Whitespace
     }
 
-    pub fn eat_whitespace(&mut self) {
-        while self.nth(0, false).token_type == TokenType::Whitespace {
-            self.advance();
-        }
+    pub fn peek(&self, ignore_whitespace: bool) -> &Token {
+        self.nth(1, ignore_whitespace)
     }
 
-    pub fn eof(&self) -> bool {
-        self.pos == self.tokens.len()
+    pub fn expect(&mut self, kind: SyntaxKind, ignore_whitespace: bool) {
+        println!("Expecting {:?}", kind);
+        if self.eat(kind, ignore_whitespace) {
+            return;
+        }
+
+        self.error_at(format!("Expected {:#?}", kind));
+    }
+
+    pub fn eof(&self, ignore_whitespace: bool) -> bool {
+        self.peek(ignore_whitespace).kind == SyntaxKind::Eof
+    }
+
+    /// collects an SyntaxError with an `error` message at the current position
+    fn error_at(&mut self, error: String) {
+        self.errors.push(SyntaxError::new_at_offset(
+            error,
+            self.tokens
+                .get(min(
+                    self.tokens.len() - 1,
+                    self.whitespace_token_buffer.unwrap_or(self.pos),
+                ))
+                .unwrap()
+                .span
+                .start(),
+        ));
     }
 
     /// lookahead method.
@@ -165,32 +210,6 @@ impl Parser {
                 Some(token) => token,
                 None => &self.eof_token,
             }
-        }
-    }
-
-    /// checks if the current token is of `kind`
-    pub fn at(&self, kind: SyntaxKind) -> bool {
-        self.nth(0, false).kind == kind
-    }
-
-    pub fn expect(&mut self, kind: SyntaxKind) {
-        if self.eat(kind) {
-            return;
-        }
-        if self.whitespace_token_buffer.is_some() {
-            self.error_at_pos(
-                format!(
-                    "Expected {:#?}, found {:#?}",
-                    kind,
-                    self.tokens[self.whitespace_token_buffer.unwrap()].kind
-                ),
-                self.whitespace_token_buffer.unwrap(),
-            );
-        } else {
-            self.error_at_pos(
-                format!("Expected {:#?}, found {:#?}", kind, self.nth(0, false)),
-                self.pos + 1,
-            );
         }
     }
 }
