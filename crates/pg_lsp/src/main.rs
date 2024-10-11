@@ -1,9 +1,12 @@
 use lsp_server::Connection;
 use pg_lsp::server::Server;
 
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     let (connection, threads) = Connection::stdio();
-    Server::init(connection)?;
+    let server = Server::init(connection)?;
+
+    server.run().await?;
     threads.join()?;
 
     Ok(())
