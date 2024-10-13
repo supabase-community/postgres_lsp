@@ -1487,6 +1487,7 @@ dependencies = [
  "text-size",
  "threadpool",
  "tokio",
+ "tokio-util",
 ]
 
 [[package]]
@@ -2518,6 +2519,19 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.71",
+]
+
+[[package]]
+name = "tokio-util"
+version = "0.7.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "61e7c3654c13bcd040d4a03abee2c75b1d14a37b423cf5a813ceae1cc903ec6a"
+dependencies = [
+ "bytes",
+ "futures-core",
+ "futures-sink",
+ "pin-project-lite",
+ "tokio",
 ]
 
 [[package]]
