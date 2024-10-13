@@ -2,8 +2,6 @@ mod debouncer;
 mod dispatch;
 pub mod options;
 
-use async_std::task::{self};
-use crossbeam_channel::{unbounded, Receiver, Sender};
 use lsp_server::{Connection, ErrorCode, Message, RequestId};
 use lsp_types::{
     notification::{
@@ -29,9 +27,11 @@ use pg_hover::HoverParams;
 use pg_schema_cache::SchemaCache;
 use pg_workspace::Workspace;
 use serde::{de::DeserializeOwned, Serialize};
-use std::{collections::HashSet, sync::Arc, time::Duration};
+use std::{collections::HashSet, future::Future, sync::Arc, time::Duration};
 use text_size::TextSize;
-use threadpool::ThreadPool;
+
+use tokio::sync::mpsc;
+use tokio_util::sync::CancellationToken;
 
 use crate::{
     client::{client_flags::ClientFlags, LspClient},
@@ -68,12 +68,39 @@ impl DbConnection {
     }
 }
 
+/// `lsp-servers` `Connection` type uses a crossbeam channel, which is not compatible with tokio's async runtime.
+/// For now, we move it into a separate task and use tokio's channels to communicate.
+fn get_client_receiver(
+    connection: Connection,
+    cancel_token: Arc<CancellationToken>,
+) -> mpsc::UnboundedReceiver<Message> {
+    let (message_tx, message_rx) = mpsc::unbounded_channel();
+
+    tokio::task::spawn(async move {
+        // TODO: improve Result handling
+        loop {
+            let msg = connection.receiver.recv().unwrap();
+
+            match msg {
+                Message::Request(r) if connection.handle_shutdown(&r).unwrap() => {
+                    cancel_token.cancel();
+                    return;
+                }
+
+                _ => message_tx.send(msg).unwrap(),
+            };
+        }
+    });
+
+    message_rx
+}
+
 pub struct Server {
-    connection: Arc<Connection>,
+    client_rx: mpsc::UnboundedReceiver<Message>,
+    cancel_token: Arc<tokio_util::sync::CancellationToken>,
     client: LspClient,
-    internal_tx: Sender<InternalMessage>,
-    internal_rx: Receiver<InternalMessage>,
-    pool: Arc<ThreadPool>,
+    internal_tx: mpsc::UnboundedSender<InternalMessage>,
+    internal_rx: mpsc::UnboundedReceiver<InternalMessage>,
     client_flags: Arc<ClientFlags>,
     ide: Arc<Workspace>,
     db_conn: Option<DbConnection>,
@@ -81,10 +108,10 @@ pub struct Server {
 }
 
 impl Server {
-    pub fn init(connection: Connection) -> anyhow::Result<()> {
+    pub fn init(connection: Connection) -> anyhow::Result<Self> {
         let client = LspClient::new(connection.sender.clone());
 
-        let (internal_tx, internal_rx) = unbounded();
+        let (internal_tx, internal_rx) = mpsc::unbounded_channel();
 
         let (id, params) = connection.initialize_start()?;
         let params: InitializeParams = serde_json::from_value(params)?;
@@ -99,7 +126,7 @@ impl Server {
 
         connection.initialize_finish(id, serde_json::to_value(result)?)?;
 
-        let client_flags = Arc::new(from_proto::client_flags(params.capabilities));
+        let client_flags = Arc::new(ClientFlags::from_initialize_request_params(&params));
 
         let pool = Arc::new(threadpool::Builder::new().build());
 
@@ -110,8 +137,13 @@ impl Server {
         let cloned_pool = pool.clone();
         let cloned_client = client.clone();
 
+        let cancel_token = Arc::new(CancellationToken::new());
+
+        let client_rx = get_client_receiver(connection, cancel_token.clone());
+
         let server = Self {
-            connection: Arc::new(connection),
+            cancel_token,
+            client_rx,
             internal_rx,
             internal_tx,
             client,
@@ -155,11 +187,9 @@ impl Server {
                     });
                 },
             ),
-            pool,
         };
 
-        server.run()?;
-        Ok(())
+        Ok(server)
     }
 
     fn compute_now(&self) {
@@ -170,7 +200,7 @@ impl Server {
 
         self.compute_debouncer.clear();
 
-        self.pool.execute(move || {
+        self.spawn_with_cancel(async move {
             client
                 .send_notification::<ShowMessage>(ShowMessageParams {
                     typ: lsp_types::MessageType::INFO,
@@ -209,7 +239,7 @@ impl Server {
         });
     }
 
-    fn start_listening(&self) {
+    async fn start_listening(&self) {
         if self.db_conn.is_none() {
             return;
         }
@@ -217,27 +247,25 @@ impl Server {
         let pool = self.db_conn.as_ref().unwrap().pool.clone();
         let tx = self.internal_tx.clone();
 
-        task::spawn(async move {
-            let mut listener = PgListener::connect_with(&pool).await.unwrap();
-            listener
-                .listen_all(["postgres_lsp", "pgrst"])
-                .await
-                .unwrap();
+        let mut listener = PgListener::connect_with(&pool).await.unwrap();
+        listener
+            .listen_all(["postgres_lsp", "pgrst"])
+            .await
+            .unwrap();
 
-            loop {
-                match listener.recv().await {
-                    Ok(notification) => {
-                        if notification.payload().to_string() == "reload schema" {
-                            tx.send(InternalMessage::RefreshSchemaCache).unwrap();
-                        }
-                    }
-                    Err(e) => {
-                        eprintln!("Listener error: {}", e);
-                        break;
+        loop {
+            match listener.recv().await {
+                Ok(notification) => {
+                    if notification.payload().to_string() == "reload schema" {
+                        tx.send(InternalMessage::RefreshSchemaCache).unwrap();
                     }
                 }
+                Err(e) => {
+                    eprintln!("Listener error: {}", e);
+                    break;
+                }
             }
-        });
+        }
     }
 
     async fn update_db_connection(&mut self, connection_string: Option<String>) {
@@ -267,9 +295,8 @@ impl Server {
             })
             .unwrap();
 
-        self.refresh_schema_cache();
-
-        self.start_listening();
+        self.refresh_schema_cache().await;
+        self.start_listening().await;
     }
 
     fn update_options(&mut self, options: Options) {
@@ -687,15 +714,17 @@ impl Server {
         Q: FnOnce() -> anyhow::Result<R> + Send + 'static,
     {
         let client = self.client.clone();
-        self.pool.execute(move || match query() {
-            Ok(result) => {
-                let response = lsp_server::Response::new_ok(id, result);
-                client.send_response(response).unwrap();
-            }
-            Err(why) => {
-                client
-                    .send_error(id, ErrorCode::InternalError, why.to_string())
-                    .unwrap();
+        self.spawn_with_cancel(async move {
+            match query() {
+                Ok(result) => {
+                    let response = lsp_server::Response::new_ok(id, result);
+                    client.send_response(response).unwrap();
+                }
+                Err(why) => {
+                    client
+                        .send_error(id, ErrorCode::InternalError, why.to_string())
+                        .unwrap();
+                }
             }
         });
     }
@@ -721,13 +750,15 @@ impl Server {
         let client = self.client.clone();
         let ide = Arc::clone(&self.ide);
 
-        self.pool.execute(move || {
+        self.spawn_with_cancel(async move {
             let response = lsp_server::Response::new_ok(id, query(&ide));
-            client.send_response(response).unwrap();
+            client
+                .send_response(response)
+                .expect("Failed to send query to client");
         });
     }
 
-    fn refresh_schema_cache(&self) {
+    async fn refresh_schema_cache(&self) {
         if self.db_conn.is_none() {
             return;
         }
@@ -736,24 +767,22 @@ impl Server {
         let conn = self.db_conn.as_ref().unwrap().pool.clone();
         let client = self.client.clone();
 
-        async_std::task::spawn(async move {
-            client
-                .send_notification::<ShowMessage>(ShowMessageParams {
-                    typ: lsp_types::MessageType::INFO,
-                    message: "Refreshing schema cache...".to_string(),
-                })
-                .unwrap();
-            let schema_cache = SchemaCache::load(&conn).await;
-            tx.send(InternalMessage::SetSchemaCache(schema_cache))
-                .unwrap();
-        });
+        client
+            .send_notification::<ShowMessage>(ShowMessageParams {
+                typ: lsp_types::MessageType::INFO,
+                message: "Refreshing schema cache...".to_string(),
+            })
+            .unwrap();
+        let schema_cache = SchemaCache::load(&conn).await;
+        tx.send(InternalMessage::SetSchemaCache(schema_cache))
+            .unwrap();
     }
 
     fn did_change_configuration(
         &mut self,
         params: DidChangeConfigurationParams,
     ) -> anyhow::Result<()> {
-        if self.client_flags.configuration_pull {
+        if self.client_flags.has_configuration {
             self.pull_options();
         } else {
             let options = self.client.parse_options(params.settings)?;
@@ -763,74 +792,86 @@ impl Server {
         Ok(())
     }
 
-    fn process_messages(&mut self) -> anyhow::Result<()> {
+    async fn process_messages(&mut self) -> anyhow::Result<()> {
         loop {
-            crossbeam_channel::select! {
-                recv(&self.connection.receiver) -> msg => {
-                    match msg? {
-                        Message::Request(request) => {
-                            if self.connection.handle_shutdown(&request)? {
-                                return Ok(());
-                            }
-
-                            if let Some(response) = dispatch::RequestDispatcher::new(request)
-                                .on::<InlayHintRequest, _>(|id, params| self.inlay_hint(id, params))?
-                                .on::<HoverRequest, _>(|id, params| self.hover(id, params))?
-                                .on::<ExecuteCommand,_>(|id, params| self.execute_command(id, params))?
-                                .on::<Completion, _>(|id, params| {
-                                    self.completion(id, params)
-                                })?
-                                .on::<CodeActionRequest, _>(|id, params| {
-                                    self.code_actions(id, params)
-                                })?
-                                .default()
-                            {
-                                self.client.send_response(response)?;
-                            }
-                        }
-                        Message::Notification(notification) => {
-                            dispatch::NotificationDispatcher::new(notification)
-                                .on::<DidChangeConfiguration, _>(|params| {
-                                    self.did_change_configuration(params)
-                                })?
-                                .on::<DidCloseTextDocument, _>(|params| self.did_close(params))?
-                                .on::<DidOpenTextDocument, _>(|params| self.did_open(params))?
-                                .on::<DidChangeTextDocument, _>(|params| self.did_change(params))?
-                                .on::<DidSaveTextDocument, _>(|params| self.did_save(params))?
-                                .on::<DidCloseTextDocument, _>(|params| self.did_close(params))?
-                                .default();
-                        }
-                        Message::Response(response) => {
-                            self.client.recv_response(response)?;
-                        }
-                    };
+            tokio::select! {
+                _ = self.cancel_token.cancelled() => {
+                    // Close the loop, proceed to shutdown.
+                    return Ok(())
                 },
-                recv(&self.internal_rx) -> msg => {
-                    match msg? {
-                        InternalMessage::SetSchemaCache(c) => {
-                            self.ide.set_schema_cache(c);
-                            self.compute_now();
-                        }
-                        InternalMessage::RefreshSchemaCache => {
-                            self.refresh_schema_cache();
-                        }
-                        InternalMessage::PublishDiagnostics(uri) => {
-                            self.publish_diagnostics(uri)?;
-                        }
-                        InternalMessage::SetOptions(options) => {
-                            self.update_options(options);
-                        }
-                    };
-                }
-            };
+
+                msg = self.internal_rx.recv() => {
+                    match msg {
+                        None => panic!("The LSP's internal sender closed. This should never happen."),
+                        Some(m) => self.handle_internal_message(m).await
+                    }
+                },
+
+                msg = self.client_rx.recv() => {
+                    match msg {
+                        None => panic!("The LSP's client closed, but not via an 'exit' method. This should never happen."),
+                        Some(m) => self.handle_message(m)
+                    }
+                },
+            }?;
         }
     }
 
-    fn pull_options(&mut self) {
-        if !self.client_flags.configuration_pull {
-            return;
+    fn handle_message(&mut self, msg: Message) -> anyhow::Result<()> {
+        match msg {
+            Message::Request(request) => {
+                if let Some(response) = dispatch::RequestDispatcher::new(request)
+                    .on::<InlayHintRequest, _>(|id, params| self.inlay_hint(id, params))?
+                    .on::<HoverRequest, _>(|id, params| self.hover(id, params))?
+                    .on::<ExecuteCommand, _>(|id, params| self.execute_command(id, params))?
+                    .on::<Completion, _>(|id, params| self.completion(id, params))?
+                    .on::<CodeActionRequest, _>(|id, params| self.code_actions(id, params))?
+                    .default()
+                {
+                    self.client.send_response(response)?;
+                }
+            }
+            Message::Notification(notification) => {
+                dispatch::NotificationDispatcher::new(notification)
+                    .on::<DidChangeConfiguration, _>(|params| {
+                        self.did_change_configuration(params)
+                    })?
+                    .on::<DidCloseTextDocument, _>(|params| self.did_close(params))?
+                    .on::<DidOpenTextDocument, _>(|params| self.did_open(params))?
+                    .on::<DidChangeTextDocument, _>(|params| self.did_change(params))?
+                    .on::<DidSaveTextDocument, _>(|params| self.did_save(params))?
+                    .on::<DidCloseTextDocument, _>(|params| self.did_close(params))?
+                    .default();
+            }
+            Message::Response(response) => {
+                self.client.recv_response(response)?;
+            }
         }
 
+        Ok(())
+    }
+
+    async fn handle_internal_message(&mut self, msg: InternalMessage) -> anyhow::Result<()> {
+        match msg {
+            InternalMessage::SetSchemaCache(c) => {
+                self.ide.set_schema_cache(c);
+                self.compute_now();
+            }
+            InternalMessage::RefreshSchemaCache => {
+                self.refresh_schema_cache().await;
+            }
+            InternalMessage::PublishDiagnostics(uri) => {
+                self.publish_diagnostics(uri)?;
+            }
+            InternalMessage::SetOptions(options) => {
+                self.update_options(options);
+            }
+        }
+
+        Ok(())
+    }
+
+    fn pull_options(&mut self) {
         let params = ConfigurationParams {
             items: vec![ConfigurationItem {
                 section: Some("postgres_lsp".to_string()),
@@ -839,53 +880,72 @@ impl Server {
         };
 
         let client = self.client.clone();
-        let sender = self.internal_tx.clone();
-        self.pool.execute(move || {
+        let internal_tx = self.internal_tx.clone();
+        self.spawn_with_cancel(async move {
             match client.send_request::<WorkspaceConfiguration>(params) {
                 Ok(mut json) => {
                     let options = client
                         .parse_options(json.pop().expect("invalid configuration request"))
                         .unwrap();
 
-                    sender.send(InternalMessage::SetOptions(options)).unwrap();
+                    if let Err(why) = internal_tx.send(InternalMessage::SetOptions(options)) {
+                        println!("Failed to set internal options: {}", why);
+                    }
                 }
-                Err(_why) => {
-                    // log::error!("Retrieving configuration failed: {}", why);
+                Err(why) => {
+                    println!("Retrieving configuration failed: {}", why);
                 }
             };
         });
     }
 
     fn register_configuration(&mut self) {
-        if self.client_flags.configuration_push {
-            let registration = Registration {
-                id: "pull-config".to_string(),
-                method: DidChangeConfiguration::METHOD.to_string(),
-                register_options: None,
-            };
+        let registration = Registration {
+            id: "pull-config".to_string(),
+            method: DidChangeConfiguration::METHOD.to_string(),
+            register_options: None,
+        };
 
-            let params = RegistrationParams {
-                registrations: vec![registration],
-            };
+        let params = RegistrationParams {
+            registrations: vec![registration],
+        };
 
-            let client = self.client.clone();
-            self.pool.execute(move || {
-                if let Err(_why) = client.send_request::<RegisterCapability>(params) {
-                    // log::error!(
-                    //     "Failed to register \"{}\" notification: {}",
-                    //     DidChangeConfiguration::METHOD,
-                    //     why
-                    // );
-                }
-            });
-        }
+        let client = self.client.clone();
+        self.spawn_with_cancel(async move {
+            if let Err(why) = client.send_request::<RegisterCapability>(params) {
+                println!(
+                    "Failed to register \"{}\" notification: {}",
+                    DidChangeConfiguration::METHOD,
+                    why
+                );
+            }
+        });
     }
 
-    pub fn run(mut self) -> anyhow::Result<()> {
-        self.register_configuration();
-        self.pull_options();
-        self.process_messages()?;
-        self.pool.join();
+    fn spawn_with_cancel<F>(&self, f: F) -> tokio::task::JoinHandle<()>
+    where
+        F: Future + Send + 'static,
+    {
+        let cancel_token = self.cancel_token.clone();
+        tokio::spawn(async move {
+            tokio::select! {
+                _ = cancel_token.cancelled() => {},
+                _ = f => {}
+            };
+        })
+    }
+
+    pub async fn run(mut self) -> anyhow::Result<()> {
+        if self.client_flags.will_push_configuration {
+            self.register_configuration();
+        }
+
+        if self.client_flags.has_configuration {
+            self.pull_options();
+        }
+
+        self.process_messages().await?;
+
         Ok(())
     }
 }
