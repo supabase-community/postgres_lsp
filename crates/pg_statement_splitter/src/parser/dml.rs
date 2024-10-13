@@ -6,14 +6,14 @@ use super::{
 };
 
 pub(crate) fn cte(p: &mut Parser) {
-    p.expect(SyntaxKind::With, true);
+    p.expect(SyntaxKind::With);
 
     loop {
-        p.expect(SyntaxKind::Ident, true);
-        p.expect(SyntaxKind::As, true);
+        p.expect(SyntaxKind::Ident);
+        p.expect(SyntaxKind::As);
         parenthesis(p);
 
-        if !p.eat(SyntaxKind::Ascii44, true) {
+        if !p.eat(SyntaxKind::Ascii44) {
             break;
         }
     }
@@ -22,7 +22,7 @@ pub(crate) fn cte(p: &mut Parser) {
 }
 
 pub(crate) fn select(p: &mut Parser) {
-    p.expect(SyntaxKind::Select, true);
+    p.expect(SyntaxKind::Select);
 
     unknown(p);
 }

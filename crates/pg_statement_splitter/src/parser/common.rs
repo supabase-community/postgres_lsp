@@ -1,34 +1,36 @@
-use pg_lexer::{SyntaxKind, Token};
+use pg_lexer::{SyntaxKind, Token, TokenType};
 
 use super::{
+    data::at_statement_start,
     dml::{cte, select},
     Parser,
 };
 
 pub fn source(p: &mut Parser) {
     loop {
-        // todo find a better way to handle stmt start
-        // same problem as below... for the first token we need to use nth(0),
-        // but for the rest we need to use peek
-        p.start_stmt();
-        statement(p);
-        p.close_stmt();
-
-        if p.eof(true) {
-            break;
+        match p.peek() {
+            Token {
+                kind: SyntaxKind::Eof,
+                ..
+            } => {
+                break;
+            }
+            Token {
+                token_type: TokenType::Whitespace | TokenType::NoKeyword,
+                ..
+            } => {
+                p.advance();
+            }
+            _ => {
+                statement(p);
+            }
         }
     }
 }
 
 pub(crate) fn statement(p: &mut Parser) {
-    // todo find a better way to handle first token
-    let token = if p.pos == 0 {
-        p.nth(0, true)
-    } else {
-        p.peek(true)
-    };
-
-    match token.kind {
+    p.start_stmt();
+    match p.peek().kind {
         SyntaxKind::With => {
             cte(p);
         }
@@ -52,44 +54,30 @@ pub(crate) fn statement(p: &mut Parser) {
             // unknown(p);
         }
     }
+    p.close_stmt();
 }
 
 pub(crate) fn parenthesis(p: &mut Parser) {
-    p.expect(SyntaxKind::Ascii40, true);
+    p.expect(SyntaxKind::Ascii40);
 
     loop {
-        if p.eof(true) {
-            p.expect(SyntaxKind::Ascii41, true);
-            break;
-        }
-        if p.nth(0, true).kind == SyntaxKind::Ascii41 {
-            break;
+        match p.peek().kind {
+            SyntaxKind::Ascii41 | SyntaxKind::Eof => {
+                p.advance();
+                break;
+            }
+            _ => {
+                p.advance();
+            }
         }
     }
 }
 
 pub(crate) fn unknown(p: &mut Parser) {
     loop {
-        match p.peek(false) {
-            t @ Token {
-                kind: SyntaxKind::Newline,
-                ..
-            } => {
-                if t.text.chars().count() > 1 {
-                    p.advance(false);
-                    break;
-                }
-            }
+        match p.peek() {
             Token {
-                // ";"
-                kind: SyntaxKind::Ascii59,
-                ..
-            } => {
-                p.advance(false);
-                break;
-            }
-            Token {
-                kind: SyntaxKind::Eof,
+                kind: SyntaxKind::Newline | SyntaxKind::Ascii59 | SyntaxKind::Eof,
                 ..
             } => {
                 break;
@@ -101,8 +89,11 @@ pub(crate) fn unknown(p: &mut Parser) {
                 parenthesis(p);
             }
             t => {
-                println!("Unknown token {:?}", t);
-                p.advance(false);
+                if at_statement_start(t.kind) {
+                    break;
+                }
+
+                p.advance();
             }
         }
     }

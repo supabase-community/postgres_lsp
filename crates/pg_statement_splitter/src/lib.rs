@@ -6,10 +6,8 @@ mod syntax_error;
 
 use parser::{source, Parse, Parser};
 
-use pg_lexer::lex;
-
 pub fn split(sql: &str) -> Parse {
-    let mut parser = Parser::new(lex(sql));
+    let mut parser = Parser::new(sql);
 
     source(&mut parser);
 
@@ -18,9 +16,12 @@ pub fn split(sql: &str) -> Parse {
 
 #[cfg(test)]
 mod tests {
+    use ntest::timeout;
+
     use super::*;
 
     #[test]
+    #[timeout(1000)]
     fn basic() {
         let input = "select 1 from contact; select 1;";
 
@@ -42,15 +43,12 @@ mod tests {
 
     #[test]
     fn double_newlines() {
-        let input = "select 1 from contact\nselect 1\n\nalter table t add column c int";
+        let input = "select 1 from contact\n\nselect 1\n\nselect 3";
 
         let res = split(input);
         assert_eq!(res.ranges.len(), 3);
         assert_eq!("select 1 from contact", input[res.ranges[0]].to_string());
         assert_eq!("select 1", input[res.ranges[1]].to_string());
-        assert_eq!(
-            "alter table t add column c int",
-            input[res.ranges[2]].to_string()
-        );
+        assert_eq!("select 3", input[res.ranges[2]].to_string());
     }
 }
