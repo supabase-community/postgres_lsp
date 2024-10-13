@@ -127,7 +127,7 @@ impl Server {
 
         connection.initialize_finish(id, serde_json::to_value(result)?)?;
 
-        let client_flags = Arc::new(from_proto::client_flags(params.capabilities));
+        let client_flags = Arc::new(ClientFlags::from_initialize_request_params(&params));
 
         let pool = Arc::new(threadpool::Builder::new().build());
 
@@ -200,7 +200,7 @@ impl Server {
 
         self.compute_debouncer.clear();
 
-        self.pool.execute(move || {
+        tokio::spawn(async move {
             client
                 .send_notification::<ShowMessage>(ShowMessageParams {
                     typ: lsp_types::MessageType::INFO,
@@ -778,7 +778,7 @@ impl Server {
         &mut self,
         params: DidChangeConfigurationParams,
     ) -> anyhow::Result<()> {
-        if self.client_flags.configuration_pull {
+        if self.client_flags.has_configuration {
             self.pull_options();
         } else {
             let options = self.client.parse_options(params.settings)?;
@@ -869,7 +869,7 @@ impl Server {
     }
 
     fn pull_options(&mut self) {
-        if !self.client_flags.configuration_pull {
+        if !self.client_flags.has_configuration {
             return;
         }
 
@@ -899,7 +899,7 @@ impl Server {
     }
 
     fn register_configuration(&mut self) {
-        if self.client_flags.configuration_push {
+        if self.client_flags.will_push_configuration {
             let registration = Registration {
                 id: "pull-config".to_string(),
                 method: DidChangeConfiguration::METHOD.to_string(),
