@@ -2,7 +2,6 @@ mod debouncer;
 mod dispatch;
 pub mod options;
 
-use async_std::task::{self};
 use lsp_server::{Connection, ErrorCode, Message, RequestId};
 use lsp_types::{
     notification::{
@@ -240,7 +239,7 @@ impl Server {
         });
     }
 
-    fn start_listening(&self) {
+    async fn start_listening(&self) {
         if self.db_conn.is_none() {
             return;
         }
@@ -248,27 +247,25 @@ impl Server {
         let pool = self.db_conn.as_ref().unwrap().pool.clone();
         let tx = self.internal_tx.clone();
 
-        task::spawn(async move {
-            let mut listener = PgListener::connect_with(&pool).await.unwrap();
-            listener
-                .listen_all(["postgres_lsp", "pgrst"])
-                .await
-                .unwrap();
+        let mut listener = PgListener::connect_with(&pool).await.unwrap();
+        listener
+            .listen_all(["postgres_lsp", "pgrst"])
+            .await
+            .unwrap();
 
-            loop {
-                match listener.recv().await {
-                    Ok(notification) => {
-                        if notification.payload().to_string() == "reload schema" {
-                            tx.send(InternalMessage::RefreshSchemaCache).unwrap();
-                        }
-                    }
-                    Err(e) => {
-                        eprintln!("Listener error: {}", e);
-                        break;
+        loop {
+            match listener.recv().await {
+                Ok(notification) => {
+                    if notification.payload().to_string() == "reload schema" {
+                        tx.send(InternalMessage::RefreshSchemaCache).unwrap();
                     }
                 }
+                Err(e) => {
+                    eprintln!("Listener error: {}", e);
+                    break;
+                }
             }
-        });
+        }
     }
 
     async fn update_db_connection(&mut self, connection_string: Option<String>) {
@@ -298,9 +295,8 @@ impl Server {
             })
             .unwrap();
 
-        self.refresh_schema_cache();
-
-        self.start_listening();
+        self.refresh_schema_cache().await;
+        self.start_listening().await;
     }
 
     fn update_options(&mut self, options: Options) {
