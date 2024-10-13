@@ -758,7 +758,7 @@ impl Server {
         });
     }
 
-    fn refresh_schema_cache(&self) {
+    async fn refresh_schema_cache(&self) {
         if self.db_conn.is_none() {
             return;
         }
@@ -767,17 +767,15 @@ impl Server {
         let conn = self.db_conn.as_ref().unwrap().pool.clone();
         let client = self.client.clone();
 
-        async_std::task::spawn(async move {
-            client
-                .send_notification::<ShowMessage>(ShowMessageParams {
-                    typ: lsp_types::MessageType::INFO,
-                    message: "Refreshing schema cache...".to_string(),
-                })
-                .unwrap();
-            let schema_cache = SchemaCache::load(&conn).await;
-            tx.send(InternalMessage::SetSchemaCache(schema_cache))
-                .unwrap();
-        });
+        client
+            .send_notification::<ShowMessage>(ShowMessageParams {
+                typ: lsp_types::MessageType::INFO,
+                message: "Refreshing schema cache...".to_string(),
+            })
+            .unwrap();
+        let schema_cache = SchemaCache::load(&conn).await;
+        tx.send(InternalMessage::SetSchemaCache(schema_cache))
+            .unwrap();
     }
 
     fn did_change_configuration(
