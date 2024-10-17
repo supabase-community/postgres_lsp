@@ -126,7 +126,6 @@ impl Change {
             );
             // TODO also use errors returned by extract sql statement ranges
             doc.statement_ranges = pg_statement_splitter::split(&self.text)
-                .ranges
                 .iter()
                 .map(|r| r.clone())
                 .collect();
@@ -248,7 +247,7 @@ impl Change {
                         + 1,
             );
 
-            for range in pg_statement_splitter::split(extracted_text).ranges {
+            for range in pg_statement_splitter::split(extracted_text) {
                 match doc
                     .statement_ranges
                     .binary_search_by(|r| r.start().cmp(&range.start()))
