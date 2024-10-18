@@ -84,7 +84,6 @@ impl Parser {
                 .ranges
                 .iter()
                 .map(|(start, end)| {
-                    println!("{} {}", start, end);
                     let from = self.tokens.get(*start);
                     let to = self.tokens.get(*end).unwrap_or(&self.eof_token);
 
