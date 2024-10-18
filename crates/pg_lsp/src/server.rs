@@ -801,14 +801,14 @@ impl Server {
                 self.publish_diagnostics(uri)?;
             }
             InternalMessage::SetOptions(options) => {
-                self.update_db_connection(options);
+                self.update_db_connection(options)?;
             }
             InternalMessage::SetDatabaseConnection(conn) => {
                 let current = self.db_conn.replace(conn);
                 if current.is_some() {
                     current.unwrap().close().await
                 }
-                self.listen_for_schema_updates();
+                self.listen_for_schema_updates().await?;
             }
         }
 
