@@ -216,6 +216,7 @@ impl Server {
             || self
                 .db_conn
                 .as_ref()
+                // if the connection is already connected to the same database, do nothing
                 .is_some_and(|c| c.connected_to(options.db_connection_string.as_ref().unwrap()))
         {
             return Ok(());
@@ -257,8 +258,7 @@ impl Server {
             .listen_for_schema_updates(move |schema_cache| {
                 internal_tx
                     .send(InternalMessage::SetSchemaCache(schema_cache))
-                    .unwrap();
-                // TODO: handle result
+                    .expect("LSP Server: Failed to send internal message.");
             })
             .await?;
 
