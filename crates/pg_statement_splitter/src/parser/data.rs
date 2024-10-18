@@ -1,6 +1,6 @@
 use pg_lexer::SyntaxKind;
 
-pub static STATEMENT_START_TOKENS: &[SyntaxKind] = &[
+static STATEMENT_START_TOKENS: &[SyntaxKind] = &[
     SyntaxKind::With,
     SyntaxKind::Select,
     SyntaxKind::Insert,

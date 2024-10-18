@@ -50,7 +50,7 @@ pub(crate) fn statement(p: &mut Parser) {
             // delete(p);
         }
         t => {
-            panic!("stmt: Unknown token {:?}", t);
+            panic!("stmt: Unknown start token {:?}", t);
             // unknown(p);
         }
     }

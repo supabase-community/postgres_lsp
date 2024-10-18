@@ -4,14 +4,13 @@ mod dml;
 
 pub use common::source;
 
-use std::cmp::min;
-
 use pg_lexer::{lex, SyntaxKind, Token, WHITESPACE_TOKENS};
 use text_size::{TextRange, TextSize};
 
 use crate::syntax_error::SyntaxError;
 
 /// Main parser that exposes the `cstree` api, and collects errors and statements
+/// It is modelled after a Pratt Parser. For a gentle introduction to Pratt Parsing, see https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 pub struct Parser {
     /// The ranges of the statements
     ranges: Vec<TextRange>,
@@ -53,7 +52,12 @@ impl Parser {
 
         Self {
             ranges: Vec::new(),
-            eof_token: Token::eof(usize::from(tokens.first().unwrap().span.end())),
+            eof_token: Token::eof(usize::from(
+                tokens
+                    .first()
+                    .map(|t| t.span.start())
+                    .unwrap_or(TextSize::from(0)),
+            )),
             errors: Vec::new(),
             current_stmt_start: None,
             tokens,
