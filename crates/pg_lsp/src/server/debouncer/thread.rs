@@ -8,7 +8,6 @@ use super::buffer::{EventBuffer, Get, State};
 struct DebouncerThread<B> {
     mutex: Arc<Mutex<B>>,
     thread: JoinHandle<()>,
-    stopped: Arc<AtomicBool>,
 }
 
 impl<B> DebouncerThread<B> {
@@ -36,13 +35,7 @@ impl<B> DebouncerThread<B> {
         Self {
             mutex,
             thread,
-            stopped,
         }
-    }
-
-    fn stop(self) -> JoinHandle<()> {
-        self.stopped.store(true, Ordering::Relaxed);
-        self.thread
     }
 }
 
@@ -67,13 +60,6 @@ impl<T> EventDebouncer<T> {
 
     pub fn clear(&self) {
         self.0.mutex.lock().unwrap().clear();
-    }
-
-    /// Signals the debouncer thread to quit and returns a
-    /// [std::thread::JoinHandle] which can be `.join()`ed in the consumer
-    /// thread. The common idiom is: `debouncer.stop().join().unwrap();`
-    pub fn stop(self) -> JoinHandle<()> {
-        self.0.stop()
     }
 }
 

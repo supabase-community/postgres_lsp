@@ -722,7 +722,7 @@ impl Server {
             self.pull_options();
         } else {
             let options = self.client.parse_options(params.settings)?;
-            self.update_db_connection(options);
+            self.update_db_connection(options)?;
         }
 
         Ok(())
@@ -770,8 +770,7 @@ impl Server {
             Message::Notification(notification) => {
                 dispatch::NotificationDispatcher::new(notification)
                     .on::<DidChangeConfiguration, _>(|params| {
-                        self.did_change_configuration(params);
-                        Ok(())
+                        self.did_change_configuration(params)
                     })?
                     .on::<DidCloseTextDocument, _>(|params| self.did_close(params))?
                     .on::<DidOpenTextDocument, _>(|params| self.did_open(params))?
