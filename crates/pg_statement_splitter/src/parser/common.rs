@@ -77,7 +77,14 @@ pub(crate) fn unknown(p: &mut Parser) {
     loop {
         match p.peek() {
             Token {
-                kind: SyntaxKind::Newline | SyntaxKind::Ascii59 | SyntaxKind::Eof,
+                kind: SyntaxKind::Ascii59,
+                ..
+            } => {
+                p.advance();
+                break;
+            }
+            Token {
+                kind: SyntaxKind::Newline | SyntaxKind::Eof,
                 ..
             } => {
                 break;

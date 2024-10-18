@@ -13,17 +13,17 @@ use crate::syntax_error::SyntaxError;
 /// It is modelled after a Pratt Parser. For a gentle introduction to Pratt Parsing, see https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 pub struct Parser {
     /// The ranges of the statements
-    ranges: Vec<TextRange>,
+    ranges: Vec<(usize, usize)>,
     /// The syntax errors accumulated during parsing
     errors: Vec<SyntaxError>,
     /// The start of the current statement, if any
-    current_stmt_start: Option<TextSize>,
+    current_stmt_start: Option<usize>,
     /// The tokens to parse
     pub tokens: Vec<Token>,
 
     eof_token: Token,
 
-    last_token_end: Option<TextSize>,
+    next_pos: usize,
 }
 
 /// Result of Building
@@ -46,66 +46,96 @@ impl Parser {
                 return !WHITESPACE_TOKENS.contains(&t.kind)
                     || (t.kind == SyntaxKind::Newline && t.text.chars().count() > 1);
             })
-            .rev()
             .cloned()
             .collect::<Vec<_>>();
 
+        let eof_token = Token::eof(usize::from(
+            tokens
+                .last()
+                .map(|t| t.span.start())
+                .unwrap_or(TextSize::from(0)),
+        ));
+
+        // next_pos should be the initialised with the first valid token already
+        let mut next_pos = 0;
+        loop {
+            let token = tokens.get(next_pos).unwrap_or(&eof_token);
+
+            if is_irrelevant_token(token) {
+                next_pos += 1;
+            } else {
+                break;
+            }
+        }
+
         Self {
             ranges: Vec::new(),
-            eof_token: Token::eof(usize::from(
-                tokens
-                    .first()
-                    .map(|t| t.span.start())
-                    .unwrap_or(TextSize::from(0)),
-            )),
+            eof_token,
             errors: Vec::new(),
             current_stmt_start: None,
             tokens,
-            last_token_end: None,
+            next_pos,
         }
     }
 
     pub fn finish(self) -> Parse {
         Parse {
-            ranges: self.ranges,
+            ranges: self
+                .ranges
+                .iter()
+                .map(|(start, end)| {
+                    println!("{} {}", start, end);
+                    let from = self.tokens.get(*start);
+                    let to = self.tokens.get(*end).unwrap_or(&self.eof_token);
+
+                    TextRange::new(from.unwrap().span.start(), to.span.end())
+                })
+                .collect(),
             errors: self.errors,
         }
     }
 
     /// Start statement
-    pub fn start_stmt(&mut self) -> Token {
+    pub fn start_stmt(&mut self) {
         assert!(self.current_stmt_start.is_none());
-
-        let token = self.peek();
-
-        self.current_stmt_start = Some(token.span.start());
-
-        token
+        self.current_stmt_start = Some(self.next_pos);
     }
 
     /// Close statement
     pub fn close_stmt(&mut self) {
-        self.ranges.push(TextRange::new(
+        assert!(self.next_pos > 0);
+
+        self.ranges.push((
             self.current_stmt_start.expect("Expected active statement"),
-            self.last_token_end.expect("Expected last token end"),
+            self.next_pos - 1,
         ));
 
         self.current_stmt_start = None;
     }
 
-    fn advance(&mut self) -> Token {
-        let token = self.tokens.pop().unwrap_or(self.eof_token.clone());
+    fn advance(&mut self) -> &Token {
+        let mut first_relevant_token = None;
+        loop {
+            let token = self.tokens.get(self.next_pos).unwrap_or(&self.eof_token);
 
-        self.last_token_end = Some(token.span.end());
+            // we need to continue with next_pos until the next relevant token after we already
+            // found the first one
+            if !is_irrelevant_token(token) {
+                if let Some(t) = first_relevant_token {
+                    return t;
+                }
+                first_relevant_token = Some(token);
+            }
 
-        token
+            self.next_pos += 1;
+        }
     }
 
-    fn peek(&mut self) -> Token {
-        self.tokens
-            .last()
-            .cloned()
-            .unwrap_or(self.eof_token.clone())
+    fn peek(&self) -> &Token {
+        match self.tokens.get(self.next_pos) {
+            Some(token) => token,
+            None => &self.eof_token,
+        }
     }
 
     /// checks if the current token is of `kind` and advances if true
@@ -131,4 +161,9 @@ impl Parser {
     fn error_at(&mut self, error: String) {
         todo!();
     }
+}
+
+fn is_irrelevant_token(t: &Token) -> bool {
+    return WHITESPACE_TOKENS.contains(&t.kind)
+        && (t.kind != SyntaxKind::Newline || t.text.chars().count() == 1);
 }
