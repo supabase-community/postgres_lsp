@@ -35,6 +35,7 @@ use tokio_util::sync::CancellationToken;
 
 use crate::{
     client::{client_flags::ClientFlags, LspClient},
+    db_connection::DbConnection,
     utils::{file_path, from_proto, line_index_ext::LineIndexExt, normalize_uri, to_proto},
 };
 
@@ -50,22 +51,6 @@ enum InternalMessage {
     SetOptions(Options),
     RefreshSchemaCache,
     SetSchemaCache(SchemaCache),
-}
-
-#[derive(Debug)]
-struct DbConnection {
-    pub pool: PgPool,
-    connection_string: String,
-}
-
-impl DbConnection {
-    pub async fn new(connection_string: &str) -> Result<Self, sqlx::Error> {
-        let pool = PgPool::connect(connection_string).await?;
-        Ok(Self {
-            pool,
-            connection_string: connection_string.to_owned(),
-        })
-    }
 }
 
 /// `lsp-servers` `Connection` type uses a crossbeam channel, which is not compatible with tokio's async runtime.
@@ -110,21 +95,9 @@ pub struct Server {
 impl Server {
     pub fn init(connection: Connection) -> anyhow::Result<Self> {
         let client = LspClient::new(connection.sender.clone());
+        let cancel_token = Arc::new(CancellationToken::new());
 
-        let (internal_tx, internal_rx) = mpsc::unbounded_channel();
-
-        let (id, params) = connection.initialize_start()?;
-        let params: InitializeParams = serde_json::from_value(params)?;
-
-        let result = InitializeResult {
-            capabilities: Self::capabilities(),
-            server_info: Some(ServerInfo {
-                name: "Postgres LSP".to_owned(),
-                version: Some(env!("CARGO_PKG_VERSION").to_owned()),
-            }),
-        };
-
-        connection.initialize_finish(id, serde_json::to_value(result)?)?;
+        let (params, client_rx) = Self::establish_client_connection(connection, &cancel_token)?;
 
         let client_flags = Arc::new(ClientFlags::from_initialize_request_params(&params));
 
@@ -132,14 +105,12 @@ impl Server {
 
         let ide = Arc::new(Workspace::new());
 
+        let (internal_tx, internal_rx) = mpsc::unbounded_channel();
+
         let cloned_tx = internal_tx.clone();
         let cloned_ide = ide.clone();
         let cloned_pool = pool.clone();
         let cloned_client = client.clone();
-
-        let cancel_token = Arc::new(CancellationToken::new());
-
-        let client_rx = get_client_receiver(connection, cancel_token.clone());
 
         let server = Self {
             cancel_token,
@@ -239,68 +210,31 @@ impl Server {
         });
     }
 
-    async fn start_listening(&self) {
-        if self.db_conn.is_none() {
-            return;
+    async fn update_options(&mut self, options: Options) -> anyhow::Result<()> {
+        if options.db_connection_string.is_none() {
+            return Ok(());
         }
 
-        let pool = self.db_conn.as_ref().unwrap().pool.clone();
-        let tx = self.internal_tx.clone();
+        let new_conn = if self.db_conn.is_none() {
+            DbConnection::new(options.db_connection_string.clone().unwrap()).await?
+        } else {
+            let current_conn = self.db_conn.take().unwrap();
+            current_conn
+                .refresh_db_connection(options.db_connection_string.clone())
+                .await?
+        };
 
-        let mut listener = PgListener::connect_with(&pool).await.unwrap();
-        listener
-            .listen_all(["postgres_lsp", "pgrst"])
-            .await
-            .unwrap();
+        let internal_tx = self.internal_tx.clone();
+        self.spawn_with_cancel(async move {
+            new_conn.start_listening(move || {
+                internal_tx
+                    .send(InternalMessage::RefreshSchemaCache)
+                    .unwrap();
+            // TODO: handle result
+            }).await.unwrap()
+        });
 
-        loop {
-            match listener.recv().await {
-                Ok(notification) => {
-                    if notification.payload().to_string() == "reload schema" {
-                        tx.send(InternalMessage::RefreshSchemaCache).unwrap();
-                    }
-                }
-                Err(e) => {
-                    eprintln!("Listener error: {}", e);
-                    break;
-                }
-            }
-        }
-    }
-
-    async fn update_db_connection(&mut self, connection_string: Option<String>) {
-        if connection_string == self.db_conn.as_ref().map(|c| c.connection_string.clone()) {
-            return;
-        }
-        if let Some(conn) = self.db_conn.take() {
-            conn.pool.close().await;
-        }
-
-        if connection_string.is_none() {
-            return;
-        }
-
-        let new_conn = DbConnection::new(connection_string.unwrap().as_str()).await;
-
-        if new_conn.is_err() {
-            return;
-        }
-
-        self.db_conn = Some(new_conn.unwrap());
-
-        self.client
-            .send_notification::<ShowMessage>(ShowMessageParams {
-                typ: lsp_types::MessageType::INFO,
-                message: "Connection to database established".to_string(),
-            })
-            .unwrap();
-
-        self.refresh_schema_cache().await;
-        self.start_listening().await;
-    }
-
-    fn update_options(&mut self, options: Options) {
-        async_std::task::block_on(self.update_db_connection(options.db_connection_string));
+        Ok(())
     }
 
     fn capabilities() -> ServerCapabilities {
@@ -922,16 +856,40 @@ impl Server {
         });
     }
 
-    fn spawn_with_cancel<F>(&self, f: F) -> tokio::task::JoinHandle<()>
+    fn establish_client_connection(
+        connection: Connection,
+        cancel_token: &Arc<CancellationToken>,
+    ) -> anyhow::Result<(InitializeParams, mpsc::UnboundedReceiver<Message>)> {
+        let (id, params) = connection.initialize_start()?;
+
+        let params: InitializeParams = serde_json::from_value(params)?;
+
+        let result = InitializeResult {
+            capabilities: Self::capabilities(),
+            server_info: Some(ServerInfo {
+                name: "Postgres LSP".to_owned(),
+                version: Some(env!("CARGO_PKG_VERSION").to_owned()),
+            }),
+        };
+
+        connection.initialize_finish(id, serde_json::to_value(result)?)?;
+
+        let client_rx = get_client_receiver(connection, cancel_token.clone());
+
+        Ok((params, client_rx))
+    }
+
+    fn spawn_with_cancel<F, O>(&self, f: F) -> tokio::task::JoinHandle<Option<F::Output>>
     where
-        F: Future + Send + 'static,
+        F: Future<Output = O> + Send + 'static,
+        O: Send + 'static,
     {
         let cancel_token = self.cancel_token.clone();
         tokio::spawn(async move {
             tokio::select! {
-                _ = cancel_token.cancelled() => {},
-                _ = f => {}
-            };
+                _ = cancel_token.cancelled() => None,
+                output = f => Some(output)
+            }
         })
     }
 
