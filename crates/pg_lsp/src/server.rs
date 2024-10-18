@@ -40,17 +40,14 @@ use crate::{
 };
 
 use self::{debouncer::EventDebouncer, options::Options};
-use sqlx::{
-    postgres::{PgListener, PgPool},
-    Executor,
-};
+use sqlx::{postgres::PgPool, Executor};
 
 #[derive(Debug)]
 enum InternalMessage {
     PublishDiagnostics(lsp_types::Url),
     SetOptions(Options),
-    RefreshSchemaCache,
     SetSchemaCache(SchemaCache),
+    SetDatabaseConnection(DbConnection),
 }
 
 /// `lsp-servers` `Connection` type uses a crossbeam channel, which is not compatible with tokio's async runtime.
@@ -210,29 +207,54 @@ impl Server {
         });
     }
 
-    async fn update_options(&mut self, options: Options) -> anyhow::Result<()> {
-        if options.db_connection_string.is_none() {
+    fn update_db_connection(&self, options: Options) -> anyhow::Result<()> {
+        if options.db_connection_string.is_none()
+            || self
+                .db_conn
+                .as_ref()
+                .is_some_and(|c| c.connected_to(options.db_connection_string.as_ref().unwrap()))
+        {
             return Ok(());
         }
 
-        let new_conn = if self.db_conn.is_none() {
-            DbConnection::new(options.db_connection_string.clone().unwrap()).await?
-        } else {
-            let current_conn = self.db_conn.take().unwrap();
-            current_conn
-                .refresh_db_connection(options.db_connection_string.clone())
-                .await?
-        };
+        let connection_string = options.db_connection_string.unwrap();
 
         let internal_tx = self.internal_tx.clone();
+        let client = self.client.clone();
         self.spawn_with_cancel(async move {
-            new_conn.start_listening(move || {
-                internal_tx
-                    .send(InternalMessage::RefreshSchemaCache)
-                    .unwrap();
-            // TODO: handle result
-            }).await.unwrap()
+            match DbConnection::new(connection_string.into()).await {
+                Ok(conn) => {
+                    internal_tx
+                        .send(InternalMessage::SetDatabaseConnection(conn))
+                        .unwrap();
+                }
+                Err(why) => {
+                    client.send_info_notification(&format!("Unable to update database connection: {}", why));
+                    
+                }
+            }
         });
+
+        Ok(())
+    }
+
+    async fn listen_for_schema_updates(&mut self) -> anyhow::Result<()> {
+        if self.db_conn.is_none() {
+            eprintln!("Error trying to listen for schema updates: No database connection");
+            return Ok(());
+        }
+
+        let internal_tx = self.internal_tx.clone();
+        self.db_conn
+            .as_mut()
+            .unwrap()
+            .listen_for_schema_updates(move |schema_cache| {
+                internal_tx
+                    .send(InternalMessage::SetSchemaCache(schema_cache))
+                    .unwrap();
+                // TODO: handle result
+            })
+            .await?;
 
         Ok(())
     }
@@ -692,26 +714,6 @@ impl Server {
         });
     }
 
-    async fn refresh_schema_cache(&self) {
-        if self.db_conn.is_none() {
-            return;
-        }
-
-        let tx = self.internal_tx.clone();
-        let conn = self.db_conn.as_ref().unwrap().pool.clone();
-        let client = self.client.clone();
-
-        client
-            .send_notification::<ShowMessage>(ShowMessageParams {
-                typ: lsp_types::MessageType::INFO,
-                message: "Refreshing schema cache...".to_string(),
-            })
-            .unwrap();
-        let schema_cache = SchemaCache::load(&conn).await;
-        tx.send(InternalMessage::SetSchemaCache(schema_cache))
-            .unwrap();
-    }
-
     fn did_change_configuration(
         &mut self,
         params: DidChangeConfigurationParams,
@@ -720,7 +722,7 @@ impl Server {
             self.pull_options();
         } else {
             let options = self.client.parse_options(params.settings)?;
-            self.update_options(options);
+            self.update_db_connection(options);
         }
 
         Ok(())
@@ -744,14 +746,14 @@ impl Server {
                 msg = self.client_rx.recv() => {
                     match msg {
                         None => panic!("The LSP's client closed, but not via an 'exit' method. This should never happen."),
-                        Some(m) => self.handle_message(m)
+                        Some(m) => self.handle_message(m).await
                     }
                 },
             }?;
         }
     }
 
-    fn handle_message(&mut self, msg: Message) -> anyhow::Result<()> {
+    async fn handle_message(&mut self, msg: Message) -> anyhow::Result<()> {
         match msg {
             Message::Request(request) => {
                 if let Some(response) = dispatch::RequestDispatcher::new(request)
@@ -768,7 +770,8 @@ impl Server {
             Message::Notification(notification) => {
                 dispatch::NotificationDispatcher::new(notification)
                     .on::<DidChangeConfiguration, _>(|params| {
-                        self.did_change_configuration(params)
+                        self.did_change_configuration(params);
+                        Ok(())
                     })?
                     .on::<DidCloseTextDocument, _>(|params| self.did_close(params))?
                     .on::<DidOpenTextDocument, _>(|params| self.did_open(params))?
@@ -788,17 +791,24 @@ impl Server {
     async fn handle_internal_message(&mut self, msg: InternalMessage) -> anyhow::Result<()> {
         match msg {
             InternalMessage::SetSchemaCache(c) => {
+                self.client
+                    .send_info_notification("Refreshing Schema Cache...");
                 self.ide.set_schema_cache(c);
+                self.client.send_info_notification("Updated Schema Cache.");
                 self.compute_now();
-            }
-            InternalMessage::RefreshSchemaCache => {
-                self.refresh_schema_cache().await;
             }
             InternalMessage::PublishDiagnostics(uri) => {
                 self.publish_diagnostics(uri)?;
             }
             InternalMessage::SetOptions(options) => {
-                self.update_options(options);
+                self.update_db_connection(options);
+            }
+            InternalMessage::SetDatabaseConnection(conn) => {
+                let current = self.db_conn.replace(conn);
+                if current.is_some() {
+                    current.unwrap().close().await
+                }
+                self.listen_for_schema_updates();
             }
         }
 

@@ -50,6 +50,14 @@ impl LspClient {
         Ok(())
     }
 
+    /// This will ignore any errors that occur while sending the notification.
+    pub fn send_info_notification(&self, message: &str) {
+        let _ = self.send_notification::<ShowMessage>(ShowMessageParams {
+            message: message.into(),
+            typ: MessageType::INFO,
+        });
+    }
+
     pub fn send_request<R>(&self, params: R::Params) -> Result<R::Result>
     where
         R: lsp_types::request::Request,
