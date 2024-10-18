@@ -59,9 +59,15 @@ fn get_client_receiver(
     let (message_tx, message_rx) = mpsc::unbounded_channel();
 
     tokio::task::spawn(async move {
-        // TODO: improve Result handling
         loop {
-            let msg = connection.receiver.recv().unwrap();
+            let msg = match connection.receiver.recv() {
+                Ok(msg) => msg, 
+                Err(e) => {
+                    eprint!("Connection was closed by LSP client: {}", e);
+                    cancel_token.cancel();
+                    return;
+                }
+            };
 
             match msg {
                 Message::Request(r) if connection.handle_shutdown(&r).unwrap() => {
@@ -69,6 +75,7 @@ fn get_client_receiver(
                     return;
                 }
 
+                // any non-shutdown request is forwarded to the server
                 _ => message_tx.send(msg).unwrap(),
             };
         }
