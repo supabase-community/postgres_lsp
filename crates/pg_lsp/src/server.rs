@@ -2,8 +2,6 @@ mod debouncer;
 mod dispatch;
 pub mod options;
 
-use async_std::task::{self};
-use crossbeam_channel::{unbounded, Receiver, Sender};
 use lsp_server::{Connection, ErrorCode, Message, RequestId};
 use lsp_types::{
     notification::{
@@ -29,51 +27,69 @@ use pg_hover::HoverParams;
 use pg_schema_cache::SchemaCache;
 use pg_workspace::Workspace;
 use serde::{de::DeserializeOwned, Serialize};
-use std::{collections::HashSet, sync::Arc, time::Duration};
+use std::{collections::HashSet, future::Future, sync::Arc, time::Duration};
 use text_size::TextSize;
-use threadpool::ThreadPool;
+
+use tokio::sync::mpsc;
+use tokio_util::sync::CancellationToken;
 
 use crate::{
     client::{client_flags::ClientFlags, LspClient},
+    db_connection::DbConnection,
     utils::{file_path, from_proto, line_index_ext::LineIndexExt, normalize_uri, to_proto},
 };
 
 use self::{debouncer::EventDebouncer, options::Options};
-use sqlx::{
-    postgres::{PgListener, PgPool},
-    Executor,
-};
+use sqlx::{postgres::PgPool, Executor};
 
 #[derive(Debug)]
 enum InternalMessage {
     PublishDiagnostics(lsp_types::Url),
     SetOptions(Options),
-    RefreshSchemaCache,
     SetSchemaCache(SchemaCache),
+    SetDatabaseConnection(DbConnection),
 }
 
-#[derive(Debug)]
-struct DbConnection {
-    pub pool: PgPool,
-    connection_string: String,
-}
+/// `lsp-servers` `Connection` type uses a crossbeam channel, which is not compatible with tokio's async runtime.
+/// For now, we move it into a separate task and use tokio's channels to communicate.
+fn get_client_receiver(
+    connection: Connection,
+    cancel_token: Arc<CancellationToken>,
+) -> mpsc::UnboundedReceiver<Message> {
+    let (message_tx, message_rx) = mpsc::unbounded_channel();
 
-impl DbConnection {
-    pub async fn new(connection_string: &str) -> Result<Self, sqlx::Error> {
-        let pool = PgPool::connect(connection_string).await?;
-        Ok(Self {
-            pool,
-            connection_string: connection_string.to_owned(),
-        })
-    }
+    tokio::task::spawn(async move {
+        loop {
+            let msg = match connection.receiver.recv() {
+                Ok(msg) => msg, 
+                Err(e) => {
+                    eprint!("Connection was closed by LSP client: {}", e);
+                    cancel_token.cancel();
+                    return;
+                }
+            };
+
+            match msg {
+                Message::Request(r) if connection.handle_shutdown(&r).unwrap() => {
+                    cancel_token.cancel();
+                    return;
+                }
+
+                // any non-shutdown request is forwarded to the server
+                _ => message_tx.send(msg).unwrap(),
+            };
+        }
+    });
+
+    message_rx
 }
 
 pub struct Server {
-    connection: Arc<Connection>,
+    client_rx: mpsc::UnboundedReceiver<Message>,
+    cancel_token: Arc<tokio_util::sync::CancellationToken>,
     client: LspClient,
-    internal_tx: Sender<InternalMessage>,
-    internal_rx: Receiver<InternalMessage>,
-    pool: Arc<ThreadPool>,
+    internal_tx: mpsc::UnboundedSender<InternalMessage>,
+    internal_rx: mpsc::UnboundedReceiver<InternalMessage>,
     client_flags: Arc<ClientFlags>,
     ide: Arc<Workspace>,
     db_conn: Option<DbConnection>,
@@ -81,41 +97,29 @@ pub struct Server {
 }
 
 impl Server {
-    pub fn init(connection: Connection) -> anyhow::Result<()> {
+    pub fn init(connection: Connection) -> anyhow::Result<Self> {
         let client = LspClient::new(connection.sender.clone());
+        let cancel_token = Arc::new(CancellationToken::new());
 
-        let (internal_tx, internal_rx) = unbounded();
+        let (client_flags, client_rx) = Self::establish_client_connection(connection, &cancel_token)?;
 
-        let (id, params) = connection.initialize_start()?;
-        let params: InitializeParams = serde_json::from_value(params)?;
-
-        let result = InitializeResult {
-            capabilities: Self::capabilities(),
-            server_info: Some(ServerInfo {
-                name: "Postgres LSP".to_owned(),
-                version: Some(env!("CARGO_PKG_VERSION").to_owned()),
-            }),
-        };
-
-        connection.initialize_finish(id, serde_json::to_value(result)?)?;
-
-        let client_flags = Arc::new(from_proto::client_flags(params.capabilities));
-
-        let pool = Arc::new(threadpool::Builder::new().build());
 
         let ide = Arc::new(Workspace::new());
 
+        let (internal_tx, internal_rx) = mpsc::unbounded_channel();
+
         let cloned_tx = internal_tx.clone();
         let cloned_ide = ide.clone();
-        let cloned_pool = pool.clone();
+        let pool = Arc::new(threadpool::Builder::new().build());
         let cloned_client = client.clone();
 
         let server = Self {
-            connection: Arc::new(connection),
+            cancel_token,
+            client_rx,
             internal_rx,
             internal_tx,
             client,
-            client_flags,
+            client_flags: Arc::new(client_flags),
             db_conn: None,
             ide,
             compute_debouncer: EventDebouncer::new(
@@ -124,7 +128,7 @@ impl Server {
                     let inner_cloned_ide = cloned_ide.clone();
                     let inner_cloned_tx = cloned_tx.clone();
                     let inner_cloned_client = cloned_client.clone();
-                    cloned_pool.execute(move || {
+                    pool.execute(move || {
                         inner_cloned_client
                             .send_notification::<ShowMessage>(ShowMessageParams {
                                 typ: lsp_types::MessageType::INFO,
@@ -155,11 +159,9 @@ impl Server {
                     });
                 },
             ),
-            pool,
         };
 
-        server.run()?;
-        Ok(())
+        Ok(server)
     }
 
     fn compute_now(&self) {
@@ -170,7 +172,7 @@ impl Server {
 
         self.compute_debouncer.clear();
 
-        self.pool.execute(move || {
+        self.spawn_with_cancel(async move {
             client
                 .send_notification::<ShowMessage>(ShowMessageParams {
                     typ: lsp_types::MessageType::INFO,
@@ -209,71 +211,58 @@ impl Server {
         });
     }
 
-    fn start_listening(&self) {
-        if self.db_conn.is_none() {
-            return;
+    fn update_db_connection(&self, options: Options) -> anyhow::Result<()> {
+        if options.db_connection_string.is_none()
+            || self
+                .db_conn
+                .as_ref()
+                // if the connection is already connected to the same database, do nothing
+                .is_some_and(|c| c.connected_to(options.db_connection_string.as_ref().unwrap()))
+        {
+            return Ok(());
         }
 
-        let pool = self.db_conn.as_ref().unwrap().pool.clone();
-        let tx = self.internal_tx.clone();
+        let connection_string = options.db_connection_string.unwrap();
 
-        task::spawn(async move {
-            let mut listener = PgListener::connect_with(&pool).await.unwrap();
-            listener
-                .listen_all(["postgres_lsp", "pgrst"])
-                .await
-                .unwrap();
-
-            loop {
-                match listener.recv().await {
-                    Ok(notification) => {
-                        if notification.payload().to_string() == "reload schema" {
-                            tx.send(InternalMessage::RefreshSchemaCache).unwrap();
-                        }
-                    }
-                    Err(e) => {
-                        eprintln!("Listener error: {}", e);
-                        break;
-                    }
+        let internal_tx = self.internal_tx.clone();
+        let client = self.client.clone();
+        self.spawn_with_cancel(async move {
+            match DbConnection::new(connection_string.into()).await {
+                Ok(conn) => {
+                    internal_tx
+                        .send(InternalMessage::SetDatabaseConnection(conn))
+                        .unwrap();
+                }
+                Err(why) => {
+                    client.send_info_notification(&format!(
+                        "Unable to update database connection: {}",
+                        why
+                    ));
                 }
             }
         });
+
+        Ok(())
     }
 
-    async fn update_db_connection(&mut self, connection_string: Option<String>) {
-        if connection_string == self.db_conn.as_ref().map(|c| c.connection_string.clone()) {
-            return;
-        }
-        if let Some(conn) = self.db_conn.take() {
-            conn.pool.close().await;
+    async fn listen_for_schema_updates(&mut self) -> anyhow::Result<()> {
+        if self.db_conn.is_none() {
+            eprintln!("Error trying to listen for schema updates: No database connection");
+            return Ok(());
         }
 
-        if connection_string.is_none() {
-            return;
-        }
-
-        let new_conn = DbConnection::new(connection_string.unwrap().as_str()).await;
-
-        if new_conn.is_err() {
-            return;
-        }
-
-        self.db_conn = Some(new_conn.unwrap());
-
-        self.client
-            .send_notification::<ShowMessage>(ShowMessageParams {
-                typ: lsp_types::MessageType::INFO,
-                message: "Connection to database established".to_string(),
+        let internal_tx = self.internal_tx.clone();
+        self.db_conn
+            .as_mut()
+            .unwrap()
+            .listen_for_schema_updates(move |schema_cache| {
+                internal_tx
+                    .send(InternalMessage::SetSchemaCache(schema_cache))
+                    .expect("LSP Server: Failed to send internal message.");
             })
-            .unwrap();
+            .await?;
 
-        self.refresh_schema_cache();
-
-        self.start_listening();
-    }
-
-    fn update_options(&mut self, options: Options) {
-        async_std::task::block_on(self.update_db_connection(options.db_connection_string));
+        Ok(())
     }
 
     fn capabilities() -> ServerCapabilities {
@@ -687,15 +676,17 @@ impl Server {
         Q: FnOnce() -> anyhow::Result<R> + Send + 'static,
     {
         let client = self.client.clone();
-        self.pool.execute(move || match query() {
-            Ok(result) => {
-                let response = lsp_server::Response::new_ok(id, result);
-                client.send_response(response).unwrap();
-            }
-            Err(why) => {
-                client
-                    .send_error(id, ErrorCode::InternalError, why.to_string())
-                    .unwrap();
+        self.spawn_with_cancel(async move {
+            match query() {
+                Ok(result) => {
+                    let response = lsp_server::Response::new_ok(id, result);
+                    client.send_response(response).unwrap();
+                }
+                Err(why) => {
+                    client
+                        .send_error(id, ErrorCode::InternalError, why.to_string())
+                        .unwrap();
+                }
             }
         });
     }
@@ -721,31 +712,11 @@ impl Server {
         let client = self.client.clone();
         let ide = Arc::clone(&self.ide);
 
-        self.pool.execute(move || {
+        self.spawn_with_cancel(async move {
             let response = lsp_server::Response::new_ok(id, query(&ide));
-            client.send_response(response).unwrap();
-        });
-    }
-
-    fn refresh_schema_cache(&self) {
-        if self.db_conn.is_none() {
-            return;
-        }
-
-        let tx = self.internal_tx.clone();
-        let conn = self.db_conn.as_ref().unwrap().pool.clone();
-        let client = self.client.clone();
-
-        async_std::task::spawn(async move {
             client
-                .send_notification::<ShowMessage>(ShowMessageParams {
-                    typ: lsp_types::MessageType::INFO,
-                    message: "Refreshing schema cache...".to_string(),
-                })
-                .unwrap();
-            let schema_cache = SchemaCache::load(&conn).await;
-            tx.send(InternalMessage::SetSchemaCache(schema_cache))
-                .unwrap();
+                .send_response(response)
+                .expect("Failed to send query to client");
         });
     }
 
@@ -753,84 +724,103 @@ impl Server {
         &mut self,
         params: DidChangeConfigurationParams,
     ) -> anyhow::Result<()> {
-        if self.client_flags.configuration_pull {
+        if self.client_flags.has_configuration {
             self.pull_options();
         } else {
             let options = self.client.parse_options(params.settings)?;
-            self.update_options(options);
+            self.update_db_connection(options)?;
         }
 
         Ok(())
     }
 
-    fn process_messages(&mut self) -> anyhow::Result<()> {
+    async fn process_messages(&mut self) -> anyhow::Result<()> {
         loop {
-            crossbeam_channel::select! {
-                recv(&self.connection.receiver) -> msg => {
-                    match msg? {
-                        Message::Request(request) => {
-                            if self.connection.handle_shutdown(&request)? {
-                                return Ok(());
-                            }
-
-                            if let Some(response) = dispatch::RequestDispatcher::new(request)
-                                .on::<InlayHintRequest, _>(|id, params| self.inlay_hint(id, params))?
-                                .on::<HoverRequest, _>(|id, params| self.hover(id, params))?
-                                .on::<ExecuteCommand,_>(|id, params| self.execute_command(id, params))?
-                                .on::<Completion, _>(|id, params| {
-                                    self.completion(id, params)
-                                })?
-                                .on::<CodeActionRequest, _>(|id, params| {
-                                    self.code_actions(id, params)
-                                })?
-                                .default()
-                            {
-                                self.client.send_response(response)?;
-                            }
-                        }
-                        Message::Notification(notification) => {
-                            dispatch::NotificationDispatcher::new(notification)
-                                .on::<DidChangeConfiguration, _>(|params| {
-                                    self.did_change_configuration(params)
-                                })?
-                                .on::<DidCloseTextDocument, _>(|params| self.did_close(params))?
-                                .on::<DidOpenTextDocument, _>(|params| self.did_open(params))?
-                                .on::<DidChangeTextDocument, _>(|params| self.did_change(params))?
-                                .on::<DidSaveTextDocument, _>(|params| self.did_save(params))?
-                                .on::<DidCloseTextDocument, _>(|params| self.did_close(params))?
-                                .default();
-                        }
-                        Message::Response(response) => {
-                            self.client.recv_response(response)?;
-                        }
-                    };
+            tokio::select! {
+                _ = self.cancel_token.cancelled() => {
+                    // Close the loop, proceed to shutdown.
+                    return Ok(())
                 },
-                recv(&self.internal_rx) -> msg => {
-                    match msg? {
-                        InternalMessage::SetSchemaCache(c) => {
-                            self.ide.set_schema_cache(c);
-                            self.compute_now();
-                        }
-                        InternalMessage::RefreshSchemaCache => {
-                            self.refresh_schema_cache();
-                        }
-                        InternalMessage::PublishDiagnostics(uri) => {
-                            self.publish_diagnostics(uri)?;
-                        }
-                        InternalMessage::SetOptions(options) => {
-                            self.update_options(options);
-                        }
-                    };
-                }
-            };
+
+                msg = self.internal_rx.recv() => {
+                    match msg {
+                        None => panic!("The LSP's internal sender closed. This should never happen."),
+                        Some(m) => self.handle_internal_message(m).await
+                    }
+                },
+
+                msg = self.client_rx.recv() => {
+                    match msg {
+                        None => panic!("The LSP's client closed, but not via an 'exit' method. This should never happen."),
+                        Some(m) => self.handle_message(m).await
+                    }
+                },
+            }?;
         }
     }
 
-    fn pull_options(&mut self) {
-        if !self.client_flags.configuration_pull {
-            return;
+    async fn handle_message(&mut self, msg: Message) -> anyhow::Result<()> {
+        match msg {
+            Message::Request(request) => {
+                if let Some(response) = dispatch::RequestDispatcher::new(request)
+                    .on::<InlayHintRequest, _>(|id, params| self.inlay_hint(id, params))?
+                    .on::<HoverRequest, _>(|id, params| self.hover(id, params))?
+                    .on::<ExecuteCommand, _>(|id, params| self.execute_command(id, params))?
+                    .on::<Completion, _>(|id, params| self.completion(id, params))?
+                    .on::<CodeActionRequest, _>(|id, params| self.code_actions(id, params))?
+                    .default()
+                {
+                    self.client.send_response(response)?;
+                }
+            }
+            Message::Notification(notification) => {
+                dispatch::NotificationDispatcher::new(notification)
+                    .on::<DidChangeConfiguration, _>(|params| {
+                        self.did_change_configuration(params)
+                    })?
+                    .on::<DidCloseTextDocument, _>(|params| self.did_close(params))?
+                    .on::<DidOpenTextDocument, _>(|params| self.did_open(params))?
+                    .on::<DidChangeTextDocument, _>(|params| self.did_change(params))?
+                    .on::<DidSaveTextDocument, _>(|params| self.did_save(params))?
+                    .on::<DidCloseTextDocument, _>(|params| self.did_close(params))?
+                    .default();
+            }
+            Message::Response(response) => {
+                self.client.recv_response(response)?;
+            }
         }
 
+        Ok(())
+    }
+
+    async fn handle_internal_message(&mut self, msg: InternalMessage) -> anyhow::Result<()> {
+        match msg {
+            InternalMessage::SetSchemaCache(c) => {
+                self.client
+                    .send_info_notification("Refreshing Schema Cache...");
+                self.ide.set_schema_cache(c);
+                self.client.send_info_notification("Updated Schema Cache.");
+                self.compute_now();
+            }
+            InternalMessage::PublishDiagnostics(uri) => {
+                self.publish_diagnostics(uri)?;
+            }
+            InternalMessage::SetOptions(options) => {
+                self.update_db_connection(options)?;
+            }
+            InternalMessage::SetDatabaseConnection(conn) => {
+                let current = self.db_conn.replace(conn);
+                if current.is_some() {
+                    current.unwrap().close().await
+                }
+                self.listen_for_schema_updates().await?;
+            }
+        }
+
+        Ok(())
+    }
+
+    fn pull_options(&mut self) {
         let params = ConfigurationParams {
             items: vec![ConfigurationItem {
                 section: Some("postgres_lsp".to_string()),
@@ -839,53 +829,97 @@ impl Server {
         };
 
         let client = self.client.clone();
-        let sender = self.internal_tx.clone();
-        self.pool.execute(move || {
+        let internal_tx = self.internal_tx.clone();
+        self.spawn_with_cancel(async move {
             match client.send_request::<WorkspaceConfiguration>(params) {
                 Ok(mut json) => {
                     let options = client
                         .parse_options(json.pop().expect("invalid configuration request"))
                         .unwrap();
 
-                    sender.send(InternalMessage::SetOptions(options)).unwrap();
+                    if let Err(why) = internal_tx.send(InternalMessage::SetOptions(options)) {
+                        println!("Failed to set internal options: {}", why);
+                    }
                 }
-                Err(_why) => {
-                    // log::error!("Retrieving configuration failed: {}", why);
+                Err(why) => {
+                    println!("Retrieving configuration failed: {}", why);
                 }
             };
         });
     }
 
     fn register_configuration(&mut self) {
-        if self.client_flags.configuration_push {
-            let registration = Registration {
-                id: "pull-config".to_string(),
-                method: DidChangeConfiguration::METHOD.to_string(),
-                register_options: None,
-            };
+        let registration = Registration {
+            id: "pull-config".to_string(),
+            method: DidChangeConfiguration::METHOD.to_string(),
+            register_options: None,
+        };
 
-            let params = RegistrationParams {
-                registrations: vec![registration],
-            };
+        let params = RegistrationParams {
+            registrations: vec![registration],
+        };
 
-            let client = self.client.clone();
-            self.pool.execute(move || {
-                if let Err(_why) = client.send_request::<RegisterCapability>(params) {
-                    // log::error!(
-                    //     "Failed to register \"{}\" notification: {}",
-                    //     DidChangeConfiguration::METHOD,
-                    //     why
-                    // );
-                }
-            });
-        }
+        let client = self.client.clone();
+        self.spawn_with_cancel(async move {
+            if let Err(why) = client.send_request::<RegisterCapability>(params) {
+                println!(
+                    "Failed to register \"{}\" notification: {}",
+                    DidChangeConfiguration::METHOD,
+                    why
+                );
+            }
+        });
     }
 
-    pub fn run(mut self) -> anyhow::Result<()> {
-        self.register_configuration();
-        self.pull_options();
-        self.process_messages()?;
-        self.pool.join();
-        Ok(())
+    fn establish_client_connection(
+        connection: Connection,
+        cancel_token: &Arc<CancellationToken>,
+    ) -> anyhow::Result<(ClientFlags, mpsc::UnboundedReceiver<Message>)> {
+        let (id, params) = connection.initialize_start()?;
+
+        let params: InitializeParams = serde_json::from_value(params)?;
+
+        let result = InitializeResult {
+            capabilities: Self::capabilities(),
+            server_info: Some(ServerInfo {
+                name: "Postgres LSP".to_owned(),
+                version: Some(env!("CARGO_PKG_VERSION").to_owned()),
+            }),
+        };
+
+        connection.initialize_finish(id, serde_json::to_value(result)?)?;
+
+        let client_rx = get_client_receiver(connection, cancel_token.clone());
+
+        let client_flags = ClientFlags::from_initialize_request_params(&params);
+
+        Ok((client_flags, client_rx))
+    }
+
+    /// Spawns an asynchronous task that can be cancelled with the `Server`'s `cancel_token`.
+    fn spawn_with_cancel<F, O>(&self, f: F) -> tokio::task::JoinHandle<Option<F::Output>>
+    where
+        F: Future<Output = O> + Send + 'static,
+        O: Send + 'static,
+    {
+        let cancel_token = self.cancel_token.clone();
+        tokio::spawn(async move {
+            tokio::select! {
+                _ = cancel_token.cancelled() => None,
+                output = f => Some(output)
+            }
+        })
+    }
+
+    pub async fn run(mut self) -> anyhow::Result<()> {
+        if self.client_flags.will_push_configuration {
+            self.register_configuration();
+        }
+
+        if self.client_flags.has_configuration {
+            self.pull_options();
+        }
+
+        self.process_messages().await
     }
 }
