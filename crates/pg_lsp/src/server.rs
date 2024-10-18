@@ -94,11 +94,8 @@ impl Server {
         let client = LspClient::new(connection.sender.clone());
         let cancel_token = Arc::new(CancellationToken::new());
 
-        let (params, client_rx) = Self::establish_client_connection(connection, &cancel_token)?;
+        let (client_flags, client_rx) = Self::establish_client_connection(connection, &cancel_token)?;
 
-        let client_flags = Arc::new(ClientFlags::from_initialize_request_params(&params));
-
-        let pool = Arc::new(threadpool::Builder::new().build());
 
         let ide = Arc::new(Workspace::new());
 
@@ -106,7 +103,7 @@ impl Server {
 
         let cloned_tx = internal_tx.clone();
         let cloned_ide = ide.clone();
-        let cloned_pool = pool.clone();
+        let pool = Arc::new(threadpool::Builder::new().build());
         let cloned_client = client.clone();
 
         let server = Self {
@@ -115,7 +112,7 @@ impl Server {
             internal_rx,
             internal_tx,
             client,
-            client_flags,
+            client_flags: Arc::new(client_flags),
             db_conn: None,
             ide,
             compute_debouncer: EventDebouncer::new(
@@ -124,7 +121,7 @@ impl Server {
                     let inner_cloned_ide = cloned_ide.clone();
                     let inner_cloned_tx = cloned_tx.clone();
                     let inner_cloned_client = cloned_client.clone();
-                    cloned_pool.execute(move || {
+                    pool.execute(move || {
                         inner_cloned_client
                             .send_notification::<ShowMessage>(ShowMessageParams {
                                 typ: lsp_types::MessageType::INFO,
@@ -229,8 +226,10 @@ impl Server {
                         .unwrap();
                 }
                 Err(why) => {
-                    client.send_info_notification(&format!("Unable to update database connection: {}", why));
-                    
+                    client.send_info_notification(&format!(
+                        "Unable to update database connection: {}",
+                        why
+                    ));
                 }
             }
         });
@@ -868,7 +867,7 @@ impl Server {
     fn establish_client_connection(
         connection: Connection,
         cancel_token: &Arc<CancellationToken>,
-    ) -> anyhow::Result<(InitializeParams, mpsc::UnboundedReceiver<Message>)> {
+    ) -> anyhow::Result<(ClientFlags, mpsc::UnboundedReceiver<Message>)> {
         let (id, params) = connection.initialize_start()?;
 
         let params: InitializeParams = serde_json::from_value(params)?;
@@ -885,9 +884,12 @@ impl Server {
 
         let client_rx = get_client_receiver(connection, cancel_token.clone());
 
-        Ok((params, client_rx))
+        let client_flags = ClientFlags::from_initialize_request_params(&params);
+
+        Ok((client_flags, client_rx))
     }
 
+    /// Spawns an asynchronous task that can be cancelled with the `Server`'s `cancel_token`.
     fn spawn_with_cancel<F, O>(&self, f: F) -> tokio::task::JoinHandle<Option<F::Output>>
     where
         F: Future<Output = O> + Send + 'static,
@@ -911,8 +913,6 @@ impl Server {
             self.pull_options();
         }
 
-        self.process_messages().await?;
-
-        Ok(())
+        self.process_messages().await
     }
 }

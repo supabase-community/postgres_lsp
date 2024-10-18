@@ -32,10 +32,7 @@ impl<B> DebouncerThread<B> {
                 }
             }
         });
-        Self {
-            mutex,
-            thread,
-        }
+        Self { mutex, thread }
     }
 }
 
