@@ -2,7 +2,7 @@ use pg_lexer::{SyntaxKind, Token, TokenType};
 
 use super::{
     data::at_statement_start,
-    dml::{cte, select},
+    dml::{cte, delete, insert, select, update},
     Parser,
 };
 
@@ -16,7 +16,9 @@ pub fn source(p: &mut Parser) {
                 break;
             }
             Token {
-                token_type: TokenType::Whitespace | TokenType::NoKeyword,
+                // we might want to ignore TokenType::NoKeyword here too
+                // but this will lead to invalid statements to not being picked up
+                token_type: TokenType::Whitespace,
                 ..
             } => {
                 p.advance();
@@ -38,20 +40,16 @@ pub(crate) fn statement(p: &mut Parser) {
             select(p);
         }
         SyntaxKind::Insert => {
-            todo!();
-            // insert(p);
+            insert(p);
         }
         SyntaxKind::Update => {
-            todo!();
-            // update(p);
+            update(p);
         }
         SyntaxKind::DeleteP => {
-            todo!();
-            // delete(p);
+            delete(p);
         }
-        t => {
-            panic!("stmt: Unknown start token {:?}", t);
-            // unknown(p);
+        _ => {
+            unknown(p);
         }
     }
     p.close_stmt();

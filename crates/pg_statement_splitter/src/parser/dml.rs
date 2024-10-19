@@ -26,3 +26,23 @@ pub(crate) fn select(p: &mut Parser) {
 
     unknown(p);
 }
+
+pub(crate) fn insert(p: &mut Parser) {
+    p.expect(SyntaxKind::Insert);
+    p.expect(SyntaxKind::Into);
+
+    unknown(p);
+}
+
+pub(crate) fn update(p: &mut Parser) {
+    p.expect(SyntaxKind::Update);
+
+    unknown(p);
+}
+
+pub(crate) fn delete(p: &mut Parser) {
+    p.expect(SyntaxKind::DeleteP);
+    p.expect(SyntaxKind::From);
+
+    unknown(p);
+}

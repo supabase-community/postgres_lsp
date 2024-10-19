@@ -40,14 +40,7 @@ impl Parser {
         // we dont care about whitespace tokens, except for double newlines
         // to make everything simpler, we just filter them out
         // the token holds the text range, so we dont need to worry about that
-        let tokens = lex(sql)
-            .iter()
-            .filter(|t| {
-                return !WHITESPACE_TOKENS.contains(&t.kind)
-                    || (t.kind == SyntaxKind::Newline && t.text.chars().count() > 1);
-            })
-            .cloned()
-            .collect::<Vec<_>>();
+        let tokens = lex(sql);
 
         let eof_token = Token::eof(usize::from(
             tokens
@@ -104,9 +97,25 @@ impl Parser {
     pub fn close_stmt(&mut self) {
         assert!(self.next_pos > 0);
 
+        // go back the positions until we find the first relevant token
+        let mut end_token_pos = self.next_pos - 1;
+        loop {
+            let token = self.tokens.get(end_token_pos);
+
+            if end_token_pos == 0 || token.is_none() {
+                break;
+            }
+
+            if !is_irrelevant_token(token.unwrap()) {
+                break;
+            }
+
+            end_token_pos -= 1;
+        }
+
         self.ranges.push((
             self.current_stmt_start.expect("Expected active statement"),
-            self.next_pos - 1,
+            end_token_pos,
         ));
 
         self.current_stmt_start = None;
