@@ -37,9 +37,6 @@ pub struct Parse {
 
 impl Parser {
     pub fn new(sql: &str) -> Self {
-        // we dont care about whitespace tokens, except for double newlines
-        // to make everything simpler, we just filter them out
-        // the token holds the text range, so we dont need to worry about that
         let tokens = lex(sql);
 
         let eof_token = Token::eof(usize::from(
