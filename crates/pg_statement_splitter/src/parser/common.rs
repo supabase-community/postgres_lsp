@@ -124,10 +124,23 @@ pub(crate) fn unknown(p: &mut Parser, exclude: &[SyntaxKind]) {
             }
             t => match at_statement_start(t.kind, exclude) {
                 Some(SyntaxKind::Select) => {
-                    // we need to check for `as` here to not break on `select as`
-                    if p.look_back().map(|t| t.kind) != Some(SyntaxKind::As) {
+                    let prev = p.look_back().map(|t| t.kind);
+                    if [
+                        // for create view / table as
+                        SyntaxKind::As,
+                        // for create rule
+                        SyntaxKind::On,
+                        // for create rule
+                        SyntaxKind::Also,
+                        // for create rule
+                        SyntaxKind::Instead,
+                    ]
+                    .iter()
+                    .all(|x| Some(x) != prev.as_ref())
+                    {
                         break;
                     }
+
                     p.advance();
                 }
                 Some(SyntaxKind::Insert) | Some(SyntaxKind::Update) | Some(SyntaxKind::DeleteP) => {
