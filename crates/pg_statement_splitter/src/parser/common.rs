@@ -2,6 +2,7 @@ use pg_lexer::{SyntaxKind, Token, TokenType};
 
 use super::{
     data::at_statement_start,
+    ddl::create,
     dml::{cte, delete, insert, select, update},
     Parser,
 };
@@ -48,6 +49,9 @@ pub(crate) fn statement(p: &mut Parser) {
         SyntaxKind::DeleteP => {
             delete(p);
         }
+        SyntaxKind::Create => {
+            create(p);
+        }
         _ => {
             unknown(p);
         }
@@ -61,6 +65,22 @@ pub(crate) fn parenthesis(p: &mut Parser) {
     loop {
         match p.peek().kind {
             SyntaxKind::Ascii41 | SyntaxKind::Eof => {
+                p.advance();
+                break;
+            }
+            _ => {
+                p.advance();
+            }
+        }
+    }
+}
+
+pub(crate) fn case(p: &mut Parser) {
+    p.expect(SyntaxKind::Case);
+
+    loop {
+        match p.peek().kind {
+            SyntaxKind::EndP => {
                 p.advance();
                 break;
             }
@@ -88,18 +108,51 @@ pub(crate) fn unknown(p: &mut Parser) {
                 break;
             }
             Token {
+                kind: SyntaxKind::Case,
+                ..
+            } => {
+                case(p);
+            }
+            Token {
                 kind: SyntaxKind::Ascii40,
                 ..
             } => {
                 parenthesis(p);
             }
-            t => {
-                if at_statement_start(t.kind) {
+            t => match at_statement_start(t.kind) {
+                Some(SyntaxKind::Select) => {
+                    // we need to check for `as` here to not break on `select as`
+                    if p.look_back().map(|t| t.kind) != Some(SyntaxKind::As) {
+                        break;
+                    }
+                    p.advance();
+                }
+                Some(SyntaxKind::Insert) | Some(SyntaxKind::Update) | Some(SyntaxKind::DeleteP) => {
+                    let prev = p.look_back().map(|t| t.kind);
+                    if [
+                        // for create trigger
+                        SyntaxKind::After,
+                        // for create rule
+                        SyntaxKind::On,
+                        // for create rule
+                        SyntaxKind::Also,
+                        // for create rule
+                        SyntaxKind::Instead,
+                    ]
+                    .iter()
+                    .all(|x| Some(x) != prev.as_ref())
+                    {
+                        break;
+                    }
+                    p.advance();
+                }
+                Some(_) => {
                     break;
                 }
-
-                p.advance();
-            }
+                None => {
+                    p.advance();
+                }
+            },
         }
     }
 }

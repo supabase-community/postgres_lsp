@@ -1,5 +1,6 @@
 mod common;
 mod data;
+mod ddl;
 mod dml;
 
 pub use common::source;
@@ -143,6 +144,24 @@ impl Parser {
         }
     }
 
+    fn look_back(&self) -> Option<&Token> {
+        // we need to look back to the last relevant token
+        let mut look_back_pos = self.next_pos - 1;
+        loop {
+            let token = self.tokens.get(look_back_pos);
+
+            if look_back_pos == 0 || token.is_none() {
+                return None;
+            }
+
+            if !is_irrelevant_token(token.unwrap()) {
+                return token;
+            }
+
+            look_back_pos -= 1;
+        }
+    }
+
     /// checks if the current token is of `kind` and advances if true
     /// returns true if the current token is of `kind`
     pub fn eat(&mut self, kind: SyntaxKind) -> bool {
@@ -164,7 +183,7 @@ impl Parser {
 
     /// collects an SyntaxError with an `error` message at the current position
     fn error_at(&mut self, error: String) {
-        todo!();
+        todo!("{error}");
     }
 }
 

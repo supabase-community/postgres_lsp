@@ -73,6 +73,34 @@ mod tests {
     }
 
     #[test]
+    fn insert_with_select() {
+        Tester::from("\ninsert into tbl (id) select 1\n\nselect 3")
+            .expect_statements(vec!["insert into tbl (id) select 1", "select 3"]);
+    }
+
+    #[test]
+    fn case() {
+        Tester::from("select case when select 2 then 1 else 0 end")
+            .expect_statements(vec!["select case when select 2 then 1 else 0 end"]);
+    }
+
+    #[test]
+    fn create_rule() {
+        Tester::from(
+            "create rule log_employee_insert as
+on insert to employees
+do also insert into employee_log (action, employee_id, log_time)
+values ('insert', new.id, now());",
+        )
+        .expect_statements(vec![
+            "create rule log_employee_insert as
+on insert to employees
+do also insert into employee_log (action, employee_id, log_time)
+values ('insert', new.id, now());",
+        ]);
+    }
+
+    #[test]
     fn insert_into() {
         Tester::from("randomness\ninsert into tbl (id) values (1)\nselect 3").expect_statements(
             vec!["randomness", "insert into tbl (id) values (1)", "select 3"],
