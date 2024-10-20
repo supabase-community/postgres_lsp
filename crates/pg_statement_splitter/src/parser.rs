@@ -178,12 +178,10 @@ impl Parser {
             return;
         }
 
-        self.error_at(format!("Expected {:#?}", kind));
-    }
-
-    /// collects an SyntaxError with an `error` message at the current position
-    fn error_at(&mut self, error: String) {
-        todo!("{error}");
+        self.errors.push(SyntaxError::new(
+            format!("Expected {:#?}", kind),
+            self.peek().span,
+        ));
     }
 }
 

@@ -2,7 +2,7 @@ use pg_lexer::{SyntaxKind, Token, TokenType};
 
 use super::{
     data::at_statement_start,
-    ddl::create,
+    ddl::{alter, create},
     dml::{cte, delete, insert, select, update},
     Parser,
 };
@@ -52,8 +52,11 @@ pub(crate) fn statement(p: &mut Parser) {
         SyntaxKind::Create => {
             create(p);
         }
+        SyntaxKind::Alter => {
+            alter(p);
+        }
         _ => {
-            unknown(p);
+            unknown(p, &[]);
         }
     }
     p.close_stmt();
@@ -91,7 +94,7 @@ pub(crate) fn case(p: &mut Parser) {
     }
 }
 
-pub(crate) fn unknown(p: &mut Parser) {
+pub(crate) fn unknown(p: &mut Parser, exclude: &[SyntaxKind]) {
     loop {
         match p.peek() {
             Token {
@@ -119,7 +122,7 @@ pub(crate) fn unknown(p: &mut Parser) {
             } => {
                 parenthesis(p);
             }
-            t => match at_statement_start(t.kind) {
+            t => match at_statement_start(t.kind, exclude) {
                 Some(SyntaxKind::Select) => {
                     // we need to check for `as` here to not break on `select as`
                     if p.look_back().map(|t| t.kind) != Some(SyntaxKind::As) {

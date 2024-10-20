@@ -24,25 +24,25 @@ pub(crate) fn cte(p: &mut Parser) {
 pub(crate) fn select(p: &mut Parser) {
     p.expect(SyntaxKind::Select);
 
-    unknown(p);
+    unknown(p, &[]);
 }
 
 pub(crate) fn insert(p: &mut Parser) {
     p.expect(SyntaxKind::Insert);
     p.expect(SyntaxKind::Into);
 
-    unknown(p);
+    unknown(p, &[SyntaxKind::Select]);
 }
 
 pub(crate) fn update(p: &mut Parser) {
     p.expect(SyntaxKind::Update);
 
-    unknown(p);
+    unknown(p, &[]);
 }
 
 pub(crate) fn delete(p: &mut Parser) {
     p.expect(SyntaxKind::DeleteP);
     p.expect(SyntaxKind::From);
 
-    unknown(p);
+    unknown(p, &[]);
 }
