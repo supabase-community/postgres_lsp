@@ -34,6 +34,7 @@ pg_workspace.workspace = true
 pg_diagnostics.workspace = true
 tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread", "sync"] }
 tokio-util = "0.7.12"
+tower-lsp = "0.20.0"
 
 [dev-dependencies]
 
