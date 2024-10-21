@@ -1,11 +1,17 @@
-use std::cmp::min;
+mod common;
+mod data;
+mod ddl;
+mod dml;
 
-use pg_lexer::{SyntaxKind, Token, TokenType, WHITESPACE_TOKENS};
+pub use common::source;
+
+use pg_lexer::{lex, SyntaxKind, Token, WHITESPACE_TOKENS};
 use text_size::{TextRange, TextSize};
 
 use crate::syntax_error::SyntaxError;
 
 /// Main parser that exposes the `cstree` api, and collects errors and statements
+/// It is modelled after a Pratt Parser. For a gentle introduction to Pratt Parsing, see https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 pub struct Parser {
     /// The ranges of the statements
     ranges: Vec<(usize, usize)>,
@@ -15,12 +21,10 @@ pub struct Parser {
     current_stmt_start: Option<usize>,
     /// The tokens to parse
     pub tokens: Vec<Token>,
-    /// The current position in the token stream
-    pub pos: usize,
-    /// index from which whitespace tokens are buffered
-    pub whitespace_token_buffer: Option<usize>,
 
     eof_token: Token,
+
+    next_pos: usize,
 }
 
 /// Result of Building
@@ -33,15 +37,35 @@ pub struct Parse {
 }
 
 impl Parser {
-    pub fn new(tokens: Vec<Token>) -> Self {
+    pub fn new(sql: &str) -> Self {
+        let tokens = lex(sql);
+
+        let eof_token = Token::eof(usize::from(
+            tokens
+                .last()
+                .map(|t| t.span.start())
+                .unwrap_or(TextSize::from(0)),
+        ));
+
+        // next_pos should be the initialised with the first valid token already
+        let mut next_pos = 0;
+        loop {
+            let token = tokens.get(next_pos).unwrap_or(&eof_token);
+
+            if is_irrelevant_token(token) {
+                next_pos += 1;
+            } else {
+                break;
+            }
+        }
+
         Self {
-            eof_token: Token::eof(usize::from(tokens.last().unwrap().span.end())),
             ranges: Vec::new(),
+            eof_token,
             errors: Vec::new(),
             current_stmt_start: None,
             tokens,
-            pos: 0,
-            whitespace_token_buffer: None,
+            next_pos,
         }
     }
 
@@ -52,70 +76,96 @@ impl Parser {
                 .iter()
                 .map(|(start, end)| {
                     let from = self.tokens.get(*start);
-                    let to = self.tokens.get(end - 1);
-                    // get text range from token range
-                    let text_start = from.unwrap().span.start();
-                    let text_end = to.unwrap().span.end();
+                    let to = self.tokens.get(*end).unwrap_or(&self.eof_token);
 
-                    TextRange::new(
-                        TextSize::try_from(text_start).unwrap(),
-                        TextSize::try_from(text_end).unwrap(),
-                    )
+                    TextRange::new(from.unwrap().span.start(), to.span.end())
                 })
                 .collect(),
             errors: self.errors,
         }
     }
 
+    /// Start statement
     pub fn start_stmt(&mut self) {
         assert!(self.current_stmt_start.is_none());
-        self.current_stmt_start = Some(self.pos);
+        self.current_stmt_start = Some(self.next_pos);
     }
 
+    /// Close statement
     pub fn close_stmt(&mut self) {
-        assert!(self.current_stmt_start.is_some());
-        self.ranges
-            .push((self.current_stmt_start.take().unwrap(), self.pos));
-    }
+        assert!(self.next_pos > 0);
 
-    /// collects an SyntaxError with an `error` message at `pos`
-    pub fn error_at_pos(&mut self, error: String, pos: usize) {
-        self.errors.push(SyntaxError::new_at_offset(
-            error,
-            self.tokens
-                .get(min(self.tokens.len() - 1, pos))
-                .unwrap()
-                .span
-                .start(),
-        ));
-    }
+        // go back the positions until we find the first relevant token
+        let mut end_token_pos = self.next_pos - 1;
+        loop {
+            let token = self.tokens.get(end_token_pos);
 
-    /// applies token and advances
-    pub fn advance(&mut self) {
-        assert!(!self.eof());
-        if self.nth(0, false).kind == SyntaxKind::Whitespace {
-            if self.whitespace_token_buffer.is_none() {
-                self.whitespace_token_buffer = Some(self.pos);
+            if end_token_pos == 0 || token.is_none() {
+                break;
             }
-        } else {
-            self.flush_token_buffer();
+
+            if !is_irrelevant_token(token.unwrap()) {
+                break;
+            }
+
+            end_token_pos -= 1;
         }
-        self.pos += 1;
+
+        self.ranges.push((
+            self.current_stmt_start.expect("Expected active statement"),
+            end_token_pos,
+        ));
+
+        self.current_stmt_start = None;
     }
 
-    /// flush token buffer and applies all tokens
-    pub fn flush_token_buffer(&mut self) {
-        if self.whitespace_token_buffer.is_none() {
-            return;
+    fn advance(&mut self) -> &Token {
+        let mut first_relevant_token = None;
+        loop {
+            let token = self.tokens.get(self.next_pos).unwrap_or(&self.eof_token);
+
+            // we need to continue with next_pos until the next relevant token after we already
+            // found the first one
+            if !is_irrelevant_token(token) {
+                if let Some(t) = first_relevant_token {
+                    return t;
+                }
+                first_relevant_token = Some(token);
+            }
+
+            self.next_pos += 1;
         }
-        while self.whitespace_token_buffer.unwrap() < self.pos {
-            self.whitespace_token_buffer = Some(self.whitespace_token_buffer.unwrap() + 1);
-        }
-        self.whitespace_token_buffer = None;
     }
 
+    fn peek(&self) -> &Token {
+        match self.tokens.get(self.next_pos) {
+            Some(token) => token,
+            None => &self.eof_token,
+        }
+    }
+
+    fn look_back(&self) -> Option<&Token> {
+        // we need to look back to the last relevant token
+        let mut look_back_pos = self.next_pos - 1;
+        loop {
+            let token = self.tokens.get(look_back_pos);
+
+            if look_back_pos == 0 || token.is_none() {
+                return None;
+            }
+
+            if !is_irrelevant_token(token.unwrap()) {
+                return token;
+            }
+
+            look_back_pos -= 1;
+        }
+    }
+
+    /// checks if the current token is of `kind` and advances if true
+    /// returns true if the current token is of `kind`
     pub fn eat(&mut self, kind: SyntaxKind) -> bool {
-        if self.at(kind) {
+        if self.peek().kind == kind {
             self.advance();
             true
         } else {
@@ -123,74 +173,19 @@ impl Parser {
         }
     }
 
-    pub fn at_whitespace(&self) -> bool {
-        self.nth(0, false).kind == SyntaxKind::Whitespace
-    }
-
-    pub fn eat_whitespace(&mut self) {
-        while self.nth(0, false).token_type == TokenType::Whitespace {
-            self.advance();
-        }
-    }
-
-    pub fn eof(&self) -> bool {
-        self.pos == self.tokens.len()
-    }
-
-    /// lookahead method.
-    ///
-    /// if `ignore_whitespace` is true, it will skip all whitespace tokens
-    pub fn nth(&self, lookahead: usize, ignore_whitespace: bool) -> &Token {
-        if ignore_whitespace {
-            let mut idx = 0;
-            let mut non_whitespace_token_ctr = 0;
-            loop {
-                match self.tokens.get(self.pos + idx) {
-                    Some(token) => {
-                        if !WHITESPACE_TOKENS.contains(&token.kind) {
-                            if non_whitespace_token_ctr == lookahead {
-                                return token;
-                            }
-                            non_whitespace_token_ctr += 1;
-                        }
-                        idx += 1;
-                    }
-                    None => {
-                        return &self.eof_token;
-                    }
-                }
-            }
-        } else {
-            match self.tokens.get(self.pos + lookahead) {
-                Some(token) => token,
-                None => &self.eof_token,
-            }
-        }
-    }
-
-    /// checks if the current token is of `kind`
-    pub fn at(&self, kind: SyntaxKind) -> bool {
-        self.nth(0, false).kind == kind
-    }
-
     pub fn expect(&mut self, kind: SyntaxKind) {
         if self.eat(kind) {
             return;
         }
-        if self.whitespace_token_buffer.is_some() {
-            self.error_at_pos(
-                format!(
-                    "Expected {:#?}, found {:#?}",
-                    kind,
-                    self.tokens[self.whitespace_token_buffer.unwrap()].kind
-                ),
-                self.whitespace_token_buffer.unwrap(),
-            );
-        } else {
-            self.error_at_pos(
-                format!("Expected {:#?}, found {:#?}", kind, self.nth(0, false)),
-                self.pos + 1,
-            );
-        }
+
+        self.errors.push(SyntaxError::new(
+            format!("Expected {:#?}", kind),
+            self.peek().span,
+        ));
     }
+}
+
+fn is_irrelevant_token(t: &Token) -> bool {
+    return WHITESPACE_TOKENS.contains(&t.kind)
+        && (t.kind != SyntaxKind::Newline || t.text.chars().count() == 1);
 }

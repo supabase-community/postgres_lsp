@@ -42,9 +42,9 @@ impl ChangedStatement {
     }
 }
 
-fn apply_text_change(text: &String, range: Option<TextRange>, change_text: &String) -> String {
+fn apply_text_change(text: &str, range: Option<TextRange>, change_text: &str) -> String {
     if range.is_none() {
-        return change_text.clone();
+        return change_text.to_string();
     }
 
     let range = range.unwrap();
@@ -53,7 +53,7 @@ fn apply_text_change(text: &String, range: Option<TextRange>, change_text: &Stri
 
     let mut new_text = String::new();
     new_text.push_str(&text[..start]);
-    new_text.push_str(&change_text);
+    new_text.push_str(change_text);
     new_text.push_str(&text[end..]);
 
     new_text
@@ -97,7 +97,7 @@ impl Change {
         self.range.is_some() && self.text.len() < self.range.unwrap().len().into()
     }
 
-    pub fn apply_to_text(&self, text: &String) -> String {
+    pub fn apply_to_text(&self, text: &str) -> String {
         if self.range.is_none() {
             return self.text.clone();
         }
@@ -122,14 +122,10 @@ impl Change {
             changed_statements.extend(
                 doc.drain_statements()
                     .into_iter()
-                    .map(|s| StatementChange::Deleted(s)),
+                    .map(StatementChange::Deleted),
             );
             // TODO also use errors returned by extract sql statement ranges
-            doc.statement_ranges = pg_statement_splitter::split(&self.text)
-                .ranges
-                .iter()
-                .map(|r| r.clone())
-                .collect();
+            doc.statement_ranges = pg_statement_splitter::split(&self.text).ranges.to_vec();
             doc.text = self.text.clone();
             doc.line_index = LineIndex::new(&doc.text);
 
@@ -155,7 +151,7 @@ impl Change {
                         changed_statements.push(StatementChange::Modified(ChangedStatement {
                             statement: StatementRef {
                                 idx: pos,
-                                text: doc.text[r.clone()].to_string(),
+                                text: doc.text[*r].to_string(),
                                 document_url: doc.url.clone(),
                             },
                             // change must be relative to statement
@@ -166,15 +162,9 @@ impl Change {
                         // if addition, expand the range
                         // if deletion, shrink the range
                         if self.is_addition() {
-                            *r = TextRange::new(
-                                r.start(),
-                                r.end() + TextSize::from(self.diff_size()),
-                            );
+                            *r = TextRange::new(r.start(), r.end() + self.diff_size());
                         } else if self.is_deletion() {
-                            *r = TextRange::new(
-                                r.start(),
-                                r.end() - TextSize::from(self.diff_size()),
-                            );
+                            *r = TextRange::new(r.start(), r.end() - self.diff_size());
                         }
                     } else if self.is_addition() {
                         *r += self.diff_size();
@@ -206,7 +196,7 @@ impl Change {
             {
                 changed_statements.push(StatementChange::Deleted(StatementRef {
                     idx,
-                    text: doc.text[r.clone()].to_string(),
+                    text: doc.text[*r].to_string(),
                     document_url: doc.url.clone(),
                 }));
 
@@ -344,15 +334,14 @@ mod tests {
         assert_eq!(d.statement_ranges.len(), 2);
 
         for r in &pg_statement_splitter::split(&d.text).ranges {
-            assert_eq!(
-                d.statement_ranges.iter().position(|x| r == x).is_some(),
-                true,
+            assert!(
+                d.statement_ranges.iter().any(|x| r == x),
                 "should have stmt with range {:#?}",
                 r
             );
         }
 
-        assert_eq!(d.statement_ranges[0], TextRange::new(0.into(), 26.into()));
+        assert_eq!(d.statement_ranges[0], TextRange::new(0.into(), 25.into()));
         assert_eq!(d.statement_ranges[1], TextRange::new(26.into(), 35.into()));
     }
 
@@ -364,8 +353,8 @@ mod tests {
 
         assert_eq!(d.statement_ranges.len(), 2);
 
-        let stmt_1_range = d.statement_ranges[0].clone();
-        let stmt_2_range = d.statement_ranges[1].clone();
+        let stmt_1_range = d.statement_ranges[0];
+        let stmt_2_range = d.statement_ranges[1];
 
         let update_text = " contacts;";
 
@@ -522,8 +511,8 @@ mod tests {
 
         assert_eq!(d.statement_ranges.len(), 2);
 
-        let stmt_1_range = d.statement_ranges[0].clone();
-        let stmt_2_range = d.statement_ranges[1].clone();
+        let stmt_1_range = d.statement_ranges[0];
+        let stmt_2_range = d.statement_ranges[1];
 
         let update_text = ",test";
 

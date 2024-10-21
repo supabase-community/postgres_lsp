@@ -1,137 +1,203 @@
-///! Postgres Statement Splitter
-///!
-///! This crate provides a function to split a SQL source string into individual statements.
-///!
-///! TODO:
-///! Instead of relying on statement start tokens, we need to include as many tokens as
-///! possible. For example, a `CREATE TRIGGER` statement includes an `EXECUTE [ PROCEDURE |
-///! FUNCTION ]` clause, but `EXECUTE` is also a statement start token for an `EXECUTE` statement.
-/// We should expand the definition map to include an `Any*`, which must be followed by at least
-/// one required token and allows the parser to search for the end tokens of the statement. This
-/// will hopefully be enough to reduce collisions to zero.
-mod is_at_stmt_start;
+//! Postgres Statement Splitter
+//!
+//! This crate provides a function to split a SQL source string into individual statements.
 mod parser;
 mod syntax_error;
 
-use is_at_stmt_start::{is_at_stmt_start, TokenStatement, STATEMENT_START_TOKEN_MAPS};
-
-use parser::{Parse, Parser};
-
-use pg_lexer::{lex, SyntaxKind};
+use parser::{source, Parse, Parser};
 
 pub fn split(sql: &str) -> Parse {
-    let mut parser = Parser::new(lex(sql));
+    let mut parser = Parser::new(sql);
 
-    while !parser.eof() {
-        match is_at_stmt_start(&mut parser) {
-            Some(stmt) => {
-                parser.start_stmt();
-
-                // advance over all start tokens of the statement
-                for i in 0..STATEMENT_START_TOKEN_MAPS.len() {
-                    parser.eat_whitespace();
-                    let token = parser.nth(0, false);
-                    if let Some(result) = STATEMENT_START_TOKEN_MAPS[i].get(&token.kind) {
-                        let is_in_results = result
-                            .iter()
-                            .find(|x| match x {
-                                TokenStatement::EoS(y) | TokenStatement::Any(y) => y == &stmt,
-                            })
-                            .is_some();
-                        if i == 0 && !is_in_results {
-                            panic!("Expected statement start");
-                        } else if is_in_results {
-                            parser.expect(token.kind);
-                        } else {
-                            break;
-                        }
-                    }
-                }
-
-                // move until the end of the statement, or until the next statement start
-                let mut is_sub_stmt = 0;
-                let mut is_sub_trx = 0;
-                let mut ignore_next_non_whitespace = false;
-                while !parser.at(SyntaxKind::Ascii59) && !parser.eof() {
-                    match parser.nth(0, false).kind {
-                        SyntaxKind::All => {
-                            // ALL is never a statement start, but needs to be skipped when combining queries
-                            // (e.g. UNION ALL)
-                            parser.advance();
-                        }
-                        SyntaxKind::BeginP => {
-                            // BEGIN, consume until END
-                            is_sub_trx += 1;
-                            parser.advance();
-                        }
-                        SyntaxKind::EndP => {
-                            is_sub_trx -= 1;
-                            parser.advance();
-                        }
-                        // opening brackets "(", consume until closing bracket ")"
-                        SyntaxKind::Ascii40 => {
-                            is_sub_stmt += 1;
-                            parser.advance();
-                        }
-                        SyntaxKind::Ascii41 => {
-                            is_sub_stmt -= 1;
-                            parser.advance();
-                        }
-                        SyntaxKind::As
-                        | SyntaxKind::Union
-                        | SyntaxKind::Intersect
-                        | SyntaxKind::Except => {
-                            // ignore the next non-whitespace token
-                            ignore_next_non_whitespace = true;
-                            parser.advance();
-                        }
-                        _ => {
-                            // if another stmt FIRST is encountered, break
-                            // ignore if parsing sub stmt
-                            if ignore_next_non_whitespace == false
-                                && is_sub_stmt == 0
-                                && is_sub_trx == 0
-                                && is_at_stmt_start(&mut parser).is_some()
-                            {
-                                break;
-                            } else {
-                                if ignore_next_non_whitespace == true && !parser.at_whitespace() {
-                                    ignore_next_non_whitespace = false;
-                                }
-                                parser.advance();
-                            }
-                        }
-                    }
-                }
-
-                parser.expect(SyntaxKind::Ascii59);
-
-                parser.close_stmt();
-            }
-            None => {
-                parser.advance();
-            }
-        }
-    }
+    source(&mut parser);
 
     parser.finish()
 }
 
 #[cfg(test)]
 mod tests {
+    use ntest::timeout;
+    use pg_lexer::SyntaxKind;
+    use syntax_error::SyntaxError;
+    use text_size::TextRange;
+
     use super::*;
 
-    #[test]
-    fn test_splitter() {
-        let input = "select 1 from contact;\nselect 1;\nalter table test drop column id;";
+    struct Tester {
+        input: String,
+        parse: Parse,
+    }
 
-        let res = split(input);
-        assert_eq!(res.ranges.len(), 3);
-        assert_eq!("select 1 from contact;", input[res.ranges[0]].to_string());
-        assert_eq!("select 1;", input[res.ranges[1]].to_string());
-        assert_eq!(
+    impl From<&str> for Tester {
+        fn from(input: &str) -> Self {
+            Tester {
+                parse: split(input),
+                input: input.to_string(),
+            }
+        }
+    }
+
+    impl Tester {
+        fn expect_statements(&self, expected: Vec<&str>) -> &Self {
+            assert_eq!(
+                self.parse.ranges.len(),
+                expected.len(),
+                "Expected {} statements, got {}: {:?}",
+                expected.len(),
+                self.parse.ranges.len(),
+                self.parse
+                    .ranges
+                    .iter()
+                    .map(|r| &self.input[*r])
+                    .collect::<Vec<_>>()
+            );
+
+            for (range, expected) in self.parse.ranges.iter().zip(expected.iter()) {
+                assert_eq!(*expected, self.input[*range].to_string());
+            }
+
+            self
+        }
+
+        fn expect_errors(&self, expected: Vec<SyntaxError>) -> &Self {
+            assert_eq!(
+                self.parse.errors.len(),
+                expected.len(),
+                "Expected {} errors, got {}: {:?}",
+                expected.len(),
+                self.parse.errors.len(),
+                self.parse.errors
+            );
+
+            for (err, expected) in self.parse.errors.iter().zip(expected.iter()) {
+                assert_eq!(expected, err);
+            }
+
+            self
+        }
+    }
+
+    #[test]
+    #[timeout(1000)]
+    fn basic() {
+        Tester::from("select 1 from contact; select 1;")
+            .expect_statements(vec!["select 1 from contact;", "select 1;"]);
+    }
+
+    #[test]
+    fn no_semicolons() {
+        Tester::from("select 1 from contact\nselect 1")
+            .expect_statements(vec!["select 1 from contact", "select 1"]);
+    }
+
+    #[test]
+    fn double_newlines() {
+        Tester::from("select 1 from contact\n\nselect 1\n\nselect 3").expect_statements(vec![
+            "select 1 from contact",
+            "select 1",
+            "select 3",
+        ]);
+    }
+
+    #[test]
+    fn insert_expect_error() {
+        Tester::from("\ninsert select 1\n\nselect 3")
+            .expect_statements(vec!["insert select 1", "select 3"])
+            .expect_errors(vec![SyntaxError::new(
+                format!("Expected {:?}", SyntaxKind::Into),
+                TextRange::new(8.into(), 14.into()),
+            )]);
+    }
+
+    #[test]
+    fn insert_with_select() {
+        Tester::from("\ninsert into tbl (id) select 1\n\nselect 3")
+            .expect_statements(vec!["insert into tbl (id) select 1", "select 3"]);
+    }
+
+    #[test]
+    fn case() {
+        Tester::from("select case when select 2 then 1 else 0 end")
+            .expect_statements(vec!["select case when select 2 then 1 else 0 end"]);
+    }
+
+    #[test]
+    #[timeout(1000)]
+    fn simple_select() {
+        Tester::from(
+            "
+select id, name, test1231234123, unknown from co;
+
+select 14433313331333
+
+alter table test drop column id;
+
+select lower('test');
+",
+        )
+        .expect_statements(vec![
+            "select id, name, test1231234123, unknown from co;",
+            "select 14433313331333",
             "alter table test drop column id;",
-            input[res.ranges[2]].to_string()
+            "select lower('test');",
+        ]);
+    }
+
+    #[test]
+    fn create_rule() {
+        Tester::from(
+            "create rule log_employee_insert as
+on insert to employees
+do also insert into employee_log (action, employee_id, log_time)
+values ('insert', new.id, now());",
+        )
+        .expect_statements(vec![
+            "create rule log_employee_insert as
+on insert to employees
+do also insert into employee_log (action, employee_id, log_time)
+values ('insert', new.id, now());",
+        ]);
+    }
+
+    #[test]
+    fn insert_into() {
+        Tester::from("randomness\ninsert into tbl (id) values (1)\nselect 3").expect_statements(
+            vec!["randomness", "insert into tbl (id) values (1)\nselect 3"],
         );
+    }
+
+    #[test]
+    fn update() {
+        Tester::from("more randomness\nupdate tbl set col = '1'\n\nselect 3").expect_statements(
+            vec!["more randomness", "update tbl set col = '1'", "select 3"],
+        );
+    }
+
+    #[test]
+    fn delete_from() {
+        Tester::from("more randomness\ndelete from test where id = 1\n\nselect 3")
+            .expect_statements(vec![
+                "more randomness",
+                "delete from test where id = 1",
+                "select 3",
+            ]);
+    }
+
+    #[test]
+    fn unknown() {
+        Tester::from("random stuff\n\nmore randomness\n\nselect 3").expect_statements(vec![
+            "random stuff",
+            "more randomness",
+            "select 3",
+        ]);
+    }
+
+    #[test]
+    fn unknown_2() {
+        Tester::from("random stuff\nselect 1\n\nselect 3").expect_statements(vec![
+            "random stuff",
+            "select 1",
+            "select 3",
+        ]);
     }
 }
