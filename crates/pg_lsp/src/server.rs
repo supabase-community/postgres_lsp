@@ -29,6 +29,7 @@ use pg_workspace::Workspace;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{collections::HashSet, future::Future, sync::Arc, time::Duration};
 use text_size::TextSize;
+use tower_lsp::Client;
 
 use tokio::sync::mpsc;
 use tokio_util::sync::CancellationToken;
@@ -39,13 +40,13 @@ use crate::{
     utils::{file_path, from_proto, line_index_ext::LineIndexExt, normalize_uri, to_proto},
 };
 
-use self::{debouncer::EventDebouncer, options::Options};
+use self::{debouncer::EventDebouncer, options::ClientConfigurationOptions};
 use sqlx::{postgres::PgPool, Executor};
 
 #[derive(Debug)]
 enum InternalMessage {
     PublishDiagnostics(lsp_types::Url),
-    SetOptions(Options),
+    SetOptions(ClientConfigurationOptions),
     SetSchemaCache(SchemaCache),
     SetDatabaseConnection(DbConnection),
 }
@@ -61,7 +62,7 @@ fn get_client_receiver(
     tokio::task::spawn(async move {
         loop {
             let msg = match connection.receiver.recv() {
-                Ok(msg) => msg, 
+                Ok(msg) => msg,
                 Err(e) => {
                     eprint!("Connection was closed by LSP client: {}", e);
                     cancel_token.cancel();
@@ -97,12 +98,12 @@ pub struct Server {
 }
 
 impl Server {
-    pub fn init(connection: Connection) -> anyhow::Result<Self> {
-        let client = LspClient::new(connection.sender.clone());
+    pub fn init(client: Client) -> anyhow::Result<Self> {
+        let client = LspClient::new(client);
         let cancel_token = Arc::new(CancellationToken::new());
 
-        let (client_flags, client_rx) = Self::establish_client_connection(connection, &cancel_token)?;
-
+        let (client_flags, client_rx) =
+            Self::establish_client_connection(connection, &cancel_token)?;
 
         let ide = Arc::new(Workspace::new());
 
@@ -211,7 +212,7 @@ impl Server {
         });
     }
 
-    fn update_db_connection(&self, options: Options) -> anyhow::Result<()> {
+    fn update_db_connection(&self, options: ClientConfigurationOptions) -> anyhow::Result<()> {
         if options.db_connection_string.is_none()
             || self
                 .db_conn

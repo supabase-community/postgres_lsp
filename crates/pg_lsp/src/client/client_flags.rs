@@ -1,4 +1,4 @@
-use lsp_types::InitializeParams;
+use tower_lsp::lsp_types::InitializeParams;
 
 /// Contains information about the client's capabilities.
 /// This is used to determine which features the server can use.
