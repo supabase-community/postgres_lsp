@@ -1,5 +1,9 @@
+use pg_commands::ExecuteStatementCommand;
 use pg_schema_cache::SchemaCache;
-use sqlx::{postgres::PgListener, PgPool};
+use sqlx::{
+    postgres::{PgListener, PgQueryResult},
+    PgPool,
+};
 use tokio::task::JoinHandle;
 
 #[derive(Debug)]
@@ -17,6 +21,14 @@ impl DbConnection {
             connection_string: connection_string,
             schema_update_handle: None,
         })
+    }
+
+    /// TODO: this should simply take a `Command` type, and the individual
+    /// enums should have their deps included (i.e. `ExecuteStatement(String)`)
+    pub async fn run_stmt(&self, stmt: String) -> anyhow::Result<PgQueryResult> {
+        let command = ExecuteStatementCommand::new(stmt);
+        let pool = self.pool.clone();
+        command.run(Some(pool)).await
     }
 
     pub(crate) fn connected_to(&self, connection_string: &str) -> bool {

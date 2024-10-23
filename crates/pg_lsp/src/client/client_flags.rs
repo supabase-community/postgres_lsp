@@ -5,22 +5,22 @@ use tower_lsp::lsp_types::InitializeParams;
 #[derive(Debug, Clone)]
 pub struct ClientFlags {
     /// If `true`, the server can pull configuration from the client.
-    pub has_configuration: bool,
+    pub supports_pull_opts: bool,
 
     /// If `true`, the client notifies the server when its configuration changes.
-    pub will_push_configuration: bool,
+    pub supports_dynamic_registration: bool,
 }
 
 impl ClientFlags {
     pub(crate) fn from_initialize_request_params(params: &InitializeParams) -> Self {
-        let has_configuration = params
+        let supports_pull_opts = params
             .capabilities
             .workspace
             .as_ref()
             .and_then(|w| w.configuration)
             .unwrap_or(false);
 
-        let will_push_configuration = params
+        let supports_dynamic_registration = params
             .capabilities
             .workspace
             .as_ref()
@@ -29,8 +29,8 @@ impl ClientFlags {
             .unwrap_or(false);
 
         Self {
-            has_configuration,
-            will_push_configuration,
+            supports_pull_opts,
+            supports_dynamic_registration,
         }
     }
 }

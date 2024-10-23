@@ -725,7 +725,7 @@ impl Server {
         &mut self,
         params: DidChangeConfigurationParams,
     ) -> anyhow::Result<()> {
-        if self.client_flags.has_configuration {
+        if self.client_flags.supports_pull_opts {
             self.pull_options();
         } else {
             let options = self.client.parse_options(params.settings)?;
@@ -913,11 +913,11 @@ impl Server {
     }
 
     pub async fn run(mut self) -> anyhow::Result<()> {
-        if self.client_flags.will_push_configuration {
+        if self.client_flags.supports_dynamic_registration {
             self.register_configuration();
         }
 
-        if self.client_flags.has_configuration {
+        if self.client_flags.supports_pull_opts {
             self.pull_options();
         }
 
