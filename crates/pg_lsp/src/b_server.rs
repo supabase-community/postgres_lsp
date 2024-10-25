@@ -4,7 +4,7 @@ use notification::ShowMessage;
 use pg_commands::CommandType;
 use pg_workspace::Workspace;
 use tokio::sync::RwLock;
-use tower_lsp::jsonrpc::Error;
+use tower_lsp::jsonrpc;
 use tower_lsp::lsp_types::*;
 use tower_lsp::{Client, LanguageServer};
 
@@ -134,7 +134,7 @@ impl Server {
 
 #[tower_lsp::async_trait]
 impl LanguageServer for Server {
-    async fn initialize(&self, params: InitializeParams) -> tower_lsp::jsonrpc::Result<InitializeResult> {
+    async fn initialize(&self, params: InitializeParams) -> jsonrpc::Result<InitializeResult> {
         let flags = ClientFlags::from_initialize_request_params(&params);
         self.client_capabilities.blocking_write().replace(flags);
 
@@ -174,7 +174,7 @@ impl LanguageServer for Server {
             .await;
     }
 
-    async fn shutdown(&self) -> anyhow::Result<()> {
+    async fn shutdown(&self) -> jsonrpc::Result<()> {
         self.client
             .log_message(MessageType::INFO, "Postgres LSP terminated.")
             .await;
@@ -202,19 +202,16 @@ impl LanguageServer for Server {
     async fn execute_command(
         &self,
         params: ExecuteCommandParams,
-    ) -> tower_lsp::jsonrpc::Result<Option<serde_json::Value>> {
+    ) -> jsonrpc::Result<Option<serde_json::Value>> {
         match CommandType::from_id(params.command.replace("pglsp.", "").as_str()) {
             Some(CommandType::ExecuteStatement) => {
                 if params.arguments.is_empty() {
-                    return tower_lsp::jsonrpc::Result::Err(Error::new("No arguments provided!"));
+                    return jsonrpc::Result::Err(jsonrpc::Error::invalid_request());
                 }
 
-                let stmt = params
-                    .arguments
-                    .into_iter()
-                    .next()
-                    .map(|v| serde_json::from_value(v))
-                    .unwrap()?;
+                let params = params.arguments.into_iter().next().unwrap();
+                let stmt = serde_json::from_value(params)
+                    .map_err(|_| jsonrpc::Error::invalid_request())?;
 
                 let conn = self.db.read().await;
                 match conn
