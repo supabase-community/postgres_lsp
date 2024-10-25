@@ -1,31 +1,27 @@
-use std::sync::Arc;
-
 use notification::ShowMessage;
 use pg_commands::CommandType;
-use pg_workspace::Workspace;
 use tokio::sync::RwLock;
 use tower_lsp::jsonrpc;
 use tower_lsp::lsp_types::*;
 use tower_lsp::{Client, LanguageServer};
 
 use crate::client::client_flags::ClientFlags;
-use crate::db_connection::DbConnection;
 use crate::server::options::ClientConfigurationOptions;
+use crate::utils::file_path;
+use crate::utils::normalize_uri;
+use crate::workspace_handler::WorkspaceHandler;
 
 struct Server {
     client: Client,
-    db: RwLock<Option<DbConnection>>,
-    ide: Arc<RwLock<Workspace>>,
+    workspace_handler: WorkspaceHandler,
     client_capabilities: RwLock<Option<ClientFlags>>,
 }
 
 impl Server {
     pub async fn new(client: Client) -> Self {
-        let ide = Arc::new(RwLock::new(Workspace::new()));
         Self {
             client,
-            db: RwLock::new(None),
-            ide,
+            workspace_handler: WorkspaceHandler::new(),
             client_capabilities: RwLock::new(None),
         }
     }
@@ -52,46 +48,6 @@ impl Server {
                 None
             }
         }
-    }
-
-    /// `update_db_connection` will update `Self`'s database connection.
-    /// If the passed-in connection string is the same that we're already connected to, it's a noop.
-    /// Otherwise, it'll first open a new connection, replace `Self`'s connection, and then close
-    /// the old one.
-    async fn update_db_connection(
-        &self,
-        options: ClientConfigurationOptions,
-    ) -> anyhow::Result<()> {
-        if options.db_connection_string.is_none()
-            || self
-                .db
-                .read()
-                .await
-                .as_ref()
-                // if the connection is already connected to the same database, do nothing
-                .is_some_and(|c| c.connected_to(options.db_connection_string.as_ref().unwrap()))
-        {
-            return Ok(());
-        }
-
-        let connection_string = options.db_connection_string.unwrap();
-
-        let mut db = DbConnection::new(connection_string).await?;
-
-        let ide = self.ide.clone();
-        db.listen_for_schema_updates(move |schema| {
-            let _guard = ide.blocking_write().set_schema_cache(schema);
-        });
-
-        let mut current_db = self.db.blocking_write();
-        let old_db = current_db.replace(db);
-
-        if old_db.is_some() {
-            let old_db = old_db.unwrap();
-            old_db.close().await;
-        }
-
-        Ok(())
     }
 
     async fn request_opts_from_client(&self) -> Option<ClientConfigurationOptions> {
@@ -129,6 +85,30 @@ impl Server {
                 None
             }
         }
+    }
+
+    async fn publish_diagnostics(&self, mut uri: Url) -> anyhow::Result<()> {
+        normalize_uri(&mut uri);
+
+        let diagnostics = self
+            .workspace_handler
+            .get_diagnostics(file_path(&uri))
+            .await;
+
+        self.client
+            .send_notification::<ShowMessage>(ShowMessageParams {
+                typ: MessageType::INFO,
+                message: format!("diagnostics {}", diagnostics.len()),
+            })
+            .await;
+
+        let params = PublishDiagnosticsParams {
+            uri,
+            diagnostics,
+            version: None,
+        };
+
+        Ok(())
     }
 }
 
@@ -186,16 +166,24 @@ impl LanguageServer for Server {
 
         if capabilities.as_ref().unwrap().supports_pull_opts {
             let opts = self.request_opts_from_client().await;
-            if opts.is_some() {
-                self.update_db_connection(opts.unwrap()).await;
+            if opts
+                .as_ref()
+                .is_some_and(|o| o.db_connection_string.is_some())
+            {
+                let conn_str = opts.unwrap().db_connection_string.unwrap();
+                self.workspace_handler.change_db(conn_str).await;
                 return;
             }
         }
 
         let opts = self.parse_options_from_client(params.settings);
 
-        if opts.is_some() {
-            self.update_db_connection(opts.unwrap()).await;
+        if opts
+            .as_ref()
+            .is_some_and(|o| o.db_connection_string.is_some())
+        {
+            let conn_str = opts.unwrap().db_connection_string.unwrap();
+            self.workspace_handler.change_db(conn_str).await;
         }
     }
 
@@ -213,21 +201,12 @@ impl LanguageServer for Server {
                 let stmt = serde_json::from_value(params)
                     .map_err(|_| jsonrpc::Error::invalid_request())?;
 
-                let conn = self.db.read().await;
-                match conn
-                    .as_ref()
-                    .expect("No connection to the database.")
-                    .run_stmt(stmt)
-                    .await
-                {
-                    Ok(pg_result) => {
+                match self.workspace_handler.run_stmt(stmt).await {
+                    Ok(rows_affected) => {
                         self.client
                             .send_notification::<ShowMessage>(ShowMessageParams {
                                 typ: MessageType::INFO,
-                                message: format!(
-                                    "Success! Affected rows: {}",
-                                    pg_result.rows_affected()
-                                ),
+                                message: format!("Success! Affected rows: {}", rows_affected),
                             })
                             .await;
                     }
