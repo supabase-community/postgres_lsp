@@ -1,11 +1,10 @@
 use std::sync::Arc;
 
-use lsp_types::Range;
 use pg_base_db::PgLspPath;
 use pg_diagnostics::Diagnostic;
 use pg_workspace::Workspace;
-use text_size::TextRange;
 use tokio::sync::RwLock;
+use tower_lsp::lsp_types::Range;
 
 use crate::{db_connection::DbConnection, utils::line_index_ext::LineIndexExt};
 
@@ -82,7 +81,12 @@ impl WorkspaceHandler {
             .diagnostics(&path)
             .into_iter()
             .map(|d| {
-                let range = doc.as_ref().unwrap().line_index.line_col_lsp_range(d.range).unwrap();
+                let range = doc
+                    .as_ref()
+                    .unwrap()
+                    .line_index
+                    .line_col_lsp_range(d.range)
+                    .unwrap();
                 (d, range)
             })
             .collect()

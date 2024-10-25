@@ -9,6 +9,7 @@ use crate::client::client_flags::ClientFlags;
 use crate::server::options::ClientConfigurationOptions;
 use crate::utils::file_path;
 use crate::utils::normalize_uri;
+use crate::utils::to_proto;
 use crate::workspace_handler::WorkspaceHandler;
 
 struct Server {
@@ -87,7 +88,7 @@ impl Server {
         }
     }
 
-    async fn publish_diagnostics(&self, mut uri: Url) -> anyhow::Result<()> {
+    async fn publish_diagnostics(&self, mut uri: Url) {
         normalize_uri(&mut uri);
 
         let diagnostics = self
@@ -95,12 +96,16 @@ impl Server {
             .get_diagnostics(file_path(&uri))
             .await;
 
+        let diagnostics: Vec<Diagnostic> = diagnostics
+            .into_iter()
+            .map(|(d, r)| to_proto::diagnostic(d, r))
+            .collect();
+
         self.client
             .send_notification::<ShowMessage>(ShowMessageParams {
                 typ: MessageType::INFO,
                 message: format!("diagnostics {}", diagnostics.len()),
-            })
-            .await;
+            });
 
         let params = PublishDiagnosticsParams {
             uri,
@@ -108,7 +113,8 @@ impl Server {
             version: None,
         };
 
-        Ok(())
+        self.client
+            .send_notification::<notification::PublishDiagnostics>(params);
     }
 }
 
