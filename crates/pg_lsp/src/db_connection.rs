@@ -8,7 +8,7 @@ use tokio::task::JoinHandle;
 
 #[derive(Debug)]
 pub(crate) struct DbConnection {
-    pub pool: PgPool,
+    pool: PgPool,
     connection_string: String,
     schema_update_handle: Option<JoinHandle<()>>,
 }
@@ -74,5 +74,9 @@ impl DbConnection {
         self.schema_update_handle = Some(handle);
 
         Ok(())
+    }
+
+    pub(crate) fn get_pool(&self) -> PgPool {
+        self.pool.clone()
     }
 }

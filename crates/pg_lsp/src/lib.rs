@@ -4,4 +4,4 @@ pub mod server;
 mod utils;
 
 mod b_server;
-mod workspace_handler;
+mod session;

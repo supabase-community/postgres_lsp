@@ -7,14 +7,14 @@ use tower_lsp::{Client, LanguageServer};
 
 use crate::client::client_flags::ClientFlags;
 use crate::server::options::ClientConfigurationOptions;
+use crate::session::Session;
 use crate::utils::file_path;
 use crate::utils::normalize_uri;
 use crate::utils::to_proto;
-use crate::workspace_handler::WorkspaceHandler;
 
 struct Server {
     client: Client,
-    workspace_handler: WorkspaceHandler,
+    session: Session,
     client_capabilities: RwLock<Option<ClientFlags>>,
 }
 
@@ -22,7 +22,7 @@ impl Server {
     pub async fn new(client: Client) -> Self {
         Self {
             client,
-            workspace_handler: WorkspaceHandler::new(),
+            session: Session::new(),
             client_capabilities: RwLock::new(None),
         }
     }
@@ -91,10 +91,8 @@ impl Server {
     async fn publish_diagnostics(&self, mut uri: Url) {
         normalize_uri(&mut uri);
 
-        let diagnostics = self
-            .workspace_handler
-            .get_diagnostics(file_path(&uri))
-            .await;
+        let url = file_path(&uri);
+        let diagnostics = self.session.get_diagnostics(url).await;
 
         let diagnostics: Vec<Diagnostic> = diagnostics
             .into_iter()
@@ -177,11 +175,13 @@ impl LanguageServer for Server {
                 .is_some_and(|o| o.db_connection_string.is_some())
             {
                 let conn_str = opts.unwrap().db_connection_string.unwrap();
-                self.workspace_handler.change_db(conn_str).await;
+                self.session.change_db(conn_str).await;
                 return;
             }
         }
 
+        // if we couldn't pull settings from the client,
+        // we'll try parsing the passed in params.
         let opts = self.parse_options_from_client(params.settings);
 
         if opts
@@ -189,8 +189,63 @@ impl LanguageServer for Server {
             .is_some_and(|o| o.db_connection_string.is_some())
         {
             let conn_str = opts.unwrap().db_connection_string.unwrap();
-            self.workspace_handler.change_db(conn_str).await;
+            self.session.change_db(conn_str).await;
         }
+    }
+
+    async fn did_open(&self, params: DidOpenTextDocumentParams) {
+        let mut uri = params.text_document.uri;
+        normalize_uri(&mut uri);
+
+        let changed_urls = self
+            .session
+            .apply_doc_changes(
+                file_path(url),
+                params.text_document.version,
+                params.text_document.text,
+            )
+            .await;
+
+        for url in changed_urls {
+            self.publish_diagnostics(url).await;
+        }
+    }
+
+    async fn did_save(&self, params: DidSaveTextDocumentParams) {
+        let mut uri = params.text_document.uri;
+        normalize_uri(&mut uri);
+
+        self.publish_diagnostics(uri).await;
+
+        // TODO: "Compute Now"
+        let changed_urls = self.session.recompute_and_get_changed_files();
+        for url in changed_urls {
+            self.publish_diagnostics(url).await;
+        }
+    }
+
+    async fn did_change(&self, params: DidChangeTextDocumentParams) {
+        todo!()
+    }
+
+    async fn did_close(&self, params: DidSaveTextDocumentParams) {
+        let mut uri = params.text_document.uri;
+        normalize_uri(&mut uri);
+        let path = file_path(&uri);
+
+        self.session.on_file_closed(path);
+    }
+
+    async fn code_action(&self, params: CodeActionParams) -> Result<Option<CodeActionResponse>> {
+        let mut uri = params.text_document.uri;
+        normalize_uri(&mut uri);
+
+        let path = file_path(&uri);
+        let range = params.range;
+
+        let actions = self.session.get_available_code_actions(path, range);
+
+        Ok(actions)
     }
 
     async fn execute_command(
@@ -207,7 +262,7 @@ impl LanguageServer for Server {
                 let stmt = serde_json::from_value(params)
                     .map_err(|_| jsonrpc::Error::invalid_request())?;
 
-                match self.workspace_handler.run_stmt(stmt).await {
+                match self.session.run_stmt(stmt).await {
                     Ok(rows_affected) => {
                         self.client
                             .send_notification::<ShowMessage>(ShowMessageParams {

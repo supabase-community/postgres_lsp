@@ -197,7 +197,9 @@ impl Server {
                     })
                     .unwrap();
             }
+
             let changed = cloned_ide.compute(conn);
+
             let urls = HashSet::<&str>::from_iter(
                 changed.iter().map(|f| f.document_url.to_str().unwrap()),
             );
@@ -375,7 +377,7 @@ impl Server {
             DocumentChange::new(params.text_document.version, changes),
         );
 
-        let conn = self.db_conn.as_ref().map(|p| p.pool.clone());
+        let conn = self.db_conn.as_ref().map(|p| p.get_pool());
         self.compute_debouncer.put(conn);
 
         Ok(())
