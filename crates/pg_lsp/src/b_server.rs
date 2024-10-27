@@ -243,7 +243,10 @@ impl LanguageServer for Server {
         let path = file_path(&uri);
         let range = params.range;
 
-        let actions = self.session.get_available_code_actions(path, range);
+        let actions = self
+            .session
+            .get_available_code_actions_or_commands(path, range)
+            .await;
 
         Ok(actions)
     }
@@ -258,6 +261,33 @@ impl LanguageServer for Server {
         let hints = self.session.get_inlay_hints(path, range).await;
 
         Ok(hints)
+    }
+
+    async fn completion(&self, params: CompletionParams) -> Result<Option<CompletionResponse>> {
+        let mut uri = params.text_document_position.text_document.uri;
+        normalize_uri(&mut uri);
+
+        let path = file_path(&uri);
+        let position = params.text_document_position.position;
+
+        let completions = self.session.get_available_completions(path, position).await;
+
+        Ok(completions.map(|c| CompletionResponse::List(c)))
+    }
+
+    async fn hover(&self, params: HoverParams) -> Result<Option<Hover>> {
+        let mut uri = params.text_document_position_params.text_document.uri;
+        normalize_uri(&mut uri);
+
+        let path = file_path(&uri);
+        let position = params.text_document_position_params.position;
+
+        let hover_diagnostics = self
+            .session
+            .get_available_hover_diagnostics(path, position)
+            .await;
+
+        Ok(hover_diagnostics)
     }
 
     async fn execute_command(

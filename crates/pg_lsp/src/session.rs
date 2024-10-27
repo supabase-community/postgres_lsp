@@ -3,9 +3,13 @@ use std::{collections::HashSet, sync::Arc};
 use pg_base_db::{Change, DocumentChange, PgLspPath};
 use pg_commands::ExecuteStatementCommand;
 use pg_diagnostics::Diagnostic;
+use pg_hover::HoverParams;
 use pg_workspace::Workspace;
 use tokio::sync::RwLock;
-use tower_lsp::lsp_types::{CodeAction, InlayHint, Range};
+use tower_lsp::lsp_types::{
+    CodeAction, CodeActionOrCommand, CompletionItem, CompletionItemKind, CompletionList, Hover,
+    HoverContents, InlayHint, MarkedString, Position, Range,
+};
 
 use crate::{db_connection::DbConnection, utils::line_index_ext::LineIndexExt};
 
@@ -133,21 +137,15 @@ impl Session {
             .collect()
     }
 
-    pub async fn get_available_code_actions(
+    pub async fn get_available_code_actions_or_commands(
         &self,
         path: PgLspPath,
         range: Range,
-    ) -> Option<Vec<CodeAction>> {
+    ) -> Option<Vec<CodeActionOrCommand>> {
         let ide = self.ide.read().await;
-        let doc = ide.documents.get(&path);
-        if doc.is_none() {
-            return None;
-        }
+        let doc = ide.documents.get(&path)?;
 
-        let db = self.db.read().await;
-        if db.is_none() {
-            return None;
-        }
+        let db = self.db.read().await?;
 
         let doc = doc.unwrap();
         let range = doc.line_index.offset_lsp_range(range).unwrap();
@@ -162,20 +160,11 @@ impl Session {
                     "Execute '{}'",
                     ExecuteStatementCommand::trim_statement(stmt.text.clone(), 50)
                 );
-                CodeAction {
-                    title: title.clone(),
-                    kind: None,
-                    edit: None,
-                    command: Some(Command {
-                        title,
-                        command: format!("pglsp.{}", cmd.id()),
-                        arguments: Some(vec![serde_json::to_value(stmt.text.clone()).unwrap()]),
-                    }),
-                    diagnostics: None,
-                    is_preferred: None,
-                    disabled: None,
-                    data: None,
-                }
+                CodeActionOrCommand::Command(Command {
+                    title,
+                    command: format!("pglsp.{}", cmd.id()),
+                    arguments: Some(vec![serde_json::to_value(stmt.text.clone()).unwrap()]),
+                })
             })
             .collect();
 
@@ -184,13 +173,9 @@ impl Session {
 
     pub async fn get_inlay_hints(&self, path: PgLspPath, range: Range) -> Option<Vec<InlayHint>> {
         let ide = self.ide.read().await;
-        let doc = ide.documents.get(&path);
-        if doc.is_none() {
-            return None;
-        }
+        let doc = ide.documents.get(&path)?;
 
-        let doc = doc.unwrap();
-        let range = doc.line_index.offset_lsp_range(range).unwrap();
+        let range = doc.line_index.offset_lsp_range(range)?;
 
         let schema_cache = ide.schema_cache.read().expect("Unable to get Schema Cache");
 
@@ -234,5 +219,88 @@ impl Session {
             .collect();
 
         Some(hints)
+    }
+
+    pub async fn get_available_completions(
+        &self,
+        path: PgLspPath,
+        position: Position,
+    ) -> Option<CompletionList> {
+        let ide = self.ide.read().await;
+
+        let doc = ide.documents.get(&path)?;
+        let offset = doc.line_index.offset_lsp(position)?;
+        let (range, stmt) = doc.statement_at_offset_with_range(&offset)?;
+
+        let schema_cache = ide.schema_cache.read().expect("No Schema Cache");
+
+        let completion_items = pg_completions::complete(&CompletionParams {
+            position: pos - range.start() - TextSize::from(1),
+            text: stmt.text.as_str(),
+            tree: ide.tree_sitter.tree(&stmt).as_ref().map(|x| x.as_ref()),
+            schema: &schema,
+        })
+        .items
+        .into_iter()
+        .map(|i| CompletionItem {
+            // TODO: add more data
+            label: i.data.label().to_string(),
+            label_details: None,
+            kind: Some(CompletionItemKind::CLASS),
+            detail: None,
+            documentation: None,
+            deprecated: None,
+            preselect: None,
+            sort_text: None,
+            filter_text: None,
+            insert_text: None,
+            insert_text_format: None,
+            insert_text_mode: None,
+            text_edit: None,
+            additional_text_edits: None,
+            commit_characters: None,
+            data: None,
+            tags: None,
+            command: None,
+        })
+        .collect();
+
+        Some(CompletionList {
+            is_incomplete: false,
+            items: completion_items,
+        })
+    }
+
+    pub async fn get_available_hover_diagnostics(
+        &self,
+        path: PgLspPath,
+        position: Position,
+    ) -> Option<Hover> {
+        let ide = self.ide.read().await;
+        let doc = ide.documents.get(&path)?;
+
+        let offset = doc.line_index.offset_lsp(position)?;
+
+        let (range, stmt) = doc.statement_at_offset_with_range(&offset)?;
+        let range_start = range.start();
+        let hover_range = doc.line_index.line_col_lsp_range(range);
+
+        let schema_cache = ide.schema_cache.read().expect("No Schema Cache");
+
+        ::pg_hover::hover(HoverParams {
+            position: offset - range_start,
+            source: stmt.text.as_str(),
+            enriched_ast: ide
+                .pg_query
+                .enriched_ast(&stmt)
+                .as_ref()
+                .map(|x| x.as_ref()),
+            tree: ide.tree_sitter.tree(&stmt).as_ref().map(|x| x.as_ref()),
+            schema_cache: schema_cache.clone(),
+        })
+        .map(|hover| Hover {
+            contents: HoverContents::Scalar(MarkedString::String(hover.content)),
+            range: hover_range,
+        })
     }
 }
