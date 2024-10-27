@@ -1,10 +1,11 @@
 use std::{collections::HashSet, sync::Arc};
 
 use pg_base_db::{Change, DocumentChange, PgLspPath};
+use pg_commands::ExecuteStatementCommand;
 use pg_diagnostics::Diagnostic;
 use pg_workspace::Workspace;
 use tokio::sync::RwLock;
-use tower_lsp::lsp_types::{CodeAction, Range};
+use tower_lsp::lsp_types::{CodeAction, InlayHint, Range};
 
 use crate::{db_connection::DbConnection, utils::line_index_ext::LineIndexExt};
 
@@ -56,13 +57,14 @@ impl Session {
         Ok(())
     }
 
+    /// Runs the passed-in statement against the underlying database.
     pub async fn run_stmt(&self, stmt: String) -> anyhow::Result<u64> {
         let db = self.db.read().await;
-        db.as_ref()
-            .expect("No Db Connection")
-            .run_stmt(stmt)
-            .await
-            .map(|pg_query_result| pg_query_result.rows_affected())
+        let pool = db.map(|d| d.get_pool());
+
+        let cmd = ExecuteStatementCommand::new(stmt);
+
+        cmd.run(pool).await
     }
 
     pub async fn on_file_closed(&self, path: PgLspPath) {
@@ -137,15 +139,17 @@ impl Session {
         range: Range,
     ) -> Option<Vec<CodeAction>> {
         let ide = self.ide.read().await;
-        let db = self.db.read().await;
-
         let doc = ide.documents.get(&path);
-        if doc.is_none() || db.is_none() {
+        if doc.is_none() {
+            return None;
+        }
+
+        let db = self.db.read().await;
+        if db.is_none() {
             return None;
         }
 
         let doc = doc.unwrap();
-
         let range = doc.line_index.offset_lsp_range(range).unwrap();
 
         // for now, we only provide `ExcecuteStatementCommand`s.
@@ -176,5 +180,59 @@ impl Session {
             .collect();
 
         Some(actions)
+    }
+
+    pub async fn get_inlay_hints(&self, path: PgLspPath, range: Range) -> Option<Vec<InlayHint>> {
+        let ide = self.ide.read().await;
+        let doc = ide.documents.get(&path);
+        if doc.is_none() {
+            return None;
+        }
+
+        let doc = doc.unwrap();
+        let range = doc.line_index.offset_lsp_range(range).unwrap();
+
+        let schema_cache = ide.schema_cache.read().expect("Unable to get Schema Cache");
+
+        let hints = doc
+            .statements_at_range(&range)
+            .into_iter()
+            .flat_map(|stmt| {
+                ::pg_inlay_hints::inlay_hints(::pg_inlay_hints::InlayHintsParams {
+                    ast: ide.pg_query.ast(&stmt).as_ref().map(|x| x.as_ref()),
+                    enriched_ast: ide
+                        .pg_query
+                        .enriched_ast(&stmt)
+                        .as_ref()
+                        .map(|x| x.as_ref()),
+                    tree: ide.tree_sitter.tree(&stmt).as_ref().map(|x| x.as_ref()),
+                    cst: ide.pg_query.cst(&stmt).as_ref().map(|x| x.as_ref()),
+                    schema_cache: &schema_cache,
+                })
+            })
+            .map(|hint| InlayHint {
+                position: doc.line_index.line_col_lsp(hint.offset).unwrap(),
+                label: match hint.content {
+                    pg_inlay_hints::InlayHintContent::FunctionArg(arg) => {
+                        InlayHintLabel::String(match arg.name {
+                            Some(name) => format!("{} ({})", name, arg.type_name),
+                            None => arg.type_name.clone(),
+                        })
+                    }
+                },
+                kind: match hint.content {
+                    pg_inlay_hints::InlayHintContent::FunctionArg(_) => {
+                        Some(InlayHintKind::PARAMETER)
+                    }
+                },
+                text_edits: None,
+                tooltip: None,
+                padding_left: None,
+                padding_right: None,
+                data: None,
+            })
+            .collect();
+
+        Some(hints)
     }
 }

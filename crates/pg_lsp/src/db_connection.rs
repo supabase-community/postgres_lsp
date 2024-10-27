@@ -23,14 +23,6 @@ impl DbConnection {
         })
     }
 
-    /// TODO: this should simply take a `Command` type, and the individual
-    /// enums should have their deps included (i.e. `ExecuteStatement(String)`)
-    pub async fn run_stmt(&self, stmt: String) -> anyhow::Result<PgQueryResult> {
-        let command = ExecuteStatementCommand::new(stmt);
-        let pool = self.pool.clone();
-        command.run(Some(pool)).await
-    }
-
     pub(crate) fn connected_to(&self, connection_string: &str) -> bool {
         connection_string == self.connection_string
     }

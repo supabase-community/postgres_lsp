@@ -248,6 +248,18 @@ impl LanguageServer for Server {
         Ok(actions)
     }
 
+    async fn inlay_hint(&self, params: InlayHintParams) -> Result<Option<Vec<InlayHint>>> {
+        let mut uri = params.text_document.uri;
+        normalize_uri(&mut uri);
+        
+        let path = file_path(&uri);
+        let range = params.range;
+
+        let hints = self.session.get_inlay_hints(path, range).await;
+
+        Ok(hints)
+    }
+
     async fn execute_command(
         &self,
         params: ExecuteCommandParams,
