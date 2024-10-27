@@ -251,7 +251,7 @@ impl LanguageServer for Server {
     async fn inlay_hint(&self, params: InlayHintParams) -> Result<Option<Vec<InlayHint>>> {
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
-        
+
         let path = file_path(&uri);
         let range = params.range;
 
