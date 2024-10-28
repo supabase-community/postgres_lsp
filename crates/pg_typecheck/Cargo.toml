@@ -8,7 +8,7 @@ pg_base_db.workspace = true
 pg_schema_cache.workspace = true
 pg_syntax.workspace = true
 pg_query_ext.workspace = true
-text-size = "1.1.1"
+text-size.workspace = true
 async-std = "1.12.0"
 sqlx = { version = "0.7.3", features = [ "runtime-async-std", "tls-rustls", "postgres", "json" ] }
 
