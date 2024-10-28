@@ -185,7 +185,8 @@ mod tests {
     use pg_diagnostics::Diagnostic;
     use text_size::{TextRange, TextSize};
 
-    use crate::{PgLspPath, Workspace};
+    use crate::Workspace;
+    use pg_fs::PgLspPath;
 
     #[test]
     fn test_apply_change() {

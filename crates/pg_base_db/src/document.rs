@@ -163,8 +163,9 @@ impl Document {
 mod tests {
 
     use text_size::{TextRange, TextSize};
+    use pg_fs::PgLspPath;
 
-    use crate::{Document, PgLspPath};
+    use crate::{Document};
 
     #[test]
     fn test_statements_at_range() {
