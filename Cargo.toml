@@ -18,6 +18,7 @@ tracing = "0.1.40"
 
 # postgres specific crates
 pg_lexer = { path = "./crates/pg_lexer", version = "0.0.0" }
+pg_workspace_new = { path = "./crates/pg_workspace_new", version = "0.0.0" }
 pg_fs = { path = "./crates/pg_fs", version = "0.0.0" }
 pg_diagnostics = { path = "./crates/pg_diagnostics", version = "0.0.0" }
 pg_lexer_codegen = { path = "./crates/pg_lexer_codegen", version = "0.0.0" }

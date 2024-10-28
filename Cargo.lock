@@ -1655,6 +1655,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "pg_workspace_new"
+version = "0.0.0"
+dependencies = [
+ "dashmap",
+ "pg_fs",
+ "sqlx",
+ "text-size",
+]
+
+[[package]]
 name = "pin-project-lite"
 version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
