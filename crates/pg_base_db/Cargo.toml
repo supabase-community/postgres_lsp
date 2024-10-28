@@ -8,6 +8,7 @@ text-size = "1.1.1"
 line_index.workspace = true
 
 pg_statement_splitter.workspace = true
+pg_fs.workspace = true
 
 [dev-dependencies]
 

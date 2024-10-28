@@ -3,7 +3,7 @@ use std::{hash::Hash, hash::Hasher, ops::RangeBounds};
 use line_index::LineIndex;
 use text_size::{TextRange, TextSize};
 
-use crate::PgLspPath;
+use pg_fs::PgLspPath;
 
 extern crate test;
 

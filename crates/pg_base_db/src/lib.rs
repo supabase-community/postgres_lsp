@@ -15,8 +15,6 @@
 
 mod change;
 mod document;
-mod path;
 
 pub use change::{Change, ChangedStatement, DocumentChange, StatementChange};
 pub use document::{Document, StatementRef};
-pub use path::PgLspPath;

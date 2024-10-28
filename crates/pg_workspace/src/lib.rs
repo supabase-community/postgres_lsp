@@ -7,7 +7,8 @@ use std::sync::{RwLock, RwLockWriteGuard};
 
 use dashmap::{DashMap, DashSet};
 use lint::Linter;
-use pg_base_db::{Document, DocumentChange, PgLspPath, StatementRef};
+use pg_base_db::{Document, DocumentChange, StatementRef};
+use pg_fs::PgLspPath;
 use pg_query::PgQueryParser;
 use pg_schema_cache::SchemaCache;
 use sqlx::PgPool;
