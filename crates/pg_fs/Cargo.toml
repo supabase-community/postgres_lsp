@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 directories       = "5.0.1"
 tracing           = { workspace = true }
+serde = { workspace = true }
 
 [dev-dependencies]
 

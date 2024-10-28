@@ -9,7 +9,7 @@ regex = "1.9.1"
 pg_query = "0.8"
 pg_lexer_codegen.workspace = true
 
-text-size = "1.1.1"
+text-size.workspace = true
 cstree = { version = "0.12.0", features = ["derive"] }
 
 [dev-dependencies]

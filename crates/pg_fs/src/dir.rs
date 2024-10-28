@@ -4,9 +4,9 @@ use tracing::warn;
 
 pub fn ensure_cache_dir() -> PathBuf {
     if let Some(proj_dirs) = ProjectDirs::from("dev", "supabase-community", "pglsp") {
-        // Linux: /home/alice/.cache/biome
-        // Win: C:\Users\Alice\AppData\Local\biomejs\biome\cache
-        // Mac: /Users/Alice/Library/Caches/dev.biomejs.biome
+        // Linux: /home/alice/.cache/pglsp
+        // Win: C:\Users\Alice\AppData\Local\supabase-community\pglsp\cache
+        // Mac: /Users/Alice/Library/Caches/dev.supabase-community.pglsp
         let cache_dir = proj_dirs.cache_dir().to_path_buf();
         if let Err(err) = fs::create_dir_all(&cache_dir) {
             let temp_dir = env::temp_dir();

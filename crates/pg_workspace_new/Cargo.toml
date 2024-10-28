@@ -4,9 +4,11 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-text-size = "1.1.1"
+text-size.workspace = true
 dashmap = "5.5.3"
 sqlx = { version = "0.7.3", features = [ "runtime-async-std", "tls-rustls", "postgres", "json" ] }
+serde                    = { workspace = true, features = ["derive"] }
+serde_json               = { workspace = true, features = ["raw_value"] }
 
 pg_fs.workspace =  true
 

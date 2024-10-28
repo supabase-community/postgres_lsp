@@ -1,6 +1,6 @@
 use std::{ops::Deref, path::PathBuf};
 
-#[derive(Debug, Clone, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct PgLspPath {
     path: PathBuf,
 }

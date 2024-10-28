@@ -1,0 +1,16 @@
+[package]
+name = "pg_markup"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+proc-macro-error = { version = "1.0.4", default-features = false }
+proc-macro2      = { workspace = true }
+quote            = "1.0.14"
+
+[dev-dependencies]
+
+[lib]
+proc-macro = true
+
+[features]
