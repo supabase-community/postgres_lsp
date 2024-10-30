@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use pg_base_db::{ChangedStatement, StatementRef};
-use pg_diagnostics::{Diagnostic, Severity};
+use crate::{Diagnostic, Severity};
 use text_size::TextRange;
 
 pub struct PgQueryParser {

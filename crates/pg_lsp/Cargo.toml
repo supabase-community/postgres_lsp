@@ -32,7 +32,6 @@ pg_commands.workspace = true
 pg_base_db.workspace = true
 pg_schema_cache.workspace = true
 pg_workspace.workspace = true
-pg_diagnostics.workspace = true
 
 [dev-dependencies]
 

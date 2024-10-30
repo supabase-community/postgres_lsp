@@ -4,7 +4,17 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
+backtrace                    = "0.3.74"
 text-size.workspace = true
+pg_diagnostics_macros     = { workspace = true }
+pg_console                = { workspace = true, features = ["serde_markup"] }
+pg_text_edit                = { workspace = true }
+bpaf                         = { workspace = true }
+serde                = { workspace = true, features = ["derive"] }
+enumflags2                   = { workspace = true }
+termcolor                    = { workspace = true }
+unicode-width                = { workspace = true }
+serde_json                   = { workspace = true }
 
 [dev-dependencies]
 

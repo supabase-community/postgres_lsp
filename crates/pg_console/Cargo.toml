@@ -7,6 +7,7 @@ edition = "2021"
 pg_markup         = { workspace = true }
 text-size         = { workspace = true }
 
+schemars             = { workspace = true, optional = true }
 serde                = { workspace = true, optional = true, features = ["derive"] }
 termcolor            = { workspace = true }
 unicode-segmentation = "1.12.0"
@@ -15,7 +16,9 @@ unicode-width        = { workspace = true }
 [dev-dependencies]
 trybuild = "1.0.99"
 
+[features]
+serde_markup = ["serde", "schemars"]
+
 [lib]
 doctest = false
 
-[features]

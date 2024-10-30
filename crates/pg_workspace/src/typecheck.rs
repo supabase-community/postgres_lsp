@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use pg_base_db::StatementRef;
-use pg_diagnostics::{Diagnostic, Severity};
+use crate::{Diagnostic, Severity};
 use pg_typecheck::{check_sql, PgSeverity, TypeError, TypecheckerParams};
 use text_size::TextRange;
 
