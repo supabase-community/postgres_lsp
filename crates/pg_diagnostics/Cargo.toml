@@ -7,6 +7,7 @@ edition = "2021"
 backtrace                    = "0.3.74"
 text-size.workspace = true
 pg_diagnostics_macros     = { workspace = true }
+pg_diagnostics_categories     = { workspace = true, features = ["serde"] }
 pg_console                = { workspace = true, features = ["serde_markup"] }
 pg_text_edit                = { workspace = true }
 bpaf                         = { workspace = true }

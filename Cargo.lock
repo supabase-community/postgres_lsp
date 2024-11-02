@@ -1564,6 +1564,7 @@ dependencies = [
  "bpaf",
  "enumflags2",
  "pg_console",
+ "pg_diagnostics_categories",
  "pg_diagnostics_macros",
  "pg_text_edit",
  "serde",
@@ -1571,6 +1572,15 @@ dependencies = [
  "termcolor",
  "text-size",
  "unicode-width",
+]
+
+[[package]]
+name = "pg_diagnostics_categories"
+version = "0.0.0"
+dependencies = [
+ "quote",
+ "schemars",
+ "serde",
 ]
 
 [[package]]

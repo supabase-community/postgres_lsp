@@ -37,6 +37,7 @@ pg_workspace_new = { path = "./crates/pg_workspace_new", version = "0.0.0" }
 pg_fs = { path = "./crates/pg_fs", version = "0.0.0" }
 pg_diagnostics = { path = "./crates/pg_diagnostics", version = "0.0.0" }
 pg_diagnostics_macros = { path = "./crates/pg_diagnostics_macros", version = "0.0.0" }
+pg_diagnostics_categories = { path = "./crates/pg_diagnostics_categories", version = "0.0.0" }
 pg_lexer_codegen = { path = "./crates/pg_lexer_codegen", version = "0.0.0" }
 pg_statement_splitter = { path = "./crates/pg_statement_splitter", version = "0.0.0" }
 pg_query_ext = { path = "./crates/pg_query_ext", version = "0.0.0" }

@@ -23,8 +23,8 @@ pub use termcolor;
 pub use pg_console as console;
 
 // Re-export macros from utility crates
-// pub use pg_diagnostics_categories::{category, category_concat, Category};
-// pub use pg_diagnostics_macros::Diagnostic;
+pub use pg_diagnostics_categories::{category, category_concat, Category};
+pub use pg_diagnostics_macros::Diagnostic;
 
 pub use crate::advice::{
     Advices, CodeFrameAdvice, CommandAdvice, DiffAdvice, LogAdvice, LogCategory, Visit,
