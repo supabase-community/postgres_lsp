@@ -5,7 +5,7 @@ use text_size::{TextRange, TextSize};
 use std::io;
 
 /// Helper struct for printing a diagnostic as markup into any formatter
-/// implementing [biome_console::fmt::Write].
+/// implementing [pg_console::fmt::Write].
 pub struct PrintGitHubDiagnostic<'fmt, D: ?Sized>(pub &'fmt D);
 
 impl<D: AsDiagnostic + ?Sized> fmt::Display for PrintGitHubDiagnostic<'_, D> {

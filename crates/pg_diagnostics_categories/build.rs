@@ -85,7 +85,7 @@ pub fn main() -> io::Result<()> {
         /// # Example
         ///
         /// ```
-        /// # use biome_diagnostics_categories::{Category, category};
+        /// # use pg_diagnostics_categories::{Category, category};
         /// let category: &'static Category = category!("internalError/io");
         /// assert_eq!(category.name(), "internalError/io");
         /// assert_eq!(category.link(), None);

@@ -2,7 +2,7 @@
 
 use ::serde::{Deserialize, Serialize};
 
-pub mod adapter;
+pub mod adapters;
 pub mod advice;
 pub mod context;
 pub mod diagnostic;

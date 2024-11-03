@@ -39,7 +39,7 @@ impl Eq for Location<'_> {}
 
 /// Represents the resource a diagnostic is associated with.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub enum Resource<P> {
     /// The diagnostic is related to the content of the command line arguments.
     Argv,

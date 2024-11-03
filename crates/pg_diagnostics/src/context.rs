@@ -260,7 +260,7 @@ mod internal {
     };
 
     /// This trait is inherited by `DiagnosticExt` and `Context`, since it's
-    /// not visible outside of `biome_diagnostics` this prevents these extension
+    /// not visible outside of `pg_diagnostics` this prevents these extension
     /// traits from being implemented on other types outside of this module
     ///
     /// Making these traits "sealed" is mainly intended as a stability

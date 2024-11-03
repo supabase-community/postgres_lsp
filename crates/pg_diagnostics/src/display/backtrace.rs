@@ -197,7 +197,7 @@ thread_local! {
 ///
 /// On the main thread:
 /// ```
-/// # use biome_diagnostics::set_bottom_frame;
+/// # use pg_diagnostics::set_bottom_frame;
 /// # #[allow(clippy::needless_doctest_main)]
 /// pub fn main() {
 ///     set_bottom_frame(main as usize);
@@ -208,7 +208,7 @@ thread_local! {
 ///
 /// On worker threads:
 /// ```
-/// # use biome_diagnostics::set_bottom_frame;
+/// # use pg_diagnostics::set_bottom_frame;
 /// fn worker_thread() {
 ///     set_bottom_frame(worker_thread as usize);
 ///

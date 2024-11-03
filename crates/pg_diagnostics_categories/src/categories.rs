@@ -1,4 +1,4 @@
-// This file contains the list of all diagnostic categories for the Biome
+// This file contains the list of all diagnostic categories for the pg
 // toolchain
 //
 // The `define_categories` macro is preprocessed in the build script for the
@@ -16,6 +16,9 @@ define_categories! {
     "somerule": "https://example.com/some-rule",
     ;
     "lint",
+    "configuration",
+    "database/connection",
     "internalError/io",
+    "internalError/fs",
     "flags/invalid",
 }

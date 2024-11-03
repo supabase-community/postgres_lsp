@@ -22,7 +22,7 @@ use crate::{Category, Location, Visit};
 /// instead rely on the `Diagnostic` derive macro also provided by this crate:
 ///
 /// ```
-/// # use biome_diagnostics::Diagnostic;
+/// # use pg_diagnostics::Diagnostic;
 /// #[derive(Debug, Diagnostic)]
 /// #[diagnostic(category = "lint/style/noShoutyConstants", tags(FIXABLE))]
 /// struct ExampleDiagnostic {
@@ -117,7 +117,7 @@ pub trait Diagnostic: Debug {
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, Default,
 )]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 /// The severity to associate to a diagnostic.
 pub enum Severity {
     /// Reports a hint.
@@ -164,7 +164,7 @@ impl Display for Severity {
 /// Internal enum used to automatically generate bit offsets for [DiagnosticTags]
 /// and help with the implementation of `serde` and `schemars` for tags.
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 #[bitflags]
 #[repr(u8)]
 pub(super) enum DiagnosticTag {
@@ -247,7 +247,7 @@ pub(crate) mod internal {
     /// trait (as that would conflict with the implementation of `From<T> for T`
     /// in the standard library). The [AsDiagnostic] exists as an internal
     /// implementation detail to bridge this gap and allow various types and
-    /// functions in `biome_diagnostics` to be generic over all diagnostics +
+    /// functions in `pg_diagnostics` to be generic over all diagnostics +
     /// `Error`.
     pub trait AsDiagnostic: Debug {
         type Diagnostic: Diagnostic + ?Sized;

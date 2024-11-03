@@ -37,7 +37,7 @@ fn generate_struct_diagnostic(input: DeriveStructInput) -> TokenStream {
     let generics = input.generics;
 
     quote! {
-        impl #generic_params biome_diagnostics::Diagnostic for #ident #generics {
+        impl #generic_params pg_diagnostics::Diagnostic for #ident #generics {
             #category
             #severity
             #description
@@ -54,7 +54,7 @@ fn generate_struct_diagnostic(input: DeriveStructInput) -> TokenStream {
 fn generate_category(input: &DeriveStructInput) -> TokenStream {
     let category = match &input.category {
         Some(StaticOrDynamic::Static(value)) => quote! {
-            biome_diagnostics::category!(#value)
+            pg_diagnostics::category!(#value)
         },
         Some(StaticOrDynamic::Dynamic(value)) => quote! {
             self.#value
@@ -63,7 +63,7 @@ fn generate_category(input: &DeriveStructInput) -> TokenStream {
     };
 
     quote! {
-        fn category(&self) -> Option<&'static biome_diagnostics::Category> {
+        fn category(&self) -> Option<&'static pg_diagnostics::Category> {
             Some(#category)
         }
     }
@@ -72,7 +72,7 @@ fn generate_category(input: &DeriveStructInput) -> TokenStream {
 fn generate_severity(input: &DeriveStructInput) -> TokenStream {
     let severity = match &input.severity {
         Some(StaticOrDynamic::Static(value)) => quote! {
-            biome_diagnostics::Severity::#value
+            pg_diagnostics::Severity::#value
         },
         Some(StaticOrDynamic::Dynamic(value)) => quote! {
             self.#value
@@ -81,7 +81,7 @@ fn generate_severity(input: &DeriveStructInput) -> TokenStream {
     };
 
     quote! {
-        fn severity(&self) -> biome_diagnostics::Severity {
+        fn severity(&self) -> pg_diagnostics::Severity {
             #severity
         }
     }
@@ -137,12 +137,12 @@ fn generate_description(input: &DeriveStructInput) -> TokenStream {
         Some(StaticOrDynamic::Static(StringOrMarkup::Markup(markup))) => quote! {
             let mut buffer = Vec::new();
 
-            let write = biome_diagnostics::termcolor::NoColor::new(&mut buffer);
-            let mut write = biome_diagnostics::console::fmt::Termcolor(write);
-            let mut write = biome_diagnostics::console::fmt::Formatter::new(&mut write);
+            let write = pg_diagnostics::termcolor::NoColor::new(&mut buffer);
+            let mut write = pg_diagnostics::console::fmt::Termcolor(write);
+            let mut write = pg_diagnostics::console::fmt::Formatter::new(&mut write);
 
-            use biome_diagnostics::console as biome_console;
-            write.write_markup(&biome_diagnostics::console::markup!{ #markup })
+            use pg_diagnostics::console as pg_console;
+            write.write_markup(&pg_diagnostics::console::markup!{ #markup })
                 .map_err(|_| ::std::fmt::Error)?;
 
             fmt.write_str(::std::str::from_utf8(&buffer).map_err(|_| ::std::fmt::Error)?)
@@ -166,17 +166,17 @@ fn generate_message(input: &DeriveStructInput) -> TokenStream {
             fmt.write_str(#value)
         },
         Some(StaticOrDynamic::Static(StringOrMarkup::Markup(markup))) => quote! {
-            use biome_diagnostics::console as biome_console;
-            fmt.write_markup(biome_diagnostics::console::markup!{ #markup })
+            use pg_diagnostics::console as pg_console;
+            fmt.write_markup(pg_diagnostics::console::markup!{ #markup })
         },
         Some(StaticOrDynamic::Dynamic(value)) => quote! {
-            biome_diagnostics::console::fmt::Display::fmt(&self.#value, fmt)
+            pg_diagnostics::console::fmt::Display::fmt(&self.#value, fmt)
         },
         None => return quote!(),
     };
 
     quote! {
-        fn message(&self, fmt: &mut biome_diagnostics::console::fmt::Formatter<'_>) -> ::std::io::Result<()> {
+        fn message(&self, fmt: &mut pg_diagnostics::console::fmt::Formatter<'_>) -> ::std::io::Result<()> {
             #message
         }
     }
@@ -190,8 +190,8 @@ fn generate_advices(input: &DeriveStructInput) -> TokenStream {
     let advices = input.advices.iter();
 
     quote! {
-        fn advices(&self, visitor: &mut dyn biome_diagnostics::Visit) -> ::std::io::Result<()> {
-            #( biome_diagnostics::Advices::record(&self.#advices, visitor)?; )*
+        fn advices(&self, visitor: &mut dyn pg_diagnostics::Visit) -> ::std::io::Result<()> {
+            #( pg_diagnostics::Advices::record(&self.#advices, visitor)?; )*
             Ok(())
         }
     }
@@ -205,8 +205,8 @@ fn generate_verbose_advices(input: &DeriveStructInput) -> TokenStream {
     let verbose_advices = input.verbose_advices.iter();
 
     quote! {
-        fn verbose_advices(&self, visitor: &mut dyn biome_diagnostics::Visit) -> ::std::io::Result<()> {
-            #( biome_diagnostics::Advices::record(&self.#verbose_advices, visitor)?; )*
+        fn verbose_advices(&self, visitor: &mut dyn pg_diagnostics::Visit) -> ::std::io::Result<()> {
+            #( pg_diagnostics::Advices::record(&self.#verbose_advices, visitor)?; )*
             Ok(())
         }
     }
@@ -221,8 +221,8 @@ fn generate_location(input: &DeriveStructInput) -> TokenStream {
     let method = input.location.iter().map(|(_, method)| method);
 
     quote! {
-        fn location(&self) -> biome_diagnostics::Location<'_> {
-            biome_diagnostics::Location::builder()
+        fn location(&self) -> pg_diagnostics::Location<'_> {
+            pg_diagnostics::Location::builder()
                 #( .#method(&self.#field) )*
                 .build()
         }
@@ -234,7 +234,7 @@ fn generate_tags(input: &DeriveStructInput) -> TokenStream {
         Some(StaticOrDynamic::Static(value)) => {
             let values = value.iter();
             quote! {
-                #( biome_diagnostics::DiagnosticTags::#values )|*
+                #( pg_diagnostics::DiagnosticTags::#values )|*
             }
         }
         Some(StaticOrDynamic::Dynamic(value)) => quote! {
@@ -244,7 +244,7 @@ fn generate_tags(input: &DeriveStructInput) -> TokenStream {
     };
 
     quote! {
-        fn tags(&self) -> biome_diagnostics::DiagnosticTags {
+        fn tags(&self) -> pg_diagnostics::DiagnosticTags {
             #tags
         }
     }
@@ -253,7 +253,7 @@ fn generate_tags(input: &DeriveStructInput) -> TokenStream {
 fn generate_source(input: &DeriveStructInput) -> TokenStream {
     match &input.source {
         Some(value) => quote! {
-            fn source(&self) -> Option<&dyn biome_diagnostics::Diagnostic> {
+            fn source(&self) -> Option<&dyn pg_diagnostics::Diagnostic> {
                 self.#value.as_deref()
             }
         },
@@ -280,58 +280,58 @@ fn generate_enum_diagnostic(input: DeriveEnumInput) -> TokenStream {
         .collect();
 
     quote! {
-        impl #generic_params biome_diagnostics::Diagnostic for #ident #generics {
-            fn category(&self) -> Option<&'static biome_diagnostics::Category> {
+        impl #generic_params pg_diagnostics::Diagnostic for #ident #generics {
+            fn category(&self) -> Option<&'static pg_diagnostics::Category> {
                 match self {
-                    #(Self::#variants(error) => biome_diagnostics::Diagnostic::category(error),)*
+                    #(Self::#variants(error) => pg_diagnostics::Diagnostic::category(error),)*
                 }
             }
 
             fn description(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 match self {
-                    #(Self::#variants(error) => biome_diagnostics::Diagnostic::description(error, fmt),)*
+                    #(Self::#variants(error) => pg_diagnostics::Diagnostic::description(error, fmt),)*
                 }
             }
 
-            fn message(&self, fmt: &mut biome_console::fmt::Formatter<'_>) -> std::io::Result<()> {
+            fn message(&self, fmt: &mut pg_console::fmt::Formatter<'_>) -> std::io::Result<()> {
                 match self {
-                    #(Self::#variants(error) => biome_diagnostics::Diagnostic::message(error, fmt),)*
+                    #(Self::#variants(error) => pg_diagnostics::Diagnostic::message(error, fmt),)*
                 }
             }
 
-            fn severity(&self) -> biome_diagnostics::Severity {
+            fn severity(&self) -> pg_diagnostics::Severity {
                 match self {
-                    #(Self::#variants(error) => biome_diagnostics::Diagnostic::severity(error),)*
+                    #(Self::#variants(error) => pg_diagnostics::Diagnostic::severity(error),)*
                 }
             }
 
-            fn tags(&self) -> biome_diagnostics::DiagnosticTags {
+            fn tags(&self) -> pg_diagnostics::DiagnosticTags {
                 match self {
-                    #(Self::#variants(error) => biome_diagnostics::Diagnostic::tags(error),)*
+                    #(Self::#variants(error) => pg_diagnostics::Diagnostic::tags(error),)*
                 }
             }
 
-            fn location(&self) -> biome_diagnostics::Location<'_> {
+            fn location(&self) -> pg_diagnostics::Location<'_> {
                 match self {
-                    #(Self::#variants(error) => biome_diagnostics::Diagnostic::location(error),)*
+                    #(Self::#variants(error) => pg_diagnostics::Diagnostic::location(error),)*
                 }
             }
 
-            fn source(&self) -> Option<&dyn biome_diagnostics::Diagnostic> {
+            fn source(&self) -> Option<&dyn pg_diagnostics::Diagnostic> {
                 match self {
-                    #(Self::#variants(error) => biome_diagnostics::Diagnostic::source(error),)*
+                    #(Self::#variants(error) => pg_diagnostics::Diagnostic::source(error),)*
                 }
             }
 
-            fn advices(&self, visitor: &mut dyn biome_diagnostics::Visit) -> std::io::Result<()> {
+            fn advices(&self, visitor: &mut dyn pg_diagnostics::Visit) -> std::io::Result<()> {
                 match self {
-                    #(Self::#variants(error) => biome_diagnostics::Diagnostic::advices(error, visitor),)*
+                    #(Self::#variants(error) => pg_diagnostics::Diagnostic::advices(error, visitor),)*
                 }
             }
 
-            fn verbose_advices(&self, visitor: &mut dyn biome_diagnostics::Visit) -> std::io::Result<()> {
+            fn verbose_advices(&self, visitor: &mut dyn pg_diagnostics::Visit) -> std::io::Result<()> {
                 match self {
-                    #(Self::#variants(error) => biome_diagnostics::Diagnostic::verbose_advices(error, visitor),)*
+                    #(Self::#variants(error) => pg_diagnostics::Diagnostic::verbose_advices(error, visitor),)*
                 }
             }
         }

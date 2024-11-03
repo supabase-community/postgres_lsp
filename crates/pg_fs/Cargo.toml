@@ -7,6 +7,11 @@ edition = "2021"
 directories       = "5.0.1"
 tracing           = { workspace = true }
 serde = { workspace = true }
+parking_lot       = { version = "0.12.3", features = ["arc_lock"] }
+rayon             = { workspace = true }
+rustc-hash        = { workspace = true }
+pg_diagnostics = { workspace = true }
+crossbeam         = { workspace = true }
 
 [dev-dependencies]
 

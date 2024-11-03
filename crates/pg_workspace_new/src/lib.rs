@@ -2,7 +2,12 @@ use std::ops::{Deref, DerefMut};
 
 use workspace::Workspace;
 
-mod workspace;
+pub mod settings;
+pub mod workspace;
+pub mod diagnostics;
+pub mod configuration;
+
+pub use crate::diagnostics::WorkspaceError;
 
 /// This is the main entrypoint of the application.
 pub struct App<'app> {

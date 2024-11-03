@@ -669,8 +669,8 @@ impl<W: fmt::Write + ?Sized> fmt::Write for ElementWrapper<'_, W> {
 #[cfg(test)]
 mod tests {
     use super::print_diff;
-    use biome_console::{fmt, markup, MarkupBuf};
-    use biome_text_edit::TextEdit;
+    use pg_console::{fmt, markup, MarkupBuf};
+    use pg_text_edit::TextEdit;
     use termcolor::Buffer;
 
     fn assert_eq_markup(actual: &MarkupBuf, expected: &MarkupBuf) {

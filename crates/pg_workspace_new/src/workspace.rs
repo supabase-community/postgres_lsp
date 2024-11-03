@@ -2,6 +2,8 @@ use std::panic::RefUnwindSafe;
 
 use pg_fs::PgLspPath;
 
+use crate::WorkspaceError;
+
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct OpenFileParams {
     pub path: PgLspPath,

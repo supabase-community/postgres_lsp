@@ -11,6 +11,9 @@ serde                    = { workspace = true, features = ["derive"] }
 serde_json               = { workspace = true, features = ["raw_value"] }
 
 pg_fs.workspace =  true
+pg_diagnostics        = { workspace = true }
+pg_configuration        = { workspace = true }
+pg_console        = { workspace = true }
 
 [dev-dependencies]
 

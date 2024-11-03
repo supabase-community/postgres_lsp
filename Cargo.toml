@@ -27,9 +27,16 @@ similar            = "2.6.0"
 bpaf               = { version = "0.9.15", features = ["derive"] }
 quote = "1.0.33"
 syn                = "1.0.109"
+indexmap           = { version = "2.6.0", features = ["serde"] }
+crossbeam          = "0.8.4"
+rayon              = "1.10.0"
+rustc-hash         = "2.0.0"
+biome_deserialize        = "0.6.0"
+biome_deserialize_macros        = "0.6.0"
 
 # postgres specific crates
 pg_lexer = { path = "./crates/pg_lexer", version = "0.0.0" }
+pg_configuration = { path = "./crates/pg_configuration", version = "0.0.0" }
 pg_markup = { path = "./crates/pg_markup", version = "0.0.0" }
 pg_console = { path = "./crates/pg_console", version = "0.0.0" }
 pg_text_edit = { path = "./crates/pg_text_edit", version = "0.0.0" }

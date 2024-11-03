@@ -35,7 +35,7 @@ impl<D: AsDiagnostic + ?Sized> std::fmt::Display for PrintDescription<'_, D> {
 }
 
 /// Helper struct for printing a diagnostic as markup into any formatter
-/// implementing [biome_console::fmt::Write].
+/// implementing [pg_console::fmt::Write].
 pub struct PrintDiagnostic<'fmt, D: ?Sized> {
     diag: &'fmt D,
     verbose: bool,
@@ -531,11 +531,11 @@ where
     D: Diagnostic + ?Sized,
 {
     if diagnostic.severity() == Severity::Fatal {
-        visitor.record_log(LogCategory::Warn, &"Biome exited as this error could not be handled and resulted in a fatal error. Please report it if necessary.")?;
+        visitor.record_log(LogCategory::Warn, &"Exited as this error could not be handled and resulted in a fatal error. Please report it if necessary.")?;
     }
 
     if diagnostic.tags().contains(DiagnosticTags::INTERNAL) {
-        visitor.record_log(LogCategory::Warn, &"This diagnostic was derived from an internal Biome error. Potential bug, please report it if necessary.")?;
+        visitor.record_log(LogCategory::Warn, &"This diagnostic was derived from an internal error. Potential bug, please report it if necessary.")?;
     }
 
     Ok(())
@@ -665,14 +665,14 @@ impl<W: fmt::Write + ?Sized> fmt::Write for IndentWriter<'_, W> {
 mod tests {
     use std::io;
 
-    use biome_console::{fmt, markup};
-    use biome_diagnostics::{DiagnosticTags, Severity};
-    use biome_diagnostics_categories::{category, Category};
-    use biome_text_edit::TextEdit;
-    use biome_text_size::{TextRange, TextSize};
+    use pg_console::{fmt, markup};
+    use pg_diagnostics::{DiagnosticTags, Severity};
+    use pg_diagnostics_categories::{category, Category};
+    use pg_text_edit::TextEdit;
+    use pg_text_size::{TextRange, TextSize};
     use serde_json::{from_value, json};
 
-    use crate::{self as biome_diagnostics};
+    use crate::{self as pg_diagnostics};
     use crate::{
         Advices, Diagnostic, Location, LogCategory, PrintDiagnostic, Resource, SourceCode, Visit,
     };
@@ -837,7 +837,7 @@ mod tests {
 
     impl Advices for CommandAdvice {
         fn record(&self, visitor: &mut dyn Visit) -> io::Result<()> {
-            visitor.record_command("biome command --argument")
+            visitor.record_command("pg command --argument")
         }
     }
 
@@ -1032,7 +1032,7 @@ mod tests {
             <Emphasis><Error>"✖"</Error></Emphasis>" "<Error>"diagnostic message"</Error>"\n"
             "  \n"
             "  "
-            <Emphasis>"$"</Emphasis>" biome command --argument\n"
+            <Emphasis>"$"</Emphasis>" pg command --argument\n"
             "  \n"
         }.to_owned();
 

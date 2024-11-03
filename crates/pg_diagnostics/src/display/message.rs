@@ -9,7 +9,7 @@ use termcolor::NoColor;
 /// ## Examples
 ///
 /// ```
-/// use biome_diagnostics::{Diagnostic, MessageAndDescription};
+/// use pg_diagnostics::{Diagnostic, MessageAndDescription};
 ///
 /// #[derive(Debug, Diagnostic)]
 /// struct TestDiagnostic {

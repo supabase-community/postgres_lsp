@@ -16,21 +16,21 @@ pub use similar::ChangeTag;
 use similar::{utils::TextDiffRemapper, TextDiff};
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct TextEdit {
     dictionary: String,
     ops: Vec<CompressedOp>,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub enum CompressedOp {
     DiffOp(DiffOp),
     EqualLines { line_count: NonZeroU32 },
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub enum DiffOp {
     Equal { range: TextRange },
     Insert { range: TextRange },
