@@ -1,18 +1,18 @@
-pub(crate) struct SimpleTokioDebouncer<Args> {
+use std::{future::Future, pin::Pin};
+
+type AsyncBlock = Pin<Box<dyn Future<Output = ()> + 'static + Send>>;
+
+pub(crate) struct SimpleTokioDebouncer {
     handle: tokio::task::JoinHandle<()>,
-    tx: tokio::sync::mpsc::Sender<Args>,
+    tx: tokio::sync::mpsc::Sender<AsyncBlock>,
 }
 
-impl<Args> SimpleTokioDebouncer<Args> {
-    pub fn new<F>(timeout: std::time::Duration, mut callback: F) -> Self
-    where
-        F: FnMut(Args) + Send + 'static,
-        Args: Send + 'static,
-    {
+impl SimpleTokioDebouncer {
+    pub fn new(timeout: std::time::Duration) -> Self {
         let (tx, mut rx) = tokio::sync::mpsc::channel(100);
 
         let handle = tokio::spawn(async move {
-            let mut maybe_args: Option<Args> = None;
+            let mut maybe_args: Option<AsyncBlock> = None;
             let mut instant = tokio::time::Instant::now() + timeout;
 
             loop {
@@ -20,8 +20,8 @@ impl<Args> SimpleTokioDebouncer<Args> {
                     // If the timeout is reached, execute and reset the last received action
                     _ = tokio::time::sleep_until(instant) => {
                         match maybe_args {
-                            Some(args) => {
-                                callback(args);
+                            Some(block) => {
+                                block.await;
                                 maybe_args = None;
                             }
                             None => continue,
@@ -45,9 +45,8 @@ impl<Args> SimpleTokioDebouncer<Args> {
         Self { handle, tx }
     }
 
-    pub async fn debounce(&self, args: Args)
-    {
-        self.tx.send(args).await.unwrap();
+    pub async fn debounce(&self, block: AsyncBlock) {
+        self.tx.send(block).await.unwrap();
     }
 
     pub async fn shutdown(self) {

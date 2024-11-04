@@ -1,4 +1,4 @@
-use std::{collections::HashSet,sync::Arc};
+use std::{collections::HashSet, sync::Arc};
 
 use pg_base_db::{Change, DocumentChange, PgLspPath};
 use pg_commands::{Command, ExecuteStatementCommand};
@@ -9,7 +9,8 @@ use pg_workspace::Workspace;
 use text_size::TextSize;
 use tokio::sync::RwLock;
 use tower_lsp::lsp_types::{
-    CodeActionOrCommand, CompletionItem, CompletionItemKind, CompletionList, Hover, HoverContents, InlayHint, InlayHintKind, InlayHintLabel, MarkedString, Position, Range
+    CodeActionOrCommand, CompletionItem, CompletionItemKind, CompletionList, Hover, HoverContents,
+    InlayHint, InlayHintKind, InlayHintLabel, MarkedString, Position, Range,
 };
 
 use crate::{db_connection::DbConnection, utils::line_index_ext::LineIndexExt};
@@ -27,6 +28,10 @@ impl Session {
             db: Arc::new(RwLock::new(None)),
             ide,
         }
+    }
+
+    async fn shutdown(&mut self) {
+        // TODO
     }
 
     /// `update_db_connection` will update `Self`'s database connection.
@@ -50,7 +55,8 @@ impl Session {
         let ide = self.ide.clone();
         db.listen_for_schema_updates(move |schema| {
             let _guard = ide.blocking_write().set_schema_cache(schema);
-        });
+        })
+        .await?;
 
         let mut current_db = self.db.blocking_write();
         let old_db = current_db.replace(db);
@@ -160,10 +166,7 @@ impl Session {
 
         let changed_files = ide.compute(pool);
 
-        changed_files
-            .into_iter()
-            .map(|p| p.document_url)
-            .collect()
+        changed_files.into_iter().map(|p| p.document_url).collect()
     }
 
     pub async fn get_available_code_actions_or_commands(

@@ -17,52 +17,21 @@ pub struct Server {
     client: Client,
     session: Session,
     client_capabilities: RwLock<Option<ClientFlags>>,
-    debouncer: SimpleTokioDebouncer<Url>,
+    debouncer: SimpleTokioDebouncer,
 }
 
 impl Server {
     pub fn new(client: Client) -> Self {
-        let session = Session::new();
-
-        let cloned_session = session.clone();
-        let cloned_client = client.clone();
-
-        let debouncer =
-            SimpleTokioDebouncer::new(std::time::Duration::from_millis(500), move |mut uri| {
-                normalize_uri(&mut uri);
-                let url = file_path(&uri);
-
-                let diagnostics = cloned_session.get_diagnostics_sync(url);
-
-                let diagnostics: Vec<Diagnostic> = diagnostics
-                    .into_iter()
-                    .map(|(d, r)| to_proto::diagnostic(d, r))
-                    .collect();
-
-                cloned_client.send_notification::<ShowMessage>(ShowMessageParams {
-                    typ: MessageType::INFO,
-                    message: format!("diagnostics {}", diagnostics.len()),
-                });
-
-                let params = PublishDiagnosticsParams {
-                    uri,
-                    diagnostics,
-                    version: None,
-                };
-
-                cloned_client.send_notification::<notification::PublishDiagnostics>(params);
-            });
-
         Self {
             client,
             session: Session::new(),
             client_capabilities: RwLock::new(None),
-            debouncer,
+            debouncer: SimpleTokioDebouncer::new(std::time::Duration::from_millis(500)),
         }
     }
 
     /// When the client sends a didChangeConfiguration notification, we need to parse the received JSON.
-    fn parse_options_from_client(
+    async fn parse_options_from_client(
         &self,
         mut value: serde_json::Value,
     ) -> Option<ClientConfigurationOptions> {
@@ -79,7 +48,8 @@ impl Server {
                 );
                 let typ = MessageType::WARNING;
                 self.client
-                    .send_notification::<ShowMessage>(ShowMessageParams { message, typ });
+                    .send_notification::<ShowMessage>(ShowMessageParams { message, typ })
+                    .await;
                 None
             }
         }
@@ -106,9 +76,7 @@ impl Server {
                     .next()
                     .expect("workspace/configuration request did not yield expected response.");
 
-                let opts = self.parse_options_from_client(relevant);
-
-                opts
+                self.parse_options_from_client(relevant).await
             }
             Err(why) => {
                 let message = format!(
@@ -116,7 +84,7 @@ impl Server {
                     why
                 );
                 println!("{}", message);
-                self.client.log_message(MessageType::ERROR, message);
+                self.client.log_message(MessageType::ERROR, message).await;
                 None
             }
         }
@@ -137,7 +105,8 @@ impl Server {
             .send_notification::<ShowMessage>(ShowMessageParams {
                 typ: MessageType::INFO,
                 message: format!("diagnostics {}", diagnostics.len()),
-            });
+            })
+            .await;
 
         let params = PublishDiagnosticsParams {
             uri,
@@ -146,11 +115,44 @@ impl Server {
         };
 
         self.client
-            .send_notification::<notification::PublishDiagnostics>(params);
+            .send_notification::<notification::PublishDiagnostics>(params)
+            .await;
     }
 
-    async fn publish_diagnostics_debounced(&self, uri: Url) {
-        self.debouncer.debounce(uri);
+    async fn publish_diagnostics_debounced(&self, mut uri: Url) {
+        let session = self.session.clone();
+        let client = self.client.clone();
+
+        self.debouncer
+            .debounce(Box::pin(async move {
+                normalize_uri(&mut uri);
+                let url = file_path(&uri);
+
+                let diagnostics = session.get_diagnostics_sync(url);
+
+                let diagnostics: Vec<Diagnostic> = diagnostics
+                    .into_iter()
+                    .map(|(d, r)| to_proto::diagnostic(d, r))
+                    .collect();
+
+                client
+                    .send_notification::<ShowMessage>(ShowMessageParams {
+                        typ: MessageType::INFO,
+                        message: format!("diagnostics {}", diagnostics.len()),
+                    })
+                    .await;
+
+                let params = PublishDiagnosticsParams {
+                    uri,
+                    diagnostics,
+                    version: None,
+                };
+
+                client
+                    .send_notification::<notification::PublishDiagnostics>(params)
+                    .await;
+            }))
+            .await;
     }
 }
 
@@ -197,6 +199,8 @@ impl LanguageServer for Server {
     }
 
     async fn shutdown(&self) -> jsonrpc::Result<()> {
+        // TODO: Shutdown stuff.
+
         self.client
             .log_message(MessageType::INFO, "Postgres LSP terminated.")
             .await;
@@ -213,21 +217,41 @@ impl LanguageServer for Server {
                 .is_some_and(|o| o.db_connection_string.is_some())
             {
                 let conn_str = opts.unwrap().db_connection_string.unwrap();
-                self.session.change_db(conn_str).await;
+                match self.session.change_db(conn_str).await {
+                    Ok(_) => {}
+                    Err(err) => {
+                        self.client
+                            .show_message(
+                                MessageType::ERROR,
+                                format!("Pulled Client Options but failed to set them: {}", err),
+                            )
+                            .await
+                    }
+                }
                 return;
             }
         }
 
         // if we couldn't pull settings from the client,
         // we'll try parsing the passed in params.
-        let opts = self.parse_options_from_client(params.settings);
+        let opts = self.parse_options_from_client(params.settings).await;
 
         if opts
             .as_ref()
             .is_some_and(|o| o.db_connection_string.is_some())
         {
             let conn_str = opts.unwrap().db_connection_string.unwrap();
-            self.session.change_db(conn_str).await;
+            match self.session.change_db(conn_str).await {
+                Ok(_) => {}
+                Err(err) => {
+                    self.client
+                        .show_message(
+                            MessageType::ERROR,
+                            format!("Used Client Options from params but failed to set them: {}", err),
+                        )
+                        .await
+                }
+            }
         }
     }
 
@@ -268,7 +292,7 @@ impl LanguageServer for Server {
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
 
-        self.debouncer.debounce(uri).await
+        self.publish_diagnostics_debounced(uri).await;
     }
 
     async fn did_close(&self, params: DidCloseTextDocumentParams) {
