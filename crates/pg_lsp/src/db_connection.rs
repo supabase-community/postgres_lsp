@@ -1,9 +1,5 @@
-use pg_commands::ExecuteStatementCommand;
 use pg_schema_cache::SchemaCache;
-use sqlx::{
-    postgres::{PgListener, PgQueryResult},
-    PgPool,
-};
+use sqlx::{postgres::PgListener, PgPool};
 use tokio::task::JoinHandle;
 
 #[derive(Debug)]

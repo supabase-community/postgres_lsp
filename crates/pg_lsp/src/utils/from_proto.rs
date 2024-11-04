@@ -1,5 +1,6 @@
 use super::line_index_ext::LineIndexExt;
 use pg_base_db::{Change, Document};
+use tower_lsp::lsp_types;
 
 pub fn content_changes(
     document: &Document,

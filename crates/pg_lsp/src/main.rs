@@ -1,13 +1,12 @@
-use lsp_server::Connection;
 use pg_lsp::server::Server;
+use tower_lsp::LspService;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let (connection, threads) = Connection::stdio();
+    let (server, client_socket) = LspService::build(|client| {
+        Server::new(client)
+    }).finish();
 
-    let server = Server::init(connection)?;
-    server.run().await?;
-    threads.join()?;
 
     Ok(())
 }

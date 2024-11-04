@@ -1,7 +1,6 @@
 mod client;
 mod db_connection;
-pub mod server;
+mod debouncer;
 mod utils;
-
-mod b_server;
 mod session;
+pub mod server;
