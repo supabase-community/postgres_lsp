@@ -1,5 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
+use pg_console::Console;
+use pg_fs::{FileSystem, OsFileSystem};
 use workspace::Workspace;
 
 pub mod settings;
@@ -7,19 +9,42 @@ pub mod workspace;
 pub mod diagnostics;
 pub mod configuration;
 
-pub use crate::diagnostics::WorkspaceError;
+pub use crate::diagnostics::{WorkspaceError, TransportError};
 
 /// This is the main entrypoint of the application.
 pub struct App<'app> {
+ /// A reference to the internal virtual file system
+    pub fs: DynRef<'app, dyn FileSystem>,
+/// A reference to the internal workspace
     pub workspace: WorkspaceRef<'app>,
+  /// A reference to the internal console, where its buffer will be used to write messages and
+    /// errors
+    pub console: &'app mut dyn Console,
 }
 
+
 impl<'app> App<'app> {
-    /// Create a new instance of the app using the [Workspace] implementation
+    pub fn with_console(console: &'app mut dyn Console) -> Self {
+        Self::with_filesystem_and_console(DynRef::Owned(Box::<OsFileSystem>::default()), console)
+    }
+
+    /// Create a new instance of the app using the specified [FileSystem] and [Console] implementation
+    pub fn with_filesystem_and_console(
+        fs: DynRef<'app, dyn FileSystem>,
+        console: &'app mut dyn Console,
+    ) -> Self {
+        Self::new(fs, console, WorkspaceRef::Owned(workspace::server()))
+    }
+
+    /// Create a new instance of the app using the specified [FileSystem], [Console] and [Workspace] implementation
     pub fn new(
+        fs: DynRef<'app, dyn FileSystem>,
+        console: &'app mut dyn Console,
         workspace: WorkspaceRef<'app>,
     ) -> Self {
         Self {
+            fs,
+            console,
             workspace,
         }
     }

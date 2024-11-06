@@ -15,6 +15,11 @@ use files::{partial_files_configuration, FilesConfiguration, PartialFilesConfigu
 use serde::{Deserialize, Serialize};
 use biome_deserialize_macros::Partial;
 
+pub const VERSION: &str = match option_env!("PGLSP_VERSION") {
+    Some(version) => version,
+    None => "0.0.0",
+};
+
 /// The configuration that is contained inside the configuration file.
 #[derive(Clone, Debug, Default, Deserialize, Eq, Partial, PartialEq, Serialize)]
 #[partial(derive(Bpaf, Clone, Eq, PartialEq))]

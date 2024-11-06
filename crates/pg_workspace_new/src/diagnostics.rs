@@ -26,6 +26,8 @@ pub enum WorkspaceError {
     CantReadFile(CantReadFile),
     /// The file does not exist in the [crate::Workspace]
     NotFound(NotFound),
+  /// Error emitted by the underlying transport layer for a remote Workspace
+    TransportError(TransportError),
 }
 
 impl WorkspaceError {
@@ -52,6 +54,12 @@ impl Display for WorkspaceError {
     }
 }
 
+impl From<TransportError> for WorkspaceError {
+    fn from(err: TransportError) -> Self {
+        Self::TransportError(err)
+    }
+}
+
 impl Termination for WorkspaceError {
     fn report(self) -> ExitCode {
         ExitCode::FAILURE
@@ -69,6 +77,66 @@ impl From<ConfigurationDiagnostic> for WorkspaceError {
         Self::Configuration(err)
     }
 }
+
+
+#[derive(Debug, Serialize, Deserialize)]
+/// Error emitted by the underlying transport layer for a remote Workspace
+pub enum TransportError {
+    /// Error emitted by the transport layer if the connection was lost due to an I/O error
+    ChannelClosed,
+    /// Error emitted by the transport layer if a request timed out
+    Timeout,
+    /// Error caused by a serialization or deserialization issue
+    SerdeError(String),
+    /// Generic error type for RPC errors that can't be deserialized into RomeError
+    RPCError(String),
+}
+
+impl Display for TransportError {
+    fn fmt(&self, fmt: &mut Formatter) -> fmt::Result {
+        self.description(fmt)
+    }
+}
+
+impl Diagnostic for TransportError {
+    fn category(&self) -> Option<&'static Category> {
+        Some(category!("internalError/io"))
+    }
+
+    fn severity(&self) -> Severity {
+        Severity::Error
+    }
+
+    fn description(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            TransportError::SerdeError(err) => write!(fmt, "serialization error: {err}"),
+            TransportError::ChannelClosed => fmt.write_str(
+                "a request to the remote workspace failed because the connection was interrupted",
+            ),
+            TransportError::Timeout => {
+                fmt.write_str("the request to the remote workspace timed out")
+            }
+            TransportError::RPCError(err) => fmt.write_str(err),
+        }
+    }
+
+    fn message(&self, fmt: &mut pg_console::fmt::Formatter<'_>) -> std::io::Result<()> {
+        match self {
+            TransportError::SerdeError(err) => write!(fmt, "serialization error: {err}"),
+            TransportError::ChannelClosed => fmt.write_str(
+                "a request to the remote workspace failed because the connection was interrupted",
+            ),
+            TransportError::Timeout => {
+                fmt.write_str("the request to the remote workspace timed out")
+            }
+            TransportError::RPCError(err) => fmt.write_str(err),
+        }
+    }
+    fn tags(&self) -> DiagnosticTags {
+        DiagnosticTags::INTERNAL
+    }
+}
+
 
 #[derive(Debug, Serialize, Deserialize, Diagnostic)]
 #[diagnostic(
