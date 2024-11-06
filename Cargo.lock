@@ -1855,6 +1855,7 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
+ "toml",
 ]
 
 [[package]]
@@ -2160,6 +2161,7 @@ dependencies = [
  "serde_json",
  "sqlx",
  "text-size",
+ "toml",
 ]
 
 [[package]]

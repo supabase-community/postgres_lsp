@@ -12,6 +12,7 @@ biome_deserialize_macros              = { workspace = true }
 bpaf                     = { workspace = true }
 pg_diagnostics                     = { workspace = true }
 pg_console                     = { workspace = true }
+toml = { workspace = true }
 
 [lib]
 doctest = false

@@ -10,6 +10,9 @@ pub enum ConfigurationDiagnostic {
     /// Thrown when the program can't serialize the configuration, while saving it
     SerializationError(SerializationError),
 
+    /// Error thrown when de-serialising the configuration from file
+    DeserializationError(DeserializationError),
+
     /// Thrown when trying to **create** a new configuration file, but it exists already
     ConfigAlreadyExists(ConfigAlreadyExists),
 
@@ -22,6 +25,10 @@ pub enum ConfigurationDiagnostic {
 
 
 impl ConfigurationDiagnostic {
+    pub fn new_deserialization_error(error: toml::de::Error) -> Self {
+        Self::DeserializationError(DeserializationError {message: error.message().to_string()})
+    }
+
     pub fn new_serialization_error() -> Self {
         Self::SerializationError(SerializationError)
     }
@@ -91,6 +98,18 @@ impl Advices for ConfigurationAdvices {
 
         Ok(())
     }
+}
+
+#[derive(Debug, Serialize, Deserialize, Diagnostic)]
+#[diagnostic(
+    message = "Failed to deserialize",
+    category = "configuration",
+    severity = Error
+)]
+pub struct DeserializationError {
+    #[message]
+    #[description]
+    pub message: String
 }
 
 #[derive(Debug, Serialize, Deserialize, Diagnostic)]

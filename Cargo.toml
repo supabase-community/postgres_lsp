@@ -33,6 +33,7 @@ rayon              = "1.10.0"
 rustc-hash         = "2.0.0"
 biome_deserialize        = "0.6.0"
 biome_deserialize_macros        = "0.6.0"
+toml = "0.8.19"
 
 # postgres specific crates
 pg_lexer = { path = "./crates/pg_lexer", version = "0.0.0" }

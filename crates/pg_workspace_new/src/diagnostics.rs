@@ -1,3 +1,4 @@
+use pg_configuration::ConfigurationDiagnostic;
 use pg_diagnostics::{
     category, Advices, Category, Diagnostic, DiagnosticTags, Location, LogCategory,
     MessageAndDescription, Severity, Visit,
@@ -13,6 +14,8 @@ use serde::{Deserialize, Serialize};
 /// Generic errors thrown during operations
 #[derive(Deserialize, Diagnostic, Serialize)]
 pub enum WorkspaceError {
+    /// Error thrown when validating the configuration. Once deserialized, further checks have to be done.
+    Configuration(ConfigurationDiagnostic),
     /// Error when trying to access the database
     DatabaseConnectionError(DatabaseConnectionError),
     /// Diagnostics emitted when querying the file system
@@ -58,6 +61,12 @@ impl Termination for WorkspaceError {
 impl From<FileSystemDiagnostic> for WorkspaceError {
     fn from(err: FileSystemDiagnostic) -> Self {
         Self::FileSystem(err)
+    }
+}
+
+impl From<ConfigurationDiagnostic> for WorkspaceError {
+    fn from(err: ConfigurationDiagnostic) -> Self {
+        Self::Configuration(err)
     }
 }
 
