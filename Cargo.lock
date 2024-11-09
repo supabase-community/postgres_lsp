@@ -2157,11 +2157,13 @@ dependencies = [
  "pg_console",
  "pg_diagnostics",
  "pg_fs",
+ "pg_statement_splitter",
  "serde",
  "serde_json",
  "sqlx",
  "text-size",
  "toml",
+ "tracing",
 ]
 
 [[package]]

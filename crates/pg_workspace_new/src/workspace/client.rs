@@ -84,7 +84,7 @@ where
     }
 
     pub fn shutdown(self) -> Result<(), WorkspaceError> {
-        self.request("biome/shutdown", ())
+        self.request("pglsp/shutdown", ())
     }
 }
 

@@ -3,11 +3,12 @@ use std::{panic::RefUnwindSafe, sync::Arc};
 use client::WorkspaceTransport;
 use pg_fs::PgLspPath;
 use serde::{Deserialize, Serialize};
+use text_size::TextRange;
 
 use crate::WorkspaceError;
 
 mod client;
-// mod server;
+mod server;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct OpenFileParams {
@@ -20,6 +21,21 @@ pub struct OpenFileParams {
 pub struct CloseFileParams {
     pub path: PgLspPath,
 }
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ChangeFileParams {
+    pub path: PgLspPath,
+    pub version: i32,
+    pub changes: Vec<ChangeParams>,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ChangeParams {
+    /// The range of the file that changed. If `None`, the whole file changed.
+    pub range: Option<TextRange>,
+    pub text: String,
+}
+
 
 #[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
 pub struct ServerInfo {
@@ -37,6 +53,9 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
 
     /// Remove a file from the workspace
     fn close_file(&self, params: CloseFileParams) -> Result<(), WorkspaceError>;
+
+    /// Change the content of an open file
+    fn change_file(&self, params: ChangeFileParams) -> Result<(), WorkspaceError>;
 }
 
 /// Convenience function for constructing a server instance of [Workspace]
