@@ -15,23 +15,26 @@ use tower_lsp::lsp_types::{
 
 use crate::{db_connection::DbConnection, utils::line_index_ext::LineIndexExt};
 
-#[derive(Clone)]
 pub struct Session {
-    db: Arc<RwLock<Option<DbConnection>>>,
+    db: RwLock<Option<DbConnection>>,
     ide: Arc<RwLock<Workspace>>,
 }
 
 impl Session {
     pub fn new() -> Self {
-        let ide = Arc::new(RwLock::new(Workspace::new()));
         Self {
-            db: Arc::new(RwLock::new(None)),
-            ide,
+            db: RwLock::new(None),
+            ide: Arc::new(RwLock::new(Workspace::new())),
         }
     }
 
-    async fn shutdown(&mut self) {
-        // TODO
+    pub async fn shutdown(&self) {
+        let mut db = self.db.blocking_write();
+        let db = db.take();
+
+        if db.is_some() {
+            db.unwrap().close().await;
+        }
     }
 
     /// `update_db_connection` will update `Self`'s database connection.
@@ -50,16 +53,15 @@ impl Session {
             return Ok(());
         }
 
-        let mut db = DbConnection::new(connection_string).await?;
-
         let ide = self.ide.clone();
-        db.listen_for_schema_updates(move |schema| {
+        let new_db = DbConnection::new(connection_string, move |schema| {
             let _guard = ide.blocking_write().set_schema_cache(schema);
         })
         .await?;
 
         let mut current_db = self.db.blocking_write();
-        let old_db = current_db.replace(db);
+        let old_db = current_db.replace(new_db);
+        drop(current_db);
 
         if old_db.is_some() {
             let old_db = old_db.unwrap();

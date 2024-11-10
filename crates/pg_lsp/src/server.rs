@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use notification::ShowMessage;
 use pg_commands::CommandType;
 use tokio::sync::RwLock;
@@ -13,18 +15,18 @@ use crate::utils::file_path;
 use crate::utils::normalize_uri;
 use crate::utils::to_proto;
 
-pub struct Server {
-    client: Client,
-    session: Session,
+pub struct LspServer {
+    client: Arc<Client>,
+    session: Arc<Session>,
     client_capabilities: RwLock<Option<ClientFlags>>,
     debouncer: SimpleTokioDebouncer,
 }
 
-impl Server {
+impl LspServer {
     pub fn new(client: Client) -> Self {
         Self {
-            client,
-            session: Session::new(),
+            client: Arc::new(client),
+            session: Arc::new(Session::new()),
             client_capabilities: RwLock::new(None),
             debouncer: SimpleTokioDebouncer::new(std::time::Duration::from_millis(500)),
         }
@@ -120,8 +122,8 @@ impl Server {
     }
 
     async fn publish_diagnostics_debounced(&self, mut uri: Url) {
-        let session = self.session.clone();
-        let client = self.client.clone();
+        let client = Arc::clone(&self.client);
+        let session = Arc::clone(&self.session);
 
         self.debouncer
             .debounce(Box::pin(async move {
@@ -157,7 +159,7 @@ impl Server {
 }
 
 #[tower_lsp::async_trait]
-impl LanguageServer for Server {
+impl LanguageServer for LspServer {
     async fn initialize(&self, params: InitializeParams) -> jsonrpc::Result<InitializeResult> {
         let flags = ClientFlags::from_initialize_request_params(&params);
         self.client_capabilities.blocking_write().replace(flags);
@@ -199,11 +201,13 @@ impl LanguageServer for Server {
     }
 
     async fn shutdown(&self) -> jsonrpc::Result<()> {
-        // TODO: Shutdown stuff.
+        self.session.shutdown().await;
+        self.debouncer.shutdown().await;
 
         self.client
             .log_message(MessageType::INFO, "Postgres LSP terminated.")
             .await;
+
         Ok(())
     }
 
@@ -247,7 +251,10 @@ impl LanguageServer for Server {
                     self.client
                         .show_message(
                             MessageType::ERROR,
-                            format!("Used Client Options from params but failed to set them: {}", err),
+                            format!(
+                                "Used Client Options from params but failed to set them: {}",
+                                err
+                            ),
                         )
                         .await
                 }
