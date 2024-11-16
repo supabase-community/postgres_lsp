@@ -99,4 +99,12 @@ where
     fn close_file(&self, params: CloseFileParams) -> Result<(), WorkspaceError> {
         self.request("pglsp/close_file", params)
     }
+
+    fn change_file(&self, params: super::ChangeFileParams) -> Result<(), WorkspaceError> {
+        self.request("pglsp/change_file", params)
+    }
+
+    fn update_settings(&self, params: super::UpdateSettingsParams) -> Result<(), WorkspaceError> {
+        self.request("pglsp/update_settings", params)
+    }
 }

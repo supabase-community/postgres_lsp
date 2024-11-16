@@ -4,9 +4,9 @@ use dashmap::DashMap;
 use pg_fs::PgLspPath;
 use store::Document;
 
-use crate::{settings::Settings, WorkspaceError};
+use crate::{settings::{Settings, SettingsHandleMut}, WorkspaceError};
 
-use super::{OpenFileParams, Workspace};
+use super::{OpenFileParams, UpdateSettingsParams, Workspace};
 
 mod store;
 
@@ -38,9 +38,31 @@ impl WorkspaceServer {
             documents: DashMap::default(),
         }
     }
+
+    fn settings_mut(&self) -> SettingsHandleMut {
+        SettingsHandleMut::new(&self.settings)
+    }
 }
 
 impl Workspace for WorkspaceServer {
+    /// Update the global settings for this workspace
+    ///
+    /// ## Panics
+    /// This function may panic if the internal settings mutex has been poisoned
+    /// by another thread having previously panicked while holding the lock
+    #[tracing::instrument(level = "trace", skip(self))]
+    fn update_settings(&self, params: UpdateSettingsParams) -> Result<(), WorkspaceError> {
+        let mut settings = self.settings_mut();
+       settings
+            .as_mut()
+            .merge_with_configuration(
+                params.configuration,
+                params.workspace_directory
+            )?;
+
+        Ok(())
+    }
+
     /// Add a new file to the workspace
     #[tracing::instrument(level = "trace", skip(self))]
     fn open_file(&self, params: OpenFileParams) -> Result<(), WorkspaceError> {

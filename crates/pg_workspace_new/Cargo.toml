@@ -9,9 +9,11 @@ dashmap = "5.5.3"
 sqlx = { version = "0.7.3", features = [ "runtime-async-std", "tls-rustls", "postgres", "json" ] }
 serde                    = { workspace = true, features = ["derive"] }
 serde_json               = { workspace = true, features = ["raw_value"] }
+ignore                   = { workspace = true }
 toml = { workspace = true }
 pg_fs.workspace =  true
 pg_diagnostics        = { workspace = true }
+biome_deserialize        = "0.6.0"
 pg_statement_splitter        = { workspace = true }
 pg_configuration        = { workspace = true }
 pg_console        = { workspace = true }

@@ -2,14 +2,15 @@ use std::ops::{Deref, DerefMut};
 
 use pg_console::Console;
 use pg_fs::{FileSystem, OsFileSystem};
-use workspace::Workspace;
 
+pub mod matcher;
 pub mod settings;
 pub mod workspace;
 pub mod diagnostics;
 pub mod configuration;
 
 pub use crate::diagnostics::{WorkspaceError, TransportError};
+pub use crate::workspace::Workspace;
 
 /// This is the main entrypoint of the application.
 pub struct App<'app> {

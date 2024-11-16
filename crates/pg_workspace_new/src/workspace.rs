@@ -1,6 +1,7 @@
-use std::{panic::RefUnwindSafe, sync::Arc};
+use std::{panic::RefUnwindSafe, path::PathBuf, sync::Arc};
 
 use client::WorkspaceTransport;
+use pg_configuration::PartialConfiguration;
 use pg_fs::PgLspPath;
 use serde::{Deserialize, Serialize};
 use text_size::TextRange;
@@ -36,6 +37,11 @@ pub struct ChangeParams {
     pub text: String,
 }
 
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct UpdateSettingsParams {
+    pub configuration: PartialConfiguration,
+    pub workspace_directory: Option<PathBuf>,
+}
 
 #[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
 pub struct ServerInfo {
@@ -48,6 +54,9 @@ pub struct ServerInfo {
 }
 
 pub trait Workspace: Send + Sync + RefUnwindSafe {
+    /// Update the global settings for this workspace
+    fn update_settings(&self, params: UpdateSettingsParams) -> Result<(), WorkspaceError>;
+
     /// Add a new file to the workspace
     fn open_file(&self, params: OpenFileParams) -> Result<(), WorkspaceError>;
 

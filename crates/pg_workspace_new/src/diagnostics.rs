@@ -1,4 +1,6 @@
 use pg_configuration::ConfigurationDiagnostic;
+use pg_console::fmt::Bytes;
+use pg_console::markup;
 use pg_diagnostics::{
     category, Advices, Category, Diagnostic, DiagnosticTags, Location, LogCategory,
     MessageAndDescription, Severity, Visit,
@@ -26,8 +28,12 @@ pub enum WorkspaceError {
     CantReadFile(CantReadFile),
     /// The file does not exist in the [crate::Workspace]
     NotFound(NotFound),
-  /// Error emitted by the underlying transport layer for a remote Workspace
+    /// Error emitted by the underlying transport layer for a remote Workspace
     TransportError(TransportError),
+    /// Emitted when the file is ignored and should not be processed
+    FileIgnored(FileIgnored),
+    /// Emitted when a file could not be parsed because it's larger than the size limit
+    FileTooLarge(FileTooLarge),
 }
 
 impl WorkspaceError {
@@ -178,3 +184,51 @@ pub struct CantReadFile {
     #[location(resource)]
     path: String,
 }
+
+#[derive(Debug, Serialize, Deserialize, Diagnostic)]
+#[diagnostic(
+    category = "internalError/fs",
+    message(
+        message("The file "{self.path}" was ignored."),
+        description = "The file {path} was ignored."
+    ),
+    severity = Warning,
+)]
+pub struct FileIgnored {
+    #[location(resource)]
+    path: String,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FileTooLarge {
+    path: String,
+    size: usize,
+    limit: usize,
+}
+
+impl Diagnostic for FileTooLarge {
+    fn category(&self) -> Option<&'static Category> {
+        Some(category!("internalError/fs"))
+    }
+
+    fn message(&self, fmt: &mut pg_console::fmt::Formatter<'_>) -> std::io::Result<()> {
+        fmt.write_markup(
+            markup!{
+                "Size of "{self.path}" is "{Bytes(self.size)}" which exceeds configured maximum of "{Bytes(self.limit)}" for this project.
+                The file size limit exists to prevent us inadvertently slowing down and loading large files that we shouldn't.
+                Use the `files.maxSize` configuration to change the maximum size of files processed."
+            }
+        )
+    }
+
+    fn description(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
+        write!(fmt,
+               "Size of {} is {} which exceeds configured maximum of {} for this project.\n\
+               The file size limit exists to prevent us inadvertently slowing down and loading large files that we shouldn't.\n\
+               Use the `files.maxSize` configuration to change the maximum size of files processed.",
+               self.path, Bytes(self.size), Bytes(self.limit)
+        )
+    }
+}
+

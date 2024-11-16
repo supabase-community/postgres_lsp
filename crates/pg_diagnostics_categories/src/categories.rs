@@ -15,6 +15,7 @@
 define_categories! {
     "somerule": "https://example.com/some-rule",
     ;
+    "stdin",
     "lint",
     "configuration",
     "database/connection",
