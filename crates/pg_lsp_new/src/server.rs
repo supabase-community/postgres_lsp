@@ -142,9 +142,7 @@ impl LanguageServer for LSPServer {
         info!("Attempting to load the configuration from 'pglsp.toml' file");
 
         futures::join!(
-            self.session.load_extension_settings(),
-            self.session.load_workspace_settings(),
-            self.session.load_manifest()
+            self.session.load_workspace_settings()
         );
 
         let msg = format!("Server initialized with PID: {}", std::process::id());
@@ -156,7 +154,7 @@ impl LanguageServer for LSPServer {
         self.setup_capabilities().await;
 
         // Diagnostics are disabled by default, so update them after fetching workspace config
-        self.session.update_all_diagnostics().await;
+        // self.session.update_all_diagnostics().await;
     }
 
     async fn shutdown(&self) -> LspResult<()> {
@@ -167,9 +165,8 @@ impl LanguageServer for LSPServer {
     async fn did_change_configuration(&self, params: DidChangeConfigurationParams) {
         let _ = params;
         self.session.load_workspace_settings().await;
-        self.session.load_extension_settings().await;
         self.setup_capabilities().await;
-        self.session.update_all_diagnostics().await;
+        // self.session.update_all_diagnostics().await;
     }
 
     #[tracing::instrument(level = "trace", skip(self))]
@@ -189,9 +186,8 @@ impl LanguageServer for LSPServer {
                                     .contains(&&*watched_file.display().to_string())
                             {
                                 self.session.load_workspace_settings().await;
-                                self.session.load_manifest().await;
                                 self.setup_capabilities().await;
-                                self.session.update_all_diagnostics().await;
+                                // self.session.update_all_diagnostics().await;
                                 // for now we are only interested to the configuration file,
                                 // so it's OK to exist the loop
                                 break;
@@ -214,9 +210,9 @@ impl LanguageServer for LSPServer {
     }
 
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
-        handlers::text_document::did_change(&self.session, params)
-            .await
-            .ok();
+        // handlers::text_document::did_change(&self.session, params)
+        //     .await
+        //     .ok();
     }
 
     async fn did_close(&self, params: DidCloseTextDocumentParams) {

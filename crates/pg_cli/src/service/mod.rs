@@ -51,7 +51,7 @@ pub(crate) use self::windows::{
 mod unix;
 #[cfg(unix)]
 pub(crate) use self::unix::{
-    ensure_daemon, enumerate_pipes, open_socket, print_socket, run_daemon,
+    ensure_daemon, open_socket, print_socket, run_daemon,
 };
 
 /// Tries to open a connection to a running daemon instance, returning a

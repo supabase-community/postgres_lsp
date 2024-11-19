@@ -6,7 +6,7 @@ use store::Document;
 
 use crate::{settings::{Settings, SettingsHandleMut}, WorkspaceError};
 
-use super::{OpenFileParams, UpdateSettingsParams, Workspace};
+use super::{OpenFileParams, ServerInfo, UpdateSettingsParams, Workspace};
 
 mod store;
 
@@ -87,5 +87,9 @@ impl Workspace for WorkspaceServer {
     fn change_file(&self, params: super::ChangeFileParams) -> Result<(), WorkspaceError> {
         // get statement ids from document and apply changes and update the store for parse results
         todo!()
+    }
+
+    fn server_info(&self) -> Option<&ServerInfo> {
+        None
     }
 }

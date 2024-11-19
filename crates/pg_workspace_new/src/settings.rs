@@ -1,6 +1,5 @@
 use std::{num::NonZeroU64, path::PathBuf, sync::{RwLock, RwLockWriteGuard}};
-use ignore::gitignore::{Gitignore, GitignoreBuilder};
-use biome_deserialize::{Merge, StringSet};
+use biome_deserialize::StringSet;
 
 use pg_configuration::{files::FilesConfiguration, ConfigurationDiagnostic, PartialConfiguration};
 
@@ -9,8 +8,6 @@ use crate::{matcher::Matcher, WorkspaceError};
 /// Global settings for the entire workspace
 #[derive(Debug, Default)]
 pub struct Settings {
-    /// The database connection string
-    pub db_connection: String,
     /// Filesystem settings for the workspace
     pub files: FilesSettings,
 }
@@ -58,16 +55,9 @@ fn to_file_settings(
     working_directory: Option<PathBuf>,
     config: Option<FilesConfiguration>,
 ) -> Result<Option<FilesSettings>, WorkspaceError> {
-    let config = if let Some(config) = config {
-        Some(config)
-    } else {
-        None
-    };
-    let git_ignore = None;
     Ok(if let Some(config) = config {
         Some(FilesSettings {
             max_size: config.max_size,
-            git_ignore,
             ignored_files: to_matcher(working_directory.clone(), Some(&config.ignore))?,
             included_files: to_matcher(working_directory, Some(&config.include))?,
         })
@@ -109,9 +99,6 @@ pub struct FilesSettings {
     /// File size limit in bytes
     pub max_size: NonZeroU64,
 
-    /// gitignore file patterns
-    pub git_ignore: Option<Gitignore>,
-
     /// List of paths/files to matcher
     pub ignored_files: Matcher,
 
@@ -128,7 +115,6 @@ impl Default for FilesSettings {
     fn default() -> Self {
         Self {
             max_size: DEFAULT_FILE_SIZE_LIMIT,
-            git_ignore: None,
             ignored_files: Matcher::empty(),
             included_files: Matcher::empty(),
         }

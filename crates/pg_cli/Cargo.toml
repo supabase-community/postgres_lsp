@@ -18,6 +18,10 @@ tracing-tree             = "0.4.0"
 hdrhistogram             = { version = "7.5.4", default-features = false }
 rustc-hash               = { workspace = true }
 tokio                    = { workspace = true, features = ["io-std", "io-util", "net", "time", "rt", "sync", "rt-multi-thread", "macros"] }
+anyhow                   = { workspace = true }
+dashmap = "5.5.3"
+serde                    = { workspace = true, features = ["derive"] }
+serde_json               = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]
 libc  = "0.2.161"

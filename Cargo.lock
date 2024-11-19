@@ -2012,7 +2012,9 @@ dependencies = [
 name = "pg_cli"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "bpaf",
+ "dashmap",
  "hdrhistogram",
  "libc",
  "mimalloc",
@@ -2023,6 +2025,8 @@ dependencies = [
  "pg_lsp_new",
  "pg_workspace_new",
  "rustc-hash 2.0.0",
+ "serde",
+ "serde_json",
  "tikv-jemallocator",
  "tokio",
  "tracing",
@@ -2244,10 +2248,12 @@ dependencies = [
  "pg_diagnostics",
  "pg_fs",
  "pg_lsp_converters",
+ "pg_text_edit",
  "pg_workspace_new",
  "rustc-hash 2.0.0",
  "serde",
  "serde_json",
+ "text-size",
  "tokio",
  "tower-lsp",
  "tracing",

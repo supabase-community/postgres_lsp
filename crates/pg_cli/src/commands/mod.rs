@@ -153,14 +153,14 @@ impl PgLspCommand {
         match self.cli_options() {
             Some(cli_options) => {
                 // To properly display GitHub annotations we need to disable colors
-                if matches!(cli_options.reporter, CliReporter::GitHub) {
-                    return Some(&ColorsArg::Off);
-                }
+                // if matches!(cli_options.reporter, CliReporter::GitHub) {
+                //     return Some(&ColorsArg::Off);
+                // }
                 // We want force colors in CI, to give e better UX experience
                 // Unless users explicitly set the colors flag
-                if matches!(self, PgLspCommand::Ci { .. }) && cli_options.colors.is_none() {
-                    return Some(&ColorsArg::Force);
-                }
+                // if matches!(self, PgLspCommand::Ci { .. }) && cli_options.colors.is_none() {
+                //     return Some(&ColorsArg::Force);
+                // }
                 // Normal behaviors
                 cli_options.colors.as_ref()
             }
@@ -218,41 +218,26 @@ pub(crate) fn validate_configuration_diagnostics(
             }
         }
     }
-    let diagnostics = loaded_configuration.as_diagnostics_iter();
-    for diagnostic in diagnostics {
-        if diagnostic.tags().is_verbose() && verbose {
-            console.error(markup! {{PrintDiagnostic::verbose(diagnostic)}})
-        } else {
-            console.error(markup! {{PrintDiagnostic::simple(diagnostic)}})
-        }
-    }
 
-    if loaded_configuration.has_errors() {
-        return Err(CliDiagnostic::workspace_error(
-            ConfigurationDiagnostic::invalid_configuration(
-                "Exited because the configuration resulted in errors. Please fix them.",
-            )
-            .into(),
-        ));
-    }
+    // let diagnostics = loaded_configuration.as_diagnostics_iter();
+    // for diagnostic in diagnostics {
+    //     if diagnostic.tags().is_verbose() && verbose {
+    //         console.error(markup! {{PrintDiagnostic::verbose(diagnostic)}})
+    //     } else {
+    //         console.error(markup! {{PrintDiagnostic::simple(diagnostic)}})
+    //     }
+    // }
+    //
+    // if loaded_configuration.has_errors() {
+    //     return Err(CliDiagnostic::workspace_error(
+    //         ConfigurationDiagnostic::invalid_configuration(
+    //             "Exited because the configuration resulted in errors. Please fix them.",
+    //         )
+    //         .into(),
+    //     ));
+    // }
 
     Ok(())
-}
-
-fn resolve_manifest(
-    fs: &DynRef<'_, dyn FileSystem>,
-) -> Result<Option<(PgLspPath, String)>, WorkspaceError> {
-    let result = fs.auto_search(
-        &fs.working_directory().unwrap_or_default(),
-        &["package.json"],
-        false,
-    )?;
-
-    if let Some(result) = result {
-        return Ok(Some((PgLspPath::new(result.file_path), result.content)));
-    }
-
-    Ok(None)
 }
 
 /// Generic interface for executing commands.
@@ -307,19 +292,14 @@ pub(crate) trait CommandRunner: Sized {
         let configuration_path = loaded_configuration.directory_path.clone();
         let configuration = self.merge_configuration(loaded_configuration, fs, console)?;
         let vcs_base_path = configuration_path.or(fs.working_directory());
-        let (vcs_base_path, gitignore_matches) =
-            configuration.retrieve_gitignore_matches(fs, vcs_base_path.as_deref())?;
+        // let (vcs_base_path, gitignore_matches) =
+        //     configuration.retrieve_gitignore_matches(fs, vcs_base_path.as_deref())?;
         let paths = self.get_files_to_process(fs, &configuration)?;
-        workspace.register_project_folder(RegisterProjectFolderParams {
-            path: fs.working_directory(),
-            set_as_current_workspace: true,
-        })?;
+        // workspace.register_project_folder(RegisterProjectFolderParams {
+        //     path: fs.working_directory(),
+        //     set_as_current_workspace: true,
+        // })?;
 
-        let manifest_data = resolve_manifest(fs)?;
-
-        if let Some(manifest_data) = manifest_data {
-            workspace.set_manifest_for_project(manifest_data.into())?;
-        }
         workspace.update_settings(UpdateSettingsParams {
             workspace_directory: fs.working_directory(),
             configuration,

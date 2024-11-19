@@ -1,19 +1,17 @@
 use anyhow::{ensure, Context, Result};
-use biome_console::fmt::Termcolor;
-use biome_console::fmt::{self, Formatter};
-use biome_console::MarkupBuf;
-use biome_diagnostics::termcolor::NoColor;
-use biome_diagnostics::{
-    Applicability, {Diagnostic, DiagnosticTags, Location, PrintDescription, Severity, Visit},
+use pg_console::fmt::Termcolor;
+use pg_console::fmt::{self, Formatter};
+use pg_console::MarkupBuf;
+use pg_diagnostics::termcolor::NoColor;
+use pg_diagnostics::{
+    Diagnostic, DiagnosticTags, Location, PrintDescription, Severity, Visit
 };
-use biome_lsp_converters::line_index::LineIndex;
-use biome_lsp_converters::{from_proto, to_proto, PositionEncoding};
-use biome_rowan::{TextRange, TextSize};
-use biome_service::workspace::CodeAction;
-use biome_text_edit::{CompressedOp, DiffOp, TextEdit};
+use pg_lsp_converters::line_index::LineIndex;
+use pg_lsp_converters::{from_proto, to_proto, PositionEncoding};
+use text_size::{TextRange, TextSize};
+use pg_text_edit::{CompressedOp, DiffOp, TextEdit};
 use std::any::Any;
 use std::borrow::Cow;
-use std::collections::HashMap;
 use std::fmt::{Debug, Display};
 use std::ops::{Add, Range};
 use std::{io, mem};
@@ -90,78 +88,7 @@ pub(crate) fn text_edit(
     Ok(result)
 }
 
-pub(crate) fn code_fix_to_lsp(
-    url: &lsp::Url,
-    line_index: &LineIndex,
-    position_encoding: PositionEncoding,
-    diagnostics: &[lsp::Diagnostic],
-    action: CodeAction,
-    offset: Option<u32>,
-) -> Result<lsp::CodeAction> {
-    // Mark diagnostics emitted by the same rule as resolved by this action
-    let diagnostics: Vec<_> = action
-        .rule_name
-        .as_ref()
-        .filter(|_| action.category.matches("quickfix"))
-        .map(|(group_name, rule_name)| {
-            diagnostics
-                .iter()
-                .filter_map(|d| {
-                    let code = d.code.as_ref()?;
-                    let code = match code {
-                        lsp::NumberOrString::String(code) => code.as_str(),
-                        lsp::NumberOrString::Number(_) => return None,
-                    };
-
-                    let code = code.strip_prefix("lint/")?;
-                    let code = code.strip_prefix(group_name.as_ref())?;
-                    let code = code.strip_prefix('/')?;
-
-                    if code == rule_name {
-                        Some(d.clone())
-                    } else {
-                        None
-                    }
-                })
-                .collect()
-        })
-        .unwrap_or_default();
-
-    let kind = action.category.to_str().into_owned();
-    let suggestion = action.suggestion;
-
-    let mut changes = HashMap::new();
-    let edits = text_edit(line_index, suggestion.suggestion, position_encoding, offset)?;
-
-    changes.insert(url.clone(), edits);
-
-    let edit = lsp::WorkspaceEdit {
-        changes: Some(changes),
-        document_changes: None,
-        change_annotations: None,
-    };
-
-    let is_preferred = matches!(action.category, ActionCategory::Source(_))
-        || matches!(suggestion.applicability, Applicability::Always)
-            && !action.category.matches("quickfix.suppressRule");
-
-    Ok(lsp::CodeAction {
-        title: print_markup(&suggestion.msg),
-        kind: Some(lsp::CodeActionKind::from(kind)),
-        diagnostics: if !diagnostics.is_empty() {
-            Some(diagnostics)
-        } else {
-            None
-        },
-        edit: Some(edit),
-        command: None,
-        is_preferred: is_preferred.then_some(true),
-        disabled: None,
-        data: None,
-    })
-}
-
-/// Convert an [biome_diagnostics::Diagnostic] to a [lsp::Diagnostic], using the span
+/// Convert an [pg_diagnostics::Diagnostic] to a [lsp::Diagnostic], using the span
 /// of the diagnostic's primary label as the diagnostic range.
 /// Requires a [LineIndex] to convert a byte offset range to the line/col range
 /// expected by LSP.
@@ -241,7 +168,7 @@ pub(crate) fn diagnostic_to_lsp<D: Diagnostic>(
         span,
         Some(severity),
         code,
-        Some("biome".into()),
+        Some("pg".into()),
         message,
         related_information,
         tags,
@@ -379,9 +306,9 @@ pub(crate) fn apply_document_changes(
 #[cfg(test)]
 mod tests {
     use super::apply_document_changes;
-    use biome_lsp_converters::line_index::LineIndex;
-    use biome_lsp_converters::{PositionEncoding, WideEncoding};
-    use biome_text_edit::TextEdit;
+    use pg_lsp_converters::line_index::LineIndex;
+    use pg_lsp_converters::{PositionEncoding, WideEncoding};
+    use pg_text_edit::TextEdit;
     use tower_lsp::lsp_types as lsp;
     use tower_lsp::lsp_types::{Position, Range, TextDocumentContentChangeEvent};
 

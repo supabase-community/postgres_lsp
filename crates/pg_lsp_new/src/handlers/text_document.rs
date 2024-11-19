@@ -1,7 +1,7 @@
 use crate::{documents::Document, session::Session};
 use anyhow::Result;
 use pg_workspace_new::workspace::{
-     CloseFileParams, DocumentFileSource, GetFileContentParams, OpenFileParams,
+     CloseFileParams, OpenFileParams,
 };
 use tower_lsp::lsp_types;
 use tracing::{error, field};

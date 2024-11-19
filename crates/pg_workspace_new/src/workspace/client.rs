@@ -107,4 +107,8 @@ where
     fn update_settings(&self, params: super::UpdateSettingsParams) -> Result<(), WorkspaceError> {
         self.request("pglsp/update_settings", params)
     }
+
+    fn server_info(&self) -> Option<&ServerInfo> {
+        self.server_info.as_ref()
+    }
 }

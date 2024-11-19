@@ -3,20 +3,18 @@ use crate::documents::Document;
 use crate::utils;
 use anyhow::Result;
 use biome_deserialize::Merge;
+use futures::stream::futures_unordered::FuturesUnordered;
+use futures::StreamExt;
 use pg_configuration::{ConfigurationPathHint, PartialConfiguration};
 use pg_console::markup;
 use pg_diagnostics::{DiagnosticExt, Error, PrintDescription};
-use pg_fs::{PgLspPath, FileSystem};
+use pg_fs::{FileSystem, PgLspPath};
 use pg_lsp_converters::{negotiated_encoding, PositionEncoding, WideEncoding};
-use pg_workspace_new::configuration::{
-    load_configuration, LoadedConfiguration,
-};
+use pg_workspace_new::configuration::{load_configuration, LoadedConfiguration};
 use pg_workspace_new::settings::Settings;
 use pg_workspace_new::workspace::UpdateSettingsParams;
 use pg_workspace_new::Workspace;
 use pg_workspace_new::{DynRef, WorkspaceError};
-use futures::stream::futures_unordered::FuturesUnordered;
-use futures::StreamExt;
 use rustc_hash::FxHashMap;
 use serde_json::Value;
 use std::ffi::OsStr;
@@ -369,69 +367,26 @@ impl Session {
     ) -> ConfigurationStatus {
         match load_configuration(&self.fs, base_path.clone()) {
             Ok(loaded_configuration) => {
-                    let LoadedConfiguration {
-                        configuration: fs_configuration,
-                        directory_path: configuration_path,
-                        ..
-                    } = loaded_configuration;
-                    info!("Configuration loaded successfully from disk.");
-                    info!("Update workspace settings.");
+                let LoadedConfiguration {
+                    configuration: fs_configuration,
+                    ..
+                } = loaded_configuration;
+                info!("Configuration loaded successfully from disk.");
+                info!("Update workspace settings.");
 
-                    let fs = &self.fs;
-                    let mut configuration = PartialConfiguration::default();
+                let result = self.workspace.update_settings(UpdateSettingsParams {
+                    workspace_directory: self.fs.working_directory(),
+                    configuration: fs_configuration,
+                });
 
-                    configuration.merge_with(fs_configuration);
-
-                    let result =
-                        configuration.retrieve_gitignore_matches(fs, configuration_path.as_deref());
-
-                    match result {
-                        Ok((vcs_base_path, gitignore_matches)) => {
-                            let register_result =
-                                if let ConfigurationPathHint::FromWorkspace(path) = &base_path {
-                                    // We don't need the key
-                                    self.workspace
-                                        .register_project_folder(RegisterProjectFolderParams {
-                                            path: Some(path.clone()),
-                                            // This is naive, but we don't know if the user has a file already open or not, so we register every project as the current one.
-                                            // The correct one is actually set when the LSP calls `textDocument/didOpen`
-                                            set_as_current_workspace: true,
-                                        })
-                                        .err()
-                                } else {
-                                    self.workspace
-                                        .register_project_folder(RegisterProjectFolderParams {
-                                            path: fs.working_directory(),
-                                            set_as_current_workspace: true,
-                                        })
-                                        .err()
-                                };
-                            if let Some(error) = register_result {
-                                error!("Failed to register the project folder: {}", error);
-                                self.client.log_message(MessageType::ERROR, &error).await;
-                                return ConfigurationStatus::Error;
-                            }
-                            let result = self.workspace.update_settings(UpdateSettingsParams {
-                                workspace_directory: fs.working_directory(),
-                                configuration,
-                            });
-
-                            if let Err(error) = result {
-                                error!("Failed to set workspace settings: {}", error);
-                                self.client.log_message(MessageType::ERROR, &error).await;
-                                ConfigurationStatus::Error
-                            } else {
-                                ConfigurationStatus::Loaded
-                            }
-                        }
-                        Err(err) => {
-                            error!("Couldn't load the configuration file, reason:\n {}", err);
-                            self.client.log_message(MessageType::ERROR, &err).await;
-                            ConfigurationStatus::Error
-                        }
-                    }
+                if let Err(error) = result {
+                    error!("Failed to set workspace settings: {}", error);
+                    self.client.log_message(MessageType::ERROR, &error).await;
+                    ConfigurationStatus::Error
+                } else {
+                    ConfigurationStatus::Loaded
+                }
             }
-
             Err(err) => {
                 error!("Couldn't load the configuration file, reason:\n {}", err);
                 self.client.log_message(MessageType::ERROR, &err).await;
@@ -477,4 +432,3 @@ impl Session {
             })
     }
 }
-

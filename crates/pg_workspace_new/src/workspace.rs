@@ -1,6 +1,6 @@
 use std::{panic::RefUnwindSafe, path::PathBuf, sync::Arc};
 
-use client::WorkspaceTransport;
+pub use self::client::{TransportRequest, WorkspaceClient, WorkspaceTransport};
 use pg_configuration::PartialConfiguration;
 use pg_fs::PgLspPath;
 use serde::{Deserialize, Serialize};
@@ -65,6 +65,10 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
 
     /// Change the content of an open file
     fn change_file(&self, params: ChangeFileParams) -> Result<(), WorkspaceError>;
+
+    /// Returns information about the server this workspace is connected to or `None` if the workspace isn't connected to a server.
+    fn server_info(&self) -> Option<&ServerInfo>;
+
 }
 
 /// Convenience function for constructing a server instance of [Workspace]
