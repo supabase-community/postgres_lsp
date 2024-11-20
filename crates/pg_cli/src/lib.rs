@@ -15,11 +15,13 @@ mod cli_options;
 mod commands;
 mod metrics;
 mod panic;
+mod execute;
 mod reporter;
 mod diagnostics;
 mod service;
 
 use crate::cli_options::{CliOptions, ColorsArg};
+pub use execute::{execute_mode, Execution, TraversalMode, VcsTargeted};
 pub use panic::setup_panic_handler;
 pub use reporter::{DiagnosticsPayload, Reporter, ReporterVisitor, TraversalSummary};
 pub use crate::logging::{setup_cli_subscriber, LoggingLevel};
@@ -51,17 +53,11 @@ impl<'app> CliSession<'app> {
         })
     }
 
-    /// Main function to run Biome CLI
+    /// Main function to run the CLI
     pub fn run(self, command: PgLspCommand) -> Result<(), CliDiagnostic> {
         let has_metrics = command.has_metrics();
         if has_metrics {
             crate::metrics::init_metrics();
-        }
-        // TODO: remove in Biome v2
-        if env::var_os("BIOME_LOG_DIR").is_some() {
-            self.app.console.log(markup! {
-                <Warn>"The use of BIOME_LOG_DIR is deprecated. Use BIOME_LOG_PATH instead."</Warn>
-            });
         }
 
         let result = match command {

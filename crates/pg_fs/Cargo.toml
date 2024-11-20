@@ -12,6 +12,8 @@ rayon             = { workspace = true }
 rustc-hash        = { workspace = true }
 pg_diagnostics = { workspace = true }
 crossbeam         = { workspace = true }
+smallvec          = { workspace = true }
+enumflags2        = { workspace = true }
 
 [dev-dependencies]
 

@@ -22,4 +22,5 @@ define_categories! {
     "internalError/io",
     "internalError/fs",
     "flags/invalid",
+    "internalError/panic",
 }
