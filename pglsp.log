@@ -1,0 +1,3 @@
+2024-11-23T16:57:38.897370Z  INFO pglsp: Starting server.
+2024-11-23T16:57:38.897489Z  INFO pg_lsp::server: Setting up server.
+2024-11-23T16:57:38.897666Z  INFO pg_lsp::server: Server setup complete.

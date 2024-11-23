@@ -61,12 +61,13 @@ impl SimpleTokioDebouncer {
         }
     }
 
+    #[tracing::instrument(name = "Adding task to debouncer", skip(self, block))]
     pub async fn debounce(&self, block: AsyncBlock) {
         if self
             .shutdown_flag
             .load(std::sync::atomic::Ordering::Relaxed)
         {
-            println!(
+            tracing::error!(
                 "Trying to debounce tasks, but the Debouncer is in the process of shutting down."
             );
             return;
@@ -75,6 +76,7 @@ impl SimpleTokioDebouncer {
         self.tx.send(block).await.unwrap();
     }
 
+    #[tracing::instrument(name = "Shutting down debouncer", skip(self))]
     pub async fn shutdown(&self) {
         self.shutdown_flag
             .store(true, std::sync::atomic::Ordering::Relaxed);

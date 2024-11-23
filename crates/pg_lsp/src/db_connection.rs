@@ -1,6 +1,9 @@
+use std::sync::Arc;
+
 use pg_schema_cache::SchemaCache;
+use pg_workspace::Workspace;
 use sqlx::{postgres::PgListener, PgPool};
-use tokio::task::JoinHandle;
+use tokio::{sync::RwLock, task::JoinHandle};
 
 pub(crate) struct DbConnection {
     pool: PgPool,
@@ -10,13 +13,10 @@ pub(crate) struct DbConnection {
 }
 
 impl DbConnection {
-    pub(crate) async fn new<F>(
+    pub(crate) async fn new(
         connection_string: String,
-        on_schema_update: F,
-    ) -> Result<Self, sqlx::Error>
-    where
-        F: Fn(SchemaCache) -> () + Send + 'static,
-    {
+        ide: Arc<RwLock<Workspace>>,
+    ) -> Result<Self, sqlx::Error> {
         let pool = PgPool::connect(&connection_string).await?;
 
         let mut listener = PgListener::connect_with(&pool).await?;
@@ -36,7 +36,7 @@ impl DbConnection {
                             Ok(not) => {
                                 if not.payload().to_string() == "reload schema" {
                                     let schema_cache = SchemaCache::load(&cloned_pool).await;
-                                    on_schema_update(schema_cache);
+                                    ide.write().await.set_schema_cache(schema_cache);
                                 };
                             }
                             Err(why) => {

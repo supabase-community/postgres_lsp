@@ -24,16 +24,25 @@ pub struct LspServer {
 
 impl LspServer {
     pub fn new(client: Client) -> Self {
-        Self {
+        tracing::info!("Setting up server.");
+        let s = Self {
             client: Arc::new(client),
             session: Arc::new(Session::new()),
             client_capabilities: RwLock::new(None),
             debouncer: SimpleTokioDebouncer::new(std::time::Duration::from_millis(500)),
-        }
+        };
+        tracing::info!("Server setup complete.");
+
+        s
     }
 
     /// When the client sends a didChangeConfiguration notification, we need to parse the received JSON.
-    async fn parse_options_from_client(
+    #[tracing::instrument(
+        name = "Parsing config from client",
+        skip(self),
+        fields(options = %value)
+    )]
+    async fn parse_config_from_client(
         &self,
         mut value: serde_json::Value,
     ) -> Option<ClientConfigurationOptions> {
@@ -57,7 +66,8 @@ impl LspServer {
         }
     }
 
-    async fn request_opts_from_client(&self) -> Option<ClientConfigurationOptions> {
+    #[tracing::instrument(name = "Requesting Configuration from Client", skip(self))]
+    async fn request_config_from_client(&self) -> Option<ClientConfigurationOptions> {
         let params = ConfigurationParams {
             items: vec![ConfigurationItem {
                 section: Some("pglsp".to_string()),
@@ -65,6 +75,7 @@ impl LspServer {
             }],
         };
 
+        tracing::info!("sending workspace/configuration request");
         match self
             .client
             .send_request::<request::WorkspaceConfiguration>(params)
@@ -78,20 +89,24 @@ impl LspServer {
                     .next()
                     .expect("workspace/configuration request did not yield expected response.");
 
-                self.parse_options_from_client(relevant).await
+                self.parse_config_from_client(relevant).await
             }
             Err(why) => {
                 let message = format!(
                     "Unable to pull client options via workspace/configuration request: {}",
                     why
                 );
-                println!("{}", message);
                 self.client.log_message(MessageType::ERROR, message).await;
                 None
             }
         }
     }
 
+    #[tracing::instrument(
+        name="Publishing diagnostics",
+        skip(self),
+        fields(%uri)
+    )]
     async fn publish_diagnostics(&self, mut uri: Url) {
         normalize_uri(&mut uri);
 
@@ -121,6 +136,11 @@ impl LspServer {
             .await;
     }
 
+    #[tracing::instrument(
+        name="Publishing diagnostics via Debouncer",
+        skip(self),
+        fields(%uri)
+    )]
     async fn publish_diagnostics_debounced(&self, mut uri: Url) {
         let client = Arc::clone(&self.client);
         let session = Arc::clone(&self.session);
@@ -130,7 +150,7 @@ impl LspServer {
                 normalize_uri(&mut uri);
                 let url = file_path(&uri);
 
-                let diagnostics = session.get_diagnostics_sync(url);
+                let diagnostics = session.get_diagnostics(url).await;
 
                 let diagnostics: Vec<Diagnostic> = diagnostics
                     .into_iter()
@@ -160,9 +180,13 @@ impl LspServer {
 
 #[tower_lsp::async_trait]
 impl LanguageServer for LspServer {
+    #[tracing::instrument(name = "initialize", skip(self, params))]
     async fn initialize(&self, params: InitializeParams) -> jsonrpc::Result<InitializeResult> {
+        self.client
+            .show_message(MessageType::INFO, "Initialize Request received")
+            .await;
         let flags = ClientFlags::from_initialize_request_params(&params);
-        self.client_capabilities.blocking_write().replace(flags);
+        self.client_capabilities.write().await.replace(flags);
 
         Ok(InitializeResult {
             server_info: None,
@@ -194,15 +218,17 @@ impl LanguageServer for LspServer {
         })
     }
 
+    #[tracing::instrument(name = "initialized", skip(self, _params))]
     async fn initialized(&self, _params: InitializedParams) {
         self.client
             .log_message(MessageType::INFO, "Postgres LSP Connected!")
             .await;
     }
 
+    #[tracing::instrument(name = "shutdown", skip(self))]
     async fn shutdown(&self) -> jsonrpc::Result<()> {
-        self.session.shutdown().await;
-        self.debouncer.shutdown().await;
+        // self.session.shutdown().await;
+        // self.debouncer.shutdown().await;
 
         self.client
             .log_message(MessageType::INFO, "Postgres LSP terminated.")
@@ -211,11 +237,12 @@ impl LanguageServer for LspServer {
         Ok(())
     }
 
+    #[tracing::instrument(name = "workspace/didChangeConfiguration", skip(self, params))]
     async fn did_change_configuration(&self, params: DidChangeConfigurationParams) {
         let capabilities = self.client_capabilities.read().await;
 
         if capabilities.as_ref().unwrap().supports_pull_opts {
-            let opts = self.request_opts_from_client().await;
+            let opts = self.request_config_from_client().await;
             if opts
                 .as_ref()
                 .is_some_and(|o| o.db_connection_string.is_some())
@@ -238,7 +265,7 @@ impl LanguageServer for LspServer {
 
         // if we couldn't pull settings from the client,
         // we'll try parsing the passed in params.
-        let opts = self.parse_options_from_client(params.settings).await;
+        let opts = self.parse_config_from_client(params.settings).await;
 
         if opts
             .as_ref()
@@ -262,8 +289,16 @@ impl LanguageServer for LspServer {
         }
     }
 
+    #[tracing::instrument(
+        name= "textDocument/didOpen",
+        skip(self),
+        fields(
+            uri = %params.text_document.uri
+        )
+    )]
     async fn did_open(&self, params: DidOpenTextDocumentParams) {
         let mut uri = params.text_document.uri;
+
         normalize_uri(&mut uri);
 
         let changed_urls = self
@@ -281,6 +316,13 @@ impl LanguageServer for LspServer {
         }
     }
 
+    #[tracing::instrument(
+        name= "textDocument/didSave",
+        skip(self),
+        fields(
+            uri = %params.text_document.uri
+        )
+    )]
     async fn did_save(&self, params: DidSaveTextDocumentParams) {
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
@@ -295,6 +337,13 @@ impl LanguageServer for LspServer {
         }
     }
 
+    #[tracing::instrument(
+        name= "textDocument/didChange",
+        skip(self),
+        fields(
+            uri = %params.text_document.uri
+        )
+    )]
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
@@ -302,6 +351,13 @@ impl LanguageServer for LspServer {
         self.publish_diagnostics_debounced(uri).await;
     }
 
+    #[tracing::instrument(
+        name= "textDocument/didClose",
+        skip(self),
+        fields(
+            uri = %params.text_document.uri
+        )
+    )]
     async fn did_close(&self, params: DidCloseTextDocumentParams) {
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
@@ -310,6 +366,13 @@ impl LanguageServer for LspServer {
         self.session.on_file_closed(path).await
     }
 
+    #[tracing::instrument(
+        name= "textDocument/codeAction",
+        skip(self),
+        fields(
+            uri = %params.text_document.uri
+        )
+    )]
     async fn code_action(
         &self,
         params: CodeActionParams,
@@ -328,6 +391,13 @@ impl LanguageServer for LspServer {
         Ok(actions)
     }
 
+    #[tracing::instrument(
+        name= "inlayHint/resolve",
+        skip(self),
+        fields(
+            uri = %params.text_document.uri
+        )
+    )]
     async fn inlay_hint(&self, params: InlayHintParams) -> jsonrpc::Result<Option<Vec<InlayHint>>> {
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
@@ -340,6 +410,13 @@ impl LanguageServer for LspServer {
         Ok(hints)
     }
 
+    #[tracing::instrument(
+        name= "textDocument/completion",
+        skip(self),
+        fields(
+            uri = %params.text_document_position.text_document.uri
+        )
+    )]
     async fn completion(
         &self,
         params: CompletionParams,
@@ -355,6 +432,13 @@ impl LanguageServer for LspServer {
         Ok(completions.map(|c| CompletionResponse::List(c)))
     }
 
+    #[tracing::instrument(
+        name= "textDocument/hover",
+        skip(self),
+        fields(
+            uri = %params.text_document_position_params.text_document.uri
+        )
+    )]
     async fn hover(&self, params: HoverParams) -> jsonrpc::Result<Option<Hover>> {
         let mut uri = params.text_document_position_params.text_document.uri;
         normalize_uri(&mut uri);
@@ -370,6 +454,7 @@ impl LanguageServer for LspServer {
         Ok(hover_diagnostics)
     }
 
+    #[tracing::instrument(name = "workspace/executeCommand", skip(self, params))]
     async fn execute_command(
         &self,
         params: ExecuteCommandParams,

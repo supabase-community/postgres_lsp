@@ -29,7 +29,7 @@ impl Session {
     }
 
     pub async fn shutdown(&self) {
-        let mut db = self.db.blocking_write();
+        let mut db = self.db.write().await;
         let db = db.take();
 
         if db.is_some() {
@@ -53,13 +53,9 @@ impl Session {
             return Ok(());
         }
 
-        let ide = self.ide.clone();
-        let new_db = DbConnection::new(connection_string, move |schema| {
-            let _guard = ide.blocking_write().set_schema_cache(schema);
-        })
-        .await?;
+        let new_db = DbConnection::new(connection_string, Arc::clone(&self.ide)).await?;
 
-        let mut current_db = self.db.blocking_write();
+        let mut current_db = self.db.write().await;
         let old_db = current_db.replace(new_db);
         drop(current_db);
 
@@ -87,30 +83,6 @@ impl Session {
     pub async fn on_file_closed(&self, path: PgLspPath) {
         let ide = self.ide.read().await;
         ide.remove_document(path);
-    }
-
-    pub fn get_diagnostics_sync(&self, path: PgLspPath) -> Vec<(Diagnostic, Range)> {
-        let ide = self.ide.blocking_read();
-
-        // make sure there are documents at the provided path before
-        // trying to collect diagnostics.
-        let doc = ide.documents.get(&path);
-        if doc.is_none() {
-            return vec![];
-        }
-
-        ide.diagnostics(&path)
-            .into_iter()
-            .map(|d| {
-                let range = doc
-                    .as_ref()
-                    .unwrap()
-                    .line_index
-                    .line_col_lsp_range(d.range)
-                    .unwrap();
-                (d, range)
-            })
-            .collect()
     }
 
     pub async fn get_diagnostics(&self, path: PgLspPath) -> Vec<(Diagnostic, Range)> {
