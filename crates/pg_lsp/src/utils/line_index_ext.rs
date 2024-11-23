@@ -54,7 +54,8 @@ impl LineIndexExt for LineIndex {
 
 #[cfg(test)]
 mod tests {
-    use pg_base_db::{Document, PgLspPath};
+    use pg_base_db::Document;
+    use pg_fs::PgLspPath;
     use text_size::{TextRange, TextSize};
 
     use crate::utils::line_index_ext::LineIndexExt;

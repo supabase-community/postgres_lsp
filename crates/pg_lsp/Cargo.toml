@@ -25,6 +25,7 @@ text-size = "1.1.1"
 line_index.workspace = true
 
 pg_hover.workspace = true
+pg_fs.workspace = true
 pg_completions.workspace = true
 pg_inlay_hints.workspace = true
 pg_commands.workspace = true

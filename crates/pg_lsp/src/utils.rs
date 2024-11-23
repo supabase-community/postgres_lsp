@@ -3,7 +3,7 @@ pub mod to_proto;
 
 use std::path::PathBuf;
 
-use pg_base_db::PgLspPath;
+use pg_fs::PgLspPath;
 use tower_lsp::lsp_types;
 
 /// Convert a `lsp_types::Url` to a `PgLspPath`.

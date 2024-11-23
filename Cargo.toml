@@ -14,9 +14,11 @@ rust-version = "1.71"
 line_index = { path = "./lib/line_index", version = "0.0.0" }
 tree_sitter_sql = { path = "./lib/tree_sitter_sql", version = "0.0.0" }
 tree-sitter = "0.20.10"
+tracing = "0.1.40"
 
 # postgres specific crates
 pg_lexer = { path = "./crates/pg_lexer", version = "0.0.0" }
+pg_fs = { path = "./crates/pg_fs", version = "0.0.0" }
 pg_diagnostics = { path = "./crates/pg_diagnostics", version = "0.0.0" }
 pg_lexer_codegen = { path = "./crates/pg_lexer_codegen", version = "0.0.0" }
 pg_statement_splitter = { path = "./crates/pg_statement_splitter", version = "0.0.0" }

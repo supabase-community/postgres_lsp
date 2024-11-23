@@ -3,7 +3,7 @@ use std::{hash::Hash, hash::Hasher, ops::RangeBounds};
 use line_index::LineIndex;
 use text_size::{TextRange, TextSize};
 
-use crate::PgLspPath;
+use pg_fs::PgLspPath;
 
 extern crate test;
 
@@ -163,8 +163,9 @@ impl Document {
 mod tests {
 
     use text_size::{TextRange, TextSize};
+    use pg_fs::PgLspPath;
 
-    use crate::{Document, PgLspPath};
+    use crate::{Document};
 
     #[test]
     fn test_statements_at_range() {
