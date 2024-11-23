@@ -28,6 +28,7 @@ impl Session {
         }
     }
 
+    #[tracing::instrument(name = "Shutting down Session", skip(self))]
     pub async fn shutdown(&self) {
         let mut db = self.db.write().await;
         let db = db.take();

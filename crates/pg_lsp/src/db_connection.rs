@@ -65,6 +65,7 @@ impl DbConnection {
         connection_string == self.connection_string
     }
 
+    #[tracing::instrument(name = "Closing DB Pool", skip(self))]
     pub(crate) async fn close(self) {
         let _ = self.close_tx.send(());
         let _ = self.schema_update_handle.await;
