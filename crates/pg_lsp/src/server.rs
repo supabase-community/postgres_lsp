@@ -227,12 +227,17 @@ impl LanguageServer for LspServer {
 
     #[tracing::instrument(name = "shutdown", skip(self))]
     async fn shutdown(&self) -> jsonrpc::Result<()> {
-        // self.session.shutdown().await;
-        // self.debouncer.shutdown().await;
+        tracing::info!("Shutting down session...");
+        self.session.shutdown().await;
+
+        tracing::info!("Shutting down debouncer...");
+        self.debouncer.shutdown().await;
 
         self.client
             .log_message(MessageType::INFO, "Postgres LSP terminated.")
             .await;
+
+        tracing::info!("Shutdown successful.");
 
         Ok(())
     }
