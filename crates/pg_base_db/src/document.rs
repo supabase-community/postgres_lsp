@@ -1,4 +1,4 @@
-use std::{hash::Hash, hash::Hasher, ops::RangeBounds, usize};
+use std::{hash::Hash, hash::Hasher, ops::RangeBounds};
 
 use line_index::LineIndex;
 use text_size::{TextRange, TextSize};
@@ -44,18 +44,11 @@ impl Document {
     pub fn new(url: PgLspPath, text: Option<String>) -> Document {
         Document {
             version: 0,
-            line_index: LineIndex::new(&text.as_ref().unwrap_or(&"".to_string())),
+            line_index: LineIndex::new(text.as_ref().unwrap_or(&"".to_string())),
             // TODO: use errors returned by split
-            statement_ranges: text.as_ref().map_or_else(
-                || Vec::new(),
-                |f| {
-                    pg_statement_splitter::split(&f)
-                        .ranges
-                        .iter()
-                        .map(|range| range.clone())
-                        .collect()
-                },
-            ),
+            statement_ranges: text.as_ref().map_or_else(Vec::new, |f| {
+                pg_statement_splitter::split(f).ranges.to_vec()
+            }),
             text: text.unwrap_or("".to_string()),
             url,
         }
@@ -99,7 +92,7 @@ impl Document {
             .enumerate()
             .map(|(idx, range)| StatementRef {
                 document_url: self.url.clone(),
-                text: self.text[range.clone()].to_string(),
+                text: self.text[range].to_string(),
                 idx,
             })
             .collect()
@@ -112,10 +105,10 @@ impl Document {
             .enumerate()
             .map(|(idx, range)| {
                 (
-                    range.clone(),
+                    *range,
                     StatementRef {
                         document_url: self.url.clone(),
-                        text: self.text[range.clone()].to_string(),
+                        text: self.text[*range].to_string(),
                         idx,
                     },
                 )
@@ -130,7 +123,7 @@ impl Document {
             .enumerate()
             .map(|(idx, range)| StatementRef {
                 document_url: self.url.clone(),
-                text: self.text[range.clone()].to_string(),
+                text: self.text[*range].to_string(),
                 idx,
             })
             .collect()
@@ -142,7 +135,7 @@ impl Document {
             .get(pos)
             .map(|range| StatementRef {
                 document_url: self.url.clone(),
-                text: self.text[range.clone()].to_string(),
+                text: self.text[*range].to_string(),
                 idx: pos,
             })
             .unwrap()
@@ -154,10 +147,10 @@ impl Document {
             .get(pos)
             .map(|range| {
                 (
-                    range.clone(),
+                    *range,
                     StatementRef {
                         document_url: self.url.clone(),
-                        text: self.text[range.clone()].to_string(),
+                        text: self.text[*range].to_string(),
                         idx: pos,
                     },
                 )
