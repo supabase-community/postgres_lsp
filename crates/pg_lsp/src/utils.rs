@@ -5,7 +5,7 @@ pub mod to_proto;
 use std::path::PathBuf;
 
 use lsp_types;
-use pg_base_db::PgLspPath;
+use pg_fs::PgLspPath;
 
 /// Convert a `lsp_types::Url` to a `PgLspPath`.
 pub(crate) fn file_path(url: &lsp_types::Url) -> PgLspPath {

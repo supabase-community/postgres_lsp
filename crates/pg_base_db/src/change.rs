@@ -291,7 +291,8 @@ impl DocumentChange {
 mod tests {
     use text_size::{TextRange, TextSize};
 
-    use crate::{change::Change, document::StatementRef, Document, DocumentChange, PgLspPath};
+    use crate::{change::Change, document::StatementRef, Document, DocumentChange};
+    use pg_fs::PgLspPath;
 
     #[test]
     fn test_document_apply_changes() {

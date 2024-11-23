@@ -10,6 +10,7 @@ async-std = "1.12.0"
 sqlx = { version = "0.7.3", features = [ "runtime-async-std", "tls-rustls", "postgres", "json" ] }
 
 pg_base_db.workspace =  true
+pg_fs.workspace =  true
 pg_diagnostics.workspace =  true
 pg_query_ext.workspace =  true
 pg_lint.workspace =  true

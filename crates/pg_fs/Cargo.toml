@@ -1,0 +1,15 @@
+[package]
+name = "pg_fs"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+directories       = "5.0.1"
+tracing           = { workspace = true }
+
+[dev-dependencies]
+
+[lib]
+doctest = false
+
+[features]
