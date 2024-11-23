@@ -1,7 +1,8 @@
-use std::{fs::File, path::PathBuf, str::FromStr, sync::Mutex};
+use std::{fs::File, path::PathBuf, str::FromStr};
 
 use pg_lsp::server::LspServer;
 use tower_lsp::{LspService, Server};
+use tracing_subscriber::fmt::format::FmtSpan;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -9,8 +10,10 @@ async fn main() -> anyhow::Result<()> {
     let file = File::create(path).expect("Could not open the file.");
 
     let subscriber = tracing_subscriber::FmtSubscriber::builder()
+        .with_span_events(FmtSpan::ENTER)
+        .with_span_events(FmtSpan::CLOSE)
         .with_ansi(false)
-        .with_writer(Mutex::new(file))
+        .with_writer(file)
         .finish();
 
     tracing::subscriber::set_global_default(subscriber)?;

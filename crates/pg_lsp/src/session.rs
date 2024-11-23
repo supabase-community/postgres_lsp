@@ -92,6 +92,7 @@ impl Session {
         // trying to collect diagnostics.
         let doc = ide.documents.get(&path);
         if doc.is_none() {
+            tracing::info!("Doc not found, path: {:?}", &path);
             return vec![];
         }
 
@@ -117,11 +118,6 @@ impl Session {
     ) -> HashSet<PgLspPath> {
         {
             let ide = self.ide.read().await;
-
-            let doc = ide.documents.get(&path);
-            if doc.is_none() {
-                return HashSet::new();
-            }
 
             ide.apply_change(
                 path,

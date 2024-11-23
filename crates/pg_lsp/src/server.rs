@@ -39,7 +39,7 @@ impl LspServer {
     /// When the client sends a didChangeConfiguration notification, we need to parse the received JSON.
     #[tracing::instrument(
         name = "Parsing config from client",
-        skip(self),
+        skip(self, value),
         fields(options = %value)
     )]
     async fn parse_config_from_client(
@@ -104,7 +104,7 @@ impl LspServer {
 
     #[tracing::instrument(
         name="Publishing diagnostics",
-        skip(self),
+        skip(self, uri),
         fields(%uri)
     )]
     async fn publish_diagnostics(&self, mut uri: Url) {
@@ -138,7 +138,7 @@ impl LspServer {
 
     #[tracing::instrument(
         name="Publishing diagnostics via Debouncer",
-        skip(self),
+        skip(self, uri),
         fields(%uri)
     )]
     async fn publish_diagnostics_debounced(&self, mut uri: Url) {
@@ -290,8 +290,8 @@ impl LanguageServer for LspServer {
     }
 
     #[tracing::instrument(
-        name= "textDocument/didOpen",
-        skip(self),
+        name = "textDocument/didOpen",
+        skip(self, params),
         fields(
             uri = %params.text_document.uri
         )
@@ -318,7 +318,7 @@ impl LanguageServer for LspServer {
 
     #[tracing::instrument(
         name= "textDocument/didSave",
-        skip(self),
+        skip(self, params),
         fields(
             uri = %params.text_document.uri
         )
@@ -333,13 +333,16 @@ impl LanguageServer for LspServer {
         let changed_urls = self.session.recompute_and_get_changed_files().await;
         for url in changed_urls {
             let url = Url::from_file_path(url.as_path()).expect("Expected absolute File Path");
+
+            tracing::info!("publishing diagnostics: {}", url);
+
             self.publish_diagnostics(url).await;
         }
     }
 
     #[tracing::instrument(
         name= "textDocument/didChange",
-        skip(self),
+        skip(self, params),
         fields(
             uri = %params.text_document.uri
         )
@@ -348,12 +351,14 @@ impl LanguageServer for LspServer {
         let mut uri = params.text_document.uri;
         normalize_uri(&mut uri);
 
+        tracing::info!("{}", uri);
+
         self.publish_diagnostics_debounced(uri).await;
     }
 
     #[tracing::instrument(
         name= "textDocument/didClose",
-        skip(self),
+        skip(self, params),
         fields(
             uri = %params.text_document.uri
         )
@@ -368,7 +373,7 @@ impl LanguageServer for LspServer {
 
     #[tracing::instrument(
         name= "textDocument/codeAction",
-        skip(self),
+        skip(self, params),
         fields(
             uri = %params.text_document.uri
         )
@@ -393,7 +398,7 @@ impl LanguageServer for LspServer {
 
     #[tracing::instrument(
         name= "inlayHint/resolve",
-        skip(self),
+        skip(self, params),
         fields(
             uri = %params.text_document.uri
         )
@@ -412,7 +417,7 @@ impl LanguageServer for LspServer {
 
     #[tracing::instrument(
         name= "textDocument/completion",
-        skip(self),
+        skip(self, params),
         fields(
             uri = %params.text_document_position.text_document.uri
         )
@@ -434,7 +439,7 @@ impl LanguageServer for LspServer {
 
     #[tracing::instrument(
         name= "textDocument/hover",
-        skip(self),
+        skip(self, params),
         fields(
             uri = %params.text_document_position_params.text_document.uri
         )
