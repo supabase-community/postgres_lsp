@@ -11,7 +11,7 @@ use pg_diagnostics::{DiagnosticExt, Error, PrintDescription};
 use pg_fs::{FileSystem, PgLspPath};
 use pg_lsp_converters::{negotiated_encoding, PositionEncoding, WideEncoding};
 use pg_workspace_new::configuration::{load_configuration, LoadedConfiguration};
-use pg_workspace_new::settings::Settings;
+use pg_workspace_new::settings::{PartialConfigurationExt, Settings};
 use pg_workspace_new::workspace::UpdateSettingsParams;
 use pg_workspace_new::Workspace;
 use pg_workspace_new::{DynRef, WorkspaceError};
@@ -369,22 +369,37 @@ impl Session {
             Ok(loaded_configuration) => {
                 let LoadedConfiguration {
                     configuration: fs_configuration,
+                    directory_path: configuration_path,
                     ..
                 } = loaded_configuration;
                 info!("Configuration loaded successfully from disk.");
                 info!("Update workspace settings.");
 
-                let result = self.workspace.update_settings(UpdateSettingsParams {
-                    workspace_directory: self.fs.working_directory(),
-                    configuration: fs_configuration,
-                });
+                let result = fs_configuration
+                    .retrieve_gitignore_matches(&self.fs, configuration_path.as_deref());
 
-                if let Err(error) = result {
-                    error!("Failed to set workspace settings: {}", error);
-                    self.client.log_message(MessageType::ERROR, &error).await;
-                    ConfigurationStatus::Error
-                } else {
-                    ConfigurationStatus::Loaded
+                match result {
+                    Ok((vcs_base_path, gitignore_matches)) => {
+                        let result = self.workspace.update_settings(UpdateSettingsParams {
+                            workspace_directory: self.fs.working_directory(),
+                            configuration: fs_configuration,
+                            vcs_base_path,
+                            gitignore_matches,
+                        });
+
+                        if let Err(error) = result {
+                            error!("Failed to set workspace settings: {}", error);
+                            self.client.log_message(MessageType::ERROR, &error).await;
+                            ConfigurationStatus::Error
+                        } else {
+                            ConfigurationStatus::Loaded
+                        }
+                    }
+                    Err(err) => {
+                        error!("Couldn't load the configuration file, reason:\n {}", err);
+                        self.client.log_message(MessageType::ERROR, &err).await;
+                        ConfigurationStatus::Error
+                    }
                 }
             }
             Err(err) => {

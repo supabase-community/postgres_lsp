@@ -41,6 +41,7 @@ anyhow             = "1.0.92"
 smallvec           = { version = "1.13.2", features = ["union", "const_new", "serde"] }
 
 # postgres specific crates
+pg_flags = { path = "./crates/pg_flags", version = "0.0.0" }
 pg_lexer = { path = "./crates/pg_lexer", version = "0.0.0" }
 pg_lsp_new = { path = "./crates/pg_lsp_new", version = "0.0.0" }
 pg_lsp_converters = { path = "./crates/pg_lsp_converters", version = "0.0.0" }

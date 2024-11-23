@@ -36,6 +36,26 @@ pub struct CliOptions {
     )]
     pub max_diagnostics: MaxDiagnostics,
 
+    /// Skip over files containing syntax errors instead of emitting an error diagnostic.
+    #[bpaf(long("skip-errors"), switch)]
+    pub skip_errors: bool,
+
+    /// Silence errors that would be emitted in case no files were processed during the execution of the command.
+    #[bpaf(long("no-errors-on-unmatched"), switch)]
+    pub no_errors_on_unmatched: bool,
+
+    /// Tell Biome to exit with an error code if some diagnostics emit warnings.
+    #[bpaf(long("error-on-warnings"), switch)]
+    pub error_on_warnings: bool,
+
+    /// Allows to change how diagnostics and summary are reported.
+    #[bpaf(
+        long("reporter"),
+        argument("json|json-pretty|github|junit|summary|gitlab"),
+        fallback(CliReporter::default())
+    )]
+    pub reporter: CliReporter,
+
     #[bpaf(
         long("log-level"),
         argument("none|debug|info|warn|error"),
@@ -62,7 +82,7 @@ pub struct CliOptions {
         fallback(Severity::default()),
         display_fallback
     )]
-    /// The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing `--diagnostic-level=error` print only diagnostics that contain only errors.
+    /// The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing `--diagnostic-level=error` will cause Biome to print only diagnostics that contain only errors.
     pub diagnostic_level: Severity,
 }
 
@@ -101,16 +121,10 @@ pub enum CliReporter {
     /// The default reporter
     #[default]
     Default,
-    /// Reports information using the JSON format
-    Json,
-    /// Reports information using the JSON format, formatted.
-    JsonPretty,
     /// Diagnostics are printed for GitHub workflow commands
     GitHub,
     /// Diagnostics and summary are printed in JUnit format
     Junit,
-    /// Reports linter diagnostics grouped by category and number of hits. Reports formatter diagnostics grouped by file.
-    Summary,
     /// Reports linter diagnostics using the [GitLab Code Quality report](https://docs.gitlab.com/ee/ci/testing/code_quality.html#implement-a-custom-tool).
     GitLab,
 
@@ -127,9 +141,6 @@ impl FromStr for CliReporter {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "json" => Ok(Self::Json),
-            "json-pretty" => Ok(Self::JsonPretty),
-            "summary" => Ok(Self::Summary),
             "github" => Ok(Self::GitHub),
             "junit" => Ok(Self::Junit),
             "gitlab" => Ok(Self::GitLab),
@@ -144,9 +155,6 @@ impl Display for CliReporter {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             CliReporter::Default => f.write_str("default"),
-            CliReporter::Json => f.write_str("json"),
-            CliReporter::JsonPretty => f.write_str("json-pretty"),
-            CliReporter::Summary => f.write_str("summary"),
             CliReporter::GitHub => f.write_str("github"),
             CliReporter::Junit => f.write_str("junit"),
             CliReporter::GitLab => f.write_str("gitlab"),

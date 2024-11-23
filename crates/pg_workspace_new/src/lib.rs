@@ -8,6 +8,7 @@ pub mod settings;
 pub mod workspace;
 pub mod diagnostics;
 pub mod configuration;
+pub mod dome;
 
 pub use crate::diagnostics::{WorkspaceError, TransportError};
 pub use crate::workspace::Workspace;

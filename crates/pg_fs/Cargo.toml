@@ -14,10 +14,13 @@ pg_diagnostics = { workspace = true }
 crossbeam         = { workspace = true }
 smallvec          = { workspace = true }
 enumflags2        = { workspace = true }
+schemars          = { workspace = true, optional = true }
+
+[features]
+serde = ["schemars", "pg_diagnostics/schema"]
 
 [dev-dependencies]
 
 [lib]
 doctest = false
 
-[features]

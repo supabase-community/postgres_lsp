@@ -1,12 +1,12 @@
-use std::{panic::RefUnwindSafe, sync::RwLock};
+use std::{fs, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
 use dashmap::DashMap;
-use pg_fs::PgLspPath;
+use pg_fs::{ConfigName, PgLspPath};
 use store::Document;
 
-use crate::{settings::{Settings, SettingsHandleMut}, WorkspaceError};
+use crate::{settings::{Settings, SettingsHandleMut, SettingsHandle}, WorkspaceError};
 
-use super::{OpenFileParams, ServerInfo, UpdateSettingsParams, Workspace};
+use super::{GetFileContentParams, IsPathIgnoredParams, OpenFileParams, ServerInfo, UpdateSettingsParams, Workspace};
 
 mod store;
 
@@ -39,8 +39,46 @@ impl WorkspaceServer {
         }
     }
 
+    /// Provides a reference to the current settings
+    fn settings(&self) -> SettingsHandle {
+        SettingsHandle::new(&self.settings)
+    }
+
     fn settings_mut(&self) -> SettingsHandleMut {
         SettingsHandleMut::new(&self.settings)
+    }
+
+    /// Check whether a file is ignored in the top-level config `files.ignore`/`files.include`
+    fn is_ignored(&self, path: &Path) -> bool {
+        let file_name = path.file_name().and_then(|s| s.to_str());
+        // Never ignore Biome's config file regardless `include`/`ignore`
+        (file_name != Some(ConfigName::pglsp_toml())) &&
+            // Apply top-level `include`/`ignore
+            (self.is_ignored_by_top_level_config(path))
+    }
+
+    /// Check whether a file is ignored in the top-level config `files.ignore`/`files.include`
+    fn is_ignored_by_top_level_config(&self, path: &Path) -> bool {
+        let set = self.settings();
+        let settings = set.as_ref();
+        let is_included = settings.files.included_files.is_empty()
+            || is_dir(path)
+            || settings.files.included_files.matches_path(path);
+        !is_included
+            || settings.files.ignored_files.matches_path(path)
+            || settings.files.git_ignore.as_ref().is_some_and(|ignore| {
+                // `matched_path_or_any_parents` panics if `source` is not under the gitignore root.
+                // This checks excludes absolute paths that are not a prefix of the base root.
+                if !path.has_root() || path.starts_with(ignore.path()) {
+                    // Because Biome passes a list of paths,
+                    // we use `matched_path_or_any_parents` instead of `matched`.
+                    ignore
+                        .matched_path_or_any_parents(path, path.is_dir())
+                        .is_ignore()
+                } else {
+                    false
+                }
+            })
     }
 }
 
@@ -57,7 +95,9 @@ impl Workspace for WorkspaceServer {
             .as_mut()
             .merge_with_configuration(
                 params.configuration,
-                params.workspace_directory
+                params.workspace_directory,
+                params.vcs_base_path,
+                params.gitignore_matches.as_slice()
             )?;
 
         Ok(())
@@ -92,4 +132,23 @@ impl Workspace for WorkspaceServer {
     fn server_info(&self) -> Option<&ServerInfo> {
         None
     }
+
+    fn get_file_content(&self, params: GetFileContentParams) -> Result<String, WorkspaceError> {
+        let document = self
+            .documents
+            .get(&params.path)
+            .ok_or(WorkspaceError::not_found())?;
+        Ok(document.content.clone())
+    }
+
+    fn is_path_ignored(&self, params: IsPathIgnoredParams) -> Result<bool, WorkspaceError> {
+        Ok(self.is_ignored(params.pglsp_path.as_path()))
+    }
 }
+
+/// Returns `true` if `path` is a directory or
+/// if it is a symlink that resolves to a directory.
+fn is_dir(path: &Path) -> bool {
+    path.is_dir() || (path.is_symlink() && fs::read_link(path).is_ok_and(|path| path.is_dir()))
+}
+

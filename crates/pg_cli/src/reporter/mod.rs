@@ -1,8 +1,6 @@
 pub(crate) mod github;
 pub(crate) mod gitlab;
-pub(crate) mod json;
 pub(crate) mod junit;
-pub(crate) mod summary;
 pub(crate) mod terminal;
 
 use crate::execute::Execution;
@@ -21,7 +19,6 @@ pub struct DiagnosticsPayload {
 
 /// A type that holds the result of the traversal
 #[derive(Debug, Default, Serialize, Copy, Clone)]
-#[serde(rename_all = "camelCase")]
 pub struct TraversalSummary {
     pub changed: usize,
     pub unchanged: usize,

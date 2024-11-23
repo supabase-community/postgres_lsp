@@ -5,15 +5,18 @@
 
 pub mod files;
 pub mod diagnostics;
+pub mod vcs;
 
 pub use crate::diagnostics::ConfigurationDiagnostic;
 
 use std::path::PathBuf;
 
+use crate::vcs::{partial_vcs_configuration, PartialVcsConfiguration, VcsConfiguration};
 use bpaf::Bpaf;
 use files::{partial_files_configuration, FilesConfiguration, PartialFilesConfiguration};
 use serde::{Deserialize, Serialize};
 use biome_deserialize_macros::Partial;
+use vcs::VcsClientKind;
 
 pub const VERSION: &str = match option_env!("PGLSP_VERSION") {
     Some(version) => version,
@@ -26,6 +29,10 @@ pub const VERSION: &str = match option_env!("PGLSP_VERSION") {
 #[partial(cfg_attr(feature = "schema", derive(schemars::JsonSchema)))]
 #[partial(serde(deny_unknown_fields, rename_all = "snake_case"))]
 pub struct Configuration {
+    /// The configuration of the VCS integration
+    #[partial(type, bpaf(external(partial_vcs_configuration), optional, hide_usage))]
+    pub vcs: VcsConfiguration,
+
     /// The configuration of the filesystem
     #[partial(
         type,
@@ -41,6 +48,12 @@ impl PartialConfiguration {
         Self {
             files: Some(PartialFilesConfiguration {
                 ignore: Some(Default::default()),
+                ..Default::default()
+            }),
+            vcs: Some(PartialVcsConfiguration {
+                enabled: Some(false),
+                client_kind: Some(VcsClientKind::Git),
+                use_ignore_file: Some(false),
                 ..Default::default()
             }),
         }

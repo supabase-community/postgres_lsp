@@ -8,7 +8,7 @@ use std::{
 };
 
 use super::{
-     CloseFileParams, OpenFileParams
+     CloseFileParams, GetFileContentParams, IsPathIgnoredParams, OpenFileParams
 };
 
 pub struct WorkspaceClient<T> {
@@ -32,7 +32,6 @@ pub struct TransportRequest<P> {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Default, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct InitializeResult {
     /// Information about the server.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -108,7 +107,15 @@ where
         self.request("pglsp/update_settings", params)
     }
 
+    fn is_path_ignored(&self, params: IsPathIgnoredParams) -> Result<bool, WorkspaceError> {
+        self.request("pglsp/is_path_ignored", params)
+    }
+
     fn server_info(&self) -> Option<&ServerInfo> {
         self.server_info.as_ref()
+    }
+
+    fn get_file_content(&self, params: GetFileContentParams) -> Result<String, WorkspaceError> {
+        self.request("biome/get_file_content", params)
     }
 }

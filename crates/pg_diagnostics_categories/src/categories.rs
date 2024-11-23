@@ -22,5 +22,7 @@ define_categories! {
     "internalError/io",
     "internalError/fs",
     "flags/invalid",
+    "project",
     "internalError/panic",
+    "dummy",
 }

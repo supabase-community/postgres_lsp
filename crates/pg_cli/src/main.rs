@@ -1,7 +1,7 @@
 //! This is the main binary
 
 use pg_cli::{
-    biome_command, open_transport, setup_panic_handler, to_color_mode, BiomeCommand, CliDiagnostic,
+    pg_lsp_command, open_transport, setup_panic_handler, to_color_mode, PgLspCommand, CliDiagnostic,
     CliSession,
 };
 use pg_console::{markup, ConsoleExt, EnvConsole};
@@ -31,7 +31,7 @@ fn main() -> ExitCode {
     set_bottom_frame(main as usize);
 
     let mut console = EnvConsole::default();
-    let command = biome_command().fallback_to_usage().run();
+    let command = pg_lsp_command().fallback_to_usage().run();
 
     console.set_color(to_color_mode(command.get_color()));
 
@@ -50,7 +50,7 @@ fn main() -> ExitCode {
     }
 }
 
-fn run_workspace(console: &mut EnvConsole, command: BiomeCommand) -> Result<(), CliDiagnostic> {
+fn run_workspace(console: &mut EnvConsole, command: PgLspCommand) -> Result<(), CliDiagnostic> {
     // If the `--use-server` CLI flag is set, try to open a connection to an
     // existing Biome server socket
     let workspace = if command.should_use_server() {

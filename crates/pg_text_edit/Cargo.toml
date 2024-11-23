@@ -7,10 +7,13 @@ edition = "2021"
 text-size = { workspace = true, features = ["serde"] }
 similar         = { workspace = true, features = ["unicode"] }
 serde           = { workspace = true, features = ["derive"] }
+schemars        = { workspace = true, optional = true }
+
+[features]
+schemars = ["dep:schemars"]
 
 [dev-dependencies]
 
 [lib]
 doctest = false
 
-[features]

@@ -1,9 +1,8 @@
 pub(crate) mod workspace_file;
 
-use crate::execute::diagnostics::{ResultExt, UnhandledDiagnostic};
 use crate::execute::traverse::TraversalOptions;
 use crate::execute::TraversalMode;
-use pg_diagnostics::{category, DiagnosticExt, DiagnosticTags, Error};
+use pg_diagnostics::Error;
 use pg_fs::PgLspPath;
 use std::marker::PhantomData;
 use std::ops::Deref;
@@ -44,13 +43,7 @@ pub(crate) enum Message {
         content: String,
         diagnostics: Vec<Error>,
         skipped_diagnostics: u32,
-    },
-    Diff {
-        file_name: String,
-        old: String,
-        new: String,
-        diff_kind: DiffKind,
-    },
+    }
 }
 
 impl Message {
@@ -121,32 +114,8 @@ pub(crate) fn process_file(ctx: &TraversalOptions, pglsp_path: &PgLspPath) -> Fi
         let shared_context = &SharedTraversalOptions::new(ctx);
 
         match ctx.execution.traversal_mode {
-            TraversalMode::Lint {
-                ref suppression_reason,
-                suppress,
-                ..
-            } => {
-                // the unsupported case should be handled already at this point
-                lint(
-                    shared_context,
-                    pglsp_path,
-                    suppress,
-                    suppression_reason.as_deref(),
-                )
-            }
-            TraversalMode::Format { .. } => {
-                // the unsupported case should be handled already at this point
-                format(shared_context, pglsp_path)
-            }
-            TraversalMode::Check { .. } | TraversalMode::CI { .. } => {
-                check_file(shared_context, pglsp_path, &file_features)
-            }
-            TraversalMode::Migrate { .. } => {
-                unreachable!("The migration should not be called for this file")
-            }
-            TraversalMode::Search { ref pattern, .. } => {
-                // the unsupported case should be handled already at this point
-                search(shared_context, pglsp_path, pattern)
+            TraversalMode::Dummy => {
+                unreachable!("The dummy mode should not be called for this file")
             }
         }
     })

@@ -8,6 +8,7 @@ schemars                 = { workspace = true, features = ["indexmap1"], optiona
 serde                    = { workspace = true, features = ["derive"] }
 serde_json               = { workspace = true, features = ["raw_value"] }
 biome_deserialize              = { workspace = true }
+text-size              = { workspace = true }
 biome_deserialize_macros              = { workspace = true }
 bpaf                     = { workspace = true }
 pg_diagnostics                     = { workspace = true }

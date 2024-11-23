@@ -11,7 +11,7 @@ serde                    = { workspace = true, features = ["derive"] }
 serde_json               = { workspace = true, features = ["raw_value"] }
 ignore                   = { workspace = true }
 toml = { workspace = true }
-pg_fs.workspace =  true
+pg_fs =  { workspace = true, features = ["serde"] }
 pg_diagnostics        = { workspace = true }
 biome_deserialize        = "0.6.0"
 pg_statement_splitter        = { workspace = true }

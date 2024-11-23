@@ -16,10 +16,13 @@ enumflags2                   = { workspace = true }
 termcolor                    = { workspace = true }
 unicode-width                = { workspace = true }
 serde_json                   = { workspace = true }
+schemars                     = { workspace = true, optional = true }
+
+[features]
+schema = ["schemars", "pg_text_edit/schemars", "pg_diagnostics_categories/schemars"]
 
 [dev-dependencies]
 
 [lib]
 doctest = false
 
-[features]

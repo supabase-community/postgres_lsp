@@ -37,10 +37,31 @@ pub struct ChangeParams {
     pub text: String,
 }
 
+impl ChangeParams {
+    pub fn overwrite(text: String) -> Self {
+        Self {
+            range: None,
+            text,
+        }
+    }
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct IsPathIgnoredParams {
+    pub pglsp_path: PgLspPath
+}
+
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct UpdateSettingsParams {
     pub configuration: PartialConfiguration,
+    pub vcs_base_path: Option<PathBuf>,
+    pub gitignore_matches: Vec<String>,
     pub workspace_directory: Option<PathBuf>,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct GetFileContentParams {
+    pub path: PgLspPath,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
@@ -69,6 +90,16 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
     /// Returns information about the server this workspace is connected to or `None` if the workspace isn't connected to a server.
     fn server_info(&self) -> Option<&ServerInfo>;
 
+    /// Return the content of a file
+    fn get_file_content(&self, params: GetFileContentParams) -> Result<String, WorkspaceError>;
+
+    /// Checks if the current path is ignored by the workspace.
+    ///
+    /// Takes as input the path of the file that workspace is currently processing and
+    /// a list of paths to match against.
+    ///
+    /// If the file path matches, then `true` is returned, and it should be considered ignored.
+    fn is_path_ignored(&self, params: IsPathIgnoredParams) -> Result<bool, WorkspaceError>;
 }
 
 /// Convenience function for constructing a server instance of [Workspace]
@@ -104,19 +135,19 @@ impl<'app, W: Workspace + ?Sized> FileGuard<'app, W> {
         Ok(Self { workspace, path })
     }
 
-    // pub fn change_file(&self, version: i32, content: String) -> Result<(), WorkspaceError> {
-    //     self.workspace.change_file(ChangeFileParams {
-    //         path: self.path.clone(),
-    //         version,
-    //         content,
-    //     })
-    // }
+    pub fn change_file(&self, version: i32, changes: Vec<ChangeParams>) -> Result<(), WorkspaceError> {
+        self.workspace.change_file(ChangeFileParams {
+            path: self.path.clone(),
+            version,
+            changes,
+        })
+    }
 
-    // pub fn get_file_content(&self) -> Result<String, WorkspaceError> {
-    //     self.workspace.get_file_content(GetFileContentParams {
-    //         path: self.path.clone(),
-    //     })
-    // }
+    pub fn get_file_content(&self) -> Result<String, WorkspaceError> {
+        self.workspace.get_file_content(GetFileContentParams {
+            path: self.path.clone(),
+        })
+    }
     //
     // pub fn pull_diagnostics(
     //     &self,

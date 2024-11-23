@@ -59,20 +59,6 @@ impl<'a> ReporterVisitor for ConsoleReporterVisitor<'a> {
         execution: &Execution,
         summary: TraversalSummary,
     ) -> io::Result<()> {
-        if execution.is_check() && summary.suggested_fixes_skipped > 0 {
-            self.0.log(markup! {
-                <Warn>"Skipped "{summary.suggested_fixes_skipped}" suggested fixes.\n"</Warn>
-                <Info>"If you wish to apply the suggested (unsafe) fixes, use the command "<Emphasis>"biome check --fix --unsafe\n"</Emphasis></Info>
-            })
-        }
-
-        if !execution.is_ci() && summary.diagnostics_not_printed > 0 {
-            self.0.log(markup! {
-                <Warn>"The number of diagnostics exceeds the number allowed by Biome.\n"</Warn>
-                <Info>"Diagnostics not shown: "</Info><Emphasis>{summary.diagnostics_not_printed}</Emphasis><Info>"."</Info>
-            })
-        }
-
         self.0.log(markup! {
             {ConsoleTraversalSummary(execution.traversal_mode(), &summary)}
         });
@@ -112,15 +98,10 @@ impl<'a> ReporterVisitor for ConsoleReporterVisitor<'a> {
 
     fn report_diagnostics(
         &mut self,
-        execution: &Execution,
+        _execution: &Execution,
         diagnostics_payload: DiagnosticsPayload,
     ) -> io::Result<()> {
         for diagnostic in &diagnostics_payload.diagnostics {
-            if execution.is_search() {
-                self.0.log(markup! {{PrintDiagnostic::search(diagnostic)}});
-                continue;
-            }
-
             if diagnostic.severity() >= diagnostics_payload.diagnostic_level {
                 if diagnostic.tags().is_verbose() && diagnostics_payload.verbose {
                     self.0
@@ -153,10 +134,6 @@ struct SummaryDetail<'a>(pub(crate) &'a TraversalMode, usize);
 
 impl<'a> fmt::Display for SummaryDetail<'a> {
     fn fmt(&self, fmt: &mut Formatter) -> io::Result<()> {
-        if let TraversalMode::Search { .. } = self.0 {
-            return Ok(());
-        }
-
         if self.1 > 0 {
             fmt.write_markup(markup! {
                 " Fixed "{Files(self.1)}"."
@@ -174,37 +151,8 @@ impl<'a> fmt::Display for SummaryTotal<'a> {
     fn fmt(&self, fmt: &mut Formatter) -> io::Result<()> {
         let files = Files(self.1);
         match self.0 {
-            TraversalMode::Check { .. } | TraversalMode::Lint { .. } | TraversalMode::CI { .. } => {
-                fmt.write_markup(markup! {
-                    "Checked "{files}" in "{self.2}"."
-                })
-            }
-            TraversalMode::Format { write, .. } => {
-                if *write {
-                    fmt.write_markup(markup! {
-                        "Formatted "{files}" in "{self.2}"."
-                    })
-                } else {
-                    fmt.write_markup(markup! {
-                        "Checked "{files}" in "{self.2}"."
-                    })
-                }
-            }
-
-            TraversalMode::Migrate { write, .. } => {
-                if *write {
-                    fmt.write_markup(markup! {
-                      "Migrated your configuration file in "{self.2}"."
-                    })
-                } else {
-                    fmt.write_markup(markup! {
-                        "Checked your configuration file in "{self.2}"."
-                    })
-                }
-            }
-
-            TraversalMode::Search { .. } => fmt.write_markup(markup! {
-                "Searched "{files}" in "{self.2}"."
+            TraversalMode::Dummy { .. } => fmt.write_markup(markup! {
+                "Dummy "{files}" in "{self.2}"."
             }),
         }
     }
@@ -234,14 +182,6 @@ impl<'a> fmt::Display for ConsoleTraversalSummary<'a> {
                 fmt.write_markup(markup!("\n"<Warn>"Found "{self.1.warnings}" warnings."</Warn>))?;
             }
         }
-
-        if let TraversalMode::Search { .. } = self.0 {
-            if self.1.matches == 1 {
-                fmt.write_markup(markup!(" "<Info>"Found "{self.1.matches}" match."</Info>))?
-            } else {
-                fmt.write_markup(markup!(" "<Info>"Found "{self.1.matches}" matches."</Info>))?
-            };
-        };
         Ok(())
     }
 }

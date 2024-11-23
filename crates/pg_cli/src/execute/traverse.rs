@@ -2,19 +2,17 @@ use super::process_file::{process_file, DiffKind, FileStatus, Message};
 use super::{Execution, TraversalMode};
 use crate::cli_options::CliOptions;
 use crate::execute::diagnostics::{
-    AssistsDiffDiagnostic, CIAssistsDiffDiagnostic, CIFormatDiffDiagnostic,
-    CIOrganizeImportsDiffDiagnostic, ContentDiffAdvice, FormatDiffDiagnostic,
-    OrganizeImportsDiffDiagnostic, PanicDiagnostic,
+    PanicDiagnostic,
 };
 use crate::reporter::TraversalSummary;
 use crate::{CliDiagnostic, CliSession};
 use pg_diagnostics::DiagnosticTags;
-use pg_diagnostics::{category, DiagnosticExt, Error, Resource, Severity};
+use pg_diagnostics::{DiagnosticExt, Error, Resource, Severity};
 use pg_fs::{PgLspPath, FileSystem, PathInterner};
 use pg_fs::{TraversalContext, TraversalScope};
 use pg_workspace_new::dome::Dome;
-use pg_workspace_new::workspace::{DropPatternParams, IsPathIgnoredParams};
-use pg_workspace_new::{extension_error, workspace::SupportsFeatureParams, Workspace, WorkspaceError};
+use pg_workspace_new::workspace::IsPathIgnoredParams;
+use pg_workspace_new::{Workspace, WorkspaceError};
 use crossbeam::channel::{unbounded, Receiver, Sender};
 use rustc_hash::FxHashSet;
 use std::collections::BTreeSet;
@@ -49,11 +47,7 @@ pub(crate) fn traverse(
 
     if inputs.is_empty() {
         match &execution.traversal_mode {
-            TraversalMode::Check { .. }
-            | TraversalMode::Lint { .. }
-            | TraversalMode::Format { .. }
-            | TraversalMode::CI { .. }
-            | TraversalMode::Search { .. } => {
+            TraversalMode::Dummy => {
                 // If `--staged` or `--changed` is specified, it's acceptable for them to be empty, so ignore it.
                 if !execution.is_vcs_targeted() {
                     match current_dir() {
@@ -94,7 +88,7 @@ pub(crate) fn traverse(
 
     let (duration, evaluated_paths, diagnostics) = thread::scope(|s| {
         let handler = thread::Builder::new()
-            .name(String::from("biome::console"))
+            .name(String::from("pglsp::console"))
             .spawn_scoped(s, || printer.run(receiver, recv_files))
             .expect("failed to spawn console thread");
 
@@ -122,13 +116,6 @@ pub(crate) fn traverse(
 
         (elapsed, evaluated_paths, diagnostics)
     });
-
-    // Make sure patterns are always cleaned up at the end of traversal.
-    if let TraversalMode::Search { pattern, .. } = execution.traversal_mode() {
-        let _ = session.app.workspace.drop_pattern(DropPatternParams {
-            pattern: pattern.clone(),
-        });
-    }
 
     let errors = printer.errors();
     let warnings = printer.warnings();
@@ -187,10 +174,6 @@ fn traverse_inputs(
     let mut iter = dome.iter();
     fs.traversal(Box::new(|scope: &dyn TraversalScope| {
         while let Some(path) = iter.next_config() {
-            scope.handle(ctx, path.to_path_buf());
-        }
-
-        while let Some(path) = iter.next_manifest() {
             scope.handle(ctx, path.to_path_buf());
         }
 
@@ -378,156 +361,24 @@ impl<'ctx> DiagnosticsPrinter<'ctx> {
                         .fetch_add(skipped_diagnostics, Ordering::Relaxed);
 
                     // is CI mode we want to print all the diagnostics
-                    if self.execution.is_ci() {
-                        for diag in diagnostics {
-                            let severity = diag.severity();
-                            if self.should_skip_diagnostic(severity, diag.tags()) {
-                                continue;
-                            }
-
-                            if severity == Severity::Error {
-                                self.errors.fetch_add(1, Ordering::Relaxed);
-                            }
-                            if severity == Severity::Warning {
-                                self.warnings.fetch_add(1, Ordering::Relaxed);
-                            }
-
-                            let diag = diag.with_file_path(&name).with_file_source_code(&content);
-                            diagnostics_to_print.push(diag);
+                    for diag in diagnostics {
+                        let severity = diag.severity();
+                        if self.should_skip_diagnostic(severity, diag.tags()) {
+                            continue;
                         }
-                    } else {
-                        for diag in diagnostics {
-                            let severity = diag.severity();
-                            if self.should_skip_diagnostic(severity, diag.tags()) {
-                                continue;
-                            }
-                            if severity == Severity::Error {
-                                self.errors.fetch_add(1, Ordering::Relaxed);
-                            }
-                            if severity == Severity::Warning {
-                                self.warnings.fetch_add(1, Ordering::Relaxed);
-                            }
-
-                            let should_print = self.should_print();
-
-                            if should_print {
-                                let diag =
-                                    diag.with_file_path(&name).with_file_source_code(&content);
-                                diagnostics_to_print.push(diag)
-                            }
+                        if severity == Severity::Error {
+                            self.errors.fetch_add(1, Ordering::Relaxed);
                         }
-                    }
-                }
-                Message::Diff {
-                    file_name,
-                    old,
-                    new,
-                    diff_kind,
-                } => {
-                    // A diff is an error in CI mode and in format check mode
-                    let is_error = self.execution.is_ci() || !self.execution.is_format_write();
-                    if is_error {
-                        self.errors.fetch_add(1, Ordering::Relaxed);
-                    }
+                        if severity == Severity::Warning {
+                            self.warnings.fetch_add(1, Ordering::Relaxed);
+                        }
 
-                    let severity: Severity = if is_error {
-                        Severity::Error
-                    } else {
-                        // we set lowest
-                        Severity::Hint
-                    };
+                        let should_print = self.should_print();
 
-                    if self.should_skip_diagnostic(severity, DiagnosticTags::empty()) {
-                        continue;
-                    }
-
-                    let should_print = self.should_print();
-
-                    if should_print {
-                        if self.execution.is_ci() {
-                            match diff_kind {
-                                DiffKind::Format => {
-                                    let diag = CIFormatDiffDiagnostic {
-                                        file_name: file_name.clone(),
-                                        diff: ContentDiffAdvice {
-                                            old: old.clone(),
-                                            new: new.clone(),
-                                        },
-                                    };
-                                    diagnostics_to_print.push(
-                                        diag.with_severity(severity)
-                                            .with_file_source_code(old.clone()),
-                                    );
-                                }
-                                DiffKind::OrganizeImports => {
-                                    let diag = CIOrganizeImportsDiffDiagnostic {
-                                        file_name: file_name.clone(),
-                                        diff: ContentDiffAdvice {
-                                            old: old.clone(),
-                                            new: new.clone(),
-                                        },
-                                    };
-                                    diagnostics_to_print.push(
-                                        diag.with_severity(severity)
-                                            .with_file_source_code(old.clone()),
-                                    );
-                                }
-                                DiffKind::Assists => {
-                                    let diag = CIAssistsDiffDiagnostic {
-                                        file_name: file_name.clone(),
-                                        diff: ContentDiffAdvice {
-                                            old: old.clone(),
-                                            new: new.clone(),
-                                        },
-                                    };
-                                    diagnostics_to_print.push(
-                                        diag.with_severity(severity)
-                                            .with_file_source_code(old.clone()),
-                                    )
-                                }
-                            };
-                        } else {
-                            match diff_kind {
-                                DiffKind::Format => {
-                                    let diag = FormatDiffDiagnostic {
-                                        file_name: file_name.clone(),
-                                        diff: ContentDiffAdvice {
-                                            old: old.clone(),
-                                            new: new.clone(),
-                                        },
-                                    };
-                                    diagnostics_to_print.push(
-                                        diag.with_severity(severity)
-                                            .with_file_source_code(old.clone()),
-                                    )
-                                }
-                                DiffKind::OrganizeImports => {
-                                    let diag = OrganizeImportsDiffDiagnostic {
-                                        file_name: file_name.clone(),
-                                        diff: ContentDiffAdvice {
-                                            old: old.clone(),
-                                            new: new.clone(),
-                                        },
-                                    };
-                                    diagnostics_to_print.push(
-                                        diag.with_severity(severity)
-                                            .with_file_source_code(old.clone()),
-                                    )
-                                }
-                                DiffKind::Assists => {
-                                    let diag = AssistsDiffDiagnostic {
-                                        file_name: file_name.clone(),
-                                        diff: ContentDiffAdvice {
-                                            old: old.clone(),
-                                            new: new.clone(),
-                                        },
-                                    };
-                                    diagnostics_to_print.push(
-                                        diag.with_severity(severity)
-                                            .with_file_source_code(old.clone()),
-                                    )
-                                }
-                            };
+                        if should_print {
+                            let diag =
+                                diag.with_file_path(&name).with_file_source_code(&content);
+                            diagnostics_to_print.push(diag)
                         }
                     }
                 }
@@ -586,14 +437,6 @@ impl<'ctx, 'app> TraversalOptions<'ctx, 'app> {
         self.messages.send(msg.into()).ok();
     }
 
-    pub(crate) fn miss_handler_err(&self, err: WorkspaceError, pglsp_path: &PgLspPath) {
-        self.push_diagnostic(
-            err.with_category(category!("files/missingHandler"))
-                .with_file_path(pglsp_path.display().to_string())
-                .with_tags(DiagnosticTags::VERBOSE),
-        );
-    }
-
     pub(crate) fn protected_file(&self, pglsp_path: &PgLspPath) {
         self.push_diagnostic(
             WorkspaceError::protected_file(pglsp_path.display().to_string()).into(),
@@ -626,8 +469,7 @@ impl<'ctx, 'app> TraversalContext for TraversalOptions<'ctx, 'app> {
             let can_handle = !self
                 .workspace
                 .is_path_ignored(IsPathIgnoredParams {
-                    pglsp_path: pglsp_path.clone(),
-                    features: self.execution.to_feature(),
+                    pglsp_path: pglsp_path.clone()
                 })
                 .unwrap_or_else(|err| {
                     self.push_diagnostic(err.into());
@@ -641,42 +483,8 @@ impl<'ctx, 'app> TraversalContext for TraversalOptions<'ctx, 'app> {
             return false;
         }
 
-        let file_features = self.workspace.file_features(SupportsFeatureParams {
-            path: pglsp_path.clone(),
-            features: self.execution.to_feature(),
-        });
-
-        let file_features = match file_features {
-            Ok(file_features) => {
-                if file_features.is_protected() {
-                    self.protected_file(pglsp_path);
-                    return false;
-                }
-
-                if file_features.is_not_supported() && !file_features.is_ignored() {
-                    // we should throw a diagnostic if we can't handle a file that isn't ignored
-                    self.miss_handler_err(extension_error(pglsp_path), pglsp_path);
-                    return false;
-                }
-                file_features
-            }
-            Err(err) => {
-                self.miss_handler_err(err, pglsp_path);
-
-                return false;
-            }
-        };
         match self.execution.traversal_mode() {
-            TraversalMode::Check { .. } | TraversalMode::CI { .. } => {
-                file_features.supports_lint()
-                    || file_features.supports_format()
-                    || file_features.supports_organize_imports()
-            }
-            TraversalMode::Format { .. } => file_features.supports_format(),
-            TraversalMode::Lint { .. } => file_features.supports_lint(),
-            // Imagine if Biome can't handle its own configuration file...
-            TraversalMode::Migrate { .. } => true,
-            TraversalMode::Search { .. } => file_features.supports_search(),
+            TraversalMode::Dummy { .. } => true
         }
     }
 

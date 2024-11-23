@@ -1,17 +1,18 @@
-use crate::cli_options::{cli_options, CliOptions, CliReporter, ColorsArg};
-use crate::diagnostics::{DeprecatedArgument, DeprecatedConfigurationFile};
+use crate::cli_options::{cli_options, CliOptions, ColorsArg};
+use crate::diagnostics::DeprecatedConfigurationFile;
 use crate::logging::LoggingKind;
 use crate::{
     execute_mode, setup_cli_subscriber, CliDiagnostic, CliSession, Execution, LoggingLevel, VERSION,
 };
-use pg_configuration::{ConfigurationDiagnostic, PartialConfiguration};
+use pg_configuration::PartialConfiguration;
 use pg_console::{markup, Console, ConsoleExt};
 use pg_diagnostics::{Diagnostic, PrintDiagnostic};
-use pg_fs::{PgLspPath, FileSystem};
+use pg_fs::FileSystem;
 use pg_workspace_new::configuration::{
-    load_configuration, LoadedConfiguration, PartialConfigurationExt,
+    load_configuration, LoadedConfiguration,
 };
-use pg_workspace_new::workspace::{FixFileMode, RegisterProjectFolderParams, UpdateSettingsParams};
+use pg_workspace_new::settings::PartialConfigurationExt;
+use pg_workspace_new::workspace::UpdateSettingsParams;
 use pg_workspace_new::{DynRef, Workspace, WorkspaceError};
 use bpaf::Bpaf;
 use std::ffi::OsString;
@@ -292,17 +293,15 @@ pub(crate) trait CommandRunner: Sized {
         let configuration_path = loaded_configuration.directory_path.clone();
         let configuration = self.merge_configuration(loaded_configuration, fs, console)?;
         let vcs_base_path = configuration_path.or(fs.working_directory());
-        // let (vcs_base_path, gitignore_matches) =
-        //     configuration.retrieve_gitignore_matches(fs, vcs_base_path.as_deref())?;
+        let (vcs_base_path, gitignore_matches) =
+            configuration.retrieve_gitignore_matches(fs, vcs_base_path.as_deref())?;
         let paths = self.get_files_to_process(fs, &configuration)?;
-        // workspace.register_project_folder(RegisterProjectFolderParams {
-        //     path: fs.working_directory(),
-        //     set_as_current_workspace: true,
-        // })?;
 
         workspace.update_settings(UpdateSettingsParams {
             workspace_directory: fs.working_directory(),
             configuration,
+            vcs_base_path,
+            gitignore_matches
         })?;
 
         let execution = self.get_execution(cli_options, console, workspace)?;

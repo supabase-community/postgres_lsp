@@ -21,7 +21,7 @@ use tracing::{debug, info, Instrument};
 /// Returns the filesystem path of the global socket used to communicate with
 /// the server daemon
 fn get_socket_name() -> PathBuf {
-    pg_fs::ensure_cache_dir().join(format!("biome-socket-{}", pg_configuration::VERSION))
+    pg_fs::ensure_cache_dir().join(format!("pglsp-socket-{}", pg_configuration::VERSION))
 }
 
 pub(crate) fn enumerate_pipes() -> io::Result<impl Iterator<Item = String>> {
@@ -221,6 +221,7 @@ pub(crate) async fn run_daemon(
         let (stream, _) = listener.accept().await?;
         let connection = factory.create(config_path.clone());
         let span = tracing::trace_span!("run_server");
+        info!("Accepted connection");
         tokio::spawn(run_server(connection, stream).instrument(span.or_current()));
     }
 }

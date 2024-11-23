@@ -176,7 +176,7 @@ pub(crate) fn read_most_recent_log_file(
     log_path: Option<PathBuf>,
     log_file_name_prefix: String,
 ) -> io::Result<Option<String>> {
-    let biome_log_path = log_path.unwrap_or(default_biome_log_path());
+    let biome_log_path = log_path.unwrap_or(default_pglsp_log_path());
 
     let most_recent = fs::read_dir(biome_log_path)?
         .flatten()
@@ -229,8 +229,8 @@ fn setup_tracing_subscriber(log_path: Option<PathBuf>, log_file_name_prefix: Opt
         .init();
 }
 
-pub fn default_biome_log_path() -> PathBuf {
-    match env::var_os("BIOME_LOG_PATH") {
+pub fn default_pglsp_log_path() -> PathBuf {
+    match env::var_os("PGLSP_LOG_PATH") {
         Some(directory) => PathBuf::from(directory),
         None => pg_fs::ensure_cache_dir().join("pglsp-logs"),
     }

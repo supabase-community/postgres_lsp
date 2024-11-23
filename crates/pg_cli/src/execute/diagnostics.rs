@@ -1,8 +1,7 @@
 use pg_diagnostics::adapters::{IoError, StdError};
 use pg_diagnostics::{
-    Advices, Category, Diagnostic, DiagnosticExt, DiagnosticTags, Error, Visit,
+    Category, Diagnostic, DiagnosticExt, DiagnosticTags, Error
 };
-use pg_text_edit::TextEdit;
 use std::io;
 
 #[derive(Debug, Diagnostic)]

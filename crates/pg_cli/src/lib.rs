@@ -4,7 +4,6 @@
 //! to parse commands and arguments, redirect the execution of the commands and
 //! execute the traversal of directory and files, based on the command that was passed.
 
-use commands::{CommandRunner, PgLspCommand};
 use pg_console::{markup, ColorMode, Console, ConsoleExt};
 use pg_fs::OsFileSystem;
 use pg_workspace_new::{App, DynRef, Workspace, WorkspaceRef};
@@ -20,6 +19,7 @@ mod reporter;
 mod diagnostics;
 mod service;
 
+use crate::commands::CommandRunner;
 use crate::cli_options::{CliOptions, ColorsArg};
 pub use execute::{execute_mode, Execution, TraversalMode, VcsTargeted};
 pub use panic::setup_panic_handler;
@@ -27,6 +27,7 @@ pub use reporter::{DiagnosticsPayload, Reporter, ReporterVisitor, TraversalSumma
 pub use crate::logging::{setup_cli_subscriber, LoggingLevel};
 pub use service::{open_transport, SocketTransport};
 pub use diagnostics::CliDiagnostic;
+pub use crate::commands::{pg_lsp_command, PgLspCommand};
 
 pub(crate) const VERSION: &str = match option_env!("PGLSP_VERSION") {
     Some(version) => version,

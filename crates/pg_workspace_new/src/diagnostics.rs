@@ -5,7 +5,7 @@ use pg_diagnostics::{
     category, Advices, Category, Diagnostic, DiagnosticTags, Location, LogCategory,
     MessageAndDescription, Severity, Visit,
 };
-use pg_fs::FileSystemDiagnostic;
+use pg_fs::{FileSystemDiagnostic, PgLspPath};
 use std::process::{ExitCode, Termination};
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
@@ -34,6 +34,10 @@ pub enum WorkspaceError {
     FileIgnored(FileIgnored),
     /// Emitted when a file could not be parsed because it's larger than the size limit
     FileTooLarge(FileTooLarge),
+    /// Diagnostic raised when a file is protected
+    ProtectedFile(ProtectedFile),
+    /// Raised when there's an issue around the VCS integration
+    Vcs(VcsDiagnostic)
 }
 
 impl WorkspaceError {
@@ -43,6 +47,17 @@ impl WorkspaceError {
 
     pub fn not_found() -> Self {
         Self::NotFound(NotFound)
+    }
+
+    pub fn protected_file(file_path: impl Into<String>) -> Self {
+        Self::ProtectedFile(ProtectedFile {
+            file_path: file_path.into(),
+            verbose_advice: ProtectedFileAdvice,
+        })
+    }
+
+    pub fn vcs_disabled() -> Self {
+        Self::Vcs(VcsDiagnostic::DisabledVcs(DisabledVcs {}))
     }
 }
 
@@ -143,6 +158,41 @@ impl Diagnostic for TransportError {
     }
 }
 
+#[derive(Debug, Deserialize, Diagnostic, Serialize)]
+pub enum VcsDiagnostic {
+    /// When the VCS folder couldn't be found
+    NoVcsFolderFound(NoVcsFolderFound),
+    /// VCS is disabled
+    DisabledVcs(DisabledVcs),
+}
+
+#[derive(Debug, Diagnostic, Serialize, Deserialize)]
+#[diagnostic(
+    category = "internalError/fs",
+    severity = Warning,
+    message = "Couldn't determine a directory for the VCS integration. VCS integration will be disabled."
+)]
+pub struct DisabledVcs {}
+
+#[derive(Debug, Diagnostic, Serialize, Deserialize)]
+#[diagnostic(
+    category = "internalError/fs",
+    severity = Error,
+    message(
+        description = "Couldn't find the VCS folder at the following path: {path}",
+        message("Couldn't find the VCS folder at the following path: "<Emphasis>{self.path}</Emphasis>),
+    )
+)]
+pub struct NoVcsFolderFound {
+    #[location(resource)]
+    pub path: String,
+}
+
+impl From<VcsDiagnostic> for WorkspaceError {
+    fn from(value: VcsDiagnostic) -> Self {
+        Self::Vcs(value)
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Diagnostic)]
 #[diagnostic(
@@ -158,6 +208,33 @@ pub struct DatabaseConnectionError;
     tags(INTERNAL)
 )]
 pub struct NotFound;
+
+#[derive(Debug, Serialize, Deserialize, Diagnostic)]
+#[diagnostic(
+    category = "project",
+    severity = Information,
+    message(
+        message("The file "<Emphasis>{self.file_path}</Emphasis>" is protected because is handled by another tool. We won't process it."),
+        description = "The file {file_path} is protected because is handled by another tool. We won't process it.",
+    ),
+    tags(VERBOSE)
+)]
+pub struct ProtectedFile {
+    #[location(resource)]
+    pub file_path: String,
+
+    #[verbose_advice]
+    pub verbose_advice: ProtectedFileAdvice,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ProtectedFileAdvice;
+
+impl Advices for ProtectedFileAdvice {
+    fn record(&self, visitor: &mut dyn Visit) -> std::io::Result<()> {
+        visitor.record_log(LogCategory::Info, &markup! { "You can hide this diagnostic by using "<Emphasis>"--diagnostic-level=warn"</Emphasis>" to increase the diagnostic level shown by CLI." })
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Diagnostic)]
 #[diagnostic(
