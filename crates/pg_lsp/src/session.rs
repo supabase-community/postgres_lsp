@@ -43,6 +43,7 @@ impl Session {
     /// If the passed-in connection string is the same that we're already connected to, it's a noop.
     /// Otherwise, it'll first open a new connection, replace `Self`'s connection, and then close
     /// the old one.
+    #[tracing::instrument(name = "Updating DB Connection", skip(self))]
     pub async fn change_db(&self, connection_string: String) -> anyhow::Result<()> {
         if self
             .db
