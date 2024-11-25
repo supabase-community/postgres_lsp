@@ -1,6 +1,6 @@
 use line_index::{LineCol, LineColUtf16, LineIndex};
-use lsp_types::{Position, Range};
 use text_size::{TextRange, TextSize};
+use tower_lsp::lsp_types::{Position, Range};
 
 pub trait LineIndexExt {
     fn offset_lsp(&self, line_col: Position) -> Option<TextSize>;

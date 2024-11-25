@@ -36,7 +36,6 @@ pg_hover = { path = "./crates/pg_hover", version = "0.0.0" }
 pg_inlay_hints = { path = "./crates/pg_inlay_hints", version = "0.0.0" }
 pg_lint = { path = "./crates/pg_lint", version = "0.0.0" }
 pg_workspace = { path = "./crates/pg_workspace", version = "0.0.0" }
-pg_lsp = { path = "./crates/lsp", version = "0.0.0" }
 
 # parser = { path = "./crates/parser", version = "0.0.0" }
 # sql_parser = { path = "./crates/sql_parser", version = "0.0.0" }
@@ -45,4 +44,3 @@ pg_lsp = { path = "./crates/lsp", version = "0.0.0" }
 
 [profile.dev.package]
 insta.opt-level = 3
-similar.opt-level = 3

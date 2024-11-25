@@ -4,11 +4,11 @@
 #![feature(future_join)]
 
 mod functions;
-mod versions;
 mod schema_cache;
 mod schemas;
 mod tables;
 mod types;
+mod versions;
 
 use sqlx::postgres::PgPool;
 

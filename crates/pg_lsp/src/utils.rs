@@ -1,11 +1,10 @@
-pub mod from_proto;
 pub mod line_index_ext;
 pub mod to_proto;
 
 use std::path::PathBuf;
 
-use lsp_types;
 use pg_fs::PgLspPath;
+use tower_lsp::lsp_types;
 
 /// Convert a `lsp_types::Url` to a `PgLspPath`.
 pub(crate) fn file_path(url: &lsp_types::Url) -> PgLspPath {
