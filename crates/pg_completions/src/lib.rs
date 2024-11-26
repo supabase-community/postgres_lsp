@@ -65,6 +65,8 @@ pub fn complete<'a>(params: &'a CompletionParams<'a>) -> CompletionResult<'a> {
 mod tests {
     use async_std::task::block_on;
     use pg_schema_cache::SchemaCache;
+    use pg_test_utils::test_database::*;
+
     use sqlx::PgPool;
 
     use crate::{complete, CompletionParams};
@@ -105,6 +107,43 @@ mod tests {
         let conn_string = std::env::var("DB_CONNECTION_STRING").unwrap();
 
         let pool = block_on(PgPool::connect(conn_string.as_str())).unwrap();
+
+        let mut parser = tree_sitter::Parser::new();
+        parser
+            .set_language(tree_sitter_sql::language())
+            .expect("Error loading sql language");
+
+        let tree = parser.parse(input, None).unwrap();
+        let schema_cache = block_on(SchemaCache::load(&pool));
+
+        let p = CompletionParams {
+            position: 47.into(),
+            schema: &schema_cache,
+            text: input,
+            tree: Some(&tree),
+        };
+
+        let result = complete(&p);
+
+        assert!(result.items.len() > 0);
+    }
+
+    #[test]
+    fn test_complete_with_db() {
+        let setup = r#"
+            create table users (
+                id serial primary key,
+                name text,
+                password text
+            );
+        "#;
+
+        let input = "select * from u";
+
+        let conn_string = std::env::var("DB_CONNECTION_STRING").unwrap();
+        let password = std::env::var("DB_PASSWORD").unwrap_or("postgres".into());
+
+        let test_db = block_on(get_new_test_db(conn_string, password));
 
         let mut parser = tree_sitter::Parser::new();
         parser
