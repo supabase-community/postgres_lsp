@@ -1,23 +1,31 @@
 use std::{fs, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
 use change::StatementChange;
-use dashmap::DashMap;
+use dashmap::{DashMap, DashSet};
 use pg_fs::{ConfigName, PgLspPath};
-use store::{Document, StatementRef};
+use document::{Document, StatementRef};
+use store::Store;
+use tree_sitter::TreeSitterStore;
 
 use crate::{settings::{Settings, SettingsHandleMut, SettingsHandle}, WorkspaceError};
 
 use super::{GetFileContentParams, IsPathIgnoredParams, OpenFileParams, ServerInfo, UpdateSettingsParams, Workspace};
 
-mod store;
+mod document;
 mod change;
+mod tree_sitter;
+mod store;
 
 pub(super) struct WorkspaceServer {
     /// global settings object for this workspace
     settings: RwLock<Settings>,
     /// Stores the document (text content + version number) associated with a URL
     documents: DashMap<PgLspPath, Document>,
-    // ts: DashMap<StatementRef, tree_sitter::TreeSitter>
+
+    tree_sitter: TreeSitterStore
+
+    // Stores the statements that have changed since the last analysis
+    changed_stmts: DashSet<StatementRef>,
 }
 
 
@@ -39,6 +47,8 @@ impl WorkspaceServer {
         Self {
             settings: RwLock::default(),
             documents: DashMap::default(),
+            tree_sitter:TreeSitterStore::new(),
+            changed_stmts: DashSet::default(),
         }
     }
 
@@ -137,27 +147,27 @@ impl Workspace for WorkspaceServer {
         for c in &doc.apply_file_change(&params) {
             match c {
                 StatementChange::Added(s) => {
-                    // self.tree_sitter.add_statement(s);
+                    self.tree_sitter.add_statement(s);
                     // self.pg_query.add_statement(s);
                     //
-                    // self.changed_stmts.insert(s.to_owned());
+                    self.changed_stmts.insert(s.to_owned());
                 }
                 StatementChange::Deleted(s) => {
-                    // self.tree_sitter.remove_statement(s);
+                    self.tree_sitter.remove_statement(s);
                     // self.pg_query.remove_statement(s);
                     // self.linter.clear_statement_violations(s);
                     // self.typechecker.clear_statement_errors(s);
                     //
-                    // self.changed_stmts.insert(s.to_owned());
+                    self.changed_stmts.insert(s.to_owned());
                 }
                 StatementChange::Modified(s) => {
-                    // self.tree_sitter.modify_statement(s);
+                    self.tree_sitter.modify_statement(s);
                     // self.pg_query.modify_statement(s);
                     // self.linter.clear_statement_violations(&s.statement);
                     // self.typechecker.clear_statement_errors(&s.statement);
-                    //
-                    // self.changed_stmts.remove(&s.statement);
-                    // self.changed_stmts.insert(s.new_statement().to_owned());
+
+                    self.changed_stmts.remove(&s.old.ref_);
+                    self.changed_stmts.insert(s.new_statement().to_owned());
                 }
             }
         }

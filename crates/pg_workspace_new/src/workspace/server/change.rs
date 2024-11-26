@@ -21,6 +21,15 @@ pub struct ChangedStatement {
     pub text: String,
 }
 
+impl ChangedStatement {
+    pub fn new_statement(&self) -> Statement {
+        Statement {
+            ref_: self.new_ref.clone(),
+            text: apply_text_change(&self.old.text, Some(self.range), &self.text),
+        }
+    }
+}
+
 impl StatementChange {
     pub fn statement_ref(&self) -> &StatementRef {
         match self {
