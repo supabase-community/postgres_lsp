@@ -1,7 +1,7 @@
-use std::usize;
-
 use pg_fs::PgLspPath;
 use text_size::{TextRange, TextSize};
+
+use super::change::{Change, StatementChange};
 
 /// Global unique identifier for a statement
 #[derive(Debug, Hash, Eq, PartialEq, Clone)]
@@ -12,25 +12,38 @@ pub(crate) struct StatementRef {
     pub(crate) id: StatementId,
 }
 
+/// Represenation of a statement
+#[derive(Debug)]
+pub(crate) struct Statement {
+    pub(crate) ref_: StatementRef,
+    pub(crate) text: String,
+}
+
 pub type StatementId = usize;
 
+type InnerStatementRef = (StatementId, TextRange);
+
 pub(crate) struct Document {
+    pub(crate) path: PgLspPath,
     pub(crate) content: String,
     pub(crate) version: i32,
     /// List of statements sorted by range.start()
-    pub(crate) statements: Vec<(StatementId, TextRange)>,
+    pub(crate) statements: Vec<InnerStatementRef>,
 
-    id_generator: IdGenerator,
+    pub(super) id_generator: IdGenerator,
 }
 
 impl Document {
-    pub(crate) fn new(content: String, version: i32) -> Self {
+    pub(crate) fn new(path: PgLspPath, content: String, version: i32) -> Self {
         let mut id_generator = IdGenerator::new();
 
         Self {
-            statements: pg_statement_splitter::split(&content).ranges.iter().map(|r| {
-                (id_generator.next(), *r)
-            }).collect(),
+            path,
+            statements: pg_statement_splitter::split(&content)
+                .ranges
+                .iter()
+                .map(|r| (id_generator.next(), *r))
+                .collect(),
             content,
             version,
 
@@ -38,38 +51,95 @@ impl Document {
         }
     }
 
-    /// Returns the statement at the given offset
-    pub fn statement_at_offset(&self, offset: &TextSize) -> Option<StatementId> {
+    /// Returns the statement ref at the given offset
+    pub fn statement_ref_at_offset(&self, offset: &TextSize) -> Option<StatementRef> {
+        self.statements.iter().find_map(|r| {
+            if r.1.contains(*offset) {
+                Some(self.statement_ref(r))
+            } else {
+                None
+            }
+        })
+    }
+
+    /// Returns the statement refs at the given range
+    pub fn statement_refs_at_range(&self, range: &TextRange) -> Vec<StatementRef> {
         self.statements
             .iter()
-            .position(|r| r.1.contains(*offset))
+            .filter(|(_, r)| {
+                range.contains_range(r.to_owned().to_owned()) || r.contains_range(range.to_owned())
+            })
+            .map(|x| self.statement_ref(x))
+            .collect()
+    }
+
+    /// Returns the statement at the given offset
+    pub fn statement_at_offset(&self, offset: &TextSize) -> Option<Statement> {
+        self.statements.iter().find_map(|r| {
+            if r.1.contains(*offset) {
+                Some(self.statement(r))
+            } else {
+                None
+            }
+        })
+    }
+
+    pub fn mut_statement_at(&mut self, pos: usize, new_range: TextRange) -> StatementId {
+        let new_id = self.id_generator.next();
+        self.statements[pos] = (new_id, new_range);
+        new_id
+    }
+
+    pub fn insert_statement_at(&mut self, pos: usize, range: TextRange) -> StatementId {
+        let new_id = self.id_generator.next();
+        self.statements.insert(pos, (new_id, range));
+        new_id
     }
 
     /// Returns the statements at the given range
-    pub fn statements_at_range(&self, range: &TextRange) -> Vec<StatementId> {
+    pub fn statements_at_range(&self, range: &TextRange) -> Vec<Statement> {
         self.statements
             .iter()
-            .enumerate()
             .filter(|(_, r)| {
-                range.contains_range(r.1.to_owned().to_owned()) || r.1.contains_range(range.to_owned())
+                range.contains_range(r.to_owned().to_owned()) || r.contains_range(range.to_owned())
             })
-            .map(|(idx, _)| idx)
+            .map(|x| self.statement(x))
             .collect()
+    }
+
+    pub fn statement_at(&self, pos: usize) -> Statement {
+        self.statement(&self.statements[pos])
+    }
+
+    pub fn statement_ref_at(&self, pos: usize) -> StatementRef {
+        self.statement_ref(&self.statements[pos])
+    }
+
+    pub fn statement_ref(&self, inner_ref: &InnerStatementRef) -> StatementRef {
+        StatementRef {
+            id: inner_ref.0,
+            path: self.path.clone(),
+        }
+    }
+
+    pub fn statement(&self, inner_ref: &InnerStatementRef) -> Statement {
+        Statement {
+            ref_: self.statement_ref(inner_ref),
+            text: self.content[inner_ref.1].to_string(),
+        }
     }
 }
 
 struct IdGenerator {
-    next_id: usize,
+    pub(super) next_id: usize,
 }
 
 impl IdGenerator {
     fn new() -> Self {
-        Self {
-            next_id: 0,
-        }
+        Self { next_id: 0 }
     }
 
-    fn next(&mut self) -> usize {
+    pub(super) fn next(&mut self) -> usize {
         let id = self.next_id;
         self.next_id += 1;
         id

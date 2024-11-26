@@ -2,19 +2,21 @@ use std::{fs, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
 use dashmap::DashMap;
 use pg_fs::{ConfigName, PgLspPath};
-use store::Document;
+use store::{Document, StatementRef};
 
 use crate::{settings::{Settings, SettingsHandleMut, SettingsHandle}, WorkspaceError};
 
 use super::{GetFileContentParams, IsPathIgnoredParams, OpenFileParams, ServerInfo, UpdateSettingsParams, Workspace};
 
 mod store;
+mod change;
 
 pub(super) struct WorkspaceServer {
     /// global settings object for this workspace
     settings: RwLock<Settings>,
     /// Stores the document (text content + version number) associated with a URL
     documents: DashMap<PgLspPath, Document>,
+    // ts: DashMap<StatementRef, tree_sitter::TreeSitter>
 }
 
 
@@ -106,9 +108,10 @@ impl Workspace for WorkspaceServer {
     /// Add a new file to the workspace
     #[tracing::instrument(level = "trace", skip(self))]
     fn open_file(&self, params: OpenFileParams) -> Result<(), WorkspaceError> {
+        tracing::info!("Opening file: {:?}", params.path);
         self.documents.insert(
             params.path.clone(),
-            Document::new(params.content, params.version)
+            Document::new(params.path, params.content, params.version)
         );
 
         Ok(())
@@ -125,8 +128,12 @@ impl Workspace for WorkspaceServer {
 
     /// Change the content of an open file
     fn change_file(&self, params: super::ChangeFileParams) -> Result<(), WorkspaceError> {
+
+
         // get statement ids from document and apply changes and update the store for parse results
         todo!()
+
+
     }
 
     fn server_info(&self) -> Option<&ServerInfo> {

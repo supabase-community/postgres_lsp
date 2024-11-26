@@ -1,15 +1,15 @@
 use crate::capabilities::server_capabilities;
 use crate::diagnostics::{handle_lsp_error, LspError};
+use crate::handlers;
 use crate::session::{
     CapabilitySet, CapabilityStatus, ClientInformation, Session, SessionHandle, SessionKey,
 };
 use crate::utils::{into_lsp_error, panic_to_lsp_error};
-use crate::handlers;
+use futures::future::ready;
+use futures::FutureExt;
 use pg_diagnostics::panic::PanicError;
 use pg_fs::{ConfigName, FileSystem, OsFileSystem};
 use pg_workspace_new::{workspace, DynRef, Workspace};
-use futures::future::ready;
-use futures::FutureExt;
 use rustc_hash::FxHashMap;
 use serde_json::json;
 use std::panic::RefUnwindSafe;
@@ -57,19 +57,27 @@ impl LSPServer {
         let mut capabilities = CapabilitySet::default();
 
         capabilities.add_capability(
+            "pglsp_did_change_extension_settings",
+            "workspace/didChangeConfiguration",
+            if self.session.can_register_did_change_configuration() {
+                CapabilityStatus::Enable(None)
+            } else {
+                CapabilityStatus::Disable
+            },
+        );
+
+        capabilities.add_capability(
             "pglsp_did_change_workspace_settings",
             "workspace/didChangeWatchedFiles",
             if let Some(base_path) = self.session.base_path() {
                 CapabilityStatus::Enable(Some(json!(DidChangeWatchedFilesRegistrationOptions {
-                    watchers: vec![
-                        FileSystemWatcher {
-                            glob_pattern: GlobPattern::String(format!(
-                                "{}/pglsp.toml",
-                                base_path.display()
-                            )),
-                            kind: Some(WatchKind::all()),
-                        },
-                    ],
+                    watchers: vec![FileSystemWatcher {
+                        glob_pattern: GlobPattern::String(format!(
+                            "{}/pglsp.toml",
+                            base_path.display()
+                        )),
+                        kind: Some(WatchKind::all()),
+                    },],
                 })))
             } else {
                 CapabilityStatus::Disable
@@ -141,9 +149,7 @@ impl LanguageServer for LSPServer {
 
         info!("Attempting to load the configuration from 'pglsp.toml' file");
 
-        futures::join!(
-            self.session.load_workspace_settings()
-        );
+        futures::join!(self.session.load_workspace_settings());
 
         let msg = format!("Server initialized with PID: {}", std::process::id());
         self.session
@@ -183,7 +189,7 @@ impl LanguageServer for LSPServer {
                         let possible_config_toml = file_path.strip_prefix(&base_path);
                         if let Ok(watched_file) = possible_config_toml {
                             if ConfigName::file_names()
-                                    .contains(&&*watched_file.display().to_string())
+                                .contains(&&*watched_file.display().to_string())
                             {
                                 self.session.load_workspace_settings().await;
                                 self.setup_capabilities().await;
@@ -211,6 +217,12 @@ impl LanguageServer for LSPServer {
 
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
         // handlers::text_document::did_change(&self.session, params)
+        //     .await
+        //     .ok();
+    }
+
+    async fn did_save(&self, params: DidSaveTextDocumentParams) {
+        // handlers::text_document::did_save(&self.session, params)
         //     .await
         //     .ok();
     }
@@ -249,6 +261,7 @@ macro_rules! workspace_method {
             concat!("pglsp/", stringify!($method)),
             |server: &LSPServer, params| {
                 let span = tracing::trace_span!(concat!("pglsp/", stringify!($method)), params = ?params).or_current();
+                tracing::info!("Received request: {}", stringify!($method));
 
                 let workspace = server.session.workspace.clone();
                 let result = spawn_blocking(move || {
@@ -400,4 +413,3 @@ impl ServerConnection {
             .await;
     }
 }
-

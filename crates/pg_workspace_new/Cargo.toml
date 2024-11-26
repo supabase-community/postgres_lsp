@@ -18,6 +18,8 @@ pg_statement_splitter        = { workspace = true }
 pg_configuration        = { workspace = true }
 pg_console        = { workspace = true }
 tracing                  = { workspace = true, features = ["attributes", "log"] }
+tree-sitter.workspace = true
+tree_sitter_sql.workspace = true
 
 [dev-dependencies]
 

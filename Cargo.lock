@@ -2468,6 +2468,8 @@ dependencies = [
  "text-size",
  "toml",
  "tracing",
+ "tree-sitter",
+ "tree_sitter_sql",
 ]
 
 [[package]]
