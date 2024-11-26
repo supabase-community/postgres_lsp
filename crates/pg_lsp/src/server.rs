@@ -1,4 +1,3 @@
-use std::fmt::format;
 use std::sync::Arc;
 
 use notification::ShowMessage;
@@ -126,10 +125,10 @@ impl LspServer {
             Ok(()) => {}
             Err(e) => {
                 self.client
-                    .send_notification::<ShowMessage>(ShowMessageParams {
-                        typ: MessageType::ERROR,
-                        message: format!("Unable to process config received from client: {e:?}"),
-                    })
+                    .log_message(
+                        MessageType::ERROR,
+                        format!("Unable to process config from client: {e:?}"),
+                    )
                     .await
             }
         };

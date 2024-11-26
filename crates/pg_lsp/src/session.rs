@@ -56,17 +56,20 @@ impl Session {
             return Ok(());
         }
 
+        tracing::info!("Setting up new Database connection");
         let new_db = DbConnection::new(connection_string, Arc::clone(&self.ide)).await?;
+        tracing::info!("Set up new connection, trying to acquire write lock…");
 
         let mut current_db = self.db.write().await;
         let old_db = current_db.replace(new_db);
-        drop(current_db);
 
         if old_db.is_some() {
+            tracing::info!("Dropping previous Database Connection.");
             let old_db = old_db.unwrap();
             old_db.close().await;
         }
 
+        tracing::info!("Successfully set up new connection.");
         Ok(())
     }
 
