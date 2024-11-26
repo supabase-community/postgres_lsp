@@ -21,14 +21,14 @@ pub(crate) struct Statement {
 
 pub type StatementId = usize;
 
-type InnerStatementRef = (StatementId, TextRange);
+type StatementPosition = (StatementId, TextRange);
 
 pub(crate) struct Document {
     pub(crate) path: PgLspPath,
     pub(crate) content: String,
     pub(crate) version: i32,
     /// List of statements sorted by range.start()
-    pub(crate) statements: Vec<InnerStatementRef>,
+    pub(super) statements: Vec<StatementPosition>,
 
     pub(super) id_generator: IdGenerator,
 }
@@ -49,6 +49,10 @@ impl Document {
 
             id_generator,
         }
+    }
+
+     pub fn get_statements(&self) -> &[StatementPosition] {
+        &self.statements
     }
 
     /// Returns the statement ref at the given offset
@@ -84,18 +88,6 @@ impl Document {
         })
     }
 
-    pub fn mut_statement_at(&mut self, pos: usize, new_range: TextRange) -> StatementId {
-        let new_id = self.id_generator.next();
-        self.statements[pos] = (new_id, new_range);
-        new_id
-    }
-
-    pub fn insert_statement_at(&mut self, pos: usize, range: TextRange) -> StatementId {
-        let new_id = self.id_generator.next();
-        self.statements.insert(pos, (new_id, range));
-        new_id
-    }
-
     /// Returns the statements at the given range
     pub fn statements_at_range(&self, range: &TextRange) -> Vec<Statement> {
         self.statements
@@ -115,14 +107,14 @@ impl Document {
         self.statement_ref(&self.statements[pos])
     }
 
-    pub fn statement_ref(&self, inner_ref: &InnerStatementRef) -> StatementRef {
+    pub fn statement_ref(&self, inner_ref: &StatementPosition) -> StatementRef {
         StatementRef {
             id: inner_ref.0,
             path: self.path.clone(),
         }
     }
 
-    pub fn statement(&self, inner_ref: &InnerStatementRef) -> Statement {
+    pub fn statement(&self, inner_ref: &StatementPosition) -> Statement {
         Statement {
             ref_: self.statement_ref(inner_ref),
             text: self.content[inner_ref.1].to_string(),

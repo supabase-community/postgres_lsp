@@ -1,5 +1,6 @@
 use std::{fs, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
+use change::{DocumentChange, StatementChange};
 use dashmap::DashMap;
 use pg_fs::{ConfigName, PgLspPath};
 use store::{Document, StatementRef};
@@ -128,12 +129,40 @@ impl Workspace for WorkspaceServer {
 
     /// Change the content of an open file
     fn change_file(&self, params: super::ChangeFileParams) -> Result<(), WorkspaceError> {
+        let mut doc = self
+            .documents
+            .entry(params.path.clone())
+            .or_insert(Document::new(params.path.clone(), "".to_string(), params.version));
 
+        for c in &doc.apply_file_change(&params) {
+            match c {
+                StatementChange::Added(s) => {
+                    // self.tree_sitter.add_statement(s);
+                    // self.pg_query.add_statement(s);
+                    //
+                    // self.changed_stmts.insert(s.to_owned());
+                }
+                StatementChange::Deleted(s) => {
+                    // self.tree_sitter.remove_statement(s);
+                    // self.pg_query.remove_statement(s);
+                    // self.linter.clear_statement_violations(s);
+                    // self.typechecker.clear_statement_errors(s);
+                    //
+                    // self.changed_stmts.insert(s.to_owned());
+                }
+                StatementChange::Modified(s) => {
+                    // self.tree_sitter.modify_statement(s);
+                    // self.pg_query.modify_statement(s);
+                    // self.linter.clear_statement_violations(&s.statement);
+                    // self.typechecker.clear_statement_errors(&s.statement);
+                    //
+                    // self.changed_stmts.remove(&s.statement);
+                    // self.changed_stmts.insert(s.new_statement().to_owned());
+                }
+            }
+        }
 
-        // get statement ids from document and apply changes and update the store for parse results
-        todo!()
-
-
+        Ok(())
     }
 
     fn server_info(&self) -> Option<&ServerInfo> {
