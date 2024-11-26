@@ -1,0 +1,11 @@
+[package]
+name = "pg_test_utils"
+version = "0.1.0"
+edition = "2021"
+rust-version.workspace = true
+
+[dependencies]
+anyhow = "1.0.81"
+uuid = { version = "1.11.0", features = ["v4"] }
+
+sqlx.workspace = true

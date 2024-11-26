@@ -9,12 +9,15 @@ resolver = "2"
 [workspace.package]
 rust-version = "1.71"
 
+
+
 [workspace.dependencies]
 # supporting crates unrelated to postgres
 line_index = { path = "./lib/line_index", version = "0.0.0" }
 tree_sitter_sql = { path = "./lib/tree_sitter_sql", version = "0.0.0" }
 tree-sitter = "0.20.10"
 tracing = "0.1.40"
+sqlx = { version = "0.8.2", features = [ "runtime-async-std", "tls-rustls", "postgres", "json" ] }
 
 # postgres specific crates
 pg_lexer = { path = "./crates/pg_lexer", version = "0.0.0" }
@@ -38,6 +41,7 @@ pg_lint = { path = "./crates/pg_lint", version = "0.0.0" }
 pg_workspace = { path = "./crates/pg_workspace", version = "0.0.0" }
 pg_lsp = { path = "./crates/lsp", version = "0.0.0" }
 
+pg_test_utils = { path = "./crates/pg_test_utils", version = "0.0.0" }
 # parser = { path = "./crates/parser", version = "0.0.0" }
 # sql_parser = { path = "./crates/sql_parser", version = "0.0.0" }
 # sql_parser_codegen = { path = "./crates/sql_parser_codegen", version = "0.0.0" }
