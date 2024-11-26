@@ -1,6 +1,6 @@
 use std::{fs, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
-use change::{DocumentChange, StatementChange};
+use change::StatementChange;
 use dashmap::DashMap;
 use pg_fs::{ConfigName, PgLspPath};
 use store::{Document, StatementRef};

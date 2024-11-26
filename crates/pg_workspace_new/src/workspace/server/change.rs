@@ -3,16 +3,16 @@ use text_size::{TextLen, TextRange, TextSize};
 
 use crate::workspace::{ChangeFileParams, ChangeParams};
 
-use super::{store::{Statement, StatementId}, Document, StatementRef};
+use super::{store::Statement, Document, StatementRef};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum StatementChange {
     Added(Statement),
     Deleted(StatementRef),
     Modified(ChangedStatement),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct ChangedStatement {
     pub old: Statement,
     pub new_ref: StatementRef,
@@ -21,6 +21,15 @@ pub struct ChangedStatement {
     pub text: String,
 }
 
+impl StatementChange {
+    pub fn statement_ref(&self) -> &StatementRef {
+        match self {
+            StatementChange::Added(stmt) => &stmt.ref_,
+            StatementChange::Deleted(ref_) => ref_,
+            StatementChange::Modified(changed) => &changed.new_ref,
+        }
+    }
+}
 
 impl Document {
     pub fn apply_file_change(&mut self, change: &ChangeFileParams) -> Vec<StatementChange> {
@@ -31,9 +40,16 @@ impl Document {
             .map(|pos| pos + 1);
 
         let changes = if let Some(pos) = latest_change_without_range {
-           change.changes[pos..].iter().flat_map(|c| self.apply_change(c)).collect()
-        } else  {
-            change.changes.iter().flat_map(|c| self.apply_change(c)).collect()
+            change.changes[(pos - 1)..]
+                .iter()
+                .flat_map(|c| self.apply_change(c))
+                .collect()
+        } else {
+            change
+                .changes
+                .iter()
+                .flat_map(|c| self.apply_change(c))
+                .collect()
         };
 
         self.version = change.version;
@@ -44,16 +60,16 @@ impl Document {
     fn apply_change(&mut self, change: &ChangeParams) -> Vec<StatementChange> {
         if change.range.is_none() {
             // full change
-            return self.apply_full_change(change);
+            self.apply_full_change(change)
         } else if let Some(changed_stmt_pos) = self
             .statements
             .iter()
             .position(|(_, range)| range.contains_range(change.range.unwrap()))
         {
-            return self.apply_single_statement_change(change, changed_stmt_pos);
+            self.apply_single_statement_change(change, changed_stmt_pos)
         } else {
             // change across stmts
-            return self.apply_change_across_statements(change);
+            self.apply_change_across_statements(change)
         }
     }
 
@@ -83,7 +99,7 @@ impl Document {
             changed.push(StatementChange::Added(Statement {
                 ref_: StatementRef {
                     path: self.path.clone(),
-                    id ,
+                    id,
                 },
                 text: self.content[range].to_string(),
             }))
@@ -100,7 +116,7 @@ impl Document {
         let mut changed: Vec<StatementChange> = vec![];
 
         // save the old statement
-        let old = self.statement_at(changed_stmt_pos);
+        let old = self.statement(&self.statements[changed_stmt_pos]);
         let old_range = self.statements[changed_stmt_pos].1;
 
         // first mutate the target statement
@@ -124,7 +140,7 @@ impl Document {
 
         changed.push(StatementChange::Modified(ChangedStatement {
             old,
-            new_ref: self.statement_ref_at(changed_stmt_pos),
+            new_ref: self.statement_ref(&self.statements[changed_stmt_pos]),
             // change must be relative to statement
             range: change.range.unwrap().sub(old_range.start()),
             text: change.text.clone(),
@@ -193,9 +209,7 @@ impl Document {
             .get(usize::from(min)..usize::from(max))
             .unwrap();
 
-        self.statements.drain(
-            from_idx..(to_idx + 1)
-        );
+        self.statements.drain(from_idx..(to_idx + 1));
 
         for range in pg_statement_splitter::split(extracted_text).ranges {
             match self
@@ -206,7 +220,9 @@ impl Document {
                 Err(pos) => {
                     let new_id = self.id_generator.next();
                     self.statements.insert(pos, (new_id, range));
-                    changed.push(StatementChange::Added(self.statement_at(pos)));
+                    changed.push(StatementChange::Added(
+                        self.statement(&self.statements[pos]),
+                    ));
                 }
             }
         }
@@ -275,71 +291,94 @@ impl ChangeParams {
 mod tests {
     use text_size::{TextRange, TextSize};
 
-    use super::{super::StatementRef, Document, DocumentChange};
+    use crate::workspace::{server::store::Statement, ChangeFileParams, ChangeParams};
+
+    use super::{super::StatementRef, Document, StatementChange};
     use pg_fs::PgLspPath;
 
     #[test]
-    fn test_document_apply_changes() {
+    fn apply_changes() {
+        let path = PgLspPath::new("test.sql");
         let input = "select id from users;\nselect * from contacts;";
 
         let mut d = Document::new(PgLspPath::new("test.sql"), input.to_string(), 0);
 
         assert_eq!(d.statements.len(), 2);
 
-        let mut change = DocumentChange::new(
-            1,
-            vec![Change {
+        let change = ChangeFileParams {
+            path: path.clone(),
+            version: 1,
+            changes: vec![ChangeParams {
                 text: ",test from users\nselect 1;".to_string(),
                 range: Some(TextRange::new(9.into(), 45.into())),
             }],
-        );
+        };
 
-        change.apply(&mut d);
-        let changed = change.collect_statement_changes();
+        let changed = d.apply_file_change(&change);
 
         assert_eq!(changed.len(), 4);
+
         assert_eq!(
-            changed[0].statement().to_owned(),
-            StatementRef {
-                document_url: PgLspPath::new("test.sql"),
-                text: "select id from users;".to_string(),
-                idx: 0
-            }
+            changed[0],
+            StatementChange::Deleted(StatementRef {
+                path: path.clone(),
+                id: 0
+            })
         );
         assert_eq!(
-            changed[1].statement().to_owned(),
-            StatementRef {
-                document_url: PgLspPath::new("test.sql"),
-                text: "select * from contacts;".to_string(),
-                idx: 1
-            }
+            changed[1],
+            StatementChange::Deleted(StatementRef {
+                path: path.clone(),
+                id: 1
+            })
+        );
+        assert_eq!(
+            changed[2],
+            StatementChange::Added(Statement {
+                ref_: StatementRef {
+                    path: path.clone(),
+                    id: 2
+                },
+                text: "select id,test from users".to_string()
+            })
+        );
+        assert_eq!(
+            changed[3],
+            StatementChange::Added(Statement {
+                ref_: StatementRef {
+                    path: path.clone(),
+                    id: 3
+                },
+                text: "select 1;".to_string()
+            })
         );
 
-        assert_eq!("select id,test from users\nselect 1;", d.text);
-        assert_eq!(d.statement_ranges.len(), 2);
+        assert_eq!("select id,test from users\nselect 1;", d.content);
+        assert_eq!(d.statements.len(), 2);
 
-        for r in &pg_statement_splitter::split(&d.text).ranges {
+        for r in &pg_statement_splitter::split(&d.content).ranges {
             assert!(
-                d.statement_ranges.iter().any(|x| r == x),
+                d.statements.iter().any(|x| r == &x.1),
                 "should have stmt with range {:#?}",
                 r
             );
         }
 
-        assert_eq!(d.statement_ranges[0], TextRange::new(0.into(), 25.into()));
-        assert_eq!(d.statement_ranges[1], TextRange::new(26.into(), 35.into()));
+        assert_eq!(d.statements[0].1, TextRange::new(0.into(), 25.into()));
+        assert_eq!(d.statements[1].1, TextRange::new(26.into(), 35.into()));
     }
 
     #[test]
-    fn test_document_apply_changes_at_end_of_statement() {
+    fn apply_changes_at_end_of_statement() {
+        let path = PgLspPath::new("test.sql");
         let input = "select id from\nselect * from contacts;";
 
-        let mut d = Document::new(PgLspPath::new("test.sql"), Some(input.to_string()));
+        let mut d = Document::new(path.clone(), input.to_string(), 1);
 
-        assert_eq!(d.statement_ranges.len(), 2);
+        assert_eq!(d.statements.len(), 2);
 
-        let stmt_1_range = d.statement_ranges[0];
-        let stmt_2_range = d.statement_ranges[1];
+        let stmt_1_range = d.statements[0];
+        let stmt_2_range = d.statements[1];
 
         let update_text = " contacts;";
 
@@ -348,156 +387,164 @@ mod tests {
         let update_text_len = u32::try_from(update_text.chars().count()).unwrap();
         let update_addition = update_text_len - u32::from(update_range.len());
 
-        let mut change = DocumentChange::new(
-            1,
-            vec![Change {
+        let change = ChangeFileParams {
+            path: path.clone(),
+            version: 2,
+            changes: vec![ChangeParams {
                 text: update_text.to_string(),
                 range: Some(update_range),
             }],
-        );
+        };
 
-        change.apply(&mut d);
+        d.apply_file_change(&change);
 
-        assert_eq!("select id from contacts;\nselect * from contacts;", d.text);
-        assert_eq!(d.statement_ranges.len(), 2);
-        assert_eq!(d.statement_ranges[0].start(), stmt_1_range.start());
+        assert_eq!("select id from contacts;\nselect * from contacts;", d.content);
+        assert_eq!(d.statements.len(), 2);
+        assert_eq!(d.statements[0].1.start(), stmt_1_range.1.start());
         assert_eq!(
-            u32::from(d.statement_ranges[0].end()),
-            u32::from(stmt_1_range.end()) + update_addition
+            u32::from(d.statements[0].1.end()),
+            u32::from(stmt_1_range.1.end()) + update_addition
         );
         assert_eq!(
-            u32::from(d.statement_ranges[1].start()),
-            u32::from(stmt_2_range.start()) + update_addition
+            u32::from(d.statements[1].1.start()),
+            u32::from(stmt_2_range.1.start()) + update_addition
         );
         assert_eq!(
-            u32::from(d.statement_ranges[1].end()),
-            u32::from(stmt_2_range.end()) + update_addition
+            u32::from(d.statements[1].1.end()),
+            u32::from(stmt_2_range.1.end()) + update_addition
         );
     }
 
     #[test]
-    fn test_document_apply_changes_replacement() {
+    fn apply_changes_replacement() {
         let path = PgLspPath::new("test.sql");
 
-        let mut doc = Document::new(path, None);
+        let mut doc = Document::new(path.clone(),  "".to_string(), 0);
 
-        let mut c = DocumentChange::new(
-            1,
-            vec![Change {
-                range: None,
+        let change = ChangeFileParams {
+            path: path.clone(),
+            version: 1,
+            changes: vec![ChangeParams {
                 text: "select 1;\nselect 2;".to_string(),
+                range: None,
             }],
-        );
+        };
 
-        c.apply(&mut doc);
+        doc.apply_file_change(&change);
 
-        assert_eq!(doc.statement_ref(0).text, "select 1;".to_string());
-        assert_eq!(doc.statement_ref(1).text, "select 2;".to_string());
+        assert_eq!(doc.statement(&doc.statements[0]).text, "select 1;".to_string());
+        assert_eq!(doc.statement(&doc.statements[1]).text, "select 2;".to_string());
         assert_eq!(
-            doc.statement_ranges[0],
+            doc.statements[0].1,
             TextRange::new(TextSize::new(0), TextSize::new(9))
         );
         assert_eq!(
-            doc.statement_ranges[1],
+            doc.statements[1].1,
             TextRange::new(TextSize::new(10), TextSize::new(19))
         );
 
-        let mut c = DocumentChange::new(
-            2,
-            vec![Change {
-                range: Some(TextRange::new(7.into(), 8.into())),
+        let change_2 = ChangeFileParams {
+            path: path.clone(),
+            version: 2,
+            changes: vec![ChangeParams {
                 text: "".to_string(),
+                range: Some(TextRange::new(7.into(), 8.into())),
             }],
-        );
+        };
 
-        c.apply(&mut doc);
+        doc.apply_file_change(&change_2);
 
-        assert_eq!(doc.text, "select ;\nselect 2;");
-        assert_eq!(doc.statement_refs().len(), 2);
-        assert_eq!(doc.statement_ref(0).text, "select ;".to_string());
-        assert_eq!(doc.statement_ref(1).text, "select 2;".to_string());
+        assert_eq!(doc.content, "select ;\nselect 2;");
+        assert_eq!(doc.statements.len(), 2);
+        assert_eq!(doc.statement(&doc.statements[0]).text, "select ;".to_string());
+        assert_eq!(doc.statement(&doc.statements[1]).text, "select 2;".to_string());
         assert_eq!(
-            doc.statement_ranges[0],
+            doc.statements[0].1,
             TextRange::new(TextSize::new(0), TextSize::new(8))
         );
         assert_eq!(
-            doc.statement_ranges[1],
+            doc.statements[1].1,
             TextRange::new(TextSize::new(9), TextSize::new(18))
         );
 
-        let mut c = DocumentChange::new(
-            3,
-            vec![Change {
-                range: Some(TextRange::new(7.into(), 7.into())),
+        let change_3 = ChangeFileParams {
+            path: path.clone(),
+            version: 3,
+            changes: vec![ChangeParams {
                 text: "!".to_string(),
+                range: Some(TextRange::new(7.into(), 7.into())),
             }],
-        );
+        };
 
-        c.apply(&mut doc);
+        doc.apply_file_change(&change_3);
 
-        assert_eq!(doc.text, "select !;\nselect 2;");
-        assert_eq!(doc.statement_refs().len(), 2);
+        assert_eq!(doc.content, "select !;\nselect 2;");
+        assert_eq!(doc.statements.len(), 2);
         assert_eq!(
-            doc.statement_ranges[0],
+            doc.statements[0].1,
             TextRange::new(TextSize::new(0), TextSize::new(9))
         );
         assert_eq!(
-            doc.statement_ranges[1],
+            doc.statements[1].1,
             TextRange::new(TextSize::new(10), TextSize::new(19))
         );
 
-        let mut c = DocumentChange::new(
-            4,
-            vec![Change {
-                range: Some(TextRange::new(7.into(), 8.into())),
+        let change_4 = ChangeFileParams {
+            path: path.clone(),
+            version: 4,
+            changes: vec![ChangeParams {
                 text: "".to_string(),
+                range: Some(TextRange::new(7.into(), 8.into())),
             }],
-        );
+        };
 
-        c.apply(&mut doc);
+        doc.apply_file_change(&change_4);
 
-        assert_eq!(doc.text, "select ;\nselect 2;");
-        assert_eq!(doc.statement_refs().len(), 2);
+        assert_eq!(doc.content, "select ;\nselect 2;");
+        assert_eq!(doc.statements.len(), 2);
         assert_eq!(
-            doc.statement_ranges[0],
+            doc.statements[0].1,
             TextRange::new(TextSize::new(0), TextSize::new(8))
         );
         assert_eq!(
-            doc.statement_ranges[1],
+            doc.statements[1].1,
             TextRange::new(TextSize::new(9), TextSize::new(18))
         );
 
-        let mut c = DocumentChange::new(
-            5,
-            vec![Change {
-                range: Some(TextRange::new(7.into(), 7.into())),
+        let change_5 = ChangeFileParams {
+            path: path.clone(),
+            version: 5,
+            changes: vec![ChangeParams {
                 text: "1".to_string(),
+                range: Some(TextRange::new(7.into(), 7.into())),
             }],
-        );
-        c.apply(&mut doc);
+        };
 
-        assert_eq!(doc.text, "select 1;\nselect 2;");
-        assert_eq!(doc.statement_refs().len(), 2);
+        doc.apply_file_change(&change_5);
+
+        assert_eq!(doc.content, "select 1;\nselect 2;");
+        assert_eq!(doc.statements.len(), 2);
         assert_eq!(
-            doc.statement_ranges[0],
+            doc.statements[0].1,
             TextRange::new(TextSize::new(0), TextSize::new(9))
         );
         assert_eq!(
-            doc.statement_ranges[1],
+            doc.statements[1].1,
             TextRange::new(TextSize::new(10), TextSize::new(19))
         );
     }
 
     #[test]
-    fn test_document_apply_changes_within_statement() {
+    fn apply_changes_within_statement() {
         let input = "select id  from users;\nselect * from contacts;";
+        let path = PgLspPath::new("test.sql");
 
-        let mut d = Document::new(PgLspPath::new("test.sql"), Some(input.to_string()));
+        let mut doc = Document::new(path.clone(), input.to_string(), 0);
 
-        assert_eq!(d.statement_ranges.len(), 2);
+        assert_eq!(doc.statements.len(), 2);
 
-        let stmt_1_range = d.statement_ranges[0];
-        let stmt_2_range = d.statement_ranges[1];
+        let stmt_1_range = doc.statements[0];
+        let stmt_2_range = doc.statements[1];
 
         let update_text = ",test";
 
@@ -506,33 +553,34 @@ mod tests {
         let update_text_len = u32::try_from(update_text.chars().count()).unwrap();
         let update_addition = update_text_len - u32::from(update_range.len());
 
-        let mut change = DocumentChange::new(
-            1,
-            vec![Change {
+        let change = ChangeFileParams {
+            path: path.clone(),
+            version: 1,
+            changes: vec![ChangeParams {
                 text: update_text.to_string(),
                 range: Some(update_range),
             }],
-        );
+        };
 
-        change.apply(&mut d);
+        doc.apply_file_change(&change);
 
         assert_eq!(
             "select id,test from users;\nselect * from contacts;",
-            d.text
+            doc.content
         );
-        assert_eq!(d.statement_ranges.len(), 2);
-        assert_eq!(d.statement_ranges[0].start(), stmt_1_range.start());
+        assert_eq!(doc.statements.len(), 2);
+        assert_eq!(doc.statements[0].1.start(), stmt_1_range.1.start());
         assert_eq!(
-            u32::from(d.statement_ranges[0].end()),
-            u32::from(stmt_1_range.end()) + update_addition
-        );
-        assert_eq!(
-            u32::from(d.statement_ranges[1].start()),
-            u32::from(stmt_2_range.start()) + update_addition
+            u32::from(doc.statements[0].1.end()),
+            u32::from(stmt_1_range.1.end()) + update_addition
         );
         assert_eq!(
-            u32::from(d.statement_ranges[1].end()),
-            u32::from(stmt_2_range.end()) + update_addition
+            u32::from(doc.statements[1].1.start()),
+            u32::from(stmt_2_range.1.start()) + update_addition
+        );
+        assert_eq!(
+            u32::from(doc.statements[1].1.end()),
+            u32::from(stmt_2_range.1.end()) + update_addition
         );
     }
 }

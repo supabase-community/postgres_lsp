@@ -1,8 +1,6 @@
 use pg_fs::PgLspPath;
 use text_size::{TextRange, TextSize};
 
-use super::change::{Change, StatementChange};
-
 /// Global unique identifier for a statement
 #[derive(Debug, Hash, Eq, PartialEq, Clone)]
 pub(crate) struct StatementRef {
@@ -13,7 +11,7 @@ pub(crate) struct StatementRef {
 }
 
 /// Represenation of a statement
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub(crate) struct Statement {
     pub(crate) ref_: StatementRef,
     pub(crate) text: String,
@@ -99,22 +97,14 @@ impl Document {
             .collect()
     }
 
-    pub fn statement_at(&self, pos: usize) -> Statement {
-        self.statement(&self.statements[pos])
-    }
-
-    pub fn statement_ref_at(&self, pos: usize) -> StatementRef {
-        self.statement_ref(&self.statements[pos])
-    }
-
-    pub fn statement_ref(&self, inner_ref: &StatementPosition) -> StatementRef {
+    pub(super) fn statement_ref(&self, inner_ref: &StatementPosition) -> StatementRef {
         StatementRef {
             id: inner_ref.0,
             path: self.path.clone(),
         }
     }
 
-    pub fn statement(&self, inner_ref: &StatementPosition) -> Statement {
+    pub(super) fn statement(&self, inner_ref: &StatementPosition) -> Statement {
         Statement {
             ref_: self.statement_ref(inner_ref),
             text: self.content[inner_ref.1].to_string(),
@@ -122,7 +112,7 @@ impl Document {
     }
 }
 
-struct IdGenerator {
+pub(crate) struct IdGenerator {
     pub(super) next_id: usize,
 }
 
