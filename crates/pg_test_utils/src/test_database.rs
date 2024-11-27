@@ -8,8 +8,14 @@ pub async fn get_new_test_db(connection_string: String, database_password: Strin
         .parse()
         .expect("Invalid Connection String");
 
+    let host = options_without_db_name.get_host();
+    assert!(
+        host == "localhost" || host == "127.0.0.1",
+        "Running tests against non-local database!"
+    );
+
     let options_without_db_name = PgConnectOptions::new()
-        .host(options_from_conn_str.get_host())
+        .host(host)
         .port(options_from_conn_str.get_port())
         .username(options_from_conn_str.get_username())
         .password(&database_password);

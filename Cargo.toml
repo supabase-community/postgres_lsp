@@ -41,7 +41,7 @@ pg_lint = { path = "./crates/pg_lint", version = "0.0.0" }
 pg_workspace = { path = "./crates/pg_workspace", version = "0.0.0" }
 pg_lsp = { path = "./crates/lsp", version = "0.0.0" }
 
-pg_test_utils = { path = "./crates/pg_test_utils", version = "0.0.0" }
+pg_test_utils = { path = "./crates/pg_test_utils" }
 # parser = { path = "./crates/parser", version = "0.0.0" }
 # sql_parser = { path = "./crates/sql_parser", version = "0.0.0" }
 # sql_parser_codegen = { path = "./crates/sql_parser_codegen", version = "0.0.0" }
