@@ -124,7 +124,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_complete_with_db() {
+    async fn test_complete_three() {
         let test_db = get_new_test_db().await;
 
         let setup = r#"
@@ -159,6 +159,7 @@ mod tests {
 
         let result = complete(&p);
 
+        // TODO: actually assert that we get good autocompletion suggestions
         assert!(result.items.len() > 0);
     }
 }
