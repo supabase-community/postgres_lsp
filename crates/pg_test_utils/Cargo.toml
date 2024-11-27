@@ -8,3 +8,4 @@ anyhow = "1.0.81"
 uuid = { version = "1.11.0", features = ["v4"] }
 
 sqlx.workspace = true
+dotenv = "0.15.0"

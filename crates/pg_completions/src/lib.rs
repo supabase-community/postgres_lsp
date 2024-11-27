@@ -63,21 +63,18 @@ pub fn complete<'a>(params: &'a CompletionParams<'a>) -> CompletionResult<'a> {
 
 #[cfg(test)]
 mod tests {
-    use async_std::task::block_on;
     use pg_schema_cache::SchemaCache;
     use pg_test_utils::test_database::*;
 
-    use sqlx::PgPool;
+    use sqlx::Executor;
 
     use crate::{complete, CompletionParams};
 
-    #[test]
-    fn test_complete() {
+    #[tokio::test]
+    async fn test_complete() {
+        let pool = get_new_test_db().await;
+
         let input = "select id from c;";
-
-        let conn_string = std::env::var("DB_CONNECTION_STRING").unwrap();
-
-        let pool = block_on(PgPool::connect(conn_string.as_str())).unwrap();
 
         let mut parser = tree_sitter::Parser::new();
         parser
@@ -86,7 +83,7 @@ mod tests {
 
         let tree = parser.parse(input, None).unwrap();
 
-        let schema_cache = block_on(SchemaCache::load(&pool));
+        let schema_cache = SchemaCache::load(&pool).await;
 
         let p = CompletionParams {
             position: 15.into(),
@@ -100,13 +97,11 @@ mod tests {
         assert!(result.items.len() > 0);
     }
 
-    #[test]
-    fn test_complete_two() {
+    #[tokio::test]
+    async fn test_complete_two() {
+        let pool = get_new_test_db().await;
+
         let input = "select id, name, test1231234123, unknown from co;";
-
-        let conn_string = std::env::var("DB_CONNECTION_STRING").unwrap();
-
-        let pool = block_on(PgPool::connect(conn_string.as_str())).unwrap();
 
         let mut parser = tree_sitter::Parser::new();
         parser
@@ -114,7 +109,7 @@ mod tests {
             .expect("Error loading sql language");
 
         let tree = parser.parse(input, None).unwrap();
-        let schema_cache = block_on(SchemaCache::load(&pool));
+        let schema_cache = SchemaCache::load(&pool).await;
 
         let p = CompletionParams {
             position: 47.into(),
@@ -128,8 +123,10 @@ mod tests {
         assert!(result.items.len() > 0);
     }
 
-    #[test]
-    fn test_complete_with_db() {
+    #[tokio::test]
+    async fn test_complete_with_db() {
+        let test_db = get_new_test_db().await;
+
         let setup = r#"
             create table users (
                 id serial primary key,
@@ -138,12 +135,12 @@ mod tests {
             );
         "#;
 
+        test_db
+            .execute(setup)
+            .await
+            .expect("Failed to execute setup query");
+
         let input = "select * from u";
-
-        let conn_string = std::env::var("DB_CONNECTION_STRING").unwrap();
-        let password = std::env::var("DB_PASSWORD").unwrap_or("postgres".into());
-
-        let test_db = block_on(get_new_test_db(conn_string, password));
 
         let mut parser = tree_sitter::Parser::new();
         parser
@@ -151,10 +148,10 @@ mod tests {
             .expect("Error loading sql language");
 
         let tree = parser.parse(input, None).unwrap();
-        let schema_cache = block_on(SchemaCache::load(&pool));
+        let schema_cache = SchemaCache::load(&test_db).await;
 
         let p = CompletionParams {
-            position: 47.into(),
+            position: ((input.len() - 1) as u32).into(),
             schema: &schema_cache,
             text: input,
             tree: Some(&tree),

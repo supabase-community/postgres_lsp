@@ -3,7 +3,15 @@ use uuid::Uuid;
 
 // TODO: Work with proper config objects instead of a connection_string.
 // With the current implementation, we can't parse the password from the connection string.
-pub async fn get_new_test_db(connection_string: String, database_password: String) -> PgPool {
+pub async fn get_new_test_db() -> PgPool {
+    dotenv::dotenv()
+        .ok()
+        .expect("Unable to load .env file for tests");
+
+    let connection_string =
+        std::env::var("DB_CONNECTION_STRING").expect("DB_CONNECTION_STRING not set");
+    let password = std::env::var("DB_PASSWORD").unwrap_or("postgres".into());
+
     let options_from_conn_str: PgConnectOptions = connection_string
         .parse()
         .expect("Invalid Connection String");
@@ -18,7 +26,7 @@ pub async fn get_new_test_db(connection_string: String, database_password: Strin
         .host(host)
         .port(options_from_conn_str.get_port())
         .username(options_from_conn_str.get_username())
-        .password(&database_password);
+        .password(&password);
 
     let postgres = sqlx::PgPool::connect_with(options_without_db_name.clone())
         .await
