@@ -33,6 +33,11 @@ pg_base_db.workspace = true
 pg_schema_cache.workspace = true
 pg_workspace.workspace = true
 pg_diagnostics.workspace = true
+tokio = { version = "1.40.0", features = ["io-std", "macros", "rt-multi-thread", "sync", "time"] }
+tokio-util = "0.7.12"
+tower-lsp = "0.20.0"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
 
 [dev-dependencies]
 

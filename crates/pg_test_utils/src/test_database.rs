@@ -8,8 +8,7 @@ pub async fn get_new_test_db() -> PgPool {
         .ok()
         .expect("Unable to load .env file for tests");
 
-    let connection_string =
-        std::env::var("DB_CONNECTION_STRING").expect("DB_CONNECTION_STRING not set");
+    let connection_string = std::env::var("DATABASE_URL").expect("DATABASE_URL not set");
     let password = std::env::var("DB_PASSWORD").unwrap_or("postgres".into());
 
     let options_from_conn_str: PgConnectOptions = connection_string

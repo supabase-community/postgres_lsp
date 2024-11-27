@@ -17,3 +17,5 @@ target/
 # File system
 .DS_Store
 desktop.ini
+
+*.log
