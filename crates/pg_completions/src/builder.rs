@@ -1,19 +1,19 @@
-use crate::{CompletionItem, CompletionResult};
+use crate::{item::CompletionItem, CompletionResult};
 
-pub struct CompletionBuilder<'a> {
-    pub items: Vec<CompletionItem<'a>>,
+pub struct CompletionBuilder {
+    pub items: Vec<CompletionItem>,
 }
 
 pub struct CompletionConfig {}
 
-impl<'a> From<&'a CompletionConfig> for CompletionBuilder<'a> {
+impl From<&CompletionConfig> for CompletionBuilder {
     fn from(_config: &CompletionConfig) -> Self {
         Self { items: Vec::new() }
     }
 }
 
-impl<'a> CompletionBuilder<'a> {
-    pub fn finish(mut self) -> CompletionResult<'a> {
+impl CompletionBuilder {
+    pub fn finish(mut self) -> CompletionResult {
         self.items.sort_by(|a, b| {
             b.preselect
                 .cmp(&a.preselect)
