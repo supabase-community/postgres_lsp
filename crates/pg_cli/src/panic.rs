@@ -16,7 +16,7 @@ fn panic_handler(info: &PanicHookInfo) {
     // panic at the same time
     let mut error = String::new();
 
-    writeln!(error, "Biome encountered an unexpected error").unwrap();
+    writeln!(error, "Encountered an unexpected error").unwrap();
     writeln!(error).unwrap();
 
     writeln!(error, "This is a bug in PgLsp, not an error in your code, and we would appreciate it if you could report it along with the following information to help us fixing the issue:").unwrap();

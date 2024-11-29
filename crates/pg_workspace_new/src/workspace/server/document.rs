@@ -35,13 +35,15 @@ impl Document {
     pub(crate) fn new(path: PgLspPath, content: String, version: i32) -> Self {
         let mut id_generator = IdGenerator::new();
 
-        Self {
-            path,
-            statements: pg_statement_splitter::split(&content)
+        let statements: Vec<StatementPosition> = pg_statement_splitter::split(&content)
                 .ranges
                 .iter()
                 .map(|r| (id_generator.next(), *r))
-                .collect(),
+                .collect();
+
+        Self {
+            path,
+            statements,
             content,
             version,
 
@@ -49,8 +51,18 @@ impl Document {
         }
     }
 
+    pub fn debug_statements(&self) {
+        for (id, range) in self.statements.iter() {
+            tracing::info!("Document::debug_statements: statement: id: {}, range: {:?}, text: {:?}", id, range, &self.content[*range]);
+        }
+    }
+
      pub fn get_statements(&self) -> &[StatementPosition] {
         &self.statements
+    }
+
+    pub fn statement_refs(&self) -> Vec<StatementRef> {
+        self.statements.iter().map(|inner_ref| self.statement_ref(inner_ref)).collect()
     }
 
     /// Returns the statement ref at the given offset

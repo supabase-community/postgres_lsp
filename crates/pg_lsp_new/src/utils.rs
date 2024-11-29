@@ -242,7 +242,7 @@ pub(crate) fn panic_to_lsp_error(err: Box<dyn Any + Send>) -> LspError {
                 error.message = Cow::Owned(msg.to_string());
             }
             Err(_) => {
-                error.message = Cow::Owned(String::from("Biome encountered an unknown error"));
+                error.message = Cow::Owned(String::from("Encountered an unknown error"));
             }
         },
     }
@@ -253,7 +253,7 @@ pub(crate) fn panic_to_lsp_error(err: Box<dyn Any + Send>) -> LspError {
 pub(crate) fn apply_document_changes(
     position_encoding: PositionEncoding,
     current_content: String,
-    mut content_changes: Vec<lsp_types::TextDocumentContentChangeEvent>,
+    content_changes: &[lsp_types::TextDocumentContentChangeEvent],
 ) -> String {
     // Skip to the last full document change, as it invalidates all previous changes anyways.
     let mut start = content_changes
@@ -262,12 +262,12 @@ pub(crate) fn apply_document_changes(
         .position(|change| change.range.is_none())
         .map_or(0, |idx| content_changes.len() - idx - 1);
 
-    let mut text: String = match content_changes.get_mut(start) {
+    let mut text: String = match content_changes.get(start) {
         // peek at the first content change as an optimization
         Some(lsp_types::TextDocumentContentChangeEvent {
             range: None, text, ..
         }) => {
-            let text = mem::take(text);
+            let text = text.clone();
             start += 1;
 
             // The only change is a full document update
@@ -300,6 +300,7 @@ pub(crate) fn apply_document_changes(
             }
         }
     }
+
     text
 }
 

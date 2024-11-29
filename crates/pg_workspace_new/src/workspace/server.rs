@@ -22,7 +22,7 @@ pub(super) struct WorkspaceServer {
     /// Stores the document (text content + version number) associated with a URL
     documents: DashMap<PgLspPath, Document>,
 
-    tree_sitter: TreeSitterStore
+    tree_sitter: TreeSitterStore,
 
     // Stores the statements that have changed since the last analysis
     changed_stmts: DashSet<StatementRef>,
@@ -130,9 +130,13 @@ impl Workspace for WorkspaceServer {
 
     /// Remove a file from the workspace
     fn close_file(&self, params: super::CloseFileParams) -> Result<(), crate::WorkspaceError> {
-        self.documents
+        let (_, doc) = self.documents
             .remove(&params.path)
             .ok_or_else(WorkspaceError::not_found)?;
+
+        for stmt in doc.statement_refs() {
+            self.tree_sitter.remove_statement(&stmt);
+        }
 
         Ok(())
     }
@@ -144,30 +148,33 @@ impl Workspace for WorkspaceServer {
             .entry(params.path.clone())
             .or_insert(Document::new(params.path.clone(), "".to_string(), params.version));
 
+        tracing::info!("Changing file: {:?}", params.path);
+
         for c in &doc.apply_file_change(&params) {
             match c {
                 StatementChange::Added(s) => {
+                    tracing::info!("Adding statement: {:?}", s);
                     self.tree_sitter.add_statement(s);
                     // self.pg_query.add_statement(s);
                     //
-                    self.changed_stmts.insert(s.to_owned());
+                    self.changed_stmts.insert(s.ref_.to_owned());
                 }
                 StatementChange::Deleted(s) => {
+                    tracing::info!("Deleting statement: {:?}", s);
                     self.tree_sitter.remove_statement(s);
                     // self.pg_query.remove_statement(s);
                     // self.linter.clear_statement_violations(s);
                     // self.typechecker.clear_statement_errors(s);
-                    //
-                    self.changed_stmts.insert(s.to_owned());
                 }
                 StatementChange::Modified(s) => {
+                    tracing::info!("Modifying statement: {:?}", s);
                     self.tree_sitter.modify_statement(s);
                     // self.pg_query.modify_statement(s);
                     // self.linter.clear_statement_violations(&s.statement);
                     // self.typechecker.clear_statement_errors(&s.statement);
 
                     self.changed_stmts.remove(&s.old.ref_);
-                    self.changed_stmts.insert(s.new_statement().to_owned());
+                    self.changed_stmts.insert(s.new_ref.to_owned());
                 }
             }
         }

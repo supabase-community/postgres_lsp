@@ -216,9 +216,9 @@ impl LanguageServer for LSPServer {
     }
 
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
-        // handlers::text_document::did_change(&self.session, params)
-        //     .await
-        //     .ok();
+        handlers::text_document::did_change(&self.session, params)
+            .await
+            .ok();
     }
 
     async fn did_save(&self, params: DidSaveTextDocumentParams) {
