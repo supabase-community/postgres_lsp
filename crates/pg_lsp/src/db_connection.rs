@@ -13,14 +13,20 @@ pub(crate) struct DbConnection {
 }
 
 impl DbConnection {
+    #[tracing::instrument(name = "Setting up new Database Connection…", skip(ide))]
     pub(crate) async fn new(
         connection_string: String,
         ide: Arc<RwLock<Workspace>>,
     ) -> Result<Self, sqlx::Error> {
+        tracing::info!("Trying to connect to pool…");
         let pool = PgPool::connect(&connection_string).await?;
+        tracing::info!("Connected to Pool.");
 
         let mut listener = PgListener::connect_with(&pool).await?;
+        tracing::info!("Connected to Listener.");
+
         listener.listen_all(["postgres_lsp", "pgrst"]).await?;
+        tracing::info!("Listening!");
 
         let (close_tx, close_rx) = tokio::sync::oneshot::channel::<()>();
 
@@ -52,6 +58,7 @@ impl DbConnection {
                 }
             }
         });
+        tracing::info!("Set up schema update handle.");
 
         Ok(Self {
             pool,

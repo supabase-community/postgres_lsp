@@ -43,6 +43,7 @@ impl Session {
     /// If the passed-in connection string is the same that we're already connected to, it's a noop.
     /// Otherwise, it'll first open a new connection, replace `Self`'s connection, and then close
     /// the old one.
+    #[tracing::instrument(name = "Updating DB Connection", skip(self))]
     pub async fn change_db(&self, connection_string: String) -> anyhow::Result<()> {
         if self
             .db
@@ -55,17 +56,20 @@ impl Session {
             return Ok(());
         }
 
+        tracing::info!("Setting up new Database connection");
         let new_db = DbConnection::new(connection_string, Arc::clone(&self.ide)).await?;
+        tracing::info!("Set up new connection, trying to acquire write lock…");
 
         let mut current_db = self.db.write().await;
         let old_db = current_db.replace(new_db);
-        drop(current_db);
 
         if old_db.is_some() {
+            tracing::info!("Dropping previous Database Connection.");
             let old_db = old_db.unwrap();
             old_db.close().await;
         }
 
+        tracing::info!("Successfully set up new connection.");
         Ok(())
     }
 

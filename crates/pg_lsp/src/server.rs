@@ -66,30 +66,49 @@ impl LspServer {
         }
     }
 
-    #[tracing::instrument(name = "Requesting Configuration from Client", skip(self))]
-    async fn request_config_from_client(&self) -> Option<ClientConfigurationOptions> {
-        let params = ConfigurationParams {
-            items: vec![ConfigurationItem {
-                section: Some("pglsp".to_string()),
-                scope_uri: None,
-            }],
+    #[tracing::instrument(name = "Processing Config", skip(self))]
+    async fn process_config(&self, opts: Option<ClientConfigurationOptions>) -> anyhow::Result<()> {
+        if opts
+            .as_ref()
+            .is_some_and(|o| o.db_connection_string.is_some())
+        {
+            let conn_str = opts.unwrap().db_connection_string.unwrap();
+            self.session.change_db(conn_str).await
+        } else {
+            Ok(())
+        }
+    }
+
+    async fn parse_and_handle_config_from_client(&self, value: serde_json::Value) {
+        let parsed = self.parse_config_from_client(value).await;
+        match self.process_config(parsed).await {
+            Ok(_) => {}
+            Err(e) => {
+                self.client
+                    .show_message(
+                        MessageType::ERROR,
+                        format!("Unable to parse received config: {e:?}"),
+                    )
+                    .await;
+            }
         };
+    }
+
+    #[tracing::instrument(name = "Requesting & Handling Configuration from Client", skip(self))]
+    async fn request_and_handle_config_from_client(&self) {
+        let config_items = vec![ConfigurationItem {
+            section: Some("pglsp".to_string()),
+            scope_uri: None,
+        }];
 
         tracing::info!("sending workspace/configuration request");
-        match self
-            .client
-            .send_request::<request::WorkspaceConfiguration>(params)
-            .await
-        {
+        let config = match self.client.configuration(config_items).await {
             Ok(json) => {
                 // The client reponse fits the requested `ConfigurationParams.items`,
                 // so the first value is what we're looking for.
-                let relevant = json
-                    .into_iter()
+                json.into_iter()
                     .next()
-                    .expect("workspace/configuration request did not yield expected response.");
-
-                self.parse_config_from_client(relevant).await
+                    .expect("workspace/configuration request did not yield expected response.")
             }
             Err(why) => {
                 let message = format!(
@@ -97,9 +116,22 @@ impl LspServer {
                     why
                 );
                 self.client.log_message(MessageType::ERROR, message).await;
-                None
+                return;
             }
-        }
+        };
+
+        let parsed = self.parse_config_from_client(config).await;
+        match self.process_config(parsed).await {
+            Ok(()) => {}
+            Err(e) => {
+                self.client
+                    .log_message(
+                        MessageType::ERROR,
+                        format!("Unable to process config from client: {e:?}"),
+                    )
+                    .await
+            }
+        };
     }
 
     #[tracing::instrument(
@@ -185,7 +217,11 @@ impl LanguageServer for LspServer {
         self.client
             .show_message(MessageType::INFO, "Initialize Request received")
             .await;
+
         let flags = ClientFlags::from_initialize_request_params(&params);
+
+        tracing::info!("flags: {:?}", flags);
+
         self.client_capabilities.write().await.replace(flags);
 
         Ok(InitializeResult {
@@ -220,6 +256,12 @@ impl LanguageServer for LspServer {
 
     #[tracing::instrument(name = "initialized", skip(self, _params))]
     async fn initialized(&self, _params: InitializedParams) {
+        let capabilities = self.client_capabilities.read().await;
+
+        if capabilities.as_ref().unwrap().supports_pull_opts {
+            self.request_and_handle_config_from_client().await;
+        }
+
         self.client
             .log_message(MessageType::INFO, "Postgres LSP Connected!")
             .await;
@@ -245,51 +287,11 @@ impl LanguageServer for LspServer {
         let capabilities = self.client_capabilities.read().await;
 
         if capabilities.as_ref().unwrap().supports_pull_opts {
-            let opts = self.request_config_from_client().await;
-            if opts
-                .as_ref()
-                .is_some_and(|o| o.db_connection_string.is_some())
-            {
-                let conn_str = opts.unwrap().db_connection_string.unwrap();
-                match self.session.change_db(conn_str).await {
-                    Ok(_) => {}
-                    Err(err) => {
-                        self.client
-                            .show_message(
-                                MessageType::ERROR,
-                                format!("Pulled Client Options but failed to set them: {}", err),
-                            )
-                            .await
-                    }
-                }
-                return;
-            }
-        }
-
-        // if we couldn't pull settings from the client,
-        // we'll try parsing the passed in params.
-        let opts = self.parse_config_from_client(params.settings).await;
-
-        if opts
-            .as_ref()
-            .is_some_and(|o| o.db_connection_string.is_some())
-        {
-            let conn_str = opts.unwrap().db_connection_string.unwrap();
-            match self.session.change_db(conn_str).await {
-                Ok(_) => {}
-                Err(err) => {
-                    self.client
-                        .show_message(
-                            MessageType::ERROR,
-                            format!(
-                                "Used Client Options from params but failed to set them: {}",
-                                err
-                            ),
-                        )
-                        .await
-                }
-            }
-        }
+            self.request_and_handle_config_from_client().await
+        } else {
+            self.parse_and_handle_config_from_client(params.settings)
+                .await
+        };
     }
 
     #[tracing::instrument(
@@ -332,13 +334,9 @@ impl LanguageServer for LspServer {
 
         self.publish_diagnostics(uri).await;
 
-        // TODO: "Compute Now"
         let changed_urls = self.session.recompute_and_get_changed_files().await;
         for url in changed_urls {
             let url = Url::from_file_path(url.as_path()).expect("Expected absolute File Path");
-
-            tracing::info!("publishing diagnostics: {}", url);
-
             self.publish_diagnostics(url).await;
         }
     }
