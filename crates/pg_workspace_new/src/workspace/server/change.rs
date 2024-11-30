@@ -1,4 +1,4 @@
-use std::ops::Sub;
+use std::{ops::Sub};
 use text_size::{TextLen, TextRange, TextSize};
 
 use crate::workspace::{ChangeFileParams, ChangeParams};
@@ -64,11 +64,16 @@ impl Document {
         } else if let Some(changed_stmt_pos) = self
             .statements
             .iter()
-            .position(|(_, range)| range.contains_range(change.range.unwrap()))
+            .position(|(_, range)|
+                range.contains_range(change.range.unwrap()) ||
+                range.end() == change.range.unwrap().start() ||
+                range.start() == change.range.unwrap().end()
+            )
         {
             self.apply_single_statement_change(change, changed_stmt_pos)
         } else if self.statements.iter().all(|(_, r)| {
             let intersection = r.intersect(change.range.unwrap());
+            tracing::info!("intersection: {:?}", intersection);
             intersection.is_none() || intersection.unwrap().is_empty()
         }) {
             self.apply_unrelated_change(change)
@@ -195,6 +200,7 @@ impl Document {
 
         // save the old statement
         let old = self.statement(&self.statements[changed_stmt_pos]);
+        tracing::info!("old statement: {:#?}", old);
         let old_range = self.statements[changed_stmt_pos].1;
 
         // first mutate the target statement
@@ -211,6 +217,8 @@ impl Document {
         } else {
             None
         };
+
+        let mut latest_changed_pos = changed_stmt_pos;
 
         if let Some(new_range) = new_range {
             // if the new range is empty, remove the statement
@@ -233,14 +241,18 @@ impl Document {
                 };
 
                 // run it trough the splitter
+                tracing::info!("changed text: {:#?}", &changed_stmt.new_statement().text);
                 let ranges =
                     pg_statement_splitter::split(&changed_stmt.new_statement().text).ranges;
+                tracing::info!("ranges: {:#?}", ranges);
                 if ranges.len() > 1 {
                     // if the statement was split, we need to remove the old one and add the new ones
                     self.statements.remove(changed_stmt_pos);
                     for (idx, range) in ranges.iter().enumerate() {
                         let new_id = self.id_generator.next();
-                        self.statements.insert(changed_stmt_pos + idx, (new_id, *range));
+                        self.statements
+                            .insert(changed_stmt_pos + idx, (new_id, *range));
+                        latest_changed_pos = changed_stmt_pos + idx;
                         changed.push(StatementChange::Added(
                             self.statement(&self.statements[changed_stmt_pos]),
                         ));
@@ -254,8 +266,9 @@ impl Document {
         // then move the rest of the statements accordingly
         self.statements
             .iter_mut()
-            .skip_while(|(_, r)| r.end() <= change.range.unwrap().start())
-            .for_each(|(_, range)| {
+            .enumerate()
+            .skip_while(|(idx, _)| *idx <= latest_changed_pos)
+            .for_each(|(_, (_, range))| {
                 if change.is_addition() {
                     *range += change.diff_size();
                 } else if change.is_deletion() {
