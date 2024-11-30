@@ -83,7 +83,7 @@ mod tests {
 
     #[test]
     fn test_schema_cache() {
-        let conn_string = std::env::var("DB_CONNECTION_STRING").unwrap();
+        let conn_string = std::env::var("DATABASE_URL").unwrap();
 
         let pool = async_std::task::block_on(PgPool::connect(conn_string.as_str())).unwrap();
 

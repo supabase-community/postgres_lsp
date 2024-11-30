@@ -28,7 +28,7 @@ jobs:
           - 5432:5432
 
     env:
-      DB_CONNECTION_STRING: postgresql://postgres:postgres@localhost:5432/postgres
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
 
     steps:
       - name: 🏗 Setup repository
