@@ -133,7 +133,14 @@ mod tests {
 
         let result = complete(p);
 
-        // TODO: actually assert that we get good autocompletion suggestions
         assert!(result.items.len() > 0);
+
+        let best_match = &result.items[0];
+
+        assert_eq!(
+            best_match.label, "users",
+            "Does not return the expected table to autocomplete: {}",
+            best_match.label
+        )
     }
 }
