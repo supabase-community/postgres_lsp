@@ -235,17 +235,21 @@ impl Session {
 
         let schema_cache = ide.schema_cache.read().expect("No Schema Cache");
 
-        let completion_items = pg_completions::complete(&CompletionParams {
+        let completion_items = pg_completions::complete(CompletionParams {
             position: offset - range.start() - TextSize::from(1),
-            text: stmt.text.as_str(),
-            tree: ide.tree_sitter.tree(&stmt).as_ref().map(|x| x.as_ref()),
+            text: &stmt.text,
+            tree: ide
+                .tree_sitter
+                .tree(&stmt)
+                .as_ref()
+                .and_then(|t| Some(t.as_ref())),
             schema: &schema_cache,
         })
         .items
         .into_iter()
         .map(|i| CompletionItem {
             // TODO: add more data
-            label: i.data.label().to_string(),
+            label: i.label,
             label_details: None,
             kind: Some(CompletionItemKind::CLASS),
             detail: None,

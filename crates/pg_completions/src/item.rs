@@ -1,33 +1,41 @@
 use text_size::TextRange;
 
-#[derive(Debug, PartialEq, Eq)]
-pub enum CompletionItemData {
-    Table(pg_schema_cache::Table),
+use crate::relevance::CompletionRelevance;
+
+#[derive(Debug)]
+pub enum CompletionItemData<'a> {
+    Table(&'a pg_schema_cache::Table),
 }
 
-impl CompletionItemData {
-    pub fn label(&self) -> &str {
+impl<'a> CompletionItemData<'a> {
+    pub fn label(&self) -> String {
         match self {
-            CompletionItemData::Table(t) => t.name.as_str(),
+            CompletionItemData::Table(t) => t.name.clone(),
         }
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct CompletionItem {
-    pub score: i32,
     pub range: TextRange,
-    pub preselect: bool,
-    pub data: CompletionItemData,
+    pub label: String,
+    relevance: CompletionRelevance,
 }
 
 impl CompletionItem {
-    pub fn new_simple(score: i32, range: TextRange, data: CompletionItemData) -> Self {
+    pub(crate) fn new(
+        range: TextRange,
+        data: CompletionItemData,
+        relevance: CompletionRelevance,
+    ) -> Self {
         Self {
-            score,
             range,
-            preselect: false,
-            data,
+            label: data.label(),
+            relevance,
         }
+    }
+
+    pub(crate) fn score(&self) -> i32 {
+        self.relevance.score()
     }
 }

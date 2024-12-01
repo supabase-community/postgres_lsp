@@ -1,6 +1,8 @@
 use text_size::TextSize;
 
-use crate::{builder, context::CompletionContext, item::CompletionItem};
+use crate::{
+    builder::CompletionBuilder, context::CompletionContext, item::CompletionItem, providers,
+};
 
 pub const LIMIT: usize = 50;
 
@@ -17,9 +19,18 @@ pub struct CompletionResult {
     pub items: Vec<CompletionItem>,
 }
 
-pub fn complete(params: &CompletionParams) -> CompletionResult {
-    let ctx = CompletionContext::new(params);
-    let mut builder = builder::CompletionBuilder::from(&builder::CompletionConfig {});
+pub fn complete(params: CompletionParams) -> CompletionResult {
+    let ctx = CompletionContext::new(&params);
+    let mut builder = CompletionBuilder::new();
+
+    if let Some(node) = ctx.ts_node {
+        match node.kind() {
+            "relation" => providers::complete_tables(&ctx, &mut builder),
+            _ => {}
+        }
+    } else {
+        // if query emtpy, autocomplete select keywords etc?
+    }
 
     builder.finish()
 }
@@ -55,7 +66,7 @@ mod tests {
             tree: Some(&tree),
         };
 
-        let result = complete(&p);
+        let result = complete(p);
 
         assert!(result.items.len() > 0);
     }
@@ -81,7 +92,7 @@ mod tests {
             tree: Some(&tree),
         };
 
-        let result = complete(&p);
+        let result = complete(p);
 
         assert!(result.items.len() > 0);
     }
@@ -120,7 +131,7 @@ mod tests {
             tree: Some(&tree),
         };
 
-        let result = complete(&p);
+        let result = complete(p);
 
         // TODO: actually assert that we get good autocompletion suggestions
         assert!(result.items.len() > 0);
