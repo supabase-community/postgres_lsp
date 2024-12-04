@@ -17,6 +17,7 @@ line_index = { path = "./lib/line_index", version = "0.0.0" }
 tree_sitter_sql = { path = "./lib/tree_sitter_sql", version = "0.0.0" }
 tree-sitter = "0.20.10"
 tracing = "0.1.40"
+tower-lsp = "0.20.0"
 sqlx = { version = "0.8.2", features = [ "runtime-async-std", "tls-rustls", "postgres", "json" ] }
 
 # postgres specific crates
