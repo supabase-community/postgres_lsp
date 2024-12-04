@@ -1,4 +1,4 @@
-use crate::context::CompletionContext;
+use crate::{context::CompletionContext, data::CompletionItemData};
 
 #[derive(Debug, Default)]
 pub(crate) struct CompletionRelevance {
@@ -14,6 +14,20 @@ pub(crate) struct CompletionRelevance {
 }
 
 impl CompletionRelevance {
+    pub fn from_data_and_ctx(data: &CompletionItemData, ctx: &CompletionContext) -> Self {
+        let mut relevance = CompletionRelevance::default();
+
+        match data {
+            CompletionItemData::Table(tb) => {
+                relevance.set_is_catalog(&tb.schema);
+                relevance.set_matches_schema(ctx, &tb.schema);
+                relevance.set_matches_prefix(ctx, &tb.name);
+            }
+        }
+
+        relevance
+    }
+
     pub fn score(&self) -> i32 {
         let mut score: i32 = 0;
 

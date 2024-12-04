@@ -1,41 +1,26 @@
-use text_size::TextRange;
+use tower_lsp::lsp_types;
 
-use crate::relevance::CompletionRelevance;
-
-#[derive(Debug)]
-pub enum CompletionItemData<'a> {
-    Table(&'a pg_schema_cache::Table),
-}
-
-impl<'a> CompletionItemData<'a> {
-    pub fn label(&self) -> String {
-        match self {
-            CompletionItemData::Table(t) => t.name.clone(),
-        }
-    }
-}
+use crate::{data::CompletionItemData, relevance::CompletionRelevance};
 
 #[derive(Debug)]
-pub struct CompletionItem {
-    pub range: TextRange,
-    pub label: String,
+pub struct CompletionItemWithRelevance {
+    item: lsp_types::CompletionItem,
     relevance: CompletionRelevance,
 }
 
-impl CompletionItem {
-    pub(crate) fn new(
-        range: TextRange,
-        data: CompletionItemData,
-        relevance: CompletionRelevance,
-    ) -> Self {
+impl CompletionItemWithRelevance {
+    pub(crate) fn new(data: CompletionItemData, relevance: CompletionRelevance) -> Self {
         Self {
-            range,
-            label: data.label(),
+            item: data.into(),
             relevance,
         }
     }
 
     pub(crate) fn score(&self) -> i32 {
         self.relevance.score()
+    }
+
+    pub(crate) fn label(&self) -> &str {
+        &self.item.label
     }
 }

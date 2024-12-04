@@ -12,6 +12,7 @@ tree-sitter.workspace = true
 tree_sitter_sql.workspace = true
 pg_schema_cache.workspace = true
 pg_test_utils.workspace = true
+tower-lsp.workspace = true
 
 sqlx.workspace = true
 
