@@ -1,26 +1,32 @@
-use tower_lsp::lsp_types;
+use tower_lsp::lsp_types::{self, CompletionItem};
 
 use crate::{data::CompletionItemData, relevance::CompletionRelevance};
 
 #[derive(Debug)]
-pub struct CompletionItemWithRelevance {
-    item: lsp_types::CompletionItem,
-    relevance: CompletionRelevance,
+pub struct CompletionItemWithScore {
+    pub item: lsp_types::CompletionItem,
+    pub score: i32,
 }
 
-impl CompletionItemWithRelevance {
+impl CompletionItemWithScore {
     pub(crate) fn new(data: CompletionItemData, relevance: CompletionRelevance) -> Self {
         Self {
             item: data.into(),
-            relevance,
+            score: relevance.score(),
         }
-    }
-
-    pub(crate) fn score(&self) -> i32 {
-        self.relevance.score()
     }
 
     pub(crate) fn label(&self) -> &str {
         &self.item.label
+    }
+
+    pub(crate) fn set_preselected(&mut self, is_preselected: bool) {
+        self.item.preselect = Some(is_preselected)
+    }
+}
+
+impl Into<CompletionItem> for CompletionItemWithScore {
+    fn into(self) -> CompletionItem {
+        self.item
     }
 }

@@ -1,9 +1,7 @@
 use text_size::TextSize;
+use tower_lsp::lsp_types::CompletionItem;
 
-use crate::{
-    builder::CompletionBuilder, context::CompletionContext, item::CompletionItemWithRelevance,
-    providers,
-};
+use crate::{builder::CompletionBuilder, context::CompletionContext, providers};
 
 pub const LIMIT: usize = 50;
 
@@ -17,7 +15,7 @@ pub struct CompletionParams<'a> {
 
 #[derive(Debug, Default)]
 pub struct CompletionResult {
-    pub items: Vec<CompletionItemWithRelevance>,
+    pub items: Vec<CompletionItem>,
 }
 
 pub fn complete(params: CompletionParams) -> CompletionResult {
@@ -25,6 +23,7 @@ pub fn complete(params: CompletionParams) -> CompletionResult {
     let mut builder = CompletionBuilder::new();
 
     if let Some(node) = ctx.ts_node {
+        println!("{}", node.kind());
         match node.kind() {
             "relation" => providers::complete_tables(&ctx, &mut builder),
             _ => {}
@@ -92,11 +91,12 @@ mod tests {
         )
     }
 
+    #[tokio::test]
     async fn autocompletes_table_with_schema() {
         let test_db = get_new_test_db().await;
 
         let setup = r#"
-            create schema public;
+            create schema open;
             create schema private;
 
             create table private.users (
@@ -105,7 +105,7 @@ mod tests {
                 password text
             );
 
-            create table public.user_requests (
+            create table open.user_requests (
                 id serial primary key,
                 request text,
                 send_at timestamp with time zone
