@@ -1,4 +1,4 @@
-use std::ops::Sub;
+use std::ops::{Sub, Add};
 use text_size::{TextLen, TextRange, TextSize};
 
 use crate::workspace::{ChangeFileParams, ChangeParams};
@@ -93,7 +93,6 @@ impl Document {
 
             return changed;
         }
-
 
         // no matter where the change is, we can never be sure if its a modification or a deletion/addition
         // e.g. if a statement is "select 1", and the change is "select 2; select 2", its an addition even though its in the middle of the statement.
@@ -226,7 +225,7 @@ impl Document {
                 println!("diff: {:#?}", change.diff_size());
 
                 let new_id = self.id_generator.next();
-                self.statements[stmt.0] = (new_id, *new_stmt);
+                self.statements[stmt.0] = (new_id, new_stmt.add(start));
 
                 let changed_stmt = ChangedStatement {
                     old: self.statement(&stmt.1),
@@ -379,6 +378,8 @@ mod tests {
         assert!(
             matches!(&changed[0], StatementChange::Added(Statement { ref_: _, text }) if text == "select 1;")
         );
+
+        assert_document_integrity(&d);
     }
 
     #[test]
@@ -416,6 +417,18 @@ mod tests {
         assert!(
             matches!(&changed[3], StatementChange::Added(Statement { ref_: _, text }) if text == "select 1;")
         );
+
+        assert_document_integrity(&d);
+    }
+
+    fn assert_document_integrity(d: &Document) {
+        let ranges = pg_statement_splitter::split(&d.content).ranges;
+
+        assert!(ranges.len() == d.statements.len());
+
+        assert!(ranges.iter().all(|r| {
+            d.statements.iter().any(|(_, stmt_range)| stmt_range == r)
+        }));
     }
 
     #[test]
@@ -440,6 +453,8 @@ mod tests {
 
         assert_eq!(changed.len(), 1);
         matches!(changed[0], StatementChange::Modified(_));
+
+        assert_document_integrity(&d);
     }
 
     #[test]
@@ -512,6 +527,8 @@ mod tests {
 
         assert_eq!(d.statements[0].1, TextRange::new(0.into(), 25.into()));
         assert_eq!(d.statements[1].1, TextRange::new(26.into(), 35.into()));
+
+        assert_document_integrity(&d);
     }
 
     #[test]
@@ -566,6 +583,8 @@ mod tests {
             u32::from(d.statements[1].1.end()),
             u32::from(stmt_2_range.1.end()) + update_addition
         );
+
+        assert_document_integrity(&d);
     }
 
     #[test]
@@ -615,6 +634,7 @@ mod tests {
 
         assert_eq!(doc.content, "select ;\nselect 2;");
         assert_eq!(doc.statements.len(), 2);
+        println!("{:#?}", doc.statements);
         assert_eq!(
             doc.statement(&doc.statements[0]).text,
             "select ;".to_string()
@@ -697,6 +717,8 @@ mod tests {
             doc.statements[1].1,
             TextRange::new(TextSize::new(10), TextSize::new(19))
         );
+
+        assert_document_integrity(&doc);
     }
 
     #[test]
@@ -747,5 +769,7 @@ mod tests {
             u32::from(doc.statements[1].1.end()),
             u32::from(stmt_2_range.1.end()) + update_addition
         );
+
+        assert_document_integrity(&doc);
     }
 }
