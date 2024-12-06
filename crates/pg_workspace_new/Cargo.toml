@@ -16,6 +16,7 @@ pg_diagnostics        = { workspace = true }
 biome_deserialize        = "0.6.0"
 pg_statement_splitter        = { workspace = true }
 pg_configuration        = { workspace = true }
+pg_query_ext        = { workspace = true }
 pg_console        = { workspace = true }
 tracing                  = { workspace = true, features = ["attributes", "log"] }
 tree-sitter.workspace = true

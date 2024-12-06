@@ -4,6 +4,7 @@ use change::StatementChange;
 use dashmap::{DashMap, DashSet};
 use pg_fs::{ConfigName, PgLspPath};
 use document::{Document, StatementRef};
+use pg_query::PgQueryStore;
 use store::Store;
 use tree_sitter::TreeSitterStore;
 
@@ -14,6 +15,7 @@ use super::{GetFileContentParams, IsPathIgnoredParams, OpenFileParams, ServerInf
 mod document;
 mod change;
 mod tree_sitter;
+mod pg_query;
 mod store;
 
 pub(super) struct WorkspaceServer {
@@ -23,6 +25,7 @@ pub(super) struct WorkspaceServer {
     documents: DashMap<PgLspPath, Document>,
 
     tree_sitter: TreeSitterStore,
+    pg_query: PgQueryStore,
 
     // Stores the statements that have changed since the last analysis
     changed_stmts: DashSet<StatementRef>,
@@ -48,6 +51,7 @@ impl WorkspaceServer {
             settings: RwLock::default(),
             documents: DashMap::default(),
             tree_sitter:TreeSitterStore::new(),
+            pg_query: PgQueryStore::new(),
             changed_stmts: DashSet::default(),
         }
     }
@@ -155,23 +159,21 @@ impl Workspace for WorkspaceServer {
                 StatementChange::Added(s) => {
                     tracing::info!("Adding statement: {:?}", s);
                     self.tree_sitter.add_statement(s);
-                    // self.pg_query.add_statement(s);
-                    //
+                    self.pg_query.add_statement(s);
+
                     self.changed_stmts.insert(s.ref_.to_owned());
                 }
                 StatementChange::Deleted(s) => {
                     tracing::info!("Deleting statement: {:?}", s);
                     self.tree_sitter.remove_statement(s);
-                    // self.pg_query.remove_statement(s);
-                    // self.linter.clear_statement_violations(s);
-                    // self.typechecker.clear_statement_errors(s);
+                    self.pg_query.remove_statement(s);
+
+                    self.changed_stmts.remove(s);
                 }
                 StatementChange::Modified(s) => {
                     tracing::info!("Modifying statement: {:?}", s);
                     self.tree_sitter.modify_statement(s);
-                    // self.pg_query.modify_statement(s);
-                    // self.linter.clear_statement_violations(&s.statement);
-                    // self.typechecker.clear_statement_errors(&s.statement);
+                    self.pg_query.modify_statement(s);
 
                     self.changed_stmts.remove(&s.old.ref_);
                     self.changed_stmts.insert(s.new_ref.to_owned());

@@ -2461,6 +2461,7 @@ dependencies = [
  "pg_console",
  "pg_diagnostics",
  "pg_fs",
+ "pg_query_ext",
  "pg_statement_splitter",
  "serde",
  "serde_json",
