@@ -1,3 +1,7 @@
+[[bin]]
+name = "tree_print"
+path = "src/bin/tree_print.rs"
+
 [package]
 name = "pg_test_utils"
 version = "0.0.0"
@@ -6,6 +10,10 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.81"
 uuid = { version = "1.11.0", features = ["v4"] }
+dotenv = "0.15.0"
+clap = { version = "4.5.23", features = ["derive"] }
 
 sqlx.workspace = true
-dotenv = "0.15.0"
+tree-sitter.workspace = true
+tree_sitter_sql.workspace = true
+

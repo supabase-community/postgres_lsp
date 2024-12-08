@@ -1,29 +1,55 @@
-use crate::{CompletionItem, CompletionResult};
+use tower_lsp::lsp_types::CompletionItem;
 
-pub struct CompletionBuilder<'a> {
-    pub items: Vec<CompletionItem<'a>>,
+use crate::{item::CompletionItemWithScore, CompletionResult};
+
+pub(crate) struct CompletionBuilder {
+    items: Vec<CompletionItemWithScore>,
 }
 
-pub struct CompletionConfig {}
-
-impl<'a> From<&'a CompletionConfig> for CompletionBuilder<'a> {
-    fn from(_config: &CompletionConfig) -> Self {
-        Self { items: Vec::new() }
+impl CompletionBuilder {
+    pub fn new() -> Self {
+        CompletionBuilder { items: vec![] }
     }
-}
 
-impl<'a> CompletionBuilder<'a> {
-    pub fn finish(mut self) -> CompletionResult<'a> {
+    pub fn add_item(&mut self, item: CompletionItemWithScore) {
+        self.items.push(item);
+    }
+
+    pub fn finish(mut self) -> CompletionResult {
         self.items.sort_by(|a, b| {
-            b.preselect
-                .cmp(&a.preselect)
-                .then_with(|| b.score.cmp(&a.score))
-                .then_with(|| a.data.label().cmp(b.data.label()))
+            b.score
+                .cmp(&a.score)
+                .then_with(|| a.label().cmp(&b.label()))
         });
 
-        self.items.dedup_by(|a, b| a.data.label() == b.data.label());
+        self.items.dedup_by(|a, b| a.label() == b.label());
         self.items.truncate(crate::LIMIT);
-        let Self { items, .. } = self;
+
+        let should_preselect_first_item = self.should_preselect_first_item();
+
+        let items: Vec<CompletionItem> = self
+            .items
+            .into_iter()
+            .enumerate()
+            .map(|(idx, mut item)| {
+                if idx == 0 {
+                    item.set_preselected(should_preselect_first_item);
+                }
+                item.into()
+            })
+            .collect();
+
         CompletionResult { items }
+    }
+
+    fn should_preselect_first_item(&mut self) -> bool {
+        let mut items_iter = self.items.iter();
+        let first = items_iter.next();
+        let second = items_iter.next();
+
+        first.is_some_and(|f| match second {
+            Some(s) => (f.score - s.score) > 10,
+            None => true,
+        })
     }
 }
