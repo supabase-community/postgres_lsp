@@ -85,6 +85,66 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn autocompletes_table_alphanumerically() {
+        let test_db = get_new_test_db().await;
+
+        let setup = r#"
+            create table addresses (
+                id serial primary key
+            );
+
+            create table users (
+                id serial primary key
+            );
+
+            create table emails (
+                id serial primary key
+            );
+        "#;
+
+        test_db
+            .execute(setup)
+            .await
+            .expect("Failed to execute setup query");
+
+        let schema_cache = SchemaCache::load(&test_db).await;
+
+        let mut parser = tree_sitter::Parser::new();
+        parser
+            .set_language(tree_sitter_sql::language())
+            .expect("Error loading sql language");
+
+        let test_cases = vec![
+            ("select * from us", "users"),
+            ("select * from em", "emails"),
+            ("select * from ", "addresses"),
+        ];
+
+        for (input, expected_label) in test_cases {
+            let tree = parser.parse(input, None).unwrap();
+
+            let p = CompletionParams {
+                position: ((input.len() - 1) as u32).into(),
+                schema: &schema_cache,
+                text: input,
+                tree: Some(&tree),
+            };
+
+            let result = complete(p);
+
+            assert!(result.items.len() > 0);
+
+            let best_match = &result.items[0];
+
+            assert_eq!(
+                best_match.label, expected_label,
+                "Does not return the expected table to autocomplete: {}",
+                best_match.label
+            )
+        }
+    }
+
+    #[tokio::test]
     async fn autocompletes_table_with_schema() {
         let test_db = get_new_test_db().await;
 
