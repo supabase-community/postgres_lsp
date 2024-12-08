@@ -10,7 +10,7 @@ pub fn complete_tables(ctx: &CompletionContext, builder: &mut CompletionBuilder)
         .iter()
         .map(|table| {
             let data = CompletionItemData::Table(table);
-            let relevance = CompletionRelevance::from_data_and_ctx(&data, ctx);
+            let relevance = CompletionRelevance::new(&data, ctx);
             CompletionItemWithScore::new(data, relevance)
         })
         .collect();

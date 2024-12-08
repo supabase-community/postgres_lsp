@@ -1,7 +1,7 @@
 use text_size::TextSize;
 use tower_lsp::lsp_types::CompletionItem;
 
-use crate::{builder::CompletionBuilder, context::CompletionContext, providers};
+use crate::{builder::CompletionBuilder, context::CompletionContext, providers::complete_tables};
 
 pub const LIMIT: usize = 50;
 
@@ -20,17 +20,10 @@ pub struct CompletionResult {
 
 pub fn complete(params: CompletionParams) -> CompletionResult {
     let ctx = CompletionContext::new(&params);
+
     let mut builder = CompletionBuilder::new();
 
-    if let Some(node) = ctx.ts_node {
-        println!("{}", node.kind());
-        match node.kind() {
-            "relation" => providers::complete_tables(&ctx, &mut builder),
-            _ => {}
-        }
-    } else {
-        // if query emtpy, autocomplete select keywords etc?
-    }
+    complete_tables(&ctx, &mut builder);
 
     builder.finish()
 }
@@ -96,16 +89,16 @@ mod tests {
         let test_db = get_new_test_db().await;
 
         let setup = r#"
-            create schema open;
+            create schema customer_support;
             create schema private;
 
-            create table private.users (
+            create table private.user_z (
                 id serial primary key,
                 name text,
                 password text
             );
 
-            create table open.user_requests (
+            create table customer_support.user_y (
                 id serial primary key,
                 request text,
                 send_at timestamp with time zone
@@ -124,9 +117,13 @@ mod tests {
             .set_language(tree_sitter_sql::language())
             .expect("Error loading sql language");
 
-        // testing the private schema
-        {
-            let input = "select * from private.u";
+        let test_cases = vec![
+            ("select * from u", "user_y"), // user_y is preferred alphanumerically
+            ("select * from private.u", "user_z"),
+            ("select * from customer_support.u", "user_y"),
+        ];
+
+        for (input, expected_label) in test_cases {
             let tree = parser.parse(input, None).unwrap();
 
             let p = CompletionParams {
@@ -143,7 +140,7 @@ mod tests {
             let best_match = &result.items[0];
 
             assert_eq!(
-                best_match.label, "users",
+                best_match.label, expected_label,
                 "Does not return the expected table to autocomplete: {}",
                 best_match.label
             )

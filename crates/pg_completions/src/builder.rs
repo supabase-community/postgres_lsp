@@ -12,7 +12,7 @@ impl CompletionBuilder {
     }
 
     pub fn add_item(&mut self, item: CompletionItemWithScore) {
-        self.items.push(item)
+        self.items.push(item);
     }
 
     pub fn finish(mut self) -> CompletionResult {
