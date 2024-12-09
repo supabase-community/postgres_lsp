@@ -167,4 +167,3 @@ pub struct CantResolve {
     #[source]
     source: Option<Error>,
 }
-

@@ -6,6 +6,7 @@
 pub mod files;
 pub mod diagnostics;
 pub mod vcs;
+pub mod database;
 
 pub use crate::diagnostics::ConfigurationDiagnostic;
 
@@ -13,6 +14,7 @@ use std::path::PathBuf;
 
 use crate::vcs::{partial_vcs_configuration, PartialVcsConfiguration, VcsConfiguration};
 use bpaf::Bpaf;
+use database::{partial_database_configuration, DatabaseConfiguration, PartialDatabaseConfiguration};
 use files::{partial_files_configuration, FilesConfiguration, PartialFilesConfiguration};
 use serde::{Deserialize, Serialize};
 use biome_deserialize_macros::Partial;
@@ -39,6 +41,13 @@ pub struct Configuration {
         bpaf(external(partial_files_configuration), optional, hide_usage)
     )]
     pub files: FilesConfiguration,
+
+    /// The configuration of the database connection
+    #[partial(
+        type,
+        bpaf(external(partial_database_configuration), optional, hide_usage)
+    )]
+    pub db: DatabaseConfiguration,
 }
 
 
@@ -56,6 +65,7 @@ impl PartialConfiguration {
                 use_ignore_file: Some(false),
                 ..Default::default()
             }),
+            db: Some(Default::default()),
         }
     }
 }

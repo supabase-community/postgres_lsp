@@ -2,35 +2,75 @@ use std::{fs, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
 use change::StatementChange;
 use dashmap::{DashMap, DashSet};
-use pg_fs::{ConfigName, PgLspPath};
 use document::{Document, StatementRef};
+use pg_fs::{ConfigName, PgLspPath};
 use pg_query::PgQueryStore;
+use pg_schema_cache::SchemaCache;
+use sqlx::PgPool;
 use store::Store;
+use tokio::runtime::Runtime;
 use tree_sitter::TreeSitterStore;
 
-use crate::{settings::{Settings, SettingsHandleMut, SettingsHandle}, WorkspaceError};
+use crate::{
+    settings::{Settings, SettingsHandle, SettingsHandleMut},
+    WorkspaceError,
+};
 
-use super::{GetFileContentParams, IsPathIgnoredParams, OpenFileParams, ServerInfo, UpdateSettingsParams, Workspace};
+use super::{
+    GetFileContentParams, IsPathIgnoredParams, OpenFileParams, ServerInfo,
+    UpdateSettingsParams, Workspace,
+};
 
-mod document;
 mod change;
-mod tree_sitter;
+mod document;
 mod pg_query;
 mod store;
+mod tree_sitter;
+
+/// Simple helper to manage the db connection and the associated connection string
+#[derive(Default)]
+struct DbConnection {
+    pool: Option<PgPool>,
+    connection_string: Option<String>,
+}
+
+impl DbConnection {
+    pub(crate) fn is_connected_to(&self, connection_string: &str) -> bool {
+        self.connection_string.as_ref().is_some_and(|x| x == connection_string)
+    }
+
+    pub(crate) fn get_pool(&self) -> Option<PgPool> {
+        self.pool.as_ref().map(|p| p.clone())
+    }
+
+    pub(crate) fn set_connection(&mut self, connection_string: &str) -> Result<(), WorkspaceError> {
+        if self.connection_string.is_none() || self.connection_string.as_ref().unwrap() != connection_string {
+            self.connection_string = Some(connection_string.to_string());
+            self.pool = Some(PgPool::connect_lazy(connection_string)?);
+        }
+
+        Ok(())
+    }
+}
 
 pub(super) struct WorkspaceServer {
     /// global settings object for this workspace
     settings: RwLock<Settings>,
+
+    /// Stores the schema cache for this workspace
+    schema_cache: RwLock<SchemaCache>,
+
     /// Stores the document (text content + version number) associated with a URL
     documents: DashMap<PgLspPath, Document>,
 
     tree_sitter: TreeSitterStore,
     pg_query: PgQueryStore,
 
-    // Stores the statements that have changed since the last analysis
+    /// Stores the statements that have changed since the last analysis
     changed_stmts: DashSet<StatementRef>,
-}
 
+    connection: RwLock<DbConnection>,
+}
 
 /// The `Workspace` object is long-lived, so we want it to be able to cross
 /// unwind boundaries.
@@ -50,9 +90,11 @@ impl WorkspaceServer {
         Self {
             settings: RwLock::default(),
             documents: DashMap::default(),
-            tree_sitter:TreeSitterStore::new(),
+            tree_sitter: TreeSitterStore::new(),
             pg_query: PgQueryStore::new(),
             changed_stmts: DashSet::default(),
+            schema_cache: RwLock::default(),
+            connection: RwLock::default(),
         }
     }
 
@@ -63,6 +105,33 @@ impl WorkspaceServer {
 
     fn settings_mut(&self) -> SettingsHandleMut {
         SettingsHandleMut::new(&self.settings)
+    }
+
+    fn refresh_db_connection(&self) {
+        let s = self.settings();
+
+        let mut conn = self.connection.write().unwrap();
+
+        conn.set_connection(&s.as_ref().db.to_connection_string());
+
+        self.reload_schema_cache();
+    }
+
+    fn reload_schema_cache(&self) -> Result<(), WorkspaceError> {
+        // TODO return error if db connection is not available
+        if let Some(c) = self.connection.read().unwrap().get_pool() {
+            let runtime = Runtime::new().unwrap();
+            // TODO load should return a Result
+            let schema_cache = runtime.block_on(SchemaCache::load(&c));
+
+            let mut cache = self.schema_cache.write().unwrap();
+            *cache = schema_cache;
+        } else {
+            let mut cache = self.schema_cache.write().unwrap();
+            *cache = SchemaCache::default();
+        }
+
+        Ok(())
     }
 
     /// Check whether a file is ignored in the top-level config `files.ignore`/`files.include`
@@ -100,6 +169,11 @@ impl WorkspaceServer {
 }
 
 impl Workspace for WorkspaceServer {
+    #[tracing::instrument(level = "trace", skip(self))]
+    fn refresh_schema_cache(&self) -> Result<(), WorkspaceError> {
+        self.reload_schema_cache()
+    }
+
     /// Update the global settings for this workspace
     ///
     /// ## Panics
@@ -108,14 +182,14 @@ impl Workspace for WorkspaceServer {
     #[tracing::instrument(level = "trace", skip(self))]
     fn update_settings(&self, params: UpdateSettingsParams) -> Result<(), WorkspaceError> {
         let mut settings = self.settings_mut();
-       settings
-            .as_mut()
-            .merge_with_configuration(
-                params.configuration,
-                params.workspace_directory,
-                params.vcs_base_path,
-                params.gitignore_matches.as_slice()
-            )?;
+        settings.as_mut().merge_with_configuration(
+            params.configuration,
+            params.workspace_directory,
+            params.vcs_base_path,
+            params.gitignore_matches.as_slice(),
+        )?;
+
+        self.refresh_db_connection();
 
         Ok(())
     }
@@ -126,7 +200,7 @@ impl Workspace for WorkspaceServer {
         tracing::info!("Opening file: {:?}", params.path);
         self.documents.insert(
             params.path.clone(),
-            Document::new(params.path, params.content, params.version)
+            Document::new(params.path, params.content, params.version),
         );
 
         Ok(())
@@ -134,7 +208,8 @@ impl Workspace for WorkspaceServer {
 
     /// Remove a file from the workspace
     fn close_file(&self, params: super::CloseFileParams) -> Result<(), crate::WorkspaceError> {
-        let (_, doc) = self.documents
+        let (_, doc) = self
+            .documents
             .remove(&params.path)
             .ok_or_else(WorkspaceError::not_found)?;
 
@@ -150,7 +225,11 @@ impl Workspace for WorkspaceServer {
         let mut doc = self
             .documents
             .entry(params.path.clone())
-            .or_insert(Document::new(params.path.clone(), "".to_string(), params.version));
+            .or_insert(Document::new(
+                params.path.clone(),
+                "".to_string(),
+                params.version,
+            ));
 
         tracing::info!("Changing file: {:?}", params.path);
 
@@ -206,4 +285,3 @@ impl Workspace for WorkspaceServer {
 fn is_dir(path: &Path) -> bool {
     path.is_dir() || (path.is_symlink() && fs::read_link(path).is_ok_and(|path| path.is_dir()))
 }
-

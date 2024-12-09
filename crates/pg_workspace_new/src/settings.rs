@@ -2,7 +2,7 @@ use std::{num::NonZeroU64, path::{Path, PathBuf}, sync::{RwLock, RwLockReadGuard
 use biome_deserialize::StringSet;
 
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
-use pg_configuration::{diagnostics::InvalidIgnorePattern, files::FilesConfiguration, ConfigurationDiagnostic, PartialConfiguration};
+use pg_configuration::{database::{DatabaseConfiguration, PartialDatabaseConfiguration}, diagnostics::InvalidIgnorePattern, files::FilesConfiguration, ConfigurationDiagnostic, PartialConfiguration};
 use pg_fs::FileSystem;
 
 use crate::{matcher::Matcher, DynRef, WorkspaceError};
@@ -12,6 +12,9 @@ use crate::{matcher::Matcher, DynRef, WorkspaceError};
 pub struct Settings {
     /// Filesystem settings for the workspace
     pub files: FilesSettings,
+
+    /// Database settings for the workspace
+    pub db: DatabaseSettings,
 }
 
 #[derive(Debug)]
@@ -73,6 +76,11 @@ impl Settings {
             gitignore_matches,
         )? {
             self.files = files;
+        }
+
+        // db settings
+        if let Some(db) = configuration.db {
+            self.db = db.into()
         }
 
         Ok(())
@@ -157,6 +165,49 @@ pub fn to_matcher(
     Ok(matcher)
 }
 
+/// Database settings for the entire workspace
+#[derive(Debug)]
+pub struct DatabaseSettings {
+    pub host: String,
+    pub port: u16,
+    pub username: String,
+    pub password: String,
+    pub database: String
+}
+
+impl Default for DatabaseSettings {
+    fn default() -> Self {
+        Self {
+            host: "127.0.0.1".to_string(),
+            port: 5432,
+            username: "postgres".to_string(),
+            password: "postgres".to_string(),
+            database: "postgres".to_string(),
+        }
+    }
+}
+
+impl DatabaseSettings {
+    pub fn to_connection_string(&self) -> String {
+        format!(
+            "postgres://{}:{}@{}:{}/{}",
+            self.username, self.password, self.host, self.port, self.database
+        )
+    }
+}
+
+impl From<PartialDatabaseConfiguration> for DatabaseSettings {
+    fn from(value: PartialDatabaseConfiguration) -> Self {
+        let d = DatabaseSettings::default();
+        Self {
+            host: value.host.unwrap_or(d.host),
+            port: value.port.unwrap_or(d.port),
+            username: value.username.unwrap_or(d.username),
+            password: value.password.unwrap_or(d.password),
+            database: value.database.unwrap_or(d.database)
+        }
+    }
+}
 
 /// Filesystem settings for the entire workspace
 #[derive(Debug)]

@@ -6,12 +6,11 @@ use pg_diagnostics::{
     MessageAndDescription, Severity, Visit,
 };
 use pg_fs::{FileSystemDiagnostic, PgLspPath};
-use std::process::{ExitCode, Termination};
+use serde::{Deserialize, Serialize};
+use std::error::Error;
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
-use std::error::Error;
-use serde::{Deserialize, Serialize};
-
+use std::process::{ExitCode, Termination};
 
 /// Generic errors thrown during operations
 #[derive(Deserialize, Diagnostic, Serialize)]
@@ -98,7 +97,6 @@ impl From<ConfigurationDiagnostic> for WorkspaceError {
         Self::Configuration(err)
     }
 }
-
 
 #[derive(Debug, Serialize, Deserialize)]
 /// Error emitted by the underlying transport layer for a remote Workspace
@@ -197,9 +195,29 @@ impl From<VcsDiagnostic> for WorkspaceError {
 #[derive(Debug, Serialize, Deserialize, Diagnostic)]
 #[diagnostic(
     category = "database/connection",
-    message = "Error when trying to access the database",
+    message = "Database error: {message}"
 )]
-pub struct DatabaseConnectionError;
+pub struct DatabaseConnectionError {
+    message: String,
+    code: Option<String>,
+}
+
+impl From<sqlx::Error> for WorkspaceError {
+    fn from(err: sqlx::Error) -> Self {
+        let db_err = err.as_database_error();
+        if let Some(db_err) = db_err {
+            Self::DatabaseConnectionError(DatabaseConnectionError {
+                message: db_err.message().to_string(),
+                code: db_err.code().map(|c| c.to_string()),
+            })
+        } else {
+            Self::DatabaseConnectionError(DatabaseConnectionError {
+                message: err.to_string(),
+                code: None
+            })
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Diagnostic)]
 #[diagnostic(
@@ -276,7 +294,6 @@ pub struct FileIgnored {
     path: String,
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FileTooLarge {
     path: String,
@@ -308,4 +325,3 @@ impl Diagnostic for FileTooLarge {
         )
     }
 }
-

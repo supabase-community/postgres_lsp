@@ -116,6 +116,10 @@ where
     }
 
     fn get_file_content(&self, params: GetFileContentParams) -> Result<String, WorkspaceError> {
-        self.request("biome/get_file_content", params)
+        self.request("pglsp/get_file_content", params)
+    }
+
+    fn refresh_schema_cache(&self) -> Result<(), WorkspaceError> {
+        self.request("pglsp/refresh_schema_cache", ())
     }
 }

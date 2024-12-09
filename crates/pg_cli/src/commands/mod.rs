@@ -1,10 +1,10 @@
-use crate::cli_options::{cli_options, CliOptions, ColorsArg};
+use crate::cli_options::{cli_options, CliOptions, CliReporter, ColorsArg};
 use crate::diagnostics::DeprecatedConfigurationFile;
 use crate::logging::LoggingKind;
 use crate::{
     execute_mode, setup_cli_subscriber, CliDiagnostic, CliSession, Execution, LoggingLevel, VERSION,
 };
-use pg_configuration::PartialConfiguration;
+use pg_configuration::{PartialConfiguration};
 use pg_console::{markup, Console, ConsoleExt};
 use pg_diagnostics::{Diagnostic, PrintDiagnostic};
 use pg_fs::FileSystem;
@@ -154,9 +154,9 @@ impl PgLspCommand {
         match self.cli_options() {
             Some(cli_options) => {
                 // To properly display GitHub annotations we need to disable colors
-                // if matches!(cli_options.reporter, CliReporter::GitHub) {
-                //     return Some(&ColorsArg::Off);
-                // }
+                if matches!(cli_options.reporter, CliReporter::GitHub) {
+                    return Some(&ColorsArg::Off);
+                }
                 // We want force colors in CI, to give e better UX experience
                 // Unless users explicitly set the colors flag
                 // if matches!(self, PgLspCommand::Ci { .. }) && cli_options.colors.is_none() {
@@ -168,6 +168,7 @@ impl PgLspCommand {
             None => None,
         }
     }
+
 
     pub const fn should_use_server(&self) -> bool {
         match self.cli_options() {
@@ -272,7 +273,6 @@ pub(crate) trait CommandRunner: Sized {
     /// - Configure the VCS integration
     /// - Computes the paths to traverse/handle. This changes based on the VCS arguments that were passed.
     /// - Register a project folder using the working directory.
-    /// - Resolves the closets manifest AKA `package.json` and registers it.
     /// - Updates the settings that belong to the project registered
     fn configure_workspace(
         &mut self,
