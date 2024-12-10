@@ -6,6 +6,7 @@ mod typecheck;
 
 use std::sync::{RwLock, RwLockWriteGuard};
 
+use diagnostics::{Diagnostic, Severity};
 use dashmap::{DashMap, DashSet};
 use lint::Linter;
 use pg_base_db::{Document, DocumentChange, StatementRef};
@@ -98,10 +99,10 @@ impl Workspace {
     }
 
     /// Collects all diagnostics for a given document. It does not compute them, it just collects.
-    pub fn diagnostics(&self, url: &PgLspPath) -> Vec<pg_diagnostics::Diagnostic> {
-        let mut diagnostics: Vec<pg_diagnostics::Diagnostic> = vec![];
+    pub fn diagnostics(&self, url: &PgLspPath) -> Vec<crate::Diagnostic> {
+        let mut diagnostics: Vec<crate::Diagnostic> = vec![];
 
-        let doc = self.documents.get(&url);
+        let doc = self.documents.get(url);
 
         if doc.is_none() {
             return diagnostics;

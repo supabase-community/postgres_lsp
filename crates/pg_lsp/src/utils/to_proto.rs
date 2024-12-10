@@ -1,4 +1,4 @@
-use pg_diagnostics::Diagnostic;
+use pg_workspace::diagnostics::{Diagnostic, Severity};
 use tower_lsp::lsp_types;
 
 pub fn diagnostic(diagnostic: Diagnostic, range: lsp_types::Range) -> lsp_types::Diagnostic {
