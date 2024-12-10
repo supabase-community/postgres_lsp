@@ -1,4 +1,4 @@
-use crate::{context::CompletionContext, data::CompletionItemData};
+use crate::context::CompletionContext;
 
 #[derive(Debug, Default)]
 pub(crate) struct CompletionRelevance {
@@ -10,21 +10,7 @@ impl CompletionRelevance {
         self.score
     }
 
-    pub fn new(data: &CompletionItemData, ctx: &CompletionContext) -> Self {
-        let mut relevance = CompletionRelevance::default();
-
-        match data {
-            CompletionItemData::Table(tb) => {
-                relevance.check_if_catalog(ctx);
-                relevance.check_matches_schema(ctx, &tb.schema);
-                relevance.check_matches_query_input(ctx, &tb.name);
-            }
-        }
-
-        relevance
-    }
-
-    fn check_matches_query_input(&mut self, ctx: &CompletionContext, name: &str) {
+    pub fn check_matches_query_input(&mut self, ctx: &CompletionContext, name: &str) {
         let node = ctx.ts_node.unwrap();
 
         let content = match ctx.get_ts_node_content(node) {
@@ -42,7 +28,7 @@ impl CompletionRelevance {
         };
     }
 
-    fn check_matches_schema(&mut self, ctx: &CompletionContext, schema: &str) {
+    pub fn check_matches_schema(&mut self, ctx: &CompletionContext, schema: &str) {
         if ctx.schema_name.is_none() {
             return;
         }
@@ -56,7 +42,7 @@ impl CompletionRelevance {
         }
     }
 
-    fn check_if_catalog(&mut self, ctx: &CompletionContext) {
+    pub fn check_if_catalog(&mut self, ctx: &CompletionContext) {
         if ctx.schema_name.as_ref().is_some_and(|n| n == "pg_catalog") {
             return;
         }

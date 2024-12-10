@@ -1,9 +1,7 @@
-use tower_lsp::lsp_types::CompletionItem;
-
-use crate::{item::CompletionItemWithScore, CompletionResult};
+use crate::{item::CompletionItem, CompletionResult};
 
 pub(crate) struct CompletionBuilder {
-    items: Vec<CompletionItemWithScore>,
+    items: Vec<CompletionItem>,
 }
 
 impl CompletionBuilder {
@@ -11,18 +9,15 @@ impl CompletionBuilder {
         CompletionBuilder { items: vec![] }
     }
 
-    pub fn add_item(&mut self, item: CompletionItemWithScore) {
+    pub fn add_item(&mut self, item: CompletionItem) {
         self.items.push(item);
     }
 
     pub fn finish(mut self) -> CompletionResult {
-        self.items.sort_by(|a, b| {
-            b.score
-                .cmp(&a.score)
-                .then_with(|| a.label().cmp(&b.label()))
-        });
+        self.items
+            .sort_by(|a, b| b.score.cmp(&a.score).then_with(|| a.label.cmp(&b.label)));
 
-        self.items.dedup_by(|a, b| a.label() == b.label());
+        self.items.dedup_by(|a, b| a.label == b.label);
         self.items.truncate(crate::LIMIT);
 
         let should_preselect_first_item = self.should_preselect_first_item();
@@ -33,7 +28,7 @@ impl CompletionBuilder {
             .enumerate()
             .map(|(idx, mut item)| {
                 if idx == 0 {
-                    item.set_preselected(should_preselect_first_item);
+                    item.preselected = Some(should_preselect_first_item);
                 }
                 item.into()
             })

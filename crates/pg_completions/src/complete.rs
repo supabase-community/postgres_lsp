@@ -1,7 +1,9 @@
 use text_size::TextSize;
-use tower_lsp::lsp_types::CompletionItem;
 
-use crate::{builder::CompletionBuilder, context::CompletionContext, providers::complete_tables};
+use crate::{
+    builder::CompletionBuilder, context::CompletionContext, item::CompletionItem,
+    providers::complete_tables,
+};
 
 pub const LIMIT: usize = 50;
 
@@ -16,6 +18,14 @@ pub struct CompletionParams<'a> {
 #[derive(Debug, Default)]
 pub struct CompletionResult {
     pub items: Vec<CompletionItem>,
+}
+
+impl IntoIterator for CompletionResult {
+    type Item = CompletionItem;
+    type IntoIter = <Vec<CompletionItem> as IntoIterator>::IntoIter;
+    fn into_iter(self) -> Self::IntoIter {
+        self.items.into_iter()
+    }
 }
 
 pub fn complete(params: CompletionParams) -> CompletionResult {
