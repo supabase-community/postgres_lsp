@@ -10,8 +10,8 @@ use pg_workspace::Workspace;
 use text_size::TextSize;
 use tokio::sync::RwLock;
 use tower_lsp::lsp_types::{
-    CodeActionOrCommand, CompletionItem, CompletionItemKind, CompletionList, Hover, HoverContents,
-    InlayHint, InlayHintKind, InlayHintLabel, MarkedString, Position, Range,
+    CodeActionOrCommand, CompletionItem, CompletionList, Hover, HoverContents, InlayHint,
+    InlayHintKind, InlayHintLabel, MarkedString, Position, Range,
 };
 
 use crate::{db_connection::DbConnection, utils::line_index_ext::LineIndexExt};
@@ -239,35 +239,18 @@ impl Session {
 
         let schema_cache = ide.schema_cache.read().expect("No Schema Cache");
 
-        let completion_items = pg_completions::complete(&CompletionParams {
+        let completion_items: Vec<CompletionItem> = pg_completions::complete(CompletionParams {
             position: offset - range.start() - TextSize::from(1),
-            text: stmt.text.as_str(),
-            tree: ide.tree_sitter.tree(&stmt).as_ref().map(|x| x.as_ref()),
+            text: &stmt.text,
+            tree: ide
+                .tree_sitter
+                .tree(&stmt)
+                .as_ref()
+                .and_then(|t| Some(t.as_ref())),
             schema: &schema_cache,
         })
-        .items
         .into_iter()
-        .map(|i| CompletionItem {
-            // TODO: add more data
-            label: i.data.label().to_string(),
-            label_details: None,
-            kind: Some(CompletionItemKind::CLASS),
-            detail: None,
-            documentation: None,
-            deprecated: None,
-            preselect: None,
-            sort_text: None,
-            filter_text: None,
-            insert_text: None,
-            insert_text_format: None,
-            insert_text_mode: None,
-            text_edit: None,
-            additional_text_edits: None,
-            commit_characters: None,
-            data: None,
-            tags: None,
-            command: None,
-        })
+        .map(|i| i.into())
         .collect();
 
         Some(CompletionList {

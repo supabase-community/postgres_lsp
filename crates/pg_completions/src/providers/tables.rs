@@ -1,31 +1,37 @@
-use text_size::{TextRange, TextSize};
+use pg_schema_cache::Table;
 
-use crate::{builder::CompletionBuilder, CompletionItem, CompletionItemData};
+use crate::{
+    builder::CompletionBuilder,
+    context::CompletionContext,
+    item::{CompletionItem, CompletionItemKind},
+    relevance::CompletionRelevance,
+};
 
-use super::CompletionProviderParams;
+pub fn complete_tables(ctx: &CompletionContext, builder: &mut CompletionBuilder) {
+    let available_tables = &ctx.schema_cache.tables;
 
-// todo unify this in a type resolver crate
-pub fn complete_tables<'a>(
-    params: CompletionProviderParams<'a>,
-    builder: &mut CompletionBuilder<'a>,
-) {
-    if let Some(ts) = params.ts_node {
-        let range = TextRange::new(
-            TextSize::try_from(ts.start_byte()).unwrap(),
-            TextSize::try_from(ts.end_byte()).unwrap(),
-        );
-        match ts.kind() {
-            "relation" => {
-                // todo better search
-                params.schema.tables.iter().for_each(|table| {
-                    builder.items.push(CompletionItem::new_simple(
-                        1,
-                        range,
-                        CompletionItemData::Table(table),
-                    ));
-                });
-            }
-            _ => {}
-        }
+    let completion_items: Vec<CompletionItem> = available_tables
+        .iter()
+        .map(|table| CompletionItem {
+            label: table.name.clone(),
+            score: get_score(ctx, table),
+            description: format!("Schema: {}", table.schema),
+            preselected: None,
+            kind: CompletionItemKind::Table,
+        })
+        .collect();
+
+    for item in completion_items {
+        builder.add_item(item);
     }
+}
+
+fn get_score(ctx: &CompletionContext, table: &Table) -> i32 {
+    let mut relevance = CompletionRelevance::default();
+
+    relevance.check_matches_query_input(ctx, &table.name);
+    relevance.check_matches_schema(ctx, &table.schema);
+    relevance.check_if_catalog(ctx);
+
+    relevance.score()
 }
