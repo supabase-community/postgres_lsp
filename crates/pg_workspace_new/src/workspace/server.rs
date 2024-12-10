@@ -40,12 +40,6 @@ static RUNTIME: LazyLock<Runtime> =
     LazyLock::new(|| Runtime::new().expect("Failed to create Tokio runtime"));
 
 impl DbConnection {
-    pub(crate) fn is_connected_to(&self, connection_string: &str) -> bool {
-        self.connection_string
-            .as_ref()
-            .is_some_and(|x| x == connection_string)
-    }
-
     pub(crate) fn get_pool(&self) -> Option<PgPool> {
         self.pool.clone()
     }
