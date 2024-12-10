@@ -6,4 +6,4 @@ select * from test;
 
 alter table test drop column id;
 
-select lower('test');
+select lower();

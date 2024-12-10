@@ -16,13 +16,13 @@ lsp-types = "0.95.0"
 serde.workspace = true
 serde_json.workspace = true
 anyhow = "1.0.81"
-sqlx = { version = "0.7.3", features = [ "runtime-async-std", "tls-rustls", "postgres", "json" ] }
 async-std = "1.12.0"
 threadpool = "1.8.1"
 dashmap = "5.5.3"
 text-size.workspace = true
 
 line_index.workspace = true
+sqlx.workspace = true
 
 pg_hover.workspace = true
 pg_fs.workspace = true
@@ -32,6 +32,12 @@ pg_commands.workspace = true
 pg_base_db.workspace = true
 pg_schema_cache.workspace = true
 pg_workspace.workspace = true
+pg_diagnostics.workspace = true
+tokio = { version = "1.40.0", features = ["io-std", "macros", "rt-multi-thread", "sync", "time"] }
+tokio-util = "0.7.12"
+tower-lsp = "0.20.0"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
 
 [dev-dependencies]
 

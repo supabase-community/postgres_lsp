@@ -5,15 +5,17 @@ edition = "2021"
 
 [dependencies]
 async-std = "1.12.0"
-sqlx = { version = "0.7.3", features = [ "runtime-async-std", "tls-rustls", "postgres", "json" ] }
 
 text-size.workspace = true
 
 tree-sitter.workspace = true
 tree_sitter_sql.workspace = true
 pg_schema_cache.workspace = true
+pg_test_utils.workspace = true
 
-[dev-dependencies]
+sqlx.workspace = true
+
+tokio = { version = "1.41.1", features = ["full"] }
 
 [lib]
 doctest = false

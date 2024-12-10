@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   db:
+    # postgres://postgres:postgres@127.0.0.1:5432/postgres
     image: postgres
     restart: always
     environment:
