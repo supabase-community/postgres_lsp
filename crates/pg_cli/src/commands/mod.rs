@@ -4,17 +4,15 @@ use crate::logging::LoggingKind;
 use crate::{
     execute_mode, setup_cli_subscriber, CliDiagnostic, CliSession, Execution, LoggingLevel, VERSION,
 };
-use pg_configuration::{PartialConfiguration};
+use bpaf::Bpaf;
+use pg_configuration::PartialConfiguration;
 use pg_console::{markup, Console, ConsoleExt};
 use pg_diagnostics::{Diagnostic, PrintDiagnostic};
 use pg_fs::FileSystem;
-use pg_workspace_new::configuration::{
-    load_configuration, LoadedConfiguration,
-};
+use pg_workspace_new::configuration::{load_configuration, LoadedConfiguration};
 use pg_workspace_new::settings::PartialConfigurationExt;
 use pg_workspace_new::workspace::UpdateSettingsParams;
 use pg_workspace_new::{DynRef, Workspace, WorkspaceError};
-use bpaf::Bpaf;
 use std::ffi::OsString;
 use std::path::PathBuf;
 
@@ -169,7 +167,6 @@ impl PgLspCommand {
         }
     }
 
-
     pub const fn should_use_server(&self) -> bool {
         match self.cli_options() {
             Some(cli_options) => cli_options.use_server,
@@ -301,7 +298,7 @@ pub(crate) trait CommandRunner: Sized {
             workspace_directory: fs.working_directory(),
             configuration,
             vcs_base_path,
-            gitignore_matches
+            gitignore_matches,
         })?;
 
         let execution = self.get_execution(cli_options, console, workspace)?;
@@ -366,4 +363,3 @@ mod tests {
         pg_lsp_command().check_invariants(false);
     }
 }
-

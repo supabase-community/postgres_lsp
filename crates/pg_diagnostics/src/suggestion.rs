@@ -1,7 +1,7 @@
 use ::serde::{Deserialize, Serialize};
 use pg_console::MarkupBuf;
-use text_size::TextRange;
 use pg_text_edit::TextEdit;
+use text_size::TextRange;
 
 /// Indicates how a tool should manage this suggestion.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]

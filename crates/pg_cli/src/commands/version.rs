@@ -40,4 +40,3 @@ impl fmt::Display for DisplayServerVersion<'_> {
         }
     }
 }
-

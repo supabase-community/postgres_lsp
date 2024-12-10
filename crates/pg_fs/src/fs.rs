@@ -1,8 +1,8 @@
-use crate::{PgLspPath, PathInterner};
-use pg_diagnostics::{console, Advices, Diagnostic, LogCategory, Visit};
-use pg_diagnostics::{Error, Severity};
+use crate::{PathInterner, PgLspPath};
 pub use memory::{ErrorEntry, MemoryFileSystem};
 pub use os::OsFileSystem;
+use pg_diagnostics::{console, Advices, Diagnostic, LogCategory, Visit};
+use pg_diagnostics::{Error, Severity};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Display, Formatter};
@@ -141,10 +141,7 @@ pub trait FileSystem: Send + Sync + RefUnwindSafe {
                 match file.read_to_string(&mut content) {
                     Ok(_) => Ok(content),
                     Err(err) => {
-                        error!(
-                            "Couldn't read the file {:?}, reason:\n{:?}",
-                            file_path, err
-                        );
+                        error!("Couldn't read the file {:?}, reason:\n{:?}", file_path, err);
                         Err(FileSystemDiagnostic {
                             path: file_path.display().to_string(),
                             severity: Severity::Error,
@@ -154,10 +151,7 @@ pub trait FileSystem: Send + Sync + RefUnwindSafe {
                 }
             }
             Err(err) => {
-                error!(
-                    "Couldn't open the file {:?}, reason:\n{:?}",
-                    file_path, err
-                );
+                error!("Couldn't open the file {:?}, reason:\n{:?}", file_path, err);
                 Err(FileSystemDiagnostic {
                     path: file_path.display().to_string(),
                     severity: Severity::Error,
@@ -361,7 +355,6 @@ where
     fn get_staged_files(&self) -> io::Result<Vec<String>> {
         T::get_staged_files(self)
     }
-
 }
 
 #[derive(Debug, Diagnostic, Deserialize, Serialize)]

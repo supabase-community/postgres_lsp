@@ -1,8 +1,8 @@
 use crate::display::frame::SourceFile;
 use crate::{diagnostic::internal::AsDiagnostic, Diagnostic, Resource, Severity};
 use pg_console::{fmt, markup, MarkupBuf};
-use text_size::{TextRange, TextSize};
 use std::io;
+use text_size::{TextRange, TextSize};
 
 /// Helper struct for printing a diagnostic as markup into any formatter
 /// implementing [pg_console::fmt::Write].

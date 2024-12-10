@@ -109,4 +109,3 @@ impl Display for PgLspEnv {
         Ok(())
     }
 }
-

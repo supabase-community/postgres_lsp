@@ -1,8 +1,8 @@
-use text_size::{TextRange, TextSize};
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use std::ops::Range;
 use std::{borrow::Borrow, ops::Deref};
+use text_size::{TextRange, TextSize};
 
 /// Represents the location of a diagnostic in a resource.
 #[derive(Debug, Default, Clone, Copy)]

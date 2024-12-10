@@ -1,9 +1,9 @@
 use std::num::NonZeroU64;
 
-use bpaf::Bpaf;
-use serde::{Deserialize, Serialize};
 use biome_deserialize::StringSet;
 use biome_deserialize_macros::Partial;
+use bpaf::Bpaf;
+use serde::{Deserialize, Serialize};
 
 /// Limit the size of files to 1.0 MiB by default
 pub const DEFAULT_FILE_SIZE_LIMIT: NonZeroU64 =

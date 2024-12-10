@@ -2456,6 +2456,7 @@ version = "0.0.0"
 dependencies = [
  "biome_deserialize",
  "dashmap",
+ "futures",
  "ignore",
  "pg_configuration",
  "pg_console",

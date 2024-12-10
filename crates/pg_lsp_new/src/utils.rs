@@ -3,18 +3,16 @@ use pg_console::fmt::Termcolor;
 use pg_console::fmt::{self, Formatter};
 use pg_console::MarkupBuf;
 use pg_diagnostics::termcolor::NoColor;
-use pg_diagnostics::{
-    Diagnostic, DiagnosticTags, Location, PrintDescription, Severity, Visit
-};
+use pg_diagnostics::{Diagnostic, DiagnosticTags, Location, PrintDescription, Severity, Visit};
 use pg_lsp_converters::line_index::LineIndex;
 use pg_lsp_converters::{from_proto, to_proto, PositionEncoding};
-use text_size::{TextRange, TextSize};
 use pg_text_edit::{CompressedOp, DiffOp, TextEdit};
 use std::any::Any;
 use std::borrow::Cow;
 use std::fmt::{Debug, Display};
 use std::ops::{Add, Range};
 use std::{io, mem};
+use text_size::{TextRange, TextSize};
 use tower_lsp::jsonrpc::Error as LspError;
 use tower_lsp::lsp_types;
 use tower_lsp::lsp_types::{self as lsp, CodeDescription, Url};
@@ -441,4 +439,3 @@ line 7 new";
         assert_eq!(output, expected);
     }
 }
-

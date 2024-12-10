@@ -3,8 +3,8 @@
 
 use std::mem;
 
-use text_size::TextSize;
 use rustc_hash::FxHashMap;
+use text_size::TextSize;
 
 use crate::{LineCol, WideChar, WideEncoding, WideLineCol};
 
@@ -142,4 +142,3 @@ impl LineIndex {
         col.into()
     }
 }
-

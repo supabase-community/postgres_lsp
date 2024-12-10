@@ -1,8 +1,17 @@
-use std::{num::NonZeroU64, path::{Path, PathBuf}, sync::{RwLock, RwLockReadGuard, RwLockWriteGuard}};
 use biome_deserialize::StringSet;
+use std::{
+    num::NonZeroU64,
+    path::{Path, PathBuf},
+    sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
+};
 
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
-use pg_configuration::{database::{DatabaseConfiguration, PartialDatabaseConfiguration}, diagnostics::InvalidIgnorePattern, files::FilesConfiguration, ConfigurationDiagnostic, PartialConfiguration};
+use pg_configuration::{
+    database::{DatabaseConfiguration, PartialDatabaseConfiguration},
+    diagnostics::InvalidIgnorePattern,
+    files::FilesConfiguration,
+    ConfigurationDiagnostic, PartialConfiguration,
+};
 use pg_fs::FileSystem;
 
 use crate::{matcher::Matcher, DynRef, WorkspaceError};
@@ -42,7 +51,6 @@ impl<'a> AsRef<Settings> for SettingsHandle<'a> {
     }
 }
 
-
 impl<'a> SettingsHandleMut<'a> {
     pub(crate) fn new(settings: &'a RwLock<Settings>) -> Self {
         Self {
@@ -57,7 +65,6 @@ impl<'a> AsMut<Settings> for SettingsHandleMut<'a> {
     }
 }
 
-
 impl Settings {
     /// The [PartialConfiguration] is merged into the workspace
     #[tracing::instrument(level = "trace", skip(self))]
@@ -66,7 +73,7 @@ impl Settings {
         configuration: PartialConfiguration,
         working_directory: Option<PathBuf>,
         vcs_path: Option<PathBuf>,
-        gitignore_matches: &[String]
+        gitignore_matches: &[String],
     ) -> Result<(), WorkspaceError> {
         // Filesystem settings
         if let Some(files) = to_file_settings(
@@ -172,7 +179,7 @@ pub struct DatabaseSettings {
     pub port: u16,
     pub username: String,
     pub password: String,
-    pub database: String
+    pub database: String,
 }
 
 impl Default for DatabaseSettings {
@@ -204,7 +211,7 @@ impl From<PartialDatabaseConfiguration> for DatabaseSettings {
             port: value.port.unwrap_or(d.port),
             username: value.username.unwrap_or(d.username),
             password: value.password.unwrap_or(d.password),
-            database: value.database.unwrap_or(d.database)
+            database: value.database.unwrap_or(d.database),
         }
     }
 }
@@ -236,11 +243,10 @@ impl Default for FilesSettings {
             max_size: DEFAULT_FILE_SIZE_LIMIT,
             ignored_files: Matcher::empty(),
             included_files: Matcher::empty(),
-            git_ignore: None
+            git_ignore: None,
         }
     }
 }
-
 
 pub trait PartialConfigurationExt {
     fn retrieve_gitignore_matches(
@@ -294,5 +300,3 @@ impl PartialConfigurationExt for PartialConfiguration {
         Ok((None, vec![]))
     }
 }
-
-

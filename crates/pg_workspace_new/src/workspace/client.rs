@@ -7,9 +7,7 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
-use super::{
-     CloseFileParams, GetFileContentParams, IsPathIgnoredParams, OpenFileParams
-};
+use super::{CloseFileParams, GetFileContentParams, IsPathIgnoredParams, OpenFileParams};
 
 pub struct WorkspaceClient<T> {
     transport: T,

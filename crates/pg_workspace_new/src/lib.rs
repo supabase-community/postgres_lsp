@@ -3,27 +3,26 @@ use std::ops::{Deref, DerefMut};
 use pg_console::Console;
 use pg_fs::{FileSystem, OsFileSystem};
 
+pub mod configuration;
+pub mod diagnostics;
+pub mod dome;
 pub mod matcher;
 pub mod settings;
 pub mod workspace;
-pub mod diagnostics;
-pub mod configuration;
-pub mod dome;
 
-pub use crate::diagnostics::{WorkspaceError, TransportError};
+pub use crate::diagnostics::{TransportError, WorkspaceError};
 pub use crate::workspace::Workspace;
 
 /// This is the main entrypoint of the application.
 pub struct App<'app> {
- /// A reference to the internal virtual file system
+    /// A reference to the internal virtual file system
     pub fs: DynRef<'app, dyn FileSystem>,
-/// A reference to the internal workspace
+    /// A reference to the internal workspace
     pub workspace: WorkspaceRef<'app>,
-  /// A reference to the internal console, where its buffer will be used to write messages and
+    /// A reference to the internal console, where its buffer will be used to write messages and
     /// errors
     pub console: &'app mut dyn Console,
 }
-
 
 impl<'app> App<'app> {
     pub fn with_console(console: &'app mut dyn Console) -> Self {

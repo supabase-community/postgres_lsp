@@ -1,8 +1,8 @@
 use crate::logging::LoggingKind;
 use crate::LoggingLevel;
+use bpaf::Bpaf;
 use pg_configuration::ConfigurationPathHint;
 use pg_diagnostics::Severity;
-use bpaf::Bpaf;
 use std::fmt::{Display, Formatter};
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -127,7 +127,6 @@ pub enum CliReporter {
     Junit,
     /// Reports linter diagnostics using the [GitLab Code Quality report](https://docs.gitlab.com/ee/ci/testing/code_quality.html#implement-a-custom-tool).
     GitLab,
-
 }
 
 impl CliReporter {
@@ -229,4 +228,3 @@ impl From<MaxDiagnostics> for u32 {
         }
     }
 }
-

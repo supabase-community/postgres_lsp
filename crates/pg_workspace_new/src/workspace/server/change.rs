@@ -1,4 +1,4 @@
-use std::ops::{Sub, Add};
+use std::ops::{Add, Sub};
 use text_size::{TextLen, TextRange, TextSize};
 
 use crate::workspace::{ChangeFileParams, ChangeParams};
@@ -426,9 +426,9 @@ mod tests {
 
         assert!(ranges.len() == d.statements.len());
 
-        assert!(ranges.iter().all(|r| {
-            d.statements.iter().any(|(_, stmt_range)| stmt_range == r)
-        }));
+        assert!(ranges
+            .iter()
+            .all(|r| { d.statements.iter().any(|(_, stmt_range)| stmt_range == r) }));
     }
 
     #[test]

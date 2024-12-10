@@ -1,12 +1,12 @@
 use std::io;
 
 use pg_console::{fmt, markup, MarkupBuf};
-use text_size::{TextSize, TextRange};
 use pg_text_edit::TextEdit;
 use serde::{
     de::{self, SeqAccess},
     Deserialize, Deserializer, Serialize, Serializer,
 };
+use text_size::{TextRange, TextSize};
 
 use crate::{
     diagnostic::internal::AsDiagnostic, diagnostic::DiagnosticTag, Advices as _, Backtrace,
@@ -358,8 +358,8 @@ impl<'de> Deserialize<'de> for DiagnosticTags {
 mod tests {
     use std::io;
 
-    use text_size::{TextRange, TextSize};
     use serde_json::{from_value, json, to_value, Value};
+    use text_size::{TextRange, TextSize};
 
     use crate::{
         self as pg_diagnostics, {Advices, LogCategory, Visit},

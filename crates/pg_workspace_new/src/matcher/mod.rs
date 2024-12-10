@@ -1,8 +1,8 @@
 pub mod pattern;
 
+pub use pattern::{MatchOptions, Pattern, PatternError};
 use pg_console::markup;
 use pg_diagnostics::Diagnostic;
-pub use pattern::{MatchOptions, Pattern, PatternError};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::RwLock;
@@ -197,4 +197,3 @@ mod test {
         assert!(result);
     }
 }
-

@@ -1,8 +1,8 @@
 //! This is the main binary
 
 use pg_cli::{
-    pg_lsp_command, open_transport, setup_panic_handler, to_color_mode, PgLspCommand, CliDiagnostic,
-    CliSession,
+    open_transport, pg_lsp_command, setup_panic_handler, to_color_mode, CliDiagnostic, CliSession,
+    PgLspCommand,
 };
 use pg_console::{markup, ConsoleExt, EnvConsole};
 use pg_diagnostics::{set_bottom_frame, Diagnostic, PrintDiagnostic};
@@ -66,4 +66,3 @@ fn run_workspace(console: &mut EnvConsole, command: PgLspCommand) -> Result<(), 
     let session = CliSession::new(&*workspace, console)?;
     session.run(command)
 }
-

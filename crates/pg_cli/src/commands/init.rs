@@ -20,4 +20,3 @@ Welcome to the Postgres Language Server! Let's get you started...
     });
     Ok(())
 }
-

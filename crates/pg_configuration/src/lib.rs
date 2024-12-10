@@ -3,21 +3,23 @@
 //! The configuration is divided by "tool", and then it's possible to further customise it
 //! by language. The language might further options divided by tool.
 
-pub mod files;
-pub mod diagnostics;
-pub mod vcs;
 pub mod database;
+pub mod diagnostics;
+pub mod files;
+pub mod vcs;
 
 pub use crate::diagnostics::ConfigurationDiagnostic;
 
 use std::path::PathBuf;
 
 use crate::vcs::{partial_vcs_configuration, PartialVcsConfiguration, VcsConfiguration};
+use biome_deserialize_macros::Partial;
 use bpaf::Bpaf;
-use database::{partial_database_configuration, DatabaseConfiguration, PartialDatabaseConfiguration};
+use database::{
+    partial_database_configuration, DatabaseConfiguration, PartialDatabaseConfiguration,
+};
 use files::{partial_files_configuration, FilesConfiguration, PartialFilesConfiguration};
 use serde::{Deserialize, Serialize};
-use biome_deserialize_macros::Partial;
 use vcs::VcsClientKind;
 
 pub const VERSION: &str = match option_env!("PGLSP_VERSION") {
@@ -50,7 +52,6 @@ pub struct Configuration {
     pub db: DatabaseConfiguration,
 }
 
-
 impl PartialConfiguration {
     /// Returns the initial configuration.
     pub fn init() -> Self {
@@ -65,11 +66,16 @@ impl PartialConfiguration {
                 use_ignore_file: Some(false),
                 ..Default::default()
             }),
-            db: Some(Default::default()),
+            db: Some(PartialDatabaseConfiguration {
+                host: Some("127.0.0.1".to_string()),
+                port: Some(5432),
+                username: Some("postgres".to_string()),
+                password: Some("postgres".to_string()),
+                database: Some("postgres".to_string()),
+            }),
         }
     }
 }
-
 
 pub struct ConfigurationPayload {
     /// The result of the deserialization
@@ -109,4 +115,3 @@ impl ConfigurationPathHint {
         matches!(self, Self::FromLsp(_))
     }
 }
-

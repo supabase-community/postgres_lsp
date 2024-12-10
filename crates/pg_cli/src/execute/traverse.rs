@@ -1,19 +1,17 @@
 use super::process_file::{process_file, DiffKind, FileStatus, Message};
 use super::{Execution, TraversalMode};
 use crate::cli_options::CliOptions;
-use crate::execute::diagnostics::{
-    PanicDiagnostic,
-};
+use crate::execute::diagnostics::PanicDiagnostic;
 use crate::reporter::TraversalSummary;
 use crate::{CliDiagnostic, CliSession};
+use crossbeam::channel::{unbounded, Receiver, Sender};
 use pg_diagnostics::DiagnosticTags;
 use pg_diagnostics::{DiagnosticExt, Error, Resource, Severity};
-use pg_fs::{PgLspPath, FileSystem, PathInterner};
+use pg_fs::{FileSystem, PathInterner, PgLspPath};
 use pg_fs::{TraversalContext, TraversalScope};
 use pg_workspace_new::dome::Dome;
 use pg_workspace_new::workspace::IsPathIgnoredParams;
 use pg_workspace_new::{Workspace, WorkspaceError};
-use crossbeam::channel::{unbounded, Receiver, Sender};
 use rustc_hash::FxHashSet;
 use std::collections::BTreeSet;
 use std::sync::atomic::AtomicU32;
@@ -376,8 +374,7 @@ impl<'ctx> DiagnosticsPrinter<'ctx> {
                         let should_print = self.should_print();
 
                         if should_print {
-                            let diag =
-                                diag.with_file_path(&name).with_file_source_code(&content);
+                            let diag = diag.with_file_path(&name).with_file_source_code(&content);
                             diagnostics_to_print.push(diag)
                         }
                     }
@@ -469,7 +466,7 @@ impl<'ctx, 'app> TraversalContext for TraversalOptions<'ctx, 'app> {
             let can_handle = !self
                 .workspace
                 .is_path_ignored(IsPathIgnoredParams {
-                    pglsp_path: pglsp_path.clone()
+                    pglsp_path: pglsp_path.clone(),
                 })
                 .unwrap_or_else(|err| {
                     self.push_diagnostic(err.into());
@@ -484,7 +481,7 @@ impl<'ctx, 'app> TraversalContext for TraversalOptions<'ctx, 'app> {
         }
 
         match self.execution.traversal_mode() {
-            TraversalMode::Dummy { .. } => true
+            TraversalMode::Dummy { .. } => true,
         }
     }
 
@@ -545,4 +542,3 @@ fn handle_file(ctx: &TraversalOptions, path: &PgLspPath) {
         }
     }
 }
-

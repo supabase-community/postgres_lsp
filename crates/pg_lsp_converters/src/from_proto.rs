@@ -39,4 +39,3 @@ pub fn text_range(
     let end = offset(line_index, range.end, position_encoding)?;
     Ok(TextRange::new(start, end))
 }
-

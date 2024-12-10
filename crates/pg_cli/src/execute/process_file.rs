@@ -43,7 +43,7 @@ pub(crate) enum Message {
         content: String,
         diagnostics: Vec<Error>,
         skipped_diagnostics: u32,
-    }
+    },
 }
 
 impl Message {
@@ -120,4 +120,3 @@ pub(crate) fn process_file(ctx: &TraversalOptions, pglsp_path: &PgLspPath) -> Fi
         }
     })
 }
-

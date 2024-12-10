@@ -45,4 +45,3 @@ fn panic_handler(info: &PanicHookInfo) {
     // want to ensure the error has at least been logged to stderr beforehand
     tracing::error!("{error}");
 }
-

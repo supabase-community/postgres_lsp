@@ -15,7 +15,7 @@ mod server;
 pub struct OpenFileParams {
     pub path: PgLspPath,
     pub content: String,
-    pub version: i32
+    pub version: i32,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -39,16 +39,13 @@ pub struct ChangeParams {
 
 impl ChangeParams {
     pub fn overwrite(text: String) -> Self {
-        Self {
-            range: None,
-            text,
-        }
+        Self { range: None, text }
     }
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct IsPathIgnoredParams {
-    pub pglsp_path: PgLspPath
+    pub pglsp_path: PgLspPath,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -138,7 +135,11 @@ impl<'app, W: Workspace + ?Sized> FileGuard<'app, W> {
         Ok(Self { workspace, path })
     }
 
-    pub fn change_file(&self, version: i32, changes: Vec<ChangeParams>) -> Result<(), WorkspaceError> {
+    pub fn change_file(
+        &self,
+        version: i32,
+        changes: Vec<ChangeParams>,
+    ) -> Result<(), WorkspaceError> {
         self.workspace.change_file(ChangeFileParams {
             path: self.path.clone(),
             version,
@@ -250,4 +251,3 @@ impl<'app, W: Workspace + ?Sized> Drop for FileGuard<'app, W> {
             .ok();
     }
 }
-

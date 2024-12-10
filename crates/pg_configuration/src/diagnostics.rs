@@ -1,8 +1,8 @@
+use pg_console::fmt::Display;
+use pg_console::{markup, MarkupBuf};
+use pg_diagnostics::{Advices, Diagnostic, Error, LogCategory, MessageAndDescription, Visit};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Formatter};
-use pg_console::fmt::Display;
-use pg_diagnostics::{Advices, Diagnostic, Error, LogCategory, MessageAndDescription, Visit};
-use pg_console::{markup, MarkupBuf};
 
 /// Series of errors that can be thrown while computing the configuration.
 #[derive(Deserialize, Diagnostic, Serialize)]
@@ -23,10 +23,11 @@ pub enum ConfigurationDiagnostic {
     InvalidIgnorePattern(InvalidIgnorePattern),
 }
 
-
 impl ConfigurationDiagnostic {
     pub fn new_deserialization_error(error: toml::de::Error) -> Self {
-        Self::DeserializationError(DeserializationError {message: error.message().to_string()})
+        Self::DeserializationError(DeserializationError {
+            message: error.message().to_string(),
+        })
     }
 
     pub fn new_serialization_error() -> Self {
@@ -109,7 +110,7 @@ impl Advices for ConfigurationAdvices {
 pub struct DeserializationError {
     #[message]
     #[description]
-    pub message: String
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Diagnostic)]

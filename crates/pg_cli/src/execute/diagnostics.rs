@@ -1,7 +1,5 @@
 use pg_diagnostics::adapters::{IoError, StdError};
-use pg_diagnostics::{
-    Category, Diagnostic, DiagnosticExt, DiagnosticTags, Error
-};
+use pg_diagnostics::{Category, Diagnostic, DiagnosticExt, DiagnosticTags, Error};
 use std::io;
 
 #[derive(Debug, Diagnostic)]
@@ -72,4 +70,3 @@ impl<T> ResultIoExt for io::Result<T> {
         self.map_err(|error| IoError::from(error).with_file_path(file_path))
     }
 }
-

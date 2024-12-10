@@ -37,4 +37,3 @@ pub fn range(
     let end = position(line_index, range.end(), position_encoding)?;
     Ok(lsp_types::Range::new(start, end))
 }
-

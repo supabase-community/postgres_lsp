@@ -19,7 +19,7 @@ impl From<WorkspaceError> for LspError {
 }
 
 impl From<pg_diagnostics::Error> for LspError {
-    fn from(value:pg_diagnostics::Error) -> Self {
+    fn from(value: pg_diagnostics::Error) -> Self {
         Self::Error(value)
     }
 }
@@ -54,8 +54,7 @@ pub(crate) async fn handle_lsp_error<T>(
     match err {
         LspError::WorkspaceError(err) => match err {
             // diagnostics that shouldn't raise an hard error, but send a message to the user
-             WorkspaceError::FileIgnored(_)
-            | WorkspaceError::FileTooLarge(_) => {
+            WorkspaceError::FileIgnored(_) | WorkspaceError::FileTooLarge(_) => {
                 let message = format!("{err}");
                 client.log_message(MessageType::WARNING, message).await;
                 Ok(None)
@@ -75,4 +74,3 @@ pub(crate) async fn handle_lsp_error<T>(
         }
     }
 }
-

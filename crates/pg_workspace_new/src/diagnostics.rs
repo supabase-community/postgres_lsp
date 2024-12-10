@@ -11,6 +11,7 @@ use std::error::Error;
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
 use std::process::{ExitCode, Termination};
+use tokio::task::JoinError;
 
 /// Generic errors thrown during operations
 #[derive(Deserialize, Diagnostic, Serialize)]
@@ -36,7 +37,9 @@ pub enum WorkspaceError {
     /// Diagnostic raised when a file is protected
     ProtectedFile(ProtectedFile),
     /// Raised when there's an issue around the VCS integration
-    Vcs(VcsDiagnostic)
+    Vcs(VcsDiagnostic),
+    /// Error in the async runtime
+    RuntimeError(RuntimeError),
 }
 
 impl WorkspaceError {
@@ -174,6 +177,24 @@ pub struct DisabledVcs {}
 
 #[derive(Debug, Diagnostic, Serialize, Deserialize)]
 #[diagnostic(
+    category = "internalError/runtime",
+    severity = Error,
+    message = "An error occurred in the async runtime."
+)]
+pub struct RuntimeError {
+    message: String,
+}
+
+impl From<JoinError> for WorkspaceError {
+    fn from(err: JoinError) -> Self {
+        Self::RuntimeError(RuntimeError {
+            message: err.to_string(),
+        })
+    }
+}
+
+#[derive(Debug, Diagnostic, Serialize, Deserialize)]
+#[diagnostic(
     category = "internalError/fs",
     severity = Error,
     message(
@@ -213,7 +234,7 @@ impl From<sqlx::Error> for WorkspaceError {
         } else {
             Self::DatabaseConnectionError(DatabaseConnectionError {
                 message: err.to_string(),
-                code: None
+                code: None,
             })
         }
     }

@@ -36,10 +36,10 @@ impl Document {
         let mut id_generator = IdGenerator::new();
 
         let statements: Vec<StatementPosition> = pg_statement_splitter::split(&content)
-                .ranges
-                .iter()
-                .map(|r| (id_generator.next(), *r))
-                .collect();
+            .ranges
+            .iter()
+            .map(|r| (id_generator.next(), *r))
+            .collect();
 
         Self {
             path,
@@ -53,16 +53,24 @@ impl Document {
 
     pub fn debug_statements(&self) {
         for (id, range) in self.statements.iter() {
-            tracing::info!("Document::debug_statements: statement: id: {}, range: {:?}, text: {:?}", id, range, &self.content[*range]);
+            tracing::info!(
+                "Document::debug_statements: statement: id: {}, range: {:?}, text: {:?}",
+                id,
+                range,
+                &self.content[*range]
+            );
         }
     }
 
-     pub fn get_statements(&self) -> &[StatementPosition] {
+    pub fn get_statements(&self) -> &[StatementPosition] {
         &self.statements
     }
 
     pub fn statement_refs(&self) -> Vec<StatementRef> {
-        self.statements.iter().map(|inner_ref| self.statement_ref(inner_ref)).collect()
+        self.statements
+            .iter()
+            .map(|inner_ref| self.statement_ref(inner_ref))
+            .collect()
     }
 
     /// Returns the statement ref at the given offset

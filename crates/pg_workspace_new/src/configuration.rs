@@ -1,6 +1,13 @@
-use std::{ffi::OsStr, io::ErrorKind, iter::FusedIterator, path::{Path, PathBuf}};
+use std::{
+    ffi::OsStr,
+    io::ErrorKind,
+    iter::FusedIterator,
+    path::{Path, PathBuf},
+};
 
-use pg_configuration::{ConfigurationPathHint, ConfigurationPayload, PartialConfiguration, ConfigurationDiagnostic};
+use pg_configuration::{
+    ConfigurationDiagnostic, ConfigurationPathHint, ConfigurationPayload, PartialConfiguration,
+};
 use pg_diagnostics::{Error, Severity};
 use pg_fs::{AutoSearchResult, ConfigName, FileSystem, OpenOptions};
 
@@ -19,7 +26,6 @@ pub struct LoadedConfiguration {
     /// The Deserialized configuration
     pub configuration: PartialConfiguration,
 }
-
 
 impl LoadedConfiguration {
     /// Return the path of the **directory** where the configuration is
@@ -93,9 +99,8 @@ fn load_config(
         if file_system.path_is_file(config_file_path) {
             let content = file_system.read_file_from_path(config_file_path)?;
 
-            let deserialized = toml::from_str::<PartialConfiguration>(&content).map_err(|err| {
-                ConfigurationDiagnostic::new_deserialization_error(err)
-            })?;
+            let deserialized = toml::from_str::<PartialConfiguration>(&content)
+                .map_err(|err| ConfigurationDiagnostic::new_deserialization_error(err))?;
 
             return Ok(Some(ConfigurationPayload {
                 deserialized,
@@ -116,16 +121,15 @@ fn load_config(
     };
 
     // We first search for `pgtoml.json`
-    if let Some(auto_search_result) =  file_system.auto_search(
+    if let Some(auto_search_result) = file_system.auto_search(
         &configuration_directory,
         ConfigName::file_names().as_slice(),
         should_error,
     )? {
         let AutoSearchResult { content, file_path } = auto_search_result;
 
-        let deserialized = toml::from_str::<PartialConfiguration>(&content).map_err(|err| {
-            ConfigurationDiagnostic::new_deserialization_error(err)
-        })?;
+        let deserialized = toml::from_str::<PartialConfiguration>(&content)
+            .map_err(|err| ConfigurationDiagnostic::new_deserialization_error(err))?;
 
         Ok(Some(ConfigurationPayload {
             deserialized,
@@ -146,7 +150,7 @@ fn load_config(
 /// - the program doesn't have the write rights
 pub fn create_config(
     fs: &mut DynRef<dyn FileSystem>,
-    configuration: PartialConfiguration
+    configuration: PartialConfiguration,
 ) -> Result<(), WorkspaceError> {
     let path = PathBuf::from(ConfigName::pglsp_toml());
 
@@ -173,4 +177,3 @@ pub fn create_config(
 
     Ok(())
 }
-

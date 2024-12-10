@@ -20,6 +20,7 @@ define_categories! {
     "configuration",
     "database/connection",
     "internalError/io",
+    "internalError/runtime",
     "internalError/fs",
     "flags/invalid",
     "project",

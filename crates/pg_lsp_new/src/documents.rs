@@ -17,4 +17,3 @@ impl Document {
         }
     }
 }
-

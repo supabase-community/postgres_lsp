@@ -6,11 +6,11 @@ use std::path::{Path, PathBuf};
 use std::str;
 use std::sync::Arc;
 
-use pg_diagnostics::{Error, Severity};
 use parking_lot::{lock_api::ArcMutexGuard, Mutex, RawMutex, RwLock};
+use pg_diagnostics::{Error, Severity};
 
 use crate::fs::OpenOptions;
-use crate::{PgLspPath, FileSystem, TraversalContext, TraversalScope};
+use crate::{FileSystem, PgLspPath, TraversalContext, TraversalScope};
 
 use super::{BoxedTraversal, ErrorKind, File, FileSystemDiagnostic};
 
@@ -341,11 +341,11 @@ mod tests {
         path::{Path, PathBuf},
     };
 
-    use pg_diagnostics::Error;
     use parking_lot::Mutex;
+    use pg_diagnostics::Error;
 
     use crate::{fs::FileSystemExt, OpenOptions};
-    use crate::{PgLspPath, FileSystem, MemoryFileSystem, PathInterner, TraversalContext};
+    use crate::{FileSystem, MemoryFileSystem, PathInterner, PgLspPath, TraversalContext};
 
     #[test]
     fn fs_read_only() {

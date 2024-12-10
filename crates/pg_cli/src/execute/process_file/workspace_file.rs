@@ -1,7 +1,7 @@
 use crate::execute::diagnostics::{ResultExt, ResultIoExt};
 use crate::execute::process_file::SharedTraversalOptions;
 use pg_diagnostics::{category, Error};
-use pg_fs::{PgLspPath, File, OpenOptions};
+use pg_fs::{File, OpenOptions, PgLspPath};
 use pg_workspace_new::workspace::{ChangeParams, FileGuard, OpenFileParams};
 use pg_workspace_new::{Workspace, WorkspaceError};
 use std::ffi::OsStr;
@@ -70,9 +70,10 @@ impl<'ctx, 'app> WorkspaceFile<'ctx, 'app> {
         self.file
             .set_content(new_content.as_bytes())
             .with_file_path(self.path.display().to_string())?;
-        self.guard
-            .change_file(self.file.file_version(), vec![ChangeParams::overwrite(new_content)])?;
+        self.guard.change_file(
+            self.file.file_version(),
+            vec![ChangeParams::overwrite(new_content)],
+        )?;
         Ok(())
     }
 }
-

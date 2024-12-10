@@ -1051,4 +1051,3 @@ mod test {
         assert!(!pattern.matches_path(Path::new("baz.js")));
     }
 }
-

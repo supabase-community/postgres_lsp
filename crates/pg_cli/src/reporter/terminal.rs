@@ -185,4 +185,3 @@ impl<'a> fmt::Display for ConsoleTraversalSummary<'a> {
         Ok(())
     }
 }
-

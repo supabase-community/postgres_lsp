@@ -231,4 +231,3 @@ async fn run_server(connection: ServerConnection, stream: UnixStream) {
     let (read, write) = stream.into_split();
     connection.accept(read, write).await;
 }
-

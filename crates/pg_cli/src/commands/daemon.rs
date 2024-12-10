@@ -277,4 +277,3 @@ impl<S> Filter<S> for LoggingFilter {
         Some(SELF_FILTER)
     }
 }
-

@@ -116,4 +116,3 @@ impl FromStr for VcsClientKind {
         }
     }
 }
-

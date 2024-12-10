@@ -5,3 +5,10 @@ use_ignore_file = false
 
 [files]
 ignore = []
+
+[db]
+host = "127.0.0.1"
+port = 54322
+username = "postgres"
+password = "postgres"
+database = "postgres"

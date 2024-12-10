@@ -1,9 +1,9 @@
 use crate::{DiagnosticsPayload, Execution, Reporter, ReporterVisitor, TraversalSummary};
+use path_absolutize::Absolutize;
 use pg_console::fmt::{Display, Formatter};
 use pg_console::{markup, Console, ConsoleExt};
 use pg_diagnostics::display::SourceFile;
 use pg_diagnostics::{Error, PrintDescription, Resource, Severity};
-use path_absolutize::Absolutize;
 use serde::Serialize;
 use std::sync::RwLock;
 use std::{
@@ -243,4 +243,3 @@ fn calculate_hash<T: Hash>(t: &T) -> u64 {
     t.hash(&mut s);
     s.finish()
 }
-

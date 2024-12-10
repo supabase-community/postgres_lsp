@@ -311,4 +311,3 @@ impl AsyncWrite for ServerWriteHalf {
         self.poll_flush(cx)
     }
 }
-

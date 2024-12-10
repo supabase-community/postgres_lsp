@@ -1,6 +1,9 @@
 use pg_lsp_converters::{negotiated_encoding, PositionEncoding, WideEncoding};
 use tower_lsp::lsp_types::{
-    ClientCapabilities, CodeActionKind, CodeActionOptions, CodeActionProviderCapability, DocumentOnTypeFormattingOptions, OneOf, PositionEncodingKind, SaveOptions, ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions, TextDocumentSyncSaveOptions
+    ClientCapabilities, CodeActionKind, CodeActionOptions, CodeActionProviderCapability,
+    DocumentOnTypeFormattingOptions, OneOf, PositionEncodingKind, SaveOptions, ServerCapabilities,
+    TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions,
+    TextDocumentSyncSaveOptions,
 };
 
 /// The capabilities to send from server as part of [`InitializeResult`]

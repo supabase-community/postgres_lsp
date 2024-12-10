@@ -82,7 +82,7 @@ impl From<(bool, bool)> for VcsTargeted {
 #[derive(Debug, Clone)]
 pub enum TraversalMode {
     /// A dummy mode to be used when the CLI is not running any command
-    Dummy
+    Dummy,
 }
 
 impl Display for TraversalMode {
@@ -109,7 +109,7 @@ pub enum ReportMode {
 
 impl Default for ReportMode {
     fn default() -> Self {
-        Self::Terminal { }
+        Self::Terminal {}
     }
 }
 
@@ -300,4 +300,3 @@ pub fn execute_mode(
         }
     }
 }
-

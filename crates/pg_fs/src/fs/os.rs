@@ -3,7 +3,7 @@ use super::{BoxedTraversal, ErrorKind, File, FileSystemDiagnostic};
 use crate::fs::OpenOptions;
 use crate::{
     fs::{TraversalContext, TraversalScope},
-    PgLspPath, FileSystem,
+    FileSystem, PgLspPath,
 };
 use pg_diagnostics::{adapters::IoError, DiagnosticExt, Error, Severity};
 use rayon::{scope, Scope};

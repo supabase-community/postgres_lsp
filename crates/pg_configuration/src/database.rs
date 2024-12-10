@@ -20,7 +20,7 @@ pub struct DatabaseConfiguration {
     pub password: String,
 
     #[partial(bpaf(long("database")))]
-    pub database: String
+    pub database: String,
 }
 
 impl Default for DatabaseConfiguration {
@@ -43,4 +43,3 @@ impl DatabaseConfiguration {
         )
     }
 }
-

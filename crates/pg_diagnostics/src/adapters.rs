@@ -134,4 +134,3 @@ impl Diagnostic for SerdeJsonError {
         fmt.write_markup(markup!({ AsConsoleDisplay(&self.error) }))
     }
 }
-

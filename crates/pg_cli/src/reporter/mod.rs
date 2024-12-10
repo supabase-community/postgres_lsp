@@ -61,4 +61,3 @@ pub trait ReporterVisitor {
         payload: DiagnosticsPayload,
     ) -> io::Result<()>;
 }
-

@@ -119,4 +119,3 @@ impl<'a> ReporterVisitor for JunitReporterVisitor<'a> {
         Ok(())
     }
 }
-

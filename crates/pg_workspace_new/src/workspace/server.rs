@@ -1,4 +1,4 @@
-use std::{fs, panic::RefUnwindSafe, path::Path, sync::RwLock};
+use std::{fs, future::Future, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
 use change::StatementChange;
 use dashmap::{DashMap, DashSet};
@@ -7,8 +7,9 @@ use pg_fs::{ConfigName, PgLspPath};
 use pg_query::PgQueryStore;
 use pg_schema_cache::SchemaCache;
 use sqlx::PgPool;
+use std::sync::{LazyLock, OnceLock};
 use store::Store;
-use tokio::runtime::Runtime;
+use tokio::runtime::{Handle, Runtime};
 use tree_sitter::TreeSitterStore;
 
 use crate::{
@@ -17,8 +18,8 @@ use crate::{
 };
 
 use super::{
-    GetFileContentParams, IsPathIgnoredParams, OpenFileParams, ServerInfo,
-    UpdateSettingsParams, Workspace,
+    GetFileContentParams, IsPathIgnoredParams, OpenFileParams, ServerInfo, UpdateSettingsParams,
+    Workspace,
 };
 
 mod change;
@@ -34,22 +35,42 @@ struct DbConnection {
     connection_string: Option<String>,
 }
 
+// Global Tokio Runtime
+static RUNTIME: LazyLock<Runtime> =
+    LazyLock::new(|| Runtime::new().expect("Failed to create Tokio runtime"));
+
 impl DbConnection {
     pub(crate) fn is_connected_to(&self, connection_string: &str) -> bool {
-        self.connection_string.as_ref().is_some_and(|x| x == connection_string)
+        self.connection_string
+            .as_ref()
+            .is_some_and(|x| x == connection_string)
     }
 
     pub(crate) fn get_pool(&self) -> Option<PgPool> {
-        self.pool.as_ref().map(|p| p.clone())
+        self.pool.clone()
     }
 
     pub(crate) fn set_connection(&mut self, connection_string: &str) -> Result<(), WorkspaceError> {
-        if self.connection_string.is_none() || self.connection_string.as_ref().unwrap() != connection_string {
+        if self.connection_string.is_none()
+            || self.connection_string.as_ref().unwrap() != connection_string
+        {
             self.connection_string = Some(connection_string.to_string());
+
+            if let Some(pool) = self.pool.take() {
+                pool.close();
+            }
+
             self.pool = Some(PgPool::connect_lazy(connection_string)?);
         }
 
         Ok(())
+    }
+
+    pub(crate) fn close(&mut self) {
+        if let Some(pool) = self.pool.take() {
+            pool.close();
+        }
+        self.connection_string = None;
     }
 }
 
@@ -107,22 +128,34 @@ impl WorkspaceServer {
         SettingsHandleMut::new(&self.settings)
     }
 
-    fn refresh_db_connection(&self) {
+    fn refresh_db_connection(&self) -> Result<(), WorkspaceError> {
+        tracing::info!("Refreshing db connection4");
+
         let s = self.settings();
 
-        let mut conn = self.connection.write().unwrap();
+        tracing::info!("Acquiring connection lock");
 
-        conn.set_connection(&s.as_ref().db.to_connection_string());
+        let connection_string = s.as_ref().db.to_connection_string();
+        self.connection
+            .write()
+            .unwrap()
+            .set_connection(&connection_string)?;
 
-        self.reload_schema_cache();
+        self.reload_schema_cache()?;
+
+        tracing::info!("Db connection refreshed");
+
+        Ok(())
     }
 
     fn reload_schema_cache(&self) -> Result<(), WorkspaceError> {
+        tracing::info!("Reloading schema cache");
         // TODO return error if db connection is not available
         if let Some(c) = self.connection.read().unwrap().get_pool() {
-            let runtime = Runtime::new().unwrap();
-            // TODO load should return a Result
-            let schema_cache = runtime.block_on(SchemaCache::load(&c));
+            let schema_cache = run_async(async move {
+                // TODO load should return a Result
+                SchemaCache::load(&c).await
+            })?;
 
             let mut cache = self.schema_cache.write().unwrap();
             *cache = schema_cache;
@@ -130,6 +163,7 @@ impl WorkspaceServer {
             let mut cache = self.schema_cache.write().unwrap();
             *cache = SchemaCache::default();
         }
+        tracing::info!("Schema cache reloaded");
 
         Ok(())
     }
@@ -181,15 +215,18 @@ impl Workspace for WorkspaceServer {
     /// by another thread having previously panicked while holding the lock
     #[tracing::instrument(level = "trace", skip(self))]
     fn update_settings(&self, params: UpdateSettingsParams) -> Result<(), WorkspaceError> {
-        let mut settings = self.settings_mut();
-        settings.as_mut().merge_with_configuration(
+        tracing::info!("Updating settings in workspace");
+
+        self.settings_mut().as_mut().merge_with_configuration(
             params.configuration,
             params.workspace_directory,
             params.vcs_base_path,
             params.gitignore_matches.as_slice(),
         )?;
 
-        self.refresh_db_connection();
+        self.refresh_db_connection()?;
+
+        tracing::info!("Updated settings in workspace");
 
         Ok(())
     }
@@ -284,4 +321,16 @@ impl Workspace for WorkspaceServer {
 /// if it is a symlink that resolves to a directory.
 fn is_dir(path: &Path) -> bool {
     path.is_dir() || (path.is_symlink() && fs::read_link(path).is_ok_and(|path| path.is_dir()))
+}
+
+/// Use this function to run async functions in the workspace, which is a sync trait called from an
+/// async context.
+///
+/// Checkout https://greptime.com/blogs/2023-03-09-bridging-async-and-sync-rust for details.
+fn run_async<F, R>(future: F) -> Result<R, WorkspaceError>
+where
+    F: Future<Output = R> + Send + 'static,
+    R: Send + 'static,
+{
+    futures::executor::block_on(async { RUNTIME.spawn(future).await.map_err(|e| e.into()) })
 }

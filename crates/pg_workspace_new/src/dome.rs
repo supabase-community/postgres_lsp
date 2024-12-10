@@ -70,4 +70,3 @@ impl<'a> Iterator for DomeIterator<'a> {
 }
 
 impl<'a> FusedIterator for DomeIterator<'a> {}
-

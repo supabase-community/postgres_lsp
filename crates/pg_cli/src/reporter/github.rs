@@ -43,4 +43,3 @@ impl<'a> ReporterVisitor for GithubReporterVisitor<'a> {
         Ok(())
     }
 }
-

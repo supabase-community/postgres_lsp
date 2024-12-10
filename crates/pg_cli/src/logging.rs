@@ -171,4 +171,3 @@ impl FromStr for LoggingKind {
         }
     }
 }
-

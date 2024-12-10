@@ -1,6 +1,15 @@
-use std::{cmp::Ordering, ffi::OsStr, fs::read_to_string, ops::{Deref, DerefMut}, path::PathBuf, io, fs::File, io::Write};
 use enumflags2::{bitflags, BitFlags};
 use smallvec::SmallVec;
+use std::{
+    cmp::Ordering,
+    ffi::OsStr,
+    fs::read_to_string,
+    fs::File,
+    io,
+    io::Write,
+    ops::{Deref, DerefMut},
+    path::PathBuf,
+};
 
 use crate::ConfigName;
 
@@ -74,7 +83,6 @@ impl From<FileKind> for FileKinds {
         Self(BitFlags::from(flag))
     }
 }
-
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Default)]
 #[cfg_attr(
@@ -191,7 +199,6 @@ impl PgLspPath {
     pub fn is_to_inspect(&self) -> bool {
         self.kind.contains(FileKind::Inspectable)
     }
-
 }
 
 #[cfg(feature = "serde")]
@@ -204,4 +211,3 @@ impl schemars::JsonSchema for FileKinds {
         <Vec<FileKind>>::json_schema(gen)
     }
 }
-

@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use super::{change::ChangedStatement, document::{Statement, StatementRef}};
+use super::{
+    change::ChangedStatement,
+    document::{Statement, StatementRef},
+};
 
 pub(crate) trait Store<T> {
     fn fetch(&self, statement: &StatementRef) -> Option<Arc<T>>;

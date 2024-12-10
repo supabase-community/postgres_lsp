@@ -250,8 +250,8 @@ mod internal {
     use std::{fmt::Debug, io};
 
     use pg_console::{fmt, markup};
-    use text_size::TextRange;
     use pg_text_edit::TextEdit;
+    use text_size::TextRange;
 
     use crate::{
         diagnostic::internal::AsDiagnostic, Advices, Backtrace, Category, Diagnostic,

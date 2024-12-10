@@ -1,8 +1,8 @@
+pub mod diagnostics;
 mod lint;
 mod pg_query;
 mod tree_sitter;
 mod typecheck;
-pub mod diagnostics;
 
 use std::sync::{RwLock, RwLockWriteGuard};
 
@@ -185,7 +185,7 @@ mod tests {
     use pg_base_db::{Change, DocumentChange};
     use text_size::{TextRange, TextSize};
 
-    use crate::{Workspace, diagnostics::Diagnostic};
+    use crate::{diagnostics::Diagnostic, Workspace};
     use pg_fs::PgLspPath;
 
     #[test]

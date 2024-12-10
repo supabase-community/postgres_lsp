@@ -9,25 +9,25 @@ use pg_fs::OsFileSystem;
 use pg_workspace_new::{App, DynRef, Workspace, WorkspaceRef};
 use std::env;
 
-mod logging;
 mod cli_options;
 mod commands;
+mod diagnostics;
+mod execute;
+mod logging;
 mod metrics;
 mod panic;
-mod execute;
 mod reporter;
-mod diagnostics;
 mod service;
 
-use crate::commands::CommandRunner;
 use crate::cli_options::{CliOptions, ColorsArg};
+use crate::commands::CommandRunner;
+pub use crate::commands::{pg_lsp_command, PgLspCommand};
+pub use crate::logging::{setup_cli_subscriber, LoggingLevel};
+pub use diagnostics::CliDiagnostic;
 pub use execute::{execute_mode, Execution, TraversalMode, VcsTargeted};
 pub use panic::setup_panic_handler;
 pub use reporter::{DiagnosticsPayload, Reporter, ReporterVisitor, TraversalSummary};
-pub use crate::logging::{setup_cli_subscriber, LoggingLevel};
 pub use service::{open_transport, SocketTransport};
-pub use diagnostics::CliDiagnostic;
-pub use crate::commands::{pg_lsp_command, PgLspCommand};
 
 pub(crate) const VERSION: &str = match option_env!("PGLSP_VERSION") {
     Some(version) => version,
@@ -106,13 +106,3 @@ pub fn to_color_mode(color: Option<&ColorsArg>) -> ColorMode {
         None => ColorMode::Auto,
     }
 }
-
-pub(crate) fn run_command(
-    session: CliSession,
-    cli_options: &CliOptions,
-    mut command: impl CommandRunner,
-) -> Result<(), CliDiagnostic> {
-    let command = &mut command;
-    command.run(session, cli_options)
-}
-

@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
+use crate::{Diagnostic, Severity};
 use dashmap::DashMap;
 use pg_base_db::StatementRef;
-use crate::{Diagnostic, Severity};
 use pg_typecheck::{check_sql, PgSeverity, TypeError, TypecheckerParams};
 use text_size::TextRange;
 

@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
+use crate::{Diagnostic, Severity};
 use dashmap::DashMap;
 use pg_base_db::{ChangedStatement, StatementRef};
-use crate::{Diagnostic, Severity};
 use text_size::TextRange;
 
 pub struct PgQueryParser {

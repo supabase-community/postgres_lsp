@@ -3,7 +3,11 @@ use std::sync::{Arc, RwLock};
 use dashmap::DashMap;
 use tree_sitter::InputEdit;
 
-use super::{change::ChangedStatement, document::{Statement, StatementRef}, store::Store};
+use super::{
+    change::ChangedStatement,
+    document::{Statement, StatementRef},
+    store::Store,
+};
 
 pub struct TreeSitterStore {
     db: DashMap<StatementRef, Arc<tree_sitter::Tree>>,
@@ -159,4 +163,3 @@ fn edit_from_change(
         new_end_position,
     }
 }
-

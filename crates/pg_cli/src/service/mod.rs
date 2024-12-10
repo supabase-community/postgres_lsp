@@ -16,11 +16,11 @@ use std::{
 };
 
 use anyhow::{bail, ensure, Context, Error};
+use dashmap::DashMap;
 use pg_workspace_new::{
     workspace::{TransportRequest, WorkspaceTransport},
     TransportError,
 };
-use dashmap::DashMap;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::{
     from_slice, from_str, to_vec,
@@ -50,9 +50,7 @@ pub(crate) use self::windows::{
 #[cfg(unix)]
 mod unix;
 #[cfg(unix)]
-pub(crate) use self::unix::{
-    ensure_daemon, open_socket, print_socket, run_daemon,
-};
+pub(crate) use self::unix::{ensure_daemon, open_socket, print_socket, run_daemon};
 
 /// Tries to open a connection to a running daemon instance, returning a
 /// [WorkspaceTransport] instance if the socket is currently active
@@ -474,4 +472,3 @@ impl FromStr for TransportHeader {
         }
     }
 }
-
