@@ -1,0 +1,17 @@
+[package]
+name = "pg_lsp_converters"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+anyhow      = { workspace = true }
+rustc-hash  = { workspace = true }
+tower-lsp   = { version = "0.20.0" }
+text-size.workspace = true
+
+[dev-dependencies]
+
+[lib]
+doctest = false
+
+[features]

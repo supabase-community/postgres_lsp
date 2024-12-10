@@ -1,0 +1,12 @@
+[package]
+name = "pg_diagnostics_categories"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+schemars = { workspace = true, optional = true }
+serde    = { workspace = true, optional = true }
+
+[build-dependencies]
+quote = "1.0.14"
+

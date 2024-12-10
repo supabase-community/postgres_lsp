@@ -4,7 +4,7 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-text-size = "1.1.1"
+text-size.workspace = true
 pg_query_ext.workspace = true
 pg_schema_cache.workspace = true
 pg_syntax.workspace = true

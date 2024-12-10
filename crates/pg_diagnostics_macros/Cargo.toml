@@ -1,0 +1,17 @@
+[package]
+name = "pg_diagnostics_macros"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro-error = { version = "1.0.4", default-features = false }
+proc-macro2      = { workspace = true }
+quote            = { workspace = true }
+syn              = { workspace = true }
+
+[dev-dependencies]
+
+[features]

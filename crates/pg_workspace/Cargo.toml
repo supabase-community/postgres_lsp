@@ -10,7 +10,6 @@ async-std = "1.12.0"
 
 pg_base_db.workspace =  true
 pg_fs.workspace =  true
-pg_diagnostics.workspace =  true
 pg_query_ext.workspace =  true
 pg_lint.workspace =  true
 pg_syntax.workspace =  true

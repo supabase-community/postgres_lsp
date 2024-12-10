@@ -162,10 +162,10 @@ impl Document {
 #[cfg(test)]
 mod tests {
 
-    use text_size::{TextRange, TextSize};
     use pg_fs::PgLspPath;
+    use text_size::{TextRange, TextSize};
 
-    use crate::{Document};
+    use crate::Document;
 
     #[test]
     fn test_statements_at_range() {
