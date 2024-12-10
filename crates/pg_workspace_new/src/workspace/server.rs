@@ -55,22 +55,10 @@ impl DbConnection {
             || self.connection_string.as_ref().unwrap() != connection_string
         {
             self.connection_string = Some(connection_string.to_string());
-
-            if let Some(pool) = self.pool.take() {
-                pool.close();
-            }
-
             self.pool = Some(PgPool::connect_lazy(connection_string)?);
         }
 
         Ok(())
-    }
-
-    pub(crate) fn close(&mut self) {
-        if let Some(pool) = self.pool.take() {
-            pool.close();
-        }
-        self.connection_string = None;
     }
 }
 
@@ -129,11 +117,7 @@ impl WorkspaceServer {
     }
 
     fn refresh_db_connection(&self) -> Result<(), WorkspaceError> {
-        tracing::info!("Refreshing db connection4");
-
         let s = self.settings();
-
-        tracing::info!("Acquiring connection lock");
 
         let connection_string = s.as_ref().db.to_connection_string();
         self.connection
@@ -142,8 +126,6 @@ impl WorkspaceServer {
             .set_connection(&connection_string)?;
 
         self.reload_schema_cache()?;
-
-        tracing::info!("Db connection refreshed");
 
         Ok(())
     }
