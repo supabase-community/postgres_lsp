@@ -192,7 +192,7 @@ mod tests {
     use pg_base_db::{Change, DocumentChange};
     use text_size::{TextRange, TextSize};
 
-    use crate::{diagnostics::Diagnostic, Workspace};
+    use crate::{diagnostics::{Diagnostic, Severity}, Workspace};
     use pg_fs::PgLspPath;
 
     #[test]
@@ -396,7 +396,7 @@ mod tests {
             Diagnostic {
                 message: "Dropping a column may break existing clients.".to_string(),
                 description: None,
-                severity: pg_diagnostics::Severity::Warning,
+                severity: Severity::Warning,
                 source: "lint".to_string(),
                 range: TextRange::new(TextSize::new(50), TextSize::new(64)),
             }
