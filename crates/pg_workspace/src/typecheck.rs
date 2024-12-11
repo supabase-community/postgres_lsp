@@ -1,13 +1,19 @@
 use std::sync::Arc;
 
+use crate::{Diagnostic, Severity};
 use dashmap::DashMap;
 use pg_base_db::StatementRef;
-use pg_diagnostics::{Diagnostic, Severity};
 use pg_typecheck::{check_sql, PgSeverity, TypeError, TypecheckerParams};
 use text_size::TextRange;
 
 pub struct Typechecker {
     errors: DashMap<StatementRef, Arc<Vec<TypeError>>>,
+}
+
+impl Default for Typechecker {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Typechecker {

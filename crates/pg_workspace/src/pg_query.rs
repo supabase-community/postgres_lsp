@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
+use crate::{Diagnostic, Severity};
 use dashmap::DashMap;
 use pg_base_db::{ChangedStatement, StatementRef};
-use pg_diagnostics::{Diagnostic, Severity};
 use text_size::TextRange;
 
 pub struct PgQueryParser {
@@ -10,6 +10,12 @@ pub struct PgQueryParser {
     native_diagnostics: DashMap<StatementRef, Arc<pg_query_ext::Error>>,
     enriched_ast_db: DashMap<StatementRef, Arc<pg_syntax::AST>>,
     cst_db: DashMap<StatementRef, Arc<pg_syntax::CST>>,
+}
+
+impl Default for PgQueryParser {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl PgQueryParser {

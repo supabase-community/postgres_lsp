@@ -151,8 +151,8 @@ fn node_handlers(nodes: &[Node]) -> Vec<TokenStream> {
     nodes
         .iter()
         .map(|node| {
-            let string_property_handlers = string_property_handlers(&node);
-            let custom_handlers = custom_handlers(&node);
+            let string_property_handlers = string_property_handlers(node);
+            let custom_handlers = custom_handlers(node);
             quote! {
                 #custom_handlers
                 #(#string_property_handlers)*

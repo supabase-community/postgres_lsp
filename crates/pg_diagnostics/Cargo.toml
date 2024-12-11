@@ -4,11 +4,25 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-text-size = "1.1.1"
+backtrace                    = "0.3.74"
+text-size.workspace = true
+pg_diagnostics_macros     = { workspace = true }
+pg_diagnostics_categories     = { workspace = true, features = ["serde"] }
+pg_console                = { workspace = true, features = ["serde_markup"] }
+pg_text_edit                = { workspace = true }
+bpaf                         = { workspace = true }
+serde                = { workspace = true, features = ["derive"] }
+enumflags2                   = { workspace = true }
+termcolor                    = { workspace = true }
+unicode-width                = { workspace = true }
+serde_json                   = { workspace = true }
+schemars                     = { workspace = true, optional = true }
+
+[features]
+schema = ["schemars", "pg_text_edit/schemars", "pg_diagnostics_categories/schemars"]
 
 [dev-dependencies]
 
 [lib]
 doctest = false
 
-[features]

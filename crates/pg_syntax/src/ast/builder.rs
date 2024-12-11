@@ -25,7 +25,7 @@ impl AstBuilder {
             start: self.current_pos.try_into().unwrap(),
             end: None,
         });
-        if self.open_nodes.len() > 0 {
+        if !self.open_nodes.is_empty() {
             let parent = self.open_nodes.last().unwrap();
             self.inner.add_edge(parent.to_owned(), idx, ());
         }

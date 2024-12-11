@@ -42,7 +42,7 @@ impl<'p> StatementParser<'p> {
         event_sink: &'p mut SyntaxBuilder,
     ) -> StatementParser<'p> {
         Self {
-            node_graph: get_nodes(&root),
+            node_graph: get_nodes(root),
             current_node: NodeIndex::<DefaultIx>::new(0),
             open_nodes: Vec::new(),
             parser: Parser::new(lex(sql), Some(event_sink)),
@@ -72,11 +72,11 @@ impl<'p> StatementParser<'p> {
 
                 if !self.node_is_open(&node_idx) {
                     // open all nodes from `self.current_node` to the target node `node_idx`
-                    let mut ancestors = self.ancestors(Some(node_idx));
+                    let ancestors = self.ancestors(Some(node_idx));
                     let mut nodes_to_open = Vec::<NodeIndex<DefaultIx>>::new();
                     // including the target node itself
                     nodes_to_open.push(node_idx);
-                    while let Some(nx) = ancestors.next() {
+                    for nx in ancestors {
                         if nx == self.current_node {
                             break;
                         }
@@ -170,7 +170,7 @@ impl<'p> StatementParser<'p> {
             // if all direct children of the current node are being skipped, break
             if current_node_children
                 .iter()
-                .all(|n| skipped_nodes.contains(&n))
+                .all(|n| skipped_nodes.contains(n))
             {
                 break;
             }
@@ -252,7 +252,7 @@ impl<'p> StatementParser<'p> {
                 == 0
         {
             // check if the node contains properties that are not at all in the part of the token stream that is not yet consumed and remove them
-            if self.node_graph[self.current_node].properties.len() > 0 {
+            if !self.node_graph[self.current_node].properties.is_empty() {
                 // if there is any property left it must be next in the token stream because we are at a
                 // leaf node. We can thereby reduce the search space to the next n non-whitespace token
                 // where n is the number of remaining properties of the current node
@@ -265,7 +265,7 @@ impl<'p> StatementParser<'p> {
                         if token.kind == SyntaxKind::Eof {
                             break;
                         }
-                        if cmp_tokens(&p, token) {
+                        if cmp_tokens(p, token) {
                             return true;
                         }
                         // FIXME: we also need to skip non-whitespace tokens such as "(" or ")", but
@@ -281,15 +281,15 @@ impl<'p> StatementParser<'p> {
                 });
             }
 
-            if self.node_graph[self.current_node].properties.len() > 0 {
+            if !self.node_graph[self.current_node].properties.is_empty() {
                 break;
             }
 
             self.finish_node();
-            if self.open_nodes.len() == 0 {
+            if self.open_nodes.is_empty() {
                 break;
             }
-            self.current_node = self.open_nodes.last().unwrap().clone();
+            self.current_node = *self.open_nodes.last().unwrap();
         }
     }
 
@@ -426,7 +426,7 @@ fn aliases(text: &str) -> Vec<&str> {
             return alias.to_vec();
         }
     }
-    return vec![text];
+    vec![text]
 }
 
 /// Custom iterator for walking ancestors of a node until the root of the tree is reached

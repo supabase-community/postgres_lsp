@@ -1,12 +1,18 @@
 use std::sync::Arc;
 
+use crate::{Diagnostic, Severity};
 use dashmap::DashMap;
 use pg_base_db::StatementRef;
-use pg_diagnostics::{Diagnostic, Severity};
 use text_size::TextRange;
 
 pub struct Linter {
     violations: DashMap<StatementRef, Arc<Vec<pg_lint::RuleViolation>>>,
+}
+
+impl Default for Linter {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Linter {

@@ -3,18 +3,15 @@ use sqlx::PgPool;
 use crate::schema_cache::SchemaCacheItem;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Default)]
 pub enum ReplicaIdentity {
+    #[default]
     Default,
     Index,
     Full,
     Nothing,
 }
 
-impl Default for ReplicaIdentity {
-    fn default() -> Self {
-        ReplicaIdentity::Default
-    }
-}
 
 impl From<String> for ReplicaIdentity {
     fn from(s: String) -> Self {

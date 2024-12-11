@@ -1,7 +1,7 @@
 fn main() {
     let src_dir = std::path::Path::new("./tree-sitter-sql/src");
     let mut config = cc::Build::new();
-    config.include(&src_dir);
+    config.include(src_dir);
     config
         .flag_if_supported("-Wno-unused-parameter")
         .flag_if_supported("-Wno-unused-but-set-variable")

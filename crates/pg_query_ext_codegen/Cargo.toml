@@ -4,8 +4,8 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-proc-macro2 = "1.0.66"
-quote = "1.0.33"
+proc-macro2.workspace = true
+quote.workspace = true
 
 pg_query_proto_parser.workspace = true
 

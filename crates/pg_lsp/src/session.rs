@@ -3,7 +3,7 @@ use std::{collections::HashSet, sync::Arc};
 use pg_base_db::{Change, DocumentChange};
 use pg_commands::{Command, ExecuteStatementCommand};
 use pg_completions::CompletionParams;
-use pg_diagnostics::Diagnostic;
+use pg_workspace::diagnostics::Diagnostic;
 use pg_fs::PgLspPath;
 use pg_hover::HoverParams;
 use pg_workspace::Workspace;

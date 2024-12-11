@@ -83,7 +83,7 @@ mod tests {
 
         let result = complete(p);
 
-        assert!(result.items.len() > 0);
+        assert!(!result.items.is_empty());
 
         let best_match = &result.items[0];
 
@@ -142,7 +142,7 @@ mod tests {
 
             let result = complete(p);
 
-            assert!(result.items.len() > 0);
+            assert!(!result.items.is_empty());
 
             let best_match = &result.items[0];
 
@@ -205,7 +205,7 @@ mod tests {
 
             let result = complete(p);
 
-            assert!(result.items.len() > 0);
+            assert!(!result.items.is_empty());
 
             let best_match = &result.items[0];
 

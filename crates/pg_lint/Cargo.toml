@@ -4,14 +4,14 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-text-size = "1.1.1"
+text-size.workspace = true
 pg_base_db.workspace = true
 pg_query_ext.workspace = true
 pg_syntax.workspace = true
 serde_plain = "1.0"
-serde = "1.0.195"
+serde.workspace = true
 lazy_static = "1.4.0"
-serde_json = "1.0"
+serde_json.workspace = true
 
 [dev-dependencies]
 

@@ -30,7 +30,7 @@ impl CompletionBuilder {
                 if idx == 0 {
                     item.preselected = Some(should_preselect_first_item);
                 }
-                item.into()
+                item
             })
             .collect();
 

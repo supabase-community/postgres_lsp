@@ -5,8 +5,8 @@ use crate::{
     util::get_string_from_node,
 };
 
-pub fn resolve_func_call<'a, 'b>(
-    node: &'a pg_query_ext::protobuf::FuncCall,
+pub fn resolve_func_call<'b>(
+    node: &pg_query_ext::protobuf::FuncCall,
     schema_cache: &'b SchemaCache,
 ) -> Option<&'b Function> {
     let (schema, name) = resolve_func_identifier(node);
@@ -17,7 +17,7 @@ pub fn resolve_func_call<'a, 'b>(
         .filter(|f| {
             function_matches(
                 f,
-                schema.as_ref().map(|s| s.as_str()),
+                schema.as_deref(),
                 name.as_str(),
                 node.args
                     .iter()
@@ -51,11 +51,11 @@ fn function_matches(
     name: &str,
     arg_types: Vec<PossibleType>,
 ) -> bool {
-    if func.name.as_ref().map(|s| s.as_str()) != Some(name) {
+    if func.name.as_deref() != Some(name) {
         return false;
     }
 
-    if schema.is_some() && func.schema.as_ref().map(|s| s.as_str()) != schema {
+    if schema.is_some() && func.schema.as_deref() != schema {
         return false;
     }
 
@@ -80,7 +80,7 @@ fn function_matches(
             PossibleType::AnyOf(types) => {
                 if types
                     .iter()
-                    .all(|type_id| type_id.to_owned() != func_arg.type_id)
+                    .all(|type_id| *type_id != func_arg.type_id)
                 {
                     return false;
                 }

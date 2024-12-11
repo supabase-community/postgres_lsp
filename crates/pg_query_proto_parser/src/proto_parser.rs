@@ -60,10 +60,7 @@ impl ProtoParser {
             .field
             .iter()
             .find(|e| e.type_name().split(".").last().unwrap() == type_name);
-        match variant {
-            Some(v) => Some(v.name.clone().unwrap().to_case(Case::UpperCamel)),
-            None => None,
-        }
+        variant.map(|v| v.name.clone().unwrap().to_case(Case::UpperCamel))
     }
 
     fn nodes(&self) -> Vec<Node> {

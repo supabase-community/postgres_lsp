@@ -1,0 +1,19 @@
+[package]
+name = "pg_text_edit"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+text-size = { workspace = true, features = ["serde"] }
+similar         = { workspace = true, features = ["unicode"] }
+serde           = { workspace = true, features = ["derive"] }
+schemars        = { workspace = true, optional = true }
+
+[features]
+schemars = ["dep:schemars"]
+
+[dev-dependencies]
+
+[lib]
+doctest = false
+
