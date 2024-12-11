@@ -1746,7 +1746,6 @@ dependencies = [
  "sqlx",
  "text-size",
  "tokio",
- "tower-lsp",
  "tree-sitter",
  "tree_sitter_sql",
 ]

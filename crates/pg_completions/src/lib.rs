@@ -6,3 +6,4 @@ mod providers;
 mod relevance;
 
 pub use complete::*;
+pub use item::*;

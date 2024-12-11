@@ -14,7 +14,10 @@ use tower_lsp::lsp_types::{
     InlayHintKind, InlayHintLabel, MarkedString, Position, Range,
 };
 
-use crate::{db_connection::DbConnection, utils::line_index_ext::LineIndexExt};
+use crate::{
+    db_connection::DbConnection,
+    utils::{line_index_ext::LineIndexExt, to_lsp_types::to_completion_kind},
+};
 
 pub struct Session {
     db: RwLock<Option<DbConnection>>,
@@ -246,7 +249,29 @@ impl Session {
             schema: &schema_cache,
         })
         .into_iter()
-        .map(|i| i.into())
+        .map(|item| CompletionItem {
+            label: item.label,
+            label_details: Some(tower_lsp::lsp_types::CompletionItemLabelDetails {
+                description: Some(item.description),
+                detail: None,
+            }),
+            kind: Some(to_completion_kind(item.kind)),
+            detail: None,
+            documentation: None,
+            deprecated: None,
+            preselect: None,
+            sort_text: None,
+            filter_text: None,
+            insert_text: None,
+            insert_text_format: None,
+            insert_text_mode: None,
+            text_edit: None,
+            additional_text_edits: None,
+            commit_characters: None,
+            data: None,
+            tags: None,
+            command: None,
+        })
         .collect();
 
         Some(CompletionList {
