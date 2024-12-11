@@ -62,6 +62,7 @@ impl Document {
         }
     }
 
+    #[allow(dead_code)]
     pub fn get_statements(&self) -> &[StatementPosition] {
         &self.statements
     }
@@ -73,6 +74,7 @@ impl Document {
             .collect()
     }
 
+    #[allow(dead_code)]
     /// Returns the statement ref at the given offset
     pub fn statement_ref_at_offset(&self, offset: &TextSize) -> Option<StatementRef> {
         self.statements.iter().find_map(|r| {
@@ -84,6 +86,7 @@ impl Document {
         })
     }
 
+    #[allow(dead_code)]
     /// Returns the statement refs at the given range
     pub fn statement_refs_at_range(&self, range: &TextRange) -> Vec<StatementRef> {
         self.statements
@@ -95,6 +98,7 @@ impl Document {
             .collect()
     }
 
+    #[allow(dead_code)]
     /// Returns the statement at the given offset
     pub fn statement_at_offset(&self, offset: &TextSize) -> Option<Statement> {
         self.statements.iter().find_map(|r| {
@@ -106,6 +110,7 @@ impl Document {
         })
     }
 
+    #[allow(dead_code)]
     /// Returns the statements at the given range
     pub fn statements_at_range(&self, range: &TextRange) -> Vec<Statement> {
         self.statements

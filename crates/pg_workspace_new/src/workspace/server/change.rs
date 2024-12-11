@@ -31,6 +31,7 @@ impl ChangedStatement {
 }
 
 impl StatementChange {
+    #[allow(dead_code)]
     pub fn statement_ref(&self) -> &StatementRef {
         match self {
             StatementChange::Added(stmt) => &stmt.ref_,

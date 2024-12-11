@@ -72,7 +72,7 @@ impl<'p> StatementParser<'p> {
 
                 if !self.node_is_open(&node_idx) {
                     // open all nodes from `self.current_node` to the target node `node_idx`
-                    let mut ancestors = self.ancestors(Some(node_idx));
+                    let ancestors = self.ancestors(Some(node_idx));
                     let mut nodes_to_open = Vec::<NodeIndex<DefaultIx>>::new();
                     // including the target node itself
                     nodes_to_open.push(node_idx);
