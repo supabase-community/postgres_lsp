@@ -41,6 +41,7 @@ tokio              = "1.40.0"
 ignore             = "0.4.23"
 anyhow             = "1.0.92"
 smallvec           = { version = "1.13.2", features = ["union", "const_new", "serde"] }
+tower-lsp = "0.20.0"
 sqlx = { version = "0.8.2", features = [ "runtime-async-std", "tls-rustls", "postgres", "json" ] }
 
 # postgres specific crates
