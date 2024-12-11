@@ -1,10 +1,18 @@
 [package]
-name = "pg_type_resolver"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_type_resolver"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
-pg_query_ext.workspace = true
+pg_query_ext.workspace    = true
 pg_schema_cache.workspace = true
 
 [dev-dependencies]

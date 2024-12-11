@@ -7,10 +7,8 @@ use std::{
 
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
 use pg_configuration::{
-    database::PartialDatabaseConfiguration,
-    diagnostics::InvalidIgnorePattern,
-    files::FilesConfiguration,
-    ConfigurationDiagnostic, PartialConfiguration,
+    database::PartialDatabaseConfiguration, diagnostics::InvalidIgnorePattern,
+    files::FilesConfiguration, ConfigurationDiagnostic, PartialConfiguration,
 };
 use pg_fs::FileSystem;
 

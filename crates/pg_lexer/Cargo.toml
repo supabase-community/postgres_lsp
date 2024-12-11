@@ -1,20 +1,27 @@
 [package]
-name = "pg_lexer"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_lexer"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
 regex = "1.9.1"
 
-pg_query = "0.8"
 pg_lexer_codegen.workspace = true
+pg_query                   = "0.8"
 
+cstree              = { version = "0.12.0", features = ["derive"] }
 text-size.workspace = true
-cstree = { version = "0.12.0", features = ["derive"] }
 
 [dev-dependencies]
 insta = "1.31.0"
 
 [lib]
 doctest = false
-

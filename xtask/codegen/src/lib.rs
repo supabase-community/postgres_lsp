@@ -2,8 +2,8 @@
 
 mod generate_crate;
 
-use bpaf::Bpaf;
 pub use self::generate_crate::generate_crate;
+use bpaf::Bpaf;
 
 #[derive(Debug, Clone, Bpaf)]
 #[bpaf(options)]
@@ -16,5 +16,3 @@ pub enum TaskCommand {
         name: String,
     },
 }
-
-

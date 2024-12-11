@@ -1,7 +1,15 @@
 [package]
-name = "pg_lsp"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_lsp"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [[bin]]
 name = "pglsp"
@@ -9,35 +17,35 @@ path = "src/main.rs"
 test = false
 
 [dependencies]
-lsp-server = "0.7.6"
-crossbeam-channel = "0.5.12"
-async-channel = "2.3.1"
-lsp-types = "0.95.0"
-serde.workspace = true
+anyhow               = "1.0.81"
+async-channel        = "2.3.1"
+async-std            = "1.12.0"
+crossbeam-channel    = "0.5.12"
+dashmap              = "5.5.3"
+lsp-server           = "0.7.6"
+lsp-types            = "0.95.0"
+serde.workspace      = true
 serde_json.workspace = true
-anyhow = "1.0.81"
-async-std = "1.12.0"
-threadpool = "1.8.1"
-dashmap = "5.5.3"
-text-size.workspace = true
+text-size.workspace  = true
+threadpool           = "1.8.1"
 
 line_index.workspace = true
-sqlx.workspace = true
-tower-lsp.workspace = true
+sqlx.workspace       = true
+tower-lsp.workspace  = true
 
-pg_hover.workspace = true
-pg_fs.workspace = true
-pg_completions.workspace = true
-pg_inlay_hints.workspace = true
-pg_commands.workspace = true
-pg_base_db.workspace = true
+pg_base_db.workspace      = true
+pg_commands.workspace     = true
+pg_completions.workspace  = true
+pg_diagnostics.workspace  = true
+pg_fs.workspace           = true
+pg_hover.workspace        = true
+pg_inlay_hints.workspace  = true
 pg_schema_cache.workspace = true
-pg_workspace.workspace = true
-pg_diagnostics.workspace = true
-tokio = { version = "1.40.0", features = ["io-std", "macros", "rt-multi-thread", "sync", "time"] }
-tokio-util = "0.7.12"
-tracing = "0.1.40"
-tracing-subscriber = "0.3.18"
+pg_workspace.workspace    = true
+tokio                     = { version = "1.40.0", features = ["io-std", "macros", "rt-multi-thread", "sync", "time"] }
+tokio-util                = "0.7.12"
+tracing                   = "0.1.40"
+tracing-subscriber        = "0.3.18"
 
 [dev-dependencies]
 

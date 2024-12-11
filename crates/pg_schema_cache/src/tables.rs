@@ -2,8 +2,7 @@ use sqlx::PgPool;
 
 use crate::schema_cache::SchemaCacheItem;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[derive(Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum ReplicaIdentity {
     #[default]
     Default,
@@ -11,7 +10,6 @@ pub enum ReplicaIdentity {
     Full,
     Nothing,
 }
-
 
 impl From<String> for ReplicaIdentity {
     fn from(s: String) -> Self {

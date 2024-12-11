@@ -27,18 +27,15 @@ pub fn resolve_type(node: &pg_query_ext::NodeEnum, schema_cache: &SchemaCache) -
                                 .types
                                 .iter()
                                 .filter(|t| {
-                                    types.iter().any(|i| &i == &&t.name)
-                                        && t.schema == "pg_catalog"
+                                    types.iter().any(|i| &i == &&t.name) && t.schema == "pg_catalog"
                                 })
                                 .map(|t| t.id)
                                 .collect(),
                         )
                     }
                     pg_query_ext::protobuf::a_const::Val::Fval(_) => {
-                        let types: Vec<String> = ["float4", "float8"]
-                            .iter()
-                            .map(|s| s.to_string())
-                            .collect();
+                        let types: Vec<String> =
+                            ["float4", "float8"].iter().map(|s| s.to_string()).collect();
 
                         PossibleType::AnyOf(
                             schema_cache
@@ -58,10 +55,8 @@ pub fn resolve_type(node: &pg_query_ext::NodeEnum, schema_cache: &SchemaCache) -
                             .collect(),
                     ),
                     pg_query_ext::protobuf::a_const::Val::Sval(v) => {
-                        let types: Vec<String> = ["text", "varchar"]
-                            .iter()
-                            .map(|s| s.to_string())
-                            .collect();
+                        let types: Vec<String> =
+                            ["text", "varchar"].iter().map(|s| s.to_string()).collect();
 
                         PossibleType::AnyOf(
                             schema_cache

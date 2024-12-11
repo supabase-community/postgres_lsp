@@ -15,9 +15,7 @@ impl ExecuteStatementCommand {
         if let Some(conn) = conn {
             match conn.execute(self.statement.as_str()).await {
                 Ok(res) => Ok(res),
-                Err(e) => {
-                    Err(anyhow::anyhow!(e.to_string()))
-                }
+                Err(e) => Err(anyhow::anyhow!(e.to_string())),
             }
         } else {
             Err(anyhow::anyhow!("No connection to database".to_string()))

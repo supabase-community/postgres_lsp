@@ -1,10 +1,18 @@
 [package]
-name = "pg_flags"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_flags"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
-pg_console      = { workspace = true }
+pg_console = { workspace = true }
 
 [dev-dependencies]
 

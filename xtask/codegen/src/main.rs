@@ -1,8 +1,6 @@
 use xtask::{project_root, pushd, Result};
 
-use xtask_codegen::{
-    generate_crate, task_command, TaskCommand,
-};
+use xtask_codegen::{generate_crate, task_command, TaskCommand};
 
 fn main() -> Result<()> {
     let _d = pushd(project_root());
@@ -16,4 +14,3 @@ fn main() -> Result<()> {
 
     Ok(())
 }
-

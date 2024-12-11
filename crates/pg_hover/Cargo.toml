@@ -1,14 +1,22 @@
 [package]
-name = "pg_hover"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_hover"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
-text-size.workspace = true
-pg_query_ext.workspace = true
+pg_query_ext.workspace    = true
 pg_schema_cache.workspace = true
-pg_syntax.workspace = true
-tree-sitter.workspace = true
+pg_syntax.workspace       = true
+text-size.workspace       = true
+tree-sitter.workspace     = true
 tree_sitter_sql.workspace = true
 
 [dev-dependencies]

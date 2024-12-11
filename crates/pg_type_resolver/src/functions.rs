@@ -78,10 +78,7 @@ fn function_matches(
                 // can be any type
             }
             PossibleType::AnyOf(types) => {
-                if types
-                    .iter()
-                    .all(|type_id| *type_id != func_arg.type_id)
-                {
+                if types.iter().all(|type_id| *type_id != func_arg.type_id) {
                     return false;
                 }
             }
