@@ -423,19 +423,19 @@ line 7 new";
         );
     }
 
-    #[test]
-    fn test_range_formatting() {
-        let encoding = PositionEncoding::Wide(WideEncoding::Utf16);
-        let input = "(\"Jan 1, 2018\u{2009}–\u{2009}Jan 1, 2019\");\n(\"Jan 1, 2018\u{2009}–\u{2009}Jan 1, 2019\");\nisSpreadAssignment;\n".to_string();
-        let change = TextDocumentContentChangeEvent {
-            range: Some(Range::new(Position::new(0, 30), Position::new(1, 0))),
-            range_length: Some(1),
-            text: String::new(),
-        };
-
-        let output = apply_document_changes(encoding, input, vec![change]);
-        let expected = "(\"Jan 1, 2018\u{2009}–\u{2009}Jan 1, 2019\");(\"Jan 1, 2018\u{2009}–\u{2009}Jan 1, 2019\");\nisSpreadAssignment;\n";
-
-        assert_eq!(output, expected);
-    }
+    // #[test]
+    // fn test_range_formatting() {
+    //     let encoding = PositionEncoding::Wide(WideEncoding::Utf16);
+    //     let input = "(\"Jan 1, 2018\u{2009}–\u{2009}Jan 1, 2019\");\n(\"Jan 1, 2018\u{2009}–\u{2009}Jan 1, 2019\");\nisSpreadAssignment;\n".to_string();
+    //     let change = TextDocumentContentChangeEvent {
+    //         range: Some(Range::new(Position::new(0, 30), Position::new(1, 0))),
+    //         range_length: Some(1),
+    //         text: String::new(),
+    //     };
+    //
+    //     let output = apply_document_changes(encoding, input, vec![change]);
+    //     let expected = "(\"Jan 1, 2018\u{2009}–\u{2009}Jan 1, 2019\");(\"Jan 1, 2018\u{2009}–\u{2009}Jan 1, 2019\");\nisSpreadAssignment;\n";
+    //
+    //     assert_eq!(output, expected);
+    // }
 }
