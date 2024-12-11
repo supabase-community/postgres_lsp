@@ -669,7 +669,7 @@ mod tests {
     use pg_diagnostics::{DiagnosticTags, Severity};
     use pg_diagnostics_categories::{category, Category};
     use pg_text_edit::TextEdit;
-    use pg_text_size::{TextRange, TextSize};
+    use text_size::{TextRange, TextSize};
     use serde_json::{from_value, json};
 
     use crate::{self as pg_diagnostics};
