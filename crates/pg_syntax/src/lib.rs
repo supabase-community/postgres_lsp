@@ -13,7 +13,7 @@ use syntax_builder::{Syntax, SyntaxBuilder};
 pub fn parse_syntax(sql: &str, root: &pg_query_ext::NodeEnum) -> Syntax {
     let mut builder = SyntaxBuilder::new();
 
-    StatementParser::new(&root, sql, &mut builder).parse();
+    StatementParser::new(root, sql, &mut builder).parse();
 
     builder.finish()
 }

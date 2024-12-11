@@ -1,4 +1,4 @@
-use super::process_file::{process_file, DiffKind, FileStatus, Message};
+use super::process_file::{process_file, FileStatus, Message};
 use super::{Execution, TraversalMode};
 use crate::cli_options::CliOptions;
 use crate::execute::diagnostics::PanicDiagnostic;

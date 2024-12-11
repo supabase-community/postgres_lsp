@@ -10,6 +10,12 @@ pub struct Typechecker {
     errors: DashMap<StatementRef, Arc<Vec<TypeError>>>,
 }
 
+impl Default for Typechecker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Typechecker {
     pub fn new() -> Typechecker {
         Typechecker {

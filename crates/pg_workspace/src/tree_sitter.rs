@@ -10,6 +10,12 @@ pub struct TreeSitterParser {
     parser: RwLock<tree_sitter::Parser>,
 }
 
+impl Default for TreeSitterParser {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TreeSitterParser {
     pub fn new() -> TreeSitterParser {
         let mut parser = tree_sitter::Parser::new();
@@ -36,7 +42,7 @@ impl TreeSitterParser {
     }
 
     pub fn remove_statement(&self, statement: &StatementRef) {
-        self.db.remove(&statement);
+        self.db.remove(statement);
     }
 
     pub fn modify_statement(&self, change: &ChangedStatement) {
@@ -52,7 +58,7 @@ impl TreeSitterParser {
         let mut tree = old.unwrap().1.as_ref().clone();
 
         let edit = edit_from_change(
-            &change.statement.text.as_str(),
+            change.statement.text.as_str(),
             usize::from(change.range.start()),
             usize::from(change.range.end()),
             change.text.as_str(),

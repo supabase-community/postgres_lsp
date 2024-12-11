@@ -14,7 +14,7 @@ pub(crate) fn run<'a>(
 ) -> Result<(), CliDiagnostic> {
     let workspace = &*session.app.workspace;
     let console = &mut *session.app.console;
-    let mut version = 0;
+    let version = 0;
 
     console.append(markup! {{content}});
     Ok(())

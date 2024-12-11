@@ -17,7 +17,7 @@ pub fn resolve_type(node: &pg_query_ext::NodeEnum, schema_cache: &SchemaCache) -
                     .expect("expected non-nullable AConst to have a value")
                 {
                     pg_query_ext::protobuf::a_const::Val::Ival(_) => {
-                        let types: Vec<String> = vec!["int2", "int4", "int8"]
+                        let types: Vec<String> = ["int2", "int4", "int8"]
                             .iter()
                             .map(|s| s.to_string())
                             .collect();
@@ -27,7 +27,7 @@ pub fn resolve_type(node: &pg_query_ext::NodeEnum, schema_cache: &SchemaCache) -
                                 .types
                                 .iter()
                                 .filter(|t| {
-                                    types.iter().find(|i| i == &&t.name).is_some()
+                                    types.iter().any(|i| &i == &&t.name)
                                         && t.schema == "pg_catalog"
                                 })
                                 .map(|t| t.id)
@@ -35,7 +35,7 @@ pub fn resolve_type(node: &pg_query_ext::NodeEnum, schema_cache: &SchemaCache) -
                         )
                     }
                     pg_query_ext::protobuf::a_const::Val::Fval(_) => {
-                        let types: Vec<String> = vec!["float4", "float8"]
+                        let types: Vec<String> = ["float4", "float8"]
                             .iter()
                             .map(|s| s.to_string())
                             .collect();
@@ -58,7 +58,7 @@ pub fn resolve_type(node: &pg_query_ext::NodeEnum, schema_cache: &SchemaCache) -
                             .collect(),
                     ),
                     pg_query_ext::protobuf::a_const::Val::Sval(v) => {
-                        let types: Vec<String> = vec!["text", "varchar"]
+                        let types: Vec<String> = ["text", "varchar"]
                             .iter()
                             .map(|s| s.to_string())
                             .collect();
@@ -68,7 +68,7 @@ pub fn resolve_type(node: &pg_query_ext::NodeEnum, schema_cache: &SchemaCache) -
                                 .types
                                 .iter()
                                 .filter(|t| {
-                                    (types.iter().find(|i| i == &&t.name).is_some()
+                                    (types.iter().any(|i| &i == &&t.name)
                                         && t.schema == "pg_catalog")
                                         || t.enums.values.contains(&v.sval)
                                 })

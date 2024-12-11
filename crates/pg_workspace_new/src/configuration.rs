@@ -1,14 +1,11 @@
 use std::{
-    ffi::OsStr,
     io::ErrorKind,
-    iter::FusedIterator,
     path::{Path, PathBuf},
 };
 
 use pg_configuration::{
     ConfigurationDiagnostic, ConfigurationPathHint, ConfigurationPayload, PartialConfiguration,
 };
-use pg_diagnostics::{Error, Severity};
 use pg_fs::{AutoSearchResult, ConfigName, FileSystem, OpenOptions};
 
 use crate::{DynRef, WorkspaceError};
@@ -100,7 +97,7 @@ fn load_config(
             let content = file_system.read_file_from_path(config_file_path)?;
 
             let deserialized = toml::from_str::<PartialConfiguration>(&content)
-                .map_err(|err| ConfigurationDiagnostic::new_deserialization_error(err))?;
+                .map_err(ConfigurationDiagnostic::new_deserialization_error)?;
 
             return Ok(Some(ConfigurationPayload {
                 deserialized,
@@ -129,7 +126,7 @@ fn load_config(
         let AutoSearchResult { content, file_path } = auto_search_result;
 
         let deserialized = toml::from_str::<PartialConfiguration>(&content)
-            .map_err(|err| ConfigurationDiagnostic::new_deserialization_error(err))?;
+            .map_err(ConfigurationDiagnostic::new_deserialization_error)?;
 
         Ok(Some(ConfigurationPayload {
             deserialized,

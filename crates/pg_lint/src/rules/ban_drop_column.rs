@@ -20,22 +20,17 @@ pub fn ban_drop_column(params: &LinterParams) -> Vec<RuleViolation> {
                 }
             }
         }
-    } else {
-        match &params.ast {
-            pg_query_ext::NodeEnum::AlterTableStmt(stmt) => {
-                for cmd in &stmt.cmds {
-                    if let Some(pg_query_ext::NodeEnum::AlterTableCmd(cmd)) = &cmd.node {
-                        if cmd.subtype() == pg_query_ext::protobuf::AlterTableType::AtDropColumn {
-                            errs.push(RuleViolation::new(
-                                RuleViolationKind::BanDropColumn,
-                                None,
-                                None,
-                            ));
-                        }
-                    }
+    } else if let pg_query_ext::NodeEnum::AlterTableStmt(stmt) = &params.ast {
+        for cmd in &stmt.cmds {
+            if let Some(pg_query_ext::NodeEnum::AlterTableCmd(cmd)) = &cmd.node {
+                if cmd.subtype() == pg_query_ext::protobuf::AlterTableType::AtDropColumn {
+                    errs.push(RuleViolation::new(
+                        RuleViolationKind::BanDropColumn,
+                        None,
+                        None,
+                    ));
                 }
             }
-            _ => {}
         }
     }
 

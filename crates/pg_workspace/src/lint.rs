@@ -9,6 +9,12 @@ pub struct Linter {
     violations: DashMap<StatementRef, Arc<Vec<pg_lint::RuleViolation>>>,
 }
 
+impl Default for Linter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Linter {
     pub fn new() -> Linter {
         Linter {

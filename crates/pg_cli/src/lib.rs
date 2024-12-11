@@ -4,7 +4,7 @@
 //! to parse commands and arguments, redirect the execution of the commands and
 //! execute the traversal of directory and files, based on the command that was passed.
 
-use pg_console::{markup, ColorMode, Console, ConsoleExt};
+use pg_console::{ColorMode, Console};
 use pg_fs::OsFileSystem;
 use pg_workspace_new::{App, DynRef, Workspace, WorkspaceRef};
 use std::env;
@@ -19,8 +19,7 @@ mod panic;
 mod reporter;
 mod service;
 
-use crate::cli_options::{CliOptions, ColorsArg};
-use crate::commands::CommandRunner;
+use crate::cli_options::ColorsArg;
 pub use crate::commands::{pg_lsp_command, PgLspCommand};
 pub use crate::logging::{setup_cli_subscriber, LoggingLevel};
 pub use diagnostics::CliDiagnostic;

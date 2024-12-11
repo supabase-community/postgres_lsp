@@ -18,7 +18,7 @@ impl<'a> CompletionContext<'a> {
     pub fn new(params: &'a CompletionParams) -> Self {
         let mut tree = Self {
             tree: params.tree,
-            text: &params.text,
+            text: params.text,
             schema_cache: params.schema,
             position: usize::from(params.position),
 

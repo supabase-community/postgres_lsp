@@ -7,9 +7,9 @@ use pg_fs::{ConfigName, PgLspPath};
 use pg_query::PgQueryStore;
 use pg_schema_cache::SchemaCache;
 use sqlx::PgPool;
-use std::sync::{LazyLock, OnceLock};
+use std::sync::LazyLock;
 use store::Store;
-use tokio::runtime::{Handle, Runtime};
+use tokio::runtime::Runtime;
 use tree_sitter::TreeSitterStore;
 
 use crate::{

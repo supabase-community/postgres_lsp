@@ -11,7 +11,7 @@ use std::any::Any;
 use std::borrow::Cow;
 use std::fmt::{Debug, Display};
 use std::ops::{Add, Range};
-use std::{io, mem};
+use std::io;
 use text_size::{TextRange, TextSize};
 use tower_lsp::jsonrpc::Error as LspError;
 use tower_lsp::lsp_types;

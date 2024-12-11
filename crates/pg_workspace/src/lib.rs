@@ -29,6 +29,12 @@ pub struct Workspace {
     pub typechecker: Typechecker,
 }
 
+impl Default for Workspace {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Workspace {
     pub fn new() -> Workspace {
         Workspace {

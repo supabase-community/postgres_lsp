@@ -2,10 +2,9 @@ use pg_configuration::ConfigurationDiagnostic;
 use pg_console::fmt::Bytes;
 use pg_console::markup;
 use pg_diagnostics::{
-    category, Advices, Category, Diagnostic, DiagnosticTags, Location, LogCategory,
-    MessageAndDescription, Severity, Visit,
+    category, Advices, Category, Diagnostic, DiagnosticTags, LogCategory, Severity, Visit,
 };
-use pg_fs::{FileSystemDiagnostic, PgLspPath};
+use pg_fs::FileSystemDiagnostic;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt;

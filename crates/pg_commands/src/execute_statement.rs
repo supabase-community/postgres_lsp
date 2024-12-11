@@ -16,11 +16,11 @@ impl ExecuteStatementCommand {
             match conn.execute(self.statement.as_str()).await {
                 Ok(res) => Ok(res),
                 Err(e) => {
-                    return Err(anyhow::anyhow!(e.to_string()));
+                    Err(anyhow::anyhow!(e.to_string()))
                 }
             }
         } else {
-            return Err(anyhow::anyhow!("No connection to database".to_string()));
+            Err(anyhow::anyhow!("No connection to database".to_string()))
         }
     }
 

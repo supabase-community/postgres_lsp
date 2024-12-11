@@ -78,7 +78,7 @@ fn node_handlers(nodes: &[Node], exclude_nodes: &[&str]) -> Vec<TokenStream> {
         .iter()
         .filter(|node| !exclude_nodes.contains(&node.name.as_str()))
         .map(|node| {
-            let property_handlers = property_handlers(&node);
+            let property_handlers = property_handlers(node);
             quote! {
                 #(#property_handlers)*
             }
@@ -99,7 +99,7 @@ fn property_handlers(node: &Node) -> Vec<TokenStream> {
                             self.stack.push_back((x.node.as_ref().unwrap().to_owned(), current_depth));
                         });
                 })
-            } else if field.field_type == FieldType::Node && field.is_one_of == false {
+            } else if field.field_type == FieldType::Node && !field.is_one_of {
                 if field.node_name == Some("Node".to_owned()) {
                     Some(quote! {
                         if n.#field_name.is_some() {

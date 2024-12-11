@@ -28,14 +28,12 @@ pub fn hover(params: HoverParams) -> Option<HoverResult> {
     let elem = if params.enriched_ast.is_some() {
         resolve::resolve_from_enriched_ast(params.position, params.enriched_ast.unwrap())
     } else if params.tree.is_some() {
-        resolve::resolve_from_tree_sitter(params.position, params.tree.unwrap(), &params.source)
+        resolve::resolve_from_tree_sitter(params.position, params.tree.unwrap(), params.source)
     } else {
         None
     };
 
-    if elem.is_none() {
-        return None;
-    }
+    elem.as_ref()?;
 
     match elem.unwrap() {
         Hoverable::Relation(r) => {
@@ -45,14 +43,14 @@ pub fn hover(params: HoverParams) -> Option<HoverResult> {
                 let mut content = t.name.to_owned();
 
                 if t.comment.is_some() {
-                    content.push_str("\n");
+                    content.push('\n');
                     content.push_str(t.comment.as_ref().unwrap());
                 }
 
-                return HoverResult {
+                HoverResult {
                     range: Some(r.range),
                     content,
-                };
+                }
             })
         }
     }

@@ -103,8 +103,7 @@ fn location_idents(nodes: &[Node], exclude_nodes: &[&str]) -> Vec<TokenStream> {
             if node
                 .fields
                 .iter()
-                .find(|n| n.name == "location" && n.field_type == FieldType::Int32)
-                .is_some()
+                .any(|n| n.name == "location" && n.field_type == FieldType::Int32)
             {
                 quote! { Some(n.location) }
             } else {

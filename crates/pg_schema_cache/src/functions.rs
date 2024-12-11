@@ -5,17 +5,14 @@ use sqlx::PgPool;
 use crate::schema_cache::SchemaCacheItem;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default)]
 pub enum Behavior {
     Immutable,
     Stable,
+    #[default]
     Volatile,
 }
 
-impl Default for Behavior {
-    fn default() -> Self {
-        Behavior::Volatile
-    }
-}
 
 impl From<Option<String>> for Behavior {
     fn from(s: Option<String>) -> Self {
