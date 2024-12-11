@@ -91,7 +91,7 @@ mod tests {
     use crate::to_proto::position;
     use crate::WideEncoding::{Utf16, Utf32};
     use crate::{LineCol, PositionEncoding, WideEncoding};
-    use biome_rowan::TextSize;
+    use text_size::TextSize;
     use tower_lsp::lsp_types::Position;
 
     macro_rules! check_conversion {
