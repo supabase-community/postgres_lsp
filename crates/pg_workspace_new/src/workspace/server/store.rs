@@ -6,6 +6,7 @@ use super::{
 };
 
 pub(crate) trait Store<T> {
+    #[allow(dead_code)]
     fn fetch(&self, statement: &StatementRef) -> Option<Arc<T>>;
 
     fn add_statement(&self, statement: &Statement);
