@@ -44,14 +44,14 @@ jobs:
       - name: Run test migrations
         run: psql -f test-db/seed.sql postgresql://postgres:postgres@localhost:5432/postgres
 
-      # - name: 📦 Build
-      #   id: build
-      #   run: cargo build
+      - name: 📦 Build
+        id: build
+        run: RUSTFLAGS="-A dead_code" cargo build
 
       - name: ⚡️ Check
         id: check
-        run: cargo check
+        run: RUSTFLAGS="-A dead_code" cargo check
 
       - name: 🦺 Test
         id: test
-        run: cargo test
+        run: RUSTFLAGS="-A dead_code" cargo test
