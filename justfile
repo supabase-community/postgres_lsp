@@ -8,14 +8,14 @@ alias t := test
 # alias qt := test-quick
 
 # Installs the tools needed to develop
-# install-tools:
-# 	cargo install cargo-binstall
-# 	cargo binstall cargo-insta taplo-cli wasm-pack wasm-tools knope
+install-tools:
+	cargo install cargo-binstall
+	cargo binstall cargo-insta taplo-cli
 
 # Upgrades the tools needed to develop
-# upgrade-tools:
-# 	cargo install cargo-binstall --force
-# 	cargo binstall cargo-insta taplo-cli wasm-pack wasm-tools knope --force
+upgrade-tools:
+	cargo install cargo-binstall --force
+	cargo binstall cargo-insta taplo-cli --force
 
 # Generate all files across crates and tools. You rarely want to use it locally.
 # gen-all:
@@ -39,30 +39,18 @@ alias t := test
 #   cargo run -p rules_check
 #   just format
 
-# Generates the initial files for all formatter crates
-# gen-formatter:
-#   cargo run -p xtask_codegen -- formatter
-
-# Generates the Tailwind CSS preset for utility class sorting (requires Bun)
-# gen-tw:
-#   bun packages/tailwindcss-config-analyzer/src/generate-tailwind-preset.ts
-
-# Generates the code of the grammars available in Biome
-# gen-grammar *args='':
-#     cargo run -p xtask_codegen -- grammar {{args}}
-
 # Generates the linter documentation and Rust documentation
 # documentation:
 #   RUSTDOCFLAGS='-D warnings' cargo documentation
 
 # Creates a new lint rule in the given path, with the given name. Name has to be camel case.
-# new-js-lintrule rulename:
+# new-lintrule rulename:
 #   cargo run -p xtask_codegen -- new-lintrule --kind=js --category=lint --name={{rulename}}
 #   just gen-lint
 #   just documentation
 
 # Creates a new lint rule in the given path, with the given name. Name has to be camel case.
-# new-js-assistrule rulename:
+# new-assistrule rulename:
 #   cargo run -p xtask_codegen -- new-lintrule --kind=js --category=assist --name={{rulename}}
 #   just gen-lint
 #   just documentation
@@ -72,7 +60,7 @@ alias t := test
 # 	cargo run -p xtask_codegen -- promote-rule --name={{rulename}} --group={{group}}
 # 	just gen-lint
 # 	just documentation
-# 	-cargo test -p biome_js_analyze -- {{snakecase(rulename)}}
+# 	-cargo test -p pg_analyze -- {{snakecase(rulename)}}
 # 	cargo insta accept
 
 
