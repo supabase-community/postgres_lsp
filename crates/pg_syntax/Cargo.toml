@@ -1,17 +1,25 @@
 [package]
-name = "pg_syntax"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_syntax"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
 petgraph = "0.6.4"
 
-cstree = { version = "0.12.0", features = ["derive"] }
+cstree              = { version = "0.12.0", features = ["derive"] }
 text-size.workspace = true
 
+pg_lexer.workspace     = true
 pg_query_ext.workspace = true
-pg_lexer.workspace = true
 
 [dev-dependencies]
+insta    = "1.31.0"
 pg_query = "0.8"
-insta = "1.31.0"

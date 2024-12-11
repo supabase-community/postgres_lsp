@@ -1,26 +1,34 @@
 [package]
-name = "pg_lsp_new"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_lsp_new"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
-futures              = "0.3.31"
-anyhow               = { workspace = true }
-rustc-hash           = { workspace = true }
-serde                = { workspace = true, features = ["derive"] }
-serde_json           = { workspace = true }
-tokio                = { workspace = true, features = ["rt", "io-std"] }
-tower-lsp            = { version = "0.20.0" }
-tracing              = { workspace = true, features = ["attributes"] }
-pg_lsp_converters              = { workspace = true }
-pg_console           = { workspace = true }
-pg_diagnostics        = { workspace = true }
-pg_configuration        = { workspace = true }
-pg_fs                = { workspace = true }
-pg_workspace_new     = { workspace = true }
-pg_text_edit     = { workspace = true }
-biome_deserialize              = { workspace = true }
+anyhow              = { workspace = true }
+biome_deserialize   = { workspace = true }
+futures             = "0.3.31"
+pg_configuration    = { workspace = true }
+pg_console          = { workspace = true }
+pg_diagnostics      = { workspace = true }
+pg_fs               = { workspace = true }
+pg_lsp_converters   = { workspace = true }
+pg_text_edit        = { workspace = true }
+pg_workspace_new    = { workspace = true }
+rustc-hash          = { workspace = true }
+serde               = { workspace = true, features = ["derive"] }
+serde_json          = { workspace = true }
 text-size.workspace = true
+tokio               = { workspace = true, features = ["rt", "io-std"] }
+tower-lsp           = { version = "0.20.0" }
+tracing             = { workspace = true, features = ["attributes"] }
 
 [dev-dependencies]
 

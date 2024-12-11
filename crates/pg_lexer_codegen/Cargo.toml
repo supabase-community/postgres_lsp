@@ -1,14 +1,21 @@
 [package]
-name = "pg_lexer_codegen"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_lexer_codegen"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
-proc-macro2.workspace = true
-quote = "1.0.33"
 pg_query_proto_parser.workspace = true
+proc-macro2.workspace           = true
+quote                           = "1.0.33"
 
 [lib]
-doctest = false
+doctest    = false
 proc-macro = true
-

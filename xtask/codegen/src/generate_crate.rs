@@ -16,8 +16,7 @@ name                 = "{name}"
 repository.workspace = true
 version              = "0.0.0"
 
-[lints]
-workspace = true
+
 "#
     )
 }
@@ -61,4 +60,3 @@ pub fn generate_crate(crate_name: String) -> Result<()> {
     // fs::write(knope_config, knope_contents)?;
     Ok(())
 }
-

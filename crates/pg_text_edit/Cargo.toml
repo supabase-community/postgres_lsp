@@ -1,13 +1,21 @@
 [package]
-name = "pg_text_edit"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_text_edit"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
+schemars  = { workspace = true, optional = true }
+serde     = { workspace = true, features = ["derive"] }
+similar   = { workspace = true, features = ["unicode"] }
 text-size = { workspace = true, features = ["serde"] }
-similar         = { workspace = true, features = ["unicode"] }
-serde           = { workspace = true, features = ["derive"] }
-schemars        = { workspace = true, optional = true }
 
 [features]
 schemars = ["dep:schemars"]
@@ -16,4 +24,3 @@ schemars = ["dep:schemars"]
 
 [lib]
 doctest = false
-

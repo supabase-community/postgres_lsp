@@ -1,7 +1,15 @@
 [package]
-name = "pg_markup"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_markup"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
 proc-macro-error = { version = "1.0.4", default-features = false }

@@ -66,8 +66,8 @@ upgrade-tools:
 
 # Format Rust files and TOML files
 format:
-	cargo format
-	# taplo format
+	cargo fmt
+	taplo format
 
 [unix]
 _touch file:

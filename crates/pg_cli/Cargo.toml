@@ -1,33 +1,41 @@
 [package]
-name = "pg_cli"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_cli"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
+anyhow             = { workspace = true }
+bpaf               = { workspace = true, features = ["bright-color"] }
+crossbeam          = { workspace = true }
+dashmap            = "5.5.3"
+hdrhistogram       = { version = "7.5.4", default-features = false }
+path-absolutize    = { version = "3.1.1", optional = false, features = ["use_unix_paths_on_wasm"] }
+pg_configuration   = { workspace = true }
 pg_console         = { workspace = true }
-pg_flags         = { workspace = true }
-pg_configuration         = { workspace = true }
-pg_fs         = { workspace = true }
+pg_diagnostics     = { workspace = true }
+pg_flags           = { workspace = true }
+pg_fs              = { workspace = true }
 pg_lsp_new         = { workspace = true }
-pg_workspace_new         = { workspace = true }
-pg_text_edit        = { workspace = true }
-path-absolutize          = { version = "3.1.1", optional = false, features = ["use_unix_paths_on_wasm"] }
-pg_diagnostics         = { workspace = true }
-crossbeam                = { workspace = true }
-bpaf                     = { workspace = true, features = ["bright-color"] }
-rayon                    = { workspace = true }
-quick-junit              = "0.5.0"
-tracing                  = { workspace = true }
-tracing-appender         = "0.2.3"
-tracing-subscriber       = { workspace = true, features = ["env-filter", "json"] }
-tracing-tree             = "0.4.0"
-hdrhistogram             = { version = "7.5.4", default-features = false }
-rustc-hash               = { workspace = true }
-tokio                    = { workspace = true, features = ["io-std", "io-util", "net", "time", "rt", "sync", "rt-multi-thread", "macros"] }
-anyhow                   = { workspace = true }
-dashmap = "5.5.3"
-serde                    = { workspace = true, features = ["derive"] }
-serde_json               = { workspace = true }
+pg_text_edit       = { workspace = true }
+pg_workspace_new   = { workspace = true }
+quick-junit        = "0.5.0"
+rayon              = { workspace = true }
+rustc-hash         = { workspace = true }
+serde              = { workspace = true, features = ["derive"] }
+serde_json         = { workspace = true }
+tokio              = { workspace = true, features = ["io-std", "io-util", "net", "time", "rt", "sync", "rt-multi-thread", "macros"] }
+tracing            = { workspace = true }
+tracing-appender   = "0.2.3"
+tracing-subscriber = { workspace = true, features = ["env-filter", "json"] }
+tracing-tree       = "0.4.0"
 
 [target.'cfg(unix)'.dependencies]
 libc  = "0.2.161"

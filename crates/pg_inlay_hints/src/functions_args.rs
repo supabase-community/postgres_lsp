@@ -25,14 +25,14 @@ impl InlayHintsResolver for FunctionArgHint {
         ChildrenIterator::new(root.to_owned())
             .filter_map(|n| match n {
                 pg_query_ext::NodeEnum::FuncCall(source_fn) => {
-                    pg_type_resolver::resolve_func_call(
-                        source_fn.as_ref(),
-                        params.schema_cache,
-                    ).map(|schema_fn| resolve_func_arg_hint(
-                            source_fn.as_ref(),
-                            schema_fn,
-                            params.schema_cache,
-                        ))
+                    pg_type_resolver::resolve_func_call(source_fn.as_ref(), params.schema_cache)
+                        .map(|schema_fn| {
+                            resolve_func_arg_hint(
+                                source_fn.as_ref(),
+                                schema_fn,
+                                params.schema_cache,
+                            )
+                        })
                 }
                 _ => None,
             })

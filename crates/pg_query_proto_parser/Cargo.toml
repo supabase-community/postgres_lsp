@@ -1,14 +1,20 @@
 [package]
-name = "pg_query_proto_parser"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_query_proto_parser"
+repository.workspace = true
+version              = "0.0.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+convert_case   = "0.6.0"
+protobuf       = "3.3.0"
 protobuf-parse = "3.3.0"
-protobuf = "3.3.0"
-convert_case = "0.6.0"
 
 [lib]
 doctest = false

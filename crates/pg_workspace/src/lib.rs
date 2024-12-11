@@ -6,8 +6,8 @@ mod typecheck;
 
 use std::sync::{RwLock, RwLockWriteGuard};
 
-use diagnostics::{Diagnostic, Severity};
 use dashmap::{DashMap, DashSet};
+use diagnostics::{Diagnostic, Severity};
 use lint::Linter;
 use pg_base_db::{Document, DocumentChange, StatementRef};
 use pg_fs::PgLspPath;
@@ -192,7 +192,10 @@ mod tests {
     use pg_base_db::{Change, DocumentChange};
     use text_size::{TextRange, TextSize};
 
-    use crate::{diagnostics::{Diagnostic, Severity}, Workspace};
+    use crate::{
+        diagnostics::{Diagnostic, Severity},
+        Workspace,
+    };
     use pg_fs::PgLspPath;
 
     #[test]

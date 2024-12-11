@@ -75,4 +75,3 @@ pub fn ensure_rustfmt() -> Result<()> {
     }
     Ok(())
 }
-

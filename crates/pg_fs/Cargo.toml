@@ -1,20 +1,28 @@
 [package]
-name = "pg_fs"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_fs"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
-directories       = "5.0.1"
-tracing           = { workspace = true }
-serde = { workspace = true }
-parking_lot       = { version = "0.12.3", features = ["arc_lock"] }
-rayon             = { workspace = true }
-rustc-hash        = { workspace = true }
+crossbeam      = { workspace = true }
+directories    = "5.0.1"
+enumflags2     = { workspace = true }
+parking_lot    = { version = "0.12.3", features = ["arc_lock"] }
 pg_diagnostics = { workspace = true }
-crossbeam         = { workspace = true }
-smallvec          = { workspace = true }
-enumflags2        = { workspace = true }
-schemars          = { workspace = true, optional = true }
+rayon          = { workspace = true }
+rustc-hash     = { workspace = true }
+schemars       = { workspace = true, optional = true }
+serde          = { workspace = true }
+smallvec       = { workspace = true }
+tracing        = { workspace = true }
 
 [features]
 serde = ["schemars", "pg_diagnostics/schema"]
@@ -23,4 +31,3 @@ serde = ["schemars", "pg_diagnostics/schema"]
 
 [lib]
 doctest = false
-

@@ -1,14 +1,22 @@
 [package]
-name = "pg_query_ext"
-version = "0.0.0"
-edition = "2021"
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_query_ext"
+repository.workspace = true
+version              = "0.0.0"
+
 
 [dependencies]
-pg_query = "0.8"
 petgraph = "0.6.4"
+pg_query = "0.8"
 
+pg_lexer.workspace             = true
 pg_query_ext_codegen.workspace = true
-pg_lexer.workspace = true
 
 [lib]
 doctest = false
