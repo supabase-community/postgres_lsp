@@ -31,6 +31,22 @@ pub struct ChangeFileParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PullDiagnosticsParams {
+    pub path: PgLspPath,
+    // pub categories: RuleCategories,
+    pub max_diagnostics: u64,
+    // pub only: Vec<RuleSelector>,
+    // pub skip: Vec<RuleSelector>,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PullDiagnosticsResult {
+    pub diagnostics: Vec<pg_diagnostics::serde::Diagnostic>,
+    pub errors: usize,
+    pub skipped_diagnostics: u64,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ChangeParams {
     /// The range of the file that changed. If `None`, the whole file changed.
     pub range: Option<TextRange>,
@@ -72,6 +88,12 @@ pub struct ServerInfo {
 }
 
 pub trait Workspace: Send + Sync + RefUnwindSafe {
+    /// Retrieves the list of diagnostics associated to a file
+    fn pull_diagnostics(
+        &self,
+        params: PullDiagnosticsParams,
+    ) -> Result<PullDiagnosticsResult, WorkspaceError>;
+
     /// Refresh the schema cache for this workspace
     fn refresh_schema_cache(&self) -> Result<(), WorkspaceError>;
 

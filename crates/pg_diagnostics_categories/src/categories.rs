@@ -25,5 +25,6 @@ define_categories! {
     "flags/invalid",
     "project",
     "internalError/panic",
+    "syntax",
     "dummy",
 }

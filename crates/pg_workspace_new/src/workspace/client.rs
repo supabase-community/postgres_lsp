@@ -120,4 +120,11 @@ where
     fn refresh_schema_cache(&self) -> Result<(), WorkspaceError> {
         self.request("pglsp/refresh_schema_cache", ())
     }
+
+    fn pull_diagnostics(
+        &self,
+        params: super::PullDiagnosticsParams,
+    ) -> Result<super::PullDiagnosticsResult, WorkspaceError> {
+        self.request("pglsp/pull_diagnostics", params)
+    }
 }
