@@ -26,11 +26,11 @@ pub struct SyntaxDiagnostic {
 
 pub struct PgQueryStore {
     ast_db: DashMap<StatementRef, Arc<pg_query_ext::NodeEnum>>,
-    diagnostics: DashMap<StatementRef, pg_query_ext::Error>,
+    diagnostics: DashMap<StatementRef, SyntaxDiagnostic>,
 }
 
-impl From<&pg_query_ext::Error> for SyntaxDiagnostic {
-    fn from(err: &pg_query_ext::Error) -> Self {
+impl From<pg_query_ext::Error> for SyntaxDiagnostic {
+    fn from(err: pg_query_ext::Error) -> Self {
         SyntaxDiagnostic {
             span: None,
             message: MessageAndDescription::from(err.to_string()),
@@ -47,9 +47,9 @@ impl PgQueryStore {
     }
 
     pub fn pull_diagnostics(&self, ref_: &StatementRef) -> Vec<SDiagnostic> {
-        self.diagnostics.get(ref_).map_or_else(Vec::new, |err| {
-            vec![SDiagnostic::new(SyntaxDiagnostic::from(err.value()))]
-        })
+        self.diagnostics
+            .get(ref_)
+            .map_or_else(Vec::new, |err| vec![SDiagnostic::new(err.value().clone())])
     }
 }
 
@@ -63,8 +63,10 @@ impl Store<pg_query_ext::NodeEnum> for PgQueryStore {
         if let Ok(ast) = r {
             self.ast_db.insert(statement.ref_.clone(), Arc::new(ast));
         } else {
-            self.diagnostics
-                .insert(statement.ref_.clone(), r.unwrap_err());
+            self.diagnostics.insert(
+                statement.ref_.clone(),
+                SyntaxDiagnostic::from(r.unwrap_err()),
+            );
         }
     }
 
