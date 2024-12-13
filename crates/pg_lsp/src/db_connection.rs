@@ -41,7 +41,7 @@ impl DbConnection {
                         match res {
                             Ok(not) => {
                                 if not.payload().to_string() == "reload schema" {
-                                    let schema_cache = SchemaCache::load(&cloned_pool).await;
+                                    let schema_cache = SchemaCache::load(&cloned_pool).await.unwrap();
                                     ide.write().await.set_schema_cache(schema_cache);
                                 };
                             }

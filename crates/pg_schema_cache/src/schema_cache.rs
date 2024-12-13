@@ -1,6 +1,6 @@
-use anyhow::Context;
 use sqlx::postgres::PgPool;
 
+use crate::diagnostics::SchemaCacheError;
 use crate::functions::Function;
 use crate::schemas::Schema;
 use crate::tables::Table;
@@ -21,15 +21,14 @@ impl SchemaCache {
         SchemaCache::default()
     }
 
-    pub async fn load(pool: &PgPool) -> anyhow::Result<SchemaCache> {
+    pub async fn load(pool: &PgPool) -> Result<SchemaCache, SchemaCacheError> {
         let (schemas, tables, functions, types, versions) = futures_util::try_join!(
             Schema::load(pool),
             Table::load(pool),
             Function::load(pool),
             PostgresType::load(pool),
             Version::load(pool),
-        )
-        .with_context(|| format!("Unable to load Schema Cache"))?;
+        )?;
 
         Ok(SchemaCache {
             schemas,
@@ -86,7 +85,7 @@ mod tests {
 
         let pool = async_std::task::block_on(PgPool::connect(conn_string.as_str())).unwrap();
 
-        async_std::task::block_on(SchemaCache::load(&pool));
+        async_std::task::block_on(SchemaCache::load(&pool)).expect("Couldn't load Schema Cache");
 
         assert!(true);
     }
