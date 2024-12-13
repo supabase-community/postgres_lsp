@@ -75,17 +75,16 @@ pub trait SchemaCacheItem {
 
 #[cfg(test)]
 mod tests {
-    use sqlx::PgPool;
+    use async_std::task::block_on;
+    use pg_test_utils::test_database::get_new_test_db;
 
     use crate::SchemaCache;
 
     #[test]
     fn test_schema_cache() {
-        let conn_string = std::env::var("DATABASE_URL").unwrap();
+        let test_db = block_on(get_new_test_db());
 
-        let pool = async_std::task::block_on(PgPool::connect(conn_string.as_str())).unwrap();
-
-        async_std::task::block_on(SchemaCache::load(&pool)).expect("Couldn't load Schema Cache");
+        block_on(SchemaCache::load(&test_db)).expect("Couldn't load Schema Cache");
 
         assert!(true);
     }

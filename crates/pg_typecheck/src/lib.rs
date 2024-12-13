@@ -85,23 +85,21 @@ pub async fn check_sql<'a>(params: TypecheckerParams<'a>) -> Vec<TypeError> {
 #[cfg(test)]
 mod tests {
     use async_std::task::block_on;
-    use sqlx::PgPool;
+    use pg_test_utils::test_database::get_new_test_db;
 
     use crate::{check_sql, TypecheckerParams};
 
     #[test]
-    fn test_check_sql() {
+    fn test_basic_type() {
         let input = "select id, unknown from contact;";
 
-        let conn_string = std::env::var("DATABASE_URL").unwrap();
-
-        let pool = block_on(PgPool::connect(conn_string.as_str())).unwrap();
+        let test_db = block_on(get_new_test_db());
 
         let root = pg_query_ext::parse(input).unwrap();
         let ast = pg_syntax::parse_syntax(input, &root).ast;
 
         let errs = block_on(check_sql(TypecheckerParams {
-            conn: &pool,
+            conn: &test_db,
             sql: input,
             ast: &root,
             enriched_ast: Some(&ast),
@@ -111,6 +109,6 @@ mod tests {
 
         let e = &errs[0];
 
-        assert_eq!(&input[e.range.unwrap()], "unknown");
+        assert_eq!(&input[e.range.unwrap()], "contact");
     }
 }

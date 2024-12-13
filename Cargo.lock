@@ -2566,6 +2566,7 @@ dependencies = [
  "futures-util",
  "pg_console",
  "pg_diagnostics",
+ "pg_test_utils",
  "serde",
  "serde_json",
  "sqlx",
@@ -2634,6 +2635,7 @@ dependencies = [
  "pg_query_ext",
  "pg_schema_cache",
  "pg_syntax",
+ "pg_test_utils",
  "sqlx",
  "text-size",
 ]
