@@ -2560,7 +2560,9 @@ dependencies = [
 name = "pg_schema_cache"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "async-std",
+ "futures-util",
  "serde",
  "serde_json",
  "sqlx",

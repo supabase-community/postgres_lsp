@@ -12,7 +12,9 @@ version              = "0.0.0"
 
 
 [dependencies]
+anyhow.workspace = true
 async-std            = { version = "1.12.0" }
+futures-util = "0.3.31"
 serde.workspace      = true
 serde_json.workspace = true
 

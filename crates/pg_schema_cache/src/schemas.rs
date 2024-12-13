@@ -12,7 +12,7 @@ pub struct Schema {
 impl SchemaCacheItem for Schema {
     type Item = Schema;
 
-    async fn load(pool: &PgPool) -> Vec<Schema> {
+    async fn load(pool: &PgPool) -> Result<Vec<Schema>, sqlx::Error> {
         sqlx::query_as!(
             Schema,
             r#"select
@@ -33,6 +33,5 @@ where
         )
         .fetch_all(pool)
         .await
-        .unwrap()
     }
 }

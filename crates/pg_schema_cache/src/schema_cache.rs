@@ -1,5 +1,4 @@
-use std::future::join;
-
+use anyhow::Context;
 use sqlx::postgres::PgPool;
 
 use crate::functions::Function;
@@ -22,23 +21,23 @@ impl SchemaCache {
         SchemaCache::default()
     }
 
-    pub async fn load(pool: &PgPool) -> SchemaCache {
-        let (schemas, tables, functions, types, versions) = join!(
+    pub async fn load(pool: &PgPool) -> anyhow::Result<SchemaCache> {
+        let (schemas, tables, functions, types, versions) = futures_util::try_join!(
             Schema::load(pool),
             Table::load(pool),
             Function::load(pool),
             PostgresType::load(pool),
             Version::load(pool),
         )
-        .await;
+        .with_context(|| format!("Unable to load Schema Cache"))?;
 
-        SchemaCache {
+        Ok(SchemaCache {
             schemas,
             tables,
             functions,
             types,
             versions,
-        }
+        })
     }
 
     /// Applies an AST node to the repository
@@ -72,7 +71,7 @@ impl SchemaCache {
 pub trait SchemaCacheItem {
     type Item;
 
-    async fn load(pool: &PgPool) -> Vec<Self::Item>;
+    async fn load(pool: &PgPool) -> Result<Vec<Self::Item>, sqlx::Error>;
 }
 
 #[cfg(test)]
