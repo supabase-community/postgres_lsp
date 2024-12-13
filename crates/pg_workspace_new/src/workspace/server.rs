@@ -214,10 +214,16 @@ impl Workspace for WorkspaceServer {
     #[tracing::instrument(level = "trace", skip(self))]
     fn open_file(&self, params: OpenFileParams) -> Result<(), WorkspaceError> {
         tracing::info!("Opening file: {:?}", params.path);
-        self.documents.insert(
-            params.path.clone(),
-            Document::new(params.path, params.content, params.version),
-        );
+
+        let doc = Document::new(params.path.clone(), params.content, params.version);
+
+        doc.statements.iter().for_each(|s| {
+            let stmt = doc.statement(s);
+            self.tree_sitter.add_statement(&stmt);
+            self.pg_query.add_statement(&stmt);
+        });
+
+        self.documents.insert(params.path, doc);
 
         Ok(())
     }

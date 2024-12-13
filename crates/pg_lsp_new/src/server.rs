@@ -160,7 +160,7 @@ impl LanguageServer for LSPServer {
         self.setup_capabilities().await;
 
         // Diagnostics are disabled by default, so update them after fetching workspace config
-        // self.session.update_all_diagnostics().await;
+        self.session.update_all_diagnostics().await;
     }
 
     async fn shutdown(&self) -> LspResult<()> {
@@ -172,7 +172,7 @@ impl LanguageServer for LSPServer {
         let _ = params;
         self.session.load_workspace_settings().await;
         self.setup_capabilities().await;
-        // self.session.update_all_diagnostics().await;
+        self.session.update_all_diagnostics().await;
     }
 
     #[tracing::instrument(level = "trace", skip(self))]
@@ -378,6 +378,7 @@ impl ServerFactory {
         workspace_method!(builder, open_file);
         workspace_method!(builder, change_file);
         workspace_method!(builder, close_file);
+        workspace_method!(builder, pull_diagnostics);
 
         let (service, socket) = builder.finish();
         ServerConnection { socket, service }

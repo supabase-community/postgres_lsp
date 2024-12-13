@@ -1,12 +1,16 @@
+use crate::diagnostics::LspError;
 use crate::documents::Document;
+use crate::utils;
 use anyhow::Result;
+use futures::stream::FuturesUnordered;
+use futures::StreamExt;
 use pg_configuration::ConfigurationPathHint;
 use pg_diagnostics::{DiagnosticExt, Error};
 use pg_fs::{FileSystem, PgLspPath};
 use pg_lsp_converters::{negotiated_encoding, PositionEncoding, WideEncoding};
 use pg_workspace_new::configuration::{load_configuration, LoadedConfiguration};
 use pg_workspace_new::settings::PartialConfigurationExt;
-use pg_workspace_new::workspace::UpdateSettingsParams;
+use pg_workspace_new::workspace::{PullDiagnosticsParams, UpdateSettingsParams};
 use pg_workspace_new::Workspace;
 use pg_workspace_new::{DynRef, WorkspaceError};
 use rustc_hash::FxHashMap;
@@ -234,6 +238,75 @@ impl Session {
             error!("Error registering {register_methods:?} capabilities: {}", e);
         } else {
             info!("Register capabilities {register_methods:?}");
+        }
+    }
+
+    /// Computes diagnostics for the file matching the provided url and publishes
+    /// them to the client. Called from [`handlers::text_document`] when a file's
+    /// contents changes.
+    #[tracing::instrument(level = "trace", skip_all, fields(url = display(&url), diagnostic_count), err)]
+    pub(crate) async fn update_diagnostics(&self, url: lsp_types::Url) -> Result<(), LspError> {
+        let pglsp_path = self.file_path(&url)?;
+        let doc = self.document(&url)?;
+        if self.configuration_status().is_error() && !self.notified_broken_configuration() {
+            self.set_notified_broken_configuration();
+            self.client
+                    .show_message(MessageType::WARNING, "The configuration file has errors. Biome will report only parsing errors until the configuration is fixed.")
+                    .await;
+        }
+
+        let diagnostics: Vec<lsp_types::Diagnostic> = {
+            let result = self.workspace.pull_diagnostics(PullDiagnosticsParams {
+                path: pglsp_path.clone(),
+                max_diagnostics: u64::MAX,
+            })?;
+
+            tracing::trace!("biome diagnostics: {:#?}", result.diagnostics);
+
+            result
+                .diagnostics
+                .into_iter()
+                .filter_map(|d| {
+                    match utils::diagnostic_to_lsp(
+                        d,
+                        &url,
+                        &doc.line_index,
+                        self.position_encoding(),
+                        None,
+                    ) {
+                        Ok(diag) => Some(diag),
+                        Err(err) => {
+                            error!("failed to convert diagnostic to LSP: {err:?}");
+                            None
+                        }
+                    }
+                })
+                .collect()
+        };
+
+        tracing::Span::current().record("diagnostic_count", diagnostics.len());
+
+        self.client
+            .publish_diagnostics(url, diagnostics, Some(doc.version))
+            .await;
+
+        Ok(())
+    }
+
+    /// Updates diagnostics for every [`Document`] in this [`Session`]
+    pub(crate) async fn update_all_diagnostics(&self) {
+        let mut futures: FuturesUnordered<_> = self
+            .documents
+            .read()
+            .unwrap()
+            .keys()
+            .map(|url| self.update_diagnostics(url.clone()))
+            .collect();
+
+        while let Some(result) = futures.next().await {
+            if let Err(e) = result {
+                error!("Error while updating diagnostics: {}", e);
+            }
         }
     }
 

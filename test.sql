@@ -4,6 +4,6 @@ select 14433313331333333333
 
 select * from test;
 
-alter table test drop column id;
+alter tqjable test drop column id;
 
 select lower();

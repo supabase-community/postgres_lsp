@@ -63,6 +63,7 @@ impl Store<pg_query_ext::NodeEnum> for PgQueryStore {
         if let Ok(ast) = r {
             self.ast_db.insert(statement.ref_.clone(), Arc::new(ast));
         } else {
+            tracing::info!("adding diagnostics");
             self.diagnostics.insert(
                 statement.ref_.clone(),
                 SyntaxDiagnostic::from(r.unwrap_err()),
