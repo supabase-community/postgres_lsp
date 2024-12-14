@@ -1,4 +1,4 @@
-use crate::context::CompletionContext;
+use crate::context::{ClauseType, CompletionContext};
 
 #[derive(Debug)]
 pub(crate) enum CompletionRelevanceData<'a> {
@@ -33,6 +33,7 @@ impl<'a> CompletionRelevance<'a> {
         self.check_matches_query_input(ctx);
         self.check_if_catalog(ctx);
         self.check_is_invocation(ctx);
+        self.check_matching_clause_type(ctx);
 
         self.score
     }
@@ -58,6 +59,27 @@ impl<'a> CompletionRelevance<'a> {
 
             self.score += len * 5;
         };
+    }
+
+    fn check_matching_clause_type(&mut self, ctx: &CompletionContext) {
+        let clause_type = match ctx.wrapping_clause_type.as_ref() {
+            None => return,
+            Some(ct) => ct,
+        };
+
+        self.score += match self.data {
+            CompletionRelevanceData::Table(_) => match clause_type {
+                ClauseType::From => 5,
+                ClauseType::Update => 15,
+                ClauseType::Delete => 15,
+                _ => -50,
+            },
+            CompletionRelevanceData::Function(_) => match clause_type {
+                ClauseType::Select => 5,
+                ClauseType::From => 0,
+                _ => -50,
+            },
+        }
     }
 
     fn check_is_invocation(&mut self, ctx: &CompletionContext) {
