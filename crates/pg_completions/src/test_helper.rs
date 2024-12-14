@@ -4,7 +4,7 @@ use sqlx::Executor;
 
 use crate::CompletionParams;
 
-pub static CURSOR_POS: &str = "€";
+pub static CURSOR_POS: char = '€';
 
 pub(crate) async fn get_test_deps(
     setup: &str,
@@ -36,6 +36,8 @@ pub(crate) fn get_test_params<'a>(
 ) -> CompletionParams<'a> {
     let position = sql.find(CURSOR_POS).unwrap();
     let text = sql.replace(CURSOR_POS, "");
+
+    println!("position: {}", position);
 
     CompletionParams {
         position: (position as u32).into(),

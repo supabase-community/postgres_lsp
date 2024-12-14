@@ -125,4 +125,38 @@ mod tests {
         assert_eq!(label, "cool");
         assert_eq!(kind, CompletionItemKind::Function);
     }
+
+    #[tokio::test]
+    async fn prefers_function_in_from_clause_if_invocation() {
+        let setup = r#"
+          create table coos (
+            id serial primary key,
+            name text
+          );
+
+          create or replace function cool() 
+          returns trigger
+          language plpgsql
+          security invoker
+          as $$
+          begin
+            raise exception 'dont matter';
+          end;
+          $$;
+        "#;
+
+        let query = format!(r#"select * from coo{}()"#, CURSOR_POS);
+
+        let (tree, cache) = get_test_deps(setup, &query).await;
+        let params = get_test_params(&tree, &cache, &query);
+        let results = complete(params);
+
+        let CompletionItem { label, kind, .. } = results
+            .into_iter()
+            .next()
+            .expect("Should return at least one completion item");
+
+        assert_eq!(label, "cool");
+        assert_eq!(kind, CompletionItemKind::Function);
+    }
 }
