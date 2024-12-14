@@ -1,8 +1,10 @@
 use text_size::TextSize;
 
 use crate::{
-    builder::CompletionBuilder, context::CompletionContext, item::CompletionItem,
-    providers::complete_tables,
+    builder::CompletionBuilder,
+    context::CompletionContext,
+    item::CompletionItem,
+    providers::{complete_functions, complete_tables},
 };
 
 pub const LIMIT: usize = 50;
@@ -34,6 +36,7 @@ pub fn complete(params: CompletionParams) -> CompletionResult {
     let mut builder = CompletionBuilder::new();
 
     complete_tables(&ctx, &mut builder);
+    complete_functions(&ctx, &mut builder);
 
     builder.finish()
 }

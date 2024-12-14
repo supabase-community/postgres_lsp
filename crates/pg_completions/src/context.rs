@@ -2,6 +2,30 @@ use pg_schema_cache::SchemaCache;
 
 use crate::CompletionParams;
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum ClauseType {
+    Select,
+    Where,
+    From,
+}
+
+impl From<&str> for ClauseType {
+    fn from(value: &str) -> Self {
+        match value {
+            "select" => Self::Select,
+            "where" => Self::Where,
+            "from" => Self::From,
+            _ => panic!("Unimplemented ClauseType: {}", value),
+        }
+    }
+}
+
+impl From<String> for ClauseType {
+    fn from(value: String) -> Self {
+        ClauseType::from(value.as_str())
+    }
+}
+
 pub(crate) struct CompletionContext<'a> {
     pub ts_node: Option<tree_sitter::Node<'a>>,
     pub tree: Option<&'a tree_sitter::Tree>,
@@ -10,7 +34,7 @@ pub(crate) struct CompletionContext<'a> {
     pub position: usize,
 
     pub schema_name: Option<String>,
-    pub wrapping_clause_type: Option<String>,
+    pub wrapping_clause_type: Option<ClauseType>,
     pub is_invocation: bool,
 }
 
@@ -65,7 +89,7 @@ impl<'a> CompletionContext<'a> {
         let current_node_kind = current_node.kind();
 
         match previous_node_kind {
-            "statement" => self.wrapping_clause_type = Some(current_node_kind.to_string()),
+            "statement" => self.wrapping_clause_type = Some(current_node_kind.into()),
             "invocation" => self.is_invocation = true,
 
             _ => {}
@@ -84,7 +108,7 @@ impl<'a> CompletionContext<'a> {
 
             // in Treesitter, the Where clause is nested inside other clauses
             "where" => {
-                self.wrapping_clause_type = Some("where".to_string());
+                self.wrapping_clause_type = Some("where".into());
             }
 
             _ => {}
@@ -156,7 +180,7 @@ mod tests {
 
             let ctx = CompletionContext::new(&params);
 
-            assert_eq!(ctx.wrapping_clause_type, Some(expected_clause.to_string()));
+            assert_eq!(ctx.wrapping_clause_type, Some(expected_clause.into()));
         }
     }
 

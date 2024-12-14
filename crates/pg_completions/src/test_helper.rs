@@ -2,18 +2,14 @@ use pg_schema_cache::SchemaCache;
 use pg_test_utils::test_database::get_new_test_db;
 use sqlx::Executor;
 
-use crate::{builder::CompletionBuilder, CompletionParams};
+use crate::CompletionParams;
 
 pub static CURSOR_POS: &str = "XXX";
 
 pub(crate) async fn get_test_deps(
     setup: &str,
     input: &str,
-) -> (
-    tree_sitter::Tree,
-    pg_schema_cache::SchemaCache,
-    CompletionBuilder,
-) {
+) -> (tree_sitter::Tree, pg_schema_cache::SchemaCache) {
     let test_db = get_new_test_db().await;
 
     test_db
@@ -29,9 +25,8 @@ pub(crate) async fn get_test_deps(
         .expect("Error loading sql language");
 
     let tree = parser.parse(input, None).unwrap();
-    let builder = CompletionBuilder::new();
 
-    (tree, schema_cache, builder)
+    (tree, schema_cache)
 }
 
 pub(crate) fn get_test_params<'a>(
