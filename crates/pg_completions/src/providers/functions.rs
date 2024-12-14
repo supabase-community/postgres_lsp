@@ -10,10 +10,10 @@ pub fn complete_functions(ctx: &CompletionContext, builder: &mut CompletionBuild
     let completion_items: Vec<CompletionItem> = available_functions
         .iter()
         .map(|foo| CompletionItem {
-            label: foo.name,
+            label: foo.name.clone(),
             score: get_score(ctx, foo),
             description: format!("Schema: {}", foo.schema),
-            preselected: None,
+            preselected: false,
             kind: CompletionItemKind::Function,
         })
         .collect();
@@ -31,17 +31,23 @@ fn get_score(ctx: &CompletionContext, foo: &Function) -> i32 {
 mod tests {
     use crate::{
         context::CompletionContext,
-        providers::complete_tables,
+        providers::complete_functions,
         test_helper::{get_test_deps, get_test_params, CURSOR_POS},
+        CompletionItem,
     };
 
     #[tokio::test]
     async fn completes_fn() {
         let setup = r#"
-          create or replace function cool() returns trigger
-          begin;
-            ## Yeahhhh
+          create or replace function cool() 
+          returns trigger
+          language plpgsql
+          security invoker
+          as $$
+          begin
+            raise exception 'dont matter';
           end;
+          $$;
         "#;
 
         let query = format!("select coo{}", CURSOR_POS);
@@ -50,6 +56,15 @@ mod tests {
         let params = get_test_params(&tree, &cache, &query);
         let ctx = CompletionContext::new(&params);
 
-        complete_tables(&ctx, &mut builder);
+        complete_functions(&ctx, &mut builder);
+
+        let results = builder.finish();
+
+        let CompletionItem { label, .. } = results
+            .into_iter()
+            .next()
+            .expect("Should return at least one completion item");
+
+        assert_eq!(label, "cool");
     }
 }

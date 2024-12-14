@@ -1,10 +1,8 @@
-use pg_schema_cache::Table;
-
 use crate::{
     builder::CompletionBuilder,
     context::CompletionContext,
     item::{CompletionItem, CompletionItemKind},
-    relevance::CompletionRelevance,
+    relevance::CompletionRelevanceData,
 };
 
 pub fn complete_tables(ctx: &CompletionContext, builder: &mut CompletionBuilder) {
@@ -14,9 +12,9 @@ pub fn complete_tables(ctx: &CompletionContext, builder: &mut CompletionBuilder)
         .iter()
         .map(|table| CompletionItem {
             label: table.name.clone(),
-            score: get_score(ctx, table),
+            score: CompletionRelevanceData::Table(table).get_score(ctx),
             description: format!("Schema: {}", table.schema),
-            preselected: None,
+            preselected: false,
             kind: CompletionItemKind::Table,
         })
         .collect();
@@ -24,14 +22,4 @@ pub fn complete_tables(ctx: &CompletionContext, builder: &mut CompletionBuilder)
     for item in completion_items {
         builder.add_item(item);
     }
-}
-
-fn get_score(ctx: &CompletionContext, table: &Table) -> i32 {
-    let mut relevance = CompletionRelevance::default();
-
-    relevance.check_matches_query_input(ctx, &table.name);
-    relevance.check_matches_schema(ctx, &table.schema);
-    relevance.check_if_catalog(ctx);
-
-    relevance.score()
 }

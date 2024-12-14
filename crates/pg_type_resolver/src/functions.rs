@@ -51,11 +51,11 @@ fn function_matches(
     name: &str,
     arg_types: Vec<PossibleType>,
 ) -> bool {
-    if func.name.as_deref() != Some(name) {
+    if func.name != name {
         return false;
     }
 
-    if schema.is_some() && func.schema.as_deref() != schema {
+    if schema.is_some() && Some(func.schema.as_str()) != schema {
         return false;
     }
 
