@@ -7,6 +7,8 @@ pub enum ClauseType {
     Select,
     Where,
     From,
+    Update,
+    Delete,
 }
 
 impl From<&str> for ClauseType {
@@ -15,6 +17,8 @@ impl From<&str> for ClauseType {
             "select" => Self::Select,
             "where" => Self::Where,
             "from" => Self::From,
+            "update" => Self::Update,
+            "delete" => Self::Delete,
             _ => panic!("Unimplemented ClauseType: {}", value),
         }
     }

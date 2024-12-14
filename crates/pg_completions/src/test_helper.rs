@@ -4,7 +4,7 @@ use sqlx::Executor;
 
 use crate::CompletionParams;
 
-pub static CURSOR_POS: &str = "XXX";
+pub static CURSOR_POS: &str = "€";
 
 pub(crate) async fn get_test_deps(
     setup: &str,
