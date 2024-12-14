@@ -32,6 +32,7 @@ impl<'a> CompletionRelevance<'a> {
         self.check_matches_schema(ctx);
         self.check_matches_query_input(ctx);
         self.check_if_catalog(ctx);
+        self.check_is_invocation(ctx);
 
         self.score
     }
@@ -56,6 +57,25 @@ impl<'a> CompletionRelevance<'a> {
                 .expect("The length of the input exceeds i32 capacity");
 
             self.score += len * 5;
+        };
+    }
+
+    fn check_is_invocation(&mut self, ctx: &CompletionContext) {
+        self.score += match self.data {
+            CompletionRelevanceData::Function(_) => {
+                if ctx.is_invocation {
+                    30
+                } else {
+                    -30
+                }
+            }
+            _ => {
+                if ctx.is_invocation {
+                    -10
+                } else {
+                    0
+                }
+            }
         };
     }
 

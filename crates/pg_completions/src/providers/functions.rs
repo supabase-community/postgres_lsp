@@ -1,7 +1,8 @@
 use pg_schema_cache::Function;
 
 use crate::{
-    builder::CompletionBuilder, context::CompletionContext, CompletionItem, CompletionItemKind,
+    builder::CompletionBuilder, context::CompletionContext, relevance::CompletionRelevanceData,
+    CompletionItem, CompletionItemKind,
 };
 
 pub fn complete_functions(ctx: &CompletionContext, builder: &mut CompletionBuilder) {
@@ -11,7 +12,7 @@ pub fn complete_functions(ctx: &CompletionContext, builder: &mut CompletionBuild
         .iter()
         .map(|foo| CompletionItem {
             label: foo.name.clone(),
-            score: get_score(ctx, foo),
+            score: CompletionRelevanceData::Function(foo).get_score(ctx),
             description: format!("Schema: {}", foo.schema),
             preselected: false,
             kind: CompletionItemKind::Function,
@@ -21,10 +22,6 @@ pub fn complete_functions(ctx: &CompletionContext, builder: &mut CompletionBuild
     for item in completion_items {
         builder.add_item(item);
     }
-}
-
-fn get_score(ctx: &CompletionContext, foo: &Function) -> i32 {
-    0
 }
 
 #[cfg(test)]
