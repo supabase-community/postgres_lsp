@@ -18,7 +18,7 @@ impl<'a> CompletionContext<'a> {
     pub fn new(params: &'a CompletionParams) -> Self {
         let mut tree = Self {
             tree: params.tree,
-            text: params.text,
+            text: &params.text,
             schema_cache: params.schema,
             position: usize::from(params.position),
 
@@ -102,7 +102,7 @@ impl<'a> CompletionContext<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::context::CompletionContext;
+    use crate::{context::CompletionContext, test_helper::CURSOR_POS};
 
     fn get_tree(input: &str) -> tree_sitter::Tree {
         let mut parser = tree_sitter::Parser::new();
@@ -112,8 +112,6 @@ mod tests {
 
         parser.parse(input, None).expect("Unable to parse tree")
     }
-
-    static CURSOR_POS: &str = "XXX";
 
     #[test]
     fn identifies_clauses() {
@@ -151,7 +149,7 @@ mod tests {
             let tree = get_tree(text.as_str());
             let params = crate::CompletionParams {
                 position: (position as u32).into(),
-                text: text.as_str(),
+                text: text,
                 tree: Some(&tree),
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
@@ -184,7 +182,7 @@ mod tests {
             let tree = get_tree(text.as_str());
             let params = crate::CompletionParams {
                 position: (position as u32).into(),
-                text: text.as_str(),
+                text: text,
                 tree: Some(&tree),
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
@@ -219,7 +217,7 @@ mod tests {
             let tree = get_tree(text.as_str());
             let params = crate::CompletionParams {
                 position: (position as u32).into(),
-                text: text.as_str(),
+                text: text,
                 tree: Some(&tree),
                 schema: &pg_schema_cache::SchemaCache::new(),
             };

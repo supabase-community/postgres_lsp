@@ -1,6 +1,7 @@
 #[derive(Debug)]
 pub enum CompletionItemKind {
     Table,
+    Function,
 }
 
 #[derive(Debug)]

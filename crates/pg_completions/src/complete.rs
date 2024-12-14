@@ -11,7 +11,7 @@ pub const LIMIT: usize = 50;
 pub struct CompletionParams<'a> {
     pub position: TextSize,
     pub schema: &'a pg_schema_cache::SchemaCache,
-    pub text: &'a str,
+    pub text: String,
     pub tree: Option<&'a tree_sitter::Tree>,
 }
 
@@ -77,7 +77,7 @@ mod tests {
         let p = CompletionParams {
             position: ((input.len() - 1) as u32).into(),
             schema: &schema_cache,
-            text: input,
+            text: input.into(),
             tree: Some(&tree),
         };
 
@@ -136,7 +136,7 @@ mod tests {
             let p = CompletionParams {
                 position: ((input.len() - 1) as u32).into(),
                 schema: &schema_cache,
-                text: input,
+                text: input.into(),
                 tree: Some(&tree),
             };
 
@@ -199,7 +199,7 @@ mod tests {
             let p = CompletionParams {
                 position: ((input.len() - 1) as u32).into(),
                 schema: &schema_cache,
-                text: input,
+                text: input.into(),
                 tree: Some(&tree),
             };
 
