@@ -1,6 +1,5 @@
 use sqlx::postgres::PgPool;
 
-use crate::diagnostics::SchemaCacheError;
 use crate::functions::Function;
 use crate::schemas::Schema;
 use crate::tables::Table;
@@ -21,7 +20,7 @@ impl SchemaCache {
         SchemaCache::default()
     }
 
-    pub async fn load(pool: &PgPool) -> Result<SchemaCache, SchemaCacheError> {
+    pub async fn load(pool: &PgPool) -> Result<SchemaCache, sqlx::Error> {
         let (schemas, tables, functions, types, versions) = futures_util::try_join!(
             Schema::load(pool),
             Table::load(pool),

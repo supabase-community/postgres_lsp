@@ -5,7 +5,6 @@ use pg_diagnostics::{
     category, Advices, Category, Diagnostic, DiagnosticTags, LogCategory, Severity, Visit,
 };
 use pg_fs::FileSystemDiagnostic;
-use pg_schema_cache::SchemaCacheError;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt;
@@ -236,19 +235,6 @@ impl From<sqlx::Error> for WorkspaceError {
                 message: err.to_string(),
                 code: None,
             })
-        }
-    }
-}
-
-impl From<SchemaCacheError> for WorkspaceError {
-    fn from(err: SchemaCacheError) -> Self {
-        match err {
-            SchemaCacheError::DatabaseConnectionError(db_err) => {
-                WorkspaceError::DatabaseConnectionError(DatabaseConnectionError {
-                    message: db_err.message,
-                    code: db_err.code,
-                })
-            }
         }
     }
 }
