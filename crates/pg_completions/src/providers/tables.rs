@@ -24,6 +24,7 @@ pub fn complete_tables(ctx: &CompletionContext, builder: &mut CompletionBuilder)
     }
 }
 
+#[cfg(test)]
 mod tests {
     use crate::{
         complete,
