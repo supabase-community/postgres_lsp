@@ -41,7 +41,7 @@ pub struct Table {
 impl SchemaCacheItem for Table {
     type Item = Table;
 
-    async fn load(pool: &PgPool) -> Vec<Table> {
+    async fn load(pool: &PgPool) -> Result<Vec<Table>, sqlx::Error> {
         sqlx::query_as!(
             Table,
             r#"SELECT
@@ -87,6 +87,5 @@ group by
         )
         .fetch_all(pool)
         .await
-        .unwrap()
     }
 }

@@ -72,7 +72,9 @@ mod tests {
             .expect("Error loading sql language");
 
         let tree = parser.parse(input, None).unwrap();
-        let schema_cache = SchemaCache::load(&test_db).await;
+        let schema_cache = SchemaCache::load(&test_db)
+            .await
+            .expect("Couldn't load Schema Cache");
 
         let p = CompletionParams {
             position: ((input.len() - 1) as u32).into(),
@@ -117,7 +119,9 @@ mod tests {
             .await
             .expect("Failed to execute setup query");
 
-        let schema_cache = SchemaCache::load(&test_db).await;
+        let schema_cache = SchemaCache::load(&test_db)
+            .await
+            .expect("Couldn't load Schema Cache");
 
         let mut parser = tree_sitter::Parser::new();
         parser
@@ -180,7 +184,9 @@ mod tests {
             .await
             .expect("Failed to execute setup query");
 
-        let schema_cache = SchemaCache::load(&test_db).await;
+        let schema_cache = SchemaCache::load(&test_db)
+            .await
+            .expect("Couldn't load SchemaCache");
 
         let mut parser = tree_sitter::Parser::new();
         parser

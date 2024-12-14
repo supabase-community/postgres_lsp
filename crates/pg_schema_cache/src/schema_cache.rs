@@ -1,5 +1,3 @@
-use std::future::join;
-
 use sqlx::postgres::PgPool;
 
 use crate::functions::Function;
@@ -22,23 +20,22 @@ impl SchemaCache {
         SchemaCache::default()
     }
 
-    pub async fn load(pool: &PgPool) -> SchemaCache {
-        let (schemas, tables, functions, types, versions) = join!(
+    pub async fn load(pool: &PgPool) -> Result<SchemaCache, sqlx::Error> {
+        let (schemas, tables, functions, types, versions) = futures_util::try_join!(
             Schema::load(pool),
             Table::load(pool),
             Function::load(pool),
             PostgresType::load(pool),
             Version::load(pool),
-        )
-        .await;
+        )?;
 
-        SchemaCache {
+        Ok(SchemaCache {
             schemas,
             tables,
             functions,
             types,
             versions,
-        }
+        })
     }
 
     /// Applies an AST node to the repository
@@ -72,22 +69,21 @@ impl SchemaCache {
 pub trait SchemaCacheItem {
     type Item;
 
-    async fn load(pool: &PgPool) -> Vec<Self::Item>;
+    async fn load(pool: &PgPool) -> Result<Vec<Self::Item>, sqlx::Error>;
 }
 
 #[cfg(test)]
 mod tests {
-    use sqlx::PgPool;
+    use async_std::task::block_on;
+    use pg_test_utils::test_database::get_new_test_db;
 
     use crate::SchemaCache;
 
     #[test]
     fn test_schema_cache() {
-        let conn_string = std::env::var("DATABASE_URL").unwrap();
+        let test_db = block_on(get_new_test_db());
 
-        let pool = async_std::task::block_on(PgPool::connect(conn_string.as_str())).unwrap();
-
-        async_std::task::block_on(SchemaCache::load(&pool));
+        block_on(SchemaCache::load(&test_db)).expect("Couldn't load Schema Cache");
 
         assert!(true);
     }

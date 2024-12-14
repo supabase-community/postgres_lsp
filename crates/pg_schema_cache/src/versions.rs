@@ -13,7 +13,7 @@ pub struct Version {
 impl SchemaCacheItem for Version {
     type Item = Version;
 
-    async fn load(pool: &PgPool) -> Vec<Version> {
+    async fn load(pool: &PgPool) -> Result<Vec<Version>, sqlx::Error> {
         sqlx::query_as!(
             Version,
             r#"select
@@ -29,7 +29,6 @@ impl SchemaCacheItem for Version {
         )
         .fetch_all(pool)
         .await
-        .unwrap()
     }
 
     /*

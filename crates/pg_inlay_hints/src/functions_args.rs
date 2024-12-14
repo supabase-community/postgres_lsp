@@ -80,7 +80,7 @@ fn resolve_func_arg_hint(
 mod tests {
     use async_std::task::block_on;
     use pg_schema_cache::SchemaCache;
-    use sqlx::PgPool;
+    use pg_test_utils::test_database::get_new_test_db;
 
     use crate::{
         functions_args::FunctionArgHint,
@@ -89,17 +89,14 @@ mod tests {
 
     #[test]
     fn test_function_args() {
+        let test_db = block_on(get_new_test_db());
         let input = "select lower('TEST')";
 
-        let conn_string = std::env::var("DATABASE_URL").unwrap();
-
-        let pool = block_on(PgPool::connect(conn_string.as_str())).unwrap();
-
         let root = pg_query_ext::parse(input).unwrap();
-
         let res = pg_syntax::parse_syntax(input, &root);
 
-        let schema_cache = block_on(SchemaCache::load(&pool));
+        let schema_cache =
+            block_on(SchemaCache::load(&test_db)).expect("Couldn't load Schema Cache");
 
         let hints = FunctionArgHint::find_all(InlayHintsParams {
             ast: Some(&root),

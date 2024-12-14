@@ -2395,6 +2395,7 @@ dependencies = [
  "pg_query_ext",
  "pg_schema_cache",
  "pg_syntax",
+ "pg_test_utils",
  "pg_type_resolver",
  "sqlx",
  "text-size",
@@ -2560,7 +2561,12 @@ dependencies = [
 name = "pg_schema_cache"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "async-std",
+ "futures-util",
+ "pg_console",
+ "pg_diagnostics",
+ "pg_test_utils",
  "serde",
  "serde_json",
  "sqlx",
@@ -2629,6 +2635,7 @@ dependencies = [
  "pg_query_ext",
  "pg_schema_cache",
  "pg_syntax",
+ "pg_test_utils",
  "sqlx",
  "text-size",
 ]
