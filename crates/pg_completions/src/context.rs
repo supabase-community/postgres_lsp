@@ -44,7 +44,7 @@ pub(crate) struct CompletionContext<'a> {
 
 impl<'a> CompletionContext<'a> {
     pub fn new(params: &'a CompletionParams) -> Self {
-        let mut tree = Self {
+        let mut ctx = Self {
             tree: params.tree,
             text: &params.text,
             schema_cache: params.schema,
@@ -56,9 +56,9 @@ impl<'a> CompletionContext<'a> {
             is_invocation: false,
         };
 
-        tree.gather_tree_context();
+        ctx.gather_tree_context();
 
-        tree
+        ctx
     }
 
     pub fn get_ts_node_content(&self, ts_node: tree_sitter::Node<'a>) -> Option<&'a str> {

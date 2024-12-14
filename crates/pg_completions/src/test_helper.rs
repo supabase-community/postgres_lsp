@@ -34,10 +34,11 @@ pub(crate) fn get_test_params<'a>(
     schema_cache: &'a pg_schema_cache::SchemaCache,
     sql: &'a str,
 ) -> CompletionParams<'a> {
-    let position = sql.find(CURSOR_POS).unwrap();
-    let text = sql.replace(CURSOR_POS, "");
+    let position = sql
+        .find(|c| c == CURSOR_POS)
+        .expect("Please insert the CURSOR_POS into your query.");
 
-    println!("position: {}", position);
+    let text = sql.replace(CURSOR_POS, "");
 
     CompletionParams {
         position: (position as u32).into(),
