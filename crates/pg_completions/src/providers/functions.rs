@@ -6,18 +6,15 @@ use crate::{
 pub fn complete_functions(ctx: &CompletionContext, builder: &mut CompletionBuilder) {
     let available_functions = &ctx.schema_cache.functions;
 
-    let completion_items: Vec<CompletionItem> = available_functions
-        .iter()
-        .map(|foo| CompletionItem {
+    for foo in available_functions {
+        let item = CompletionItem {
             label: foo.name.clone(),
             score: CompletionRelevanceData::Function(foo).get_score(ctx),
             description: format!("Schema: {}", foo.schema),
             preselected: false,
             kind: CompletionItemKind::Function,
-        })
-        .collect();
+        };
 
-    for item in completion_items {
         builder.add_item(item);
     }
 }
