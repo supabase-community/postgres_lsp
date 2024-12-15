@@ -11,22 +11,34 @@ pub enum ClauseType {
     Delete,
 }
 
-impl From<&str> for ClauseType {
-    fn from(value: &str) -> Self {
+impl TryFrom<&str> for ClauseType {
+    type Error = String;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
-            "select" => Self::Select,
-            "where" => Self::Where,
-            "from" => Self::From,
-            "update" => Self::Update,
-            "delete" => Self::Delete,
-            _ => panic!("Unimplemented ClauseType: {}", value),
+            "select" => Ok(Self::Select),
+            "where" => Ok(Self::Where),
+            "from" => Ok(Self::From),
+            "update" => Ok(Self::Update),
+            "delete" => Ok(Self::Delete),
+            _ => {
+                let message = format!("Unimplemented ClauseType: {}", value);
+
+                // Err on tests, so we notice that we're lacking an implementation immediately.
+                if cfg!(test) {
+                    panic!("{}", message);
+                }
+
+                return Err(message);
+            }
         }
     }
 }
 
-impl From<String> for ClauseType {
-    fn from(value: String) -> Self {
-        ClauseType::from(value.as_str())
+impl TryFrom<String> for ClauseType {
+    type Error = String;
+    fn try_from(value: String) -> Result<ClauseType, Self::Error> {
+        ClauseType::try_from(value.as_str())
     }
 }
 
@@ -93,7 +105,7 @@ impl<'a> CompletionContext<'a> {
         let current_node_kind = current_node.kind();
 
         match previous_node_kind {
-            "statement" => self.wrapping_clause_type = Some(current_node_kind.into()),
+            "statement" => self.wrapping_clause_type = current_node_kind.try_into().ok(),
             "invocation" => self.is_invocation = true,
 
             _ => {}
@@ -112,7 +124,7 @@ impl<'a> CompletionContext<'a> {
 
             // in Treesitter, the Where clause is nested inside other clauses
             "where" => {
-                self.wrapping_clause_type = Some("where".into());
+                self.wrapping_clause_type = "where".try_into().ok();
             }
 
             _ => {}
@@ -184,7 +196,7 @@ mod tests {
 
             let ctx = CompletionContext::new(&params);
 
-            assert_eq!(ctx.wrapping_clause_type, Some(expected_clause.into()));
+            assert_eq!(ctx.wrapping_clause_type, expected_clause.try_into().ok());
         }
     }
 
