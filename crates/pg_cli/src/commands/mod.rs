@@ -1,21 +1,24 @@
+use crate::changed::{get_changed_files, get_staged_files};
 use crate::cli_options::{cli_options, CliOptions, CliReporter, ColorsArg};
-use crate::diagnostics::DeprecatedConfigurationFile;
+use crate::diagnostics::DeprecatedArgument;
+use crate::execute::Stdin;
 use crate::logging::LoggingKind;
 use crate::{
     execute_mode, setup_cli_subscriber, CliDiagnostic, CliSession, Execution, LoggingLevel, VERSION,
 };
 use bpaf::Bpaf;
-use pg_configuration::PartialConfiguration;
+use pg_configuration::{partial_configuration, PartialConfiguration};
 use pg_console::{markup, Console, ConsoleExt};
 use pg_diagnostics::{Diagnostic, PrintDiagnostic};
 use pg_fs::FileSystem;
 use pg_workspace_new::configuration::{load_configuration, LoadedConfiguration};
 use pg_workspace_new::settings::PartialConfigurationExt;
-use pg_workspace_new::workspace::UpdateSettingsParams;
+use pg_workspace_new::workspace::{FixFileMode, UpdateSettingsParams};
 use pg_workspace_new::{DynRef, Workspace, WorkspaceError};
 use std::ffi::OsString;
 use std::path::PathBuf;
 
+pub(crate) mod check;
 pub(crate) mod clean;
 pub(crate) mod daemon;
 pub(crate) mod init;
@@ -25,11 +28,58 @@ pub(crate) mod version;
 #[bpaf(options, version(VERSION))]
 /// PgLsp official CLI. Use it to check the health of your project or run it to check single files.
 pub enum PgLspCommand {
-    /// Shows the Biome version information and quit.
+    /// Shows the version information and quit.
     #[bpaf(command)]
     Version(#[bpaf(external(cli_options), hide_usage)] CliOptions),
 
-    /// Starts the Biome daemon server process.
+    /// Runs everything to the requested files.
+    #[bpaf(command)]
+    Check {
+        /// Writes safe fixes, formatting and import sorting
+        #[bpaf(long("write"), switch)]
+        write: bool,
+
+        /// Allow to do unsafe fixes, should be used with `--write` or `--fix`
+        #[bpaf(long("unsafe"), switch)]
+        unsafe_: bool,
+
+        /// Alias for `--write`, writes safe fixes, formatting and import sorting
+        #[bpaf(long("fix"), switch, hide_usage)]
+        fix: bool,
+
+        #[bpaf(external(partial_configuration), hide_usage, optional)]
+        configuration: Option<PartialConfiguration>,
+        #[bpaf(external, hide_usage)]
+        cli_options: CliOptions,
+        /// Use this option when you want to format code piped from `stdin`, and print the output to `stdout`.
+        ///
+        /// The file doesn't need to exist on disk, what matters is the extension of the file. Based on the extension, we know how to check the code.
+        ///
+        /// Example: `echo 'let a;' | pg_cli check --stdin-file-path=test.sql`
+        #[bpaf(long("stdin-file-path"), argument("PATH"), hide_usage)]
+        stdin_file_path: Option<String>,
+
+        /// When set to true, only the files that have been staged (the ones prepared to be committed)
+        /// will be linted. This option should be used when working locally.
+        #[bpaf(long("staged"), switch)]
+        staged: bool,
+
+        /// When set to true, only the files that have been changed compared to your `defaultBranch`
+        /// configuration will be linted. This option should be used in CI environments.
+        #[bpaf(long("changed"), switch)]
+        changed: bool,
+
+        /// Use this to specify the base branch to compare against when you're using the --changed
+        /// flag and the `defaultBranch` is not set in your `pglsp.toml`
+        #[bpaf(long("since"), argument("REF"))]
+        since: Option<String>,
+
+        /// Single file, single path or list of paths
+        #[bpaf(positional("PATH"), many)]
+        paths: Vec<OsString>,
+    },
+
+    /// Starts the daemon server process.
     #[bpaf(command)]
     Start {
         /// Allows to change the prefix applied to the file name of the logs.
@@ -137,7 +187,9 @@ pub enum PgLspCommand {
 impl PgLspCommand {
     const fn cli_options(&self) -> Option<&CliOptions> {
         match self {
-            PgLspCommand::Version(cli_options) => Some(cli_options),
+            PgLspCommand::Version(cli_options) | PgLspCommand::Check { cli_options, .. } => {
+                Some(cli_options)
+            }
             PgLspCommand::LspProxy { .. }
             | PgLspCommand::Start { .. }
             | PgLspCommand::Stop
@@ -194,51 +246,6 @@ impl PgLspCommand {
     }
 }
 
-/// It accepts a [LoadedPartialConfiguration] and it prints the diagnostics emitted during parsing and deserialization.
-///
-/// If it contains [errors](Severity::Error) or higher, it returns an error.
-pub(crate) fn validate_configuration_diagnostics(
-    loaded_configuration: &LoadedConfiguration,
-    console: &mut dyn Console,
-    verbose: bool,
-) -> Result<(), CliDiagnostic> {
-    if let Some(file_path) = loaded_configuration
-        .file_path
-        .as_ref()
-        .and_then(|f| f.file_name())
-        .and_then(|f| f.to_str())
-    {
-        if file_path == "rome.json" {
-            let diagnostic = DeprecatedConfigurationFile::new(file_path);
-            if diagnostic.tags().is_verbose() && verbose {
-                console.error(markup! {{PrintDiagnostic::verbose(&diagnostic)}})
-            } else {
-                console.error(markup! {{PrintDiagnostic::simple(&diagnostic)}})
-            }
-        }
-    }
-
-    // let diagnostics = loaded_configuration.as_diagnostics_iter();
-    // for diagnostic in diagnostics {
-    //     if diagnostic.tags().is_verbose() && verbose {
-    //         console.error(markup! {{PrintDiagnostic::verbose(diagnostic)}})
-    //     } else {
-    //         console.error(markup! {{PrintDiagnostic::simple(diagnostic)}})
-    //     }
-    // }
-    //
-    // if loaded_configuration.has_errors() {
-    //     return Err(CliDiagnostic::workspace_error(
-    //         ConfigurationDiagnostic::invalid_configuration(
-    //             "Exited because the configuration resulted in errors. Please fix them.",
-    //         )
-    //         .into(),
-    //     ));
-    // }
-
-    Ok(())
-}
-
 /// Generic interface for executing commands.
 ///
 /// Consumers must implement the following methods:
@@ -280,13 +287,7 @@ pub(crate) trait CommandRunner: Sized {
     ) -> Result<(Execution, Vec<OsString>), CliDiagnostic> {
         let loaded_configuration =
             load_configuration(fs, cli_options.as_configuration_path_hint())?;
-        if self.should_validate_configuration_diagnostics() {
-            validate_configuration_diagnostics(
-                &loaded_configuration,
-                console,
-                cli_options.verbose,
-            )?;
-        }
+
         let configuration_path = loaded_configuration.directory_path.clone();
         let configuration = self.merge_configuration(loaded_configuration, fs, console)?;
         let vcs_base_path = configuration_path.or(fs.working_directory());
@@ -303,6 +304,27 @@ pub(crate) trait CommandRunner: Sized {
 
         let execution = self.get_execution(cli_options, console, workspace)?;
         Ok((execution, paths))
+    }
+
+    /// Computes [Stdin] if the CLI has the necessary information.
+    ///
+    /// ## Errors
+    /// - If the user didn't provide anything via `stdin` but the option `--stdin-file-path` is passed.
+    fn get_stdin(&self, console: &mut dyn Console) -> Result<Option<Stdin>, CliDiagnostic> {
+        let stdin = if let Some(stdin_file_path) = self.get_stdin_file_path() {
+            let input_code = console.read();
+            if let Some(input_code) = input_code {
+                let path = PathBuf::from(stdin_file_path);
+                Some((path, input_code).into())
+            } else {
+                // we provided the argument without a piped stdin, we bail
+                return Err(CliDiagnostic::missing_argument("stdin", Self::COMMAND_NAME));
+            }
+        } else {
+            None
+        };
+
+        Ok(stdin)
     }
 
     // Below, the methods that consumers must implement.
@@ -353,9 +375,193 @@ pub(crate) trait CommandRunner: Sized {
     }
 }
 
+fn get_files_to_process_with_cli_options(
+    since: Option<&str>,
+    changed: bool,
+    staged: bool,
+    fs: &DynRef<'_, dyn FileSystem>,
+    configuration: &PartialConfiguration,
+) -> Result<Option<Vec<OsString>>, CliDiagnostic> {
+    if since.is_some() {
+        if !changed {
+            return Err(CliDiagnostic::incompatible_arguments("since", "changed"));
+        }
+        if staged {
+            return Err(CliDiagnostic::incompatible_arguments("since", "staged"));
+        }
+    }
+
+    if changed {
+        if staged {
+            return Err(CliDiagnostic::incompatible_arguments("changed", "staged"));
+        }
+        Ok(Some(get_changed_files(fs, configuration, since)?))
+    } else if staged {
+        Ok(Some(get_staged_files(fs)?))
+    } else {
+        Ok(None)
+    }
+}
+
+/// Holds the options to determine the fix file mode.
+pub(crate) struct FixFileModeOptions {
+    write: bool,
+    suppress: bool,
+    suppression_reason: Option<String>,
+    fix: bool,
+    unsafe_: bool,
+}
+
+/// - [Result]: if the given options are incompatible
+/// - [Option]: if no fixes are requested
+/// - [FixFileMode]: if safe or unsafe fixes are requested
+pub(crate) fn determine_fix_file_mode(
+    options: FixFileModeOptions,
+    console: &mut dyn Console,
+) -> Result<Option<FixFileMode>, CliDiagnostic> {
+    let FixFileModeOptions {
+        write,
+        fix,
+        suppress,
+        suppression_reason: _,
+        unsafe_,
+    } = options;
+
+    check_fix_incompatible_arguments(options)?;
+
+    let safe_fixes = write || fix;
+    let unsafe_fixes = ((write || safe_fixes) && unsafe_);
+
+    if unsafe_fixes {
+        Ok(Some(FixFileMode::SafeAndUnsafeFixes))
+    } else if safe_fixes {
+        Ok(Some(FixFileMode::SafeFixes))
+    } else if suppress {
+        Ok(Some(FixFileMode::ApplySuppressions))
+    } else {
+        Ok(None)
+    }
+}
+
+/// Checks if the fix file options are incompatible.
+fn check_fix_incompatible_arguments(options: FixFileModeOptions) -> Result<(), CliDiagnostic> {
+    let FixFileModeOptions {
+        write,
+        suppress,
+        suppression_reason,
+        fix,
+        ..
+    } = options;
+    if write && fix {
+        return Err(CliDiagnostic::incompatible_arguments("--write", "--fix"));
+    } else if suppress && write {
+        return Err(CliDiagnostic::incompatible_arguments(
+            "--suppress",
+            "--write",
+        ));
+    } else if suppress && fix {
+        return Err(CliDiagnostic::incompatible_arguments("--suppress", "--fix"));
+    } else if !suppress && suppression_reason.is_some() {
+        return Err(CliDiagnostic::unexpected_argument(
+            "--reason",
+            "`--reason` is only valid when `--suppress` is used.",
+        ));
+    };
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pg_console::BufferConsole;
+
+    #[test]
+    fn incompatible_arguments() {
+        for (write, suppress, suppression_reason, fix, unsafe_) in [
+            (true, false, None, true, false), // --write --fix
+        ] {
+            assert!(check_fix_incompatible_arguments(FixFileModeOptions {
+                write,
+                suppress,
+                suppression_reason,
+                fix,
+                unsafe_
+            })
+            .is_err());
+        }
+    }
+
+    #[test]
+    fn safe_fixes() {
+        let mut console = BufferConsole::default();
+
+        for (write, suppress, suppression_reason, fix, unsafe_) in [
+            (true, false, None, false, false), // --write
+            (false, false, None, true, false), // --fix
+        ] {
+            assert_eq!(
+                determine_fix_file_mode(
+                    FixFileModeOptions {
+                        write,
+                        suppress,
+                        suppression_reason,
+                        fix,
+                        unsafe_
+                    },
+                    &mut console
+                )
+                .unwrap(),
+                Some(FixFileMode::SafeFixes)
+            );
+        }
+    }
+
+    #[test]
+    fn safe_and_unsafe_fixes() {
+        let mut console = BufferConsole::default();
+
+        for (write, suppress, suppression_reason, fix, unsafe_) in [
+            (true, false, None, false, true), // --write --unsafe
+            (false, false, None, true, true), // --fix --unsafe
+        ] {
+            assert_eq!(
+                determine_fix_file_mode(
+                    FixFileModeOptions {
+                        write,
+                        suppress,
+                        suppression_reason,
+                        fix,
+                        unsafe_
+                    },
+                    &mut console
+                )
+                .unwrap(),
+                Some(FixFileMode::SafeAndUnsafeFixes)
+            );
+        }
+    }
+
+    #[test]
+    fn no_fix() {
+        let mut console = BufferConsole::default();
+
+        let (write, suppress, suppression_reason, fix, unsafe_) =
+            (false, false, None, false, false);
+        assert_eq!(
+            determine_fix_file_mode(
+                FixFileModeOptions {
+                    write,
+                    suppress,
+                    suppression_reason,
+                    fix,
+                    unsafe_
+                },
+                &mut console
+            )
+            .unwrap(),
+            None
+        );
+    }
 
     /// Tests that all CLI options adhere to the invariants expected by `bpaf`.
     #[test]

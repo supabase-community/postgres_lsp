@@ -21,7 +21,7 @@ impl<'ctx, 'app> WorkspaceFile<'ctx, 'app> {
         ctx: &SharedTraversalOptions<'ctx, 'app>,
         path: &Path,
     ) -> Result<Self, Error> {
-        let biome_path = PgLspPath::new(path);
+        let pglsp_path = PgLspPath::new(path);
         let open_options = OpenOptions::default()
             .read(true)
             .write(ctx.execution.requires_write_access());
@@ -37,7 +37,7 @@ impl<'ctx, 'app> WorkspaceFile<'ctx, 'app> {
         let guard = FileGuard::open(
             ctx.workspace,
             OpenFileParams {
-                path: biome_path,
+                path: pglsp_path,
                 version: 0,
                 content: input.clone(),
             },

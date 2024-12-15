@@ -83,12 +83,27 @@ impl From<(bool, bool)> for VcsTargeted {
 pub enum TraversalMode {
     /// A dummy mode to be used when the CLI is not running any command
     Dummy,
+    /// This mode is enabled when running the command `check`
+    Check {
+        /// The type of fixes that should be applied when analyzing a file.
+        ///
+        /// It's [None] if the `check` command is called without `--apply` or `--apply-suggested`
+        /// arguments.
+        // fix_file_mode: Option<FixFileMode>,
+        /// An optional tuple.
+        /// 1. The virtual path to the file
+        /// 2. The content of the file
+        stdin: Option<Stdin>,
+        /// A flag to know vcs integrated options such as `--staged` or `--changed` are enabled
+        vcs_targeted: VcsTargeted,
+    },
 }
 
 impl Display for TraversalMode {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             TraversalMode::Dummy { .. } => write!(f, "dummy"),
+            TraversalMode::Check { .. } => write!(f, "check"),
         }
     }
 }
@@ -150,6 +165,7 @@ impl Execution {
     pub(crate) fn as_diagnostic_category(&self) -> &'static Category {
         match self.traversal_mode {
             TraversalMode::Dummy { .. } => category!("dummy"),
+            TraversalMode::Check { .. } => category!("check"),
         }
     }
 
@@ -161,18 +177,23 @@ impl Execution {
     pub(crate) const fn requires_write_access(&self) -> bool {
         match self.traversal_mode {
             TraversalMode::Dummy { .. } => false,
+            TraversalMode::Check { .. } => false,
         }
     }
 
     pub(crate) fn as_stdin_file(&self) -> Option<&Stdin> {
         match &self.traversal_mode {
             TraversalMode::Dummy { .. } => None,
+            TraversalMode::Check { stdin, .. } => stdin.as_ref(),
         }
     }
 
     pub(crate) fn is_vcs_targeted(&self) -> bool {
         match &self.traversal_mode {
             TraversalMode::Dummy { .. } => false,
+            TraversalMode::Check { vcs_targeted, .. } => {
+                vcs_targeted.staged || vcs_targeted.changed
+            }
         }
     }
 
@@ -184,6 +205,7 @@ impl Execution {
     pub(crate) fn is_write(&self) -> bool {
         match self.traversal_mode {
             TraversalMode::Dummy { .. } => false,
+            TraversalMode::Check { .. } => false,
         }
     }
 }
@@ -206,11 +228,11 @@ pub fn execute_mode(
 
     // don't do any traversal if there's some content coming from stdin
     if let Some(stdin) = execution.as_stdin_file() {
-        let biome_path = PgLspPath::new(stdin.as_path());
+        let pglsp_path = PgLspPath::new(stdin.as_path());
         std_in::run(
             session,
             &execution,
-            biome_path,
+            pglsp_path,
             stdin.as_content(),
             cli_options.verbose,
         )

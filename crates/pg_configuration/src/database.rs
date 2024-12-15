@@ -7,18 +7,23 @@ use serde::{Deserialize, Serialize};
 #[partial(derive(Bpaf, Clone, Eq, PartialEq))]
 #[partial(serde(rename_all = "snake_case", default, deny_unknown_fields))]
 pub struct DatabaseConfiguration {
+    /// The host of the database.
     #[partial(bpaf(long("host")))]
     pub host: String,
 
+    /// The port of the database.
     #[partial(bpaf(long("port")))]
     pub port: u16,
 
+    /// The username to connect to the database.
     #[partial(bpaf(long("username")))]
     pub username: String,
 
+    /// The password to connect to the database.
     #[partial(bpaf(long("password")))]
     pub password: String,
 
+    /// The name of the database.
     #[partial(bpaf(long("database")))]
     pub database: String,
 }

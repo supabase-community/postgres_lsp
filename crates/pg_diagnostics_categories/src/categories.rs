@@ -17,6 +17,7 @@ define_categories! {
     ;
     "stdin",
     "lint",
+    "check",
     "configuration",
     "database/connection",
     "internalError/io",

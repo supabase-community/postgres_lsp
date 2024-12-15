@@ -46,6 +46,17 @@ pub struct PullDiagnosticsResult {
     pub skipped_diagnostics: u64,
 }
 
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, PartialEq)]
+/// Which fixes should be applied during the analyzing phase
+pub enum FixFileMode {
+    /// Applies [safe](pg_diagnostics::Applicability::Always) fixes
+    SafeFixes,
+    /// Applies [safe](pg_diagnostics::Applicability::Always) and [unsafe](pg_diagnostics::Applicability::MaybeIncorrect) fixes
+    SafeAndUnsafeFixes,
+    /// Applies suppression comments to existing diagnostics when using `--suppress`
+    ApplySuppressions,
+}
+
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ChangeParams {
     /// The range of the file that changed. If `None`, the whole file changed.
@@ -174,22 +185,22 @@ impl<'app, W: Workspace + ?Sized> FileGuard<'app, W> {
             path: self.path.clone(),
         })
     }
-    //
-    // pub fn pull_diagnostics(
-    //     &self,
-    //     categories: RuleCategories,
-    //     max_diagnostics: u32,
-    //     only: Vec<RuleSelector>,
-    //     skip: Vec<RuleSelector>,
-    // ) -> Result<PullDiagnosticsResult, WorkspaceError> {
-    //     self.workspace.pull_diagnostics(PullDiagnosticsParams {
-    //         path: self.path.clone(),
-    //         categories,
-    //         max_diagnostics: max_diagnostics.into(),
-    //         only,
-    //         skip,
-    //     })
-    // }
+
+    pub fn pull_diagnostics(
+        &self,
+        // categories: RuleCategories,
+        max_diagnostics: u32,
+        // only: Vec<RuleSelector>,
+        // skip: Vec<RuleSelector>,
+    ) -> Result<PullDiagnosticsResult, WorkspaceError> {
+        self.workspace.pull_diagnostics(PullDiagnosticsParams {
+            path: self.path.clone(),
+            // categories,
+            max_diagnostics: max_diagnostics.into(),
+            // only,
+            // skip,
+        })
+    }
     //
     // pub fn pull_actions(
     //     &self,
