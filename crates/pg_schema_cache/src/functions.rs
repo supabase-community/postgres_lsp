@@ -109,7 +109,7 @@ pub struct Function {
 impl SchemaCacheItem for Function {
     type Item = Function;
 
-    async fn load(pool: &PgPool) -> Vec<Function> {
+    async fn load(pool: &PgPool) -> Result<Vec<Function>, sqlx::Error> {
         sqlx::query_as!(
             Function,
             r#"
@@ -246,6 +246,5 @@ from
         )
         .fetch_all(pool)
         .await
-        .unwrap()
     }
 }

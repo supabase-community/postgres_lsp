@@ -50,7 +50,7 @@ pub struct PostgresType {
 impl SchemaCacheItem for PostgresType {
     type Item = PostgresType;
 
-    async fn load(pool: &PgPool) -> Vec<PostgresType> {
+    async fn load(pool: &PgPool) -> Result<Vec<PostgresType>, sqlx::Error> {
         sqlx::query_as!(
             PostgresType,
             r#"select
@@ -103,6 +103,5 @@ where
         )
         .fetch_all(pool)
         .await
-        .unwrap()
     }
 }
