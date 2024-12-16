@@ -8,7 +8,7 @@ use pg_fs::PgLspPath;
 pub(crate) fn run<'a>(
     session: CliSession,
     mode: &'a Execution,
-    biome_path: PgLspPath,
+    pglsp_path: PgLspPath,
     content: &'a str,
     verbose: bool,
 ) -> Result<(), CliDiagnostic> {

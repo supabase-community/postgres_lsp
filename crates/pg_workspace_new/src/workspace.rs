@@ -31,6 +31,33 @@ pub struct ChangeFileParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PullDiagnosticsParams {
+    pub path: PgLspPath,
+    // pub categories: RuleCategories,
+    pub max_diagnostics: u64,
+    // pub only: Vec<RuleSelector>,
+    // pub skip: Vec<RuleSelector>,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PullDiagnosticsResult {
+    pub diagnostics: Vec<pg_diagnostics::serde::Diagnostic>,
+    pub errors: usize,
+    pub skipped_diagnostics: u64,
+}
+
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, PartialEq)]
+/// Which fixes should be applied during the analyzing phase
+pub enum FixFileMode {
+    /// Applies [safe](pg_diagnostics::Applicability::Always) fixes
+    SafeFixes,
+    /// Applies [safe](pg_diagnostics::Applicability::Always) and [unsafe](pg_diagnostics::Applicability::MaybeIncorrect) fixes
+    SafeAndUnsafeFixes,
+    /// Applies suppression comments to existing diagnostics when using `--suppress`
+    ApplySuppressions,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ChangeParams {
     /// The range of the file that changed. If `None`, the whole file changed.
     pub range: Option<TextRange>,
@@ -72,6 +99,12 @@ pub struct ServerInfo {
 }
 
 pub trait Workspace: Send + Sync + RefUnwindSafe {
+    /// Retrieves the list of diagnostics associated to a file
+    fn pull_diagnostics(
+        &self,
+        params: PullDiagnosticsParams,
+    ) -> Result<PullDiagnosticsResult, WorkspaceError>;
+
     /// Refresh the schema cache for this workspace
     fn refresh_schema_cache(&self) -> Result<(), WorkspaceError>;
 
@@ -152,22 +185,22 @@ impl<'app, W: Workspace + ?Sized> FileGuard<'app, W> {
             path: self.path.clone(),
         })
     }
-    //
-    // pub fn pull_diagnostics(
-    //     &self,
-    //     categories: RuleCategories,
-    //     max_diagnostics: u32,
-    //     only: Vec<RuleSelector>,
-    //     skip: Vec<RuleSelector>,
-    // ) -> Result<PullDiagnosticsResult, WorkspaceError> {
-    //     self.workspace.pull_diagnostics(PullDiagnosticsParams {
-    //         path: self.path.clone(),
-    //         categories,
-    //         max_diagnostics: max_diagnostics.into(),
-    //         only,
-    //         skip,
-    //     })
-    // }
+
+    pub fn pull_diagnostics(
+        &self,
+        // categories: RuleCategories,
+        max_diagnostics: u32,
+        // only: Vec<RuleSelector>,
+        // skip: Vec<RuleSelector>,
+    ) -> Result<PullDiagnosticsResult, WorkspaceError> {
+        self.workspace.pull_diagnostics(PullDiagnosticsParams {
+            path: self.path.clone(),
+            // categories,
+            max_diagnostics: max_diagnostics.into(),
+            // only,
+            // skip,
+        })
+    }
     //
     // pub fn pull_actions(
     //     &self,

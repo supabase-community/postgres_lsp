@@ -154,6 +154,9 @@ impl<'a> fmt::Display for SummaryTotal<'a> {
             TraversalMode::Dummy { .. } => fmt.write_markup(markup! {
                 "Dummy "{files}" in "{self.2}"."
             }),
+            TraversalMode::Check { .. } => fmt.write_markup(markup! {
+                "Checked "{files}" in "{self.2}"."
+            }),
         }
     }
 }

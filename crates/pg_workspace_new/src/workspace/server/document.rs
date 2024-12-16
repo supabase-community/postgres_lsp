@@ -74,6 +74,13 @@ impl Document {
             .collect()
     }
 
+    pub fn statement_refs_with_ranges(&self) -> Vec<(StatementRef, TextRange)> {
+        self.statements
+            .iter()
+            .map(|inner_ref| (self.statement_ref(inner_ref), inner_ref.1))
+            .collect()
+    }
+
     #[allow(dead_code)]
     /// Returns the statement ref at the given offset
     pub fn statement_ref_at_offset(&self, offset: &TextSize) -> Option<StatementRef> {

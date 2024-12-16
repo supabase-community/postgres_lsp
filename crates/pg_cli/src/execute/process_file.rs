@@ -1,7 +1,9 @@
+mod check;
 pub(crate) mod workspace_file;
 
 use crate::execute::traverse::TraversalOptions;
 use crate::execute::TraversalMode;
+use check::check_file;
 use pg_diagnostics::Error;
 use pg_fs::PgLspPath;
 use std::marker::PhantomData;
@@ -117,6 +119,7 @@ pub(crate) fn process_file(ctx: &TraversalOptions, pglsp_path: &PgLspPath) -> Fi
             TraversalMode::Dummy => {
                 unreachable!("The dummy mode should not be called for this file")
             }
+            TraversalMode::Check { .. } => check_file(shared_context, pglsp_path),
         }
     })
 }

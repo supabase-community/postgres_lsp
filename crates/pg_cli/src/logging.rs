@@ -105,7 +105,7 @@ const SELF_FILTER: LevelFilter = if cfg!(debug_assertions) {
 
 impl LoggingFilter {
     fn is_enabled(&self, meta: &Metadata<'_>) -> bool {
-        let filter = if meta.target().starts_with("biome") {
+        let filter = if meta.target().starts_with("pglsp") {
             if let Some(level) = self.level.to_filter_level() {
                 level
             } else {

@@ -3,6 +3,7 @@ use std::{fs, future::Future, panic::RefUnwindSafe, path::Path, sync::RwLock};
 use change::StatementChange;
 use dashmap::{DashMap, DashSet};
 use document::{Document, StatementRef};
+use pg_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, DiagnosticExt, Severity};
 use pg_fs::{ConfigName, PgLspPath};
 use pg_query::PgQueryStore;
 use pg_schema_cache::SchemaCache;
@@ -10,10 +11,12 @@ use sqlx::PgPool;
 use std::sync::LazyLock;
 use store::Store;
 use tokio::runtime::Runtime;
+use tracing::info;
 use tree_sitter::TreeSitterStore;
 
 use crate::{
     settings::{Settings, SettingsHandle, SettingsHandleMut},
+    workspace::PullDiagnosticsResult,
     WorkspaceError,
 };
 
@@ -209,10 +212,16 @@ impl Workspace for WorkspaceServer {
     #[tracing::instrument(level = "trace", skip(self))]
     fn open_file(&self, params: OpenFileParams) -> Result<(), WorkspaceError> {
         tracing::info!("Opening file: {:?}", params.path);
-        self.documents.insert(
-            params.path.clone(),
-            Document::new(params.path, params.content, params.version),
-        );
+
+        let doc = Document::new(params.path.clone(), params.content, params.version);
+
+        doc.statements.iter().for_each(|s| {
+            let stmt = doc.statement(s);
+            self.tree_sitter.add_statement(&stmt);
+            self.pg_query.add_statement(&stmt);
+        });
+
+        self.documents.insert(params.path, doc);
 
         Ok(())
     }
@@ -288,6 +297,50 @@ impl Workspace for WorkspaceServer {
 
     fn is_path_ignored(&self, params: IsPathIgnoredParams) -> Result<bool, WorkspaceError> {
         Ok(self.is_ignored(params.pglsp_path.as_path()))
+    }
+
+    fn pull_diagnostics(
+        &self,
+        params: super::PullDiagnosticsParams,
+    ) -> Result<super::PullDiagnosticsResult, WorkspaceError> {
+        // get all statements form the requested document and pull diagnostics out of every
+        // source
+        let doc = self
+            .documents
+            .get(&params.path)
+            .ok_or(WorkspaceError::not_found())?;
+
+        let diagnostics: Vec<SDiagnostic> = doc
+            .statement_refs_with_ranges()
+            .iter()
+            .flat_map(|(stmt, r)| {
+                let mut stmt_diagnostics = vec![];
+
+                stmt_diagnostics.extend(self.pg_query.pull_diagnostics(stmt));
+
+                stmt_diagnostics
+                    .into_iter()
+                    .map(|d| {
+                        SDiagnostic::new(
+                            d.with_file_path(params.path.as_path().display().to_string())
+                                .with_file_span(r),
+                        )
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .collect();
+
+        let errors = diagnostics
+            .iter()
+            .filter(|d| d.severity() == Severity::Error)
+            .count();
+
+        info!("Pulled {:?} diagnostic(s)", diagnostics.len());
+        Ok(PullDiagnosticsResult {
+            diagnostics,
+            errors,
+            skipped_diagnostics: 0,
+        })
     }
 }
 

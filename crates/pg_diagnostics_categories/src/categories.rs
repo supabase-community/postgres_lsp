@@ -17,6 +17,7 @@ define_categories! {
     ;
     "stdin",
     "lint",
+    "check",
     "configuration",
     "database/connection",
     "internalError/io",
@@ -25,5 +26,6 @@ define_categories! {
     "flags/invalid",
     "project",
     "internalError/panic",
+    "syntax",
     "dummy",
 }
