@@ -200,7 +200,7 @@ mod tests {
 
     #[test]
     fn test_lexer() {
-        let input = "select 1; \n -- some comment \n select 2";
+        let input = "select 1; \n -- some comment \n select 2\t";
 
         let tokens = lex(input);
         let mut tokens_iter = tokens.iter();
@@ -248,5 +248,8 @@ mod tests {
         let token = tokens_iter.next().unwrap();
         assert_eq!(token.kind, SyntaxKind::Iconst);
         assert_eq!(token.text, "2");
+
+        let token = tokens_iter.next().unwrap();
+        assert_eq!(token.kind, SyntaxKind::Tab);
     }
 }
