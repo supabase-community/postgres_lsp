@@ -17,7 +17,9 @@ pub(crate) async fn get_test_deps(
         .await
         .expect("Failed to execute setup query");
 
-    let schema_cache = SchemaCache::load(&test_db).await;
+    let schema_cache = SchemaCache::load(&test_db)
+        .await
+        .expect("Failed to load Schema Cache");
 
     let mut parser = tree_sitter::Parser::new();
     parser
