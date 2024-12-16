@@ -244,7 +244,7 @@ impl Session {
 
         let completion_items: Vec<CompletionItem> = pg_completions::complete(CompletionParams {
             position: offset - range.start() - TextSize::from(1),
-            text: &stmt.text,
+            text: stmt.text.clone(),
             tree: ide
                 .tree_sitter
                 .tree(&stmt)
