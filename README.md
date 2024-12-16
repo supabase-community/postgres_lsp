@@ -44,17 +44,20 @@ Once the parser is stable, and a robust and scalable data model is implemented, 
 Add the postgres_lsp executable to your path, and add the following to your config to use it.
 
 ```lua
+local util = require 'lspconfig.util'
+local lspconfig = require 'lspconfig'
+
 require('lspconfig.configs').postgres_lsp = {
   default_config = {
     name = 'postgres_lsp',
-    cmd = {'postgres_lsp'},
-    filetypes = {'sql'},
+    cmd = { 'postgres_lsp' },
+    filetypes = { 'sql' },
     single_file_support = true,
-    root_dir = util.root_pattern 'root-file.txt'
-  }
+    root_dir = util.root_pattern 'root-file.txt',
+  },
 }
 
-lsp.configure("postgres_lsp", {force_setup = true})
+lspconfig.postgres_lsp.setup { force_setup = true }
 ```
 
 ### Building from source
