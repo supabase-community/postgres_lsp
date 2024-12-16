@@ -15,6 +15,8 @@ const SNAPSHOTS_PATH: &str = "snapshots/data";
 #[test]
 fn valid_statements() {
     // dont do postgres regress tests for now
+    let skipped_tests: Vec<_> = SKIPPED_REGRESS_TESTS.lines().collect();
+
     for path in [VALID_STATEMENTS_PATH] {
         let mut paths: Vec<_> = fs::read_dir(path).unwrap().map(|r| r.unwrap()).collect();
         paths.sort_by_key(|dir| dir.path());
@@ -23,11 +25,7 @@ fn valid_statements() {
             let path = f.path();
             let test_name = path.file_stem().unwrap().to_str().unwrap();
 
-            if SKIPPED_REGRESS_TESTS
-                .lines()
-                .collect::<Vec<_>>()
-                .contains(&test_name)
-            {
+            if skipped_tests.contains(&test_name) {
                 continue;
             }
 
