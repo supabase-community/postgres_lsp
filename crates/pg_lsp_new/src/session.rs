@@ -261,7 +261,7 @@ impl Session {
                 max_diagnostics: u64::MAX,
             })?;
 
-            tracing::trace!("biome diagnostics: {:#?}", result.diagnostics);
+            tracing::trace!("pglsp diagnostics: {:#?}", result.diagnostics);
 
             result
                 .diagnostics
