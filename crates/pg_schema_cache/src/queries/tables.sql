@@ -5,14 +5,14 @@ select
   c.relrowsecurity as rls_enabled,
   c.relforcerowsecurity as rls_forced,
   case
-    when c.relreplident = 'd' then 'default'
-    when c.relreplident = 'i' then 'index'
-    when c.relreplident = 'f' then 'full'
-    else 'nothing'
+    when c.relreplident = 'd' then 'DEFAULT'
+    when c.relreplident = 'i' then 'INDEX'
+    when c.relreplident = 'f' then 'FULL'
+    else 'NOTHING'
   end as "replica_identity!",
-  pg_total_relation_size(format('%i.%i', nc.nspname, c.relname)) :: int8 as "bytes!",
+  pg_total_relation_size(format('%I.%I', nc.nspname, c.relname)) :: int8 as "bytes!",
   pg_size_pretty(
-    pg_total_relation_size(format('%i.%i', nc.nspname, c.relname))
+    pg_total_relation_size(format('%I.%I', nc.nspname, c.relname))
   ) as "size!",
   pg_stat_get_live_tuples(c.oid) as "live_rows_estimate!",
   pg_stat_get_dead_tuples(c.oid) as "dead_rows_estimate!",
@@ -24,12 +24,12 @@ where
   c.relkind in ('r', 'p')
   and not pg_is_other_temp_schema(nc.oid)
   and (
-    pg_has_role(c.relowner, 'usage')
+    pg_has_role(c.relowner, 'USAGE')
     or has_table_privilege(
       c.oid,
-      'select, insert, update, delete, truncate, references, trigger'
+      'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'
     )
-    or has_any_column_privilege(c.oid, 'select, insert, update, references')
+    or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
   )
 group by
   c.oid,
