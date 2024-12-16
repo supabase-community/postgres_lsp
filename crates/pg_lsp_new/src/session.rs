@@ -251,7 +251,7 @@ impl Session {
         if self.configuration_status().is_error() && !self.notified_broken_configuration() {
             self.set_notified_broken_configuration();
             self.client
-                    .show_message(MessageType::WARNING, "The configuration file has errors. Biome will report only parsing errors until the configuration is fixed.")
+                    .show_message(MessageType::WARNING, "The configuration file has errors. PgLSP will report only parsing errors until the configuration is fixed.")
                     .await;
         }
 
