@@ -89,7 +89,7 @@ fn whitespace_tokens(input: &str) -> VecDeque<Token> {
         } else if let Some(tab) = cap.name("tab") {
             tokens.push_back(Token {
                 token_type: TokenType::Whitespace,
-                kind: SyntaxKind::Newline,
+                kind: SyntaxKind::Tab,
                 text: tab.as_str().to_string(),
                 span: TextRange::new(
                     TextSize::from(u32::try_from(tab.start()).unwrap()),
@@ -176,6 +176,27 @@ pub fn lex(text: &str) -> Vec<Token> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_tab_tokens() {
+        let input = "select\t1";
+        let tokens = lex(input);
+        assert_eq!(tokens[1].kind, SyntaxKind::Tab);
+    }
+
+    #[test]
+    fn test_newline_tokens() {
+        let input = "select\n1";
+        let tokens = lex(input);
+        assert_eq!(tokens[1].kind, SyntaxKind::Newline);
+    }
+
+    #[test]
+    fn test_whitespace_tokens() {
+        let input = "select 1";
+        let tokens = lex(input);
+        assert_eq!(tokens[1].kind, SyntaxKind::Whitespace);
+    }
 
     #[test]
     fn test_lexer() {
