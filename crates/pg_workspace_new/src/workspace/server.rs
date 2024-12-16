@@ -306,7 +306,7 @@ impl Workspace for WorkspaceServer {
         params: super::PullDiagnosticsParams,
     ) -> Result<super::PullDiagnosticsResult, WorkspaceError> {
         // get all statements form the requested document and pull diagnostics out of every
-        // sourcece
+        // source
         let doc = self
             .documents
             .get(&params.path)
