@@ -91,6 +91,9 @@ impl<'a> CompletionContext<'a> {
         // go to the statement node that matches the position
         let current_node_kind = cursor.node().kind();
 
+        dbg!(current_node_kind);
+        dbg!(self.position);
+
         cursor.goto_first_child_for_byte(self.position);
 
         self.gather_context_from_node(cursor, current_node_kind);
@@ -103,6 +106,14 @@ impl<'a> CompletionContext<'a> {
     ) {
         let current_node = cursor.node();
         let current_node_kind = current_node.kind();
+
+        println!("inside..");
+        dbg!(current_node_kind);
+
+        if current_node_kind == previous_node_kind {
+            self.ts_node = Some(current_node);
+            return;
+        }
 
         match previous_node_kind {
             "statement" => self.wrapping_clause_type = current_node_kind.try_into().ok(),
@@ -266,5 +277,30 @@ mod tests {
 
             assert_eq!(ctx.is_invocation, is_invocation);
         }
+    }
+
+    #[test]
+    fn get_ts_node_content_does_not_fail_on_error_nodes() {
+        let query = format!("select * from {}", CURSOR_POS);
+
+        let position = query.find(CURSOR_POS).unwrap();
+        let text = query.replace(CURSOR_POS, "");
+
+        let tree = get_tree(text.as_str());
+
+        let params = crate::CompletionParams {
+            position: (position as u32).into(),
+            text: text,
+            tree: Some(&tree),
+            schema: &pg_schema_cache::SchemaCache::new(),
+        };
+
+        let ctx = CompletionContext::new(&params);
+
+        let node = ctx.ts_node.map(|n| n.clone());
+
+        println!("node kind: {}", node.as_ref().unwrap().kind());
+
+        ctx.get_ts_node_content(node.unwrap());
     }
 }

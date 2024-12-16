@@ -76,7 +76,7 @@ mod tests {
             (format!("select * from us{}", CURSOR_POS), "users"),
             (format!("select * from em{}", CURSOR_POS), "emails"),
             // TODO: Fix queries with tree-sitter errors.
-            // (format!("select * from {}", CURSOR_POS), "addresses"),
+            (format!("select * from {}", CURSOR_POS), "addresses"),
         ];
 
         for (query, expected_label) in test_cases {
