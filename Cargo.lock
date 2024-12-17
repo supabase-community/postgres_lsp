@@ -2217,6 +2217,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pg_analyse"
+version = "0.0.0"
+dependencies = [
+ "biome_deserialize",
+ "biome_deserialize_macros",
+ "enumflags2",
+ "pg_console",
+ "pg_diagnostics",
+ "pg_query_ext",
+ "pg_schema_cache",
+ "rustc-hash 2.1.0",
+ "serde",
+ "text-size",
+]
+
+[[package]]
 name = "pg_base_db"
 version = "0.0.0"
 dependencies = [
@@ -2427,8 +2443,11 @@ dependencies = [
 name = "pg_lint"
 version = "0.0.0"
 dependencies = [
+ "enumflags2",
  "lazy_static",
  "pg_base_db",
+ "pg_console",
+ "pg_diagnostics",
  "pg_query_ext",
  "pg_syntax",
  "serde",
