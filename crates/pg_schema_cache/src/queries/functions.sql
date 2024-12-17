@@ -1,6 +1,15 @@
 with functions as (
   select
-    *,
+    oid,
+    proname,
+    prosrc,
+    prorettype,
+    proretset,
+    provolatile,
+    prosecdef,
+    prolang,
+    pronamespace,
+    proconfig,
     -- proargmodes is null when all arg modes are IN
     coalesce(
       p.proargmodes,
@@ -29,23 +38,23 @@ with functions as (
     p.prokind = 'f'
 )
 select
-  f.oid :: int8 as id,
-  n.nspname as schema,
-  f.proname as name,
-  l.lanname as language,
+  f.oid :: int8 as "id!",
+  n.nspname as "schema!",
+  f.proname as "name!",
+  l.lanname as "language!",
   case
-    when l.lanname = 'internal' then ''
+    when l.lanname = 'internal' then null
     else f.prosrc
-  end as definition,
+  end as body,
   case
-    when l.lanname = 'internal' then f.prosrc
+    when l.lanname = 'internal' then null
     else pg_get_functiondef(f.oid)
-  end as complete_statement,
+  end as definition,
   coalesce(f_args.args, '[]') as args,
-  pg_get_function_arguments(f.oid) as argument_types,
-  pg_get_function_identity_arguments(f.oid) as identity_argument_types,
-  f.prorettype :: int8 as return_type_id,
-  pg_get_function_result(f.oid) as return_type,
+  nullif(pg_get_function_arguments(f.oid), '') as argument_types,
+  nullif(pg_get_function_identity_arguments(f.oid), '') as identity_argument_types,
+  f.prorettype :: int8 as "return_type_id!",
+  pg_get_function_result(f.oid) as "return_type!",
   nullif(rt.typrelid :: int8, 0) as return_type_relation_id,
   f.proretset as is_set_returning_function,
   case
