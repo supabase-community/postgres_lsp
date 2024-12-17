@@ -130,6 +130,10 @@ new-crate name:
   cargo new --lib crates/{{snakecase(name)}}
   cargo run -p xtask_codegen -- new-crate --name={{snakecase(name)}}
 
+# Prints the treesitter tree of the given SQL file
+tree-print file:
+	cargo run --bin tree_print -- -f {{file}}
+
 # Creates a new changeset for the final changelog
 # new-changeset:
 #     knope document-change

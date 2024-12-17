@@ -31,16 +31,25 @@ pub(crate) async fn get_test_deps(
     (tree, schema_cache)
 }
 
+pub(crate) fn get_text_and_position(sql: &str) -> (usize, String) {
+    // the cursor is to the left of the `CURSOR_POS`
+    let position = sql
+        .find(|c| c == CURSOR_POS)
+        .expect("Please insert the CURSOR_POS into your query.")
+        .checked_sub(1)
+        .unwrap_or(0);
+
+    let text = sql.replace(CURSOR_POS, "");
+
+    (position, text)
+}
+
 pub(crate) fn get_test_params<'a>(
     tree: &'a tree_sitter::Tree,
     schema_cache: &'a pg_schema_cache::SchemaCache,
     sql: &'a str,
 ) -> CompletionParams<'a> {
-    let position = sql
-        .find(|c| c == CURSOR_POS)
-        .expect("Please insert the CURSOR_POS into your query.");
-
-    let text = sql.replace(CURSOR_POS, "");
+    let (position, text) = get_text_and_position(sql);
 
     CompletionParams {
         position: (position as u32).into(),
