@@ -142,3 +142,8 @@ tree-print file:
 # dry-run-release *args='':
 #     knope release --dry-run {{args}}
 
+clear-branches:
+    git branch --merged | egrep -v "(^\\*|main)" | xargs git branch -d
+
+reset-git:
+    git checkout main && git pull && pnpm run clear-branches

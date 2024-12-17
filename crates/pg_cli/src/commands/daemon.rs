@@ -206,13 +206,13 @@ pub(crate) fn read_most_recent_log_file(
 /// `pglsp-logs/server.log.yyyy-MM-dd-HH` files inside the system temporary
 /// directory)
 fn setup_tracing_subscriber(log_path: Option<PathBuf>, log_file_name_prefix: Option<String>) {
-    let biome_log_path = log_path.unwrap_or(pg_fs::ensure_cache_dir().join("pglsp-logs"));
+    let pglsp_log_path = log_path.unwrap_or(pg_fs::ensure_cache_dir().join("pglsp-logs"));
     let appender_builder = tracing_appender::rolling::RollingFileAppender::builder();
     let file_appender = appender_builder
         .filename_prefix(log_file_name_prefix.unwrap_or(String::from("server.log")))
         .max_log_files(7)
         .rotation(Rotation::HOURLY)
-        .build(biome_log_path)
+        .build(pglsp_log_path)
         .expect("Failed to start the logger for the daemon.");
 
     registry()
@@ -241,7 +241,7 @@ pub fn default_pglsp_log_path() -> PathBuf {
 /// - All spans and events at level debug in crates whose name starts with `biome`
 struct LoggingFilter;
 
-/// Tracing filter used for spans emitted by `biome*` crates
+/// Tracing filter used for spans emitted by `pglsp*` crates
 const SELF_FILTER: LevelFilter = if cfg!(debug_assertions) {
     LevelFilter::TRACE
 } else {
@@ -250,7 +250,7 @@ const SELF_FILTER: LevelFilter = if cfg!(debug_assertions) {
 
 impl LoggingFilter {
     fn is_enabled(&self, meta: &Metadata<'_>) -> bool {
-        let filter = if meta.target().starts_with("biome") {
+        let filter = if meta.target().starts_with("pglsp") {
             SELF_FILTER
         } else {
             LevelFilter::INFO

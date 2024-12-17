@@ -52,7 +52,7 @@ fn main() -> ExitCode {
 
 fn run_workspace(console: &mut EnvConsole, command: PgLspCommand) -> Result<(), CliDiagnostic> {
     // If the `--use-server` CLI flag is set, try to open a connection to an
-    // existing Biome server socket
+    // existing server socket
     let workspace = if command.should_use_server() {
         let runtime = Runtime::new()?;
         match open_transport(runtime)? {

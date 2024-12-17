@@ -4,11 +4,15 @@
 //! to parse commands and arguments, redirect the execution of the commands and
 //! execute the traversal of directory and files, based on the command that was passed.
 
+use cli_options::CliOptions;
+use commands::check::CheckCommandPayload;
+use commands::CommandRunner;
 use pg_console::{ColorMode, Console};
 use pg_fs::OsFileSystem;
 use pg_workspace_new::{App, DynRef, Workspace, WorkspaceRef};
 use std::env;
 
+mod changed;
 mod cli_options;
 mod commands;
 mod diagnostics;
@@ -62,6 +66,32 @@ impl<'app> CliSession<'app> {
 
         let result = match command {
             PgLspCommand::Version(_) => commands::version::full_version(self),
+            PgLspCommand::Check {
+                write,
+                fix,
+                unsafe_,
+                cli_options,
+                configuration,
+                paths,
+                stdin_file_path,
+                staged,
+                changed,
+                since,
+            } => run_command(
+                self,
+                &cli_options,
+                CheckCommandPayload {
+                    write,
+                    fix,
+                    unsafe_,
+                    configuration,
+                    paths,
+                    stdin_file_path,
+                    staged,
+                    changed,
+                    since,
+                },
+            ),
             PgLspCommand::Clean => commands::clean::clean(self),
             PgLspCommand::Start {
                 config_path,
@@ -104,4 +134,13 @@ pub fn to_color_mode(color: Option<&ColorsArg>) -> ColorMode {
         Some(ColorsArg::Force) => ColorMode::Enabled,
         None => ColorMode::Auto,
     }
+}
+
+pub(crate) fn run_command(
+    session: CliSession,
+    cli_options: &CliOptions,
+    mut command: impl CommandRunner,
+) -> Result<(), CliDiagnostic> {
+    let command = &mut command;
+    command.run(session, cli_options)
 }

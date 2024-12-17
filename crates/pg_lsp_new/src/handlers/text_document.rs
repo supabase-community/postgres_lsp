@@ -5,7 +5,7 @@ use pg_workspace_new::workspace::{
     ChangeFileParams, ChangeParams, CloseFileParams, GetFileContentParams, OpenFileParams,
 };
 use tower_lsp::lsp_types;
-use tracing::field;
+use tracing::{error, field};
 
 /// Handler for `textDocument/didOpen` LSP notification
 #[tracing::instrument(
@@ -35,9 +35,9 @@ pub(crate) async fn did_open(
 
     session.insert_document(url.clone(), doc);
 
-    // if let Err(err) = session.update_diagnostics(url).await {
-    //     error!("Failed to update diagnostics: {}", err);
-    // }
+    if let Err(err) = session.update_diagnostics(url).await {
+        error!("Failed to update diagnostics: {}", err);
+    }
 
     Ok(())
 }
@@ -89,9 +89,9 @@ pub(crate) async fn did_change(
 
     session.insert_document(url.clone(), new_doc);
 
-    // if let Err(err) = session.update_diagnostics(url).await {
-    //     error!("Failed to update diagnostics: {}", err);
-    // }
+    if let Err(err) = session.update_diagnostics(url).await {
+        error!("Failed to update diagnostics: {}", err);
+    }
 
     Ok(())
 }

@@ -482,6 +482,7 @@ impl<'ctx, 'app> TraversalContext for TraversalOptions<'ctx, 'app> {
 
         match self.execution.traversal_mode() {
             TraversalMode::Dummy { .. } => true,
+            TraversalMode::Check { .. } => true,
         }
     }
 
