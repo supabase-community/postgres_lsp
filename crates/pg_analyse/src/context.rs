@@ -21,12 +21,12 @@ where
         stmt: &'a pg_query_ext::NodeEnum,
         file_path: &'a Path,
         options: &'a R::Options,
-    ) -> Result<Self, Error> {
-        Ok(Self {
+    ) -> Self {
+        Self {
             stmt,
             file_path,
             options,
-        })
+        }
     }
 
     /// Returns the group that belongs to the current rule

@@ -94,10 +94,8 @@ impl RegistryVisitor for MetadataRegistry {
 
 pub struct RuleRegistryBuilder<'a> {
     filter: &'a AnalysisFilter<'a>,
-    root: &'a pg_query_ext::NodeEnum,
     // Rule Registry
     registry: RuleRegistry,
-    diagnostics: Vec<Error>,
 }
 
 impl RegistryVisitor for RuleRegistryBuilder<'_> {
@@ -133,10 +131,19 @@ pub struct RuleRegistry {
     rules: Vec<RegistryRule>,
 }
 
+impl IntoIterator for RuleRegistry {
+    type Item = RegistryRule;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.rules.into_iter()
+    }
+}
+
 /// Internal representation of a single rule in the registry
 #[derive(Copy, Clone)]
 pub struct RegistryRule {
-    run: RuleExecutor,
+    pub(crate) run: RuleExecutor,
 }
 
 pub struct RegistryRuleParams<'analyzer> {
@@ -145,7 +152,7 @@ pub struct RegistryRuleParams<'analyzer> {
 }
 
 /// Executor for rule as a generic function pointer
-type RuleExecutor = fn(&mut RegistryRuleParams) -> Result<Vec<RuleDiagnostic>, Error>;
+type RuleExecutor = fn(&RegistryRuleParams) -> Vec<RuleDiagnostic>;
 
 impl RegistryRule {
     fn new<R>() -> Self
@@ -153,17 +160,13 @@ impl RegistryRule {
         R: Rule<Options: Default> + 'static,
     {
         /// Generic implementation of RuleExecutor for any rule type R
-        fn run<R>(params: &mut RegistryRuleParams) -> Result<Vec<RuleDiagnostic>, Error>
+        fn run<R>(params: &RegistryRuleParams) -> Vec<RuleDiagnostic>
         where
             R: Rule<Options: Default> + 'static,
         {
             let options = params.options.rule_options::<R>().unwrap_or_default();
-            let ctx = match RuleContext::new(params.root, &params.options.file_path, &options) {
-                Ok(ctx) => ctx,
-                Err(error) => return Err(error),
-            };
-
-            Ok(R::run(&ctx))
+            let ctx = RuleContext::new(params.root, &params.options.file_path, &options);
+            R::run(&ctx)
         }
 
         Self { run: run::<R> }

@@ -217,12 +217,6 @@ fn unicode_to_ascii(c: char) -> char {
 mod tests {
     use std::{fmt::Write, str::from_utf8};
 
-    
-    
-
-    
-    
-
     use super::SanitizeAdapter;
 
     #[test]

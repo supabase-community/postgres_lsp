@@ -476,7 +476,8 @@ mod tests {
     #[test]
     fn incompatible_arguments() {
         {
-            let (write, suppress, suppression_reason, fix, unsafe_) = (true, false, None, true, false);
+            let (write, suppress, suppression_reason, fix, unsafe_) =
+                (true, false, None, true, false);
             assert!(check_fix_incompatible_arguments(FixFileModeOptions {
                 write,
                 suppress,
