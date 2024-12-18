@@ -1,4 +1,3 @@
-use pg_diagnostics::{Error, Result};
 use std::path::Path;
 
 use crate::{

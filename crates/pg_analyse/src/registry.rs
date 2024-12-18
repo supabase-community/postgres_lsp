@@ -1,6 +1,5 @@
 use std::{borrow, collections::BTreeSet};
 
-use pg_diagnostics::Error;
 
 use crate::{
     context::RuleContext,
