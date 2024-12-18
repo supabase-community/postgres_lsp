@@ -40,7 +40,7 @@ impl DbConnection {
                     res = listener.recv() => {
                         match res {
                             Ok(not) => {
-                                if not.payload().to_string() == "reload schema" {
+                                if not.payload() == "reload schema" {
                                     let schema_cache = SchemaCache::load(&cloned_pool).await;
                                     ide.write().await.set_schema_cache(schema_cache);
                                 };
@@ -62,7 +62,7 @@ impl DbConnection {
 
         Ok(Self {
             pool,
-            connection_string: connection_string,
+            connection_string,
             schema_update_handle,
             close_tx,
         })

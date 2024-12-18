@@ -1,6 +1,5 @@
 use crate::changed::{get_changed_files, get_staged_files};
 use crate::cli_options::{cli_options, CliOptions, CliReporter, ColorsArg};
-use crate::diagnostics::DeprecatedArgument;
 use crate::execute::Stdin;
 use crate::logging::LoggingKind;
 use crate::{
@@ -8,8 +7,7 @@ use crate::{
 };
 use bpaf::Bpaf;
 use pg_configuration::{partial_configuration, PartialConfiguration};
-use pg_console::{markup, Console, ConsoleExt};
-use pg_diagnostics::{Diagnostic, PrintDiagnostic};
+use pg_console::Console;
 use pg_fs::FileSystem;
 use pg_workspace_new::configuration::{load_configuration, LoadedConfiguration};
 use pg_workspace_new::settings::PartialConfigurationExt;
@@ -430,7 +428,7 @@ pub(crate) fn determine_fix_file_mode(
     check_fix_incompatible_arguments(options)?;
 
     let safe_fixes = write || fix;
-    let unsafe_fixes = ((write || safe_fixes) && unsafe_);
+    let unsafe_fixes = (write || safe_fixes) && unsafe_;
 
     if unsafe_fixes {
         Ok(Some(FixFileMode::SafeAndUnsafeFixes))
@@ -477,9 +475,8 @@ mod tests {
 
     #[test]
     fn incompatible_arguments() {
-        for (write, suppress, suppression_reason, fix, unsafe_) in [
-            (true, false, None, true, false), // --write --fix
-        ] {
+        {
+            let (write, suppress, suppression_reason, fix, unsafe_) = (true, false, None, true, false);
             assert!(check_fix_incompatible_arguments(FixFileModeOptions {
                 write,
                 suppress,

@@ -10,5 +10,6 @@ pub use crate::categories::{
     SourceActionKind, SUPPRESSION_ACTION_CATEGORY,
 };
 pub use crate::options::{AnalyzerConfiguration, AnalyzerOptions, AnalyzerRules};
+pub use crate::filter::{RuleKey, GroupKey};
 pub use crate::registry::{MetadataRegistry, RegistryVisitor, RuleRegistry, RuleRegistryBuilder};
 pub use crate::rule::Rule;

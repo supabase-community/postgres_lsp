@@ -1,7 +1,5 @@
 use std::fmt::{Debug, Display, Formatter};
 
-use text_size::TextRange;
-
 use crate::{
     categories::RuleCategories,
     rule::{GroupCategory, Rule, RuleGroup},
@@ -25,8 +23,6 @@ pub struct AnalysisFilter<'a> {
     pub enabled_rules: Option<&'a [RuleFilter<'a>]>,
     /// Do not allow rules matching these names to emit signals
     pub disabled_rules: &'a [RuleFilter<'a>],
-    /// Only emit signals matching this text range
-    pub range: Option<TextRange>,
 }
 
 impl<'analysis> AnalysisFilter<'analysis> {

@@ -248,8 +248,7 @@ impl Session {
             tree: ide
                 .tree_sitter
                 .tree(&stmt)
-                .as_ref()
-                .and_then(|t| Some(t.as_ref())),
+                .as_ref().map(|t| t.as_ref()),
             schema: &schema_cache,
         })
         .into_iter()

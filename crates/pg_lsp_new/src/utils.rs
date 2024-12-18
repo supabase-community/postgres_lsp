@@ -304,12 +304,12 @@ pub(crate) fn apply_document_changes(
 
 #[cfg(test)]
 mod tests {
-    use super::apply_document_changes;
+    
     use pg_lsp_converters::line_index::LineIndex;
-    use pg_lsp_converters::{PositionEncoding, WideEncoding};
+    use pg_lsp_converters::PositionEncoding;
     use pg_text_edit::TextEdit;
     use tower_lsp::lsp_types as lsp;
-    use tower_lsp::lsp_types::{Position, Range, TextDocumentContentChangeEvent};
+    
 
     #[test]
     fn test_diff_1() {

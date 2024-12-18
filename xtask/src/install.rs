@@ -12,7 +12,7 @@ impl flags::Install {
         if cfg!(target_os = "macos") {
             fix_path_for_mac(sh).context("Fix path for mac")?;
         }
-        if let Some(_) = self.server() {
+        if self.server().is_some() {
             install_server(sh).context("install server")?;
         }
         if let Some(client) = self.client() {
