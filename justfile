@@ -114,6 +114,9 @@ test-doc:
 lint:
   cargo clippy
 
+lint-fix:
+  cargo clippy --fix
+
 # When you finished coding, run this command to run the same commands in the CI.
 # ready:
 #   git diff --exit-code --quiet
