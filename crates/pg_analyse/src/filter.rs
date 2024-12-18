@@ -1,8 +1,18 @@
-use std::fmt::{Display, Formatter, Debug};
+use std::fmt::{Debug, Display, Formatter};
 
 use text_size::TextRange;
 
-use crate::{categories::RuleCategories, rule::{GroupCategory, Rule, RuleGroup}, RuleFilter};
+use crate::{
+    categories::RuleCategories,
+    rule::{GroupCategory, Rule, RuleGroup},
+};
+
+/// Allow filtering a single rule or group of rules by their names
+#[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum RuleFilter<'a> {
+    Group(&'a str),
+    Rule(&'a str, &'a str),
+}
 
 /// Allows filtering the list of rules that will be executed in a run of the analyzer,
 /// and at what source code range signals (diagnostics or actions) may be raised
@@ -57,8 +67,6 @@ impl<'analysis> AnalysisFilter<'analysis> {
                 .any(|filter| filter.match_rule::<R>())
     }
 }
-
-
 
 impl<'a> RuleFilter<'a> {
     // Returns the group name of this filter.
@@ -122,3 +130,64 @@ impl<'a> pg_console::fmt::Display for RuleFilter<'a> {
     }
 }
 
+/// Opaque identifier for a group of rule
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub struct GroupKey {
+    group: &'static str,
+}
+
+impl GroupKey {
+    pub(crate) fn new(group: &'static str) -> Self {
+        Self { group }
+    }
+
+    pub fn group<G: RuleGroup>() -> Self {
+        Self::new(G::NAME)
+    }
+}
+
+impl From<GroupKey> for RuleFilter<'static> {
+    fn from(key: GroupKey) -> Self {
+        RuleFilter::Group(key.group)
+    }
+}
+
+/// Opaque identifier for a single rule
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct RuleKey {
+    group: &'static str,
+    rule: &'static str,
+}
+
+impl RuleKey {
+    pub fn new(group: &'static str, rule: &'static str) -> Self {
+        Self { group, rule }
+    }
+
+    pub fn rule<R: Rule>() -> Self {
+        Self::new(<R::Group as RuleGroup>::NAME, R::METADATA.name)
+    }
+
+    pub fn group(&self) -> &'static str {
+        self.group
+    }
+
+    pub fn rule_name(&self) -> &'static str {
+        self.rule
+    }
+}
+
+impl From<RuleKey> for RuleFilter<'static> {
+    fn from(key: RuleKey) -> Self {
+        RuleFilter::Rule(key.group, key.rule)
+    }
+}
+
+impl PartialEq<RuleKey> for RuleFilter<'static> {
+    fn eq(&self, other: &RuleKey) -> bool {
+        match *self {
+            RuleFilter::Group(group) => group == other.group,
+            RuleFilter::Rule(group, rule) => group == other.group && rule == other.rule,
+        }
+    }
+}

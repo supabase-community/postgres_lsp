@@ -13,18 +13,17 @@ version              = "0.0.0"
 
 
 [dependencies]
-pg_schema_cache.workspace                 = true
-pg_diagnostics.workspace                 = true
-pg_console.workspace                 = true
-pg_query_ext.workspace = true
-rustc-hash               = { workspace = true }
+pg_console.workspace      = true
+pg_diagnostics.workspace  = true
+pg_query_ext.workspace    = true
+pg_schema_cache.workspace = true
+rustc-hash                = { workspace = true }
 
-text-size.workspace = true
-enumflags2.workspace = true
-serde                    = { workspace = true, features = ["derive"], optional = true }
 biome_deserialize        = { workspace = true, optional = true }
 biome_deserialize_macros = { workspace = true, optional = true }
+enumflags2.workspace     = true
+serde                    = { workspace = true, features = ["derive"], optional = true }
+text-size.workspace      = true
 
 [features]
 serde = ["dep:serde", "dep:biome_deserialize", "dep:biome_deserialize_macros"]
-

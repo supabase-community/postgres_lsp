@@ -46,8 +46,8 @@ tree_sitter_sql          = { path = "./lib/tree_sitter_sql", version = "0.0.0" }
 unicode-width            = "0.1.12"
 
 # postgres specific crates
-pg_base_db                = { path = "./crates/pg_base_db", version = "0.0.0" }
 pg_analyse                = { path = "./crates/pg_analyse", version = "0.0.0" }
+pg_base_db                = { path = "./crates/pg_base_db", version = "0.0.0" }
 pg_cli                    = { path = "./crates/pg_cli", version = "0.0.0" }
 pg_commands               = { path = "./crates/pg_commands", version = "0.0.0" }
 pg_completions            = { path = "./crates/pg_completions", version = "0.0.0" }

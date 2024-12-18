@@ -1,7 +1,10 @@
 use pg_diagnostics::{Error, Result};
 use std::path::Path;
 
-use crate::{categories::RuleCategory, rule::{GroupCategory, Rule, RuleGroup, RuleMetadata}};
+use crate::{
+    categories::RuleCategory,
+    rule::{GroupCategory, Rule, RuleGroup, RuleMetadata},
+};
 
 pub struct RuleContext<'a, R: Rule> {
     stmt: &'a pg_query_ext::NodeEnum,
@@ -15,7 +18,7 @@ where
 {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-    stmt: &'a pg_query_ext::NodeEnum,
+        stmt: &'a pg_query_ext::NodeEnum,
         file_path: &'a Path,
         options: &'a R::Options,
     ) -> Result<Self, Error> {
@@ -86,4 +89,3 @@ where
         self.file_path
     }
 }
-

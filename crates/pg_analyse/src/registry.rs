@@ -1,8 +1,13 @@
-use std::{borrow, collections::{BTreeSet, BinaryHeap}};
+use std::{borrow, collections::BTreeSet};
 
 use pg_diagnostics::Error;
 
-use crate::{context::RuleContext, filter::AnalysisFilter, matcher::{GroupKey, RuleKey}, rule::{GroupCategory, Rule, RuleGroup}, signals::{RuleSignal, SignalEntry}, AnalyzerOptions};
+use crate::{
+    context::RuleContext,
+    filter::{AnalysisFilter, GroupKey, RuleKey},
+    rule::{GroupCategory, Rule, RuleDiagnostic, RuleGroup},
+    AnalyzerOptions,
+};
 
 pub trait RegistryVisitor {
     /// Record the category `C` to this visitor
@@ -20,7 +25,6 @@ pub trait RegistryVisitor {
     where
         R: Rule + 'static;
 }
-
 
 /// Key struct for a rule in the metadata map, sorted alphabetically
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -51,7 +55,6 @@ impl borrow::Borrow<str> for MetadataKey {
         self.inner.0
     }
 }
-
 
 /// Stores metadata information for all the rules in the registry, sorted
 /// alphabetically
@@ -97,13 +100,6 @@ pub struct RuleRegistryBuilder<'a> {
     diagnostics: Vec<Error>,
 }
 
-// TOOD: add build, then run through rules in registry and emit signals
-// i hope we can simplify this.
-// - suppresions are on statement level anyways, so we can just run through the statements and check if they are suppressing certain rules
-// - range is always the statement for now. we will add the weak ref thingy later
-// - do we really need the RegistryRule stuff? the registry rule doesnt execute, it just provides
-// the run function
-
 impl RegistryVisitor for RuleRegistryBuilder<'_> {
     fn record_category<C: GroupCategory>(&mut self) {
         if self.filter.match_category::<C>() {
@@ -143,16 +139,13 @@ pub struct RegistryRule {
     run: RuleExecutor,
 }
 
-
-pub struct RegistryRuleParams<'analyzer, 'query> {
+pub struct RegistryRuleParams<'analyzer> {
     pub root: &'analyzer pg_query_ext::NodeEnum,
-    pub signal_queue: &'query mut BinaryHeap<SignalEntry<'analyzer>>,
     pub options: &'analyzer AnalyzerOptions,
 }
 
-
 /// Executor for rule as a generic function pointer
-type RuleExecutor = fn(&mut RegistryRuleParams) -> Result<(), Error>;
+type RuleExecutor = fn(&mut RegistryRuleParams) -> Result<Vec<RuleDiagnostic>, Error>;
 
 impl RegistryRule {
     fn new<R>() -> Self
@@ -160,49 +153,19 @@ impl RegistryRule {
         R: Rule<Options: Default> + 'static,
     {
         /// Generic implementation of RuleExecutor for any rule type R
-        fn run<R>(
-            params: &mut RegistryRuleParams
-        ) -> Result<(), Error>
+        fn run<R>(params: &mut RegistryRuleParams) -> Result<Vec<RuleDiagnostic>, Error>
         where
             R: Rule<Options: Default> + 'static,
         {
             let options = params.options.rule_options::<R>().unwrap_or_default();
-            let ctx = match RuleContext::new(
-                params.root,
-                &params.options.file_path,
-                &options
-            ) {
+            let ctx = match RuleContext::new(params.root, &params.options.file_path, &options) {
                 Ok(ctx) => ctx,
                 Err(error) => return Err(error),
             };
 
-            for result in R::run(&ctx) {
-                // `None` means the entire range of the statement
-                let text_range = R::text_range(&ctx, &result);
-
-                let signal = Box::new(RuleSignal::<R>::new(
-                    params.root,
-                    result,
-                    params.options,
-                ));
-
-                params.signal_queue.push(SignalEntry {
-                    signal,
-                    rule: RuleKey::rule::<R>(),
-                    text_range,
-                });
-            }
-
-            Ok(())
+            Ok(R::run(&ctx))
         }
 
-        Self {
-            run: run::<R>,
-        }
+        Self { run: run::<R> }
     }
 }
-
-
-
-
-

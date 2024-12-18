@@ -1,18 +1,15 @@
-use text_size::TextRange;
-use std::fmt::Debug;
 use pg_console::fmt::Display;
 use pg_console::{markup, MarkupBuf};
 use pg_diagnostics::advice::CodeSuggestionAdvice;
 use pg_diagnostics::location::AsSpan;
 use pg_diagnostics::{
-    Advices, Category, Diagnostic, DiagnosticTags, Location, LogCategory, MessageAndDescription, Visit
+    Advices, Category, Diagnostic, DiagnosticTags, Location, LogCategory, MessageAndDescription,
+    Visit,
 };
+use std::fmt::Debug;
+use text_size::TextRange;
 
 use crate::{categories::RuleCategory, context::RuleContext, registry::RegistryVisitor};
-
-// use crate::categories::RuleCategory;
-// use crate::context::RuleContext;
-// use crate::registry::RegistryVisitor;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
@@ -31,17 +28,13 @@ pub struct RuleMetadata {
 }
 
 impl RuleMetadata {
-    pub const fn new(
-        version: &'static str,
-        name: &'static str,
-        docs: &'static str
-    ) -> Self {
+    pub const fn new(version: &'static str, name: &'static str, docs: &'static str) -> Self {
         Self {
             deprecated: None,
             version,
             name,
             docs,
-            recommended: false
+            recommended: false,
         }
     }
 
@@ -87,45 +80,10 @@ pub trait GroupCategory {
 /// and a callback function to be executed on all nodes matching the query to possibly
 /// raise an analysis event
 pub trait Rule: RuleMeta + Sized {
-    /// A generic type that will be kept in memory between a call to `run` and
-    /// subsequent executions of `diagnostic` or `action`, allows the rule to
-    /// hold some temporary state between the moment a signal is raised and
-    /// when a diagnostic or action needs to be built
-    type State;
-    /// An iterator type returned by `run` to yield zero or more signals to the
-    /// analyzer
-    type Signals: IntoIterator<Item = Self::State>;
-    /// The options that belong to a rule
     type Options: Default + Clone + Debug;
 
-    /// This function is called once for each node matching `Query` in the tree
-    /// being analyzed. If it returns `Some` the state object will be wrapped
-    /// in a generic `AnalyzerSignal`, and the consumer of the analyzer may call
-    /// `diagnostic` or `action` on it
-    fn run(ctx: &RuleContext<Self>) -> Self::Signals;
-
-    /// Used by the analyzer to associate a range of source text to a signal in
-    /// order to support suppression comments.
-    ///
-    /// If this function returns [None], the range of the query node will be used instead
-    ///
-    /// The default implementation returns the range of `Self::diagnostic`, and
-    /// should return the correct value for most rules however you may want to
-    /// override this if generating a diagnostic for this rule requires heavy
-    /// processing and the range could be determined through a faster path
-    fn text_range(ctx: &RuleContext<Self>, state: &Self::State) -> Option<TextRange> {
-        Self::diagnostic(ctx, state).and_then(|diag| diag.span())
-    }
-
-    /// Called by the consumer of the analyzer to try to generate a diagnostic
-    /// from a signal raised by `run`
-    ///
-    /// The default implementation returns None
-    fn diagnostic(_ctx: &RuleContext<Self>, _state: &Self::State) -> Option<RuleDiagnostic> {
-        None
-    }
+    fn run(ctx: &RuleContext<Self>) -> Vec<RuleDiagnostic>;
 }
-
 
 /// Diagnostic object returned by a single analysis rule
 #[derive(Debug, Diagnostic)]
@@ -298,5 +256,3 @@ impl RuleDiagnostic {
         &self.rule_advice
     }
 }
-
-

@@ -332,7 +332,3 @@ impl RuleCategoriesBuilder {
         RuleCategories(self.flags)
     }
 }
-
-
-
-
