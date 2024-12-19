@@ -2,6 +2,7 @@
 
 #![allow(dead_code)]
 
+mod columns;
 mod functions;
 mod schema_cache;
 mod schemas;

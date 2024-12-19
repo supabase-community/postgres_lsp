@@ -58,6 +58,10 @@ impl SchemaCache {
             .find(|t| t.name == name && schema.is_none() || Some(t.schema.as_str()) == schema)
     }
 
+    pub fn find_type_by_id(&self, type_id: i64) -> Option<&PostgresType> {
+        self.types.iter().find(|t| t.id == type_id)
+    }
+
     pub fn find_types(&self, name: &str, schema: Option<&str>) -> Vec<&PostgresType> {
         self.types
             .iter()
