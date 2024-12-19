@@ -1,75 +1,37 @@
-select
-  tbl.schemaname as schema,
-  tbl.tablename as table,
-  tbl.quoted_name,
-  tbl.is_table,
-  json_agg(a) as columns
-from
-  (
+with
+  available_tables as (
     select
-      n.nspname as schemaname,
-      c.relname as tablename,
-      (
-        quote_ident(n.nspname) || '.' || quote_ident(c.relname)
-      ) as quoted_name,
-      true as is_table
+      c.relname as table_name,
+      c.oid as table_oid,
+      c.relkind as class_kind,
+      n.nspname as schema_name
     from
       pg_catalog.pg_class c
-      join pg_catalog.pg_namespace n on n.oid = c.relnamespace
+      left join pg_catalog.pg_namespace n on n.oid = c.relnamespace
     where
-      c.relkind = 'r'
-      and n.nspname != 'pg_toast'
-      and n.nspname not like 'pg_temp_%'
-      and n.nspname not like 'pg_toast_temp_%'
-      and has_schema_privilege(n.oid, 'USAGE') = true
-      and has_table_privilege(
-        quote_ident(n.nspname) || '.' || quote_ident(c.relname),
-        'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'
-      ) = true
-    union
-    all
-    select
-      n.nspname as schemaname,
-      c.relname as tablename,
-      (
-        quote_ident(n.nspname) || '.' || quote_ident(c.relname)
-      ) as quoted_name,
-      false as is_table
-    from
-      pg_catalog.pg_class c
-      join pg_catalog.pg_namespace n on n.oid = c.relnamespace
-    where
-      c.relkind in ('v', 'm')
-      and n.nspname != 'pg_toast'
-      and n.nspname not like 'pg_temp_%'
-      and n.nspname not like 'pg_toast_temp_%'
-      and has_schema_privilege(n.oid, 'USAGE') = true
-      and has_table_privilege(
-        quote_ident(n.nspname) || '.' || quote_ident(c.relname),
-        'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'
-      ) = true
-  ) as tbl
-  left join (
-    select
-      attrelid,
-      attname,
-      format_type(atttypid, atttypmod) as data_type,
-      attnum,
-      attisdropped
-    from
-      pg_attribute
-  ) as a on (
-    a.attrelid = tbl.quoted_name :: regclass
-    and a.attnum > 0
-    and not a.attisdropped
-    and has_column_privilege(
-      tbl.quoted_name,
-      a.attname,
-      'SELECT, INSERT, UPDATE, REFERENCES'
-    )
+      -- r: normal tables
+      -- v: views
+      -- m: materialized views
+      -- f: foreign tables
+      -- p: partitioned tables
+      c.relkind in ('r', 'v', 'm', 'f', 'p')
   )
-group by
-  schemaname,
-  tablename,
-  quoted_name,
-  is_table;
+select
+  atts.attname as name,
+  ts.table_name,
+  ts.table_oid,
+  ts.class_kind,
+  ts.schema_name,
+  atts.attnum,
+  atts.atttypid as type_id,
+  not atts.attnotnull as is_nullable,
+  nullif(
+    information_schema._pg_char_max_length (atts.atttypid, atts.atttypmod),
+    -1
+  ) as varchar_length
+from
+  pg_catalog.pg_attribute atts
+  left join available_tables ts on atts.attrelid = ts.table_oid
+where
+  -- system columns, such as `cmax` or `tableoid`, have negative `attnum`s
+  atts.attnum >= 0;
