@@ -84,7 +84,7 @@ mod tests {
     use pg_test_utils::test_database::get_new_test_db;
     use sqlx::Executor;
 
-    use crate::{columns::ColumnClassKind, schema_cache, SchemaCache};
+    use crate::{columns::ColumnClassKind, SchemaCache};
 
     #[tokio::test]
     async fn loads_columns() {
