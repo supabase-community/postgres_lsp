@@ -42,17 +42,20 @@ pub struct Column {
 
     pub schema_name: String,
     pub type_id: i64,
-    // pub is_nullable: bool,
-    // pub is_primary_key: bool,
 
-    // pub default_value: Option<String>,
+    pub is_nullable: bool,
 
-    // pub varchar_length: Option<i32>,
+    pub is_primary_key: bool,
+    pub is_unique: bool,
 
+    /// The Default "value" of the column. Might be a function call, hence "_expr".
+    pub default_expr: Option<String>,
+
+    pub varchar_length: Option<i32>,
     // /// None if the column is not a foreign key.
     // pub foreign_key: Option<ForeignKeyReference>,
-
-    // pub comment: Option<String>,
+    /// Comment inserted via `COMMENT ON COLUMN my_table.my_comment '...'`, if present.
+    pub comment: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
