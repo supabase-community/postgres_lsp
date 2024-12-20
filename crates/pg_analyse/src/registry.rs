@@ -144,6 +144,17 @@ pub struct RegistryRule {
     pub(crate) run: RuleExecutor,
 }
 
+impl RuleRegistry {
+    pub fn builder<'a>(filter: &'a AnalysisFilter<'a>) -> RuleRegistryBuilder<'a> {
+        RuleRegistryBuilder {
+            filter,
+            registry: RuleRegistry {
+                rules: Default::default(),
+            },
+        }
+    }
+}
+
 pub struct RegistryRuleParams<'analyzer> {
     pub root: &'analyzer pg_query_ext::NodeEnum,
     pub options: &'analyzer AnalyzerOptions,
@@ -168,5 +179,11 @@ impl RegistryRule {
         }
 
         Self { run: run::<R> }
+    }
+}
+
+impl RuleRegistryBuilder<'_> {
+    pub fn build(self) -> RuleRegistry {
+        self.registry
     }
 }
