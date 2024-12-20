@@ -5,5 +5,6 @@ publish = false
 version = "0.0.0"
 
 [dependencies]
-bpaf  = { workspace = true, features = ["derive"] }
-xtask = { path = '../', version = "0.0" }
+biome_string_case = { workspace = true }
+bpaf              = { workspace = true, features = ["derive"] }
+xtask             = { path = '../', version = "0.0" }

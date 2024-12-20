@@ -13,7 +13,7 @@ pub static METADATA: LazyLock<MetadataRegistry> = LazyLock::new(|| {
     metadata
 });
 
-pub fn analyse(
+pub fn lint(
     root: &pg_query_ext::NodeEnum,
     filter: AnalysisFilter,
     options: &AnalyzerOptions,

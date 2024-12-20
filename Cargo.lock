@@ -500,9 +500,9 @@ dependencies = [
 
 [[package]]
 name = "biome_string_case"
-version = "0.5.7"
+version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c28b4d0e08c2f13f1c9e0df4e7a8f9bfa03ef3803713d1bcd5110578cc5c67be"
+checksum = "5868798da491b19a5b27a0bad5d8727e1e65060fa2dac360b382df00ff520774"
 
 [[package]]
 name = "biome_text_edit"
@@ -4771,6 +4771,7 @@ dependencies = [
 name = "xtask_codegen"
 version = "0.0.0"
 dependencies = [
+ "biome_string_case",
  "bpaf",
  "xtask",
 ]

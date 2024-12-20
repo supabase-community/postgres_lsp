@@ -38,9 +38,9 @@ where
         <<R::Group as RuleGroup>::Category as GroupCategory>::CATEGORY
     }
 
-    /// Returns a clone of the AST root
-    pub fn stmt(&self) -> pg_query_ext::NodeEnum {
-        self.stmt.clone()
+    /// Returns the AST root
+    pub fn stmt(&self) -> &pg_query_ext::NodeEnum {
+        self.stmt
     }
 
     /// Returns the metadata of the rule
