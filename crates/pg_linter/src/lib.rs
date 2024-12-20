@@ -13,14 +13,11 @@ pub static METADATA: LazyLock<MetadataRegistry> = LazyLock::new(|| {
     metadata
 });
 
-pub fn analyse<'a, B>(
+pub fn analyse(
     root: &pg_query_ext::NodeEnum,
     filter: AnalysisFilter,
-    options: &'a AnalyzerOptions,
-) -> Vec<RuleDiagnostic>
-where
-    B: 'a,
-{
+    options: &AnalyzerOptions,
+) -> Vec<RuleDiagnostic> {
     let mut builder = RuleRegistry::builder(&filter);
     visit_registry(&mut builder);
     let registry = builder.build();
