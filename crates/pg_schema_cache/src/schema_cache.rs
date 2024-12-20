@@ -1,5 +1,6 @@
 use sqlx::postgres::PgPool;
 
+use crate::columns::Column;
 use crate::functions::Function;
 use crate::schemas::Schema;
 use crate::tables::Table;
@@ -13,6 +14,7 @@ pub struct SchemaCache {
     pub functions: Vec<Function>,
     pub types: Vec<PostgresType>,
     pub versions: Vec<Version>,
+    pub columns: Vec<Column>,
 }
 
 impl SchemaCache {
@@ -21,12 +23,13 @@ impl SchemaCache {
     }
 
     pub async fn load(pool: &PgPool) -> Result<SchemaCache, sqlx::Error> {
-        let (schemas, tables, functions, types, versions) = futures_util::try_join!(
+        let (schemas, tables, functions, types, versions, columns) = futures_util::try_join!(
             Schema::load(pool),
             Table::load(pool),
             Function::load(pool),
             PostgresType::load(pool),
             Version::load(pool),
+            Column::load(pool)
         )?;
 
         Ok(SchemaCache {
@@ -35,6 +38,7 @@ impl SchemaCache {
             functions,
             types,
             versions,
+            columns,
         })
     }
 
@@ -58,8 +62,12 @@ impl SchemaCache {
             .find(|t| t.name == name && schema.is_none() || Some(t.schema.as_str()) == schema)
     }
 
-    pub fn find_type_by_id(&self, type_id: i64) -> Option<&PostgresType> {
-        self.types.iter().find(|t| t.id == type_id)
+    pub fn find_col(&self, name: &str, table: &str, schema: Option<&str>) -> Option<&Column> {
+        self.columns.iter().find(|c| {
+            c.name.as_str() == name
+                && c.table_name.as_str() == table
+                && schema.is_none_or(|s| s == c.schema_name.as_str())
+        })
     }
 
     pub fn find_types(&self, name: &str, schema: Option<&str>) -> Vec<&PostgresType> {
@@ -78,17 +86,16 @@ pub trait SchemaCacheItem {
 
 #[cfg(test)]
 mod tests {
-    use async_std::task::block_on;
     use pg_test_utils::test_database::get_new_test_db;
 
     use crate::SchemaCache;
 
-    #[test]
-    fn test_schema_cache() {
-        let test_db = block_on(get_new_test_db());
+    #[tokio::test]
+    async fn it_loads() {
+        let test_db = get_new_test_db().await;
 
-        block_on(SchemaCache::load(&test_db)).expect("Couldn't load Schema Cache");
-
-        assert!(true);
+        SchemaCache::load(&test_db)
+            .await
+            .expect("Couldnt' load Schema Cache");
     }
 }

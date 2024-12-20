@@ -31,19 +31,18 @@ with
 select
   atts.attname as name,
   ts.table_name,
-  ts.table_oid,
-  ts.class_kind,
+  ts.table_oid :: int8 as "table_oid!",
+  ts.class_kind :: char as "class_kind!",
   ts.schema_name,
-  atts.attnum,
-  atts.atttypid as type_id,
-  not atts.attnotnull as is_nullable,
+  atts.atttypid :: int8 as "type_id!",
+  not atts.attnotnull as "is_nullable!",
   nullif(
     information_schema._pg_char_max_length (atts.atttypid, atts.atttypmod),
     -1
   ) as varchar_length,
   pg_get_expr (def.adbin, def.adrelid) as default_expr,
-  coalesce(ix.is_primary, false) as is_primary_key,
-  coalesce(ix.is_unique, false) as is_unique,
+  coalesce(ix.is_primary, false) as "is_primary_key!",
+  coalesce(ix.is_unique, false) as "is_unique!",
   pg_catalog.col_description (ts.table_oid, atts.attnum) as comment
 from
   pg_catalog.pg_attribute atts
@@ -58,4 +57,4 @@ where
 order by
   schema_name desc,
   table_name,
-  attnum;
+  atts.attnum;

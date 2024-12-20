@@ -36,7 +36,7 @@ sqlx                     = { version = "0.8.2", features = ["runtime-async-std",
 syn                      = "1.0.109"
 termcolor                = "1.4.1"
 text-size                = "1.1.1"
-tokio                    = "1.40.0"
+tokio                    = { version = "1.40.0", features = ["full"] }
 toml                     = "0.8.19"
 tower-lsp                = "0.20.0"
 tracing                  = { version = "0.1.40", default-features = false, features = ["std"] }
