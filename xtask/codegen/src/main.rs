@@ -1,6 +1,8 @@
 use xtask::{project_root, pushd, Result};
 
-use xtask_codegen::{generate_crate, generate_new_analyser_rule, task_command, TaskCommand};
+use xtask_codegen::{
+    generate_crate, generate_new_analyser_rule, promote_rule, task_command, TaskCommand,
+};
 
 fn main() -> Result<()> {
     let _d = pushd(project_root());
@@ -12,6 +14,9 @@ fn main() -> Result<()> {
         }
         TaskCommand::NewRule { name, category } => {
             generate_new_analyser_rule(category, &name);
+        }
+        TaskCommand::PromoteRule { name, group } => {
+            promote_rule(&name, &group);
         }
     }
 

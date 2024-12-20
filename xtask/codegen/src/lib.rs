@@ -2,9 +2,11 @@
 
 mod generate_crate;
 mod generate_new_analyser_rule;
+mod promote_rule;
 
 pub use self::generate_crate::generate_crate;
 pub use self::generate_new_analyser_rule::generate_new_analyser_rule;
+pub use self::promote_rule::promote_rule;
 use bpaf::Bpaf;
 use generate_new_analyser_rule::Category;
 
@@ -28,5 +30,15 @@ pub enum TaskCommand {
         /// Name of the rule
         #[bpaf(long("category"))]
         category: Category,
+    },
+    /// Promotes a nursery rule
+    #[bpaf(command, long("promote-rule"))]
+    PromoteRule {
+        /// Path of the rule
+        #[bpaf(long("name"), argument("STRING"))]
+        name: String,
+        /// Name of the rule
+        #[bpaf(long("group"), argument("STRING"))]
+        group: String,
     },
 }

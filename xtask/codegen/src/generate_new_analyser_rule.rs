@@ -29,12 +29,10 @@ fn generate_rule_template(
         Category::Lint => "declare_lint_rule",
     };
     format!(
-        r#"use biome_analyze::{{
+        r#"use pg_analyse::{{
     context::RuleContext, {macro_name}, Rule, RuleDiagnostic, Ast
 }};
-use biome_console::markup;
-use biome_js_syntax::JsIdentifierBinding;
-use biome_rowan::AstNode;
+use pg_console::markup;
 
 {macro_name}! {{
     /// Succinct description of the rule.
@@ -48,54 +46,28 @@ use biome_rowan::AstNode;
     ///
     /// ### Invalid
     ///
-    /// ```js,expect_diagnostic
-    /// var a = 1;
-    /// a = 2;
+    /// ```sql,expect_diagnostic
+    /// select 1;
     /// ```
     ///
     /// ### Valid
     ///
-    /// ```js
-    /// // var a = 1;
+    /// ``sql`
+    /// select 2;
     /// ```
     ///
     pub {rule_name_upper_camel} {{
         version: "next",
         name: "{rule_name_lower_camel}",
-        language: "js",
         recommended: false,
     }}
 }}
 
 impl Rule for {rule_name_upper_camel} {{
-    type Query = Ast<JsIdentifierBinding>;
-    type State = ();
-    type Signals = Option<Self::State>;
     type Options = ();
 
-    fn run(ctx: &RuleContext<Self>) -> Self::Signals {{
-        let _binding = ctx.query();
-        Some(())
-    }}
-
-    fn diagnostic(ctx: &RuleContext<Self>, _state: &Self::State) -> Option<RuleDiagnostic> {{
-        //
-        // Read our guidelines to write great diagnostics:
-        // https://docs.rs/biome_analyze/latest/biome_analyze/#what-a-rule-should-say-to-the-user
-        //
-        let node = ctx.query();
-        Some(
-            RuleDiagnostic::new(
-                rule_category!(),
-                node.range(),
-                markup! {{
-                    "Variable is read here."
-                }},
-            )
-            .note(markup! {{
-                "This note will give you more information."
-            }}),
-        )
+    fn run(ctx: &RuleContext<Self>) -> Vec<RuleDiagnostic> {{
+        Vec::new()
     }}
 }}
 "#
