@@ -1,6 +1,5 @@
 use std::{borrow, collections::BTreeSet};
 
-
 use crate::{
     context::RuleContext,
     filter::{AnalysisFilter, GroupKey, RuleKey},

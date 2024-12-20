@@ -63,6 +63,7 @@ pg_inlay_hints            = { path = "./crates/pg_inlay_hints", version = "0.0.0
 pg_lexer                  = { path = "./crates/pg_lexer", version = "0.0.0" }
 pg_lexer_codegen          = { path = "./crates/pg_lexer_codegen", version = "0.0.0" }
 pg_lint                   = { path = "./crates/pg_lint", version = "0.0.0" }
+pg_linter                 = { path = "./crates/pg_linter", version = "0.0.0" }
 pg_lsp_converters         = { path = "./crates/pg_lsp_converters", version = "0.0.0" }
 pg_lsp_new                = { path = "./crates/pg_lsp_new", version = "0.0.0" }
 pg_markup                 = { path = "./crates/pg_markup", version = "0.0.0" }

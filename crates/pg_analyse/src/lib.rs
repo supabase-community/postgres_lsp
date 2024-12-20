@@ -1,9 +1,13 @@
 mod categories;
 mod context;
 mod filter;
+pub mod macros;
 mod options;
 mod registry;
 mod rule;
+
+// Re-exported for use in the `declare_group` macro
+pub use pg_diagnostics::category_concat;
 
 use registry::RegistryRuleParams;
 
@@ -11,10 +15,11 @@ pub use crate::categories::{
     ActionCategory, RefactorKind, RuleCategories, RuleCategoriesBuilder, RuleCategory,
     SourceActionKind, SUPPRESSION_ACTION_CATEGORY,
 };
+pub use crate::context::RuleContext;
 pub use crate::filter::{GroupKey, RuleKey};
 pub use crate::options::{AnalyzerConfiguration, AnalyzerOptions, AnalyzerRules};
 pub use crate::registry::{MetadataRegistry, RegistryVisitor, RuleRegistry, RuleRegistryBuilder};
-pub use crate::rule::{Rule, RuleDiagnostic};
+pub use crate::rule::{GroupCategory, Rule, RuleDiagnostic, RuleGroup, RuleMeta, RuleMetadata};
 
 pub struct Analyzer<'analyzer> {
     /// Holds the metadata for all the rules statically known to the analyzer

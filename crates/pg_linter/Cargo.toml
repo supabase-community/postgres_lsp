@@ -1,0 +1,16 @@
+
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pg_linter"
+repository.workspace = true
+version              = "0.0.0"
+
+[dependencies]
+pg_analyse = { workspace = true }
+pg_console = { workspace = true }

@@ -2457,6 +2457,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pg_linter"
+version = "0.0.0"
+dependencies = [
+ "pg_analyse",
+ "pg_console",
+]
+
+[[package]]
 name = "pg_lsp"
 version = "0.0.0"
 dependencies = [
