@@ -31,23 +31,23 @@ upgrade-tools:
 #   cargo codegen-bindings
 
 # Generates code generated files for the linter
-# gen-lint:
-#   cargo run -p xtask_codegen -- analyzer
-#   cargo codegen-configuration
-#   cargo codegen-migrate
-#   just gen-bindings
-#   cargo run -p rules_check
-#   just format
+gen-lint:
+  cargo run -p xtask_codegen -- analyser
+  # cargo codegen-configuration
+  # cargo codegen-migrate
+  # just gen-bindings
+  # cargo run -p rules_check
+  just format
 
 # Generates the linter documentation and Rust documentation
 # documentation:
 #   RUSTDOCFLAGS='-D warnings' cargo documentation
 
-# Creates a new lint rule in the given path, with the given name. Name has to be camel case.
-# new-lintrule rulename:
-#   cargo run -p xtask_codegen -- new-lintrule --kind=js --category=lint --name={{rulename}}
-#   just gen-lint
-#   just documentation
+# Creates a new lint rule in the given path, with the given name. Name has to be kebab case.
+new-lintrule rulename:
+  cargo run -p xtask_codegen -- new-lintrule --category=lint --name={{rulename}}
+  just gen-lint
+  # just documentation
 
 # Creates a new lint rule in the given path, with the given name. Name has to be camel case.
 # new-assistrule rulename:

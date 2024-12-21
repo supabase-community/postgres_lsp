@@ -1,9 +1,11 @@
 //! Codegen tools. Derived from Biome's codegen
 
+mod generate_analyser;
 mod generate_crate;
 mod generate_new_analyser_rule;
 mod promote_rule;
 
+pub use self::generate_analyser::generate_analyser;
 pub use self::generate_crate::generate_crate;
 pub use self::generate_new_analyser_rule::generate_new_analyser_rule;
 pub use self::promote_rule::promote_rule;
@@ -13,6 +15,9 @@ use generate_new_analyser_rule::Category;
 #[derive(Debug, Clone, Bpaf)]
 #[bpaf(options)]
 pub enum TaskCommand {
+    /// Generate factory functions for the analyzer and the configuration of the analysers
+    #[bpaf(command)]
+    Analyser,
     /// Creates a new crate
     #[bpaf(command, long("new-crate"))]
     NewCrate {

@@ -4771,8 +4771,11 @@ dependencies = [
 name = "xtask_codegen"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "biome_string_case",
  "bpaf",
+ "proc-macro2",
+ "quote",
  "xtask",
 ]
 

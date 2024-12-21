@@ -28,7 +28,7 @@ pg_analyse::declare_lint_rule! {
     ///
     pub PreferTextField {
         version: "0.0.1",
-        name: "prefer-text-field",
+        name: "preferTextField",
         recommended: true,
     }
 }

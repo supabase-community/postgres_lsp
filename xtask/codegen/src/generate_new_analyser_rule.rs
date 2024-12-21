@@ -30,7 +30,7 @@ fn generate_rule_template(
     };
     format!(
         r#"use pg_analyse::{{
-    context::RuleContext, {macro_name}, Rule, RuleDiagnostic, Ast
+    context::RuleContext, {macro_name}, Rule, RuleDiagnostic
 }};
 use pg_console::markup;
 
@@ -38,7 +38,6 @@ use pg_console::markup;
     /// Succinct description of the rule.
     ///
     /// Put context and details about the rule.
-    /// As a starting point, you can take the description of the corresponding _ESLint_ rule (if any).
     ///
     /// Try to stay consistent with the descriptions of implemented rules.
     ///
@@ -76,7 +75,7 @@ impl Rule for {rule_name_upper_camel} {{
 
 pub fn generate_new_analyser_rule(category: Category, rule_name: &str) {
     let rule_name_camel = Case::Camel.convert(rule_name);
-    let crate_folder = project_root().join(format!("crates/pg_lint"));
+    let crate_folder = project_root().join(format!("crates/pg_linter"));
     let test_folder = crate_folder.join("tests/specs/nursery");
     let rule_folder = match &category {
         Category::Lint => crate_folder.join("src/lint/nursery"),
@@ -105,7 +104,7 @@ pub fn generate_new_analyser_rule(category: Category, rule_name: &str) {
         // We sort rules to reduce conflicts between contributions made in parallel.
         let rule_line = match category {
             Category::Lint => format!(
-                r#"    "lint/nursery/{rule_name_camel}": "https://biomejs.dev/linter/rules/{kebab_case_rule}","#
+                r#"    "lint/nursery/{rule_name_camel}": "https://pglsp.dev/linter/rules/{kebab_case_rule}","#
             ),
         };
         let lint_start = match category {
@@ -134,12 +133,12 @@ pub fn generate_new_analyser_rule(category: Category, rule_name: &str) {
     if std::fs::File::open(&test_file).is_err() {
         let _ = std::fs::write(
             test_file,
-            "/* should not generate diagnostics */\n// var a = 1;",
+            "/* should not generate diagnostics */\n-- select 1;",
         );
     }
 
     let test_file = format!("{}/{rule_name_camel}/invalid.sql", test_folder.display());
     if std::fs::File::open(&test_file).is_err() {
-        let _ = std::fs::write(test_file, "var a = 1;\na = 2;\na = 3;");
+        let _ = std::fs::write(test_file, "select 2;");
     }
 }

@@ -5,6 +5,9 @@ publish = false
 version = "0.0.0"
 
 [dependencies]
+anyhow            = { workspace = true }
 biome_string_case = { workspace = true }
 bpaf              = { workspace = true, features = ["derive"] }
+proc-macro2       = { workspace = true, features = ["span-locations"] }
+quote             = "1.0.36"
 xtask             = { path = '../', version = "0.0" }
