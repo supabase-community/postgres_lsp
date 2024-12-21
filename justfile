@@ -43,9 +43,9 @@ gen-lint:
 # documentation:
 #   RUSTDOCFLAGS='-D warnings' cargo documentation
 
-# Creates a new lint rule in the given path, with the given name. Name has to be kebab case.
-new-lintrule rulename:
-  cargo run -p xtask_codegen -- new-lintrule --category=lint --name={{rulename}}
+# Creates a new lint rule in the given path, with the given name. Name has to be camel case. Group should be lowercase.
+new-lintrule group rulename:
+  cargo run -p xtask_codegen -- new-lintrule --category=lint --name={{rulename}} --group={{group}}
   just gen-lint
   # just documentation
 
@@ -54,15 +54,6 @@ new-lintrule rulename:
 #   cargo run -p xtask_codegen -- new-lintrule --kind=js --category=assist --name={{rulename}}
 #   just gen-lint
 #   just documentation
-
-# Promotes a rule from the nursery group to a new group
-# promote-rule rulename group:
-# 	cargo run -p xtask_codegen -- promote-rule --name={{rulename}} --group={{group}}
-# 	just gen-lint
-# 	just documentation
-# 	-cargo test -p pg_analyze -- {{snakecase(rulename)}}
-# 	cargo insta accept
-
 
 # Format Rust files and TOML files
 format:

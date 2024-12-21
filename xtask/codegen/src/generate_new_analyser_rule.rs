@@ -73,12 +73,11 @@ impl Rule for {rule_name_upper_camel} {{
     )
 }
 
-pub fn generate_new_analyser_rule(category: Category, rule_name: &str) {
+pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &str) {
     let rule_name_camel = Case::Camel.convert(rule_name);
-    let crate_folder = project_root().join(format!("crates/pg_linter"));
-    let test_folder = crate_folder.join("tests/specs/nursery");
+    let crate_folder = project_root().join("crates/pg_linter");
     let rule_folder = match &category {
-        Category::Lint => crate_folder.join("src/lint/nursery"),
+        Category::Lint => crate_folder.join(format!("src/lint/{group}")),
     };
     // Generate rule code
     let code = generate_rule_template(
@@ -104,7 +103,7 @@ pub fn generate_new_analyser_rule(category: Category, rule_name: &str) {
         // We sort rules to reduce conflicts between contributions made in parallel.
         let rule_line = match category {
             Category::Lint => format!(
-                r#"    "lint/nursery/{rule_name_camel}": "https://pglsp.dev/linter/rules/{kebab_case_rule}","#
+                r#"    "lint/{group}/{rule_name_camel}": "https://pglsp.dev/linter/rules/{kebab_case_rule}","#
             ),
         };
         let lint_start = match category {
@@ -123,22 +122,5 @@ pub fn generate_new_analyser_rule(category: Category, rule_name: &str) {
         let new_lint_rule_text = lint_rules.join("\n");
         categories.replace_range(lint_start_index..lint_end_index, &new_lint_rule_text);
         std::fs::write(categories_path, categories).unwrap();
-    }
-
-    // Generate test code
-    let tests_path = format!("{}/{rule_name_camel}", test_folder.display());
-    let _ = std::fs::create_dir_all(tests_path);
-
-    let test_file = format!("{}/{rule_name_camel}/valid.sql", test_folder.display());
-    if std::fs::File::open(&test_file).is_err() {
-        let _ = std::fs::write(
-            test_file,
-            "/* should not generate diagnostics */\n-- select 1;",
-        );
-    }
-
-    let test_file = format!("{}/{rule_name_camel}/invalid.sql", test_folder.display());
-    if std::fs::File::open(&test_file).is_err() {
-        let _ = std::fs::write(test_file, "select 2;");
     }
 }

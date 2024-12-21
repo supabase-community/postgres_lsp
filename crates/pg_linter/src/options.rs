@@ -2,6 +2,4 @@
 
 use crate::lint;
 pub type BanDropColumn =
-    <lint::nursery::ban_drop_column::BanDropColumn as pg_analyse::Rule>::Options;
-pub type PreferTextField =
-    <lint::performance::prefer_text_field::PreferTextField as pg_analyse::Rule>::Options;
+    <lint::safety::ban_drop_column::BanDropColumn as pg_analyse::Rule>::Options;

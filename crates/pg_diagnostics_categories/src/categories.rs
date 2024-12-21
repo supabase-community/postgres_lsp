@@ -13,12 +13,11 @@
 // must be between `define_categories! {\n` and `\n    ;\n`.
 
 define_categories! {
-    "lint/nursery/banDropColumn": "https://pglsp.dev/linter/rules/ban-drop-column",
+    "lint/safety/banDropColumn": "https://pglsp.dev/linter/rules/ban-drop-column",
     // end lint rules
     ;
     // General categories
     "stdin",
-    "lint",
     "check",
     "configuration",
     "database/connection",
@@ -31,8 +30,9 @@ define_categories! {
     "syntax",
     "dummy",
 
-    // Lint groups
+    // Lint groups start
     "lint",
     "lint/performance",
-    "lint/suspicious",
+    "lint/safety",
+    // Lint groups end
 }

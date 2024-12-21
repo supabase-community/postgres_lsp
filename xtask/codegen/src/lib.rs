@@ -3,12 +3,10 @@
 mod generate_analyser;
 mod generate_crate;
 mod generate_new_analyser_rule;
-mod promote_rule;
 
 pub use self::generate_analyser::generate_analyser;
 pub use self::generate_crate::generate_crate;
 pub use self::generate_new_analyser_rule::generate_new_analyser_rule;
-pub use self::promote_rule::promote_rule;
 use bpaf::Bpaf;
 use generate_new_analyser_rule::Category;
 
@@ -32,18 +30,12 @@ pub enum TaskCommand {
         #[bpaf(long("name"))]
         name: String,
 
-        /// Name of the rule
+        /// Category of the rule
         #[bpaf(long("category"))]
         category: Category,
-    },
-    /// Promotes a nursery rule
-    #[bpaf(command, long("promote-rule"))]
-    PromoteRule {
-        /// Path of the rule
-        #[bpaf(long("name"), argument("STRING"))]
-        name: String,
-        /// Name of the rule
-        #[bpaf(long("group"), argument("STRING"))]
+
+        /// Group of the rule
+        #[bpaf(long("group"))]
         group: String,
     },
 }

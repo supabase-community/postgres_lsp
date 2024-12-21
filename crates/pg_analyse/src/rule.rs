@@ -1,7 +1,6 @@
 use pg_console::fmt::Display;
 use pg_console::{markup, MarkupBuf};
 use pg_diagnostics::advice::CodeSuggestionAdvice;
-use pg_diagnostics::location::AsSpan;
 use pg_diagnostics::{
     Advices, Category, Diagnostic, DiagnosticTags, Location, LogCategory, MessageAndDescription,
     Visit,
@@ -162,11 +161,11 @@ pub struct Detail {
 impl RuleDiagnostic {
     /// Creates a new [`RuleDiagnostic`] with a severity and title that will be
     /// used in a builder-like way to modify labels.
-    pub fn new(category: &'static Category, span: impl AsSpan, title: impl Display) -> Self {
+    pub fn new(category: &'static Category, span: Option<TextRange>, title: impl Display) -> Self {
         let message = markup!({ title }).to_owned();
         Self {
             category,
-            span: span.as_span(),
+            span,
             message: MessageAndDescription::from(message),
             tags: DiagnosticTags::empty(),
             rule_advice: RuleAdvice::default(),
@@ -200,17 +199,17 @@ impl RuleDiagnostic {
     /// Attaches a label to this [`RuleDiagnostic`].
     ///
     /// The given span has to be in the file that was provided while creating this [`RuleDiagnostic`].
-    pub fn label(mut self, span: impl AsSpan, msg: impl Display) -> Self {
+    pub fn label(mut self, span: Option<TextRange>, msg: impl Display) -> Self {
         self.rule_advice.details.push(Detail {
             log_category: LogCategory::Info,
             message: markup!({ msg }).to_owned(),
-            range: span.as_span(),
+            range: span,
         });
         self
     }
 
     /// Attaches a detailed message to this [`RuleDiagnostic`].
-    pub fn detail(self, span: impl AsSpan, msg: impl Display) -> Self {
+    pub fn detail(self, span: Option<TextRange>, msg: impl Display) -> Self {
         self.label(span, msg)
     }
 

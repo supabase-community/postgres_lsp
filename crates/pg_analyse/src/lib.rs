@@ -1,5 +1,5 @@
 mod categories;
-mod context;
+pub mod context;
 mod filter;
 pub mod macros;
 mod options;
@@ -15,7 +15,6 @@ pub use crate::categories::{
     ActionCategory, RefactorKind, RuleCategories, RuleCategoriesBuilder, RuleCategory,
     SourceActionKind, SUPPRESSION_ACTION_CATEGORY,
 };
-pub use crate::context::RuleContext;
 pub use crate::filter::{AnalysisFilter, GroupKey, RuleKey};
 pub use crate::options::{AnalyzerConfiguration, AnalyzerOptions, AnalyzerRules};
 pub use crate::registry::{MetadataRegistry, RegistryVisitor, RuleRegistry, RuleRegistryBuilder};
