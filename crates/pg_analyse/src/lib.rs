@@ -18,7 +18,9 @@ pub use crate::categories::{
 pub use crate::filter::{AnalysisFilter, GroupKey, RuleKey};
 pub use crate::options::{AnalyzerConfiguration, AnalyzerOptions, AnalyzerRules};
 pub use crate::registry::{MetadataRegistry, RegistryVisitor, RuleRegistry, RuleRegistryBuilder};
-pub use crate::rule::{GroupCategory, Rule, RuleDiagnostic, RuleGroup, RuleMeta, RuleMetadata};
+pub use crate::rule::{
+    GroupCategory, Rule, RuleDiagnostic, RuleGroup, RuleMeta, RuleMetadata, RuleSource,
+};
 
 pub struct Analyzer<'analyzer> {
     /// Holds the metadata for all the rules statically known to the analyzer

@@ -5,6 +5,7 @@ use pg_diagnostics::{
     Advices, Category, Diagnostic, DiagnosticTags, Location, LogCategory, MessageAndDescription,
     Visit,
 };
+use std::cmp::Ordering;
 use std::fmt::Debug;
 use text_size::TextRange;
 
@@ -24,6 +25,8 @@ pub struct RuleMetadata {
     pub docs: &'static str,
     /// Whether a rule is recommended or not
     pub recommended: bool,
+    /// The source URL of the rule
+    pub sources: &'static [RuleSource],
 }
 
 impl RuleMetadata {
@@ -33,6 +36,7 @@ impl RuleMetadata {
             version,
             name,
             docs,
+            sources: &[],
             recommended: false,
         }
     }
@@ -44,6 +48,11 @@ impl RuleMetadata {
 
     pub const fn deprecated(mut self, deprecated: &'static str) -> Self {
         self.deprecated = Some(deprecated);
+        self
+    }
+
+    pub const fn sources(mut self, sources: &'static [RuleSource]) -> Self {
+        self.sources = sources;
         self
     }
 }
@@ -253,5 +262,65 @@ impl RuleDiagnostic {
 
     pub fn advices(&self) -> &RuleAdvice {
         &self.rule_advice
+    }
+}
+
+#[derive(Debug, Clone, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, schemars::JsonSchema))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
+pub enum RuleSource {
+    /// Rules from [Squawk](https://squawkhq.com)
+    Squawk(&'static str),
+}
+
+impl PartialEq for RuleSource {
+    fn eq(&self, other: &Self) -> bool {
+        std::mem::discriminant(self) == std::mem::discriminant(other)
+    }
+}
+
+impl std::fmt::Display for RuleSource {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Squawk(_) => write!(f, "Squawk"),
+        }
+    }
+}
+
+impl PartialOrd for RuleSource {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for RuleSource {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let self_rule = self.as_rule_name();
+        let other_rule = other.as_rule_name();
+        self_rule.cmp(other_rule)
+    }
+}
+
+impl RuleSource {
+    pub fn as_rule_name(&self) -> &'static str {
+        match self {
+            Self::Squawk(rule_name) => rule_name,
+        }
+    }
+
+    pub fn to_namespaced_rule_name(&self) -> String {
+        match self {
+            Self::Squawk(rule_name) => format!("squawk/{rule_name}"),
+        }
+    }
+
+    pub fn to_rule_url(&self) -> String {
+        match self {
+            Self::Squawk(rule_name) => format!("https://squawkhq.com/docs/{rule_name}"),
+        }
+    }
+
+    pub fn as_url_and_rule_name(&self) -> (String, &'static str) {
+        (self.to_rule_url(), self.as_rule_name())
     }
 }

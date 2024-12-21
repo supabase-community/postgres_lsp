@@ -1,4 +1,4 @@
-use pg_analyse::{context::RuleContext, declare_lint_rule, Rule, RuleDiagnostic};
+use pg_analyse::{context::RuleContext, declare_lint_rule, Rule, RuleDiagnostic, RuleSource};
 use pg_console::markup;
 
 declare_lint_rule! {
@@ -20,6 +20,7 @@ declare_lint_rule! {
         version: "next",
         name: "banDropColumn",
         recommended: true,
+        sources: &[RuleSource::Squawk("ban-drop-column")],
     }
 }
 
