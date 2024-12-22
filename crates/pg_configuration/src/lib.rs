@@ -1,18 +1,26 @@
-//! This module contains the configuration of `pg.json`
+//! This module contains the configuration of `pglsp.toml`
 //!
 //! The configuration is divided by "tool", and then it's possible to further customise it
 //! by language. The language might further options divided by tool.
 
+pub mod analyser;
 pub mod database;
 pub mod diagnostics;
 pub mod files;
+pub mod generated;
 pub mod vcs;
 
 pub use crate::diagnostics::ConfigurationDiagnostic;
 
 use std::path::PathBuf;
 
+pub use crate::generated::push_to_analyser_rules;
 use crate::vcs::{partial_vcs_configuration, PartialVcsConfiguration, VcsConfiguration};
+pub use analyser::{
+    partial_linter_configuration, LinterConfiguration, PartialLinterConfiguration,
+    RuleConfiguration, RuleFixConfiguration, RulePlainConfiguration, RuleWithFixOptions,
+    RuleWithOptions, Rules,
+};
 use biome_deserialize_macros::Partial;
 use bpaf::Bpaf;
 use database::{
@@ -44,6 +52,10 @@ pub struct Configuration {
     )]
     pub files: FilesConfiguration,
 
+    /// The configuration for the linter
+    #[partial(type, bpaf(external(partial_linter_configuration), optional))]
+    pub linter: LinterConfiguration,
+
     /// The configuration of the database connection
     #[partial(
         type,
@@ -64,6 +76,14 @@ impl PartialConfiguration {
                 enabled: Some(false),
                 client_kind: Some(VcsClientKind::Git),
                 use_ignore_file: Some(false),
+                ..Default::default()
+            }),
+            linter: Some(PartialLinterConfiguration {
+                enabled: Some(true),
+                rules: Some(Rules {
+                    recommended: Some(true),
+                    ..Default::default()
+                }),
                 ..Default::default()
             }),
             db: Some(PartialDatabaseConfiguration {

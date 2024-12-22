@@ -1,7 +1,7 @@
 use std::{ops::Deref, sync::LazyLock};
 
 use pg_analyse::{AnalysisFilter, AnalyzerOptions, MetadataRegistry, RuleDiagnostic, RuleRegistry};
-use registry::visit_registry;
+pub use registry::visit_registry;
 
 mod lint;
 pub mod options;

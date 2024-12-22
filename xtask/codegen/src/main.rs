@@ -1,7 +1,9 @@
+use xtask::Mode::Overwrite;
 use xtask::{project_root, pushd, Result};
 
 use xtask_codegen::{
-    generate_analyser, generate_crate, generate_new_analyser_rule, task_command, TaskCommand,
+    generate_analyser, generate_crate, generate_new_analyser_rule, generate_rules_configuration,
+    task_command, TaskCommand,
 };
 
 fn main() -> Result<()> {
@@ -21,6 +23,9 @@ fn main() -> Result<()> {
             group,
         } => {
             generate_new_analyser_rule(category, &name, &group);
+        }
+        TaskCommand::Configuration => {
+            generate_rules_configuration(Overwrite)?;
         }
     }
 

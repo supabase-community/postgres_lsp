@@ -18,9 +18,9 @@ upgrade-tools:
 	cargo binstall cargo-insta taplo-cli --force
 
 # Generate all files across crates and tools. You rarely want to use it locally.
-# gen-all:
-#   cargo run -p xtask_codegen -- all
-#   cargo codegen-configuration
+gen-all:
+  cargo run -p xtask_codegen -- all
+  # cargo codegen-configuration
 #   cargo codegen-migrate
 #   just gen-bindings
 #   just format
@@ -33,7 +33,7 @@ upgrade-tools:
 # Generates code generated files for the linter
 gen-lint:
   cargo run -p xtask_codegen -- analyser
-  # cargo codegen-configuration
+  cargo run -p xtask_codegen -- configuration
   # cargo codegen-migrate
   # just gen-bindings
   # cargo run -p rules_check
