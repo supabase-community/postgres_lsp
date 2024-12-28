@@ -1,5 +1,6 @@
 use std::{fs, future::Future, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
+use analyser::lint::Linter;
 use change::StatementChange;
 use dashmap::{DashMap, DashSet};
 use document::{Document, StatementRef};
@@ -29,6 +30,7 @@ mod change;
 mod document;
 mod pg_query;
 mod store;
+mod analyser;
 mod tree_sitter;
 
 /// Simple helper to manage the db connection and the associated connection string
@@ -312,13 +314,26 @@ impl Workspace for WorkspaceServer {
             .get(&params.path)
             .ok_or(WorkspaceError::not_found())?;
 
+        let linter = Linter::new(
+            analyser::lint::LinterParams {
+                settings: &self.settings(),
+                only: params.only,
+                skip: params.skip,
+                categories: Default::default(),
+            }
+        );
+
         let diagnostics: Vec<SDiagnostic> = doc
             .statement_refs_with_ranges()
             .iter()
             .flat_map(|(stmt, r)| {
                 let mut stmt_diagnostics = vec![];
 
-                stmt_diagnostics.extend(self.pg_query.pull_diagnostics(stmt));
+                stmt_diagnostics.extend(self.pg_query.diagnostics(stmt));
+                let ast = self.pg_query.load(stmt);
+                if let Some(ast) = ast {
+                    stmt_diagnostics.extend(linter.run(&ast).diagnostics);
+                }
 
                 stmt_diagnostics
                     .into_iter()

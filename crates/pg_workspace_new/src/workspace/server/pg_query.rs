@@ -45,16 +45,10 @@ impl PgQueryStore {
             diagnostics: DashMap::new(),
         }
     }
-
-    pub fn pull_diagnostics(&self, ref_: &StatementRef) -> Vec<SDiagnostic> {
-        self.diagnostics
-            .get(ref_)
-            .map_or_else(Vec::new, |err| vec![SDiagnostic::new(err.value().clone())])
-    }
 }
 
 impl Store<pg_query_ext::NodeEnum> for PgQueryStore {
-    fn fetch(&self, statement: &StatementRef) -> Option<Arc<pg_query_ext::NodeEnum>> {
+    fn load(&self, statement: &StatementRef) -> Option<Arc<pg_query_ext::NodeEnum>> {
         self.ast_db.get(statement).map(|x| x.clone())
     }
 
@@ -79,5 +73,11 @@ impl Store<pg_query_ext::NodeEnum> for PgQueryStore {
     fn modify_statement(&self, change: &ChangedStatement) {
         self.remove_statement(&change.old.ref_);
         self.add_statement(&change.new_statement());
+    }
+
+    fn diagnostics(&self, stmt: &StatementRef) -> Vec<pg_diagnostics::serde::Diagnostic> {
+        self.diagnostics
+            .get(stmt)
+            .map_or_else(Vec::new, |err| vec![SDiagnostic::new(err.value().clone())])
     }
 }

@@ -1,5 +1,3 @@
-use pg_diagnostics::Category;
-
 /// This macro is used to declare an analyzer rule type, and implement the
 //  [RuleMeta] trait for it
 ///  # Example

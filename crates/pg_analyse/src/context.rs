@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use crate::{
     categories::RuleCategory,
     rule::{GroupCategory, Rule, RuleGroup, RuleMetadata},
@@ -7,7 +5,6 @@ use crate::{
 
 pub struct RuleContext<'a, R: Rule> {
     stmt: &'a pg_query_ext::NodeEnum,
-    file_path: &'a Path,
     options: &'a R::Options,
 }
 
@@ -18,12 +15,10 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         stmt: &'a pg_query_ext::NodeEnum,
-        file_path: &'a Path,
         options: &'a R::Options,
     ) -> Self {
         Self {
             stmt,
-            file_path,
             options,
         }
     }
@@ -81,10 +76,5 @@ where
     ///
     pub fn options(&self) -> &R::Options {
         self.options
-    }
-
-    /// The file path of the current file
-    pub fn file_path(&self) -> &Path {
-        self.file_path
     }
 }

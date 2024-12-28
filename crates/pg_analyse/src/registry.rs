@@ -174,7 +174,7 @@ impl RegistryRule {
             R: Rule<Options: Default> + 'static,
         {
             let options = params.options.rule_options::<R>().unwrap_or_default();
-            let ctx = RuleContext::new(params.root, &params.options.file_path, &options);
+            let ctx = RuleContext::new(params.root, &options);
             R::run(&ctx)
         }
 

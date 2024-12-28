@@ -1,14 +1,11 @@
 use biome_deserialize::StringSet;
 use std::{
-    num::NonZeroU64,
-    path::{Path, PathBuf},
-    sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
+    borrow::Cow, num::NonZeroU64, path::{Path, PathBuf}, sync::{RwLock, RwLockReadGuard, RwLockWriteGuard}
 };
 
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
 use pg_configuration::{
-    database::PartialDatabaseConfiguration, diagnostics::InvalidIgnorePattern,
-    files::FilesConfiguration, ConfigurationDiagnostic, PartialConfiguration,
+    database::PartialDatabaseConfiguration, diagnostics::InvalidIgnorePattern, files::FilesConfiguration, ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration
 };
 use pg_fs::FileSystem;
 
@@ -22,6 +19,9 @@ pub struct Settings {
 
     /// Database settings for the workspace
     pub db: DatabaseSettings,
+
+    /// Linter settings applied to all files in the workspace
+    pub linter: LinterSettings,
 }
 
 #[derive(Debug)]
@@ -88,8 +88,38 @@ impl Settings {
             self.db = db.into()
         }
 
+        // linter part
+        if let Some(linter) = configuration.linter {
+            self.linter =
+                to_linter_settings(working_directory.clone(), LinterConfiguration::from(linter))?;
+        }
+
         Ok(())
     }
+
+    /// Retrieves the settings of the linter
+    pub fn linter(&self) -> &LinterSettings {
+        &self.linter
+    }
+
+    /// Returns linter rules.
+    pub fn as_linter_rules(
+        &self
+    ) -> Option<Cow<pg_configuration::analyser::linter::Rules>> {
+        self.linter.rules.as_ref().map(Cow::Borrowed)
+    }
+}
+
+fn to_linter_settings(
+    working_directory: Option<PathBuf>,
+    conf: LinterConfiguration,
+) -> Result<LinterSettings, WorkspaceError> {
+    Ok(LinterSettings {
+        enabled: conf.enabled,
+        rules: Some(conf.rules),
+        ignored_files: to_matcher(working_directory.clone(), Some(&conf.ignore))?,
+        included_files: to_matcher(working_directory.clone(), Some(&conf.include))?,
+    })
 }
 
 fn to_file_settings(
@@ -168,6 +198,33 @@ pub fn to_matcher(
         }
     }
     Ok(matcher)
+}
+
+/// Linter settings for the entire workspace
+#[derive(Debug)]
+pub struct LinterSettings {
+    /// Enabled by default
+    pub enabled: bool,
+
+    /// List of rules
+    pub rules: Option<pg_configuration::analyser::linter::Rules>,
+
+    /// List of ignored paths/files to match
+    pub ignored_files: Matcher,
+
+    /// List of included paths/files to match
+    pub included_files: Matcher,
+}
+
+impl Default for LinterSettings {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            rules: Some(pg_configuration::analyser::linter::Rules::default()),
+            ignored_files: Matcher::empty(),
+            included_files: Matcher::empty(),
+        }
+    }
 }
 
 /// Database settings for the entire workspace

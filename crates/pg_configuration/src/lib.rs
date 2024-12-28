@@ -19,7 +19,7 @@ use crate::vcs::{partial_vcs_configuration, PartialVcsConfiguration, VcsConfigur
 pub use analyser::{
     partial_linter_configuration, LinterConfiguration, PartialLinterConfiguration,
     RuleConfiguration, RuleFixConfiguration, RulePlainConfiguration, RuleWithFixOptions,
-    RuleWithOptions, Rules,
+    RuleWithOptions, Rules, RuleSelector
 };
 use biome_deserialize_macros::Partial;
 use bpaf::Bpaf;

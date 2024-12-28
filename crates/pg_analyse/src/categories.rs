@@ -297,12 +297,13 @@ impl schemars::JsonSchema for RuleCategories {
     }
 }
 
+
 #[derive(Debug, Default)]
 /// A convenient type create a [RuleCategories] type
 ///
 /// ```
-/// use biome_analyze::{RuleCategoriesBuilder, RuleCategory};
-/// let mut categories = RuleCategoriesBuilder::default().with_syntax().with_lint().build();
+/// use pg_analyse::{RuleCategoriesBuilder, RuleCategory};
+/// let mut categories = RuleCategoriesBuilder::default().with_lint().build();
 ///
 /// assert!(categories.contains(RuleCategory::Lint));
 /// assert!(!categories.contains(RuleCategory::Action));
@@ -325,6 +326,11 @@ impl RuleCategoriesBuilder {
 
     pub fn with_transformation(mut self) -> Self {
         self.flags.insert(Categories::Transformation);
+        self
+    }
+
+    pub fn all(mut self) -> Self {
+        self.flags = BitFlags::all();
         self
     }
 

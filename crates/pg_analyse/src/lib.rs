@@ -12,8 +12,8 @@ pub use pg_diagnostics::category_concat;
 use registry::RegistryRuleParams;
 
 pub use crate::categories::{
-    ActionCategory, RefactorKind, RuleCategories, RuleCategoriesBuilder, RuleCategory,
-    SourceActionKind, SUPPRESSION_ACTION_CATEGORY,
+    ActionCategory, RefactorKind, RuleCategories, RuleCategory,
+    SourceActionKind, SUPPRESSION_ACTION_CATEGORY, RuleCategoriesBuilder
 };
 pub use crate::filter::{AnalysisFilter, GroupKey, RuleFilter, RuleKey};
 pub use crate::options::{AnalyzerConfiguration, AnalyzerOptions, AnalyzerRules};
@@ -30,7 +30,7 @@ pub struct Analyzer<'analyzer> {
 }
 
 pub struct AnalyzerContext<'a> {
-    pub root: pg_query_ext::NodeEnum,
+    pub root: &'a pg_query_ext::NodeEnum,
     pub options: &'a AnalyzerOptions,
     pub registry: RuleRegistry,
 }
@@ -43,7 +43,7 @@ impl<'analyzer> Analyzer<'analyzer> {
 
     pub fn run(self, ctx: AnalyzerContext) -> Vec<RuleDiagnostic> {
         let params = RegistryRuleParams {
-            root: &ctx.root,
+            root: ctx.root,
             options: ctx.options,
         };
 

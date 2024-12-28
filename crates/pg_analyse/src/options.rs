@@ -3,7 +3,6 @@ use rustc_hash::FxHashMap;
 use crate::{Rule, RuleKey};
 use std::any::{Any, TypeId};
 use std::fmt::Debug;
-use std::path::PathBuf;
 
 /// A convenient new type data structure to store the options that belong to a rule
 #[derive(Debug)]
@@ -43,7 +42,7 @@ impl AnalyzerRules {
     }
 }
 
-/// A data structured derived from the `biome.json` file
+/// A data structured derived from the `pglsp.toml` file
 #[derive(Debug, Default)]
 pub struct AnalyzerConfiguration {
     /// A list of rules and their options
@@ -53,11 +52,8 @@ pub struct AnalyzerConfiguration {
 /// A set of information useful to the analyzer infrastructure
 #[derive(Debug, Default)]
 pub struct AnalyzerOptions {
-    /// A data structured derived from the [`biome.json`] file
+    /// A data structured derived from the [`pglsp.toml`] file
     pub configuration: AnalyzerConfiguration,
-
-    /// The file that is being analyzed
-    pub file_path: PathBuf,
 }
 
 impl AnalyzerOptions {

@@ -6,7 +6,6 @@ use pg_fs::{FileSystem, OsFileSystem};
 pub mod configuration;
 pub mod diagnostics;
 pub mod dome;
-pub mod handlers;
 pub mod matcher;
 pub mod settings;
 pub mod workspace;

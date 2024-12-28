@@ -20,6 +20,7 @@ hdrhistogram       = { version = "7.5.4", default-features = false }
 path-absolutize    = { version = "3.1.1", optional = false, features = ["use_unix_paths_on_wasm"] }
 pg_configuration   = { workspace = true }
 pg_console         = { workspace = true }
+pg_analyse         = { workspace = true }
 pg_diagnostics     = { workspace = true }
 pg_flags           = { workspace = true }
 pg_fs              = { workspace = true }

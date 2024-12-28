@@ -25,7 +25,7 @@ pub fn lint(
     let analyser = pg_analyse::Analyzer::new(METADATA.deref());
 
     analyser.run(pg_analyse::AnalyzerContext {
-        root: root.clone(),
+        root,
         options,
         registry,
     })

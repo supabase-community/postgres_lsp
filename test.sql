@@ -6,4 +6,6 @@ select * from test;
 
 alter tqjable test drop column id;
 
+alter table test drop column id;
+
 select lower();

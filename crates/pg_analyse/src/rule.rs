@@ -95,6 +95,7 @@ pub trait Rule: RuleMeta + Sized {
 
 /// Diagnostic object returned by a single analysis rule
 #[derive(Debug, Diagnostic)]
+#[diagnostic(severity = Warning)]
 pub struct RuleDiagnostic {
     #[category]
     pub(crate) category: &'static Category,
