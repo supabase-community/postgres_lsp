@@ -129,6 +129,13 @@ impl Document {
             .collect()
     }
 
+    pub(super) fn statement_by_id(&self, id: StatementId) -> Option<Statement> {
+        self.statements
+            .iter()
+            .find(|s| s.0 == id)
+            .map(|pos| self.statement(pos))
+    }
+
     pub(super) fn statement_ref(&self, inner_ref: &StatementPosition) -> StatementRef {
         StatementRef {
             id: inner_ref.0,

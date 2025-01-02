@@ -342,6 +342,45 @@ impl Workspace for WorkspaceServer {
             skipped_diagnostics: 0,
         })
     }
+
+    #[tracing::instrument(level = "info", skip(self))]
+    fn get_completions(
+        &self,
+        params: super::CompletionParams,
+    ) -> Result<pg_completions::CompletionResult, WorkspaceError> {
+        let doc = self
+            .documents
+            .get(&params.path)
+            .ok_or(WorkspaceError::not_found())?;
+
+        tracing::info!("Found the document.");
+        tracing::info!("Looking for statement at position: {:?}", &params.position);
+
+        let statement_ref = match doc.statement_ref_at_offset(&params.position) {
+            Some(s) => s,
+            None => return Ok(pg_completions::CompletionResult::default()),
+        };
+
+        let tree = self.tree_sitter.fetch(&statement_ref);
+        let text = doc
+            .statement_by_id(statement_ref.id)
+            .expect("Found statement_ref but no matching statement")
+            .text;
+
+        let schema_cache = self
+            .schema_cache
+            .read()
+            .map_err(|_| WorkspaceError::runtime("Unable to load SchemaCache"))?;
+
+        let result = pg_completions::complete(pg_completions::CompletionParams {
+            position: params.position,
+            schema: &schema_cache,
+            tree: tree.as_deref(),
+            text,
+        });
+
+        Ok(result)
+    }
 }
 
 /// Returns `true` if `path` is a directory or

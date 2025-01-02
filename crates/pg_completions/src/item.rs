@@ -1,10 +1,12 @@
-#[derive(Debug, PartialEq, Eq)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CompletionItemKind {
     Table,
     Function,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CompletionItem {
     pub label: String,
     pub(crate) score: i32,

@@ -127,4 +127,11 @@ where
     ) -> Result<super::PullDiagnosticsResult, WorkspaceError> {
         self.request("pglsp/pull_diagnostics", params)
     }
+
+    fn get_completions(
+        &self,
+        params: super::CompletionParams,
+    ) -> Result<pg_completions::CompletionResult, WorkspaceError> {
+        self.request("pglsp/get_completions", params)
+    }
 }
