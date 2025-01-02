@@ -2276,6 +2276,8 @@ dependencies = [
  "async-std",
  "pg_schema_cache",
  "pg_test_utils",
+ "serde",
+ "serde_json",
  "sqlx",
  "text-size",
  "tokio",
@@ -2488,6 +2490,7 @@ dependencies = [
  "anyhow",
  "biome_deserialize",
  "futures",
+ "pg_completions",
  "pg_configuration",
  "pg_console",
  "pg_diagnostics",
@@ -2502,6 +2505,7 @@ dependencies = [
  "tokio",
  "tower-lsp",
  "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -2668,6 +2672,7 @@ dependencies = [
  "dashmap 5.5.3",
  "futures",
  "ignore",
+ "pg_completions",
  "pg_configuration",
  "pg_console",
  "pg_diagnostics",
