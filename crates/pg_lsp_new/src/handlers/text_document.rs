@@ -24,11 +24,11 @@ pub(crate) async fn did_open(
     let version = params.text_document.version;
     let content = params.text_document.text;
 
-    let biome_path = session.file_path(&url)?;
+    let path = session.file_path(&url)?;
     let doc = Document::new(version, &content);
 
     session.workspace.open_file(OpenFileParams {
-        path: biome_path,
+        path,
         version,
         content,
     })?;

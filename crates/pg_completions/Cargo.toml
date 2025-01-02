@@ -16,6 +16,8 @@ async-std = "1.12.0"
 
 text-size.workspace = true
 
+serde                     = { workspace = true, features = ["derive"] }
+serde_json                = { workspace = true }
 pg_schema_cache.workspace = true
 tree-sitter.workspace     = true
 tree_sitter_sql.workspace = true

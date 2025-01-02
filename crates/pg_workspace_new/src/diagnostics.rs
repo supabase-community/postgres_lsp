@@ -60,6 +60,12 @@ impl WorkspaceError {
     pub fn vcs_disabled() -> Self {
         Self::Vcs(VcsDiagnostic::DisabledVcs(DisabledVcs {}))
     }
+
+    pub fn runtime(msg: &str) -> Self {
+        Self::RuntimeError(RuntimeError {
+            message: msg.into(),
+        })
+    }
 }
 
 impl Error for WorkspaceError {}

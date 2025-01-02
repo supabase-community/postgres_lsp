@@ -232,6 +232,14 @@ impl LanguageServer for LSPServer {
             .await
             .ok();
     }
+
+    #[tracing::instrument(level = "trace", skip(self))]
+    async fn completion(&self, params: CompletionParams) -> LspResult<Option<CompletionResponse>> {
+        match handlers::completions::get_completions(&self.session, params) {
+            Ok(result) => LspResult::Ok(Some(result)),
+            Err(e) => LspResult::Err(into_lsp_error(e)),
+        }
+    }
 }
 
 impl Drop for LSPServer {
@@ -379,6 +387,7 @@ impl ServerFactory {
         workspace_method!(builder, change_file);
         workspace_method!(builder, close_file);
         workspace_method!(builder, pull_diagnostics);
+        workspace_method!(builder, get_completions);
 
         let (service, socket) = builder.finish();
         ServerConnection { socket, service }

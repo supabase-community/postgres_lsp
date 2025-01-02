@@ -4,7 +4,7 @@ pub use self::client::{TransportRequest, WorkspaceClient, WorkspaceTransport};
 use pg_configuration::PartialConfiguration;
 use pg_fs::PgLspPath;
 use serde::{Deserialize, Serialize};
-use text_size::TextRange;
+use text_size::{TextRange, TextSize};
 
 use crate::WorkspaceError;
 
@@ -37,6 +37,14 @@ pub struct PullDiagnosticsParams {
     pub max_diagnostics: u64,
     // pub only: Vec<RuleSelector>,
     // pub skip: Vec<RuleSelector>,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CompletionParams {
+    /// The File for which a completion is requested.
+    pub path: PgLspPath,
+    /// The Cursor position in the file for which a completion is requested.
+    pub position: TextSize,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -104,6 +112,11 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
         &self,
         params: PullDiagnosticsParams,
     ) -> Result<PullDiagnosticsResult, WorkspaceError>;
+
+    fn get_completions(
+        &self,
+        params: CompletionParams,
+    ) -> Result<pg_completions::CompletionResult, WorkspaceError>;
 
     /// Refresh the schema cache for this workspace
     fn refresh_schema_cache(&self) -> Result<(), WorkspaceError>;
