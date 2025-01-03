@@ -55,7 +55,7 @@ impl ActionCategory {
     ///
     /// ```
     /// use std::borrow::Cow;
-    /// use biome_analyze::{ActionCategory, RefactorKind};
+    /// use pg_analyse::{ActionCategory, RefactorKind};
     ///
     /// assert!(ActionCategory::QuickFix(Cow::from("quickfix")).matches("quickfix"));
     ///
