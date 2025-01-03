@@ -4,7 +4,7 @@ _default:
 alias f := format
 alias t := test
 # alias r := ready
-# alias l := lint
+alias l := lint
 # alias qt := test-quick
 
 # Installs the tools needed to develop
