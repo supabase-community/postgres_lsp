@@ -137,3 +137,6 @@ clear-branches:
 
 reset-git:
     git checkout main && git pull && pnpm run clear-branches
+
+merge-main:
+    git fetch origin main:main && git merge main
