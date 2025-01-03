@@ -2,6 +2,46 @@ use pg_schema_cache::SchemaCache;
 
 use crate::CompletionParams;
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum ClauseType {
+    Select,
+    Where,
+    From,
+    Update,
+    Delete,
+}
+
+impl TryFrom<&str> for ClauseType {
+    type Error = String;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            "select" => Ok(Self::Select),
+            "where" => Ok(Self::Where),
+            "from" | "keyword_from" => Ok(Self::From),
+            "update" => Ok(Self::Update),
+            "delete" => Ok(Self::Delete),
+            _ => {
+                let message = format!("Unimplemented ClauseType: {}", value);
+
+                // Err on tests, so we notice that we're lacking an implementation immediately.
+                if cfg!(test) {
+                    panic!("{}", message);
+                }
+
+                return Err(message);
+            }
+        }
+    }
+}
+
+impl TryFrom<String> for ClauseType {
+    type Error = String;
+    fn try_from(value: String) -> Result<ClauseType, Self::Error> {
+        ClauseType::try_from(value.as_str())
+    }
+}
+
 pub(crate) struct CompletionContext<'a> {
     pub ts_node: Option<tree_sitter::Node<'a>>,
     pub tree: Option<&'a tree_sitter::Tree>,
@@ -10,15 +50,15 @@ pub(crate) struct CompletionContext<'a> {
     pub position: usize,
 
     pub schema_name: Option<String>,
-    pub wrapping_clause_type: Option<String>,
+    pub wrapping_clause_type: Option<ClauseType>,
     pub is_invocation: bool,
 }
 
 impl<'a> CompletionContext<'a> {
     pub fn new(params: &'a CompletionParams) -> Self {
-        let mut tree = Self {
+        let mut ctx = Self {
             tree: params.tree,
-            text: params.text,
+            text: &params.text,
             schema_cache: params.schema,
             position: usize::from(params.position),
 
@@ -28,9 +68,9 @@ impl<'a> CompletionContext<'a> {
             is_invocation: false,
         };
 
-        tree.gather_tree_context();
+        ctx.gather_tree_context();
 
-        tree
+        ctx
     }
 
     pub fn get_ts_node_content(&self, ts_node: tree_sitter::Node<'a>) -> Option<&'a str> {
@@ -48,10 +88,22 @@ impl<'a> CompletionContext<'a> {
 
         let mut cursor = self.tree.as_ref().unwrap().root_node().walk();
 
-        // go to the statement node that matches the position
+        /*
+         * The head node of any treesitter tree is always the "PROGRAM" node.
+         *
+         * We want to enter the next layer and focus on the child node that matches the user's cursor position.
+         * If there is no node under the users position, however, the cursor won't enter the next level – it
+         * will stay on the Program node.
+         *
+         * This might lead to an unexpected context or infinite recursion.
+         *
+         * We'll therefore adjust the cursor position such that it meets the last node of the AST.
+         * `select * from use           {}` becomes `select * from use{}`.
+         */
         let current_node_kind = cursor.node().kind();
-
-        cursor.goto_first_child_for_byte(self.position);
+        while cursor.goto_first_child_for_byte(self.position).is_none() && self.position > 0 {
+            self.position -= 1;
+        }
 
         self.gather_context_from_node(cursor, current_node_kind);
     }
@@ -64,8 +116,14 @@ impl<'a> CompletionContext<'a> {
         let current_node = cursor.node();
         let current_node_kind = current_node.kind();
 
+        // prevent infinite recursion – this can happen if we only have a PROGRAM node
+        if current_node_kind == previous_node_kind {
+            self.ts_node = Some(current_node);
+            return;
+        }
+
         match previous_node_kind {
-            "statement" => self.wrapping_clause_type = Some(current_node_kind.to_string()),
+            "statement" => self.wrapping_clause_type = current_node_kind.try_into().ok(),
             "invocation" => self.is_invocation = true,
 
             _ => {}
@@ -84,12 +142,17 @@ impl<'a> CompletionContext<'a> {
 
             // in Treesitter, the Where clause is nested inside other clauses
             "where" => {
-                self.wrapping_clause_type = Some("where".to_string());
+                self.wrapping_clause_type = "where".try_into().ok();
+            }
+
+            "keyword_from" => {
+                self.wrapping_clause_type = "keyword_from".try_into().ok();
             }
 
             _ => {}
         }
 
+        // We have arrived at the leaf node
         if current_node.child_count() == 0 {
             self.ts_node = Some(current_node);
             return;
@@ -102,7 +165,10 @@ impl<'a> CompletionContext<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::context::CompletionContext;
+    use crate::{
+        context::{ClauseType, CompletionContext},
+        test_helper::{get_text_and_position, CURSOR_POS},
+    };
 
     fn get_tree(input: &str) -> tree_sitter::Tree {
         let mut parser = tree_sitter::Parser::new();
@@ -112,8 +178,6 @@ mod tests {
 
         parser.parse(input, None).expect("Unable to parse tree")
     }
-
-    static CURSOR_POS: &str = "XXX";
 
     #[test]
     fn identifies_clauses() {
@@ -144,21 +208,21 @@ mod tests {
             ),
         ];
 
-        for (text, expected_clause) in test_cases {
-            let position = text.find(CURSOR_POS).unwrap();
-            let text = text.replace(CURSOR_POS, "");
+        for (query, expected_clause) in test_cases {
+            let (position, text) = get_text_and_position(query.as_str());
 
             let tree = get_tree(text.as_str());
+
             let params = crate::CompletionParams {
                 position: (position as u32).into(),
-                text: text.as_str(),
+                text: text,
                 tree: Some(&tree),
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
 
             let ctx = CompletionContext::new(&params);
 
-            assert_eq!(ctx.wrapping_clause_type, Some(expected_clause.to_string()));
+            assert_eq!(ctx.wrapping_clause_type, expected_clause.try_into().ok());
         }
     }
 
@@ -177,14 +241,13 @@ mod tests {
             (format!("Select * from u{}sers()", CURSOR_POS), None),
         ];
 
-        for (text, expected_schema) in test_cases {
-            let position = text.find(CURSOR_POS).unwrap();
-            let text = text.replace(CURSOR_POS, "");
+        for (query, expected_schema) in test_cases {
+            let (position, text) = get_text_and_position(query.as_str());
 
             let tree = get_tree(text.as_str());
             let params = crate::CompletionParams {
                 position: (position as u32).into(),
-                text: text.as_str(),
+                text: text,
                 tree: Some(&tree),
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
@@ -212,14 +275,13 @@ mod tests {
             ),
         ];
 
-        for (text, is_invocation) in test_cases {
-            let position = text.find(CURSOR_POS).unwrap();
-            let text = text.replace(CURSOR_POS, "");
+        for (query, is_invocation) in test_cases {
+            let (position, text) = get_text_and_position(query.as_str());
 
             let tree = get_tree(text.as_str());
             let params = crate::CompletionParams {
                 position: (position as u32).into(),
-                text: text.as_str(),
+                text: text,
                 tree: Some(&tree),
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
@@ -228,5 +290,111 @@ mod tests {
 
             assert_eq!(ctx.is_invocation, is_invocation);
         }
+    }
+
+    #[test]
+    fn does_not_fail_on_leading_whitespace() {
+        let cases = vec![
+            format!("{}      select * from", CURSOR_POS),
+            format!(" {}      select * from", CURSOR_POS),
+        ];
+
+        for query in cases {
+            let (position, text) = get_text_and_position(query.as_str());
+
+            let tree = get_tree(text.as_str());
+
+            let params = crate::CompletionParams {
+                position: (position as u32).into(),
+                text: text,
+                tree: Some(&tree),
+                schema: &pg_schema_cache::SchemaCache::new(),
+            };
+
+            let ctx = CompletionContext::new(&params);
+
+            let node = ctx.ts_node.map(|n| n.clone()).unwrap();
+
+            assert_eq!(ctx.get_ts_node_content(node), Some("select"));
+
+            assert_eq!(
+                ctx.wrapping_clause_type,
+                Some(crate::context::ClauseType::Select)
+            );
+        }
+    }
+
+    #[test]
+    fn does_not_fail_on_trailing_whitespace() {
+        let query = format!("select * from   {}", CURSOR_POS);
+
+        let (position, text) = get_text_and_position(query.as_str());
+
+        let tree = get_tree(text.as_str());
+
+        let params = crate::CompletionParams {
+            position: (position as u32).into(),
+            text: text,
+            tree: Some(&tree),
+            schema: &pg_schema_cache::SchemaCache::new(),
+        };
+
+        let ctx = CompletionContext::new(&params);
+
+        let node = ctx.ts_node.map(|n| n.clone()).unwrap();
+
+        assert_eq!(ctx.get_ts_node_content(node), Some("from"));
+        assert_eq!(
+            ctx.wrapping_clause_type,
+            Some(crate::context::ClauseType::From)
+        );
+    }
+
+    #[test]
+    fn does_not_fail_with_empty_statements() {
+        let query = format!("{}", CURSOR_POS);
+
+        let (position, text) = get_text_and_position(query.as_str());
+
+        let tree = get_tree(text.as_str());
+
+        let params = crate::CompletionParams {
+            position: (position as u32).into(),
+            text: text,
+            tree: Some(&tree),
+            schema: &pg_schema_cache::SchemaCache::new(),
+        };
+
+        let ctx = CompletionContext::new(&params);
+
+        let node = ctx.ts_node.map(|n| n.clone()).unwrap();
+
+        assert_eq!(ctx.get_ts_node_content(node), Some(""));
+        assert_eq!(ctx.wrapping_clause_type, None);
+    }
+
+    #[test]
+    fn does_not_fail_on_incomplete_keywords() {
+        //  Instead of autocompleting "FROM", we'll assume that the user
+        // is selecting a certain column name, such as `frozen_account`.
+        let query = format!("select * fro{}", CURSOR_POS);
+
+        let (position, text) = get_text_and_position(query.as_str());
+
+        let tree = get_tree(text.as_str());
+
+        let params = crate::CompletionParams {
+            position: (position as u32).into(),
+            text: text,
+            tree: Some(&tree),
+            schema: &pg_schema_cache::SchemaCache::new(),
+        };
+
+        let ctx = CompletionContext::new(&params);
+
+        let node = ctx.ts_node.map(|n| n.clone()).unwrap();
+
+        assert_eq!(ctx.get_ts_node_content(node), Some("fro"));
+        assert_eq!(ctx.wrapping_clause_type, Some(ClauseType::Select));
     }
 }

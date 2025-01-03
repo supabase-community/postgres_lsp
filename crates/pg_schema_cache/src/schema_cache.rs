@@ -1,7 +1,6 @@
-use std::future::join;
-
 use sqlx::postgres::PgPool;
 
+use crate::columns::Column;
 use crate::functions::Function;
 use crate::schemas::Schema;
 use crate::tables::Table;
@@ -15,6 +14,7 @@ pub struct SchemaCache {
     pub functions: Vec<Function>,
     pub types: Vec<PostgresType>,
     pub versions: Vec<Version>,
+    pub columns: Vec<Column>,
 }
 
 impl SchemaCache {
@@ -22,23 +22,24 @@ impl SchemaCache {
         SchemaCache::default()
     }
 
-    pub async fn load(pool: &PgPool) -> SchemaCache {
-        let (schemas, tables, functions, types, versions) = join!(
+    pub async fn load(pool: &PgPool) -> Result<SchemaCache, sqlx::Error> {
+        let (schemas, tables, functions, types, versions, columns) = futures_util::try_join!(
             Schema::load(pool),
             Table::load(pool),
             Function::load(pool),
             PostgresType::load(pool),
             Version::load(pool),
-        )
-        .await;
+            Column::load(pool)
+        )?;
 
-        SchemaCache {
+        Ok(SchemaCache {
             schemas,
             tables,
             functions,
             types,
             versions,
-        }
+            columns,
+        })
     }
 
     /// Applies an AST node to the repository
@@ -61,6 +62,14 @@ impl SchemaCache {
             .find(|t| t.name == name && schema.is_none() || Some(t.schema.as_str()) == schema)
     }
 
+    pub fn find_col(&self, name: &str, table: &str, schema: Option<&str>) -> Option<&Column> {
+        self.columns.iter().find(|c| {
+            c.name.as_str() == name
+                && c.table_name.as_str() == table
+                && schema.is_none_or(|s| s == c.schema_name.as_str())
+        })
+    }
+
     pub fn find_types(&self, name: &str, schema: Option<&str>) -> Vec<&PostgresType> {
         self.types
             .iter()
@@ -72,23 +81,21 @@ impl SchemaCache {
 pub trait SchemaCacheItem {
     type Item;
 
-    async fn load(pool: &PgPool) -> Vec<Self::Item>;
+    async fn load(pool: &PgPool) -> Result<Vec<Self::Item>, sqlx::Error>;
 }
 
 #[cfg(test)]
 mod tests {
-    use sqlx::PgPool;
+    use pg_test_utils::test_database::get_new_test_db;
 
     use crate::SchemaCache;
 
-    #[test]
-    fn test_schema_cache() {
-        let conn_string = std::env::var("DATABASE_URL").unwrap();
+    #[tokio::test]
+    async fn it_loads() {
+        let test_db = get_new_test_db().await;
 
-        let pool = async_std::task::block_on(PgPool::connect(conn_string.as_str())).unwrap();
-
-        async_std::task::block_on(SchemaCache::load(&pool));
-
-        assert!(true);
+        SchemaCache::load(&test_db)
+            .await
+            .expect("Couldnt' load Schema Cache");
     }
 }

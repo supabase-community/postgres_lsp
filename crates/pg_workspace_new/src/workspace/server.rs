@@ -136,10 +136,8 @@ impl WorkspaceServer {
         tracing::info!("Reloading schema cache");
         // TODO return error if db connection is not available
         if let Some(c) = self.connection.read().unwrap().get_pool() {
-            let schema_cache = run_async(async move {
-                // TODO load should return a Result
-                SchemaCache::load(&c).await
-            })?;
+            let maybe_schema_cache = run_async(async move { SchemaCache::load(&c).await })?;
+            let schema_cache = maybe_schema_cache?;
 
             let mut cache = self.schema_cache.write().unwrap();
             *cache = schema_cache;
@@ -311,7 +309,7 @@ impl Workspace for WorkspaceServer {
         params: super::PullDiagnosticsParams,
     ) -> Result<super::PullDiagnosticsResult, WorkspaceError> {
         // get all statements form the requested document and pull diagnostics out of every
-        // sourcece
+        // source
         let doc = self
             .documents
             .get(&params.path)

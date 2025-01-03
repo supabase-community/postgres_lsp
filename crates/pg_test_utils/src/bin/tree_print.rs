@@ -29,7 +29,13 @@ fn main() {
 
 fn print_tree(node: &tree_sitter::Node, source: &str, level: usize) {
     let indent = "  ".repeat(level);
-    let node_text = node.utf8_text(source.as_bytes()).unwrap_or("NO_NAME");
+
+    let node_text = node
+        .utf8_text(source.as_bytes())
+        .unwrap_or("NO_NAME")
+        .split_whitespace()
+        .collect::<Vec<&str>>()
+        .join(" ");
 
     println!(
         "{}{} [{}..{}] '{}'",

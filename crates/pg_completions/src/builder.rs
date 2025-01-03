@@ -28,7 +28,7 @@ impl CompletionBuilder {
             .enumerate()
             .map(|(idx, mut item)| {
                 if idx == 0 {
-                    item.preselected = Some(should_preselect_first_item);
+                    item.preselected = should_preselect_first_item;
                 }
                 item
             })

@@ -5,5 +5,6 @@ pub fn to_completion_kind(
 ) -> lsp_types::CompletionItemKind {
     match kind {
         pg_completions::CompletionItemKind::Table => lsp_types::CompletionItemKind::CLASS,
+        pg_completions::CompletionItemKind::Function => lsp_types::CompletionItemKind::FUNCTION,
     }
 }
