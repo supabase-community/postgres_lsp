@@ -43,7 +43,6 @@ where
     ///     pub(crate) Foo {
     ///         version: "0.0.0",
     ///         name: "foo",
-    ///         language: "js",
     ///         recommended: true,
     ///     }
     /// }
