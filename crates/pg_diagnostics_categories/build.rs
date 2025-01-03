@@ -104,7 +104,7 @@ pub fn main() -> io::Result<()> {
 
         /// The `category_concat!` macro is a variant of `category!` using a
         /// slightly different syntax, for use in the `declare_group` and
-        /// `declare_rule` macros in the analyzer
+        /// `declare_rule` macros in the analyser
         #[macro_export]
         macro_rules! category_concat {
             #( #concat_macro_arms )*

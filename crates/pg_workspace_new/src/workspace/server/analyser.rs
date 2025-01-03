@@ -4,14 +4,12 @@ use rustc_hash::FxHashSet;
 
 use crate::settings::Settings;
 
-pub mod lint;
-
-pub(crate) struct AnalyzerVisitorBuilder<'a, 'b> {
+pub(crate) struct AnalyserVisitorBuilder<'a, 'b> {
     lint: Option<LintVisitor<'a, 'b>>,
     settings: &'b Settings,
 }
 
-impl<'a, 'b> AnalyzerVisitorBuilder<'a, 'b> {
+impl<'a, 'b> AnalyserVisitorBuilder<'a, 'b> {
     pub(crate) fn new(settings: &'b Settings) -> Self {
         Self {
             settings,
@@ -33,7 +31,7 @@ impl<'a, 'b> AnalyzerVisitorBuilder<'a, 'b> {
         let mut disabled_rules = vec![];
         let mut enabled_rules = vec![];
         if let Some(mut lint) = self.lint {
-            pg_linter::visit_registry(&mut lint);
+            pg_analyser::visit_registry(&mut lint);
             let (linter_enabled_rules, linter_disabled_rules) = lint.finish();
             enabled_rules.extend(linter_enabled_rules);
             disabled_rules.extend(linter_disabled_rules);
@@ -42,7 +40,6 @@ impl<'a, 'b> AnalyzerVisitorBuilder<'a, 'b> {
         (enabled_rules, disabled_rules)
     }
 }
-
 
 /// Type meant to register all the lint rules
 #[derive(Debug)]
@@ -73,7 +70,8 @@ impl<'a, 'b> LintVisitor<'a, 'b> {
         let has_only_filter = !self.only.is_empty();
         if !has_only_filter {
             let enabled_rules = self
-                .settings.as_linter_rules()
+                .settings
+                .as_linter_rules()
                 .map(|rules| rules.as_enabled_rules())
                 .unwrap_or_default();
             self.enabled_rules.extend(enabled_rules);
@@ -85,9 +83,7 @@ impl<'a, 'b> LintVisitor<'a, 'b> {
     where
         R: Rule<Options: Default> + 'static,
     {
-        // Do not report unused suppression comment diagnostics if:
-        // - it is a syntax-only analyzer pass, or
-        // - if a single rule is run.
+        // Do not report unused suppression comment diagnostics if a single rule is run.
         for selector in self.only {
             let filter = RuleFilter::from(selector);
             if filter.match_rule::<R>() {
@@ -102,7 +98,6 @@ impl<'a, 'b> LintVisitor<'a, 'b> {
         }
     }
 }
-
 
 impl<'a, 'b> RegistryVisitor for LintVisitor<'a, 'b> {
     fn record_category<C: GroupCategory>(&mut self) {
@@ -132,4 +127,3 @@ impl<'a, 'b> RegistryVisitor for LintVisitor<'a, 'b> {
         self.push_rule::<R>()
     }
 }
-

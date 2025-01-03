@@ -13,14 +13,8 @@ where
     R: Rule + Sized + 'static,
 {
     #[allow(clippy::too_many_arguments)]
-    pub fn new(
-        stmt: &'a pg_query_ext::NodeEnum,
-        options: &'a R::Options,
-    ) -> Self {
-        Self {
-            stmt,
-            options,
-        }
+    pub fn new(stmt: &'a pg_query_ext::NodeEnum, options: &'a R::Options) -> Self {
+        Self { stmt, options }
     }
 
     /// Returns the group that belongs to the current rule

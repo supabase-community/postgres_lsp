@@ -75,7 +75,7 @@ impl Rule for {rule_name_upper_camel} {{
 
 pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &str) {
     let rule_name_camel = Case::Camel.convert(rule_name);
-    let crate_folder = project_root().join("crates/pg_linter");
+    let crate_folder = project_root().join("crates/pg_analyser");
     let rule_folder = match &category {
         Category::Lint => crate_folder.join(format!("src/lint/{group}")),
     };

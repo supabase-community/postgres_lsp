@@ -1,9 +1,11 @@
 use std::{fs, future::Future, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
-use analyser::lint::Linter;
+use analyser::AnalyserVisitorBuilder;
 use change::StatementChange;
 use dashmap::{DashMap, DashSet};
 use document::{Document, StatementRef};
+use pg_analyse::{AnalyserOptions, AnalysisFilter};
+use pg_analyser::{Analyser, AnalyserConfig, AnalyserContext};
 use pg_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, DiagnosticExt, Severity};
 use pg_fs::{ConfigName, PgLspPath};
 use pg_query::PgQueryStore;
@@ -16,6 +18,7 @@ use tracing::info;
 use tree_sitter::TreeSitterStore;
 
 use crate::{
+    configuration::to_analyser_rules,
     settings::{Settings, SettingsHandle, SettingsHandleMut},
     workspace::PullDiagnosticsResult,
     WorkspaceError,
@@ -26,11 +29,11 @@ use super::{
     Workspace,
 };
 
+mod analyser;
 mod change;
 mod document;
 mod pg_query;
 mod store;
-mod analyser;
 mod tree_sitter;
 
 /// Simple helper to manage the db connection and the associated connection string
@@ -314,14 +317,26 @@ impl Workspace for WorkspaceServer {
             .get(&params.path)
             .ok_or(WorkspaceError::not_found())?;
 
-        let linter = Linter::new(
-            analyser::lint::LinterParams {
-                settings: &self.settings(),
-                only: params.only,
-                skip: params.skip,
-                categories: Default::default(),
-            }
-        );
+        // create analyser for this run
+        // first, collect enabled and disabled rules from the workspace settings
+        let (enabled_rules, disabled_rules) = AnalyserVisitorBuilder::new(self.settings().as_ref())
+            .with_linter_rules(&params.only, &params.skip)
+            .finish();
+        // then, build a map that contains all options
+        let options = AnalyserOptions {
+            rules: to_analyser_rules(self.settings().as_ref()),
+        };
+        // next, build the analysis filter which will be used to match rules
+        let filter = AnalysisFilter {
+            categories: params.categories,
+            enabled_rules: Some(enabled_rules.as_slice()),
+            disabled_rules: &disabled_rules,
+        };
+        // finally, create the analyser that will be used during this run
+        let analyser = Analyser::new(AnalyserConfig {
+            options: &options,
+            filter,
+        });
 
         let diagnostics: Vec<SDiagnostic> = doc
             .statement_refs_with_ranges()
@@ -332,7 +347,13 @@ impl Workspace for WorkspaceServer {
                 stmt_diagnostics.extend(self.pg_query.diagnostics(stmt));
                 let ast = self.pg_query.load(stmt);
                 if let Some(ast) = ast {
-                    stmt_diagnostics.extend(linter.run(&ast).diagnostics);
+                    stmt_diagnostics.extend(
+                        analyser
+                            .run(AnalyserContext { root: &ast })
+                            .into_iter()
+                            .map(SDiagnostic::new)
+                            .collect::<Vec<_>>(),
+                    );
                 }
 
                 stmt_diagnostics

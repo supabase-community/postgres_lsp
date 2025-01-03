@@ -2243,6 +2243,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "pg_analyser"
+version = "0.0.0"
+dependencies = [
+ "pg_analyse",
+ "pg_console",
+ "pg_query_ext",
+]
+
+[[package]]
 name = "pg_base_db"
 version = "0.0.0"
 dependencies = [
@@ -2318,9 +2327,9 @@ dependencies = [
  "biome_deserialize_macros",
  "bpaf",
  "pg_analyse",
+ "pg_analyser",
  "pg_console",
  "pg_diagnostics",
- "pg_linter",
  "rustc-hash 2.1.0",
  "schemars",
  "serde",
@@ -2468,15 +2477,6 @@ dependencies = [
  "serde_json",
  "serde_plain",
  "text-size",
-]
-
-[[package]]
-name = "pg_linter"
-version = "0.0.0"
-dependencies = [
- "pg_analyse",
- "pg_console",
- "pg_query_ext",
 ]
 
 [[package]]
@@ -2705,11 +2705,11 @@ dependencies = [
  "futures",
  "ignore",
  "pg_analyse",
+ "pg_analyser",
  "pg_configuration",
  "pg_console",
  "pg_diagnostics",
  "pg_fs",
- "pg_linter",
  "pg_query_ext",
  "pg_schema_cache",
  "pg_statement_splitter",
@@ -4818,7 +4818,7 @@ dependencies = [
  "biome_string_case",
  "bpaf",
  "pg_analyse",
- "pg_linter",
+ "pg_analyser",
  "proc-macro2",
  "pulldown-cmark",
  "quote",

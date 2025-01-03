@@ -12,7 +12,7 @@ pub enum RuleFilter<'a> {
     Rule(&'a str, &'a str),
 }
 
-/// Allows filtering the list of rules that will be executed in a run of the analyzer,
+/// Allows filtering the list of rules that will be executed in a run of the analyser,
 /// and at what source code range signals (diagnostics or actions) may be raised
 #[derive(Debug, Default, Clone, Copy)]
 pub struct AnalysisFilter<'a> {

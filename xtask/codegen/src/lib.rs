@@ -54,7 +54,7 @@ pub fn to_capitalized(s: &str) -> String {
 #[derive(Debug, Clone, Bpaf)]
 #[bpaf(options)]
 pub enum TaskCommand {
-    /// Generate factory functions for the analyzer and the configuration of the analysers
+    /// Generate factory functions for the analyser and the configuration of the analysers
     #[bpaf(command)]
     Analyser,
     /// Generate the part of the configuration that depends on some metadata

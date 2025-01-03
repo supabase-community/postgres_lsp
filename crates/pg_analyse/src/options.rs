@@ -28,9 +28,9 @@ impl RuleOptions {
 
 /// A convenient new type data structure to insert and get rules
 #[derive(Debug, Default)]
-pub struct AnalyzerRules(FxHashMap<RuleKey, RuleOptions>);
+pub struct AnalyserRules(FxHashMap<RuleKey, RuleOptions>);
 
-impl AnalyzerRules {
+impl AnalyserRules {
     /// It tracks the options of a specific rule
     pub fn push_rule(&mut self, rule_key: RuleKey, options: RuleOptions) {
         self.0.insert(rule_key, options);
@@ -42,27 +42,19 @@ impl AnalyzerRules {
     }
 }
 
-/// A data structured derived from the `pglsp.toml` file
+/// A set of information useful to the analyser infrastructure
 #[derive(Debug, Default)]
-pub struct AnalyzerConfiguration {
-    /// A list of rules and their options
-    pub rules: AnalyzerRules,
-}
-
-/// A set of information useful to the analyzer infrastructure
-#[derive(Debug, Default)]
-pub struct AnalyzerOptions {
+pub struct AnalyserOptions {
     /// A data structured derived from the [`pglsp.toml`] file
-    pub configuration: AnalyzerConfiguration,
+    pub rules: AnalyserRules,
 }
 
-impl AnalyzerOptions {
+impl AnalyserOptions {
     pub fn rule_options<R>(&self) -> Option<R::Options>
     where
         R: Rule<Options: Clone> + 'static,
     {
-        self.configuration
-            .rules
+        self.rules
             .get_rule_options::<R::Options>(&RuleKey::rule::<R>())
             .cloned()
     }

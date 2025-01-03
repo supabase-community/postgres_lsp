@@ -21,4 +21,3 @@ pub(crate) trait Store<T> {
 
     fn modify_statement(&self, _change: &ChangedStatement) {}
 }
-

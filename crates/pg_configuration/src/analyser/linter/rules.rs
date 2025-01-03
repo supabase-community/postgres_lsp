@@ -145,7 +145,7 @@ pub struct Safety {
     pub all: Option<bool>,
     #[doc = "Dropping a column may break existing clients."]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub ban_drop_column: Option<RuleConfiguration<pg_linter::options::BanDropColumn>>,
+    pub ban_drop_column: Option<RuleConfiguration<pg_analyser::options::BanDropColumn>>,
 }
 impl Safety {
     const GROUP_NAME: &'static str = "safety";

@@ -16,9 +16,9 @@ biome_deserialize        = { workspace = true }
 biome_deserialize_macros = { workspace = true }
 bpaf                     = { workspace = true }
 pg_analyse               = { workspace = true }
+pg_analyser              = { workspace = true }
 pg_console               = { workspace = true }
 pg_diagnostics           = { workspace = true }
-pg_linter                = { workspace = true }
 rustc-hash               = { workspace = true }
 schemars                 = { workspace = true, features = ["indexmap1"], optional = true }
 serde                    = { workspace = true, features = ["derive"] }

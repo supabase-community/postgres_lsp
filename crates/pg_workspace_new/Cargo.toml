@@ -16,16 +16,16 @@ biome_deserialize         = "0.6.0"
 dashmap                   = "5.5.3"
 futures                   = "0.3.31"
 ignore                    = { workspace = true }
+pg_analyse                = { workspace = true, features = ["serde"] }
+pg_analyser               = { workspace = true }
 pg_configuration          = { workspace = true }
-pg_analyse          = { workspace = true, features = ["serde"] }
 pg_console                = { workspace = true }
 pg_diagnostics            = { workspace = true }
-pg_linter = { workspace = true }
 pg_fs                     = { workspace = true, features = ["serde"] }
-rustc-hash = { workspace = true }
 pg_query_ext              = { workspace = true }
 pg_schema_cache           = { workspace = true }
 pg_statement_splitter     = { workspace = true }
+rustc-hash                = { workspace = true }
 serde                     = { workspace = true, features = ["derive"] }
 serde_json                = { workspace = true, features = ["raw_value"] }
 sqlx.workspace            = true

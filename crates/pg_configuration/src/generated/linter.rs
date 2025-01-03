@@ -1,11 +1,11 @@
 //! Generated file, do not edit by hand, see `xtask/codegen`
 
 use crate::analyser::linter::*;
-use pg_analyse::{AnalyzerRules, MetadataRegistry};
+use pg_analyse::{AnalyserRules, MetadataRegistry};
 pub fn push_to_analyser_rules(
     rules: &Rules,
     metadata: &MetadataRegistry,
-    analyser_rules: &mut AnalyzerRules,
+    analyser_rules: &mut AnalyserRules,
 ) {
     if let Some(rules) = rules.safety.as_ref() {
         for rule_name in Safety::GROUP_RULES {

@@ -18,8 +18,8 @@ pub use crate::generated::push_to_analyser_rules;
 use crate::vcs::{partial_vcs_configuration, PartialVcsConfiguration, VcsConfiguration};
 pub use analyser::{
     partial_linter_configuration, LinterConfiguration, PartialLinterConfiguration,
-    RuleConfiguration, RuleFixConfiguration, RulePlainConfiguration, RuleWithFixOptions,
-    RuleWithOptions, Rules, RuleSelector
+    RuleConfiguration, RuleFixConfiguration, RulePlainConfiguration, RuleSelector,
+    RuleWithFixOptions, RuleWithOptions, Rules,
 };
 use biome_deserialize_macros::Partial;
 use bpaf::Bpaf;

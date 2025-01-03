@@ -31,9 +31,7 @@ pub(crate) fn check_with_guard<'ctx>(
             let pull_diagnostics_result = workspace_file
                 .guard()
                 .pull_diagnostics(
-                    RuleCategoriesBuilder::default()
-                        .all()
-                        .build(),
+                    RuleCategoriesBuilder::default().all().build(),
                     max_diagnostics,
                     only,
                     skip,

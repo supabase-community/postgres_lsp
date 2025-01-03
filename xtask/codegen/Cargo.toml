@@ -9,7 +9,7 @@ anyhow            = { workspace = true }
 biome_string_case = { workspace = true }
 bpaf              = { workspace = true, features = ["derive"] }
 pg_analyse        = { workspace = true }
-pg_linter         = { workspace = true }
+pg_analyser       = { workspace = true }
 proc-macro2       = { workspace = true, features = ["span-locations"] }
 pulldown-cmark    = { version = "0.12.2" }
 quote             = "1.0.36"

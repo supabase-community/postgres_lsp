@@ -1,10 +1,13 @@
 use std::{
-    io::ErrorKind, ops::Deref, path::{Path, PathBuf}
+    io::ErrorKind,
+    ops::Deref,
+    path::{Path, PathBuf},
 };
 
-use pg_analyse::AnalyzerRules;
+use pg_analyse::AnalyserRules;
 use pg_configuration::{
-    push_to_analyser_rules, ConfigurationDiagnostic, ConfigurationPathHint, ConfigurationPayload, PartialConfiguration
+    push_to_analyser_rules, ConfigurationDiagnostic, ConfigurationPathHint, ConfigurationPayload,
+    PartialConfiguration,
 };
 use pg_fs::{AutoSearchResult, ConfigName, FileSystem, OpenOptions};
 
@@ -176,11 +179,10 @@ pub fn create_config(
 }
 
 /// Returns the rules applied to a specific [Path], given the [Settings]
-pub fn to_analyzer_rules(settings: &Settings) -> AnalyzerRules {
-    let mut analyzer_rules = AnalyzerRules::default();
+pub fn to_analyser_rules(settings: &Settings) -> AnalyserRules {
+    let mut analyser_rules = AnalyserRules::default();
     if let Some(rules) = settings.linter.rules.as_ref() {
-        push_to_analyser_rules(rules, pg_linter::METADATA.deref(), &mut analyzer_rules);
+        push_to_analyser_rules(rules, pg_analyser::METADATA.deref(), &mut analyser_rules);
     }
-    analyzer_rules
+    analyser_rules
 }
-

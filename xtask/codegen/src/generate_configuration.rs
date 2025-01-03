@@ -36,7 +36,7 @@ pub fn generate_rules_configuration(mode: Mode) -> Result<()> {
     let push_rules_directory = project_root().join("crates/pg_configuration/src/generated");
 
     let mut lint_visitor = LintRulesVisitor::default();
-    pg_linter::visit_registry(&mut lint_visitor);
+    pg_analyser::visit_registry(&mut lint_visitor);
 
     generate_for_groups(
         lint_visitor.groups,
@@ -380,12 +380,12 @@ fn generate_for_groups(
         RuleCategory::Lint => {
             quote! {
                 use crate::analyser::linter::*;
-                use pg_analyse::{AnalyzerRules, MetadataRegistry};
+                use pg_analyse::{AnalyserRules, MetadataRegistry};
 
                 pub fn push_to_analyser_rules(
                     rules: &Rules,
                     metadata: &MetadataRegistry,
-                    analyser_rules: &mut AnalyzerRules,
+                    analyser_rules: &mut AnalyserRules,
                 ) {
                     #(
                         if let Some(rules) = rules.#group_idents.as_ref() {
@@ -404,12 +404,12 @@ fn generate_for_groups(
         RuleCategory::Action => {
             quote! {
                 use crate::analyser::assists::*;
-                use pg_analyse::{AnalyzerRules, MetadataRegistry};
+                use pg_analyse::{AnalyserRules, MetadataRegistry};
 
                 pub fn push_to_analyser_assists(
                     rules: &Actions,
                     metadata: &MetadataRegistry,
-                    analyser_rules: &mut AnalyzerRules,
+                    analyser_rules: &mut AnalyserRules,
                 ) {
                     #(
                         if let Some(rules) = rules.#group_idents.as_ref() {
@@ -534,7 +534,7 @@ fn generate_group_struct(
              #rule
         });
         let rule_option_type = quote! {
-            pg_linter::options::#rule_name
+            pg_analyser::options::#rule_name
         };
         let rule_option = if kind == RuleCategory::Action {
             quote! { Option<#rule_config_type<#rule_option_type>> }

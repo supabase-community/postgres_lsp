@@ -1,4 +1,4 @@
-/// This macro is used to declare an analyzer rule type, and implement the
+/// This macro is used to declare an analyser rule type, and implement the
 //  [RuleMeta] trait for it
 ///  # Example
 ///

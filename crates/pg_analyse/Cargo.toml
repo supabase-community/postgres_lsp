@@ -22,9 +22,9 @@ rustc-hash                = { workspace = true }
 biome_deserialize        = { workspace = true, optional = true }
 biome_deserialize_macros = { workspace = true, optional = true }
 enumflags2.workspace     = true
+schemars                 = { workspace = true, optional = true }
 serde                    = { workspace = true, features = ["derive"], optional = true }
 text-size.workspace      = true
-schemars                 = { workspace = true, optional = true }
 
 [features]
 serde = ["dep:serde", "dep:schemars", "dep:biome_deserialize", "dep:biome_deserialize_macros"]

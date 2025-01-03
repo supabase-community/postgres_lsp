@@ -13,13 +13,13 @@ pub fn generate_analyser() -> Result<()> {
 }
 
 fn generate_linter() -> Result<()> {
-    let base_path = project_root().join("crates/pg_linter/src");
-    let mut analyzers = BTreeMap::new();
-    generate_category("lint", &mut analyzers, &base_path)?;
+    let base_path = project_root().join("crates/pg_analyser/src");
+    let mut analysers = BTreeMap::new();
+    generate_category("lint", &mut analysers, &base_path)?;
 
     generate_options(&base_path)?;
 
-    update_linter_registry_builder(analyzers)
+    update_linter_registry_builder(analysers)
 }
 
 fn generate_options(base_path: &Path) -> Result<()> {
@@ -107,7 +107,7 @@ fn generate_category(
 
     let kind = match name {
         "lint" => format_ident!("Lint"),
-        _ => panic!("unimplemented analyzer category {name:?}"),
+        _ => panic!("unimplemented analyser category {name:?}"),
     };
 
     entries.insert(
@@ -200,7 +200,7 @@ fn generate_group(category: &'static str, group: &str, base_path: &Path) -> Resu
 }
 
 fn update_linter_registry_builder(rules: BTreeMap<&'static str, TokenStream>) -> Result<()> {
-    let path = project_root().join("crates/pg_linter/src/registry.rs");
+    let path = project_root().join("crates/pg_analyser/src/registry.rs");
 
     let categories = rules.into_values();
 

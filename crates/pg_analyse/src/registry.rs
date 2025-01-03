@@ -4,7 +4,7 @@ use crate::{
     context::RuleContext,
     filter::{AnalysisFilter, GroupKey, RuleKey},
     rule::{GroupCategory, Rule, RuleDiagnostic, RuleGroup},
-    AnalyzerOptions,
+    AnalyserOptions,
 };
 
 pub trait RegistryVisitor {
@@ -126,7 +126,7 @@ impl RegistryVisitor for RuleRegistryBuilder<'_> {
 
 /// The rule registry holds type-erased instances of all active analysis rules
 pub struct RuleRegistry {
-    rules: Vec<RegistryRule>,
+    pub rules: Vec<RegistryRule>,
 }
 
 impl IntoIterator for RuleRegistry {
@@ -141,7 +141,7 @@ impl IntoIterator for RuleRegistry {
 /// Internal representation of a single rule in the registry
 #[derive(Copy, Clone)]
 pub struct RegistryRule {
-    pub(crate) run: RuleExecutor,
+    pub run: RuleExecutor,
 }
 
 impl RuleRegistry {
@@ -155,9 +155,9 @@ impl RuleRegistry {
     }
 }
 
-pub struct RegistryRuleParams<'analyzer> {
-    pub root: &'analyzer pg_query_ext::NodeEnum,
-    pub options: &'analyzer AnalyzerOptions,
+pub struct RegistryRuleParams<'a> {
+    pub root: &'a pg_query_ext::NodeEnum,
+    pub options: &'a AnalyserOptions,
 }
 
 /// Executor for rule as a generic function pointer

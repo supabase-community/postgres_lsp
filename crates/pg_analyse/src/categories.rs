@@ -184,7 +184,7 @@ pub(crate) enum Categories {
 }
 
 #[derive(Debug, Copy, Clone)]
-/// The categories supported by the analyzer.
+/// The categories supported by the analyser.
 ///
 /// The default implementation of this type returns an instance with all the categories.
 ///
@@ -296,7 +296,6 @@ impl schemars::JsonSchema for RuleCategories {
         <Vec<RuleCategory>>::json_schema(gen)
     }
 }
-
 
 #[derive(Debug, Default)]
 /// A convenient type create a [RuleCategories] type

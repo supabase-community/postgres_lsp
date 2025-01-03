@@ -1,11 +1,15 @@
 use biome_deserialize::StringSet;
 use std::{
-    borrow::Cow, num::NonZeroU64, path::{Path, PathBuf}, sync::{RwLock, RwLockReadGuard, RwLockWriteGuard}
+    borrow::Cow,
+    num::NonZeroU64,
+    path::{Path, PathBuf},
+    sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
 };
 
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
 use pg_configuration::{
-    database::PartialDatabaseConfiguration, diagnostics::InvalidIgnorePattern, files::FilesConfiguration, ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration
+    database::PartialDatabaseConfiguration, diagnostics::InvalidIgnorePattern,
+    files::FilesConfiguration, ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration,
 };
 use pg_fs::FileSystem;
 
@@ -103,9 +107,7 @@ impl Settings {
     }
 
     /// Returns linter rules.
-    pub fn as_linter_rules(
-        &self
-    ) -> Option<Cow<pg_configuration::analyser::linter::Rules>> {
+    pub fn as_linter_rules(&self) -> Option<Cow<pg_configuration::analyser::linter::Rules>> {
         self.linter.rules.as_ref().map(Cow::Borrowed)
     }
 }
