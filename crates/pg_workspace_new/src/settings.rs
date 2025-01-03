@@ -1,4 +1,5 @@
 use biome_deserialize::StringSet;
+use pg_diagnostics::Category;
 use std::{
     borrow::Cow,
     num::NonZeroU64,
@@ -109,6 +110,20 @@ impl Settings {
     /// Returns linter rules.
     pub fn as_linter_rules(&self) -> Option<Cow<pg_configuration::analyser::linter::Rules>> {
         self.linter.rules.as_ref().map(Cow::Borrowed)
+    }
+
+    /// It retrieves the severity based on the `code` of the rule and the current configuration.
+    ///
+    /// The code of the has the following pattern: `{group}/{rule_name}`.
+    ///
+    /// It returns [None] if the `code` doesn't match any rule.
+    pub fn get_severity_from_rule_code(&self, code: &Category) -> Option<pg_diagnostics::Severity> {
+        let rules = self.linter.rules.as_ref();
+        if let Some(rules) = rules {
+            rules.get_severity_from_code(code)
+        } else {
+            None
+        }
     }
 }
 

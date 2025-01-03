@@ -317,14 +317,16 @@ impl Workspace for WorkspaceServer {
             .get(&params.path)
             .ok_or(WorkspaceError::not_found())?;
 
+        let settings = self.settings();
+
         // create analyser for this run
         // first, collect enabled and disabled rules from the workspace settings
-        let (enabled_rules, disabled_rules) = AnalyserVisitorBuilder::new(self.settings().as_ref())
+        let (enabled_rules, disabled_rules) = AnalyserVisitorBuilder::new(settings.as_ref())
             .with_linter_rules(&params.only, &params.skip)
             .finish();
         // then, build a map that contains all options
         let options = AnalyserOptions {
-            rules: to_analyser_rules(self.settings().as_ref()),
+            rules: to_analyser_rules(settings.as_ref()),
         };
         // next, build the analysis filter which will be used to match rules
         let filter = AnalysisFilter {
@@ -359,9 +361,25 @@ impl Workspace for WorkspaceServer {
                 stmt_diagnostics
                     .into_iter()
                     .map(|d| {
+                        // We do now check if the severity of the diagnostics should be changed.
+                        // The configuration allows to change the severity of the diagnostics emitted by rules.
+                        let severity = d
+                            .category()
+                            .filter(|category| category.name().starts_with("lint/"))
+                            .map_or_else(
+                                || d.severity(),
+                                |category| {
+                                    settings
+                                        .as_ref()
+                                        .get_severity_from_rule_code(category)
+                                        .unwrap_or(Severity::Warning)
+                                },
+                            );
+
                         SDiagnostic::new(
                             d.with_file_path(params.path.as_path().display().to_string())
-                                .with_file_span(r),
+                                .with_file_span(r)
+                                .with_severity(severity),
                         )
                     })
                     .collect::<Vec<_>>()

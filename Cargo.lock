@@ -2249,6 +2249,7 @@ dependencies = [
  "pg_analyse",
  "pg_console",
  "pg_query_ext",
+ "serde",
 ]
 
 [[package]]
