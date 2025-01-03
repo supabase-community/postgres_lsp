@@ -22,11 +22,8 @@ pub enum UpdateResult {
 /// A helper to update file on disk if it has changed.
 /// With verify = false,
 pub fn update(path: &Path, contents: &str, mode: &Mode) -> Result<UpdateResult> {
-    match fs2::read_to_string(path) {
-        Ok(old_contents) if old_contents == contents => {
-            return Ok(UpdateResult::NotUpdated);
-        }
-        _ => (),
+    if fs2::read_to_string(path).is_ok_and(|old_contents| old_contents == contents) {
+        return Ok(UpdateResult::NotUpdated);
     }
 
     if *mode == Mode::Verify {
