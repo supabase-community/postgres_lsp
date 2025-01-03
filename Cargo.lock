@@ -2577,9 +2577,11 @@ name = "pg_query_ext"
 version = "0.0.0"
 dependencies = [
  "petgraph",
+ "pg_diagnostics",
  "pg_lexer",
  "pg_query",
  "pg_query_ext_codegen",
+ "text-size",
 ]
 
 [[package]]
@@ -3183,6 +3185,21 @@ dependencies = [
  "spki",
  "subtle",
  "zeroize",
+]
+
+[[package]]
+name = "rules_check"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "pg_analyse",
+ "pg_analyser",
+ "pg_console",
+ "pg_diagnostics",
+ "pg_query_ext",
+ "pg_statement_splitter",
+ "pg_workspace_new",
+ "pulldown-cmark",
 ]
 
 [[package]]

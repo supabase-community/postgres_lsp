@@ -36,7 +36,7 @@ gen-lint:
   cargo run -p xtask_codegen -- configuration
   # cargo codegen-migrate
   # just gen-bindings
-  # cargo run -p rules_check
+  cargo run -p rules_check
   just format
 
 # Generates the linter documentation and Rust documentation

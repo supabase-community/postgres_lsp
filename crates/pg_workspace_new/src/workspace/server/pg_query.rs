@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use pg_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, MessageAndDescription};
+use pg_query_ext::diagnostics::*;
 use text_size::TextRange;
 
 use super::{
@@ -10,32 +11,9 @@ use super::{
     store::Store,
 };
 
-/// A specialized diagnostic for the libpg_query parser.
-///
-/// Parser diagnostics are always **errors**.
-#[derive(Clone, Debug, Diagnostic)]
-#[diagnostic(category = "syntax", severity = Error)]
-pub struct SyntaxDiagnostic {
-    /// The location where the error is occurred
-    #[location(span)]
-    span: Option<TextRange>,
-    #[message]
-    #[description]
-    pub message: MessageAndDescription,
-}
-
 pub struct PgQueryStore {
     ast_db: DashMap<StatementRef, Arc<pg_query_ext::NodeEnum>>,
     diagnostics: DashMap<StatementRef, SyntaxDiagnostic>,
-}
-
-impl From<pg_query_ext::Error> for SyntaxDiagnostic {
-    fn from(err: pg_query_ext::Error) -> Self {
-        SyntaxDiagnostic {
-            span: None,
-            message: MessageAndDescription::from(err.to_string()),
-        }
-    }
 }
 
 impl PgQueryStore {
