@@ -30,7 +30,7 @@ impl TreeSitterStore {
 }
 
 impl Store<tree_sitter::Tree> for TreeSitterStore {
-    fn fetch(&self, statement: &StatementRef) -> Option<Arc<tree_sitter::Tree>> {
+    fn load(&self, statement: &StatementRef) -> Option<Arc<tree_sitter::Tree>> {
         self.db.get(statement).map(|x| x.clone())
     }
 

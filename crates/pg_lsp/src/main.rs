@@ -23,7 +23,7 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("Starting server.");
 
-    let (service, socket) = LspService::new(|client| LspServer::new(client));
+    let (service, socket) = LspService::new(LspServer::new);
 
     Server::new(stdin, stdout, socket).serve(service).await;
 

@@ -1,3 +1,4 @@
+use pg_analyse::RuleCategoriesBuilder;
 use pg_diagnostics::{category, Error};
 
 use crate::execute::diagnostics::ResultExt;
@@ -24,10 +25,17 @@ pub(crate) fn check_with_guard<'ctx>(
             let input = workspace_file.input()?;
             let changed = false;
 
+            let (only, skip) = (Vec::new(), Vec::new());
+
             let max_diagnostics = ctx.remaining_diagnostics.load(Ordering::Relaxed);
             let pull_diagnostics_result = workspace_file
                 .guard()
-                .pull_diagnostics(max_diagnostics)
+                .pull_diagnostics(
+                    RuleCategoriesBuilder::default().all().build(),
+                    max_diagnostics,
+                    only,
+                    skip,
+                )
                 .with_file_path_and_code(
                     workspace_file.path.display().to_string(),
                     category!("check"),

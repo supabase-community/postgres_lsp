@@ -12,3 +12,15 @@ port = 54322
 username = "postgres"
 password = "postgres"
 database = "postgres"
+
+[linter]
+enabled = true
+
+[linter.rules]
+recommended = true
+
+[linter.rules.safety.banDropColumn]
+level = "warn"
+options = { test = "HELLO" }
+
+

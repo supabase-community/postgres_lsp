@@ -1,5 +1,5 @@
 [workspace]
-members  = ["crates/*", "lib/*", "xtask/codegen"]
+members  = ["crates/*", "lib/*", "xtask/codegen", "xtask/rules_check"]
 resolver = "2"
 
 [workspace.package]
@@ -17,6 +17,7 @@ rust-version = "1.82.0"
 anyhow                   = "1.0.92"
 biome_deserialize        = "0.6.0"
 biome_deserialize_macros = "0.6.0"
+biome_string_case        = "0.5.8"
 bpaf                     = { version = "0.9.15", features = ["derive"] }
 crossbeam                = "0.8.4"
 enumflags2               = "0.7.10"
@@ -46,6 +47,8 @@ tree_sitter_sql          = { path = "./lib/tree_sitter_sql", version = "0.0.0" }
 unicode-width            = "0.1.12"
 
 # postgres specific crates
+pg_analyse                = { path = "./crates/pg_analyse", version = "0.0.0" }
+pg_analyser               = { path = "./crates/pg_analyser", version = "0.0.0" }
 pg_base_db                = { path = "./crates/pg_base_db", version = "0.0.0" }
 pg_cli                    = { path = "./crates/pg_cli", version = "0.0.0" }
 pg_commands               = { path = "./crates/pg_commands", version = "0.0.0" }

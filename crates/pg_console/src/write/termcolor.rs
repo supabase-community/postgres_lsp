@@ -217,13 +217,7 @@ fn unicode_to_ascii(c: char) -> char {
 mod tests {
     use std::{fmt::Write, str::from_utf8};
 
-    use pg_markup::markup;
-    use termcolor::Ansi;
-
-    use crate as pg_console;
-    use crate::fmt::Formatter;
-
-    use super::{SanitizeAdapter, Termcolor};
+    use super::SanitizeAdapter;
 
     #[test]
     fn test_printing_complex_emojis() {

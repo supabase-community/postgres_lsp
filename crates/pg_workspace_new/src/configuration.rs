@@ -1,14 +1,17 @@
 use std::{
     io::ErrorKind,
+    ops::Deref,
     path::{Path, PathBuf},
 };
 
+use pg_analyse::AnalyserRules;
 use pg_configuration::{
-    ConfigurationDiagnostic, ConfigurationPathHint, ConfigurationPayload, PartialConfiguration,
+    push_to_analyser_rules, ConfigurationDiagnostic, ConfigurationPathHint, ConfigurationPayload,
+    PartialConfiguration,
 };
 use pg_fs::{AutoSearchResult, ConfigName, FileSystem, OpenOptions};
 
-use crate::{DynRef, WorkspaceError};
+use crate::{settings::Settings, DynRef, WorkspaceError};
 
 /// Information regarding the configuration that was found.
 ///
@@ -173,4 +176,13 @@ pub fn create_config(
         .map_err(|_| WorkspaceError::cant_read_file(format!("{}", path.display())))?;
 
     Ok(())
+}
+
+/// Returns the rules applied to a specific [Path], given the [Settings]
+pub fn to_analyser_rules(settings: &Settings) -> AnalyserRules {
+    let mut analyser_rules = AnalyserRules::default();
+    if let Some(rules) = settings.linter.rules.as_ref() {
+        push_to_analyser_rules(rules, pg_analyser::METADATA.deref(), &mut analyser_rules);
+    }
+    analyser_rules
 }

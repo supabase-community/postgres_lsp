@@ -358,7 +358,7 @@ impl<'de> Deserialize<'de> for DiagnosticTags {
 mod tests {
     use std::io;
 
-    use serde_json::{from_value, json, to_value, Value};
+    use serde_json::{json, Value};
     use text_size::{TextRange, TextSize};
 
     use crate::{
