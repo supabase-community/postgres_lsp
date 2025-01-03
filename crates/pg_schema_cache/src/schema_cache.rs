@@ -66,7 +66,7 @@ impl SchemaCache {
         self.columns.iter().find(|c| {
             c.name.as_str() == name
                 && c.table_name.as_str() == table
-                && schema.is_none_or(|s| s == c.schema_name.as_str())
+                && schema.map_or(true, |s| s == c.schema_name.as_str())
         })
     }
 
