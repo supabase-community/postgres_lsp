@@ -20,7 +20,8 @@ pub enum UpdateResult {
 }
 
 /// A helper to update file on disk if it has changed.
-/// With verify = false,
+/// With verify = false, the contents of the file will be updated to the passed in contents.
+/// With verify = true, an Err will be returned if the contents of the file do not match the passed-in contents.
 pub fn update(path: &Path, contents: &str, mode: &Mode) -> Result<UpdateResult> {
     if fs2::read_to_string(path).is_ok_and(|old_contents| old_contents == contents) {
         return Ok(UpdateResult::NotUpdated);
