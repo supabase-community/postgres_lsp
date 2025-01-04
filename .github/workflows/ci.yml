@@ -61,7 +61,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run clippy
         run: |
-          cargo lint
+          cargo clippy
           cargo run -p rules_check
 
   check-dependencies:
@@ -82,6 +82,15 @@ jobs:
   test:
     name: Test
     runs-on: ${{ matrix.os }}
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
     strategy:
       matrix:
         include:
@@ -116,9 +125,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run the analyser codegen
-        run: cargo codegen analyser
+        run: cargo run -p xtask_codegen -- analyser
       - name: Run the configuration codegen
-        run: cargo codegen-configuration
+        run: cargo run -p xtask_codegen -- configuration
       - name: Check for git diff
         run: |
           if [[ `git status --porcelain` ]]; then

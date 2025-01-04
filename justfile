@@ -104,9 +104,11 @@ test-doc:
 # Alias for `cargo clippy`, it runs clippy on the whole codebase
 lint:
   cargo clippy
+  cargo run -p rules_check
 
 lint-fix:
   cargo clippy --fix
+  cargo run -p rules_check
 
 # When you finished coding, run this command to run the same commands in the CI.
 # ready:
