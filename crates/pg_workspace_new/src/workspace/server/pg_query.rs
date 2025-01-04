@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use pg_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, MessageAndDescription};
+use pg_query_ext::diagnostics::*;
 use text_size::TextRange;
 
 use super::{
@@ -10,32 +11,9 @@ use super::{
     store::Store,
 };
 
-/// A specialized diagnostic for the libpg_query parser.
-///
-/// Parser diagnostics are always **errors**.
-#[derive(Clone, Debug, Diagnostic)]
-#[diagnostic(category = "syntax", severity = Error)]
-pub struct SyntaxDiagnostic {
-    /// The location where the error is occurred
-    #[location(span)]
-    span: Option<TextRange>,
-    #[message]
-    #[description]
-    pub message: MessageAndDescription,
-}
-
 pub struct PgQueryStore {
     ast_db: DashMap<StatementRef, Arc<pg_query_ext::NodeEnum>>,
     diagnostics: DashMap<StatementRef, SyntaxDiagnostic>,
-}
-
-impl From<pg_query_ext::Error> for SyntaxDiagnostic {
-    fn from(err: pg_query_ext::Error) -> Self {
-        SyntaxDiagnostic {
-            span: None,
-            message: MessageAndDescription::from(err.to_string()),
-        }
-    }
 }
 
 impl PgQueryStore {
@@ -45,16 +23,10 @@ impl PgQueryStore {
             diagnostics: DashMap::new(),
         }
     }
-
-    pub fn pull_diagnostics(&self, ref_: &StatementRef) -> Vec<SDiagnostic> {
-        self.diagnostics
-            .get(ref_)
-            .map_or_else(Vec::new, |err| vec![SDiagnostic::new(err.value().clone())])
-    }
 }
 
 impl Store<pg_query_ext::NodeEnum> for PgQueryStore {
-    fn fetch(&self, statement: &StatementRef) -> Option<Arc<pg_query_ext::NodeEnum>> {
+    fn load(&self, statement: &StatementRef) -> Option<Arc<pg_query_ext::NodeEnum>> {
         self.ast_db.get(statement).map(|x| x.clone())
     }
 
@@ -79,5 +51,11 @@ impl Store<pg_query_ext::NodeEnum> for PgQueryStore {
     fn modify_statement(&self, change: &ChangedStatement) {
         self.remove_statement(&change.old.ref_);
         self.add_statement(&change.new_statement());
+    }
+
+    fn diagnostics(&self, stmt: &StatementRef) -> Vec<pg_diagnostics::serde::Diagnostic> {
+        self.diagnostics
+            .get(stmt)
+            .map_or_else(Vec::new, |err| vec![SDiagnostic::new(err.value().clone())])
     }
 }

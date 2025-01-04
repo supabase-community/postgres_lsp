@@ -22,8 +22,8 @@ tree-sitter.workspace      = true
 tree_sitter_sql.workspace  = true
 
 [dev-dependencies]
-async-std = "1.12.0"
-pg_test_utils.workspace   = true
+async-std               = "1.12.0"
+pg_test_utils.workspace = true
 
 
 [lib]

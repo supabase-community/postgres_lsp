@@ -10,6 +10,7 @@
 //! - `get_nodes` to get all the nodes in the AST as a petgraph tree
 //! - `ChildrenIterator` to iterate over the children of a node
 mod codegen;
+pub mod diagnostics;
 
 pub use pg_query::protobuf;
 pub use pg_query::{Error, NodeEnum, Result};

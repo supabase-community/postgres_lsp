@@ -62,7 +62,7 @@ impl DbConnection {
 
         Ok(Self {
             pool,
-            connection_string: connection_string,
+            connection_string,
             schema_update_handle,
             close_tx,
         })

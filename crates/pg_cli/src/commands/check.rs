@@ -9,7 +9,7 @@ use pg_fs::FileSystem;
 use pg_workspace_new::{configuration::LoadedConfiguration, DynRef, Workspace, WorkspaceError};
 use std::ffi::OsString;
 
-use super::{determine_fix_file_mode, get_files_to_process_with_cli_options, CommandRunner};
+use super::{get_files_to_process_with_cli_options, CommandRunner};
 
 pub(crate) struct CheckCommandPayload {
     pub(crate) write: bool,

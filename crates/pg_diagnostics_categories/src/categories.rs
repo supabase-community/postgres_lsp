@@ -13,10 +13,11 @@
 // must be between `define_categories! {\n` and `\n    ;\n`.
 
 define_categories! {
-    "somerule": "https://example.com/some-rule",
+    "lint/safety/banDropColumn": "https://pglsp.dev/linter/rules/ban-drop-column",
+    // end lint rules
     ;
+    // General categories
     "stdin",
-    "lint",
     "check",
     "configuration",
     "database/connection",
@@ -28,4 +29,10 @@ define_categories! {
     "internalError/panic",
     "syntax",
     "dummy",
+
+    // Lint groups start
+    "lint",
+    "lint/performance",
+    "lint/safety",
+    // Lint groups end
 }

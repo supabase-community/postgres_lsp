@@ -1,8 +1,11 @@
 use std::{fs, future::Future, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
+use analyser::AnalyserVisitorBuilder;
 use change::StatementChange;
 use dashmap::{DashMap, DashSet};
 use document::{Document, StatementRef};
+use pg_analyse::{AnalyserOptions, AnalysisFilter};
+use pg_analyser::{Analyser, AnalyserConfig, AnalyserContext};
 use pg_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, DiagnosticExt, Severity};
 use pg_fs::{ConfigName, PgLspPath};
 use pg_query::PgQueryStore;
@@ -15,6 +18,7 @@ use tracing::info;
 use tree_sitter::TreeSitterStore;
 
 use crate::{
+    configuration::to_analyser_rules,
     settings::{Settings, SettingsHandle, SettingsHandleMut},
     workspace::PullDiagnosticsResult,
     WorkspaceError,
@@ -25,6 +29,7 @@ use super::{
     Workspace,
 };
 
+mod analyser;
 mod change;
 mod document;
 mod pg_query;
@@ -310,20 +315,69 @@ impl Workspace for WorkspaceServer {
             .get(&params.path)
             .ok_or(WorkspaceError::not_found())?;
 
+        let settings = self.settings();
+
+        // create analyser for this run
+        // first, collect enabled and disabled rules from the workspace settings
+        let (enabled_rules, disabled_rules) = AnalyserVisitorBuilder::new(settings.as_ref())
+            .with_linter_rules(&params.only, &params.skip)
+            .finish();
+        // then, build a map that contains all options
+        let options = AnalyserOptions {
+            rules: to_analyser_rules(settings.as_ref()),
+        };
+        // next, build the analysis filter which will be used to match rules
+        let filter = AnalysisFilter {
+            categories: params.categories,
+            enabled_rules: Some(enabled_rules.as_slice()),
+            disabled_rules: &disabled_rules,
+        };
+        // finally, create the analyser that will be used during this run
+        let analyser = Analyser::new(AnalyserConfig {
+            options: &options,
+            filter,
+        });
+
         let diagnostics: Vec<SDiagnostic> = doc
             .statement_refs_with_ranges()
             .iter()
             .flat_map(|(stmt, r)| {
                 let mut stmt_diagnostics = vec![];
 
-                stmt_diagnostics.extend(self.pg_query.pull_diagnostics(stmt));
+                stmt_diagnostics.extend(self.pg_query.diagnostics(stmt));
+                let ast = self.pg_query.load(stmt);
+                if let Some(ast) = ast {
+                    stmt_diagnostics.extend(
+                        analyser
+                            .run(AnalyserContext { root: &ast })
+                            .into_iter()
+                            .map(SDiagnostic::new)
+                            .collect::<Vec<_>>(),
+                    );
+                }
 
                 stmt_diagnostics
                     .into_iter()
                     .map(|d| {
+                        // We do now check if the severity of the diagnostics should be changed.
+                        // The configuration allows to change the severity of the diagnostics emitted by rules.
+                        let severity = d
+                            .category()
+                            .filter(|category| category.name().starts_with("lint/"))
+                            .map_or_else(
+                                || d.severity(),
+                                |category| {
+                                    settings
+                                        .as_ref()
+                                        .get_severity_from_rule_code(category)
+                                        .unwrap_or(Severity::Warning)
+                                },
+                            );
+
                         SDiagnostic::new(
                             d.with_file_path(params.path.as_path().display().to_string())
-                                .with_file_span(r),
+                                .with_file_span(r)
+                                .with_severity(severity),
                         )
                     })
                     .collect::<Vec<_>>()

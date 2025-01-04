@@ -12,14 +12,17 @@ version              = "0.0.0"
 
 
 [dependencies]
-lazy_static            = "1.4.0"
-pg_base_db.workspace   = true
-pg_query_ext.workspace = true
-pg_syntax.workspace    = true
-serde.workspace        = true
-serde_json.workspace   = true
-serde_plain            = "1.0"
-text-size.workspace    = true
+enumflags2.workspace     = true
+lazy_static              = "1.4.0"
+pg_base_db.workspace     = true
+pg_console.workspace     = true
+pg_diagnostics.workspace = true
+pg_query_ext.workspace   = true
+pg_syntax.workspace      = true
+serde.workspace          = true
+serde_json.workspace     = true
+serde_plain              = "1.0"
+text-size.workspace      = true
 
 [dev-dependencies]
 

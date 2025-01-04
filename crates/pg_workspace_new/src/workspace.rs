@@ -1,7 +1,8 @@
 use std::{panic::RefUnwindSafe, path::PathBuf, sync::Arc};
 
 pub use self::client::{TransportRequest, WorkspaceClient, WorkspaceTransport};
-use pg_configuration::PartialConfiguration;
+use pg_analyse::RuleCategories;
+use pg_configuration::{PartialConfiguration, RuleSelector};
 use pg_fs::PgLspPath;
 use serde::{Deserialize, Serialize};
 use text_size::TextRange;
@@ -33,10 +34,10 @@ pub struct ChangeFileParams {
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct PullDiagnosticsParams {
     pub path: PgLspPath,
-    // pub categories: RuleCategories,
+    pub categories: RuleCategories,
     pub max_diagnostics: u64,
-    // pub only: Vec<RuleSelector>,
-    // pub skip: Vec<RuleSelector>,
+    pub only: Vec<RuleSelector>,
+    pub skip: Vec<RuleSelector>,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -188,17 +189,17 @@ impl<'app, W: Workspace + ?Sized> FileGuard<'app, W> {
 
     pub fn pull_diagnostics(
         &self,
-        // categories: RuleCategories,
+        categories: RuleCategories,
         max_diagnostics: u32,
-        // only: Vec<RuleSelector>,
-        // skip: Vec<RuleSelector>,
+        only: Vec<RuleSelector>,
+        skip: Vec<RuleSelector>,
     ) -> Result<PullDiagnosticsResult, WorkspaceError> {
         self.workspace.pull_diagnostics(PullDiagnosticsParams {
             path: self.path.clone(),
-            // categories,
+            categories,
             max_diagnostics: max_diagnostics.into(),
-            // only,
-            // skip,
+            only,
+            skip,
         })
     }
     //

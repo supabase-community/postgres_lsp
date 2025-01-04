@@ -4,7 +4,7 @@ _default:
 alias f := format
 alias t := test
 # alias r := ready
-# alias l := lint
+alias l := lint
 # alias qt := test-quick
 
 # Installs the tools needed to develop
@@ -18,9 +18,9 @@ upgrade-tools:
 	cargo binstall cargo-insta taplo-cli --force
 
 # Generate all files across crates and tools. You rarely want to use it locally.
-# gen-all:
-#   cargo run -p xtask_codegen -- all
-#   cargo codegen-configuration
+gen-all:
+  cargo run -p xtask_codegen -- all
+  # cargo codegen-configuration
 #   cargo codegen-migrate
 #   just gen-bindings
 #   just format
@@ -31,38 +31,29 @@ upgrade-tools:
 #   cargo codegen-bindings
 
 # Generates code generated files for the linter
-# gen-lint:
-#   cargo run -p xtask_codegen -- analyzer
-#   cargo codegen-configuration
-#   cargo codegen-migrate
-#   just gen-bindings
-#   cargo run -p rules_check
-#   just format
+gen-lint:
+  cargo run -p xtask_codegen -- analyser
+  cargo run -p xtask_codegen -- configuration
+  # cargo codegen-migrate
+  # just gen-bindings
+  cargo run -p rules_check
+  just format
 
 # Generates the linter documentation and Rust documentation
 # documentation:
 #   RUSTDOCFLAGS='-D warnings' cargo documentation
 
-# Creates a new lint rule in the given path, with the given name. Name has to be camel case.
-# new-lintrule rulename:
-#   cargo run -p xtask_codegen -- new-lintrule --kind=js --category=lint --name={{rulename}}
-#   just gen-lint
-#   just documentation
+# Creates a new lint rule in the given path, with the given name. Name has to be camel case. Group should be lowercase.
+new-lintrule group rulename:
+  cargo run -p xtask_codegen -- new-lintrule --category=lint --name={{rulename}} --group={{group}}
+  just gen-lint
+  # just documentation
 
 # Creates a new lint rule in the given path, with the given name. Name has to be camel case.
 # new-assistrule rulename:
 #   cargo run -p xtask_codegen -- new-lintrule --kind=js --category=assist --name={{rulename}}
 #   just gen-lint
 #   just documentation
-
-# Promotes a rule from the nursery group to a new group
-# promote-rule rulename group:
-# 	cargo run -p xtask_codegen -- promote-rule --name={{rulename}} --group={{group}}
-# 	just gen-lint
-# 	just documentation
-# 	-cargo test -p pg_analyze -- {{snakecase(rulename)}}
-# 	cargo insta accept
-
 
 # Format Rust files and TOML files
 format:
@@ -114,6 +105,9 @@ test-doc:
 lint:
   cargo clippy
 
+lint-fix:
+  cargo clippy --fix
+
 # When you finished coding, run this command to run the same commands in the CI.
 # ready:
 #   git diff --exit-code --quiet
@@ -147,3 +141,6 @@ clear-branches:
 
 reset-git:
     git checkout main && git pull && pnpm run clear-branches
+
+merge-main:
+    git fetch origin main:main && git merge main

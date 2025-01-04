@@ -4,6 +4,7 @@ use crate::utils;
 use anyhow::Result;
 use futures::stream::FuturesUnordered;
 use futures::StreamExt;
+use pg_analyse::RuleCategoriesBuilder;
 use pg_configuration::ConfigurationPathHint;
 use pg_diagnostics::{DiagnosticExt, Error};
 use pg_fs::{FileSystem, PgLspPath};
@@ -255,10 +256,15 @@ impl Session {
                     .await;
         }
 
+        let categories = RuleCategoriesBuilder::default().all();
+
         let diagnostics: Vec<lsp_types::Diagnostic> = {
             let result = self.workspace.pull_diagnostics(PullDiagnosticsParams {
                 path: pglsp_path.clone(),
                 max_diagnostics: u64::MAX,
+                categories: categories.build(),
+                only: Vec::new(),
+                skip: Vec::new(),
             })?;
 
             tracing::trace!("pglsp diagnostics: {:#?}", result.diagnostics);

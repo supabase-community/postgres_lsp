@@ -81,6 +81,6 @@ impl SimpleTokioDebouncer {
         self.shutdown_flag
             .store(true, std::sync::atomic::Ordering::Relaxed);
 
-        let _ = self.handle.abort(); //  we don't care about any errors during shutdown
+        self.handle.abort(); //  we don't care about any errors during shutdown
     }
 }

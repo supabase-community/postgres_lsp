@@ -435,7 +435,7 @@ impl LanguageServer for LspServer {
 
         let completions = self.session.get_available_completions(path, position).await;
 
-        Ok(completions.map(|c| CompletionResponse::List(c)))
+        Ok(completions.map(CompletionResponse::List))
     }
 
     #[tracing::instrument(
