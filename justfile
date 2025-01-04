@@ -140,7 +140,10 @@ clear-branches:
     git branch --merged | egrep -v "(^\\*|main)" | xargs git branch -d
 
 reset-git:
-    git checkout main && git pull && pnpm run clear-branches
+    git checkout main
+    git pull
+    just clear-branches
 
 merge-main:
-    git fetch origin main:main && git merge main
+    git fetch origin main:main
+    git merge main
