@@ -161,7 +161,7 @@ jobs:
         run: cargo run -p xtask_codegen -- configuration
       - name: Check for git diff
         run: |
-          if [[ `git status --porcelain` ]]; then
+          if [[ $(git status --porcelain) ]]; then
             git status
             git diff
             exit 1
