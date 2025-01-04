@@ -135,7 +135,7 @@ jobs:
         run: cargo test --workspace
 
   codegen:
-    name: Codegen
+    name: Check Codegen
     runs-on: ubuntu-latest
     services:
       postgres:
