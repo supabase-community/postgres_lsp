@@ -44,8 +44,21 @@ jobs:
           cargo fmt --all --check
           taplo format --check
 
+  actionlint:
+    name: Lint GitHib Actions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download actionlint
+        id: get_actionlint
+        run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+        shell: bash
+      - name: Check workflow files
+        run: ${{ steps.get_actionlint.outputs.executable }} -color
+        shell: bash
+
   lint:
-    name: Lint
+    name: Lint Project
     runs-on: ubuntu-latest
     services:
       postgres:
