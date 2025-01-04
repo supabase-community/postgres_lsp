@@ -3,6 +3,14 @@ name: CI
 on:
   workflow_dispatch:
   pull_request:
+    # paths: # Only run when changes are made to rust code or root Cargo
+    #   - "crates/**"
+    #   - "fuzz/**"
+    #   - "xtask/**"
+    #   - "Cargo.toml"
+    #   - "Cargo.lock"
+    #   - "rust-toolchain.toml"
+    #   - "rustfmt.toml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
@@ -10,48 +18,171 @@ concurrency:
 
 env:
   RUSTFLAGS: --deny warnings
+  RUST_LOG: info
+  RUST_BACKTRACE: 1
+  RUSTUP_WINDOWS_PATH_ADD_BIN: 1
 
 jobs:
-  ci:
-    name: CI
-    timeout-minutes: 10
+  format:
+    name: Format
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
-
     steps:
-      - name: 🏗 Setup repository
-        uses: actions/checkout@v3
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+      - name: Free Disk Space
+        uses: ./.github/actions/free-disk-space
+      - name: Install toolchain
+        uses: moonrepo/setup-rust@v1
         with:
-          submodules: true
+          components: rustfmt
+          bins: taplo-cli
+          cache-base: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run format
+        run: |
+          cargo fmt --all --check
+          taplo format --check
 
-      - name: 🏗 Setup monorepo
-        uses: ./.github/actions/setup-monorepo
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR Branch
+        uses: actions/checkout@v4
+      - name: Free Disk Space
+        uses: ./.github/actions/free-disk-space
+      - name: Install toolchain
+        uses: moonrepo/setup-rust@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          components: clippy
+          cache-base: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run clippy
+        run: |
+          cargo lint
+          cargo run -p rules_check
 
-      - name: Run test migrations
-        run: psql -f test-db/seed.sql postgresql://postgres:postgres@localhost:5432/postgres
+  check-dependencies:
+    name: Check Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR Branch
+        uses: actions/checkout@v4
+      - name: Free Disk Space
+        uses: ./.github/actions/free-disk-space
+      - name: Install toolchain
+        run: rustup toolchain install nightly
+      - name: Install udeps
+        run: cargo install cargo-udeps --locked
+      - name: Detect unused dependencies using udeps
+        run: cargo +nightly udeps --all-targets
 
-      - name: 📦 Build
-        id: build
-        run: RUSTFLAGS="-A dead_code" cargo build
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+          - os: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+      - name: Free Disk Space
+        uses: ./.github/actions/free-disk-space
+      - name: Install toolchain
+        uses: moonrepo/setup-rust@v1
+        with:
+          cache-base: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run tests
+        run: cargo test --workspace
 
-      - name: ⚡️ Check
-        id: check
-        run: RUSTFLAGS="-A dead_code" cargo check
+  codegen:
+    name: Codegen
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+      - name: Free Disk Space
+        uses: ./.github/actions/free-disk-space
+      - name: Install toolchain
+        uses: moonrepo/setup-rust@v1
+        with:
+          cache-base: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run the analyser codegen
+        run: cargo codegen analyser
+      - name: Run the configuration codegen
+        run: cargo codegen-configuration
+      - name: Check for git diff
+        run: |
+          if [[ `git status --porcelain` ]]; then
+            git status
+            git diff
+            exit 1
+          fi
 
-      - name: 🦺 Test
-        id: test
-        run: RUSTFLAGS="-A dead_code" cargo test
+  # ci:
+  #   name: CI
+  #   timeout-minutes: 10
+  #   runs-on: ubuntu-latest
+  #
+  #   services:
+  #     postgres:
+  #       image: postgres:latest
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: postgres
+  #         POSTGRES_DB: postgres
+  #       ports:
+  #         - 5432:5432
+  #
+  #   env:
+  #     DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+  #
+  #   steps:
+  #     - name: 🏗 Setup repository
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: true
+  #
+  #     - name: Free Disk Space
+  #       uses: ./.github/actions/free-disk-space
+  #
+  #     - name: Install toolchain
+  #       uses: moonrepo/setup-rust@e013866c4215f77c925f42f60257dec7dd18836e # v1.2.1
+  #       with:
+  #         components: rustfmt
+  #         bins: taplo-cli
+  #         cache-base: main
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Run format
+  #       run: |
+  #         cargo fmt --all --check
+  #         taplo format --check
+  #
+  #     - name: 🏗 Setup monorepo
+  #       uses: ./.github/actions/setup-monorepo
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #
+  #     - name: Run test migrations
+  #       run: psql -f test-db/seed.sql postgresql://postgres:postgres@localhost:5432/postgres
+  #
+  #     - name: 📦 Build
+  #       id: build
+  #       run: RUSTFLAGS="-A dead_code" cargo build
+  #
+  #     - name: ⚡️ Check
+  #       id: check
+  #       run: RUSTFLAGS="-A dead_code" cargo check
+  #
+  #     - name: 🦺 Test
+  #       id: test
+  #       run: RUSTFLAGS="-A dead_code" cargo test
