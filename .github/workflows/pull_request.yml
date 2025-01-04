@@ -72,6 +72,8 @@ jobs:
     steps:
       - name: Checkout PR Branch
         uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Free Disk Space
         uses: ./.github/actions/free-disk-space
       - name: Install toolchain
@@ -92,6 +94,8 @@ jobs:
     steps:
       - name: Checkout PR Branch
         uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Free Disk Space
         uses: ./.github/actions/free-disk-space
       - name: Install toolchain
