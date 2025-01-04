@@ -148,27 +148,27 @@ mod tests {
             user_id_col.default_expr,
             Some("nextval('users_id_seq'::regclass)".into())
         );
-        assert_eq!(user_id_col.is_nullable, false);
-        assert_eq!(user_id_col.is_primary_key, true);
-        assert_eq!(user_id_col.is_unique, true);
+        assert!(!user_id_col.is_nullable);
+        assert!(user_id_col.is_primary_key);
+        assert!(user_id_col.is_unique);
         assert_eq!(user_id_col.varchar_length, None);
 
         let user_name_col = cache.find_col("name", "users", None).unwrap();
         assert_eq!(user_name_col.class_kind, ColumnClassKind::OrdinaryTable);
         assert_eq!(user_name_col.comment, None);
         assert_eq!(user_name_col.default_expr, None);
-        assert_eq!(user_name_col.is_nullable, false);
-        assert_eq!(user_name_col.is_primary_key, false);
-        assert_eq!(user_name_col.is_unique, false);
+        assert!(!user_name_col.is_nullable);
+        assert!(!user_name_col.is_primary_key);
+        assert!(!user_name_col.is_unique);
         assert_eq!(user_name_col.varchar_length, Some(255));
 
         let user_is_veg_col = cache.find_col("is_vegetarian", "users", None).unwrap();
         assert_eq!(user_is_veg_col.class_kind, ColumnClassKind::OrdinaryTable);
         assert_eq!(user_is_veg_col.comment, None);
         assert_eq!(user_is_veg_col.default_expr, Some("false".into()));
-        assert_eq!(user_is_veg_col.is_nullable, true);
-        assert_eq!(user_is_veg_col.is_primary_key, false);
-        assert_eq!(user_is_veg_col.is_unique, false);
+        assert!(user_is_veg_col.is_nullable);
+        assert!(!user_is_veg_col.is_primary_key);
+        assert!(!user_is_veg_col.is_unique);
         assert_eq!(user_is_veg_col.varchar_length, None);
 
         let user_middle_name_col = cache.find_col("middle_name", "users", None).unwrap();
@@ -178,9 +178,9 @@ mod tests {
         );
         assert_eq!(user_middle_name_col.comment, None);
         assert_eq!(user_middle_name_col.default_expr, None);
-        assert_eq!(user_middle_name_col.is_nullable, true);
-        assert_eq!(user_middle_name_col.is_primary_key, false);
-        assert_eq!(user_middle_name_col.is_unique, false);
+        assert!(user_middle_name_col.is_nullable);
+        assert!(!user_middle_name_col.is_primary_key);
+        assert!(!user_middle_name_col.is_unique);
         assert_eq!(user_middle_name_col.varchar_length, Some(255));
 
         let properties_owner_id_col = cache
@@ -194,9 +194,9 @@ mod tests {
             properties_owner_id_col.comment,
             Some("users might own many houses".into())
         );
-        assert_eq!(properties_owner_id_col.is_nullable, true);
-        assert_eq!(properties_owner_id_col.is_primary_key, false);
-        assert_eq!(properties_owner_id_col.is_unique, false);
+        assert!(properties_owner_id_col.is_nullable);
+        assert!(!properties_owner_id_col.is_primary_key);
+        assert!(!properties_owner_id_col.is_unique);
         assert_eq!(properties_owner_id_col.varchar_length, None);
     }
 }

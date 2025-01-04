@@ -1,9 +1,8 @@
 use std::sync::Arc;
 
 use dashmap::DashMap;
-use pg_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, MessageAndDescription};
+use pg_diagnostics::serde::Diagnostic as SDiagnostic;
 use pg_query_ext::diagnostics::*;
-use text_size::TextRange;
 
 use super::{
     change::ChangedStatement,
