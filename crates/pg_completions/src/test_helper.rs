@@ -35,7 +35,8 @@ pub(crate) fn get_text_and_position(sql: &str) -> (usize, String) {
     // the cursor is to the left of the `CURSOR_POS`
     let position = sql
         .find(CURSOR_POS)
-        .expect("Please insert the CURSOR_POS into your query.").saturating_sub(1);
+        .expect("Please insert the CURSOR_POS into your query.")
+        .saturating_sub(1);
 
     let text = sql.replace(CURSOR_POS, "");
 
