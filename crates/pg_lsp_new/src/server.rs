@@ -106,7 +106,7 @@ impl LSPServer {
 impl LanguageServer for LSPServer {
     #[allow(deprecated)]
     #[tracing::instrument(
-        level = "trace",
+        level = "info",
         skip_all,
         fields(
             root_uri = params.root_uri.as_ref().map(display),
@@ -143,7 +143,7 @@ impl LanguageServer for LSPServer {
         Ok(init)
     }
 
-    #[tracing::instrument(level = "trace", skip(self))]
+    #[tracing::instrument(level = "info", skip_all)]
     async fn initialized(&self, params: InitializedParams) {
         let _ = params;
 
@@ -163,11 +163,12 @@ impl LanguageServer for LSPServer {
         self.session.update_all_diagnostics().await;
     }
 
+    #[tracing::instrument(level = "info", skip_all)]
     async fn shutdown(&self) -> LspResult<()> {
         Ok(())
     }
 
-    #[tracing::instrument(level = "trace", skip(self))]
+    #[tracing::instrument(level = "info", skip_all)]
     async fn did_change_configuration(&self, params: DidChangeConfigurationParams) {
         let _ = params;
         self.session.load_workspace_settings().await;
@@ -209,28 +210,40 @@ impl LanguageServer for LSPServer {
         }
     }
 
+    #[tracing::instrument(level = "trace", skip(self))]
     async fn did_open(&self, params: DidOpenTextDocumentParams) {
         handlers::text_document::did_open(&self.session, params)
             .await
             .ok();
     }
 
+    #[tracing::instrument(level = "trace", skip(self, params))]
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
-        handlers::text_document::did_change(&self.session, params)
-            .await
-            .ok();
+        if let Err(e) = handlers::text_document::did_change(&self.session, params).await {
+            error!("{}", e);
+        };
     }
 
+    #[tracing::instrument(level = "trace", skip(self))]
     async fn did_save(&self, params: DidSaveTextDocumentParams) {
         // handlers::text_document::did_save(&self.session, params)
         //     .await
         //     .ok();
     }
 
+    #[tracing::instrument(level = "trace", skip(self))]
     async fn did_close(&self, params: DidCloseTextDocumentParams) {
         handlers::text_document::did_close(&self.session, params)
             .await
             .ok();
+    }
+
+    #[tracing::instrument(level = "trace", skip(self))]
+    async fn completion(&self, params: CompletionParams) -> LspResult<Option<CompletionResponse>> {
+        match handlers::completions::get_completions(&self.session, params) {
+            Ok(result) => LspResult::Ok(Some(result)),
+            Err(e) => LspResult::Err(into_lsp_error(e)),
+        }
     }
 }
 
@@ -379,6 +392,7 @@ impl ServerFactory {
         workspace_method!(builder, change_file);
         workspace_method!(builder, close_file);
         workspace_method!(builder, pull_diagnostics);
+        workspace_method!(builder, get_completions);
 
         let (service, socket) = builder.finish();
         ServerConnection { socket, service }

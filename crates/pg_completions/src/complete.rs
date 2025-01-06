@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use text_size::TextSize;
 
 use crate::{
@@ -17,9 +18,9 @@ pub struct CompletionParams<'a> {
     pub tree: Option<&'a tree_sitter::Tree>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct CompletionResult {
-    pub items: Vec<CompletionItem>,
+    pub(crate) items: Vec<CompletionItem>,
 }
 
 impl IntoIterator for CompletionResult {

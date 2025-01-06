@@ -136,6 +136,13 @@ impl Document {
         }
     }
 
+    pub(super) fn statement_range(&self, sref: &StatementRef) -> Option<TextRange> {
+        self.statements
+            .iter()
+            .find(|s| s.0 == sref.id)
+            .map(|it| it.1)
+    }
+
     pub(super) fn statement(&self, inner_ref: &StatementPosition) -> Statement {
         Statement {
             ref_: self.statement_ref(inner_ref),

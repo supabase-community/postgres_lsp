@@ -23,8 +23,8 @@ use std::sync::Arc;
 use std::sync::RwLock;
 use tokio::sync::Notify;
 use tokio::sync::OnceCell;
-use tower_lsp::lsp_types;
 use tower_lsp::lsp_types::Url;
+use tower_lsp::lsp_types::{self, ClientCapabilities};
 use tower_lsp::lsp_types::{MessageType, Registration};
 use tower_lsp::lsp_types::{Unregistration, WorkspaceFolder};
 use tracing::{error, info};
@@ -389,6 +389,13 @@ impl Session {
     /// Returns a reference to the client information for this session
     pub(crate) fn client_information(&self) -> Option<&ClientInformation> {
         self.initialize_params.get()?.client_information.as_ref()
+    }
+
+    /// Returns a reference to the client capabilities for this session
+    pub(crate) fn client_capabilities(&self) -> Option<&ClientCapabilities> {
+        self.initialize_params
+            .get()
+            .map(|params| &params.client_capabilities)
     }
 
     /// This function attempts to read the `pglsp.toml` configuration file from

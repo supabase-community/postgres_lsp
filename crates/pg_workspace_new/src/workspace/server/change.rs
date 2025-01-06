@@ -105,8 +105,6 @@ impl Document {
 
         let new_content = change.apply_to_text(&self.content);
 
-        println!("new content: '{}'", new_content);
-
         let mut affected = vec![];
 
         for (idx, (id, r)) in self.statements.iter_mut().enumerate() {
@@ -173,8 +171,6 @@ impl Document {
                 end = new_content.text_len();
             }
 
-            println!("affected: {:#?}", affected);
-
             for (_, (_, r)) in &affected {
                 // adjust the range to the new content
                 let adjusted_start = if r.start() >= change.range.unwrap().end() {
@@ -182,10 +178,6 @@ impl Document {
                 } else {
                     r.start()
                 };
-                println!("adjusted start: {:#?}", adjusted_start);
-
-                println!("r.end(): {:#?}", r.end());
-                println!("change.range(): {:#?}", change.range);
                 let adjusted_end = if r.end() >= change.range.unwrap().end() {
                     if change.is_addition() {
                         r.end() + change.diff_size()
@@ -195,7 +187,6 @@ impl Document {
                 } else {
                     r.end()
                 };
-                println!("adjusted end: {:#?}", adjusted_end);
 
                 if adjusted_start < start {
                     start = adjusted_start;
@@ -205,14 +196,10 @@ impl Document {
                 }
             }
 
-            println!("affected range: {:#?}", TextRange::new(start, end));
-
             let changed_content = new_content
                 .as_str()
                 .get(usize::from(start)..usize::from(end))
                 .unwrap();
-
-            println!("changed content: '{}'", changed_content);
 
             let ranges = pg_statement_splitter::split(changed_content).ranges;
 
@@ -220,10 +207,6 @@ impl Document {
                 // from one to one, so we do a modification
                 let stmt = &affected[0];
                 let new_stmt = &ranges[0];
-
-                println!("affected statement: {:#?}", stmt);
-                println!("new statement: {:#?}", new_stmt);
-                println!("diff: {:#?}", change.diff_size());
 
                 let new_id = self.id_generator.next();
                 self.statements[stmt.0] = (new_id, new_stmt.add(start));
@@ -235,8 +218,6 @@ impl Document {
                     range: change.range.unwrap().sub(stmt.1 .1.start()),
                     text: change.text.clone(),
                 };
-
-                println!("{:#?}", changed_stmt.new_statement());
 
                 changed.push(StatementChange::Modified(changed_stmt));
             } else {
@@ -271,8 +252,6 @@ impl Document {
                 }
             }
         }
-
-        println!("changed: {:#?}", changed);
 
         self.content = new_content;
 
@@ -635,7 +614,6 @@ mod tests {
 
         assert_eq!(doc.content, "select ;\nselect 2;");
         assert_eq!(doc.statements.len(), 2);
-        println!("{:#?}", doc.statements);
         assert_eq!(
             doc.statement(&doc.statements[0]).text,
             "select ;".to_string()
