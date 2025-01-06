@@ -5,6 +5,7 @@ on:
   pull_request:
     paths: # Only run when changes are made to rust code or root Cargo
       - "crates/**"
+      - "lib/**"
       - "fuzz/**"
       - "xtask/**"
       - "Cargo.toml"
