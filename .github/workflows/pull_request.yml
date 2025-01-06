@@ -3,14 +3,14 @@ name: Pull Request
 on:
   workflow_dispatch:
   pull_request:
-    # paths: # Only run when changes are made to rust code or root Cargo
-    #   - "crates/**"
-    #   - "fuzz/**"
-    #   - "xtask/**"
-    #   - "Cargo.toml"
-    #   - "Cargo.lock"
-    #   - "rust-toolchain.toml"
-    #   - "rustfmt.toml"
+    paths: # Only run when changes are made to rust code or root Cargo
+      - "crates/**"
+      - "fuzz/**"
+      - "xtask/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - "rustfmt.toml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
@@ -180,63 +180,3 @@ jobs:
             git diff
             exit 1
           fi
-
-  # ci:
-  #   name: CI
-  #   timeout-minutes: 10
-  #   runs-on: ubuntu-latest
-  #
-  #   services:
-  #     postgres:
-  #       image: postgres:latest
-  #       env:
-  #         POSTGRES_USER: postgres
-  #         POSTGRES_PASSWORD: postgres
-  #         POSTGRES_DB: postgres
-  #       ports:
-  #         - 5432:5432
-  #
-  #   env:
-  #     DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
-  #
-  #   steps:
-  #     - name: 🏗 Setup repository
-  #       uses: actions/checkout@v4
-  #       with:
-  #         submodules: true
-  #
-  #     - name: Free Disk Space
-  #       uses: ./.github/actions/free-disk-space
-  #
-  #     - name: Install toolchain
-  #       uses: moonrepo/setup-rust@e013866c4215f77c925f42f60257dec7dd18836e # v1.2.1
-  #       with:
-  #         components: rustfmt
-  #         bins: taplo-cli
-  #         cache-base: main
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     - name: Run format
-  #       run: |
-  #         cargo fmt --all --check
-  #         taplo format --check
-  #
-  #     - name: 🏗 Setup monorepo
-  #       uses: ./.github/actions/setup-monorepo
-  #       with:
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #
-  #     - name: Run test migrations
-  #       run: psql -f test-db/seed.sql postgresql://postgres:postgres@localhost:5432/postgres
-  #
-  #     - name: 📦 Build
-  #       id: build
-  #       run: RUSTFLAGS="-A dead_code" cargo build
-  #
-  #     - name: ⚡️ Check
-  #       id: check
-  #       run: RUSTFLAGS="-A dead_code" cargo check
-  #
-  #     - name: 🦺 Test
-  #       id: test
-  #       run: RUSTFLAGS="-A dead_code" cargo test
