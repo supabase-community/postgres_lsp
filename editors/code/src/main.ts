@@ -1,4 +1,4 @@
-import type { ExtensionContext } from 'vscode';
+import { type ExtensionContext, window } from 'vscode';
 
 import {
     type Executable,
@@ -13,10 +13,11 @@ export function activate(_context: ExtensionContext) {
     // If the extension is launched in debug mode then the debug server options are used
     // Otherwise the run options are used
     const run: Executable = {
-        command: 'pglsp'
+        command: 'pg_cli',
+        args: ['lsp-proxy']
     };
 
-    // const outputChannel = window.createOutputChannel('postgres_lsp');
+    const outputChannel = window.createOutputChannel('Postgres LSP', { log: true });
 
     const serverOptions: ServerOptions = {
         run,
@@ -26,7 +27,8 @@ export function activate(_context: ExtensionContext) {
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
         // Register the server for plain text documents
-        documentSelector: [{ scheme: 'file', language: 'sql' }]
+        documentSelector: [{ scheme: 'file', language: 'sql' }],
+        outputChannel
     };
 
     // Create the language client and start the client.
