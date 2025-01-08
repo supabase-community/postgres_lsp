@@ -150,8 +150,7 @@ impl<'a> CompletionRelevance<'a> {
 
     fn check_relations_in_stmt(&mut self, ctx: &CompletionContext) {
         match self.data {
-            CompletionRelevanceData::Table(_) => return,
-            CompletionRelevanceData::Function(_) => return,
+            CompletionRelevanceData::Table(_) | CompletionRelevanceData::Function(_) => return,
             _ => {}
         }
 

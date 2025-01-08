@@ -15,10 +15,6 @@ version              = "0.0.0"
 name = "tree_print"
 path = "src/bin/tree_print.rs"
 
-[[bin]]
-name = "query_debug"
-path = "src/bin/tree_query_debug.rs"
-
 [dependencies]
 anyhow = "1.0.81"
 clap   = { version = "4.5.23", features = ["derive"] }

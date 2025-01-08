@@ -55,16 +55,13 @@ impl<'a> QueryResultIter<'a> {
 impl<'a> Iterator for QueryResultIter<'a> {
     type Item = &'a QueryResult<'a>;
     fn next(&mut self) -> Option<Self::Item> {
-        match self.inner.next() {
-            None => return None,
-            Some(n) => {
-                if self.range.as_ref().is_some_and(|r| !n.within_range(r)) {
-                    return self.next();
-                }
+        let next = self.inner.next()?;
 
-                Some(n)
-            }
+        if self.range.as_ref().is_some_and(|r| !next.within_range(r)) {
+            return self.next();
         }
+
+        Some(next)
     }
 }
 

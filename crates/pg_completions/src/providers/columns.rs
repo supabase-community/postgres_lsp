@@ -12,7 +12,7 @@ pub fn complete_columns(ctx: &CompletionContext, builder: &mut CompletionBuilder
             score: CompletionRelevanceData::Column(col).get_score(ctx),
             description: format!("Table: {}.{}", col.schema_name, col.table_name),
             preselected: false,
-            kind: CompletionItemKind::Function,
+            kind: CompletionItemKind::Column,
         };
 
         builder.add_item(item);
