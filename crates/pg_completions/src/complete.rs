@@ -31,7 +31,7 @@ impl IntoIterator for CompletionResult {
     }
 }
 
-pub fn complete<'a>(params: CompletionParams<'a>) -> CompletionResult {
+pub fn complete(params: CompletionParams) -> CompletionResult {
     let ctx = CompletionContext::new(&params);
 
     let mut builder = CompletionBuilder::new();
