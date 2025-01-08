@@ -32,7 +32,7 @@ impl TryFrom<&str> for ClauseType {
                     panic!("{}", message);
                 }
 
-                return Err(message);
+                Err(message)
             }
         }
     }
@@ -239,7 +239,7 @@ mod tests {
 
             let params = crate::CompletionParams {
                 position: (position as u32).into(),
-                text: text,
+                text,
                 tree: Some(&tree),
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
@@ -271,7 +271,7 @@ mod tests {
             let tree = get_tree(text.as_str());
             let params = crate::CompletionParams {
                 position: (position as u32).into(),
-                text: text,
+                text,
                 tree: Some(&tree),
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
@@ -305,7 +305,7 @@ mod tests {
             let tree = get_tree(text.as_str());
             let params = crate::CompletionParams {
                 position: (position as u32).into(),
-                text: text,
+                text,
                 tree: Some(&tree),
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
@@ -330,14 +330,14 @@ mod tests {
 
             let params = crate::CompletionParams {
                 position: (position as u32).into(),
-                text: text,
+                text,
                 tree: Some(&tree),
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
 
             let ctx = CompletionContext::new(&params).await;
 
-            let node = ctx.ts_node.map(|n| n.clone()).unwrap();
+            let node = ctx.ts_node.unwrap();
 
             assert_eq!(ctx.get_ts_node_content(node), Some("select"));
 
@@ -358,14 +358,14 @@ mod tests {
 
         let params = crate::CompletionParams {
             position: (position as u32).into(),
-            text: text,
+            text,
             tree: Some(&tree),
             schema: &pg_schema_cache::SchemaCache::new(),
         };
 
         let ctx = CompletionContext::new(&params).await;
 
-        let node = ctx.ts_node.map(|n| n.clone()).unwrap();
+        let node = ctx.ts_node.unwrap();
 
         assert_eq!(ctx.get_ts_node_content(node), Some("from"));
         assert_eq!(
@@ -384,14 +384,14 @@ mod tests {
 
         let params = crate::CompletionParams {
             position: (position as u32).into(),
-            text: text,
+            text,
             tree: Some(&tree),
             schema: &pg_schema_cache::SchemaCache::new(),
         };
 
         let ctx = CompletionContext::new(&params).await;
 
-        let node = ctx.ts_node.map(|n| n.clone()).unwrap();
+        let node = ctx.ts_node.unwrap();
 
         assert_eq!(ctx.get_ts_node_content(node), Some(""));
         assert_eq!(ctx.wrapping_clause_type, None);
@@ -409,14 +409,14 @@ mod tests {
 
         let params = crate::CompletionParams {
             position: (position as u32).into(),
-            text: text,
+            text,
             tree: Some(&tree),
             schema: &pg_schema_cache::SchemaCache::new(),
         };
 
         let ctx = CompletionContext::new(&params).await;
 
-        let node = ctx.ts_node.map(|n| n.clone()).unwrap();
+        let node = ctx.ts_node.unwrap();
 
         assert_eq!(ctx.get_ts_node_content(node), Some("fro"));
         assert_eq!(ctx.wrapping_clause_type, Some(ClauseType::Select));

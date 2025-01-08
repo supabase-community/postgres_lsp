@@ -396,6 +396,54 @@ impl Workspace for WorkspaceServer {
             skipped_diagnostics: 0,
         })
     }
+
+    #[tracing::instrument(level = "debug", skip(self))]
+    fn get_completions(
+        &self,
+        params: super::CompletionParams,
+    ) -> Result<pg_completions::CompletionResult, WorkspaceError> {
+        let doc = self
+            .documents
+            .get(&params.path)
+            .ok_or(WorkspaceError::not_found())?;
+
+        tracing::debug!(
+            "Found the document. Looking for statement in file {:?} at position: {:?}",
+            &params.path,
+            &params.position
+        );
+
+        let statement = match doc.statement_at_offset(&params.position) {
+            Some(s) => s,
+            None => return Ok(pg_completions::CompletionResult::default()),
+        };
+
+        // `offset` is the position in the document,
+        // but we need the position within the *statement*.
+        let stmt_range = doc
+            .statement_range(&statement.ref_)
+            .expect("Range of statement should be defined.");
+        let position = params.position - stmt_range.start();
+
+        let tree = self.tree_sitter.load(&statement.ref_);
+        let text = statement.text;
+
+        tracing::debug!("Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {}", position, stmt_range.start(), stmt_range.end(), text);
+
+        let schema_cache = self
+            .schema_cache
+            .read()
+            .map_err(|_| WorkspaceError::runtime("Unable to load SchemaCache"))?;
+
+        let result = pg_completions::complete(pg_completions::CompletionParams {
+            position,
+            schema: &schema_cache,
+            tree: tree.as_deref(),
+            text,
+        });
+
+        Ok(result)
+    }
 }
 
 /// Returns `true` if `path` is a directory or

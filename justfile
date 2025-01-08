@@ -104,9 +104,11 @@ test-doc:
 # Alias for `cargo clippy`, it runs clippy on the whole codebase
 lint:
   cargo clippy
+  cargo run -p rules_check
 
 lint-fix:
   cargo clippy --fix
+  cargo run -p rules_check
 
 # When you finished coding, run this command to run the same commands in the CI.
 # ready:
@@ -140,7 +142,10 @@ clear-branches:
     git branch --merged | egrep -v "(^\\*|main)" | xargs git branch -d
 
 reset-git:
-    git checkout main && git pull && pnpm run clear-branches
+    git checkout main
+    git pull
+    just clear-branches
 
 merge-main:
-    git fetch origin main:main && git merge main
+    git fetch origin main:main
+    git merge main

@@ -137,7 +137,7 @@ fn install_client(sh: &Shell, client_opt: ClientOpt) -> anyhow::Result<()> {
 }
 
 fn install_server(sh: &Shell) -> anyhow::Result<()> {
-    let cmd = cmd!(sh, "cargo install --path crates/pg_lsp --locked --force");
+    let cmd = cmd!(sh, "cargo install --path crates/pg_cli --locked --force");
     cmd.run()?;
     Ok(())
 }

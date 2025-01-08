@@ -1,8 +1,8 @@
 use pg_lsp_converters::{negotiated_encoding, PositionEncoding, WideEncoding};
 use tower_lsp::lsp_types::{
-    ClientCapabilities, PositionEncodingKind, SaveOptions, ServerCapabilities,
+    ClientCapabilities, CompletionOptions, PositionEncodingKind, SaveOptions, ServerCapabilities,
     TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions,
-    TextDocumentSyncSaveOptions,
+    TextDocumentSyncSaveOptions, WorkDoneProgressOptions,
 };
 
 /// The capabilities to send from server as part of [`InitializeResult`]
@@ -28,6 +28,24 @@ pub(crate) fn server_capabilities(capabilities: &ClientCapabilities) -> ServerCa
                 })),
             },
         )),
+        completion_provider: Some(CompletionOptions {
+            // currently not supporting the completionItem/resolve request.
+            // The request is used to get more information about a simple CompletionItem.
+            resolve_provider: None,
+
+            trigger_characters: Some(vec![".".to_owned(), ",".to_owned(), " ".to_owned()]),
+
+            // No character will lead to automatically inserting the selected completion-item
+            all_commit_characters: None,
+
+            // No special support for completionItem/resolve requests
+            completion_item: None,
+
+            // We do not report the progress of the completion process
+            work_done_progress_options: WorkDoneProgressOptions {
+                work_done_progress: None,
+            },
+        }),
         document_formatting_provider: None,
         document_range_formatting_provider: None,
         document_on_type_formatting_provider: None,

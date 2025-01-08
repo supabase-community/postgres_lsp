@@ -5,7 +5,7 @@ use pg_workspace_new::workspace::{
     ChangeFileParams, ChangeParams, CloseFileParams, GetFileContentParams, OpenFileParams,
 };
 use tower_lsp::lsp_types;
-use tracing::{error, field};
+use tracing::{error, field, info};
 
 /// Handler for `textDocument/didOpen` LSP notification
 #[tracing::instrument(
@@ -24,11 +24,11 @@ pub(crate) async fn did_open(
     let version = params.text_document.version;
     let content = params.text_document.text;
 
-    let biome_path = session.file_path(&url)?;
+    let path = session.file_path(&url)?;
     let doc = Document::new(version, &content);
 
     session.workspace.open_file(OpenFileParams {
-        path: biome_path,
+        path,
         version,
         content,
     })?;
