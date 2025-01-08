@@ -96,20 +96,10 @@ impl<'a> CompletionRelevance<'a> {
 
     fn check_is_invocation(&mut self, ctx: &CompletionContext) {
         self.score += match self.data {
-            CompletionRelevanceData::Function(_) => {
-                if ctx.is_invocation {
-                    30
-                } else {
-                    -10
-                }
-            }
-            _ => {
-                if ctx.is_invocation {
-                    -10
-                } else {
-                    0
-                }
-            }
+            CompletionRelevanceData::Function(_) if ctx.is_invocation => 30,
+            CompletionRelevanceData::Function(_) if !ctx.is_invocation => -10,
+            _ if ctx.is_invocation => -10,
+            _ => 0,
         };
     }
 
