@@ -1,7 +1,14 @@
-use std::ops::Range;
+use std::{
+    collections::{HashMap, HashSet},
+    hash::Hash,
+    ops::Range,
+};
 
 use pg_schema_cache::SchemaCache;
-use pg_treesitter_queries::{queries, TreeSitterQueriesExecutor};
+use pg_treesitter_queries::{
+    queries::{self, QueryResult},
+    TreeSitterQueriesExecutor,
+};
 
 use crate::CompletionParams;
 
@@ -57,11 +64,11 @@ pub(crate) struct CompletionContext<'a> {
     pub is_invocation: bool,
     pub wrapping_statement_range: Option<Range<usize>>,
 
-    pub ts_query_executor: Option<TreeSitterQueriesExecutor<'a>>,
+    pub mentioned_relations: HashMap<Option<String>, HashSet<String>>,
 }
 
 impl<'a> CompletionContext<'a> {
-    pub async fn new(params: &'a CompletionParams<'a>) -> Self {
+    pub fn new(params: &'a CompletionParams<'a>) -> Self {
         let mut ctx = Self {
             tree: params.tree,
             text: &params.text,
@@ -73,26 +80,49 @@ impl<'a> CompletionContext<'a> {
             wrapping_clause_type: None,
             wrapping_statement_range: None,
             is_invocation: false,
-            ts_query_executor: None,
+            mentioned_relations: HashMap::new(),
         };
 
         ctx.gather_tree_context();
-        ctx.dispatch_ts_queries().await;
+        ctx.gather_info_from_ts_queries();
 
         ctx
     }
 
-    async fn dispatch_ts_queries(&mut self) {
+    fn gather_info_from_ts_queries(&mut self) {
         let tree = match self.tree.as_ref() {
             None => return,
             Some(t) => t,
         };
 
+        let stmt_range = self.wrapping_statement_range.as_ref();
+        let sql = self.text;
+
         let mut executor = TreeSitterQueriesExecutor::new(tree.root_node(), self.text);
 
-        executor.add_query_results::<queries::RelationMatch>().await;
+        executor.add_query_results::<queries::RelationMatch>();
 
-        self.ts_query_executor = Some(executor);
+        for relation_match in executor.get_iter(stmt_range) {
+            match relation_match {
+                QueryResult::Relation(r) => {
+                    let schema_name = r.get_schema(sql);
+                    let table_name = r.get_table(sql);
+
+                    let current = self.mentioned_relations.get_mut(&schema_name);
+
+                    match current {
+                        Some(c) => {
+                            c.insert(table_name);
+                        }
+                        None => {
+                            let mut new = HashSet::new();
+                            new.insert(table_name);
+                            self.mentioned_relations.insert(schema_name, new);
+                        }
+                    };
+                }
+            };
+        }
     }
 
     pub fn get_ts_node_content(&self, ts_node: tree_sitter::Node<'a>) -> Option<&'a str> {
@@ -203,8 +233,8 @@ mod tests {
         parser.parse(input, None).expect("Unable to parse tree")
     }
 
-    #[tokio::test]
-    async fn identifies_clauses() {
+    #[test]
+    fn identifies_clauses() {
         let test_cases = vec![
             (format!("Select {}* from users;", CURSOR_POS), "select"),
             (format!("Select * from u{};", CURSOR_POS), "from"),
@@ -244,14 +274,14 @@ mod tests {
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
 
-            let ctx = CompletionContext::new(&params).await;
+            let ctx = CompletionContext::new(&params);
 
             assert_eq!(ctx.wrapping_clause_type, expected_clause.try_into().ok());
         }
     }
 
-    #[tokio::test]
-    async fn identifies_schema() {
+    #[test]
+    fn identifies_schema() {
         let test_cases = vec![
             (
                 format!("Select * from private.u{}", CURSOR_POS),
@@ -276,14 +306,14 @@ mod tests {
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
 
-            let ctx = CompletionContext::new(&params).await;
+            let ctx = CompletionContext::new(&params);
 
             assert_eq!(ctx.schema_name, expected_schema.map(|f| f.to_string()));
         }
     }
 
-    #[tokio::test]
-    async fn identifies_invocation() {
+    #[test]
+    fn identifies_invocation() {
         let test_cases = vec![
             (format!("Select * from u{}sers", CURSOR_POS), false),
             (format!("Select * from u{}sers()", CURSOR_POS), true),
@@ -310,14 +340,14 @@ mod tests {
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
 
-            let ctx = CompletionContext::new(&params).await;
+            let ctx = CompletionContext::new(&params);
 
             assert_eq!(ctx.is_invocation, is_invocation);
         }
     }
 
-    #[tokio::test]
-    async fn does_not_fail_on_leading_whitespace() {
+    #[test]
+    fn does_not_fail_on_leading_whitespace() {
         let cases = vec![
             format!("{}      select * from", CURSOR_POS),
             format!(" {}      select * from", CURSOR_POS),
@@ -335,7 +365,7 @@ mod tests {
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
 
-            let ctx = CompletionContext::new(&params).await;
+            let ctx = CompletionContext::new(&params);
 
             let node = ctx.ts_node.unwrap();
 
@@ -348,8 +378,8 @@ mod tests {
         }
     }
 
-    #[tokio::test]
-    async fn does_not_fail_on_trailing_whitespace() {
+    #[test]
+    fn does_not_fail_on_trailing_whitespace() {
         let query = format!("select * from   {}", CURSOR_POS);
 
         let (position, text) = get_text_and_position(query.as_str());
@@ -363,7 +393,7 @@ mod tests {
             schema: &pg_schema_cache::SchemaCache::new(),
         };
 
-        let ctx = CompletionContext::new(&params).await;
+        let ctx = CompletionContext::new(&params);
 
         let node = ctx.ts_node.unwrap();
 
@@ -374,8 +404,8 @@ mod tests {
         );
     }
 
-    #[tokio::test]
-    async fn does_not_fail_with_empty_statements() {
+    #[test]
+    fn does_not_fail_with_empty_statements() {
         let query = format!("{}", CURSOR_POS);
 
         let (position, text) = get_text_and_position(query.as_str());
@@ -389,7 +419,7 @@ mod tests {
             schema: &pg_schema_cache::SchemaCache::new(),
         };
 
-        let ctx = CompletionContext::new(&params).await;
+        let ctx = CompletionContext::new(&params);
 
         let node = ctx.ts_node.unwrap();
 
@@ -397,8 +427,8 @@ mod tests {
         assert_eq!(ctx.wrapping_clause_type, None);
     }
 
-    #[tokio::test]
-    async fn does_not_fail_on_incomplete_keywords() {
+    #[test]
+    fn does_not_fail_on_incomplete_keywords() {
         //  Instead of autocompleting "FROM", we'll assume that the user
         // is selecting a certain column name, such as `frozen_account`.
         let query = format!("select * fro{}", CURSOR_POS);
@@ -414,7 +444,7 @@ mod tests {
             schema: &pg_schema_cache::SchemaCache::new(),
         };
 
-        let ctx = CompletionContext::new(&params).await;
+        let ctx = CompletionContext::new(&params);
 
         let node = ctx.ts_node.unwrap();
 

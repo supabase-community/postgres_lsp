@@ -5,7 +5,7 @@ use crate::{
     builder::CompletionBuilder,
     context::CompletionContext,
     item::CompletionItem,
-    providers::{complete_functions, complete_tables},
+    providers::{complete_columns, complete_functions, complete_tables},
 };
 
 pub const LIMIT: usize = 50;
@@ -31,13 +31,14 @@ impl IntoIterator for CompletionResult {
     }
 }
 
-pub async fn complete<'a>(params: CompletionParams<'a>) -> CompletionResult {
-    let ctx = CompletionContext::new(&params).await;
+pub fn complete<'a>(params: CompletionParams<'a>) -> CompletionResult {
+    let ctx = CompletionContext::new(&params);
 
     let mut builder = CompletionBuilder::new();
 
     complete_tables(&ctx, &mut builder);
     complete_functions(&ctx, &mut builder);
+    complete_columns(&ctx, &mut builder);
 
     builder.finish()
 }

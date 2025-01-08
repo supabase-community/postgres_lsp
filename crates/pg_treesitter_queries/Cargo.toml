@@ -15,7 +15,6 @@ version              = "0.0.0"
 clap   = { version = "4.5.23", features = ["derive"] }
 tree-sitter.workspace     = true
 tree_sitter_sql.workspace = true
-tokio.workspace = true
 
 [dev-dependencies]
 

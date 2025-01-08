@@ -34,8 +34,5 @@ pub(crate) trait QueryTryFrom<'a>: Sized {
 }
 
 pub(crate) trait Query<'a>: QueryTryFrom<'a> {
-    async fn execute(
-        root_node: tree_sitter::Node<'a>,
-        stmt: &'a str,
-    ) -> Vec<crate::QueryResult<'a>>;
+    fn execute(root_node: tree_sitter::Node<'a>, stmt: &'a str) -> Vec<crate::QueryResult<'a>>;
 }

@@ -10,6 +10,7 @@ mod tables;
 mod types;
 mod versions;
 
+pub use columns::*;
 pub use functions::{Behavior, Function, FunctionArg, FunctionArgs};
 pub use schema_cache::SchemaCache;
 pub use tables::{ReplicaIdentity, Table};

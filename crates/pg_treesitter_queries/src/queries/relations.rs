@@ -1,11 +1,6 @@
-use std::sync::Arc;
-use tokio::sync::OnceCell;
-
 use crate::{Query, QueryResult};
 
 use super::QueryTryFrom;
-
-static INSTANCE: OnceCell<Arc<tree_sitter::Query>> = OnceCell::const_new();
 
 static QUERY: &'static str = r#"
     (relation
@@ -21,6 +16,17 @@ static QUERY: &'static str = r#"
 pub struct RelationMatch<'a> {
     pub(crate) schema: Option<tree_sitter::Node<'a>>,
     pub(crate) table: tree_sitter::Node<'a>,
+}
+
+impl<'a> RelationMatch<'a> {
+    pub fn get_schema(&self, sql: &str) -> Option<String> {
+        let str = self.schema.as_ref()?.utf8_text(sql.as_bytes()).unwrap();
+        Some(str.to_string())
+    }
+
+    pub fn get_table(&self, sql: &str) -> String {
+        self.table.utf8_text(sql.as_bytes()).unwrap().to_string()
+    }
 }
 
 impl<'a> TryFrom<&'a QueryResult<'a>> for &'a RelationMatch<'a> {
@@ -41,18 +47,9 @@ impl<'a> QueryTryFrom<'a> for RelationMatch<'a> {
 }
 
 impl<'a> Query<'a> for RelationMatch<'a> {
-    async fn execute(
-        root_node: tree_sitter::Node<'a>,
-        stmt: &'a str,
-    ) -> Vec<crate::QueryResult<'a>> {
-        let query = INSTANCE
-            .get_or_init(|| async {
-                Arc::new(
-                    tree_sitter::Query::new(tree_sitter_sql::language(), &QUERY)
-                        .expect("Invalid Query."),
-                )
-            })
-            .await;
+    fn execute(root_node: tree_sitter::Node<'a>, stmt: &'a str) -> Vec<crate::QueryResult<'a>> {
+        let query =
+            tree_sitter::Query::new(tree_sitter_sql::language(), &QUERY).expect("Invalid Query.");
 
         let mut cursor = tree_sitter::QueryCursor::new();
 

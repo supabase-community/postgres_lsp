@@ -4,6 +4,7 @@ use crate::context::{ClauseType, CompletionContext};
 pub(crate) enum CompletionRelevanceData<'a> {
     Table(&'a pg_schema_cache::Table),
     Function(&'a pg_schema_cache::Function),
+    Column(&'a pg_schema_cache::Column),
 }
 
 impl<'a> CompletionRelevanceData<'a> {
@@ -34,6 +35,7 @@ impl<'a> CompletionRelevance<'a> {
         self.check_if_catalog(ctx);
         self.check_is_invocation(ctx);
         self.check_matching_clause_type(ctx);
+        self.check_relations_in_stmt(ctx);
 
         self.score
     }
@@ -49,6 +51,7 @@ impl<'a> CompletionRelevance<'a> {
         let name = match self.data {
             CompletionRelevanceData::Function(f) => f.name.as_str(),
             CompletionRelevanceData::Table(t) => t.name.as_str(),
+            CompletionRelevanceData::Column(c) => c.name.as_str(),
         };
 
         if name.starts_with(content) {
@@ -79,6 +82,11 @@ impl<'a> CompletionRelevance<'a> {
                 ClauseType::From => 0,
                 _ => -50,
             },
+            CompletionRelevanceData::Column(_) => match clause_type {
+                ClauseType::Select => 15,
+                ClauseType::Where => 15,
+                _ => -15,
+            },
         }
     }
 
@@ -107,15 +115,28 @@ impl<'a> CompletionRelevance<'a> {
             Some(n) => n,
         };
 
-        let data_schema = match self.data {
-            CompletionRelevanceData::Function(f) => f.schema.as_str(),
-            CompletionRelevanceData::Table(t) => t.schema.as_str(),
-        };
+        let data_schema = self.get_schema_name();
 
         if schema_name == data_schema {
             self.score += 25;
         } else {
             self.score -= 10;
+        }
+    }
+
+    fn get_schema_name(&self) -> &str {
+        match self.data {
+            CompletionRelevanceData::Function(f) => f.schema.as_str(),
+            CompletionRelevanceData::Table(t) => t.schema.as_str(),
+            CompletionRelevanceData::Column(c) => c.schema_name.as_str(),
+        }
+    }
+
+    fn get_table_name(&self) -> Option<&str> {
+        match self.data {
+            CompletionRelevanceData::Column(c) => Some(c.table_name.as_str()),
+            CompletionRelevanceData::Table(t) => Some(t.name.as_str()),
+            _ => None,
         }
     }
 
@@ -125,5 +146,33 @@ impl<'a> CompletionRelevance<'a> {
         }
 
         self.score -= 5; // unlikely that the user wants schema data
+    }
+
+    fn check_relations_in_stmt(&mut self, ctx: &CompletionContext) {
+        match self.data {
+            CompletionRelevanceData::Table(_) => return,
+            CompletionRelevanceData::Function(_) => return,
+            _ => {}
+        }
+
+        let schema = self.get_schema_name().to_string();
+        let table_name = match self.get_table_name() {
+            Some(t) => t,
+            None => return,
+        };
+
+        if ctx
+            .mentioned_relations
+            .get(&Some(schema.to_string()))
+            .is_some_and(|tables| tables.contains(table_name))
+        {
+            self.score += 45;
+        } else if ctx
+            .mentioned_relations
+            .get(&None)
+            .is_some_and(|tables| tables.contains(table_name))
+        {
+            self.score += 30;
+        }
     }
 }

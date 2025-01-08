@@ -20,12 +20,12 @@ impl<'a> TreeSitterQueriesExecutor<'a> {
     }
 
     #[allow(private_bounds)]
-    pub async fn add_query_results<Q: Query<'a>>(&mut self) {
-        let mut results = Q::execute(self.root_node, &self.stmt).await;
+    pub fn add_query_results<Q: Query<'a>>(&mut self) {
+        let mut results = Q::execute(self.root_node, &self.stmt);
         self.results.append(&mut results);
     }
 
-    pub fn get_iter(&self, range: Option<Range<usize>>) -> QueryResultIter {
+    pub fn get_iter(&self, range: Option<&'a Range<usize>>) -> QueryResultIter {
         match range {
             Some(r) => QueryResultIter::new(&self.results).within_range(r),
             None => QueryResultIter::new(&self.results),
@@ -35,7 +35,7 @@ impl<'a> TreeSitterQueriesExecutor<'a> {
 
 pub struct QueryResultIter<'a> {
     inner: Iter<'a, QueryResult<'a>>,
-    range: Option<Range<usize>>,
+    range: Option<&'a Range<usize>>,
 }
 
 impl<'a> QueryResultIter<'a> {
@@ -46,7 +46,7 @@ impl<'a> QueryResultIter<'a> {
         }
     }
 
-    pub fn within_range(mut self, r: Range<usize>) -> Self {
+    fn within_range(mut self, r: &'a Range<usize>) -> Self {
         self.range = Some(r);
         self
     }
@@ -72,8 +72,8 @@ impl<'a> Iterator for QueryResultIter<'a> {
 mod tests {
     use crate::{queries::RelationMatch, TreeSitterQueriesExecutor};
 
-    #[tokio::test]
-    async fn finds_all_relations_and_ignores_functions() {
+    #[test]
+    fn finds_all_relations_and_ignores_functions() {
         let sql = r#"
 select
   *
@@ -110,7 +110,7 @@ where
 
         let mut executor = TreeSitterQueriesExecutor::new(tree.root_node(), &sql);
 
-        executor.add_query_results::<RelationMatch>().await;
+        executor.add_query_results::<RelationMatch>();
 
         let results: Vec<&RelationMatch> = executor
             .get_iter(None)
