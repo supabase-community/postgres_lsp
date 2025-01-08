@@ -1,27 +1,24 @@
 mod relations;
 
-use std::ops::Range;
-
 pub use relations::*;
 
+#[derive(Debug)]
 pub enum QueryResult<'a> {
     Relation(RelationMatch<'a>),
 }
 
 impl<'a> QueryResult<'a> {
-    pub fn within_range(&self, range: &Range<usize>) -> bool {
+    pub fn within_range(&self, range: &tree_sitter::Range) -> bool {
         match self {
             Self::Relation(rm) => {
-                let tb_range = rm.table.byte_range();
-
                 let start = match rm.schema {
-                    Some(s) => s.byte_range().start,
-                    None => tb_range.start,
+                    Some(s) => s.start_position(),
+                    None => rm.table.start_position(),
                 };
 
-                let end = tb_range.end;
+                let end = rm.table.end_position();
 
-                range.contains(&start) && range.contains(&end)
+                start >= range.start_point && end <= range.end_point
             }
         }
     }

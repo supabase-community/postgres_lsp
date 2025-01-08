@@ -43,8 +43,8 @@ mod tests {
 
         let query = format!("select coo{}", CURSOR_POS);
 
-        let (tree, cache) = get_test_deps(setup, &query).await;
-        let params = get_test_params(&tree, &cache, &query);
+        let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
+        let params = get_test_params(&tree, &cache, query.as_str().into());
         let results = complete(params);
 
         let CompletionItem { label, .. } = results
@@ -76,8 +76,8 @@ mod tests {
 
         let query = format!(r#"select * from coo{}()"#, CURSOR_POS);
 
-        let (tree, cache) = get_test_deps(setup, &query).await;
-        let params = get_test_params(&tree, &cache, &query);
+        let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
+        let params = get_test_params(&tree, &cache, query.as_str().into());
         let results = complete(params);
 
         let CompletionItem { label, kind, .. } = results
@@ -110,8 +110,8 @@ mod tests {
 
         let query = format!(r#"select coo{}"#, CURSOR_POS);
 
-        let (tree, cache) = get_test_deps(setup, &query).await;
-        let params = get_test_params(&tree, &cache, &query);
+        let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
+        let params = get_test_params(&tree, &cache, query.as_str().into());
         let results = complete(params);
 
         let CompletionItem { label, kind, .. } = results
@@ -144,8 +144,8 @@ mod tests {
 
         let query = format!(r#"select * from coo{}()"#, CURSOR_POS);
 
-        let (tree, cache) = get_test_deps(setup, &query).await;
-        let params = get_test_params(&tree, &cache, &query);
+        let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
+        let params = get_test_params(&tree, &cache, query.as_str().into());
         let results = complete(params);
 
         let CompletionItem { label, kind, .. } = results

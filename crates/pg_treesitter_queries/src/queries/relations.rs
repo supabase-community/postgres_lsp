@@ -13,6 +13,7 @@ static QUERY: &'static str = r#"
     )
 "#;
 
+#[derive(Debug)]
 pub struct RelationMatch<'a> {
     pub(crate) schema: Option<tree_sitter::Node<'a>>,
     pub(crate) table: tree_sitter::Node<'a>,
@@ -20,12 +21,20 @@ pub struct RelationMatch<'a> {
 
 impl<'a> RelationMatch<'a> {
     pub fn get_schema(&self, sql: &str) -> Option<String> {
-        let str = self.schema.as_ref()?.utf8_text(sql.as_bytes()).unwrap();
+        let str = self
+            .schema
+            .as_ref()?
+            .utf8_text(sql.as_bytes())
+            .expect("Failed to get schema from RelationMatch");
+
         Some(str.to_string())
     }
 
     pub fn get_table(&self, sql: &str) -> String {
-        self.table.utf8_text(sql.as_bytes()).unwrap().to_string()
+        self.table
+            .utf8_text(sql.as_bytes())
+            .expect("Failed to get schema from RelationMatch")
+            .to_string()
     }
 }
 

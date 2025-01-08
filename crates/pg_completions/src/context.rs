@@ -1,8 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    hash::Hash,
-    ops::Range,
-};
+use std::collections::{HashMap, HashSet};
 
 use pg_schema_cache::SchemaCache;
 use pg_treesitter_queries::{
@@ -62,7 +58,7 @@ pub(crate) struct CompletionContext<'a> {
     pub schema_name: Option<String>,
     pub wrapping_clause_type: Option<ClauseType>,
     pub is_invocation: bool,
-    pub wrapping_statement_range: Option<Range<usize>>,
+    pub wrapping_statement_range: Option<tree_sitter::Range>,
 
     pub mentioned_relations: HashMap<Option<String>, HashSet<String>>,
 }
@@ -74,7 +70,6 @@ impl<'a> CompletionContext<'a> {
             text: &params.text,
             schema_cache: params.schema,
             position: usize::from(params.position),
-
             ts_node: None,
             schema_name: None,
             wrapping_clause_type: None,
@@ -85,6 +80,8 @@ impl<'a> CompletionContext<'a> {
 
         ctx.gather_tree_context();
         ctx.gather_info_from_ts_queries();
+
+        dbg!(ctx.wrapping_statement_range);
 
         ctx
     }
@@ -97,6 +94,8 @@ impl<'a> CompletionContext<'a> {
 
         let stmt_range = self.wrapping_statement_range.as_ref();
         let sql = self.text;
+
+        dbg!(sql);
 
         let mut executor = TreeSitterQueriesExecutor::new(tree.root_node(), self.text);
 
@@ -174,9 +173,9 @@ impl<'a> CompletionContext<'a> {
         }
 
         match previous_node.kind() {
-            "statement" => {
+            "statement" | "subquery" => {
                 self.wrapping_clause_type = current_node.kind().try_into().ok();
-                self.wrapping_statement_range = Some(previous_node.byte_range());
+                self.wrapping_statement_range = Some(previous_node.range());
             }
             "invocation" => self.is_invocation = true,
 
@@ -263,7 +262,7 @@ mod tests {
         ];
 
         for (query, expected_clause) in test_cases {
-            let (position, text) = get_text_and_position(query.as_str());
+            let (position, text) = get_text_and_position(query.as_str().into());
 
             let tree = get_tree(text.as_str());
 
@@ -296,7 +295,7 @@ mod tests {
         ];
 
         for (query, expected_schema) in test_cases {
-            let (position, text) = get_text_and_position(query.as_str());
+            let (position, text) = get_text_and_position(query.as_str().into());
 
             let tree = get_tree(text.as_str());
             let params = crate::CompletionParams {
@@ -330,7 +329,7 @@ mod tests {
         ];
 
         for (query, is_invocation) in test_cases {
-            let (position, text) = get_text_and_position(query.as_str());
+            let (position, text) = get_text_and_position(query.as_str().into());
 
             let tree = get_tree(text.as_str());
             let params = crate::CompletionParams {
@@ -354,7 +353,7 @@ mod tests {
         ];
 
         for query in cases {
-            let (position, text) = get_text_and_position(query.as_str());
+            let (position, text) = get_text_and_position(query.as_str().into());
 
             let tree = get_tree(text.as_str());
 
@@ -382,7 +381,7 @@ mod tests {
     fn does_not_fail_on_trailing_whitespace() {
         let query = format!("select * from   {}", CURSOR_POS);
 
-        let (position, text) = get_text_and_position(query.as_str());
+        let (position, text) = get_text_and_position(query.as_str().into());
 
         let tree = get_tree(text.as_str());
 
@@ -408,7 +407,7 @@ mod tests {
     fn does_not_fail_with_empty_statements() {
         let query = format!("{}", CURSOR_POS);
 
-        let (position, text) = get_text_and_position(query.as_str());
+        let (position, text) = get_text_and_position(query.as_str().into());
 
         let tree = get_tree(text.as_str());
 
@@ -433,7 +432,7 @@ mod tests {
         // is selecting a certain column name, such as `frozen_account`.
         let query = format!("select * fro{}", CURSOR_POS);
 
-        let (position, text) = get_text_and_position(query.as_str());
+        let (position, text) = get_text_and_position(query.as_str().into());
 
         let tree = get_tree(text.as_str());
 

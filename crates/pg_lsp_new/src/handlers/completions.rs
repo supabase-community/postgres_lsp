@@ -56,5 +56,6 @@ fn to_lsp_types_completion_item_kind(
     match pg_comp_kind {
         pg_completions::CompletionItemKind::Function
         | pg_completions::CompletionItemKind::Table => lsp_types::CompletionItemKind::CLASS,
+        pg_completions::CompletionItemKind::Column => lsp_types::CompletionItemKind::FIELD,
     }
 }
