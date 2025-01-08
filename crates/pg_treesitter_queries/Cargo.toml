@@ -12,7 +12,7 @@ version              = "0.0.0"
 
 
 [dependencies]
-clap   = { version = "4.5.23", features = ["derive"] }
+clap                      = { version = "4.5.23", features = ["derive"] }
 tree-sitter.workspace     = true
 tree_sitter_sql.workspace = true
 
