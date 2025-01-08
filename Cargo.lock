@@ -2313,6 +2313,7 @@ dependencies = [
  "async-std",
  "pg_schema_cache",
  "pg_test_utils",
+ "pg_treesitter_queries",
  "sqlx",
  "text-size",
  "tokio",
@@ -2663,6 +2664,16 @@ dependencies = [
  "serde",
  "similar",
  "text-size",
+]
+
+[[package]]
+name = "pg_treesitter_queries"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "tokio",
+ "tree-sitter",
+ "tree_sitter_sql",
 ]
 
 [[package]]

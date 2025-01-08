@@ -1,4 +1,7 @@
+use std::ops::Range;
+
 use pg_schema_cache::SchemaCache;
+use pg_treesitter_queries::{queries, TreeSitterQueriesExecutor};
 
 use crate::CompletionParams;
 
@@ -52,10 +55,13 @@ pub(crate) struct CompletionContext<'a> {
     pub schema_name: Option<String>,
     pub wrapping_clause_type: Option<ClauseType>,
     pub is_invocation: bool,
+    pub wrapping_statement_range: Option<Range<usize>>,
+
+    pub ts_query_executor: Option<TreeSitterQueriesExecutor<'a>>,
 }
 
 impl<'a> CompletionContext<'a> {
-    pub fn new(params: &'a CompletionParams) -> Self {
+    pub async fn new(params: &'a CompletionParams<'a>) -> Self {
         let mut ctx = Self {
             tree: params.tree,
             text: &params.text,
@@ -65,12 +71,28 @@ impl<'a> CompletionContext<'a> {
             ts_node: None,
             schema_name: None,
             wrapping_clause_type: None,
+            wrapping_statement_range: None,
             is_invocation: false,
+            ts_query_executor: None,
         };
 
         ctx.gather_tree_context();
+        ctx.dispatch_ts_queries().await;
 
         ctx
+    }
+
+    async fn dispatch_ts_queries(&mut self) {
+        let tree = match self.tree.as_ref() {
+            None => return,
+            Some(t) => t,
+        };
+
+        let mut executor = TreeSitterQueriesExecutor::new(tree.root_node(), self.text);
+
+        executor.add_query_results::<queries::RelationMatch>().await;
+
+        self.ts_query_executor = Some(executor);
     }
 
     pub fn get_ts_node_content(&self, ts_node: tree_sitter::Node<'a>) -> Option<&'a str> {
@@ -100,36 +122,38 @@ impl<'a> CompletionContext<'a> {
          * We'll therefore adjust the cursor position such that it meets the last node of the AST.
          * `select * from use           {}` becomes `select * from use{}`.
          */
-        let current_node_kind = cursor.node().kind();
+        let current_node = cursor.node();
         while cursor.goto_first_child_for_byte(self.position).is_none() && self.position > 0 {
             self.position -= 1;
         }
 
-        self.gather_context_from_node(cursor, current_node_kind);
+        self.gather_context_from_node(cursor, current_node);
     }
 
     fn gather_context_from_node(
         &mut self,
         mut cursor: tree_sitter::TreeCursor<'a>,
-        previous_node_kind: &str,
+        previous_node: tree_sitter::Node<'a>,
     ) {
         let current_node = cursor.node();
-        let current_node_kind = current_node.kind();
 
         // prevent infinite recursion – this can happen if we only have a PROGRAM node
-        if current_node_kind == previous_node_kind {
+        if current_node.kind() == previous_node.kind() {
             self.ts_node = Some(current_node);
             return;
         }
 
-        match previous_node_kind {
-            "statement" => self.wrapping_clause_type = current_node_kind.try_into().ok(),
+        match previous_node.kind() {
+            "statement" => {
+                self.wrapping_clause_type = current_node.kind().try_into().ok();
+                self.wrapping_statement_range = Some(previous_node.byte_range());
+            }
             "invocation" => self.is_invocation = true,
 
             _ => {}
         }
 
-        match current_node_kind {
+        match current_node.kind() {
             "object_reference" => {
                 let txt = self.get_ts_node_content(current_node);
                 if let Some(txt) = txt {
@@ -159,7 +183,7 @@ impl<'a> CompletionContext<'a> {
         }
 
         cursor.goto_first_child_for_byte(self.position);
-        self.gather_context_from_node(cursor, current_node_kind);
+        self.gather_context_from_node(cursor, current_node);
     }
 }
 
@@ -179,8 +203,8 @@ mod tests {
         parser.parse(input, None).expect("Unable to parse tree")
     }
 
-    #[test]
-    fn identifies_clauses() {
+    #[tokio::test]
+    async fn identifies_clauses() {
         let test_cases = vec![
             (format!("Select {}* from users;", CURSOR_POS), "select"),
             (format!("Select * from u{};", CURSOR_POS), "from"),
@@ -220,14 +244,14 @@ mod tests {
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
 
-            let ctx = CompletionContext::new(&params);
+            let ctx = CompletionContext::new(&params).await;
 
             assert_eq!(ctx.wrapping_clause_type, expected_clause.try_into().ok());
         }
     }
 
-    #[test]
-    fn identifies_schema() {
+    #[tokio::test]
+    async fn identifies_schema() {
         let test_cases = vec![
             (
                 format!("Select * from private.u{}", CURSOR_POS),
@@ -252,14 +276,14 @@ mod tests {
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
 
-            let ctx = CompletionContext::new(&params);
+            let ctx = CompletionContext::new(&params).await;
 
             assert_eq!(ctx.schema_name, expected_schema.map(|f| f.to_string()));
         }
     }
 
-    #[test]
-    fn identifies_invocation() {
+    #[tokio::test]
+    async fn identifies_invocation() {
         let test_cases = vec![
             (format!("Select * from u{}sers", CURSOR_POS), false),
             (format!("Select * from u{}sers()", CURSOR_POS), true),
@@ -286,14 +310,14 @@ mod tests {
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
 
-            let ctx = CompletionContext::new(&params);
+            let ctx = CompletionContext::new(&params).await;
 
             assert_eq!(ctx.is_invocation, is_invocation);
         }
     }
 
-    #[test]
-    fn does_not_fail_on_leading_whitespace() {
+    #[tokio::test]
+    async fn does_not_fail_on_leading_whitespace() {
         let cases = vec![
             format!("{}      select * from", CURSOR_POS),
             format!(" {}      select * from", CURSOR_POS),
@@ -311,7 +335,7 @@ mod tests {
                 schema: &pg_schema_cache::SchemaCache::new(),
             };
 
-            let ctx = CompletionContext::new(&params);
+            let ctx = CompletionContext::new(&params).await;
 
             let node = ctx.ts_node.map(|n| n.clone()).unwrap();
 
@@ -324,8 +348,8 @@ mod tests {
         }
     }
 
-    #[test]
-    fn does_not_fail_on_trailing_whitespace() {
+    #[tokio::test]
+    async fn does_not_fail_on_trailing_whitespace() {
         let query = format!("select * from   {}", CURSOR_POS);
 
         let (position, text) = get_text_and_position(query.as_str());
@@ -339,7 +363,7 @@ mod tests {
             schema: &pg_schema_cache::SchemaCache::new(),
         };
 
-        let ctx = CompletionContext::new(&params);
+        let ctx = CompletionContext::new(&params).await;
 
         let node = ctx.ts_node.map(|n| n.clone()).unwrap();
 
@@ -350,8 +374,8 @@ mod tests {
         );
     }
 
-    #[test]
-    fn does_not_fail_with_empty_statements() {
+    #[tokio::test]
+    async fn does_not_fail_with_empty_statements() {
         let query = format!("{}", CURSOR_POS);
 
         let (position, text) = get_text_and_position(query.as_str());
@@ -365,7 +389,7 @@ mod tests {
             schema: &pg_schema_cache::SchemaCache::new(),
         };
 
-        let ctx = CompletionContext::new(&params);
+        let ctx = CompletionContext::new(&params).await;
 
         let node = ctx.ts_node.map(|n| n.clone()).unwrap();
 
@@ -373,8 +397,8 @@ mod tests {
         assert_eq!(ctx.wrapping_clause_type, None);
     }
 
-    #[test]
-    fn does_not_fail_on_incomplete_keywords() {
+    #[tokio::test]
+    async fn does_not_fail_on_incomplete_keywords() {
         //  Instead of autocompleting "FROM", we'll assume that the user
         // is selecting a certain column name, such as `frozen_account`.
         let query = format!("select * fro{}", CURSOR_POS);
@@ -390,7 +414,7 @@ mod tests {
             schema: &pg_schema_cache::SchemaCache::new(),
         };
 
-        let ctx = CompletionContext::new(&params);
+        let ctx = CompletionContext::new(&params).await;
 
         let node = ctx.ts_node.map(|n| n.clone()).unwrap();
 

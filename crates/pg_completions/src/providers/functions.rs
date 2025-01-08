@@ -45,7 +45,7 @@ mod tests {
 
         let (tree, cache) = get_test_deps(setup, &query).await;
         let params = get_test_params(&tree, &cache, &query);
-        let results = complete(params);
+        let results = complete(params).await;
 
         let CompletionItem { label, .. } = results
             .into_iter()
@@ -78,7 +78,7 @@ mod tests {
 
         let (tree, cache) = get_test_deps(setup, &query).await;
         let params = get_test_params(&tree, &cache, &query);
-        let results = complete(params);
+        let results = complete(params).await;
 
         let CompletionItem { label, kind, .. } = results
             .into_iter()
@@ -112,7 +112,7 @@ mod tests {
 
         let (tree, cache) = get_test_deps(setup, &query).await;
         let params = get_test_params(&tree, &cache, &query);
-        let results = complete(params);
+        let results = complete(params).await;
 
         let CompletionItem { label, kind, .. } = results
             .into_iter()
@@ -146,7 +146,7 @@ mod tests {
 
         let (tree, cache) = get_test_deps(setup, &query).await;
         let params = get_test_params(&tree, &cache, &query);
-        let results = complete(params);
+        let results = complete(params).await;
 
         let CompletionItem { label, kind, .. } = results
             .into_iter()

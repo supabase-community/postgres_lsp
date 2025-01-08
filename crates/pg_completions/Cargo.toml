@@ -19,6 +19,7 @@ text-size.workspace = true
 pg_schema_cache.workspace = true
 tree-sitter.workspace     = true
 tree_sitter_sql.workspace = true
+pg_treesitter_queries.workspace = true
 
 sqlx.workspace = true
 

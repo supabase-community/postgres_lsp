@@ -6,25 +6,20 @@ edition.workspace    = true
 homepage.workspace   = true
 keywords.workspace   = true
 license.workspace    = true
-name                 = "pg_test_utils"
+name                 = "pg_treesitter_queries"
 repository.workspace = true
 version              = "0.0.0"
 
 
-[[bin]]
-name = "tree_print"
-path = "src/bin/tree_print.rs"
-
-[[bin]]
-name = "query_debug"
-path = "src/bin/tree_query_debug.rs"
-
 [dependencies]
-anyhow = "1.0.81"
 clap   = { version = "4.5.23", features = ["derive"] }
-dotenv = "0.15.0"
-uuid   = { version = "1.11.0", features = ["v4"] }
-
-sqlx.workspace            = true
 tree-sitter.workspace     = true
 tree_sitter_sql.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+
+[lib]
+doctest = false
+
+[features]
