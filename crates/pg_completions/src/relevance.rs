@@ -70,6 +70,8 @@ impl<'a> CompletionRelevance<'a> {
             Some(ct) => ct,
         };
 
+        let has_mentioned_tables = ctx.mentioned_relations.len() > 0;
+
         self.score += match self.data {
             CompletionRelevanceData::Table(_) => match clause_type {
                 ClauseType::From => 5,
@@ -78,13 +80,15 @@ impl<'a> CompletionRelevance<'a> {
                 _ => -50,
             },
             CompletionRelevanceData::Function(_) => match clause_type {
-                ClauseType::Select => 5,
+                ClauseType::Select if !has_mentioned_tables => 15,
+                ClauseType::Select if has_mentioned_tables => 0,
                 ClauseType::From => 0,
                 _ => -50,
             },
             CompletionRelevanceData::Column(_) => match clause_type {
-                ClauseType::Select => 15,
-                ClauseType::Where => 15,
+                ClauseType::Select if has_mentioned_tables => 10,
+                ClauseType::Select if !has_mentioned_tables => 0,
+                ClauseType::Where => 10,
                 _ => -15,
             },
         }
@@ -96,7 +100,7 @@ impl<'a> CompletionRelevance<'a> {
                 if ctx.is_invocation {
                     30
                 } else {
-                    -30
+                    -10
                 }
             }
             _ => {
