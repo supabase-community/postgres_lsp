@@ -64,7 +64,7 @@ pub(crate) struct CompletionContext<'a> {
 }
 
 impl<'a> CompletionContext<'a> {
-    pub fn new(params: &'a CompletionParams<'a>) -> Self {
+    pub fn new(params: &'a CompletionParams) -> Self {
         let mut ctx = Self {
             tree: params.tree,
             text: &params.text,
@@ -81,8 +81,6 @@ impl<'a> CompletionContext<'a> {
         ctx.gather_tree_context();
         ctx.gather_info_from_ts_queries();
 
-        dbg!(ctx.wrapping_statement_range);
-
         ctx
     }
 
@@ -95,9 +93,7 @@ impl<'a> CompletionContext<'a> {
         let stmt_range = self.wrapping_statement_range.as_ref();
         let sql = self.text;
 
-        dbg!(sql);
-
-        let mut executor = TreeSitterQueriesExecutor::new(tree.root_node(), self.text);
+        let mut executor = TreeSitterQueriesExecutor::new(tree.root_node(), sql);
 
         executor.add_query_results::<queries::RelationMatch>();
 
