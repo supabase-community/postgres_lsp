@@ -3,14 +3,10 @@ use std::sync::{Arc, RwLock};
 use dashmap::DashMap;
 use tree_sitter::InputEdit;
 
-use super::{
-    change::ChangedStatement,
-    document::{Statement, StatementRef},
-    store::Store,
-};
+use super::{change::ModifiedStatement, document::Statement};
 
 pub struct TreeSitterStore {
-    db: DashMap<StatementRef, Arc<tree_sitter::Tree>>,
+    db: DashMap<Statement, Arc<tree_sitter::Tree>>,
 
     parser: RwLock<tree_sitter::Parser>,
 }
@@ -27,30 +23,28 @@ impl TreeSitterStore {
             parser: RwLock::new(parser),
         }
     }
-}
 
-impl Store<tree_sitter::Tree> for TreeSitterStore {
-    fn load(&self, statement: &StatementRef) -> Option<Arc<tree_sitter::Tree>> {
+    pub fn get_parse_tree(&self, statement: &Statement) -> Option<Arc<tree_sitter::Tree>> {
         self.db.get(statement).map(|x| x.clone())
     }
 
-    fn add_statement(&self, statement: &Statement) {
+    pub fn add_statement(&self, statement: &Statement, content: &str) {
         let mut guard = self.parser.write().expect("Error reading parser");
         // todo handle error
-        let tree = guard.parse(&statement.text, None).unwrap();
+        let tree = guard.parse(content, None).unwrap();
         drop(guard);
-        self.db.insert(statement.ref_.clone(), Arc::new(tree));
+        self.db.insert(statement.clone(), Arc::new(tree));
     }
 
-    fn remove_statement(&self, statement: &StatementRef) {
+    pub fn remove_statement(&self, statement: &Statement) {
         self.db.remove(statement);
     }
 
-    fn modify_statement(&self, change: &ChangedStatement) {
-        let old = self.db.remove(&change.old.ref_);
+    pub fn modify_statement(&self, change: &ModifiedStatement) {
+        let old = self.db.remove(&change.old_stmt);
 
         if old.is_none() {
-            self.add_statement(&change.new_statement());
+            self.add_statement(&change.new_stmt, &change.change_text);
             return;
         }
 
@@ -59,22 +53,19 @@ impl Store<tree_sitter::Tree> for TreeSitterStore {
         let mut tree = old.unwrap().1.as_ref().clone();
 
         let edit = edit_from_change(
-            change.old.text.as_str(),
-            usize::from(change.range.start()),
-            usize::from(change.range.end()),
-            change.text.as_str(),
+            change.old_stmt_text.as_str(),
+            usize::from(change.change_range.start()),
+            usize::from(change.change_range.end()),
+            change.change_text.as_str(),
         );
 
         tree.edit(&edit);
 
-        let new_stmt = change.new_statement();
-        let new_text = new_stmt.text.clone();
-
         let mut guard = self.parser.write().expect("Error reading parser");
         // todo handle error
         self.db.insert(
-            new_stmt.ref_,
-            Arc::new(guard.parse(new_text, Some(&tree)).unwrap()),
+            change.new_stmt.clone(),
+            Arc::new(guard.parse(&change.new_stmt_text, Some(&tree)).unwrap()),
         );
         drop(guard);
     }
