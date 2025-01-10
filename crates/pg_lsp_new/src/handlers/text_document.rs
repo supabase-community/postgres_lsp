@@ -5,7 +5,7 @@ use pg_workspace_new::workspace::{
     ChangeFileParams, ChangeParams, CloseFileParams, GetFileContentParams, OpenFileParams,
 };
 use tower_lsp::lsp_types;
-use tracing::{error, field, info};
+use tracing::{error, field};
 
 /// Handler for `textDocument/didOpen` LSP notification
 #[tracing::instrument(

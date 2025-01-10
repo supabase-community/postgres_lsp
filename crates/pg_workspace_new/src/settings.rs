@@ -48,7 +48,7 @@ impl<'a> SettingsHandle<'a> {
     }
 }
 
-impl<'a> AsRef<Settings> for SettingsHandle<'a> {
+impl AsRef<Settings> for SettingsHandle<'_> {
     fn as_ref(&self) -> &Settings {
         &self.inner
     }
@@ -62,7 +62,7 @@ impl<'a> SettingsHandleMut<'a> {
     }
 }
 
-impl<'a> AsMut<Settings> for SettingsHandleMut<'a> {
+impl AsMut<Settings> for SettingsHandleMut<'_> {
     fn as_mut(&mut self) -> &mut Settings {
         &mut self.inner
     }

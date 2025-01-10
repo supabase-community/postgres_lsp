@@ -149,7 +149,7 @@ impl Pattern {
             tokens.push(AnyRecursiveSequence);
         } else {
             // A pattern is absolute if it starts with a path separator, eg. "/home" or "\\?\C:\Users"
-            let mut is_absolute = chars.first().map_or(false, |c| path::is_separator(*c));
+            let mut is_absolute = chars.first().is_some_and(|c| path::is_separator(*c));
 
             // On windows a pattern may also be absolute if it starts with a
             // drive letter, a colon and a separator, eg. "c:/Users" or "G:\Users"
@@ -368,7 +368,7 @@ impl Pattern {
     /// `Pattern` using the default match options (i.e. `MatchOptions::new()`).
     pub fn matches_path(&self, path: &Path) -> bool {
         // FIXME (#9639): This needs to handle non-utf8 paths
-        path.to_str().map_or(false, |s| self.matches(s))
+        path.to_str().is_some_and(|s| self.matches(s))
     }
 
     /// Return if the given `str` matches this `Pattern` using the specified
@@ -381,8 +381,7 @@ impl Pattern {
     /// `Pattern` using the specified match options.
     pub fn matches_path_with(&self, path: &Path, options: MatchOptions) -> bool {
         // FIXME (#9639): This needs to handle non-utf8 paths
-        path.to_str()
-            .map_or(false, |s| self.matches_with(s, options))
+        path.to_str().is_some_and(|s| self.matches_with(s, options))
     }
 
     /// Access the original glob pattern.
@@ -551,7 +550,7 @@ fn chars_eq(a: char, b: char, case_sensitive: bool) -> bool {
         true
     } else if !case_sensitive && a.is_ascii() && b.is_ascii() {
         // FIXME: work with non-ascii chars properly (issue #9084)
-        a.to_ascii_lowercase() == b.to_ascii_lowercase()
+        a.eq_ignore_ascii_case(&b)
     } else {
         a == b
     }

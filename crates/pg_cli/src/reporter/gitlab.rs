@@ -57,7 +57,7 @@ impl<'a> GitLabReporterVisitor<'a> {
     }
 }
 
-impl<'a> ReporterVisitor for GitLabReporterVisitor<'a> {
+impl ReporterVisitor for GitLabReporterVisitor<'_> {
     fn report_summary(&mut self, _: &Execution, _: TraversalSummary) -> std::io::Result<()> {
         Ok(())
     }
@@ -80,7 +80,7 @@ struct GitLabDiagnostics<'a>(
     Option<&'a Path>,
 );
 
-impl<'a> GitLabDiagnostics<'a> {
+impl GitLabDiagnostics<'_> {
     fn attempt_to_relativize(&self, subject: &str) -> Option<PathBuf> {
         let Ok(resolved) = Path::new(subject).absolutize() else {
             return None;
@@ -116,7 +116,7 @@ impl<'a> GitLabDiagnostics<'a> {
     }
 }
 
-impl<'a> Display for GitLabDiagnostics<'a> {
+impl Display for GitLabDiagnostics<'_> {
     fn fmt(&self, fmt: &mut Formatter) -> std::io::Result<()> {
         let mut hasher = self.1.write().unwrap();
         let gitlab_diagnostics: Vec<_> = self

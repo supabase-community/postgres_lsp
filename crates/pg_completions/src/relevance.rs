@@ -6,7 +6,7 @@ pub(crate) enum CompletionRelevanceData<'a> {
     Function(&'a pg_schema_cache::Function),
 }
 
-impl<'a> CompletionRelevanceData<'a> {
+impl CompletionRelevanceData<'_> {
     pub fn get_score(self, ctx: &CompletionContext) -> i32 {
         CompletionRelevance::from(self).into_score(ctx)
     }
@@ -27,7 +27,7 @@ pub(crate) struct CompletionRelevance<'a> {
     data: CompletionRelevanceData<'a>,
 }
 
-impl<'a> CompletionRelevance<'a> {
+impl CompletionRelevance<'_> {
     pub fn into_score(mut self, ctx: &CompletionContext) -> i32 {
         self.check_matches_schema(ctx);
         self.check_matches_query_input(ctx);

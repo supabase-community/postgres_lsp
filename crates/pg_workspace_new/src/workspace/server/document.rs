@@ -1,5 +1,5 @@
 use pg_fs::PgLspPath;
-use text_size::{TextRange, TextSize};
+use text_size::TextRange;
 
 /// Global unique identifier for a statement
 #[derive(Debug, Hash, Eq, PartialEq, Clone)]
