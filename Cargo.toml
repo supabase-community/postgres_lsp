@@ -75,6 +75,7 @@ pg_schema_cache           = { path = "./crates/pg_schema_cache", version = "0.0.
 pg_statement_splitter     = { path = "./crates/pg_statement_splitter", version = "0.0.0" }
 pg_syntax                 = { path = "./crates/pg_syntax", version = "0.0.0" }
 pg_text_edit              = { path = "./crates/pg_text_edit", version = "0.0.0" }
+pg_treesitter_queries     = { path = "./crates/pg_treesitter_queries", version = "0.0.0" }
 pg_type_resolver          = { path = "./crates/pg_type_resolver", version = "0.0.0" }
 pg_typecheck              = { path = "./crates/pg_typecheck", version = "0.0.0" }
 pg_workspace              = { path = "./crates/pg_workspace", version = "0.0.0" }

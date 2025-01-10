@@ -16,10 +16,10 @@ anyhow              = { workspace = true }
 biome_deserialize   = { workspace = true }
 futures             = "0.3.31"
 pg_analyse          = { workspace = true }
+pg_completions      = { workspace = true }
 pg_configuration    = { workspace = true }
 pg_console          = { workspace = true }
 pg_diagnostics      = { workspace = true }
-pg_completions      = { workspace = true }
 pg_fs               = { workspace = true }
 pg_lsp_converters   = { workspace = true }
 pg_text_edit        = { workspace = true }
