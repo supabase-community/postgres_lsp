@@ -1,8 +1,11 @@
+use std::sync::LazyLock;
+
 use crate::{Query, QueryResult};
 
 use super::QueryTryFrom;
 
-static QUERY: &'static str = r#"
+static TS_QUERY: LazyLock<tree_sitter::Query> = LazyLock::new(|| {
+    static QUERY_STR: &'static str = r#"
     (relation
         (object_reference 
             .
@@ -12,6 +15,8 @@ static QUERY: &'static str = r#"
         )+
     )
 "#;
+    tree_sitter::Query::new(tree_sitter_sql::language(), &QUERY_STR).expect("Invalid TS Query")
+});
 
 #[derive(Debug)]
 pub struct RelationMatch<'a> {
@@ -57,12 +62,9 @@ impl<'a> QueryTryFrom<'a> for RelationMatch<'a> {
 
 impl<'a> Query<'a> for RelationMatch<'a> {
     fn execute(root_node: tree_sitter::Node<'a>, stmt: &'a str) -> Vec<crate::QueryResult<'a>> {
-        let query =
-            tree_sitter::Query::new(tree_sitter_sql::language(), &QUERY).expect("Invalid Query.");
-
         let mut cursor = tree_sitter::QueryCursor::new();
 
-        let matches = cursor.matches(&query, root_node, stmt.as_bytes());
+        let matches = cursor.matches(&TS_QUERY, root_node, stmt.as_bytes());
 
         let mut to_return = vec![];
 
