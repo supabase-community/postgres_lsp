@@ -5,7 +5,7 @@ use crate::{
     builder::CompletionBuilder,
     context::CompletionContext,
     item::CompletionItem,
-    providers::{complete_functions, complete_tables},
+    providers::{complete_columns, complete_functions, complete_tables},
 };
 
 pub const LIMIT: usize = 50;
@@ -38,6 +38,7 @@ pub fn complete(params: CompletionParams) -> CompletionResult {
 
     complete_tables(&ctx, &mut builder);
     complete_functions(&ctx, &mut builder);
+    complete_columns(&ctx, &mut builder);
 
     builder.finish()
 }

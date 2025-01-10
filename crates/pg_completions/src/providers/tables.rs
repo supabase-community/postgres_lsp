@@ -23,6 +23,7 @@ pub fn complete_tables(ctx: &CompletionContext, builder: &mut CompletionBuilder)
 
 #[cfg(test)]
 mod tests {
+
     use crate::{
         complete,
         test_helper::{get_test_deps, get_test_params, CURSOR_POS},
@@ -41,8 +42,8 @@ mod tests {
 
         let query = format!("select * from u{}", CURSOR_POS);
 
-        let (tree, cache) = get_test_deps(setup, &query).await;
-        let params = get_test_params(&tree, &cache, &query);
+        let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
+        let params = get_test_params(&tree, &cache, query.as_str().into());
         let results = complete(params);
 
         assert!(!results.items.is_empty());
@@ -79,8 +80,8 @@ mod tests {
         ];
 
         for (query, expected_label) in test_cases {
-            let (tree, cache) = get_test_deps(setup, &query).await;
-            let params = get_test_params(&tree, &cache, &query);
+            let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
+            let params = get_test_params(&tree, &cache, query.as_str().into());
             let results = complete(params);
 
             assert!(!results.items.is_empty());
@@ -124,8 +125,8 @@ mod tests {
         ];
 
         for (query, expected_label) in test_cases {
-            let (tree, cache) = get_test_deps(setup, &query).await;
-            let params = get_test_params(&tree, &cache, &query);
+            let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
+            let params = get_test_params(&tree, &cache, query.as_str().into());
             let results = complete(params);
 
             assert!(!results.items.is_empty());
@@ -161,8 +162,8 @@ mod tests {
 
         let query = format!(r#"select * from coo{}"#, CURSOR_POS);
 
-        let (tree, cache) = get_test_deps(setup, &query).await;
-        let params = get_test_params(&tree, &cache, &query);
+        let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
+        let params = get_test_params(&tree, &cache, query.as_str().into());
         let results = complete(params);
 
         let CompletionItem { label, kind, .. } = results

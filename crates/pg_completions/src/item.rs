@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 pub enum CompletionItemKind {
     Table,
     Function,
+    Column,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

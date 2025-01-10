@@ -1,4 +1,10 @@
+use std::collections::{HashMap, HashSet};
+
 use pg_schema_cache::SchemaCache;
+use pg_treesitter_queries::{
+    queries::{self, QueryResult},
+    TreeSitterQueriesExecutor,
+};
 
 use crate::CompletionParams;
 
@@ -52,6 +58,9 @@ pub(crate) struct CompletionContext<'a> {
     pub schema_name: Option<String>,
     pub wrapping_clause_type: Option<ClauseType>,
     pub is_invocation: bool,
+    pub wrapping_statement_range: Option<tree_sitter::Range>,
+
+    pub mentioned_relations: HashMap<Option<String>, HashSet<String>>,
 }
 
 impl<'a> CompletionContext<'a> {
@@ -61,16 +70,54 @@ impl<'a> CompletionContext<'a> {
             text: &params.text,
             schema_cache: params.schema,
             position: usize::from(params.position),
-
             ts_node: None,
             schema_name: None,
             wrapping_clause_type: None,
+            wrapping_statement_range: None,
             is_invocation: false,
+            mentioned_relations: HashMap::new(),
         };
 
         ctx.gather_tree_context();
+        ctx.gather_info_from_ts_queries();
 
         ctx
+    }
+
+    fn gather_info_from_ts_queries(&mut self) {
+        let tree = match self.tree.as_ref() {
+            None => return,
+            Some(t) => t,
+        };
+
+        let stmt_range = self.wrapping_statement_range.as_ref();
+        let sql = self.text;
+
+        let mut executor = TreeSitterQueriesExecutor::new(tree.root_node(), sql);
+
+        executor.add_query_results::<queries::RelationMatch>();
+
+        for relation_match in executor.get_iter(stmt_range) {
+            match relation_match {
+                QueryResult::Relation(r) => {
+                    let schema_name = r.get_schema(sql);
+                    let table_name = r.get_table(sql);
+
+                    let current = self.mentioned_relations.get_mut(&schema_name);
+
+                    match current {
+                        Some(c) => {
+                            c.insert(table_name);
+                        }
+                        None => {
+                            let mut new = HashSet::new();
+                            new.insert(table_name);
+                            self.mentioned_relations.insert(schema_name, new);
+                        }
+                    };
+                }
+            };
+        }
     }
 
     pub fn get_ts_node_content(&self, ts_node: tree_sitter::Node<'a>) -> Option<&'a str> {
@@ -100,36 +147,38 @@ impl<'a> CompletionContext<'a> {
          * We'll therefore adjust the cursor position such that it meets the last node of the AST.
          * `select * from use           {}` becomes `select * from use{}`.
          */
-        let current_node_kind = cursor.node().kind();
+        let current_node = cursor.node();
         while cursor.goto_first_child_for_byte(self.position).is_none() && self.position > 0 {
             self.position -= 1;
         }
 
-        self.gather_context_from_node(cursor, current_node_kind);
+        self.gather_context_from_node(cursor, current_node);
     }
 
     fn gather_context_from_node(
         &mut self,
         mut cursor: tree_sitter::TreeCursor<'a>,
-        previous_node_kind: &str,
+        previous_node: tree_sitter::Node<'a>,
     ) {
         let current_node = cursor.node();
-        let current_node_kind = current_node.kind();
 
         // prevent infinite recursion – this can happen if we only have a PROGRAM node
-        if current_node_kind == previous_node_kind {
+        if current_node.kind() == previous_node.kind() {
             self.ts_node = Some(current_node);
             return;
         }
 
-        match previous_node_kind {
-            "statement" => self.wrapping_clause_type = current_node_kind.try_into().ok(),
+        match previous_node.kind() {
+            "statement" | "subquery" => {
+                self.wrapping_clause_type = current_node.kind().try_into().ok();
+                self.wrapping_statement_range = Some(previous_node.range());
+            }
             "invocation" => self.is_invocation = true,
 
             _ => {}
         }
 
-        match current_node_kind {
+        match current_node.kind() {
             "object_reference" => {
                 let txt = self.get_ts_node_content(current_node);
                 if let Some(txt) = txt {
@@ -159,7 +208,7 @@ impl<'a> CompletionContext<'a> {
         }
 
         cursor.goto_first_child_for_byte(self.position);
-        self.gather_context_from_node(cursor, current_node_kind);
+        self.gather_context_from_node(cursor, current_node);
     }
 }
 
@@ -209,7 +258,7 @@ mod tests {
         ];
 
         for (query, expected_clause) in test_cases {
-            let (position, text) = get_text_and_position(query.as_str());
+            let (position, text) = get_text_and_position(query.as_str().into());
 
             let tree = get_tree(text.as_str());
 
@@ -242,7 +291,7 @@ mod tests {
         ];
 
         for (query, expected_schema) in test_cases {
-            let (position, text) = get_text_and_position(query.as_str());
+            let (position, text) = get_text_and_position(query.as_str().into());
 
             let tree = get_tree(text.as_str());
             let params = crate::CompletionParams {
@@ -276,7 +325,7 @@ mod tests {
         ];
 
         for (query, is_invocation) in test_cases {
-            let (position, text) = get_text_and_position(query.as_str());
+            let (position, text) = get_text_and_position(query.as_str().into());
 
             let tree = get_tree(text.as_str());
             let params = crate::CompletionParams {
@@ -300,7 +349,7 @@ mod tests {
         ];
 
         for query in cases {
-            let (position, text) = get_text_and_position(query.as_str());
+            let (position, text) = get_text_and_position(query.as_str().into());
 
             let tree = get_tree(text.as_str());
 
@@ -328,7 +377,7 @@ mod tests {
     fn does_not_fail_on_trailing_whitespace() {
         let query = format!("select * from   {}", CURSOR_POS);
 
-        let (position, text) = get_text_and_position(query.as_str());
+        let (position, text) = get_text_and_position(query.as_str().into());
 
         let tree = get_tree(text.as_str());
 
@@ -354,7 +403,7 @@ mod tests {
     fn does_not_fail_with_empty_statements() {
         let query = format!("{}", CURSOR_POS);
 
-        let (position, text) = get_text_and_position(query.as_str());
+        let (position, text) = get_text_and_position(query.as_str().into());
 
         let tree = get_tree(text.as_str());
 
@@ -379,7 +428,7 @@ mod tests {
         // is selecting a certain column name, such as `frozen_account`.
         let query = format!("select * fro{}", CURSOR_POS);
 
-        let (position, text) = get_text_and_position(query.as_str());
+        let (position, text) = get_text_and_position(query.as_str().into());
 
         let tree = get_tree(text.as_str());
 
