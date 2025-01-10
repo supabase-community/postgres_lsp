@@ -41,11 +41,17 @@ impl StatementChange {
     }
 }
 
+/// Returns all relevant details about the change and its effects on the current state of the document.
 struct Affected {
+    /// Full range of the change, including the range of all statements that intersect with the change
     affected_range: TextRange,
+    /// All indices of affected statement positions
     affected_indices: Vec<usize>,
+    /// The index of the first statement position before the change, if any
     prev_index: Option<usize>,
+    /// The index of the first statement position after the change, if any
     next_index: Option<usize>,
+    /// the full affected range includng the prev and next statement
     full_affected_range: TextRange,
 }
 
@@ -79,11 +85,11 @@ impl Document {
         changes.extend(
             pg_statement_splitter::split(&self.content)
                 .ranges
-                .iter()
+                .into_iter()
                 .map(|range| {
                     let id = self.id_generator.next();
-                    let text = self.content[*range].to_string();
-                    self.positions.push((id, *range));
+                    let text = self.content[range].to_string();
+                    self.positions.push((id, range));
 
                     StatementChange::Added(AddedStatement {
                         stmt: Statement {
