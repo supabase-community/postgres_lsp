@@ -26,8 +26,7 @@ pub fn parse(sql: &str) -> Result<NodeEnum> {
             .nodes()
             .iter()
             .find(|n| n.1 == 1)
-            .unwrap()
-            .0
-            .to_enum()
-    })
+            .map(|n| n.0.to_enum())
+            .ok_or_else(|| Error::Parse("Unable to find root node".to_string()))
+    })?
 }

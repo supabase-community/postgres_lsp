@@ -41,7 +41,7 @@ impl PgQueryStore {
 
     pub fn modify_statement(&self, change: &ModifiedStatement) {
         self.remove_statement(&change.old_stmt);
-        self.add_statement(&change.new_stmt, &change.change_text);
+        self.add_statement(&change.new_stmt, &change.new_stmt_text);
     }
 
     pub fn get_diagnostics(&self, stmt: &Statement) -> Vec<pg_diagnostics::serde::Diagnostic> {
