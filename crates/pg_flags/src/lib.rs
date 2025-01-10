@@ -26,15 +26,15 @@ impl PgLspEnv {
     fn new() -> Self {
         Self {
             pglsp_log_path: PgLspEnvVariable::new(
-                "BIOME_LOG_PATH",
+                "PGLSP_LOG_PATH",
                 "The directory where the Daemon logs will be saved.",
             ),
             pglsp_log_prefix: PgLspEnvVariable::new(
-                "BIOME_LOG_PREFIX_NAME",
+                "PGLSP_LOG_PREFIX_NAME",
                 "A prefix that's added to the name of the log. Default: `server.log.`",
             ),
             pglsp_config_path: PgLspEnvVariable::new(
-                "BIOME_CONFIG_PATH",
+                "PGLSP_CONFIG_PATH",
                 "A path to the configuration file",
             ),
         }
