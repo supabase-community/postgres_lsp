@@ -399,6 +399,12 @@ impl Workspace for WorkspaceServer {
         &self,
         params: super::CompletionParams,
     ) -> Result<pg_completions::CompletionResult, WorkspaceError> {
+        tracing::debug!(
+            "Getting completions for file {:?} at position {:?}",
+            &params.path,
+            &params.position
+        );
+
         let doc = self
             .documents
             .get(&params.path)
