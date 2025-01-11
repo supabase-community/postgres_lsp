@@ -435,7 +435,7 @@ struct Ancestors<'a> {
     current_node: NodeIndex<DefaultIx>,
 }
 
-impl<'a> Iterator for Ancestors<'a> {
+impl Iterator for Ancestors<'_> {
     type Item = NodeIndex<DefaultIx>;
 
     fn next(&mut self) -> Option<Self::Item> {

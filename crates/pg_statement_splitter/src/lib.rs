@@ -56,6 +56,11 @@ mod tests {
                 assert_eq!(*expected, self.input[*range].to_string());
             }
 
+            assert!(
+                self.parse.ranges.is_sorted_by_key(|r| r.start()),
+                "Ranges are not sorted"
+            );
+
             self
         }
 

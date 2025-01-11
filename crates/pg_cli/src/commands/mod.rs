@@ -230,7 +230,7 @@ impl PgLspCommand {
 
     pub fn is_verbose(&self) -> bool {
         self.cli_options()
-            .map_or(false, |cli_options| cli_options.verbose)
+            .is_some_and(|cli_options| cli_options.verbose)
     }
 
     pub fn log_level(&self) -> LoggingLevel {

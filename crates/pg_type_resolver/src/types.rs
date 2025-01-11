@@ -27,7 +27,7 @@ pub fn resolve_type(node: &pg_query_ext::NodeEnum, schema_cache: &SchemaCache) -
                                 .types
                                 .iter()
                                 .filter(|t| {
-                                    types.iter().any(|i| &i == &&t.name) && t.schema == "pg_catalog"
+                                    types.iter().any(|i| i == &t.name) && t.schema == "pg_catalog"
                                 })
                                 .map(|t| t.id)
                                 .collect(),
@@ -63,8 +63,7 @@ pub fn resolve_type(node: &pg_query_ext::NodeEnum, schema_cache: &SchemaCache) -
                                 .types
                                 .iter()
                                 .filter(|t| {
-                                    (types.iter().any(|i| &i == &&t.name)
-                                        && t.schema == "pg_catalog")
+                                    (types.iter().any(|i| i == &t.name) && t.schema == "pg_catalog")
                                         || t.enums.values.contains(&v.sval)
                                 })
                                 .map(|t| t.id)

@@ -99,7 +99,7 @@ impl<'a, 'b> LintVisitor<'a, 'b> {
     }
 }
 
-impl<'a, 'b> RegistryVisitor for LintVisitor<'a, 'b> {
+impl RegistryVisitor for LintVisitor<'_, '_> {
     fn record_category<C: GroupCategory>(&mut self) {
         if C::CATEGORY == RuleCategory::Lint {
             C::record_groups(self)

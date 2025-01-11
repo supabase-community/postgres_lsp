@@ -413,7 +413,7 @@ pub(crate) struct TraversalOptions<'ctx, 'app> {
     pub(crate) evaluated_paths: RwLock<BTreeSet<PgLspPath>>,
 }
 
-impl<'ctx, 'app> TraversalOptions<'ctx, 'app> {
+impl TraversalOptions<'_, '_> {
     pub(crate) fn increment_changed(&self, path: &PgLspPath) {
         self.changed.fetch_add(1, Ordering::Relaxed);
         self.evaluated_paths
@@ -441,7 +441,7 @@ impl<'ctx, 'app> TraversalOptions<'ctx, 'app> {
     }
 }
 
-impl<'ctx, 'app> TraversalContext for TraversalOptions<'ctx, 'app> {
+impl TraversalContext for TraversalOptions<'_, '_> {
     fn interner(&self) -> &PathInterner {
         &self.interner
     }

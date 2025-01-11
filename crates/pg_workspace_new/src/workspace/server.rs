@@ -3,7 +3,7 @@ use std::{fs, future::Future, panic::RefUnwindSafe, path::Path, sync::RwLock};
 use analyser::AnalyserVisitorBuilder;
 use change::StatementChange;
 use dashmap::{DashMap, DashSet};
-use document::{Document, StatementRef};
+use document::{Document, Statement};
 use pg_analyse::{AnalyserOptions, AnalysisFilter};
 use pg_analyser::{Analyser, AnalyserConfig, AnalyserContext};
 use pg_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, DiagnosticExt, Severity};
@@ -12,7 +12,6 @@ use pg_query::PgQueryStore;
 use pg_schema_cache::SchemaCache;
 use sqlx::PgPool;
 use std::sync::LazyLock;
-use store::Store;
 use tokio::runtime::Runtime;
 use tracing::info;
 use tree_sitter::TreeSitterStore;
@@ -33,7 +32,6 @@ mod analyser;
 mod change;
 mod document;
 mod pg_query;
-mod store;
 mod tree_sitter;
 
 /// Simple helper to manage the db connection and the associated connection string
@@ -78,7 +76,7 @@ pub(super) struct WorkspaceServer {
     pg_query: PgQueryStore,
 
     /// Stores the statements that have changed since the last analysis
-    changed_stmts: DashSet<StatementRef>,
+    changed_stmts: DashSet<Statement>,
 
     connection: RwLock<DbConnection>,
 }
@@ -220,10 +218,9 @@ impl Workspace for WorkspaceServer {
 
         let doc = Document::new(params.path.clone(), params.content, params.version);
 
-        doc.statements.iter().for_each(|s| {
-            let stmt = doc.statement(s);
-            self.tree_sitter.add_statement(&stmt);
-            self.pg_query.add_statement(&stmt);
+        doc.iter_statements_with_text().for_each(|(stmt, content)| {
+            self.tree_sitter.add_statement(&stmt, content);
+            self.pg_query.add_statement(&stmt, content);
         });
 
         self.documents.insert(params.path, doc);
@@ -238,8 +235,9 @@ impl Workspace for WorkspaceServer {
             .remove(&params.path)
             .ok_or_else(WorkspaceError::not_found)?;
 
-        for stmt in doc.statement_refs() {
+        for stmt in doc.iter_statements() {
             self.tree_sitter.remove_statement(&stmt);
+            self.pg_query.remove_statement(&stmt);
         }
 
         Ok(())
@@ -260,12 +258,12 @@ impl Workspace for WorkspaceServer {
 
         for c in &doc.apply_file_change(&params) {
             match c {
-                StatementChange::Added(s) => {
-                    tracing::info!("Adding statement: {:?}", s);
-                    self.tree_sitter.add_statement(s);
-                    self.pg_query.add_statement(s);
+                StatementChange::Added(added) => {
+                    tracing::info!("Adding statement: {:?}", added);
+                    self.tree_sitter.add_statement(&added.stmt, &added.text);
+                    self.pg_query.add_statement(&added.stmt, &added.text);
 
-                    self.changed_stmts.insert(s.ref_.to_owned());
+                    self.changed_stmts.insert(added.stmt.clone());
                 }
                 StatementChange::Deleted(s) => {
                     tracing::info!("Deleting statement: {:?}", s);
@@ -279,8 +277,8 @@ impl Workspace for WorkspaceServer {
                     self.tree_sitter.modify_statement(s);
                     self.pg_query.modify_statement(s);
 
-                    self.changed_stmts.remove(&s.old.ref_);
-                    self.changed_stmts.insert(s.new_ref.to_owned());
+                    self.changed_stmts.remove(&s.old_stmt);
+                    self.changed_stmts.insert(s.new_stmt.clone());
                 }
             }
         }
@@ -339,13 +337,12 @@ impl Workspace for WorkspaceServer {
         });
 
         let diagnostics: Vec<SDiagnostic> = doc
-            .statement_refs_with_ranges()
-            .iter()
+            .iter_statements_with_range()
             .flat_map(|(stmt, r)| {
                 let mut stmt_diagnostics = vec![];
 
-                stmt_diagnostics.extend(self.pg_query.diagnostics(stmt));
-                let ast = self.pg_query.load(stmt);
+                stmt_diagnostics.extend(self.pg_query.get_diagnostics(&stmt));
+                let ast = self.pg_query.get_ast(&stmt);
                 if let Some(ast) = ast {
                     stmt_diagnostics.extend(
                         analyser
@@ -402,6 +399,12 @@ impl Workspace for WorkspaceServer {
         &self,
         params: super::CompletionParams,
     ) -> Result<pg_completions::CompletionResult, WorkspaceError> {
+        tracing::debug!(
+            "Getting completions for file {:?} at position {:?}",
+            &params.path,
+            &params.position
+        );
+
         let doc = self
             .documents
             .get(&params.path)
@@ -413,20 +416,19 @@ impl Workspace for WorkspaceServer {
             &params.position
         );
 
-        let statement = match doc.statement_at_offset(&params.position) {
+        let (statement, stmt_range, text) = match doc
+            .iter_statements_with_text_and_range()
+            .find(|(_, r, _)| r.contains(params.position))
+        {
             Some(s) => s,
             None => return Ok(pg_completions::CompletionResult::default()),
         };
 
         // `offset` is the position in the document,
         // but we need the position within the *statement*.
-        let stmt_range = doc
-            .statement_range(&statement.ref_)
-            .expect("Range of statement should be defined.");
         let position = params.position - stmt_range.start();
 
-        let tree = self.tree_sitter.load(&statement.ref_);
-        let text = statement.text;
+        let tree = self.tree_sitter.get_parse_tree(&statement);
 
         tracing::debug!("Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {}", position, stmt_range.start(), stmt_range.end(), text);
 
@@ -439,7 +441,7 @@ impl Workspace for WorkspaceServer {
             position,
             schema: &schema_cache,
             tree: tree.as_deref(),
-            text,
+            text: text.to_string(),
         });
 
         Ok(result)

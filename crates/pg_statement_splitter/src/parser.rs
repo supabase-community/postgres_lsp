@@ -186,6 +186,6 @@ impl Parser {
 }
 
 fn is_irrelevant_token(t: &Token) -> bool {
-    return WHITESPACE_TOKENS.contains(&t.kind)
-        && (t.kind != SyntaxKind::Newline || t.text.chars().count() == 1);
+    WHITESPACE_TOKENS.contains(&t.kind)
+        && (t.kind != SyntaxKind::Newline || t.text.chars().count() == 1)
 }

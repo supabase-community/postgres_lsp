@@ -42,7 +42,7 @@ impl<'analysis> AnalysisFilter<'analysis> {
     /// Return `true` if the group `G` matches this filter
     pub fn match_group<G: RuleGroup>(&self) -> bool {
         self.match_category::<G::Category>()
-            && self.enabled_rules.map_or(true, |enabled_rules| {
+            && self.enabled_rules.is_none_or(|enabled_rules| {
                 enabled_rules.iter().any(|filter| filter.match_group::<G>())
             })
             && !self
@@ -54,7 +54,7 @@ impl<'analysis> AnalysisFilter<'analysis> {
     /// Return `true` if the rule `R` matches this filter
     pub fn match_rule<R: Rule>(&self) -> bool {
         self.match_category::<<R::Group as RuleGroup>::Category>()
-            && self.enabled_rules.map_or(true, |enabled_rules| {
+            && self.enabled_rules.is_none_or(|enabled_rules| {
                 enabled_rules.iter().any(|filter| filter.match_rule::<R>())
             })
             && !self
@@ -94,13 +94,13 @@ impl<'a> RuleFilter<'a> {
     }
 }
 
-impl<'a> Debug for RuleFilter<'a> {
+impl Debug for RuleFilter<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         Display::fmt(self, f)
     }
 }
 
-impl<'a> Display for RuleFilter<'a> {
+impl Display for RuleFilter<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             RuleFilter::Group(group) => {
@@ -113,7 +113,7 @@ impl<'a> Display for RuleFilter<'a> {
     }
 }
 
-impl<'a> pg_console::fmt::Display for RuleFilter<'a> {
+impl pg_console::fmt::Display for RuleFilter<'_> {
     fn fmt(&self, fmt: &mut pg_console::fmt::Formatter) -> std::io::Result<()> {
         match self {
             RuleFilter::Group(group) => {
