@@ -2690,14 +2690,17 @@ dependencies = [
 name = "pg_typecheck"
 version = "0.0.0"
 dependencies = [
- "async-std",
- "pg_base_db",
+ "insta",
+ "pg_console",
+ "pg_diagnostics",
  "pg_query_ext",
  "pg_schema_cache",
- "pg_syntax",
  "pg_test_utils",
  "sqlx",
  "text-size",
+ "tokio",
+ "tree-sitter",
+ "tree_sitter_sql",
 ]
 
 [[package]]
@@ -2713,7 +2716,6 @@ dependencies = [
  "pg_query_ext",
  "pg_schema_cache",
  "pg_syntax",
- "pg_typecheck",
  "sqlx",
  "text-size",
  "tree-sitter",
@@ -2738,6 +2740,7 @@ dependencies = [
  "pg_query_ext",
  "pg_schema_cache",
  "pg_statement_splitter",
+ "pg_typecheck",
  "rustc-hash 2.1.0",
  "serde",
  "serde_json",

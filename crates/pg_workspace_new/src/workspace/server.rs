@@ -10,6 +10,7 @@ use pg_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, DiagnosticExt
 use pg_fs::{ConfigName, PgLspPath};
 use pg_query::PgQueryStore;
 use pg_schema_cache::SchemaCache;
+use pg_typecheck::TypecheckParams;
 use sqlx::PgPool;
 use std::sync::LazyLock;
 use tokio::runtime::Runtime;
@@ -33,6 +34,7 @@ mod change;
 mod document;
 mod pg_query;
 mod tree_sitter;
+mod typecheck;
 
 /// Simple helper to manage the db connection and the associated connection string
 #[derive(Default)]
@@ -336,13 +338,16 @@ impl Workspace for WorkspaceServer {
             filter,
         });
 
-        let diagnostics: Vec<SDiagnostic> = doc
-            .iter_statements_with_range()
-            .flat_map(|(stmt, r)| {
-                let mut stmt_diagnostics = vec![];
+        let con = self.connection.read().unwrap().get_pool();
 
-                stmt_diagnostics.extend(self.pg_query.get_diagnostics(&stmt));
+        let diagnostics: Vec<SDiagnostic> = doc
+            .iter_statements_with_text_and_range()
+            .flat_map(|(stmt, r, text)| {
+                let mut stmt_diagnostics = self.pg_query.get_diagnostics(&stmt);
+
                 let ast = self.pg_query.get_ast(&stmt);
+                let tree = self.tree_sitter.get_parse_tree(&stmt);
+
                 if let Some(ast) = ast {
                     stmt_diagnostics.extend(
                         analyser
@@ -351,6 +356,25 @@ impl Workspace for WorkspaceServer {
                             .map(SDiagnostic::new)
                             .collect::<Vec<_>>(),
                     );
+
+                    if let Some(con) = con.clone() {
+                        let text = text.to_string();
+                        let ast_clone = ast.clone();
+                        let tree_clone = tree.clone();
+                        if let Ok(typecheck_result) = run_async(async move {
+                            pg_typecheck::check_sql(TypecheckParams {
+                                conn: &con,
+                                sql: &text,
+                                ast: &ast_clone,
+                                tree: tree_clone.as_deref(),
+                            })
+                            .await
+                        }) {
+                            if let Some(typecheck_result) = typecheck_result.map(SDiagnostic::new) {
+                                stmt_diagnostics.push(typecheck_result);
+                            }
+                        }
+                    }
                 }
 
                 stmt_diagnostics

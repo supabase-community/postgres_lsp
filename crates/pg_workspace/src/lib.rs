@@ -2,7 +2,6 @@ pub mod diagnostics;
 mod lint;
 mod pg_query;
 mod tree_sitter;
-mod typecheck;
 
 use std::sync::{RwLock, RwLockWriteGuard};
 
@@ -15,7 +14,6 @@ use pg_query::PgQueryParser;
 use pg_schema_cache::SchemaCache;
 use sqlx::PgPool;
 use tree_sitter::TreeSitterParser;
-use typecheck::Typechecker;
 
 pub struct Workspace {
     pub documents: DashMap<PgLspPath, Document>,
@@ -26,7 +24,6 @@ pub struct Workspace {
     pub tree_sitter: TreeSitterParser,
     pub pg_query: PgQueryParser,
     pub linter: Linter,
-    pub typechecker: Typechecker,
 }
 
 impl Default for Workspace {
@@ -45,7 +42,6 @@ impl Workspace {
             tree_sitter: TreeSitterParser::new(),
             pg_query: PgQueryParser::new(),
             linter: Linter::new(),
-            typechecker: Typechecker::new(),
         }
     }
 
@@ -74,7 +70,6 @@ impl Workspace {
                     self.tree_sitter.remove_statement(s);
                     self.pg_query.remove_statement(s);
                     self.linter.clear_statement_violations(s);
-                    self.typechecker.clear_statement_errors(s);
 
                     self.changed_stmts.insert(s.to_owned());
                 }
@@ -82,7 +77,6 @@ impl Workspace {
                     self.tree_sitter.modify_statement(s);
                     self.pg_query.modify_statement(s);
                     self.linter.clear_statement_violations(&s.statement);
-                    self.typechecker.clear_statement_errors(&s.statement);
 
                     self.changed_stmts.remove(&s.statement);
                     self.changed_stmts.insert(s.new_statement().to_owned());
@@ -99,7 +93,6 @@ impl Workspace {
                 self.tree_sitter.remove_statement(&stmt);
                 self.pg_query.remove_statement(&stmt);
                 self.linter.clear_statement_violations(&stmt);
-                self.typechecker.clear_statement_errors(&stmt);
             }
         }
     }
@@ -119,7 +112,6 @@ impl Workspace {
         for (range, stmt) in doc.statement_refs_with_range() {
             diagnostics.extend(self.pg_query.diagnostics(&stmt, range));
             diagnostics.extend(self.linter.diagnostics(&stmt, range));
-            diagnostics.extend(self.typechecker.diagnostics(&stmt, range));
         }
 
         diagnostics
@@ -150,21 +142,6 @@ impl Workspace {
                             .map(|a| a.as_ref()),
                     },
                 );
-                if let Some(conn) = conn.as_ref() {
-                    self.typechecker.run_typecheck(
-                        stmt,
-                        ::pg_typecheck::TypecheckerParams {
-                            conn,
-                            sql: &stmt.text,
-                            ast: ast.as_ref(),
-                            enriched_ast: self
-                                .pg_query
-                                .enriched_ast(stmt)
-                                .as_ref()
-                                .map(|a| a.as_ref()),
-                        },
-                    );
-                }
             }
         });
         changed
@@ -176,7 +153,6 @@ impl Workspace {
 
         // clear all schema cache related diagnostics
         // and add all statements to the changed statements
-        self.typechecker.clear_errors();
         self.documents
             .iter()
             .flat_map(|entry| entry.value().statement_refs())
