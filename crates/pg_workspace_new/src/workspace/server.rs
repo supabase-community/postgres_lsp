@@ -14,7 +14,6 @@ use pg_schema_cache::SchemaCache;
 use pg_typecheck::TypecheckParams;
 use sqlx::PgPool;
 use std::sync::LazyLock;
-use text_size::TextRange;
 use tokio::runtime::Runtime;
 use tracing::info;
 use tree_sitter::TreeSitterStore;
