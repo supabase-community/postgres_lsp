@@ -4,6 +4,7 @@ use analyser::AnalyserVisitorBuilder;
 use change::StatementChange;
 use dashmap::{DashMap, DashSet};
 use document::{Document, Statement};
+use futures::{stream, StreamExt};
 use pg_analyse::{AnalyserOptions, AnalysisFilter};
 use pg_analyser::{Analyser, AnalyserConfig, AnalyserContext};
 use pg_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, DiagnosticExt, Severity};
@@ -13,6 +14,7 @@ use pg_schema_cache::SchemaCache;
 use pg_typecheck::TypecheckParams;
 use sqlx::PgPool;
 use std::sync::LazyLock;
+use text_size::TextRange;
 use tokio::runtime::Runtime;
 use tracing::info;
 use tree_sitter::TreeSitterStore;
@@ -338,72 +340,95 @@ impl Workspace for WorkspaceServer {
             filter,
         });
 
-        let con = self.connection.read().unwrap().get_pool();
+        let mut diagnostics: Vec<SDiagnostic> = vec![];
 
-        let diagnostics: Vec<SDiagnostic> = doc
-            .iter_statements_with_text_and_range()
-            .flat_map(|(stmt, r, text)| {
-                let mut stmt_diagnostics = self.pg_query.get_diagnostics(&stmt);
+        // run diagnostics for each statement in parallel if its mostly i/o work
+        if let Some(pool) = self.connection.read().unwrap().get_pool() {
+            let typecheck_params: Vec<_> = doc
+                .iter_statements_with_text_and_range()
+                .map(|(stmt, range, text)| {
+                    let ast = self.pg_query.get_ast(&stmt);
+                    let tree = self.tree_sitter.get_parse_tree(&stmt);
+                    (text.to_string(), ast, tree, *range)
+                })
+                .collect();
 
-                let ast = self.pg_query.get_ast(&stmt);
-                let tree = self.tree_sitter.get_parse_tree(&stmt);
+            let pool_clone = pool.clone();
+            let path_clone = params.path.clone();
+            let async_results = run_async(async move {
+                stream::iter(typecheck_params)
+                    .map(|(text, ast, tree, range)| {
+                        let pool = pool_clone.clone();
+                        let path = path_clone.clone();
+                        async move {
+                            if let Some(ast) = ast {
+                                pg_typecheck::check_sql(TypecheckParams {
+                                    conn: &pool,
+                                    sql: &text,
+                                    ast: &ast,
+                                    tree: tree.as_deref(),
+                                })
+                                .await
+                                .map(|d| {
+                                    let r = d.location().span.map(|span| span + range.start());
 
-                if let Some(ast) = ast {
-                    stmt_diagnostics.extend(
-                        analyser
-                            .run(AnalyserContext { root: &ast })
-                            .into_iter()
-                            .map(SDiagnostic::new)
-                            .collect::<Vec<_>>(),
-                    );
-
-                    if let Some(con) = con.clone() {
-                        let text = text.to_string();
-                        let ast_clone = ast.clone();
-                        let tree_clone = tree.clone();
-                        if let Ok(typecheck_result) = run_async(async move {
-                            pg_typecheck::check_sql(TypecheckParams {
-                                conn: &con,
-                                sql: &text,
-                                ast: &ast_clone,
-                                tree: tree_clone.as_deref(),
-                            })
-                            .await
-                        }) {
-                            if let Some(typecheck_result) = typecheck_result.map(SDiagnostic::new) {
-                                stmt_diagnostics.push(typecheck_result);
+                                    d.with_file_path(path.as_path().display().to_string())
+                                        .with_file_span(r.unwrap_or(range))
+                                })
+                            } else {
+                                None
                             }
                         }
-                    }
-                }
-
-                stmt_diagnostics
-                    .into_iter()
-                    .map(|d| {
-                        // We do now check if the severity of the diagnostics should be changed.
-                        // The configuration allows to change the severity of the diagnostics emitted by rules.
-                        let severity = d
-                            .category()
-                            .filter(|category| category.name().starts_with("lint/"))
-                            .map_or_else(
-                                || d.severity(),
-                                |category| {
-                                    settings
-                                        .as_ref()
-                                        .get_severity_from_rule_code(category)
-                                        .unwrap_or(Severity::Warning)
-                                },
-                            );
-
-                        SDiagnostic::new(
-                            d.with_file_path(params.path.as_path().display().to_string())
-                                .with_file_span(r)
-                                .with_severity(severity),
-                        )
                     })
+                    .buffer_unordered(10)
                     .collect::<Vec<_>>()
-            })
-            .collect();
+                    .await
+            })?;
+
+            for result in async_results.into_iter().flatten() {
+                diagnostics.push(SDiagnostic::new(result));
+            }
+        }
+
+        diagnostics.extend(doc.iter_statements_with_range().flat_map(|(stmt, r)| {
+            let mut stmt_diagnostics = self.pg_query.get_diagnostics(&stmt);
+
+            let ast = self.pg_query.get_ast(&stmt);
+
+            if let Some(ast) = ast {
+                stmt_diagnostics.extend(
+                    analyser
+                        .run(AnalyserContext { root: &ast })
+                        .into_iter()
+                        .map(SDiagnostic::new)
+                        .collect::<Vec<_>>(),
+                );
+            }
+
+            stmt_diagnostics
+                .into_iter()
+                .map(|d| {
+                    let severity = d
+                        .category()
+                        .filter(|category| category.name().starts_with("lint/"))
+                        .map_or_else(
+                            || d.severity(),
+                            |category| {
+                                settings
+                                    .as_ref()
+                                    .get_severity_from_rule_code(category)
+                                    .unwrap_or(Severity::Warning)
+                            },
+                        );
+
+                    SDiagnostic::new(
+                        d.with_file_path(params.path.as_path().display().to_string())
+                            .with_file_span(r)
+                            .with_severity(severity),
+                    )
+                })
+                .collect::<Vec<_>>()
+        }));
 
         let errors = diagnostics
             .iter()

@@ -1,15 +1,12 @@
-use std::sync::Arc;
-
 // pub conn: &'a PgPool,
 // pub sql: &'a str,
 // pub ast: &'a pg_query_ext::NodeEnum,
 // pub tree: Option<&'a tree_sitter::Tree>,
 use dashmap::DashMap;
 use pg_diagnostics::serde::Diagnostic as SDiagnostic;
-use pg_query_ext::diagnostics::*;
-use pg_typecheck::{check_sql, TypecheckDiagnostic};
+use pg_typecheck::TypecheckDiagnostic;
 
-use super::{change::ModifiedStatement, document::Statement};
+use super::document::Statement;
 
 pub struct TypecheckStore {
     diagnostics: DashMap<Statement, TypecheckDiagnostic>,

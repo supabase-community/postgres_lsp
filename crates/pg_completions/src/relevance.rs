@@ -70,7 +70,7 @@ impl CompletionRelevance<'_> {
             Some(ct) => ct,
         };
 
-        let has_mentioned_tables = ctx.mentioned_relations.len() > 0;
+        let has_mentioned_tables = !ctx.mentioned_relations.is_empty();
 
         self.score += match self.data {
             CompletionRelevanceData::Table(_) => match clause_type {

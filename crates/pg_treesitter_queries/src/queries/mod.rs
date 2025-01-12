@@ -7,7 +7,7 @@ pub enum QueryResult<'a> {
     Relation(RelationMatch<'a>),
 }
 
-impl<'a> QueryResult<'a> {
+impl QueryResult<'_> {
     pub fn within_range(&self, range: &tree_sitter::Range) -> bool {
         match self {
             Self::Relation(rm) => {
