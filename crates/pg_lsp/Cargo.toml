@@ -23,7 +23,7 @@ pg_diagnostics      = { workspace = true }
 pg_fs               = { workspace = true }
 pg_lsp_converters   = { workspace = true }
 pg_text_edit        = { workspace = true }
-pg_workspace    = { workspace = true }
+pg_workspace        = { workspace = true }
 rustc-hash          = { workspace = true }
 serde               = { workspace = true, features = ["derive"] }
 serde_json          = { workspace = true }
