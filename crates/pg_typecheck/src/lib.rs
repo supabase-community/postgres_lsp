@@ -44,7 +44,6 @@ pub async fn check_sql(params: TypecheckParams<'_>) -> Option<TypecheckDiagnosti
 
     let res = params.conn.prepare(params.sql).await;
 
-    // If there's no error, return an empty vector
     match res {
         Ok(_) => None,
         Err(sqlx::Error::Database(err)) => {

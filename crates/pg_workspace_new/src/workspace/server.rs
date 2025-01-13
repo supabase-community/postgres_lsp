@@ -35,7 +35,6 @@ mod change;
 mod document;
 mod pg_query;
 mod tree_sitter;
-mod typecheck;
 
 /// Simple helper to manage the db connection and the associated connection string
 #[derive(Default)]
@@ -342,50 +341,52 @@ impl Workspace for WorkspaceServer {
         let mut diagnostics: Vec<SDiagnostic> = vec![];
 
         // run diagnostics for each statement in parallel if its mostly i/o work
-        if let Some(pool) = self.connection.read().unwrap().get_pool() {
-            let typecheck_params: Vec<_> = doc
-                .iter_statements_with_text_and_range()
-                .map(|(stmt, range, text)| {
-                    let ast = self.pg_query.get_ast(&stmt);
-                    let tree = self.tree_sitter.get_parse_tree(&stmt);
-                    (text.to_string(), ast, tree, *range)
-                })
-                .collect();
-
-            let pool_clone = pool.clone();
-            let path_clone = params.path.clone();
-            let async_results = run_async(async move {
-                stream::iter(typecheck_params)
-                    .map(|(text, ast, tree, range)| {
-                        let pool = pool_clone.clone();
-                        let path = path_clone.clone();
-                        async move {
-                            if let Some(ast) = ast {
-                                pg_typecheck::check_sql(TypecheckParams {
-                                    conn: &pool,
-                                    sql: &text,
-                                    ast: &ast,
-                                    tree: tree.as_deref(),
-                                })
-                                .await
-                                .map(|d| {
-                                    let r = d.location().span.map(|span| span + range.start());
-
-                                    d.with_file_path(path.as_path().display().to_string())
-                                        .with_file_span(r.unwrap_or(range))
-                                })
-                            } else {
-                                None
-                            }
-                        }
+        if let Ok(connection) = self.connection.read() {
+            if let Some(pool) = connection.get_pool() {
+                let typecheck_params: Vec<_> = doc
+                    .iter_statements_with_text_and_range()
+                    .map(|(stmt, range, text)| {
+                        let ast = self.pg_query.get_ast(&stmt);
+                        let tree = self.tree_sitter.get_parse_tree(&stmt);
+                        (text.to_string(), ast, tree, *range)
                     })
-                    .buffer_unordered(10)
-                    .collect::<Vec<_>>()
-                    .await
-            })?;
+                    .collect();
 
-            for result in async_results.into_iter().flatten() {
-                diagnostics.push(SDiagnostic::new(result));
+                let pool_clone = pool.clone();
+                let path_clone = params.path.clone();
+                let async_results = run_async(async move {
+                    stream::iter(typecheck_params)
+                        .map(|(text, ast, tree, range)| {
+                            let pool = pool_clone.clone();
+                            let path = path_clone.clone();
+                            async move {
+                                if let Some(ast) = ast {
+                                    pg_typecheck::check_sql(TypecheckParams {
+                                        conn: &pool,
+                                        sql: &text,
+                                        ast: &ast,
+                                        tree: tree.as_deref(),
+                                    })
+                                    .await
+                                    .map(|d| {
+                                        let r = d.location().span.map(|span| span + range.start());
+
+                                        d.with_file_path(path.as_path().display().to_string())
+                                            .with_file_span(r.unwrap_or(range))
+                                    })
+                                } else {
+                                    None
+                                }
+                            }
+                        })
+                        .buffer_unordered(10)
+                        .collect::<Vec<_>>()
+                        .await
+                })?;
+
+                for result in async_results.into_iter().flatten() {
+                    diagnostics.push(SDiagnostic::new(result));
+                }
             }
         }
 
