@@ -26,6 +26,7 @@ define_categories! {
     "internalError/fs",
     "flags/invalid",
     "project",
+    "typecheck",
     "internalError/panic",
     "syntax",
     "dummy",

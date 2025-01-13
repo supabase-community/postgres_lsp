@@ -5,7 +5,7 @@ use crate::{Query, QueryResult};
 use super::QueryTryFrom;
 
 static TS_QUERY: LazyLock<tree_sitter::Query> = LazyLock::new(|| {
-    static QUERY_STR: &'static str = r#"
+    static QUERY_STR: &str = r#"
     (relation
         (object_reference 
             .
@@ -15,7 +15,7 @@ static TS_QUERY: LazyLock<tree_sitter::Query> = LazyLock::new(|| {
         )+
     )
 "#;
-    tree_sitter::Query::new(tree_sitter_sql::language(), &QUERY_STR).expect("Invalid TS Query")
+    tree_sitter::Query::new(tree_sitter_sql::language(), QUERY_STR).expect("Invalid TS Query")
 });
 
 #[derive(Debug)]
@@ -24,7 +24,7 @@ pub struct RelationMatch<'a> {
     pub(crate) table: tree_sitter::Node<'a>,
 }
 
-impl<'a> RelationMatch<'a> {
+impl RelationMatch<'_> {
     pub fn get_schema(&self, sql: &str) -> Option<String> {
         let str = self
             .schema
@@ -48,7 +48,7 @@ impl<'a> TryFrom<&'a QueryResult<'a>> for &'a RelationMatch<'a> {
 
     fn try_from(q: &'a QueryResult<'a>) -> Result<Self, Self::Error> {
         match q {
-            QueryResult::Relation(r) => Ok(&r),
+            QueryResult::Relation(r) => Ok(r),
 
             #[allow(unreachable_patterns)]
             _ => Err("Invalid QueryResult type".into()),

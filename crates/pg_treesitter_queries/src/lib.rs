@@ -21,7 +21,7 @@ impl<'a> TreeSitterQueriesExecutor<'a> {
 
     #[allow(private_bounds)]
     pub fn add_query_results<Q: Query<'a>>(&mut self) {
-        let mut results = Q::execute(self.root_node, &self.stmt);
+        let mut results = Q::execute(self.root_node, self.stmt);
         self.results.append(&mut results);
     }
 
@@ -104,9 +104,9 @@ where
         let mut parser = tree_sitter::Parser::new();
         parser.set_language(tree_sitter_sql::language()).unwrap();
 
-        let tree = parser.parse(&sql, None).unwrap();
+        let tree = parser.parse(sql, None).unwrap();
 
-        let mut executor = TreeSitterQueriesExecutor::new(tree.root_node(), &sql);
+        let mut executor = TreeSitterQueriesExecutor::new(tree.root_node(), sql);
 
         executor.add_query_results::<RelationMatch>();
 
@@ -152,7 +152,7 @@ on sq1.id = pt.id;
         let mut parser = tree_sitter::Parser::new();
         parser.set_language(tree_sitter_sql::language()).unwrap();
 
-        let tree = parser.parse(&sql, None).unwrap();
+        let tree = parser.parse(sql, None).unwrap();
 
         // trust me bro
         let range = {
@@ -172,7 +172,7 @@ on sq1.id = pt.id;
             cursor.node().range()
         };
 
-        let mut executor = TreeSitterQueriesExecutor::new(tree.root_node(), &sql);
+        let mut executor = TreeSitterQueriesExecutor::new(tree.root_node(), sql);
 
         executor.add_query_results::<RelationMatch>();
 

@@ -51,7 +51,7 @@ pub(crate) async fn get_test_deps(
         .set_language(tree_sitter_sql::language())
         .expect("Error loading sql language");
 
-    let tree = parser.parse(&input.to_string(), None).unwrap();
+    let tree = parser.parse(input.to_string(), None).unwrap();
 
     (tree, schema_cache)
 }
