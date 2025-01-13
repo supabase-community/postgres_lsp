@@ -11,41 +11,26 @@ repository.workspace = true
 version              = "0.0.0"
 
 
-[[bin]]
-name = "pglsp"
-path = "src/main.rs"
-test = false
-
 [dependencies]
-anyhow               = "1.0.81"
-async-channel        = "2.3.1"
-async-std            = "1.12.0"
-crossbeam-channel    = "0.5.12"
-dashmap              = "5.5.3"
-lsp-server           = "0.7.6"
-lsp-types            = "0.95.0"
-serde.workspace      = true
-serde_json.workspace = true
-text-size.workspace  = true
-threadpool           = "1.8.1"
-
-line_index.workspace = true
-sqlx.workspace       = true
-tower-lsp.workspace  = true
-
-pg_base_db.workspace      = true
-pg_commands.workspace     = true
-pg_completions.workspace  = true
-pg_diagnostics.workspace  = true
-pg_fs.workspace           = true
-pg_hover.workspace        = true
-pg_inlay_hints.workspace  = true
-pg_schema_cache.workspace = true
-pg_workspace.workspace    = true
-tokio                     = { version = "1.40.0", features = ["io-std", "macros", "rt-multi-thread", "sync", "time"] }
-tokio-util                = "0.7.12"
-tracing                   = "0.1.40"
-tracing-subscriber        = "0.3.18"
+anyhow              = { workspace = true }
+biome_deserialize   = { workspace = true }
+futures             = "0.3.31"
+pg_analyse          = { workspace = true }
+pg_completions      = { workspace = true }
+pg_configuration    = { workspace = true }
+pg_console          = { workspace = true }
+pg_diagnostics      = { workspace = true }
+pg_fs               = { workspace = true }
+pg_lsp_converters   = { workspace = true }
+pg_text_edit        = { workspace = true }
+pg_workspace    = { workspace = true }
+rustc-hash          = { workspace = true }
+serde               = { workspace = true, features = ["derive"] }
+serde_json          = { workspace = true }
+text-size.workspace = true
+tokio               = { workspace = true, features = ["rt", "io-std"] }
+tower-lsp           = { version = "0.20.0" }
+tracing             = { workspace = true, features = ["attributes"] }
 
 [dev-dependencies]
 

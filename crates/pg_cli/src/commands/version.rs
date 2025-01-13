@@ -1,6 +1,6 @@
 use pg_console::fmt::Formatter;
 use pg_console::{fmt, markup, ConsoleExt};
-use pg_workspace_new::workspace::ServerInfo;
+use pg_workspace::workspace::ServerInfo;
 
 use crate::{CliDiagnostic, CliSession, VERSION};
 

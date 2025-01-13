@@ -91,7 +91,7 @@ impl From<FileKind> for FileKinds {
 )]
 pub struct PgLspPath {
     path: PathBuf,
-    /// Determines the kind of the file inside Biome. Some files are considered as configuration files, others as manifest files, and others as files to handle
+    /// Determines the kind of the file inside PGLSP. Some files are considered as configuration files, others as manifest files, and others as files to handle
     kind: FileKinds,
     /// Whether this path (usually a file) was fixed as a result of a format/lint/check command with the `--write` filag.
     was_written: bool,
@@ -164,7 +164,7 @@ impl PgLspPath {
     /// Returns the contents of a file, if it exists
     ///
     /// ## Error
-    /// If Biome doesn't have permissions to read the file
+    /// If PGLSP doesn't have permissions to read the file
     pub fn get_buffer_from_file(&mut self) -> String {
         // we assume we have permissions
         read_to_string(&self.path).expect("cannot read the file to format")
@@ -177,7 +177,7 @@ impl PgLspPath {
     }
 
     /// The priority of the file.
-    /// - `biome.json` and `biome.jsonc` have the highest priority
+    /// - `pglsp.toml` has the highest priority
     /// - `package.json` and `tsconfig.json`/`jsconfig.json` have the second-highest priority, and they are considered as manifest files
     /// - Other files are considered as files to handle
     fn priority(file_name: &OsStr) -> FileKinds {
