@@ -22,7 +22,7 @@ pub struct CliOptions {
     #[bpaf(long("verbose"), switch, fallback(false))]
     pub verbose: bool,
 
-    /// Set the file path to the configuration file, or the directory path to find `biome.json` or `biome.jsonc`.
+    /// Set the file path to the configuration file, or the directory path to find `pglsp.toml`.
     /// If used, it disables the default configuration file resolution.
     #[bpaf(long("config-path"), argument("PATH"), optional)]
     pub config_path: Option<String>,
@@ -44,7 +44,7 @@ pub struct CliOptions {
     #[bpaf(long("no-errors-on-unmatched"), switch)]
     pub no_errors_on_unmatched: bool,
 
-    /// Tell Biome to exit with an error code if some diagnostics emit warnings.
+    /// Tell PGLSP to exit with an error code if some diagnostics emit warnings.
     #[bpaf(long("error-on-warnings"), switch)]
     pub error_on_warnings: bool,
 
@@ -82,7 +82,7 @@ pub struct CliOptions {
         fallback(Severity::default()),
         display_fallback
     )]
-    /// The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing `--diagnostic-level=error` will cause Biome to print only diagnostics that contain only errors.
+    /// The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing `--diagnostic-level=error` will cause PGLSP to print only diagnostics that contain only errors.
     pub diagnostic_level: Severity,
 }
 

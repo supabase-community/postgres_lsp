@@ -4,8 +4,8 @@ use crate::{
     CliDiagnostic, CliSession,
 };
 use pg_console::{markup, ConsoleExt};
-use pg_lsp_new::ServerFactory;
-use pg_workspace_new::{workspace::WorkspaceClient, TransportError, WorkspaceError};
+use pg_lsp::ServerFactory;
+use pg_workspace::{workspace::WorkspaceClient, TransportError, WorkspaceError};
 use std::{env, fs, path::PathBuf};
 use tokio::io;
 use tokio::runtime::Runtime;
@@ -176,9 +176,9 @@ pub(crate) fn read_most_recent_log_file(
     log_path: Option<PathBuf>,
     log_file_name_prefix: String,
 ) -> io::Result<Option<String>> {
-    let biome_log_path = log_path.unwrap_or(default_pglsp_log_path());
+    let pglsp_log_path = log_path.unwrap_or(default_pglsp_log_path());
 
-    let most_recent = fs::read_dir(biome_log_path)?
+    let most_recent = fs::read_dir(pglsp_log_path)?
         .flatten()
         .filter(|file| file.file_type().is_ok_and(|ty| ty.is_file()))
         .filter_map(|file| {
@@ -238,7 +238,7 @@ pub fn default_pglsp_log_path() -> PathBuf {
 
 /// Tracing filter enabling:
 /// - All spans and events at level info or higher
-/// - All spans and events at level debug in crates whose name starts with `biome`
+/// - All spans and events at level debug in crates whose name starts with `pglsp`
 struct LoggingFilter;
 
 /// Tracing filter used for spans emitted by `pglsp*` crates

@@ -1,6 +1,9 @@
-mod client;
-mod db_connection;
-mod debouncer;
-pub mod server;
+mod capabilities;
+mod diagnostics;
+mod documents;
+mod handlers;
+mod server;
 mod session;
 mod utils;
+
+pub use crate::server::{LSPServer, ServerConnection, ServerFactory};

@@ -1,12 +1,9 @@
-// use super::{determine_fix_file_mode, FixFileModeOptions, LoadEditorConfig};
 use crate::cli_options::CliOptions;
-// use crate::commands::{get_files_to_process_with_cli_options, CommandRunner};
 use crate::{CliDiagnostic, Execution, TraversalMode};
 use pg_configuration::PartialConfiguration;
 use pg_console::Console;
-// use biome_deserialize::Merge;
 use pg_fs::FileSystem;
-use pg_workspace_new::{configuration::LoadedConfiguration, DynRef, Workspace, WorkspaceError};
+use pg_workspace::{configuration::LoadedConfiguration, DynRef, Workspace, WorkspaceError};
 use std::ffi::OsString;
 
 use super::{get_files_to_process_with_cli_options, CommandRunner};

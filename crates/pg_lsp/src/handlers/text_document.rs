@@ -1,7 +1,7 @@
 use crate::{documents::Document, session::Session, utils::apply_document_changes};
 use anyhow::Result;
 use pg_lsp_converters::from_proto::text_range;
-use pg_workspace_new::workspace::{
+use pg_workspace::workspace::{
     ChangeFileParams, ChangeParams, CloseFileParams, GetFileContentParams, OpenFileParams,
 };
 use tower_lsp::lsp_types;
@@ -103,11 +103,11 @@ pub(crate) async fn did_close(
     params: lsp_types::DidCloseTextDocumentParams,
 ) -> Result<()> {
     let url = params.text_document.uri;
-    let biome_path = session.file_path(&url)?;
+    let pglsp_path = session.file_path(&url)?;
 
     session
         .workspace
-        .close_file(CloseFileParams { path: biome_path })?;
+        .close_file(CloseFileParams { path: pglsp_path })?;
 
     session.remove_document(&url);
 

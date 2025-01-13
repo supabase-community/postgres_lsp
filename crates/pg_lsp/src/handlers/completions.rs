@@ -1,6 +1,6 @@
 use crate::session::Session;
 use anyhow::Result;
-use pg_workspace_new::workspace;
+use pg_workspace::workspace;
 use tower_lsp::lsp_types::{self, CompletionItem, CompletionItemLabelDetails};
 
 #[tracing::instrument(level = "trace", skip_all)]

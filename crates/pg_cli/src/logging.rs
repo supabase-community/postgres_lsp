@@ -91,12 +91,12 @@ impl Display for LoggingLevel {
 
 /// Tracing filter enabling:
 /// - All spans and events at level info or higher
-/// - All spans and events at level debug in crates whose name starts with `biome`
+/// - All spans and events at level debug in crates whose name starts with `pglsp`
 struct LoggingFilter {
     level: LoggingLevel,
 }
 
-/// Tracing filter used for spans emitted by `biome*` crates
+/// Tracing filter used for spans emitted by `pglsp*` crates
 const SELF_FILTER: LevelFilter = if cfg!(debug_assertions) {
     LevelFilter::TRACE
 } else {

@@ -1,315 +1,528 @@
-use std::{collections::HashSet, sync::Arc};
-
-use pg_base_db::{Change, DocumentChange};
-use pg_commands::{Command, ExecuteStatementCommand};
-use pg_completions::CompletionParams;
-use pg_fs::PgLspPath;
-use pg_hover::HoverParams;
-use pg_workspace::diagnostics::Diagnostic;
+use crate::diagnostics::LspError;
+use crate::documents::Document;
+use crate::utils;
+use anyhow::Result;
+use futures::stream::FuturesUnordered;
+use futures::StreamExt;
+use pg_analyse::RuleCategoriesBuilder;
+use pg_configuration::ConfigurationPathHint;
+use pg_diagnostics::{DiagnosticExt, Error};
+use pg_fs::{FileSystem, PgLspPath};
+use pg_lsp_converters::{negotiated_encoding, PositionEncoding, WideEncoding};
+use pg_workspace::configuration::{load_configuration, LoadedConfiguration};
+use pg_workspace::settings::PartialConfigurationExt;
+use pg_workspace::workspace::{PullDiagnosticsParams, UpdateSettingsParams};
 use pg_workspace::Workspace;
-use text_size::TextSize;
-use tokio::sync::RwLock;
-use tower_lsp::lsp_types::{
-    CodeActionOrCommand, CompletionItem, CompletionList, Hover, HoverContents, InlayHint,
-    InlayHintKind, InlayHintLabel, MarkedString, Position, Range,
-};
+use pg_workspace::{DynRef, WorkspaceError};
+use rustc_hash::FxHashMap;
+use serde_json::Value;
+use std::path::PathBuf;
+use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicBool, AtomicU8};
+use std::sync::Arc;
+use std::sync::RwLock;
+use tokio::sync::Notify;
+use tokio::sync::OnceCell;
+use tower_lsp::lsp_types::Url;
+use tower_lsp::lsp_types::{self, ClientCapabilities};
+use tower_lsp::lsp_types::{MessageType, Registration};
+use tower_lsp::lsp_types::{Unregistration, WorkspaceFolder};
+use tracing::{error, info};
 
-use crate::{
-    db_connection::DbConnection,
-    utils::{line_index_ext::LineIndexExt, to_lsp_types::to_completion_kind},
-};
+pub(crate) struct ClientInformation {
+    /// The name of the client
+    pub(crate) name: String,
 
-pub struct Session {
-    db: RwLock<Option<DbConnection>>,
-    ide: Arc<RwLock<Workspace>>,
+    /// The version of the client
+    pub(crate) version: Option<String>,
+}
+
+/// Key, uniquely identifying a LSP session.
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
+pub(crate) struct SessionKey(pub u64);
+
+/// Represents the state of an LSP server session.
+pub(crate) struct Session {
+    /// The unique key identifying this session.
+    pub(crate) key: SessionKey,
+
+    /// The LSP client for this session.
+    pub(crate) client: tower_lsp::Client,
+
+    /// The parameters provided by the client in the "initialize" request
+    initialize_params: OnceCell<InitializeParams>,
+
+    pub(crate) workspace: Arc<dyn Workspace>,
+
+    configuration_status: AtomicU8,
+
+    /// A flag to notify a message to the user when the configuration is broken, and the LSP attempts
+    /// to update the diagnostics
+    notified_broken_configuration: AtomicBool,
+
+    /// File system to read files inside the workspace
+    pub(crate) fs: DynRef<'static, dyn FileSystem>,
+
+    documents: RwLock<FxHashMap<lsp_types::Url, Document>>,
+
+    pub(crate) cancellation: Arc<Notify>,
+
+    pub(crate) config_path: Option<PathBuf>,
+}
+
+/// The parameters provided by the client in the "initialize" request
+struct InitializeParams {
+    /// The capabilities provided by the client as part of [`lsp_types::InitializeParams`]
+    client_capabilities: lsp_types::ClientCapabilities,
+    client_information: Option<ClientInformation>,
+    root_uri: Option<Url>,
+    #[allow(unused)]
+    workspace_folders: Option<Vec<WorkspaceFolder>>,
+}
+
+#[repr(u8)]
+pub(crate) enum ConfigurationStatus {
+    /// The configuration file was properly loaded
+    Loaded = 0,
+    /// The configuration file does not exist
+    Missing = 1,
+    /// The configuration file exists but could not be loaded
+    Error = 2,
+    /// Currently loading the configuration
+    Loading = 3,
+}
+
+impl ConfigurationStatus {
+    pub(crate) const fn is_error(&self) -> bool {
+        matches!(self, ConfigurationStatus::Error)
+    }
+
+    pub(crate) const fn is_loaded(&self) -> bool {
+        matches!(self, ConfigurationStatus::Loaded)
+    }
+}
+
+impl TryFrom<u8> for ConfigurationStatus {
+    type Error = ();
+
+    fn try_from(value: u8) -> Result<Self, ()> {
+        match value {
+            0 => Ok(Self::Loaded),
+            1 => Ok(Self::Missing),
+            2 => Ok(Self::Error),
+            3 => Ok(Self::Loading),
+            _ => Err(()),
+        }
+    }
+}
+
+pub(crate) type SessionHandle = Arc<Session>;
+
+/// Holds the set of capabilities supported by the Language Server
+/// instance and whether they are enabled or not
+#[derive(Default)]
+pub(crate) struct CapabilitySet {
+    registry: FxHashMap<&'static str, (&'static str, CapabilityStatus)>,
+}
+
+/// Represents whether a capability is enabled or not, optionally holding the
+/// configuration associated with the capability
+pub(crate) enum CapabilityStatus {
+    Enable(Option<Value>),
+    Disable,
+}
+
+impl CapabilitySet {
+    /// Insert a capability in the set
+    pub(crate) fn add_capability(
+        &mut self,
+        id: &'static str,
+        method: &'static str,
+        status: CapabilityStatus,
+    ) {
+        self.registry.insert(id, (method, status));
+    }
 }
 
 impl Session {
-    pub fn new() -> Self {
+    pub(crate) fn new(
+        key: SessionKey,
+        client: tower_lsp::Client,
+        workspace: Arc<dyn Workspace>,
+        cancellation: Arc<Notify>,
+        fs: DynRef<'static, dyn FileSystem>,
+    ) -> Self {
+        let documents = Default::default();
         Self {
-            db: RwLock::new(None),
-            ide: Arc::new(RwLock::new(Workspace::new())),
+            key,
+            client,
+            initialize_params: OnceCell::default(),
+            workspace,
+            configuration_status: AtomicU8::new(ConfigurationStatus::Missing as u8),
+            documents,
+            fs,
+            cancellation,
+            config_path: None,
+            notified_broken_configuration: AtomicBool::new(false),
         }
     }
 
-    #[tracing::instrument(name = "Shutting down Session", skip(self))]
-    pub async fn shutdown(&self) {
-        let mut db = self.db.write().await;
-        let db = db.take();
+    pub(crate) fn set_config_path(&mut self, path: PathBuf) {
+        self.config_path = Some(path);
+    }
 
-        if db.is_some() {
-            db.unwrap().close().await;
+    /// Initialize this session instance with the incoming initialization parameters from the client
+    pub(crate) fn initialize(
+        &self,
+        client_capabilities: lsp_types::ClientCapabilities,
+        client_information: Option<ClientInformation>,
+        root_uri: Option<Url>,
+        workspace_folders: Option<Vec<WorkspaceFolder>>,
+    ) {
+        let result = self.initialize_params.set(InitializeParams {
+            client_capabilities,
+            client_information,
+            root_uri,
+            workspace_folders,
+        });
+
+        if let Err(err) = result {
+            error!("Failed to initialize session: {err}");
         }
     }
 
-    /// `update_db_connection` will update `Self`'s database connection.
-    /// If the passed-in connection string is the same that we're already connected to, it's a noop.
-    /// Otherwise, it'll first open a new connection, replace `Self`'s connection, and then close
-    /// the old one.
-    #[tracing::instrument(name = "Updating DB Connection", skip(self))]
-    pub async fn change_db(&self, connection_string: String) -> anyhow::Result<()> {
-        if self
-            .db
-            .read()
-            .await
-            .as_ref()
-            // if the connection is already connected to the same database, do nothing
-            .is_some_and(|c| c.connected_to(&connection_string))
-        {
-            return Ok(());
+    /// Register a set of capabilities with the client
+    pub(crate) async fn register_capabilities(&self, capabilities: CapabilitySet) {
+        let mut registrations = Vec::new();
+        let mut unregistrations = Vec::new();
+
+        let mut register_methods = String::new();
+        let mut unregister_methods = String::new();
+
+        for (id, (method, status)) in capabilities.registry {
+            unregistrations.push(Unregistration {
+                id: id.to_string(),
+                method: method.to_string(),
+            });
+
+            if !unregister_methods.is_empty() {
+                unregister_methods.push_str(", ");
+            }
+
+            unregister_methods.push_str(method);
+
+            if let CapabilityStatus::Enable(register_options) = status {
+                registrations.push(Registration {
+                    id: id.to_string(),
+                    method: method.to_string(),
+                    register_options,
+                });
+
+                if !register_methods.is_empty() {
+                    register_methods.push_str(", ");
+                }
+
+                register_methods.push_str(method);
+            }
         }
 
-        tracing::info!("Setting up new Database connection");
-        let new_db = DbConnection::new(connection_string, Arc::clone(&self.ide)).await?;
-        tracing::info!("Set up new connection, trying to acquire write lock…");
-
-        let mut current_db = self.db.write().await;
-        let old_db = current_db.replace(new_db);
-
-        if old_db.is_some() {
-            tracing::info!("Dropping previous Database Connection.");
-            let old_db = old_db.unwrap();
-            old_db.close().await;
+        if let Err(e) = self.client.unregister_capability(unregistrations).await {
+            error!(
+                "Error unregistering {unregister_methods:?} capabilities: {}",
+                e
+            );
+        } else {
+            info!("Unregister capabilities {unregister_methods:?}");
         }
 
-        tracing::info!("Successfully set up new connection.");
+        if let Err(e) = self.client.register_capability(registrations).await {
+            error!("Error registering {register_methods:?} capabilities: {}", e);
+        } else {
+            info!("Register capabilities {register_methods:?}");
+        }
+    }
+
+    /// Computes diagnostics for the file matching the provided url and publishes
+    /// them to the client. Called from [`handlers::text_document`] when a file's
+    /// contents changes.
+    #[tracing::instrument(level = "trace", skip_all, fields(url = display(&url), diagnostic_count), err)]
+    pub(crate) async fn update_diagnostics(&self, url: lsp_types::Url) -> Result<(), LspError> {
+        let pglsp_path = self.file_path(&url)?;
+        let doc = self.document(&url)?;
+        if self.configuration_status().is_error() && !self.notified_broken_configuration() {
+            self.set_notified_broken_configuration();
+            self.client
+                    .show_message(MessageType::WARNING, "The configuration file has errors. PgLSP will report only parsing errors until the configuration is fixed.")
+                    .await;
+        }
+
+        let categories = RuleCategoriesBuilder::default().all();
+
+        let diagnostics: Vec<lsp_types::Diagnostic> = {
+            let result = self.workspace.pull_diagnostics(PullDiagnosticsParams {
+                path: pglsp_path.clone(),
+                max_diagnostics: u64::MAX,
+                categories: categories.build(),
+                only: Vec::new(),
+                skip: Vec::new(),
+            })?;
+
+            tracing::trace!("pglsp diagnostics: {:#?}", result.diagnostics);
+
+            result
+                .diagnostics
+                .into_iter()
+                .filter_map(|d| {
+                    match utils::diagnostic_to_lsp(
+                        d,
+                        &url,
+                        &doc.line_index,
+                        self.position_encoding(),
+                        None,
+                    ) {
+                        Ok(diag) => Some(diag),
+                        Err(err) => {
+                            error!("failed to convert diagnostic to LSP: {err:?}");
+                            None
+                        }
+                    }
+                })
+                .collect()
+        };
+
+        tracing::Span::current().record("diagnostic_count", diagnostics.len());
+
+        self.client
+            .publish_diagnostics(url, diagnostics, Some(doc.version))
+            .await;
+
         Ok(())
     }
 
-    /// Runs the passed-in statement against the underlying database.
-    pub async fn run_stmt(&self, stmt: String) -> anyhow::Result<u64> {
-        let db = self.db.read().await;
-        let pool = db.as_ref().map(|d| d.get_pool());
+    /// Updates diagnostics for every [`Document`] in this [`Session`]
+    pub(crate) async fn update_all_diagnostics(&self) {
+        let mut futures: FuturesUnordered<_> = self
+            .documents
+            .read()
+            .unwrap()
+            .keys()
+            .map(|url| self.update_diagnostics(url.clone()))
+            .collect();
 
-        let cmd = ExecuteStatementCommand::new(stmt);
-
-        match cmd.run(pool).await {
-            Err(e) => Err(e),
-            Ok(res) => Ok(res.rows_affected()),
+        while let Some(result) = futures.next().await {
+            if let Err(e) = result {
+                error!("Error while updating diagnostics: {}", e);
+            }
         }
     }
 
-    pub async fn on_file_closed(&self, path: PgLspPath) {
-        let ide = self.ide.read().await;
-        ide.remove_document(path);
+    /// Get a [`Document`] matching the provided [`lsp_types::Url`]
+    ///
+    /// If document does not exist, result is [WorkspaceError::NotFound]
+    pub(crate) fn document(&self, url: &lsp_types::Url) -> Result<Document, Error> {
+        self.documents
+            .read()
+            .unwrap()
+            .get(url)
+            .cloned()
+            .ok_or_else(|| WorkspaceError::not_found().with_file_path(url.to_string()))
     }
 
-    pub async fn get_diagnostics(&self, path: PgLspPath) -> Vec<(Diagnostic, Range)> {
-        let ide = self.ide.read().await;
-
-        // make sure there are documents at the provided path before
-        // trying to collect diagnostics.
-        let doc = ide.documents.get(&path);
-        if doc.is_none() {
-            tracing::info!("Doc not found, path: {:?}", &path);
-            return vec![];
-        }
-
-        ide.diagnostics(&path)
-            .into_iter()
-            .map(|d| {
-                let range = doc
-                    .as_ref()
-                    .unwrap()
-                    .line_index
-                    .line_col_lsp_range(d.range)
-                    .unwrap();
-                (d, range)
-            })
-            .collect()
+    /// Set the [`Document`] for the provided [`lsp_types::Url`]
+    ///
+    /// Used by [`handlers::text_document] to synchronize documents with the client.
+    pub(crate) fn insert_document(&self, url: lsp_types::Url, document: Document) {
+        self.documents.write().unwrap().insert(url, document);
     }
 
-    pub async fn apply_doc_changes(
-        &self,
-        path: PgLspPath,
-        version: i32,
-        text: String,
-    ) -> HashSet<PgLspPath> {
-        {
-            let ide = self.ide.read().await;
-
-            ide.apply_change(
-                path,
-                DocumentChange::new(version, vec![Change { range: None, text }]),
-            );
-        }
-
-        self.recompute_and_get_changed_files().await
+    /// Remove the [`Document`] matching the provided [`lsp_types::Url`]
+    pub(crate) fn remove_document(&self, url: &lsp_types::Url) {
+        self.documents.write().unwrap().remove(url);
     }
 
-    pub async fn recompute_and_get_changed_files(&self) -> HashSet<PgLspPath> {
-        let ide = self.ide.read().await;
+    pub(crate) fn file_path(&self, url: &lsp_types::Url) -> Result<PgLspPath> {
+        let path_to_file = match url.to_file_path() {
+            Err(_) => {
+                // If we can't create a path, it's probably because the file doesn't exist.
+                // It can be a newly created file that it's not on disk
+                PathBuf::from(url.path())
+            }
+            Ok(path) => path,
+        };
 
-        let db = self.db.read().await;
-        let pool = db.as_ref().map(|d| d.get_pool());
-
-        let changed_files = ide.compute(pool);
-
-        changed_files.into_iter().map(|p| p.document_url).collect()
+        Ok(PgLspPath::new(path_to_file))
     }
 
-    pub async fn get_available_code_actions_or_commands(
-        &self,
-        path: PgLspPath,
-        range: Range,
-    ) -> Option<Vec<CodeActionOrCommand>> {
-        let ide = self.ide.read().await;
-        let doc = ide.documents.get(&path)?;
+    /// True if the client supports dynamic registration of "workspace/didChangeConfiguration" requests
+    pub(crate) fn can_register_did_change_configuration(&self) -> bool {
+        self.initialize_params
+            .get()
+            .and_then(|c| c.client_capabilities.workspace.as_ref())
+            .and_then(|c| c.did_change_configuration)
+            .and_then(|c| c.dynamic_registration)
+            == Some(true)
+    }
 
-        let range = doc.line_index.offset_lsp_range(range).unwrap();
+    /// Get the current workspace folders
+    pub(crate) fn get_workspace_folders(&self) -> Option<&Vec<WorkspaceFolder>> {
+        self.initialize_params
+            .get()
+            .and_then(|c| c.workspace_folders.as_ref())
+    }
 
-        // for now, we only provide `ExcecuteStatementCommand`s.
-        let actions = doc
-            .statements_at_range(&range)
-            .into_iter()
-            .map(|stmt| {
-                let cmd = ExecuteStatementCommand::command_type();
-                let title = format!(
-                    "Execute '{}'",
-                    ExecuteStatementCommand::trim_statement(stmt.text.clone(), 50)
+    /// Returns the base path of the workspace on the filesystem if it has one
+    pub(crate) fn base_path(&self) -> Option<PathBuf> {
+        let initialize_params = self.initialize_params.get()?;
+
+        let root_uri = initialize_params.root_uri.as_ref()?;
+        match root_uri.to_file_path() {
+            Ok(base_path) => Some(base_path),
+            Err(()) => {
+                error!(
+                    "The Workspace root URI {root_uri:?} could not be parsed as a filesystem path"
                 );
-                CodeActionOrCommand::Command(tower_lsp::lsp_types::Command {
-                    title,
-                    command: format!("pglsp.{}", cmd.id()),
-                    arguments: Some(vec![serde_json::to_value(stmt.text.clone()).unwrap()]),
-                })
-            })
-            .collect();
-
-        Some(actions)
+                None
+            }
+        }
     }
 
-    pub async fn get_inlay_hints(&self, path: PgLspPath, range: Range) -> Option<Vec<InlayHint>> {
-        let ide = self.ide.read().await;
-        let doc = ide.documents.get(&path)?;
+    /// Returns a reference to the client information for this session
+    pub(crate) fn client_information(&self) -> Option<&ClientInformation> {
+        self.initialize_params.get()?.client_information.as_ref()
+    }
 
-        let range = doc.line_index.offset_lsp_range(range)?;
+    /// Returns a reference to the client capabilities for this session
+    pub(crate) fn client_capabilities(&self) -> Option<&ClientCapabilities> {
+        self.initialize_params
+            .get()
+            .map(|params| &params.client_capabilities)
+    }
 
-        let schema_cache = ide.schema_cache.read().expect("Unable to get Schema Cache");
-
-        let hints = doc
-            .statements_at_range(&range)
-            .into_iter()
-            .flat_map(|stmt| {
-                ::pg_inlay_hints::inlay_hints(::pg_inlay_hints::InlayHintsParams {
-                    ast: ide.pg_query.ast(&stmt).as_ref().map(|x| x.as_ref()),
-                    enriched_ast: ide
-                        .pg_query
-                        .enriched_ast(&stmt)
-                        .as_ref()
-                        .map(|x| x.as_ref()),
-                    tree: ide.tree_sitter.tree(&stmt).as_ref().map(|x| x.as_ref()),
-                    cst: ide.pg_query.cst(&stmt).as_ref().map(|x| x.as_ref()),
-                    schema_cache: &schema_cache,
-                })
-            })
-            .map(|hint| InlayHint {
-                position: doc.line_index.line_col_lsp(hint.offset).unwrap(),
-                label: match hint.content {
-                    pg_inlay_hints::InlayHintContent::FunctionArg(arg) => {
-                        InlayHintLabel::String(match arg.name {
-                            Some(name) => format!("{} ({})", name, arg.type_name),
-                            None => arg.type_name.clone(),
-                        })
+    /// This function attempts to read the `pglsp.toml` configuration file from
+    /// the root URI and update the workspace settings accordingly
+    #[tracing::instrument(level = "trace", skip(self))]
+    pub(crate) async fn load_workspace_settings(&self) {
+        // Providing a custom configuration path will not allow to support workspaces
+        if let Some(config_path) = &self.config_path {
+            let base_path = ConfigurationPathHint::FromUser(config_path.clone());
+            let status = self.load_pglsp_configuration_file(base_path).await;
+            self.set_configuration_status(status);
+        } else if let Some(folders) = self.get_workspace_folders() {
+            info!("Detected workspace folder.");
+            self.set_configuration_status(ConfigurationStatus::Loading);
+            for folder in folders {
+                info!("Attempt to load the configuration file in {:?}", folder.uri);
+                let base_path = folder.uri.to_file_path();
+                match base_path {
+                    Ok(base_path) => {
+                        let status = self
+                            .load_pglsp_configuration_file(ConfigurationPathHint::FromWorkspace(
+                                base_path,
+                            ))
+                            .await;
+                        self.set_configuration_status(status);
                     }
-                },
-                kind: match hint.content {
-                    pg_inlay_hints::InlayHintContent::FunctionArg(_) => {
-                        Some(InlayHintKind::PARAMETER)
+                    Err(_) => {
+                        error!(
+                            "The Workspace root URI {:?} could not be parsed as a filesystem path",
+                            folder.uri
+                        );
                     }
-                },
-                text_edits: None,
-                tooltip: None,
-                padding_left: None,
-                padding_right: None,
-                data: None,
+                }
+            }
+        } else {
+            let base_path = match self.base_path() {
+                None => ConfigurationPathHint::default(),
+                Some(path) => ConfigurationPathHint::FromLsp(path),
+            };
+            let status = self.load_pglsp_configuration_file(base_path).await;
+            self.set_configuration_status(status);
+        }
+    }
+
+    async fn load_pglsp_configuration_file(
+        &self,
+        base_path: ConfigurationPathHint,
+    ) -> ConfigurationStatus {
+        match load_configuration(&self.fs, base_path.clone()) {
+            Ok(loaded_configuration) => {
+                let LoadedConfiguration {
+                    configuration: fs_configuration,
+                    directory_path: configuration_path,
+                    ..
+                } = loaded_configuration;
+                info!("Configuration loaded successfully from disk.");
+                info!("Update workspace settings.");
+
+                let result = fs_configuration
+                    .retrieve_gitignore_matches(&self.fs, configuration_path.as_deref());
+
+                match result {
+                    Ok((vcs_base_path, gitignore_matches)) => {
+                        let result = self.workspace.update_settings(UpdateSettingsParams {
+                            workspace_directory: self.fs.working_directory(),
+                            configuration: fs_configuration,
+                            vcs_base_path,
+                            gitignore_matches,
+                        });
+
+                        if let Err(error) = result {
+                            error!("Failed to set workspace settings: {}", error);
+                            self.client.log_message(MessageType::ERROR, &error).await;
+                            ConfigurationStatus::Error
+                        } else {
+                            ConfigurationStatus::Loaded
+                        }
+                    }
+                    Err(err) => {
+                        error!("Couldn't load the configuration file, reason:\n {}", err);
+                        self.client.log_message(MessageType::ERROR, &err).await;
+                        ConfigurationStatus::Error
+                    }
+                }
+            }
+            Err(err) => {
+                error!("Couldn't load the configuration file, reason:\n {}", err);
+                self.client.log_message(MessageType::ERROR, &err).await;
+                ConfigurationStatus::Error
+            }
+        }
+    }
+
+    /// Broadcast a shutdown signal to all active connections
+    pub(crate) fn broadcast_shutdown(&self) {
+        self.cancellation.notify_one();
+    }
+
+    /// Retrieves information regarding the configuration status
+    pub(crate) fn configuration_status(&self) -> ConfigurationStatus {
+        self.configuration_status
+            .load(Ordering::Relaxed)
+            .try_into()
+            .unwrap()
+    }
+
+    /// Updates the status of the configuration
+    fn set_configuration_status(&self, status: ConfigurationStatus) {
+        self.notified_broken_configuration
+            .store(false, Ordering::Relaxed);
+        self.configuration_status
+            .store(status as u8, Ordering::Relaxed);
+    }
+
+    fn notified_broken_configuration(&self) -> bool {
+        self.notified_broken_configuration.load(Ordering::Relaxed)
+    }
+    fn set_notified_broken_configuration(&self) {
+        self.notified_broken_configuration
+            .store(true, Ordering::Relaxed);
+    }
+
+    pub fn position_encoding(&self) -> PositionEncoding {
+        self.initialize_params
+            .get()
+            .map_or(PositionEncoding::Wide(WideEncoding::Utf16), |params| {
+                negotiated_encoding(&params.client_capabilities)
             })
-            .collect();
-
-        Some(hints)
-    }
-
-    pub async fn get_available_completions(
-        &self,
-        path: PgLspPath,
-        position: Position,
-    ) -> Option<CompletionList> {
-        let ide = self.ide.read().await;
-
-        let doc = ide.documents.get(&path)?;
-        let offset = doc.line_index.offset_lsp(position)?;
-        let (range, stmt) = doc.statement_at_offset_with_range(&offset)?;
-
-        let schema_cache = ide.schema_cache.read().expect("No Schema Cache");
-
-        let completion_items: Vec<CompletionItem> = pg_completions::complete(CompletionParams {
-            position: offset - range.start() - TextSize::from(1),
-            text: stmt.text.clone(),
-            tree: ide.tree_sitter.tree(&stmt).as_ref().map(|t| t.as_ref()),
-            schema: &schema_cache,
-        })
-        .into_iter()
-        .map(|item| CompletionItem {
-            label: item.label,
-            label_details: Some(tower_lsp::lsp_types::CompletionItemLabelDetails {
-                description: Some(item.description),
-                detail: None,
-            }),
-            kind: Some(to_completion_kind(item.kind)),
-            detail: None,
-            documentation: None,
-            deprecated: None,
-            preselect: None,
-            sort_text: None,
-            filter_text: None,
-            insert_text: None,
-            insert_text_format: None,
-            insert_text_mode: None,
-            text_edit: None,
-            additional_text_edits: None,
-            commit_characters: None,
-            data: None,
-            tags: None,
-            command: None,
-        })
-        .collect();
-
-        Some(CompletionList {
-            is_incomplete: false,
-            items: completion_items,
-        })
-    }
-
-    pub async fn get_available_hover_diagnostics(
-        &self,
-        path: PgLspPath,
-        position: Position,
-    ) -> Option<Hover> {
-        let ide = self.ide.read().await;
-        let doc = ide.documents.get(&path)?;
-
-        let offset = doc.line_index.offset_lsp(position)?;
-
-        let (range, stmt) = doc.statement_at_offset_with_range(&offset)?;
-        let range_start = range.start();
-        let hover_range = doc.line_index.line_col_lsp_range(range);
-
-        let schema_cache = ide.schema_cache.read().expect("No Schema Cache");
-
-        ::pg_hover::hover(HoverParams {
-            position: offset - range_start,
-            source: stmt.text.as_str(),
-            enriched_ast: ide
-                .pg_query
-                .enriched_ast(&stmt)
-                .as_ref()
-                .map(|x| x.as_ref()),
-            tree: ide.tree_sitter.tree(&stmt).as_ref().map(|x| x.as_ref()),
-            schema_cache: schema_cache.clone(),
-        })
-        .map(|hover| Hover {
-            contents: HoverContents::Scalar(MarkedString::String(hover.content)),
-            range: hover_range,
-        })
     }
 }

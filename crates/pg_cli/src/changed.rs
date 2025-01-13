@@ -1,7 +1,7 @@
 use crate::CliDiagnostic;
 use pg_configuration::PartialConfiguration;
 use pg_fs::FileSystem;
-use pg_workspace_new::DynRef;
+use pg_workspace::DynRef;
 use std::ffi::OsString;
 
 pub(crate) fn get_changed_files(

@@ -24,9 +24,9 @@ pg_console         = { workspace = true }
 pg_diagnostics     = { workspace = true }
 pg_flags           = { workspace = true }
 pg_fs              = { workspace = true }
-pg_lsp_new         = { workspace = true }
+pg_lsp             = { workspace = true }
 pg_text_edit       = { workspace = true }
-pg_workspace_new   = { workspace = true }
+pg_workspace       = { workspace = true }
 quick-junit        = "0.5.0"
 rayon              = { workspace = true }
 rustc-hash         = { workspace = true }

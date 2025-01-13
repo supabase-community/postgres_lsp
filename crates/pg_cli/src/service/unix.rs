@@ -6,7 +6,7 @@ use std::{
     time::Duration,
 };
 
-use pg_lsp_new::{ServerConnection, ServerFactory};
+use pg_lsp::{ServerConnection, ServerFactory};
 use tokio::{
     io::Interest,
     net::{

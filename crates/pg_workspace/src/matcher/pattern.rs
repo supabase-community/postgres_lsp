@@ -1043,7 +1043,7 @@ mod test {
 
     #[test]
     fn test_pattern_glob_brackets_not_available_by_default() {
-        // RODO: Remove this test when we make brackets available by default in Biome 2.0
+        // RODO: Remove this test when we make brackets available by default
         let pattern = Pattern::parse("{foo.js,bar.js}", false).unwrap();
         assert!(!pattern.matches_path(Path::new("foo.js")));
         assert!(!pattern.matches_path(Path::new("bar.js")));

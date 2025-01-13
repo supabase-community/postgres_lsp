@@ -13,5 +13,5 @@ pg_console            = { workspace = true }
 pg_diagnostics        = { workspace = true }
 pg_query_ext          = { workspace = true }
 pg_statement_splitter = { workspace = true }
-pg_workspace_new      = { workspace = true }
+pg_workspace          = { workspace = true }
 pulldown-cmark        = "0.12.2"

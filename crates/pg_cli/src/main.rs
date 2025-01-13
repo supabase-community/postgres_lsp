@@ -6,7 +6,7 @@ use pg_cli::{
 };
 use pg_console::{markup, ConsoleExt, EnvConsole};
 use pg_diagnostics::{set_bottom_frame, Diagnostic, PrintDiagnostic};
-use pg_workspace_new::workspace;
+use pg_workspace::workspace;
 use std::process::{ExitCode, Termination};
 use tokio::runtime::Runtime;
 

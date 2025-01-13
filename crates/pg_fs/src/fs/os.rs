@@ -195,7 +195,7 @@ impl<'scope> TraversalScope<'scope> for OsTraversalScope<'scope> {
     }
 }
 
-// TODO: remove in Biome 2.0, and directly use `.gitignore`
+// TODO: remove in 2.0, and directly use `.gitignore`
 /// Default list of ignored directories, in the future will be supplanted by
 /// detecting and parsing .ignore files
 const DEFAULT_IGNORE: &[&[u8]] = &[b".git", b".svn", b".hg", b".yarn", b"node_modules"];
@@ -295,7 +295,7 @@ fn handle_any_file<'scope>(
     // In case the file is inside a directory that is behind a symbolic link,
     // the unresolved origin path is used to construct a new path.
     // This is required to support ignore patterns to symbolic links.
-    let biome_path = if let Some(old_origin_path) = &origin_path {
+    let pglsp_path = if let Some(old_origin_path) = &origin_path {
         if let Some(file_name) = path.file_name() {
             let new_origin_path = old_origin_path.join(file_name);
             origin_path = Some(new_origin_path.clone());
@@ -317,7 +317,7 @@ fn handle_any_file<'scope>(
     // doing a directory traversal, but printing an error message if the
     // user explicitly requests an unsupported file to be handled.
     // This check also works for symbolic links.
-    if !ctx.can_handle(&biome_path) {
+    if !ctx.can_handle(&pglsp_path) {
         return;
     }
 

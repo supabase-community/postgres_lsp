@@ -65,8 +65,8 @@ pg_inlay_hints            = { path = "./crates/pg_inlay_hints", version = "0.0.0
 pg_lexer                  = { path = "./crates/pg_lexer", version = "0.0.0" }
 pg_lexer_codegen          = { path = "./crates/pg_lexer_codegen", version = "0.0.0" }
 pg_lint                   = { path = "./crates/pg_lint", version = "0.0.0" }
+pg_lsp                    = { path = "./crates/pg_lsp", version = "0.0.0" }
 pg_lsp_converters         = { path = "./crates/pg_lsp_converters", version = "0.0.0" }
-pg_lsp_new                = { path = "./crates/pg_lsp_new", version = "0.0.0" }
 pg_markup                 = { path = "./crates/pg_markup", version = "0.0.0" }
 pg_query_ext              = { path = "./crates/pg_query_ext", version = "0.0.0" }
 pg_query_ext_codegen      = { path = "./crates/pg_query_ext_codegen", version = "0.0.0" }
@@ -79,7 +79,6 @@ pg_treesitter_queries     = { path = "./crates/pg_treesitter_queries", version =
 pg_type_resolver          = { path = "./crates/pg_type_resolver", version = "0.0.0" }
 pg_typecheck              = { path = "./crates/pg_typecheck", version = "0.0.0" }
 pg_workspace              = { path = "./crates/pg_workspace", version = "0.0.0" }
-pg_workspace_new          = { path = "./crates/pg_workspace_new", version = "0.0.0" }
 
 pg_test_utils = { path = "./crates/pg_test_utils" }
 # parser = { path = "./crates/parser", version = "0.0.0" }
