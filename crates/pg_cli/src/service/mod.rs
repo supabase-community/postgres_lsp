@@ -17,7 +17,7 @@ use std::{
 
 use anyhow::{bail, ensure, Context, Error};
 use dashmap::DashMap;
-use pg_workspace_new::{
+use pg_workspace::{
     workspace::{TransportRequest, WorkspaceTransport},
     TransportError,
 };

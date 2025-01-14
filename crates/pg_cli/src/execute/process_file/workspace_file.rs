@@ -2,8 +2,8 @@ use crate::execute::diagnostics::{ResultExt, ResultIoExt};
 use crate::execute::process_file::SharedTraversalOptions;
 use pg_diagnostics::{category, Error};
 use pg_fs::{File, OpenOptions, PgLspPath};
-use pg_workspace_new::workspace::{ChangeParams, FileGuard, OpenFileParams};
-use pg_workspace_new::{Workspace, WorkspaceError};
+use pg_workspace::workspace::{ChangeParams, FileGuard, OpenFileParams};
+use pg_workspace::{Workspace, WorkspaceError};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 

@@ -9,7 +9,7 @@ use commands::check::CheckCommandPayload;
 use commands::CommandRunner;
 use pg_console::{ColorMode, Console};
 use pg_fs::OsFileSystem;
-use pg_workspace_new::{App, DynRef, Workspace, WorkspaceRef};
+use pg_workspace::{App, DynRef, Workspace, WorkspaceRef};
 use std::env;
 
 mod changed;

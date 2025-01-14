@@ -1842,35 +1842,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "lsp-server"
-version = "0.7.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "550446e84739dcaf6d48a4a093973850669e13e8a34d8f8d64851041be267cd9"
-dependencies = [
- "crossbeam-channel",
- "log",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "lsp-types"
 version = "0.94.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c66bfd44a06ae10647fe3f8214762e9369fd4248df1350924b4ef9e770a85ea1"
-dependencies = [
- "bitflags 1.3.2",
- "serde",
- "serde_json",
- "serde_repr",
- "url",
-]
-
-[[package]]
-name = "lsp-types"
-version = "0.95.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e34d33a8e9b006cd3fc4fe69a921affa097bae4bb65f76271f4644f9a334365"
 dependencies = [
  "bitflags 1.3.2",
  "serde",
@@ -2079,16 +2054,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num_cpus"
-version = "1.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4161fcb6d602d4d2081af7c3a45852d875a03dd337a6bfdd6e06407b61342a43"
-dependencies = [
- "hermit-abi 0.3.9",
- "libc",
-]
-
-[[package]]
 name = "object"
 version = "0.36.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2280,9 +2245,9 @@ dependencies = [
  "pg_diagnostics",
  "pg_flags",
  "pg_fs",
- "pg_lsp_new",
+ "pg_lsp",
  "pg_text_edit",
- "pg_workspace_new",
+ "pg_workspace",
  "quick-junit",
  "rayon",
  "rustc-hash 2.1.0",
@@ -2489,49 +2454,6 @@ name = "pg_lsp"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "async-channel 2.3.1",
- "async-std",
- "crossbeam-channel",
- "dashmap 5.5.3",
- "line_index",
- "lsp-server",
- "lsp-types 0.95.1",
- "pg_base_db",
- "pg_commands",
- "pg_completions",
- "pg_diagnostics",
- "pg_fs",
- "pg_hover",
- "pg_inlay_hints",
- "pg_schema_cache",
- "pg_workspace",
- "serde",
- "serde_json",
- "sqlx",
- "text-size",
- "threadpool",
- "tokio",
- "tokio-util",
- "tower-lsp",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "pg_lsp_converters"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "rustc-hash 2.1.0",
- "text-size",
- "tower-lsp",
-]
-
-[[package]]
-name = "pg_lsp_new"
-version = "0.0.0"
-dependencies = [
- "anyhow",
  "biome_deserialize",
  "futures",
  "pg_analyse",
@@ -2542,7 +2464,7 @@ dependencies = [
  "pg_fs",
  "pg_lsp_converters",
  "pg_text_edit",
- "pg_workspace_new",
+ "pg_workspace",
  "rustc-hash 2.1.0",
  "serde",
  "serde_json",
@@ -2550,6 +2472,16 @@ dependencies = [
  "tokio",
  "tower-lsp",
  "tracing",
+]
+
+[[package]]
+name = "pg_lsp_converters"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "rustc-hash 2.1.0",
+ "text-size",
+ "tower-lsp",
 ]
 
 [[package]]
@@ -2702,26 +2634,6 @@ dependencies = [
 
 [[package]]
 name = "pg_workspace"
-version = "0.0.0"
-dependencies = [
- "async-std",
- "dashmap 5.5.3",
- "pg_base_db",
- "pg_fs",
- "pg_hover",
- "pg_lint",
- "pg_query_ext",
- "pg_schema_cache",
- "pg_syntax",
- "pg_typecheck",
- "sqlx",
- "text-size",
- "tree-sitter",
- "tree_sitter_sql",
-]
-
-[[package]]
-name = "pg_workspace_new"
 version = "0.0.0"
 dependencies = [
  "biome_deserialize",
@@ -3220,7 +3132,7 @@ dependencies = [
  "pg_diagnostics",
  "pg_query_ext",
  "pg_statement_splitter",
- "pg_workspace_new",
+ "pg_workspace",
  "pulldown-cmark",
 ]
 
@@ -3952,15 +3864,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "threadpool"
-version = "1.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d050e60b33d41c19108b32cea32164033a9013fe3b46cbd4457559bfbf77afaa"
-dependencies = [
- "num_cpus",
-]
-
-[[package]]
 name = "tikv-jemalloc-sys"
 version = "0.6.0+5.3.0-1-ge13ca993e8ccb9ba9847cc330696e02839f328f7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4144,7 +4047,7 @@ dependencies = [
  "dashmap 5.5.3",
  "futures",
  "httparse",
- "lsp-types 0.94.1",
+ "lsp-types",
  "memchr",
  "serde",
  "serde_json",

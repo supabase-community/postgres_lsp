@@ -1,7 +1,7 @@
 use crate::utils::into_lsp_error;
 use anyhow::Error;
 use pg_diagnostics::print_diagnostic_to_string;
-use pg_workspace_new::WorkspaceError;
+use pg_workspace::WorkspaceError;
 use std::fmt::{Display, Formatter};
 use tower_lsp::lsp_types::MessageType;
 

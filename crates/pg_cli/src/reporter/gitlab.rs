@@ -131,8 +131,8 @@ impl Display for GitLabDiagnostics<'_> {
                     true
                 }
             })
-            .filter_map(|biome_diagnostic| {
-                let absolute_path = match biome_diagnostic.location().resource {
+            .filter_map(|pglsp_diagnostic| {
+                let absolute_path = match pglsp_diagnostic.location().resource {
                     Some(Resource::File(file)) => Some(file),
                     _ => None,
                 }
@@ -143,11 +143,11 @@ impl Display for GitLabDiagnostics<'_> {
                     None => absolute_path.to_owned(),
                 };
 
-                let initial_fingerprint = self.compute_initial_fingerprint(biome_diagnostic, &path);
+                let initial_fingerprint = self.compute_initial_fingerprint(pglsp_diagnostic, &path);
                 let fingerprint = hasher.rehash_until_unique(initial_fingerprint);
 
                 GitLabDiagnostic::try_from_diagnostic(
-                    biome_diagnostic,
+                    pglsp_diagnostic,
                     path.to_string(),
                     fingerprint,
                 )
