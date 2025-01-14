@@ -173,7 +173,6 @@ impl Document {
                 let end = end.min(content_size);
                 TextRange::new(start.min(end), end)
             },
-            // affected_range: TextRange::new(start, end.min(content_size)),
             affected_indices,
             prev_index,
             next_index,
@@ -198,8 +197,6 @@ impl Document {
 
     /// Applies a single change to the document and returns the affected statements
     fn apply_change(&mut self, change: &ChangeParams) -> Vec<StatementChange> {
-        tracing::info!("applying change: {:?}", change);
-
         // if range is none, we have a full change
         if change.range.is_none() {
             return self.apply_full_change(&change.text);
