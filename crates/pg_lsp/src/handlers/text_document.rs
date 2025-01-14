@@ -50,8 +50,6 @@ pub(crate) async fn did_change(
     session: &Session,
     params: lsp_types::DidChangeTextDocumentParams,
 ) -> Result<(), LspError> {
-    tracing::info!("did_change: {:#?}", params);
-
     let url = params.text_document.uri;
     let version = params.text_document.version;
 
