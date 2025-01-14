@@ -2,7 +2,7 @@ use crate::{CliDiagnostic, CliSession};
 use pg_configuration::PartialConfiguration;
 use pg_console::{markup, ConsoleExt};
 use pg_fs::ConfigName;
-use pg_workspace_new::configuration::create_config;
+use pg_workspace::configuration::create_config;
 
 pub(crate) fn init(mut session: CliSession) -> Result<(), CliDiagnostic> {
     let fs = &mut session.app.fs;

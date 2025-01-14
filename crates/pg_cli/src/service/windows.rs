@@ -13,7 +13,7 @@ use std::{
     time::Duration,
 };
 
-use pg_lsp_new::{ServerConnection, ServerFactory};
+use pg_lsp::{ServerConnection, ServerFactory};
 use tokio::{
     io::{AsyncRead, AsyncWrite, ReadBuf},
     net::windows::named_pipe::{ClientOptions, NamedPipeClient, NamedPipeServer, ServerOptions},

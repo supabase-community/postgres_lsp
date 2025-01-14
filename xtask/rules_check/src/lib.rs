@@ -11,7 +11,7 @@ use pg_analyser::{Analyser, AnalyserConfig};
 use pg_console::{markup, Console};
 use pg_diagnostics::{Diagnostic, DiagnosticExt, PrintDiagnostic};
 use pg_query_ext::diagnostics::SyntaxDiagnostic;
-use pg_workspace_new::settings::Settings;
+use pg_workspace::settings::Settings;
 use pulldown_cmark::{CodeBlockKind, Event, Parser, Tag, TagEnd};
 
 pub fn check_rules() -> anyhow::Result<()> {

@@ -9,10 +9,10 @@ use bpaf::Bpaf;
 use pg_configuration::{partial_configuration, PartialConfiguration};
 use pg_console::Console;
 use pg_fs::FileSystem;
-use pg_workspace_new::configuration::{load_configuration, LoadedConfiguration};
-use pg_workspace_new::settings::PartialConfigurationExt;
-use pg_workspace_new::workspace::{FixFileMode, UpdateSettingsParams};
-use pg_workspace_new::{DynRef, Workspace, WorkspaceError};
+use pg_workspace::configuration::{load_configuration, LoadedConfiguration};
+use pg_workspace::settings::PartialConfigurationExt;
+use pg_workspace::workspace::{FixFileMode, UpdateSettingsParams};
+use pg_workspace::{DynRef, Workspace, WorkspaceError};
 use std::ffi::OsString;
 use std::path::PathBuf;
 

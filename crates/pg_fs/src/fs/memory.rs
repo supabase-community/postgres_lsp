@@ -297,11 +297,11 @@ impl<'scope> TraversalScope<'scope> for MemoryTraversalScope<'scope> {
 
                 if should_process_file {
                     let _ = ctx.interner().intern_path(path.into());
-                    let biome_path = PgLspPath::new(path);
-                    if !ctx.can_handle(&biome_path) {
+                    let pglsp_path = PgLspPath::new(path);
+                    if !ctx.can_handle(&pglsp_path) {
                         continue;
                     }
-                    ctx.store_path(biome_path);
+                    ctx.store_path(pglsp_path);
                 }
             }
         }

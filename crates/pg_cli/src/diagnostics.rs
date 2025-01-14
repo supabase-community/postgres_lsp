@@ -4,7 +4,7 @@ use pg_diagnostics::adapters::{BpafError, IoError, SerdeJsonError};
 use pg_diagnostics::{
     Advices, Category, Diagnostic, Error, LogCategory, MessageAndDescription, Severity, Visit,
 };
-use pg_workspace_new::WorkspaceError;
+use pg_workspace::WorkspaceError;
 use std::process::{ExitCode, Termination};
 use std::{env::current_exe, fmt::Debug};
 
@@ -12,10 +12,10 @@ fn command_name() -> String {
     current_exe()
         .ok()
         .and_then(|path| Some(path.file_name()?.to_str()?.to_string()))
-        .unwrap_or_else(|| String::from("biome"))
+        .unwrap_or_else(|| String::from("pglsp"))
 }
 
-/// A diagnostic that is emitted when running biome via CLI.
+/// A diagnostic that is emitted when running PGLSP via CLI.
 ///
 /// When displaying the diagnostic,
 #[derive(Debug, Diagnostic)]
@@ -42,13 +42,13 @@ pub enum CliDiagnostic {
     FileCheck(FileCheck),
     /// When an argument is higher than the expected maximum
     OverflowNumberArgument(OverflowNumberArgument),
-    /// Wrapper for an underlying `biome_service` error
+    /// Wrapper for an underlying pglsp-service error
     WorkspaceError(WorkspaceError),
     /// Wrapper for an underlying `std::io` error
     IoError(IoDiagnostic),
     /// The daemon is not running
     ServerNotRunning(ServerNotRunning),
-    /// The end configuration (`biome.json` + other options) is incompatible with the command
+    /// The end configuration (`pglsp.toml` + other options) is incompatible with the command
     IncompatibleEndConfiguration(IncompatibleEndConfiguration),
     /// No files processed during the file system traversal
     NoFilesWereProcessed(NoFilesWereProcessed),
@@ -410,7 +410,7 @@ impl CliDiagnostic {
         Self::ServerNotRunning(ServerNotRunning)
     }
 
-    /// Emitted when the end configuration (`biome.json` file + CLI arguments + LSP configuration)
+    /// Emitted when the end configuration (`pglsp.toml` file + CLI arguments + LSP configuration)
     /// results in a combination of options that doesn't allow to run the command correctly.
     ///
     /// A reason needs to be provided
