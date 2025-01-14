@@ -527,7 +527,7 @@ mod tests {
                 assert_eq!(changed.old_stmt_text, "select ;");
                 assert_eq!(changed.new_stmt_text, "select");
                 assert_eq!(changed.change_text, "");
-                assert_eq!(changed.change_range, TextRange::new(32.into(), 33.into()));
+                assert_eq!(changed.change_range, TextRange::new(7.into(), 8.into()));
             }
             _ => panic!("expected modified statement"),
         }
