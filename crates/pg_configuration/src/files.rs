@@ -29,6 +29,10 @@ pub struct FilesConfiguration {
     /// match these patterns.
     #[partial(bpaf(hide))]
     pub include: StringSet,
+
+    /// The directory where the migration files are stored
+    #[partial(bpaf(hide))]
+    pub migration_dir: String,
 }
 
 impl Default for FilesConfiguration {
@@ -37,6 +41,7 @@ impl Default for FilesConfiguration {
             max_size: DEFAULT_FILE_SIZE_LIMIT,
             ignore: Default::default(),
             include: Default::default(),
+            migration_dir: "migrations".to_string(),
         }
     }
 }

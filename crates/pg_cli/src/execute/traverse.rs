@@ -480,6 +480,11 @@ impl TraversalContext for TraversalOptions<'_, '_> {
             return false;
         }
 
+        // only allow .sql and .pg files for now
+        if path.extension().is_some_and(|ext| ext != "sql" && ext != "pg") {
+            return false;
+        }
+
         match self.execution.traversal_mode() {
             TraversalMode::Dummy { .. } => true,
             TraversalMode::Check { .. } => true,
