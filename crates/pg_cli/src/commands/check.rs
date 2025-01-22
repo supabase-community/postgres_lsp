@@ -39,6 +39,7 @@ impl CommandRunner for CheckCommandPayload {
         fs: &DynRef<'_, dyn FileSystem>,
         configuration: &PartialConfiguration,
     ) -> Result<Vec<OsString>, CliDiagnostic> {
+        // update this to find migration files
         let paths = get_files_to_process_with_cli_options(
             self.since.as_deref(),
             self.changed,
