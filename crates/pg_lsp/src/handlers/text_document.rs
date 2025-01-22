@@ -1,4 +1,6 @@
-use crate::{documents::Document, session::Session, utils::apply_document_changes};
+use crate::{
+    diagnostics::LspError, documents::Document, session::Session, utils::apply_document_changes,
+};
 use anyhow::Result;
 use pg_lsp_converters::from_proto::text_range;
 use pg_workspace::workspace::{
@@ -47,13 +49,13 @@ pub(crate) async fn did_open(
 pub(crate) async fn did_change(
     session: &Session,
     params: lsp_types::DidChangeTextDocumentParams,
-) -> Result<()> {
+) -> Result<(), LspError> {
     let url = params.text_document.uri;
     let version = params.text_document.version;
 
     let pglsp_path = session.file_path(&url)?;
 
-    // we need to keep the documents here too for the line index
+    let old_doc = session.document(&url)?;
     let old_text = session.workspace.get_file_content(GetFileContentParams {
         path: pglsp_path.clone(),
     })?;
@@ -71,8 +73,6 @@ pub(crate) async fn did_change(
         &params.content_changes[start..],
     );
 
-    let new_doc = Document::new(version, &text);
-
     session.workspace.change_file(ChangeFileParams {
         path: pglsp_path,
         version,
@@ -80,14 +80,14 @@ pub(crate) async fn did_change(
             .iter()
             .map(|c| ChangeParams {
                 range: c.range.and_then(|r| {
-                    text_range(&new_doc.line_index, r, session.position_encoding()).ok()
+                    text_range(&old_doc.line_index, r, session.position_encoding()).ok()
                 }),
                 text: c.text.clone(),
             })
             .collect(),
     })?;
 
-    session.insert_document(url.clone(), new_doc);
+    session.insert_document(url.clone(), Document::new(version, &text));
 
     if let Err(err) = session.update_diagnostics(url).await {
         error!("Failed to update diagnostics: {}", err);

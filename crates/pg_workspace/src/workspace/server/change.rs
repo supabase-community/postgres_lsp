@@ -169,7 +169,10 @@ impl Document {
         };
 
         Affected {
-            affected_range: TextRange::new(start, end.min(content_size)),
+            affected_range: {
+                let end = end.min(content_size);
+                TextRange::new(start.min(end), end)
+            },
             affected_indices,
             prev_index,
             next_index,
@@ -194,8 +197,6 @@ impl Document {
 
     /// Applies a single change to the document and returns the affected statements
     fn apply_change(&mut self, change: &ChangeParams) -> Vec<StatementChange> {
-        tracing::info!("applying change: {:?}", change);
-
         // if range is none, we have a full change
         if change.range.is_none() {
             return self.apply_full_change(&change.text);
@@ -273,7 +274,7 @@ impl Document {
                     new_stmt_text: changed_content[new_ranges[0]].to_string(),
                     // change must be relative to the statement
                     change_text: change.text.clone(),
-                    change_range,
+                    change_range: change_range.sub(old_range.start()),
                 }));
 
                 self.content = new_content;
@@ -526,7 +527,7 @@ mod tests {
                 assert_eq!(changed.old_stmt_text, "select ;");
                 assert_eq!(changed.new_stmt_text, "select");
                 assert_eq!(changed.change_text, "");
-                assert_eq!(changed.change_range, TextRange::new(32.into(), 33.into()));
+                assert_eq!(changed.change_range, TextRange::new(7.into(), 8.into()));
             }
             _ => panic!("expected modified statement"),
         }
@@ -862,5 +863,77 @@ mod tests {
         );
 
         assert_document_integrity(&doc);
+    }
+
+    #[test]
+    fn remove_outside_of_content() {
+        let path = PgLspPath::new("test.sql");
+        let input = "select id from contacts;\n\nselect * from contacts;";
+
+        let mut d = Document::new(path.clone(), input.to_string(), 1);
+
+        assert_eq!(d.positions.len(), 2);
+
+        let change1 = ChangeFileParams {
+            path: path.clone(),
+            version: 2,
+            changes: vec![ChangeParams {
+                text: "\n".to_string(),
+                range: Some(TextRange::new(49.into(), 49.into())),
+            }],
+        };
+
+        d.apply_file_change(&change1);
+
+        assert_eq!(
+            d.content,
+            "select id from contacts;\n\nselect * from contacts;\n"
+        );
+
+        let change2 = ChangeFileParams {
+            path: path.clone(),
+            version: 3,
+            changes: vec![ChangeParams {
+                text: "\n".to_string(),
+                range: Some(TextRange::new(50.into(), 50.into())),
+            }],
+        };
+
+        d.apply_file_change(&change2);
+
+        assert_eq!(
+            d.content,
+            "select id from contacts;\n\nselect * from contacts;\n\n"
+        );
+
+        let change5 = ChangeFileParams {
+            path: path.clone(),
+            version: 6,
+            changes: vec![ChangeParams {
+                text: "".to_string(),
+                range: Some(TextRange::new(51.into(), 52.into())),
+            }],
+        };
+
+        let changes = d.apply_file_change(&change5);
+
+        assert!(matches!(
+            changes[0],
+            StatementChange::Deleted(Statement { .. })
+        ));
+
+        assert!(matches!(
+            changes[1],
+            StatementChange::Added(AddedStatement { .. })
+        ));
+
+        assert_eq!(changes.len(), 2);
+
+        assert_eq!(
+            d.content,
+            "select id from contacts;\n\nselect * from contacts;\n\n"
+        );
+
+        assert_document_integrity(&d);
     }
 }
