@@ -915,7 +915,19 @@ mod tests {
             }],
         };
 
-        assert_eq!(d.apply_file_change(&change5).len(), 0);
+        let changes = d.apply_file_change(&change5);
+
+        assert!(matches!(
+            changes[0],
+            StatementChange::Deleted(Statement { .. })
+        ));
+
+        assert!(matches!(
+            changes[1],
+            StatementChange::Added(AddedStatement { .. })
+        ));
+
+        assert_eq!(changes.len(), 2);
 
         assert_eq!(
             d.content,
