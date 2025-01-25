@@ -37,9 +37,10 @@ jobs:
 
       - name: 🧪 Run Tests
         # Ultimately, we shouldn't ignore warnings.
-        run: RUSTFLAGS="-A warnings" cargo test --release
+        run: cargo test --release
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+          RUSTFLAGS: -A warnings
 
       - name: 🛠️ Run Build
         run: cargo build -p pg_cli --release --target ${{ matrix.config.target }}
