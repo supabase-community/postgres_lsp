@@ -50,6 +50,8 @@ jobs:
             const artifactUrl = '${{ needs.build_and_test.outputs.artifact_url }}';
             const comment = `📦 [Download Artifacts](${artifactUrl})`;
 
+            console.log('tryout!');
+
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
