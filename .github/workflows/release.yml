@@ -34,7 +34,7 @@ jobs:
       - name: 🧪 Run Tests
         run: cargo test --release
         env:
-          DATABASE_URL: postgres://user:password@localhost:5432/test_db
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
 
       - name: 🛠️ Run Build
         run: cargo build --release --target ${{ matrix.config.target }}
