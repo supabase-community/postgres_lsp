@@ -14,17 +14,27 @@ jobs:
           - { os: macos-latest, target: aarch64-apple-darwin }
           - { os: windows-latest, target: x86_64-pc-windows-msvc }
           - { os: windows-latest, target: aarch64-pc-windows-msvc }
+
     runs-on: ${{ matrix.config.os }}
+
     outputs:
       artifact_url: ${{ steps.upload-artifacts.outputs.artifact-url }}
+
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
       - uses: actions-rust-lang/setup-rust-toolchain@v1
 
+      # running containers via `services` only works on linux
+      # https://github.com/actions/runner/issues/1866
+      - name: Setup postgres
+        uses: ikalnytskyi/action-setup-postgres@v7
+
       - name: 🧪 Run Tests
         run: cargo test --release
+        env:
+          DATABASE_URL: postgres://user:password@localhost:5432/test_db
 
       - name: 🛠️ Run Build
         run: cargo build --release --target ${{ matrix.config.target }}

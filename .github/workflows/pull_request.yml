@@ -142,6 +142,7 @@ jobs:
       # https://github.com/actions/runner/issues/1866
       - name: Setup postgres
         uses: ikalnytskyi/action-setup-postgres@v7
+
       - name: Run tests
         run: cargo test --workspace
 
