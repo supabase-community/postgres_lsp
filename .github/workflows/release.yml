@@ -28,6 +28,8 @@ jobs:
         with:
           target: ${{ matrix.config.target }}
 
+      - uses: Swatinem/rust-cache@v1
+
       # running containers via `services` only works on linux
       # https://github.com/actions/runner/issues/1866
       - name: Setup postgres
