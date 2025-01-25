@@ -1,4 +1,4 @@
-name: Release PGLSP
+name: Release PG_CLI
 
 on:
   workflow_dispatch:
@@ -34,12 +34,13 @@ jobs:
         uses: ikalnytskyi/action-setup-postgres@v7
 
       - name: 🧪 Run Tests
-        run: cargo test --release
+        # Ultimately, we shouldn't ignore warnings.
+        run: RUSTFLAGS="-A warnings" cargo test --release
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
 
       - name: 🛠️ Run Build
-        run: cargo build --release --target ${{ matrix.config.target }}
+        run: cargo build -p pg_cli --release --target ${{ matrix.config.target }}
 
       # It is not possible to return the artifacts from the matrix jobs individually.
       # Matrix outputs overwrite each other.
