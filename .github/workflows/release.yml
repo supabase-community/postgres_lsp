@@ -25,6 +25,8 @@ jobs:
         with:
           submodules: true
       - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: ${{ matrix.config.target }}
 
       # running containers via `services` only works on linux
       # https://github.com/actions/runner/issues/1866
