@@ -60,10 +60,9 @@ jobs:
             const artifactUrl = '${{ needs.build_and_test.outputs.artifact_url }}';
             const comment = `📦 [Download Artifacts](${artifactUrl})`;
 
-            console.log('tryout!');
-
-            github.rest.issues.createComment({
+            github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
-            })
+              title: 'New Assets!',
+              body: comment,
+            });
