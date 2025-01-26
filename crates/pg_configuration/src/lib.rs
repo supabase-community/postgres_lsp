@@ -8,6 +8,7 @@ pub mod database;
 pub mod diagnostics;
 pub mod files;
 pub mod generated;
+pub mod migrations;
 pub mod vcs;
 
 pub use crate::diagnostics::ConfigurationDiagnostic;
@@ -21,12 +22,15 @@ pub use analyser::{
     RuleConfiguration, RuleFixConfiguration, RulePlainConfiguration, RuleSelector,
     RuleWithFixOptions, RuleWithOptions, Rules,
 };
-use biome_deserialize_macros::Partial;
+use biome_deserialize_macros::{Merge, Partial};
 use bpaf::Bpaf;
 use database::{
     partial_database_configuration, DatabaseConfiguration, PartialDatabaseConfiguration,
 };
 use files::{partial_files_configuration, FilesConfiguration, PartialFilesConfiguration};
+use migrations::{
+    partial_migrations_configuration, MigrationsConfiguration, PartialMigrationsConfiguration,
+};
 use serde::{Deserialize, Serialize};
 use vcs::VcsClientKind;
 
@@ -37,7 +41,7 @@ pub const VERSION: &str = match option_env!("PGLSP_VERSION") {
 
 /// The configuration that is contained inside the configuration file.
 #[derive(Clone, Debug, Default, Deserialize, Eq, Partial, PartialEq, Serialize)]
-#[partial(derive(Bpaf, Clone, Eq, PartialEq))]
+#[partial(derive(Bpaf, Clone, Eq, PartialEq, Merge))]
 #[partial(cfg_attr(feature = "schema", derive(schemars::JsonSchema)))]
 #[partial(serde(deny_unknown_fields, rename_all = "snake_case"))]
 pub struct Configuration {
@@ -51,6 +55,13 @@ pub struct Configuration {
         bpaf(external(partial_files_configuration), optional, hide_usage)
     )]
     pub files: FilesConfiguration,
+
+    /// Configure migrations
+    #[partial(
+        type,
+        bpaf(external(partial_migrations_configuration), optional, hide_usage)
+    )]
+    pub migrations: MigrationsConfiguration,
 
     /// The configuration for the linter
     #[partial(type, bpaf(external(partial_linter_configuration), optional))]
@@ -72,6 +83,7 @@ impl PartialConfiguration {
                 ignore: Some(Default::default()),
                 ..Default::default()
             }),
+            migrations: None,
             vcs: Some(PartialVcsConfiguration {
                 enabled: Some(false),
                 client_kind: Some(VcsClientKind::Git),

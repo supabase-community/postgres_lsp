@@ -1,10 +1,10 @@
-use biome_deserialize_macros::Partial;
+use biome_deserialize_macros::{Merge, Partial};
 use bpaf::Bpaf;
 use serde::{Deserialize, Serialize};
 
 /// The configuration of the database connection.
 #[derive(Clone, Debug, Deserialize, Eq, Partial, PartialEq, Serialize)]
-#[partial(derive(Bpaf, Clone, Eq, PartialEq))]
+#[partial(derive(Bpaf, Clone, Eq, PartialEq, Merge))]
 #[partial(serde(rename_all = "snake_case", default, deny_unknown_fields))]
 pub struct DatabaseConfiguration {
     /// The host of the database.

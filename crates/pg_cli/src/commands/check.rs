@@ -1,5 +1,6 @@
 use crate::cli_options::CliOptions;
 use crate::{CliDiagnostic, Execution, TraversalMode};
+use biome_deserialize::Merge;
 use pg_configuration::PartialConfiguration;
 use pg_console::Console;
 use pg_fs::FileSystem;
@@ -9,9 +10,6 @@ use std::ffi::OsString;
 use super::{get_files_to_process_with_cli_options, CommandRunner};
 
 pub(crate) struct CheckCommandPayload {
-    pub(crate) write: bool,
-    pub(crate) fix: bool,
-    pub(crate) unsafe_: bool,
     pub(crate) configuration: Option<PartialConfiguration>,
     pub(crate) paths: Vec<OsString>,
     pub(crate) stdin_file_path: Option<String>,
@@ -26,12 +24,20 @@ impl CommandRunner for CheckCommandPayload {
     fn merge_configuration(
         &mut self,
         loaded_configuration: LoadedConfiguration,
-        fs: &DynRef<'_, dyn FileSystem>,
-        console: &mut dyn Console,
+        _fs: &DynRef<'_, dyn FileSystem>,
+        _console: &mut dyn Console,
     ) -> Result<PartialConfiguration, WorkspaceError> {
-        let LoadedConfiguration { configuration, .. } = loaded_configuration;
+        let LoadedConfiguration {
+            configuration: mut fs_configuration,
+            ..
+        } = loaded_configuration;
 
-        Ok(configuration)
+        if let Some(configuration) = self.configuration.clone() {
+            // overwrite fs config with cli args
+            fs_configuration.merge_with(configuration);
+        }
+
+        Ok(fs_configuration)
     }
 
     fn get_files_to_process(
@@ -39,7 +45,6 @@ impl CommandRunner for CheckCommandPayload {
         fs: &DynRef<'_, dyn FileSystem>,
         configuration: &PartialConfiguration,
     ) -> Result<Vec<OsString>, CliDiagnostic> {
-        // update this to find migration files
         let paths = get_files_to_process_with_cli_options(
             self.since.as_deref(),
             self.changed,
@@ -57,7 +62,7 @@ impl CommandRunner for CheckCommandPayload {
     }
 
     fn should_write(&self) -> bool {
-        self.write || self.fix
+        false
     }
 
     fn get_execution(

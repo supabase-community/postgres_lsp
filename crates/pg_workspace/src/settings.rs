@@ -9,8 +9,11 @@ use std::{
 
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
 use pg_configuration::{
-    database::PartialDatabaseConfiguration, diagnostics::InvalidIgnorePattern,
-    files::FilesConfiguration, ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration,
+    database::PartialDatabaseConfiguration,
+    diagnostics::InvalidIgnorePattern,
+    files::{FilesConfiguration, MigrationPattern},
+    migrations::{MigrationsConfiguration, PartialMigrationsConfiguration},
+    ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration,
 };
 use pg_fs::FileSystem;
 
@@ -27,6 +30,9 @@ pub struct Settings {
 
     /// Linter settings applied to all files in the workspace
     pub linter: LinterSettings,
+
+    /// Migrations settings
+    pub migrations: Option<Migrations>,
 }
 
 #[derive(Debug)]
@@ -98,6 +104,8 @@ impl Settings {
             self.linter =
                 to_linter_settings(working_directory.clone(), LinterConfiguration::from(linter))?;
         }
+
+        // TODO migrations
 
         Ok(())
     }
@@ -302,6 +310,71 @@ pub struct FilesSettings {
 
     /// gitignore file patterns
     pub git_ignore: Option<Gitignore>,
+}
+
+/// Migration settings
+#[derive(Debug)]
+pub(crate) struct Migrations {
+    path: PathBuf,
+    pattern: MigrationPattern,
+}
+
+pub(crate) struct Migration {
+    timestamp: u64,
+    name: String,
+}
+
+impl Migrations {
+    fn get_migration(&self, path: &Path) -> Option<Migration> {
+        // check if path is a child of the migration directory
+        match path.canonicalize() {
+            Ok(canonical_child) => match self.path.canonicalize() {
+                Ok(canonical_dir) => canonical_child.starts_with(&canonical_dir),
+                Err(_) => return None,
+            },
+            Err(_) => return None,
+        };
+
+        match self.pattern {
+            // supabase style migrations/0001_create_table.sql
+            MigrationPattern::Root => {
+                let file_name = path.file_name()?.to_str()?;
+                let timestamp = file_name.split('_').next()?;
+                let name = file_name
+                    .split('_')
+                    .skip(1)
+                    .collect::<Vec<&str>>()
+                    .join("_");
+                let timestamp = timestamp.parse().ok()?;
+                Some(Migration { timestamp, name })
+            }
+            // drizzle / prisma style migrations/0001_create_table/migration.sql
+            MigrationPattern::Subdirectory => {
+                let relative_path = path.strip_prefix(&self.path).ok()?;
+                let components: Vec<_> = relative_path.components().collect();
+                if components.len() != 2 {
+                    return None;
+                }
+                let dir_name = components[0].as_os_str().to_str()?;
+                let parts: Vec<&str> = dir_name.splitn(2, '_').collect();
+                if parts.len() != 2 {
+                    return None;
+                }
+                let timestamp = parts[0].parse().ok()?;
+                let name = parts[1].to_string();
+                Some(Migration { timestamp, name })
+            }
+        }
+    }
+}
+
+impl From<MigrationsConfiguration> for Migrations {
+    fn from(value: MigrationsConfiguration) -> Self {
+        Self {
+            path: value.migration_dir,
+            pattern: value.migration_pattern,
+        }
+    }
 }
 
 /// Limit the size of files to 1.0 MiB by default

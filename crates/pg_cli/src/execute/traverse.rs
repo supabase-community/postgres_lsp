@@ -481,7 +481,10 @@ impl TraversalContext for TraversalOptions<'_, '_> {
         }
 
         // only allow .sql and .pg files for now
-        if path.extension().is_none_or(|ext| ext != "sql" && ext != "pg") {
+        if path
+            .extension()
+            .is_none_or(|ext| ext != "sql" && ext != "pg")
+        {
             return false;
         }
 

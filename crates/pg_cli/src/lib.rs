@@ -67,9 +67,6 @@ impl<'app> CliSession<'app> {
         let result = match command {
             PgLspCommand::Version(_) => commands::version::full_version(self),
             PgLspCommand::Check {
-                write,
-                fix,
-                unsafe_,
                 cli_options,
                 configuration,
                 paths,
@@ -77,19 +74,18 @@ impl<'app> CliSession<'app> {
                 staged,
                 changed,
                 since,
+                after,
             } => run_command(
                 self,
                 &cli_options,
                 CheckCommandPayload {
-                    write,
-                    fix,
-                    unsafe_,
                     configuration,
                     paths,
                     stdin_file_path,
                     staged,
                     changed,
                     since,
+                    after,
                 },
             ),
             PgLspCommand::Clean => commands::clean::clean(self),
