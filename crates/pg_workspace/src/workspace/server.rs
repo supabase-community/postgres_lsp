@@ -163,11 +163,8 @@ impl WorkspaceServer {
             .migrations
             .as_ref()
             .and_then(|migration_settings| {
-                tracing::info!("Checking migration settings: {:?}", migration_settings);
                 let ignore_before = migration_settings.after.as_ref()?;
-                tracing::info!("Checking migration settings: {:?}", ignore_before);
                 let migrations_dir = migration_settings.path.as_ref()?;
-                tracing::info!("Checking migration settings: {:?}", migrations_dir);
                 let migration = migration::get_migration(path, migrations_dir)?;
 
                 Some(&migration.timestamp <= ignore_before)
