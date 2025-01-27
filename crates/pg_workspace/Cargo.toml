@@ -39,6 +39,7 @@ tree-sitter.workspace     = true
 tree_sitter_sql.workspace = true
 
 [dev-dependencies]
+tempfile = "3.15.0"
 
 [lib]
 doctest = false

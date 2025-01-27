@@ -74,7 +74,6 @@ impl<'app> CliSession<'app> {
                 staged,
                 changed,
                 since,
-                after,
             } => run_command(
                 self,
                 &cli_options,
@@ -85,7 +84,6 @@ impl<'app> CliSession<'app> {
                     staged,
                     changed,
                     since,
-                    after,
                 },
             ),
             PgLspCommand::Clean => commands::clean::clean(self),

@@ -456,7 +456,13 @@ impl TraversalContext for TraversalOptions<'_, '_> {
 
     fn can_handle(&self, pglsp_path: &PgLspPath) -> bool {
         let path = pglsp_path.as_path();
-        if self.fs.path_is_dir(path) || self.fs.path_is_symlink(path) {
+
+        let is_valid_file = self.fs.path_is_file(path)
+            && path
+                .extension()
+                .is_some_and(|ext| ext == "sql" || ext == "pg");
+
+        if self.fs.path_is_dir(path) || self.fs.path_is_symlink(path) || is_valid_file {
             // handle:
             // - directories
             // - symlinks
@@ -476,15 +482,7 @@ impl TraversalContext for TraversalOptions<'_, '_> {
         }
 
         // bail on fifo and socket files
-        if !self.fs.path_is_file(path) {
-            return false;
-        }
-
-        // only allow .sql and .pg files for now
-        if path
-            .extension()
-            .is_none_or(|ext| ext != "sql" && ext != "pg")
-        {
+        if !is_valid_file {
             return false;
         }
 
