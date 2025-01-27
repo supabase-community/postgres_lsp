@@ -339,11 +339,6 @@ fn to_migration_settings(
     working_directory: Option<PathBuf>,
     conf: MigrationsConfiguration,
 ) -> Option<MigrationSettings> {
-    tracing::debug!(
-        "Migrations configuration: {:?}, dir: {:?}",
-        conf,
-        working_directory
-    );
     working_directory.map(|working_directory| MigrationSettings {
         path: Some(working_directory.join(conf.migrations_dir)),
         after: Some(conf.after),
