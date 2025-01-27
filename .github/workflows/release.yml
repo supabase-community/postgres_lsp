@@ -3,6 +3,11 @@ name: Release PG_CLI
 on:
   workflow_dispatch:
 
+env:
+  # Ultimately, we shouldn't ignore warnings.
+  # We need to pass it as an ENV because inlining doesn't work on Windows.
+  RUSTFLAGS: -A dead_code
+
 jobs:
   build_and_test:
     strategy:
@@ -36,11 +41,9 @@ jobs:
         uses: ikalnytskyi/action-setup-postgres@v7
 
       - name: 🧪 Run Tests
-        # Ultimately, we shouldn't ignore warnings.
         run: cargo test --release
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
-          RUSTFLAGS: -A warnings
 
       - name: 🛠️ Run Build
         run: cargo build -p pg_cli --release --target ${{ matrix.config.target }}
