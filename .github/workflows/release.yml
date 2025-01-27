@@ -81,6 +81,9 @@ jobs:
             fi
           done
 
+      - name: DEBUG - List Compressed Artifacts
+        run: ls -l /tmp/compressed
+
       - name: Add Comment
         uses: actions/github-script@v7
         with:
