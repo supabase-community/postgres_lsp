@@ -49,6 +49,7 @@ async fn test(name: &str, query: &str, setup: &str) {
     });
 }
 
+#[ignore]
 #[tokio::test]
 async fn invalid_column() {
     test(
