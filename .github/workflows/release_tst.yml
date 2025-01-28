@@ -27,7 +27,6 @@ jobs:
 
     outputs:
       artifact_url: ${{ steps.upload-artifacts.outputs.artifact-url }}
-      release_tag: 1.0.0
 
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +36,11 @@ jobs:
         with:
           target: ${{ matrix.config.target }}
       - uses: Swatinem/rust-cache@v1
+        id: rust-cache
+
+      - name: Have we hit Cache?
+        run: |
+          echo "Cache hit: ${{ steps.rust-cache.outputs.cache-hit }}"
 
       # running containers via `services` only works on linux
       # https://github.com/actions/runner/issues/1866
@@ -51,6 +55,10 @@ jobs:
       - name: 🛠️ Run Build
         run: cargo build -p pg_cli --release --target ${{ matrix.config.target }}
 
+      - name: 🙏 Compress Files
+        run: |
+          tar -czf "/tmp/compressed" target/${{ matrix.config.target }}/release
+
       # It is not possible to return the artifacts from the matrix jobs individually.
       # Matrix outputs overwrite each other.
       # A common workaround is to upload and download the resulting artifacts.
@@ -58,8 +66,8 @@ jobs:
         id: upload-artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.config.target }}
-          path: target/${{ matrix.config.target }}/release/
+          name: ${{ matrix.config.target }}.tar.gz
+          path: /tmp/compressed
 
   create_changelog_and_release:
     runs-on: ubuntu-latest
@@ -77,16 +85,6 @@ jobs:
           name: ${{ needs.build_and_test.outputs.artifact_url }}
           path: /tmp/artifacts
 
-      - name: 🙏 Compress Files
-        run: |
-          mkdir /tmp/compressed
-          for item in /tmp/artifacts/*; do
-            if [ -e "$item" ]; then
-              base_item=$(basename "$item")
-              tar -czf "/tmp/compressed/pglsp-${{ needs.build_and_test.outputs.release_tag }}-$base_item.tar.gz" -C /tmp/artifacts "$base_item"
-            fi
-          done
-
       - name: 📝 Create Changelog
         uses: orhun/git-cliff-action@v3
         id: create_changelog
@@ -102,4 +100,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ steps.create_changelog.outputs.changelog }}
           tag_name: ${{ steps.create_changelog.outputs.version }}
-          files: /tmp/compressed/*
+          files: /tmp/artifacts/*
