@@ -40,7 +40,7 @@ jobs:
 
       # running containers via `services` only works on linux
       # https://github.com/actions/runner/issues/1866
-      - name: Setup postgres
+      - name: 🐘 Setup postgres
         uses: ikalnytskyi/action-setup-postgres@v7
 
       - name: 🧪 Run Tests
@@ -64,8 +64,6 @@ jobs:
   create_changelog_and_release:
     runs-on: ubuntu-latest
     needs: build_and_test # make sure that tests & build work correctly
-    outputs:
-      release_body: ${{ steps.create_changelog.outputs.content }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -73,28 +71,11 @@ jobs:
           # we need all commits to create a changelog
           fetch-depth: 0
 
-      - name: Create Changelog
-        uses: orhun/git-cliff-action@v3
-        id: create_changelog
-        with:
-          config: cliff.toml
-          args: --verbose
-        env:
-          OUTPUT: CHANGELOG.md
-          GITHUB_REPO: ${{ github.repository }}
-
-  upload_artifacts_to_release:
-    runs-on: ubuntu-latest
-    needs: build_and_test
-    steps:
       - name: 👇 Download Artifacts
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build_and_test.outputs.artifact_url }}
           path: /tmp/artifacts
-
-      - name: DEBUG - List Artifacts
-        run: ls -l /tmp/artifacts
 
       - name: 🙏 Compress Files
         run: |
@@ -106,19 +87,19 @@ jobs:
             fi
           done
 
-      - name: DEBUG - List Compressed Artifacts
-        run: ls -l /tmp/compressed
-
-      - name: Add Comment
-        uses: actions/github-script@v7
+      - name: 📝 Create Changelog
+        uses: orhun/git-cliff-action@v3
+        id: create_changelog
         with:
-          script: |
-            const artifactUrl = '${{ needs.build_and_test.outputs.artifact_url }}';
-            const comment = `📦 [Download Artifacts](${artifactUrl})`;
+          config: cliff.toml
+          args: --bump --latest
+        env:
+          GITHUB_REPO: ${{ github.repository }}
 
-            github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: 'New Assets!',
-              body: comment,
-            });
+      - name: 📂 Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: ${{ steps.create_changelog.outputs.changelog }}
+          tag_name: ${{ steps.create_changelog.outputs.version }}
+          files: /tmp/compressed/*
