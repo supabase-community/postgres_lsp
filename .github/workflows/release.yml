@@ -78,12 +78,6 @@ jobs:
           # we need all commits to create a changelog
           fetch-depth: 0
 
-      - name: 👇 Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-          merge-multiple: true
-
       - name: 📝 Create Changelog
         uses: orhun/git-cliff-action@v3
         id: create_changelog
@@ -93,10 +87,19 @@ jobs:
         env:
           GITHUB_REPO: ${{ github.repository }}
 
+      - name: 👇 Download Artifacts
+        uses: actions/download-artifact@v4
+        id: download
+        with:
+          merge-multiple: true
+
+      - name: Print Download Path
+        run: echo "Downloaded Artifacts to ${{ steps.download.outputs.download-path }}"
+
       - name: 📂 Create Release
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          body: ${{ steps.create_changelog.outputs.changelog }}
+          body: ${{ steps.create_changelog.outputs.content }}
           tag_name: ${{ steps.create_changelog.outputs.version }}
-          files: artifacts/*
+          files: ${{ steps.download.outputs.download-path }}
