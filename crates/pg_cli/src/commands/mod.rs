@@ -11,7 +11,7 @@ use pg_console::Console;
 use pg_fs::FileSystem;
 use pg_workspace::configuration::{load_configuration, LoadedConfiguration};
 use pg_workspace::settings::PartialConfigurationExt;
-use pg_workspace::workspace::{FixFileMode, UpdateSettingsParams};
+use pg_workspace::workspace::UpdateSettingsParams;
 use pg_workspace::{DynRef, Workspace, WorkspaceError};
 use std::ffi::OsString;
 use std::path::PathBuf;
@@ -33,18 +33,6 @@ pub enum PgLspCommand {
     /// Runs everything to the requested files.
     #[bpaf(command)]
     Check {
-        /// Writes safe fixes, formatting and import sorting
-        #[bpaf(long("write"), switch)]
-        write: bool,
-
-        /// Allow to do unsafe fixes, should be used with `--write` or `--fix`
-        #[bpaf(long("unsafe"), switch)]
-        unsafe_: bool,
-
-        /// Alias for `--write`, writes safe fixes, formatting and import sorting
-        #[bpaf(long("fix"), switch, hide_usage)]
-        fix: bool,
-
         #[bpaf(external(partial_configuration), hide_usage, optional)]
         configuration: Option<PartialConfiguration>,
         #[bpaf(external, hide_usage)]
@@ -401,165 +389,9 @@ fn get_files_to_process_with_cli_options(
     }
 }
 
-/// Holds the options to determine the fix file mode.
-pub(crate) struct FixFileModeOptions {
-    write: bool,
-    suppress: bool,
-    suppression_reason: Option<String>,
-    fix: bool,
-    unsafe_: bool,
-}
-
-/// - [Result]: if the given options are incompatible
-/// - [Option]: if no fixes are requested
-/// - [FixFileMode]: if safe or unsafe fixes are requested
-pub(crate) fn determine_fix_file_mode(
-    options: FixFileModeOptions,
-    console: &mut dyn Console,
-) -> Result<Option<FixFileMode>, CliDiagnostic> {
-    let FixFileModeOptions {
-        write,
-        fix,
-        suppress,
-        suppression_reason: _,
-        unsafe_,
-    } = options;
-
-    check_fix_incompatible_arguments(options)?;
-
-    let safe_fixes = write || fix;
-    let unsafe_fixes = (write || safe_fixes) && unsafe_;
-
-    if unsafe_fixes {
-        Ok(Some(FixFileMode::SafeAndUnsafeFixes))
-    } else if safe_fixes {
-        Ok(Some(FixFileMode::SafeFixes))
-    } else if suppress {
-        Ok(Some(FixFileMode::ApplySuppressions))
-    } else {
-        Ok(None)
-    }
-}
-
-/// Checks if the fix file options are incompatible.
-fn check_fix_incompatible_arguments(options: FixFileModeOptions) -> Result<(), CliDiagnostic> {
-    let FixFileModeOptions {
-        write,
-        suppress,
-        suppression_reason,
-        fix,
-        ..
-    } = options;
-    if write && fix {
-        return Err(CliDiagnostic::incompatible_arguments("--write", "--fix"));
-    } else if suppress && write {
-        return Err(CliDiagnostic::incompatible_arguments(
-            "--suppress",
-            "--write",
-        ));
-    } else if suppress && fix {
-        return Err(CliDiagnostic::incompatible_arguments("--suppress", "--fix"));
-    } else if !suppress && suppression_reason.is_some() {
-        return Err(CliDiagnostic::unexpected_argument(
-            "--reason",
-            "`--reason` is only valid when `--suppress` is used.",
-        ));
-    };
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pg_console::BufferConsole;
-
-    #[test]
-    fn incompatible_arguments() {
-        {
-            let (write, suppress, suppression_reason, fix, unsafe_) =
-                (true, false, None, true, false);
-            assert!(check_fix_incompatible_arguments(FixFileModeOptions {
-                write,
-                suppress,
-                suppression_reason,
-                fix,
-                unsafe_
-            })
-            .is_err());
-        }
-    }
-
-    #[test]
-    fn safe_fixes() {
-        let mut console = BufferConsole::default();
-
-        for (write, suppress, suppression_reason, fix, unsafe_) in [
-            (true, false, None, false, false), // --write
-            (false, false, None, true, false), // --fix
-        ] {
-            assert_eq!(
-                determine_fix_file_mode(
-                    FixFileModeOptions {
-                        write,
-                        suppress,
-                        suppression_reason,
-                        fix,
-                        unsafe_
-                    },
-                    &mut console
-                )
-                .unwrap(),
-                Some(FixFileMode::SafeFixes)
-            );
-        }
-    }
-
-    #[test]
-    fn safe_and_unsafe_fixes() {
-        let mut console = BufferConsole::default();
-
-        for (write, suppress, suppression_reason, fix, unsafe_) in [
-            (true, false, None, false, true), // --write --unsafe
-            (false, false, None, true, true), // --fix --unsafe
-        ] {
-            assert_eq!(
-                determine_fix_file_mode(
-                    FixFileModeOptions {
-                        write,
-                        suppress,
-                        suppression_reason,
-                        fix,
-                        unsafe_
-                    },
-                    &mut console
-                )
-                .unwrap(),
-                Some(FixFileMode::SafeAndUnsafeFixes)
-            );
-        }
-    }
-
-    #[test]
-    fn no_fix() {
-        let mut console = BufferConsole::default();
-
-        let (write, suppress, suppression_reason, fix, unsafe_) =
-            (false, false, None, false, false);
-        assert_eq!(
-            determine_fix_file_mode(
-                FixFileModeOptions {
-                    write,
-                    suppress,
-                    suppression_reason,
-                    fix,
-                    unsafe_
-                },
-                &mut console
-            )
-            .unwrap(),
-            None
-        );
-    }
 
     /// Tests that all CLI options adhere to the invariants expected by `bpaf`.
     #[test]

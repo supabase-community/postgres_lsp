@@ -4,13 +4,17 @@ use std::{
     borrow::Cow,
     num::NonZeroU64,
     path::{Path, PathBuf},
+    str::FromStr,
     sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
 };
 
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
 use pg_configuration::{
-    database::PartialDatabaseConfiguration, diagnostics::InvalidIgnorePattern,
-    files::FilesConfiguration, ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration,
+    database::PartialDatabaseConfiguration,
+    diagnostics::InvalidIgnorePattern,
+    files::FilesConfiguration,
+    migrations::{self, MigrationsConfiguration, PartialMigrationsConfiguration},
+    ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration,
 };
 use pg_fs::FileSystem;
 
@@ -27,6 +31,9 @@ pub struct Settings {
 
     /// Linter settings applied to all files in the workspace
     pub linter: LinterSettings,
+
+    /// Migrations settings
+    pub migrations: Option<MigrationSettings>,
 }
 
 #[derive(Debug)]
@@ -97,6 +104,14 @@ impl Settings {
         if let Some(linter) = configuration.linter {
             self.linter =
                 to_linter_settings(working_directory.clone(), LinterConfiguration::from(linter))?;
+        }
+
+        // Migrations settings
+        if let Some(migrations) = configuration.migrations {
+            self.migrations = to_migration_settings(
+                working_directory.clone(),
+                MigrationsConfiguration::from(migrations),
+            );
         }
 
         Ok(())
@@ -302,6 +317,32 @@ pub struct FilesSettings {
 
     /// gitignore file patterns
     pub git_ignore: Option<Gitignore>,
+}
+
+/// Migration settings
+#[derive(Debug, Default)]
+pub struct MigrationSettings {
+    pub path: Option<PathBuf>,
+    pub after: Option<u64>,
+}
+
+impl From<PartialMigrationsConfiguration> for MigrationSettings {
+    fn from(value: PartialMigrationsConfiguration) -> Self {
+        Self {
+            path: value.migrations_dir.map(PathBuf::from),
+            after: value.after,
+        }
+    }
+}
+
+fn to_migration_settings(
+    working_directory: Option<PathBuf>,
+    conf: MigrationsConfiguration,
+) -> Option<MigrationSettings> {
+    working_directory.map(|working_directory| MigrationSettings {
+        path: Some(working_directory.join(conf.migrations_dir)),
+        after: Some(conf.after),
+    })
 }
 
 /// Limit the size of files to 1.0 MiB by default

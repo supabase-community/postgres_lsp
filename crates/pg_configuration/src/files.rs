@@ -1,7 +1,7 @@
 use std::num::NonZeroU64;
 
 use biome_deserialize::StringSet;
-use biome_deserialize_macros::Partial;
+use biome_deserialize_macros::{Merge, Partial};
 use bpaf::Bpaf;
 use serde::{Deserialize, Serialize};
 
@@ -12,7 +12,7 @@ pub const DEFAULT_FILE_SIZE_LIMIT: NonZeroU64 =
 
 /// The configuration of the filesystem
 #[derive(Clone, Debug, Deserialize, Eq, Partial, PartialEq, Serialize)]
-#[partial(derive(Bpaf, Clone, Eq, PartialEq))]
+#[partial(derive(Bpaf, Clone, Eq, PartialEq, Merge))]
 #[partial(serde(rename_all = "snake_case", default, deny_unknown_fields))]
 pub struct FilesConfiguration {
     /// The maximum allowed size for source code files in bytes. Files above

@@ -1,4 +1,10 @@
-use std::{fs, future::Future, panic::RefUnwindSafe, path::Path, sync::RwLock};
+use std::{
+    fs,
+    future::Future,
+    panic::RefUnwindSafe,
+    path::{Path, PathBuf},
+    sync::RwLock,
+};
 
 use analyser::AnalyserVisitorBuilder;
 use change::StatementChange;
@@ -33,6 +39,7 @@ use super::{
 mod analyser;
 mod change;
 mod document;
+mod migration;
 mod pg_query;
 mod tree_sitter;
 
@@ -150,13 +157,28 @@ impl WorkspaceServer {
         Ok(())
     }
 
+    fn is_ignored_by_migration_config(&self, path: &Path) -> bool {
+        let set = self.settings();
+        set.as_ref()
+            .migrations
+            .as_ref()
+            .and_then(|migration_settings| {
+                let ignore_before = migration_settings.after.as_ref()?;
+                let migrations_dir = migration_settings.path.as_ref()?;
+                let migration = migration::get_migration(path, migrations_dir)?;
+
+                Some(&migration.timestamp <= ignore_before)
+            })
+            .unwrap_or(false)
+    }
+
     /// Check whether a file is ignored in the top-level config `files.ignore`/`files.include`
     fn is_ignored(&self, path: &Path) -> bool {
         let file_name = path.file_name().and_then(|s| s.to_str());
         // Never ignore PGLSP's config file regardless `include`/`ignore`
         (file_name != Some(ConfigName::pglsp_toml())) &&
             // Apply top-level `include`/`ignore
-            (self.is_ignored_by_top_level_config(path))
+            (self.is_ignored_by_top_level_config(path) || self.is_ignored_by_migration_config(path))
     }
 
     /// Check whether a file is ignored in the top-level config `files.ignore`/`files.include`

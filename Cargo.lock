@@ -2232,6 +2232,8 @@ name = "pg_cli"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "biome_deserialize",
+ "biome_deserialize_macros",
  "bpaf",
  "crossbeam",
  "dashmap 5.5.3",
@@ -2658,6 +2660,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sqlx",
+ "tempfile",
  "text-size",
  "tokio",
  "toml",
@@ -3788,12 +3791,13 @@ checksum = "42a4d50cdb458045afc8131fd91b64904da29548bcb63c7236e0844936c13078"
 
 [[package]]
 name = "tempfile"
-version = "3.14.0"
+version = "3.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28cce251fcbc87fac86a866eeb0d6c2d536fc16d06f184bb61aeae11aa4cee0c"
+checksum = "9a8a559c81686f576e8cd0290cd2a24a2a9ad80c98b3478856500fcbd7acd704"
 dependencies = [
  "cfg-if",
  "fastrand 2.3.0",
+ "getrandom",
  "once_cell",
  "rustix 0.38.42",
  "windows-sys 0.59.0",
