@@ -92,9 +92,12 @@ jobs:
         id: download
         with:
           merge-multiple: true
+          path: artifacts
 
       - name: Print Download Path
-        run: echo "Downloaded Artifacts to ${{ steps.download.outputs.download-path }}"
+        run: |
+          echo "Downloaded Artifacts to ${{ steps.download.outputs.download-path }}"
+          ls -lsah ${{ steps.download.outputs.download-path }}
 
       - name: 📂 Create Release
         uses: softprops/action-gh-release@v1
