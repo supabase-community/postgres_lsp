@@ -55,10 +55,6 @@ jobs:
       - name: 🛠️ Run Build
         run: cargo build -p pg_cli --release --target ${{ matrix.config.target }}
 
-      - name: 🙏 Compress Files
-        run: |
-          tar -czf "/tmp/compressed" target/${{ matrix.config.target }}/release
-
       # It is not possible to return the artifacts from the matrix jobs individually.
       # Matrix outputs overwrite each other.
       # A common workaround is to upload and download the resulting artifacts.
@@ -66,8 +62,11 @@ jobs:
         id: upload-artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.config.target }}.tar.gz
-          path: /tmp/compressed
+          name: ${{ matrix.config.target }}
+          path: target/${{ matrix.config.target }}/release
+          # The default compression level is 6; this took
+          compression-level: 2
+          if-no-files-found: warn
 
   create_changelog_and_release:
     runs-on: ubuntu-latest
@@ -82,8 +81,8 @@ jobs:
       - name: 👇 Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: ${{ needs.build_and_test.outputs.artifact_url }}
-          path: /tmp/artifacts
+          path: /artifacts
+          merge-multiple: true
 
       - name: 📝 Create Changelog
         uses: orhun/git-cliff-action@v3
@@ -94,10 +93,17 @@ jobs:
         env:
           GITHUB_REPO: ${{ github.repository }}
 
+      - name: 📍️ Prepend Release Tag
+        run: |
+          cd artifacts
+          for file in *; do
+            mv "$file" "pgcli_${{ steps.create_changelog.outputs.version }}_$file" 
+          done
+
       - name: 📂 Create Release
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ steps.create_changelog.outputs.changelog }}
           tag_name: ${{ steps.create_changelog.outputs.version }}
-          files: /tmp/artifacts/*
+          files: /artifacts/*
