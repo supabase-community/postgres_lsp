@@ -102,4 +102,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ steps.create_changelog.outputs.content }}
           tag_name: ${{ steps.create_changelog.outputs.version }}
-          files: ${{ steps.download.outputs.download-path }}
+          files: ${{ steps.download.outputs.download-path }}/*
