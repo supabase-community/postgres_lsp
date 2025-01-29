@@ -13,9 +13,9 @@ username = "postgres"
 password = "postgres"
 database = "postgres"
 
-[migrations]
-migrations_dir = "migrations"
-after = 20230912094327
+# [migrations]
+# migrations_dir = "migrations"
+# after = 20230912094327
 
 [linter]
 enabled = true

@@ -24,7 +24,11 @@ pub(crate) fn get_migration(path: &Path, migrations_dir: &Path) -> Option<Migrat
         return None;
     }
 
-    // Try Root pattern
+    // we are trying to match patterns used by popular migration tools
+
+    // in the "root" pattern, all files are directly within the migrations directory
+    // and their names follow <timestamp>_<name>.sql.
+    // this is used by supabase
     let root_migration = path
         .file_name()
         .and_then(|os_str| os_str.to_str())
@@ -39,7 +43,8 @@ pub(crate) fn get_migration(path: &Path, migrations_dir: &Path) -> Option<Migrat
         return root_migration;
     }
 
-    // Try Subdirectory pattern
+    // in the "subdirectory" pattern, each migration is in a subdirectory named <timestamp>_<name>
+    // this is used by prisma and drizzle
     path.parent()
         .and_then(|parent| parent.file_name())
         .and_then(|os_str| os_str.to_str())
@@ -95,7 +100,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_migration_non_migration_file() {
+    fn test_get_migration_not_timestamp_in_filename() {
         let migrations_dir = PathBuf::from("/tmp/migrations");
         let path = migrations_dir.join("not_a_migration.sql");
 
