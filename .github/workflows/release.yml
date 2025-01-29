@@ -35,9 +35,8 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           target: ${{ matrix.config.target }}
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
         id: rust-cache
-
       - name: Have we hit Cache?
         run: |
           echo "Cache hit: ${{ steps.rust-cache.outputs.cache-hit }}"
@@ -55,8 +54,7 @@ jobs:
       - name: 🛠️ Run Build
         run: cargo build -p pg_cli --release --target ${{ matrix.config.target }}
 
-      # It is not possible to return the artifacts from the matrix jobs individually.
-      # Matrix outputs overwrite each other.
+      # It is not possible to return the artifacts from the matrix jobs individually: Matrix outputs overwrite each other.
       # A common workaround is to upload and download the resulting artifacts.
       - name: 👆 Upload Artifacts
         id: upload-artifacts
@@ -64,7 +62,9 @@ jobs:
         with:
           name: pgcli_${{ matrix.config.target }}
           path: target/${{ matrix.config.target }}/release
-          # The default compression level is 6; this took
+          # The default compression level is 6; this took the binary down from 350 to 330MB.
+          # It is recommended to use a lower level for binaries, since the compressed result is not much smaller,
+          # and the higher levels of compression take much longer.
           compression-level: 2
           if-no-files-found: warn
 
@@ -81,7 +81,7 @@ jobs:
       - name: 👇 Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: /artifacts
+          path: artifacts
           merge-multiple: true
 
       - name: 📝 Create Changelog
@@ -99,4 +99,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ steps.create_changelog.outputs.changelog }}
           tag_name: ${{ steps.create_changelog.outputs.version }}
-          files: /artifacts/*
+          files: artifacts/*
