@@ -1,10 +1,4 @@
-use std::{
-    fs,
-    future::Future,
-    panic::RefUnwindSafe,
-    path::{Path, PathBuf},
-    sync::RwLock,
-};
+use std::{fs, future::Future, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
 use analyser::AnalyserVisitorBuilder;
 use change::StatementChange;
