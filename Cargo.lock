@@ -2420,7 +2420,7 @@ dependencies = [
  "cstree",
  "insta",
  "pg_lexer_codegen",
- "pg_query",
+ "pg_query 6.0.0",
  "regex",
  "text-size",
 ]
@@ -2512,13 +2512,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "pg_query"
+version = "6.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b43f9990f5c9816195cb45b5fce403bd032ab1590d0df3525095ee267f0edc20"
+dependencies = [
+ "bindgen",
+ "cc",
+ "fs_extra",
+ "glob",
+ "itertools",
+ "prost",
+ "prost-build",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "pg_query_ext"
 version = "0.0.0"
 dependencies = [
  "petgraph",
  "pg_diagnostics",
  "pg_lexer",
- "pg_query",
+ "pg_query 6.0.0",
  "pg_query_ext_codegen",
  "text-size",
 ]
@@ -2563,7 +2581,7 @@ version = "0.0.0"
 dependencies = [
  "ntest",
  "pg_lexer",
- "pg_query",
+ "pg_query 6.0.0",
  "text-size",
 ]
 
@@ -2575,7 +2593,7 @@ dependencies = [
  "insta",
  "petgraph",
  "pg_lexer",
- "pg_query",
+ "pg_query 0.8.2",
  "pg_query_ext",
  "text-size",
 ]
