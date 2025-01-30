@@ -22,4 +22,4 @@ pg_query_ext.workspace = true
 
 [dev-dependencies]
 insta    = "1.31.0"
-pg_query = "0.8"
+pg_query = "6.0.0"
