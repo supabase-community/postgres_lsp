@@ -6,7 +6,6 @@ use pg_diagnostics::PrintDiagnostic;
 use pg_test_utils::test_database::get_new_test_db;
 use pg_typecheck::{check_sql, TypecheckParams};
 use sqlx::Executor;
-use unicode_normalization::UnicodeNormalization;
 
 async fn test(name: &str, query: &str, setup: &str) {
     let test_db = get_new_test_db().await;
@@ -44,13 +43,10 @@ async fn test(name: &str, query: &str, setup: &str) {
 
     let content = String::from_utf8(content).unwrap();
 
-    // Normalize Unicode characters
-    let normalized = content.nfkc().collect::<String>();
-
     insta::with_settings!({
         prepend_module_to_snapshot => false,
     }, {
-        insta::assert_snapshot!(name, normalized);
+        insta::assert_snapshot!(name, content);
     });
 }
 
