@@ -42,10 +42,17 @@ async fn test(name: &str, query: &str, setup: &str) {
         .unwrap();
 
     let content = String::from_utf8(content).unwrap();
+
+    // Normalize line endings
+    let normalized_content = content.replace("\r\n", "\n");
+
+    // Replace Windows-style path separators with forward slashes
+    let normalized_content = normalized_content.replace("\\", "/");
+
     insta::with_settings!({
         prepend_module_to_snapshot => false,
     }, {
-        insta::assert_snapshot!(name, content);
+        insta::assert_snapshot!(name, normalized_content);
     });
 }
 
