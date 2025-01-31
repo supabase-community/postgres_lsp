@@ -45,7 +45,7 @@ async fn test(name: &str, query: &str, setup: &str) {
     let content = String::from_utf8(content).unwrap();
 
     // Normalize Unicode characters
-    let normalized = content.nfkd().collect::<String>();
+    let normalized = content.nfkc().collect::<String>();
 
     insta::with_settings!({
         prepend_module_to_snapshot => false,
