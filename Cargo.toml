@@ -60,8 +60,6 @@ pg_diagnostics_categories = { path = "./crates/pg_diagnostics_categories", versi
 pg_diagnostics_macros     = { path = "./crates/pg_diagnostics_macros", version = "0.0.0" }
 pg_flags                  = { path = "./crates/pg_flags", version = "0.0.0" }
 pg_fs                     = { path = "./crates/pg_fs", version = "0.0.0" }
-pg_hover                  = { path = "./crates/pg_hover", version = "0.0.0" }
-pg_inlay_hints            = { path = "./crates/pg_inlay_hints", version = "0.0.0" }
 pg_lexer                  = { path = "./crates/pg_lexer", version = "0.0.0" }
 pg_lexer_codegen          = { path = "./crates/pg_lexer_codegen", version = "0.0.0" }
 pg_lint                   = { path = "./crates/pg_lint", version = "0.0.0" }
@@ -73,7 +71,6 @@ pg_query_ext_codegen      = { path = "./crates/pg_query_ext_codegen", version = 
 pg_query_proto_parser     = { path = "./crates/pg_query_proto_parser", version = "0.0.0" }
 pg_schema_cache           = { path = "./crates/pg_schema_cache", version = "0.0.0" }
 pg_statement_splitter     = { path = "./crates/pg_statement_splitter", version = "0.0.0" }
-pg_syntax                 = { path = "./crates/pg_syntax", version = "0.0.0" }
 pg_text_edit              = { path = "./crates/pg_text_edit", version = "0.0.0" }
 pg_treesitter_queries     = { path = "./crates/pg_treesitter_queries", version = "0.0.0" }
 pg_type_resolver          = { path = "./crates/pg_type_resolver", version = "0.0.0" }
