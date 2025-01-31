@@ -16,5 +16,5 @@ pg_lexer.workspace  = true
 text-size.workspace = true
 
 [dev-dependencies]
-ntest    = "0.9.3"
-pg_query = "6.0.0"
+ntest              = "0.9.3"
+pg_query.workspace = true
