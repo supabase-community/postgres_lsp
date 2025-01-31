@@ -4,7 +4,6 @@ use std::{
     borrow::Cow,
     num::NonZeroU64,
     path::{Path, PathBuf},
-    str::FromStr,
     sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
 };
 
@@ -13,7 +12,7 @@ use pg_configuration::{
     database::PartialDatabaseConfiguration,
     diagnostics::InvalidIgnorePattern,
     files::FilesConfiguration,
-    migrations::{self, MigrationsConfiguration, PartialMigrationsConfiguration},
+    migrations::{MigrationsConfiguration, PartialMigrationsConfiguration},
     ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration,
 };
 use pg_fs::FileSystem;

@@ -3,7 +3,7 @@ mod codegen;
 use pg_query::protobuf::{KeywordKind, ScanToken};
 use regex::Regex;
 use std::{collections::VecDeque, sync::LazyLock};
-use text_size::{TextRange, TextSize};
+use text_size::{TextLen, TextRange, TextSize};
 
 pub use crate::codegen::SyntaxKind;
 
@@ -119,25 +119,24 @@ pub fn lex(text: &str) -> Vec<Token> {
 
     // merge the two token lists
     let mut tokens: Vec<Token> = Vec::new();
-    let mut pos = 0;
+    let mut pos = TextSize::from(0);
 
-    while pos < text.len() {
-        if !pg_query_tokens.is_empty() && pg_query_tokens[0].start == i32::try_from(pos).unwrap() {
+    while pos < text.text_len() {
+        if !pg_query_tokens.is_empty()
+            && TextSize::from(u32::try_from(pg_query_tokens[0].start).unwrap()) == pos
+        {
             let pg_query_token = pg_query_tokens.pop_front().unwrap();
-            let token_text: String = text
-                .chars()
-                .skip(usize::try_from(pg_query_token.start).unwrap())
-                .take(
-                    usize::try_from(pg_query_token.end).unwrap()
-                        - usize::try_from(pg_query_token.start).unwrap(),
-                )
-                .collect();
-            let len = token_text.len();
+
+            // the lexer returns byte indices, so we need to slice
+            let token_text = &text[usize::try_from(pg_query_token.start).unwrap()
+                ..usize::try_from(pg_query_token.end).unwrap()];
+
+            let len = token_text.text_len();
             let has_whitespace = token_text.contains(" ") || token_text.contains("\n");
             tokens.push(Token {
                 token_type: TokenType::from(&pg_query_token),
                 kind: SyntaxKind::from(&pg_query_token),
-                text: token_text,
+                text: token_text.to_string(),
                 span: TextRange::new(
                     TextSize::from(u32::try_from(pg_query_token.start).unwrap()),
                     TextSize::from(u32::try_from(pg_query_token.end).unwrap()),
@@ -147,8 +146,7 @@ pub fn lex(text: &str) -> Vec<Token> {
 
             if has_whitespace {
                 while !whitespace_tokens.is_empty()
-                    && whitespace_tokens[0].span.start()
-                        < TextSize::from(u32::try_from(pos).unwrap())
+                    && whitespace_tokens[0].span.start() < TextSize::from(u32::from(pos))
                 {
                     whitespace_tokens.pop_front();
                 }
@@ -158,16 +156,21 @@ pub fn lex(text: &str) -> Vec<Token> {
         }
 
         if !whitespace_tokens.is_empty()
-            && whitespace_tokens[0].span.start() == TextSize::from(u32::try_from(pos).unwrap())
+            && whitespace_tokens[0].span.start() == TextSize::from(u32::from(pos))
         {
             let whitespace_token = whitespace_tokens.pop_front().unwrap();
-            let len = whitespace_token.text.len();
+            let len = whitespace_token.text.text_len();
             tokens.push(whitespace_token);
             pos += len;
             continue;
         }
 
-        panic!("No token found at position {}", pos);
+        let usize_pos = usize::from(pos);
+        panic!(
+            "No token found at position {:?}: '{:?}'",
+            pos,
+            text.get(usize_pos..usize_pos + 1)
+        );
     }
 
     tokens
@@ -176,6 +179,13 @@ pub fn lex(text: &str) -> Vec<Token> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_special_chars() {
+        let input = "insert into c (name, full_name) values ('Å', 1);";
+        let tokens = lex(input);
+        assert!(!tokens.is_empty());
+    }
 
     #[test]
     fn test_tab_tokens() {
