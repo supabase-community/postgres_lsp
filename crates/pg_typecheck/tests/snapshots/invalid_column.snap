@@ -1,6 +1,6 @@
 ---
 source: crates/pg_typecheck/tests/diagnostics.rs
-expression: content
+expression: normalized
 snapshot_kind: text
 ---
 typecheck ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -8,5 +8,3 @@ typecheck ━━━━━━━━━━━━━━━━━━━━━━━�
   <strong><span style="color: Tomato;">✖</span></strong> <span style="color: Tomato;">column &quot;unknown&quot; does not exist</span>
   
   <strong><span style="color: Tomato;">✖</span></strong> <span style="color: Tomato;">Error Code: </span><span style="color: Tomato;"><strong>42703</strong></span>
-  
-  <strong><span style="color: lightgreen;">ℹ</span></strong> <span style="color: lightgreen;">Source: </span><span style="color: lightgreen;">parse_relation.c</span><span style="color: lightgreen;">:</span><span style="color: lightgreen;">3716</span><span style="color: lightgreen;"> in </span><span style="color: lightgreen;">errorMissingColumn</span>

@@ -122,7 +122,7 @@ jobs:
       matrix:
         include:
           # reactive once we upgrade to the latest version of pg_query that is windows-compatible
-          # - os: windows-latest
+          - os: windows-latest
           - os: ubuntu-latest
     steps:
       - name: Checkout PR branch

@@ -42,6 +42,7 @@ async fn test(name: &str, query: &str, setup: &str) {
         .unwrap();
 
     let content = String::from_utf8(content).unwrap();
+
     insta::with_settings!({
         prepend_module_to_snapshot => false,
     }, {

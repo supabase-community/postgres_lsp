@@ -2386,34 +2386,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pg_hover"
-version = "0.0.0"
-dependencies = [
- "pg_query_ext",
- "pg_schema_cache",
- "pg_syntax",
- "text-size",
- "tree-sitter",
- "tree_sitter_sql",
-]
-
-[[package]]
-name = "pg_inlay_hints"
-version = "0.0.0"
-dependencies = [
- "async-std",
- "pg_query_ext",
- "pg_schema_cache",
- "pg_syntax",
- "pg_test_utils",
- "pg_type_resolver",
- "sqlx",
- "text-size",
- "tree-sitter",
- "tree_sitter_sql",
-]
-
-[[package]]
 name = "pg_lexer"
 version = "0.0.0"
 dependencies = [
@@ -2432,23 +2404,6 @@ dependencies = [
  "pg_query_proto_parser",
  "proc-macro2",
  "quote",
-]
-
-[[package]]
-name = "pg_lint"
-version = "0.0.0"
-dependencies = [
- "enumflags2",
- "lazy_static",
- "pg_base_db",
- "pg_console",
- "pg_diagnostics",
- "pg_query_ext",
- "pg_syntax",
- "serde",
- "serde_json",
- "serde_plain",
- "text-size",
 ]
 
 [[package]]
@@ -2497,12 +2452,14 @@ dependencies = [
 
 [[package]]
 name = "pg_query"
-version = "0.8.2"
+version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d62d572612b3aa26c454f27f2a3d94c19b7d10edcca957c1d23767a8f3fbccb6"
+checksum = "b43f9990f5c9816195cb45b5fce403bd032ab1590d0df3525095ee267f0edc20"
 dependencies = [
  "bindgen",
+ "cc",
  "fs_extra",
+ "glob",
  "itertools",
  "prost",
  "prost-build",
@@ -2564,19 +2521,6 @@ dependencies = [
  "ntest",
  "pg_lexer",
  "pg_query",
- "text-size",
-]
-
-[[package]]
-name = "pg_syntax"
-version = "0.0.0"
-dependencies = [
- "cstree",
- "insta",
- "petgraph",
- "pg_lexer",
- "pg_query",
- "pg_query_ext",
  "text-size",
 ]
 
@@ -3317,15 +3261,6 @@ dependencies = [
  "itoa",
  "memchr",
  "ryu",
- "serde",
-]
-
-[[package]]
-name = "serde_plain"
-version = "1.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ce1fc6db65a611022b23a0dec6975d63fb80a302cb3388835ff02c097258d50"
-dependencies = [
  "serde",
 ]
 

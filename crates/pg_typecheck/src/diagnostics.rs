@@ -86,18 +86,6 @@ impl Advices for TypecheckAdvices {
             visitor.record_log(LogCategory::Info, &markup! { "Hint: "{hint}"" })?;
         }
 
-        // Show source location if available
-        if let (Some(file), Some(line)) = (&self.file, &self.line) {
-            if let Some(routine) = &self.routine {
-                visitor.record_log(
-                    LogCategory::Info,
-                    &markup! { "Source: "{file}":"{line}" in "{routine}"" },
-                )?;
-            } else {
-                visitor.record_log(LogCategory::Info, &markup! { "Source: "{file}":"{line}"" })?;
-            }
-        }
-
         Ok(())
     }
 }

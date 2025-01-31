@@ -13,10 +13,10 @@ version              = "0.0.0"
 
 [dependencies]
 petgraph = "0.6.4"
-pg_query = "0.8"
 
 pg_diagnostics.workspace       = true
 pg_lexer.workspace             = true
+pg_query.workspace             = true
 pg_query_ext_codegen.workspace = true
 text-size.workspace            = true
 

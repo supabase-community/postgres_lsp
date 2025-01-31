@@ -60,7 +60,7 @@ pub static WHITESPACE_TOKENS: &[SyntaxKind] = &[
 ];
 
 static PATTERN_LEXER: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?P<whitespace> +)|(?P<newline>\n+)|(?P<tab>\t+)").unwrap());
+    LazyLock::new(|| Regex::new(r"(?P<whitespace> +)|(?P<newline>\r?\n+)|(?P<tab>\t+)").unwrap());
 
 fn whitespace_tokens(input: &str) -> VecDeque<Token> {
     let mut tokens = VecDeque::new();
