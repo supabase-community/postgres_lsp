@@ -2579,6 +2579,7 @@ dependencies = [
  "tokio",
  "tree-sitter",
  "tree_sitter_sql",
+ "unicode-normalization",
 ]
 
 [[package]]
