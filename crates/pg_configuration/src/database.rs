@@ -26,6 +26,10 @@ pub struct DatabaseConfiguration {
     /// The name of the database.
     #[partial(bpaf(long("database")))]
     pub database: String,
+
+    /// The connection timeout in seconds.
+    #[partial(bpaf(long("conn_timeout")))]
+    pub conn_timeout: Option<u16>,
 }
 
 impl Default for DatabaseConfiguration {
@@ -36,15 +40,7 @@ impl Default for DatabaseConfiguration {
             username: "postgres".to_string(),
             password: "postgres".to_string(),
             database: "postgres".to_string(),
+            conn_timeout: Some(10),
         }
-    }
-}
-
-impl DatabaseConfiguration {
-    pub fn to_connection_string(&self) -> String {
-        format!(
-            "postgres://{}:{}@{}:{}/{}",
-            self.username, self.password, self.host, self.port, self.database
-        )
     }
 }

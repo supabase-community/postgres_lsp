@@ -1,4 +1,7 @@
-use std::{fs, future::Future, panic::RefUnwindSafe, path::Path, sync::RwLock};
+use std::{
+    fs, future::Future, panic::RefUnwindSafe, path::Path, str::FromStr, sync::RwLock,
+    time::Duration,
+};
 
 use analyser::AnalyserVisitorBuilder;
 use change::StatementChange;
@@ -12,7 +15,11 @@ use pg_fs::{ConfigName, PgLspPath};
 use pg_query::PgQueryStore;
 use pg_schema_cache::SchemaCache;
 use pg_typecheck::TypecheckParams;
-use sqlx::PgPool;
+use sqlx::{
+    pool::PoolOptions,
+    postgres::{PgConnectOptions, PgPoolOptions},
+    PgPool,
+};
 use std::sync::LazyLock;
 use tokio::runtime::Runtime;
 use tracing::info;
@@ -20,7 +27,7 @@ use tree_sitter::TreeSitterStore;
 
 use crate::{
     configuration::to_analyser_rules,
-    settings::{Settings, SettingsHandle, SettingsHandleMut},
+    settings::{DatabaseSettings, Settings, SettingsHandle, SettingsHandleMut},
     workspace::PullDiagnosticsResult,
     WorkspaceError,
 };
@@ -41,7 +48,6 @@ mod tree_sitter;
 #[derive(Default)]
 struct DbConnection {
     pool: Option<PgPool>,
-    connection_string: Option<String>,
 }
 
 // Global Tokio Runtime
@@ -53,15 +59,40 @@ impl DbConnection {
         self.pool.clone()
     }
 
-    pub(crate) fn set_connection(&mut self, connection_string: &str) -> Result<(), WorkspaceError> {
-        if self.connection_string.is_none()
-            || self.connection_string.as_ref().unwrap() != connection_string
-        {
-            self.connection_string = Some(connection_string.to_string());
-            self.pool = Some(PgPool::connect_lazy(connection_string)?);
+    pub(crate) fn set_connection(
+        &mut self,
+        settings: &DatabaseSettings,
+    ) -> Result<(), WorkspaceError> {
+        if self.is_already_connected(settings) {
+            return Ok(());
         }
 
+        let config = PgConnectOptions::new()
+            .host(&settings.host)
+            .port(settings.port)
+            .username(&settings.username)
+            .password(&settings.password)
+            .database(&settings.database);
+
+        self.pool = Some(
+            PoolOptions::new()
+                .acquire_timeout(settings.conn_timeout.clone())
+                .connect_lazy_with(config),
+        );
+
         Ok(())
+    }
+
+    fn is_already_connected(&self, settings: &DatabaseSettings) -> bool {
+        self.pool
+            .as_ref()
+            .map(|p| p.connect_options())
+            .is_some_and(|opts| {
+                opts.get_host() == settings.host
+                    && opts.get_port() == settings.port
+                    && opts.get_username() == settings.username
+                    && opts.get_database() == Some(&settings.database)
+            })
     }
 }
 
@@ -122,11 +153,10 @@ impl WorkspaceServer {
     fn refresh_db_connection(&self) -> Result<(), WorkspaceError> {
         let s = self.settings();
 
-        let connection_string = s.as_ref().db.to_connection_string();
         self.connection
             .write()
             .unwrap()
-            .set_connection(&connection_string)?;
+            .set_connection(&s.as_ref().db)?;
 
         self.reload_schema_cache()?;
 
