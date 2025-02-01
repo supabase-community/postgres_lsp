@@ -53,7 +53,7 @@ impl DbConnection {
     }
 
     pub(crate) fn connect(&mut self, settings: &DatabaseSettings) -> Result<(), WorkspaceError> {
-        if self.matches_current_connection(settings) {
+        if self.is_already_connected(settings) {
             return Ok(());
         }
 
@@ -78,7 +78,7 @@ impl DbConnection {
         Ok(())
     }
 
-    fn matches_current_connection(&self, settings: &DatabaseSettings) -> bool {
+    fn is_already_connected(&self, settings: &DatabaseSettings) -> bool {
         self.pool
             .as_ref()
             .map(|p| p.connect_options())
@@ -148,10 +148,22 @@ impl WorkspaceServer {
     fn refresh_db_connection(&self) -> Result<(), WorkspaceError> {
         let s = self.settings();
 
-        self.connection.write().unwrap().connect(&s.as_ref().db)?;
-        self.reload_schema_cache()?;
+        match self.connection.write().unwrap().connect(&s.as_ref().db) {
+            Ok(_) => {
+                self.reload_schema_cache()?;
+                Ok(())
+            }
+            Err(e) => {
+                tracing::error!("Failed to connect to database: {:?}", e);
+                self.reset_schema_cache();
+                Err(e)
+            }
+        }
+    }
 
-        Ok(())
+    fn reset_schema_cache(&self) {
+        let mut cache = self.schema_cache.write().unwrap();
+        *cache = SchemaCache::default();
     }
 
     fn reload_schema_cache(&self) -> Result<(), WorkspaceError> {
@@ -164,8 +176,7 @@ impl WorkspaceServer {
             *cache = schema_cache;
         } else {
             // if we can't get a connection, we'l reset the schema cache
-            let mut cache = self.schema_cache.write().unwrap();
-            *cache = SchemaCache::default();
+            self.reset_schema_cache();
         }
         tracing::info!("Schema cache reloaded");
 
