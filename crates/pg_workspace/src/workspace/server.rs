@@ -1,7 +1,4 @@
-use std::{
-    fs, future::Future, panic::RefUnwindSafe, path::Path, str::FromStr, sync::RwLock,
-    time::Duration,
-};
+use std::{fs, future::Future, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
 use analyser::AnalyserVisitorBuilder;
 use change::StatementChange;
@@ -15,11 +12,7 @@ use pg_fs::{ConfigName, PgLspPath};
 use pg_query::PgQueryStore;
 use pg_schema_cache::SchemaCache;
 use pg_typecheck::TypecheckParams;
-use sqlx::{
-    pool::PoolOptions,
-    postgres::{PgConnectOptions, PgPoolOptions},
-    PgPool,
-};
+use sqlx::{pool::PoolOptions, postgres::PgConnectOptions, PgPool, Postgres};
 use std::sync::LazyLock;
 use tokio::runtime::Runtime;
 use tracing::info;
@@ -59,11 +52,8 @@ impl DbConnection {
         self.pool.clone()
     }
 
-    pub(crate) fn set_connection(
-        &mut self,
-        settings: &DatabaseSettings,
-    ) -> Result<(), WorkspaceError> {
-        if self.is_already_connected(settings) {
+    pub(crate) fn connect(&mut self, settings: &DatabaseSettings) -> Result<(), WorkspaceError> {
+        if self.matches_current_connection(settings) {
             return Ok(());
         }
 
@@ -74,16 +64,21 @@ impl DbConnection {
             .password(&settings.password)
             .database(&settings.database);
 
-        self.pool = Some(
-            PoolOptions::new()
-                .acquire_timeout(settings.conn_timeout.clone())
-                .connect_lazy_with(config),
-        );
+        let timeout = settings.conn_timeout.clone();
+
+        let maybe_pool = run_async(async move {
+            PoolOptions::<Postgres>::new()
+                .acquire_timeout(timeout)
+                .connect_with(config)
+                .await
+        })?;
+
+        self.pool = Some(maybe_pool?);
 
         Ok(())
     }
 
-    fn is_already_connected(&self, settings: &DatabaseSettings) -> bool {
+    fn matches_current_connection(&self, settings: &DatabaseSettings) -> bool {
         self.pool
             .as_ref()
             .map(|p| p.connect_options())
@@ -153,11 +148,7 @@ impl WorkspaceServer {
     fn refresh_db_connection(&self) -> Result<(), WorkspaceError> {
         let s = self.settings();
 
-        self.connection
-            .write()
-            .unwrap()
-            .set_connection(&s.as_ref().db)?;
-
+        self.connection.write().unwrap().connect(&s.as_ref().db)?;
         self.reload_schema_cache()?;
 
         Ok(())
@@ -165,14 +156,14 @@ impl WorkspaceServer {
 
     fn reload_schema_cache(&self) -> Result<(), WorkspaceError> {
         tracing::info!("Reloading schema cache");
-        // TODO return error if db connection is not available
+
         if let Some(c) = self.connection.read().unwrap().get_pool() {
             let maybe_schema_cache = run_async(async move { SchemaCache::load(&c).await })?;
             let schema_cache = maybe_schema_cache?;
-
             let mut cache = self.schema_cache.write().unwrap();
             *cache = schema_cache;
         } else {
+            // if we can't get a connection, we'l reset the schema cache
             let mut cache = self.schema_cache.write().unwrap();
             *cache = SchemaCache::default();
         }
