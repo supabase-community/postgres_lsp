@@ -44,13 +44,21 @@ impl SchemaCache {
     fn pool_to_conn_str(pool: &PgPool) -> String {
         let conn = pool.connect_options();
 
-        format!(
-            "postgres://{}:<redacted_pw>@{}:{}/{}",
-            conn.get_username(),
-            conn.get_host(),
-            conn.get_port(),
-            conn.get_database().unwrap_or("default")
-        )
+        match conn.get_database() {
+            None => format!(
+                "postgres://{}:<redacted_pw>@{}:{}",
+                conn.get_username(),
+                conn.get_host(),
+                conn.get_port()
+            ),
+            Some(db) => format!(
+                "postgres://{}:<redacted_pw>@{}:{}/{}",
+                conn.get_username(),
+                conn.get_host(),
+                conn.get_port(),
+                db
+            ),
+        }
     }
 
     pub fn has_already_cached_connection(&self, pool: &PgPool) -> bool {
