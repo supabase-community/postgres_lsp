@@ -119,9 +119,6 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
         params: CompletionParams,
     ) -> Result<pg_completions::CompletionResult, WorkspaceError>;
 
-    /// Refresh the schema cache for this workspace
-    fn refresh_schema_cache(&self) -> Result<(), WorkspaceError>;
-
     /// Update the global settings for this workspace
     fn update_settings(&self, params: UpdateSettingsParams) -> Result<(), WorkspaceError>;
 

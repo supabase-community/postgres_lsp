@@ -7,7 +7,7 @@ use_ignore_file = false
 ignore = []
 
 [db]
-host = "127.0.0.1"
+host = "127.1.1.1"
 port = 5432
 username = "postgres"
 password = "postgres"
