@@ -64,7 +64,7 @@ impl DbConnection {
             .password(&settings.password)
             .database(&settings.database);
 
-        let timeout = settings.conn_timeout.clone();
+        let timeout = settings.conn_timeout_secs.clone();
 
         let maybe_pool = run_async(async move {
             PoolOptions::<Postgres>::new()
