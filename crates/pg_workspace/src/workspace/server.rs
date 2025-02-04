@@ -161,10 +161,12 @@ impl Workspace for WorkspaceServer {
 
         tracing::info!("Updated settings in workspace");
 
-        self.connection
-            .write()
-            .unwrap()
-            .set_conn_settings(&self.settings().as_ref().db);
+        if !params.skip_db {
+            self.connection
+                .write()
+                .unwrap()
+                .set_conn_settings(&self.settings().as_ref().db);
+        }
 
         tracing::info!("Updated Db connection settings");
 
@@ -298,10 +300,12 @@ impl Workspace for WorkspaceServer {
 
         let mut diagnostics: Vec<SDiagnostic> = vec![];
 
-        // run diagnostics for each statement in parallel if its mostly i/o work
-        if let Ok(connection) = self.connection.read() {
-            let pool = connection.get_pool();
-
+        if let Some(pool) = self
+            .connection
+            .read()
+            .expect("DbConnection RwLock panicked")
+            .get_pool()
+        {
             let typecheck_params: Vec<_> = doc
                 .iter_statements_with_text_and_range()
                 .map(|(stmt, range, text)| {
@@ -311,12 +315,12 @@ impl Workspace for WorkspaceServer {
                 })
                 .collect();
 
-            let pool_clone = pool.clone();
+            // run diagnostics for each statement in parallel if its mostly i/o work
             let path_clone = params.path.clone();
             let async_results = run_async(async move {
                 stream::iter(typecheck_params)
                     .map(|(text, ast, tree, range)| {
-                        let pool = pool_clone.clone();
+                        let pool = pool.clone();
                         let path = path_clone.clone();
                         async move {
                             if let Some(ast) = ast {
@@ -412,6 +416,11 @@ impl Workspace for WorkspaceServer {
             &params.position
         );
 
+        let pool = match self.connection.read().unwrap().get_pool() {
+            Some(pool) => pool,
+            None => return Ok(pg_completions::CompletionResult::default()),
+        };
+
         let doc = self
             .documents
             .get(&params.path)
@@ -439,7 +448,6 @@ impl Workspace for WorkspaceServer {
 
         tracing::debug!("Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {}", position, stmt_range.start(), stmt_range.end(), text);
 
-        let pool = self.connection.read().unwrap().get_pool();
         let schema_cache = self.schema_cache.load(pool)?;
 
         let result = pg_completions::complete(pg_completions::CompletionParams {

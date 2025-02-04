@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use sqlx::{pool::PoolOptions, postgres::PgConnectOptions, PgPool, Postgres};
 
 use crate::settings::DatabaseSettings;
@@ -8,11 +10,9 @@ pub struct DbConnection {
 }
 
 impl DbConnection {
-    /// Requires that you call `set_conn_settings` at least once before getting a pool.
-    pub(crate) fn get_pool(&self) -> PgPool {
-        self.pool
-            .clone()
-            .expect("The database has never been properly initialized.")
+    /// There might be no pool available if the user decides to skip db checks.
+    pub(crate) fn get_pool(&self) -> Option<PgPool> {
+        self.pool.clone()
     }
 
     pub(crate) fn set_conn_settings(&mut self, settings: &DatabaseSettings) {
@@ -27,6 +27,7 @@ impl DbConnection {
 
         let pool = PoolOptions::<Postgres>::new()
             .acquire_timeout(timeout)
+            .acquire_slow_threshold(Duration::from_secs(2))
             .connect_lazy_with(config);
 
         self.pool = Some(pool);

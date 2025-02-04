@@ -35,6 +35,7 @@ pub(crate) fn check_with_guard<'ctx>(
                     max_diagnostics,
                     only,
                     skip,
+                    true,
                 )
                 .with_file_path_and_code(
                     workspace_file.path.display().to_string(),
