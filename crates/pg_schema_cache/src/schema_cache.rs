@@ -9,8 +9,6 @@ use crate::versions::Version;
 
 #[derive(Debug, Clone, Default)]
 pub struct SchemaCache {
-    cached_conn_str: String,
-
     pub schemas: Vec<Schema>,
     pub tables: Vec<Table>,
     pub functions: Vec<Function>,
@@ -31,7 +29,6 @@ impl SchemaCache {
         )?;
 
         Ok(SchemaCache {
-            cached_conn_str: SchemaCache::pool_to_conn_str(pool),
             schemas,
             tables,
             functions,
@@ -39,30 +36,6 @@ impl SchemaCache {
             versions,
             columns,
         })
-    }
-
-    fn pool_to_conn_str(pool: &PgPool) -> String {
-        let conn = pool.connect_options();
-
-        match conn.get_database() {
-            None => format!(
-                "postgres://{}:<redacted_pw>@{}:{}",
-                conn.get_username(),
-                conn.get_host(),
-                conn.get_port()
-            ),
-            Some(db) => format!(
-                "postgres://{}:<redacted_pw>@{}:{}/{}",
-                conn.get_username(),
-                conn.get_host(),
-                conn.get_port(),
-                db
-            ),
-        }
-    }
-
-    pub fn has_already_cached_connection(&self, pool: &PgPool) -> bool {
-        self.cached_conn_str == SchemaCache::pool_to_conn_str(pool)
     }
 
     /// Applies an AST node to the repository
