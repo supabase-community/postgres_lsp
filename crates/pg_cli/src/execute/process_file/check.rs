@@ -28,6 +28,7 @@ pub(crate) fn check_with_guard<'ctx>(
             let (only, skip) = (Vec::new(), Vec::new());
 
             let max_diagnostics = ctx.remaining_diagnostics.load(Ordering::Relaxed);
+
             let pull_diagnostics_result = workspace_file
                 .guard()
                 .pull_diagnostics(
@@ -40,6 +41,10 @@ pub(crate) fn check_with_guard<'ctx>(
                     workspace_file.path.display().to_string(),
                     category!("check"),
                 )?;
+
+            if pull_diagnostics_result.skipped_db_checks {
+                ctx.set_skipped_db_conn(true);
+            }
 
             let no_diagnostics = pull_diagnostics_result.diagnostics.is_empty()
                 && pull_diagnostics_result.skipped_diagnostics == 0;

@@ -10,11 +10,14 @@ use std::collections::BTreeSet;
 use std::io;
 use std::time::Duration;
 
+use super::UserHintsPayload;
+
 pub(crate) struct ConsoleReporter {
     pub(crate) summary: TraversalSummary,
     pub(crate) diagnostics_payload: DiagnosticsPayload,
     pub(crate) execution: Execution,
     pub(crate) evaluated_paths: BTreeSet<PgLspPath>,
+    pub(crate) user_hints_payload: UserHintsPayload,
 }
 
 impl Reporter for ConsoleReporter {
@@ -22,6 +25,7 @@ impl Reporter for ConsoleReporter {
         let verbose = self.diagnostics_payload.verbose;
         visitor.report_diagnostics(&self.execution, self.diagnostics_payload)?;
         visitor.report_summary(&self.execution, self.summary)?;
+        visitor.report_user_hints(&self.execution, self.user_hints_payload)?;
         if verbose {
             visitor.report_handled_paths(self.evaluated_paths)?;
         }
@@ -113,6 +117,18 @@ impl ReporterVisitor for ConsoleReporterVisitor<'_> {
             }
         }
 
+        Ok(())
+    }
+
+    fn report_user_hints(
+        &mut self,
+        _execution: &Execution,
+        payload: UserHintsPayload,
+    ) -> io::Result<()> {
+        for hint in payload.hints {
+            self.0.log(markup! {{hint}});
+        }
+        self.0.log(markup! {{"\n"}});
         Ok(())
     }
 }

@@ -53,6 +53,7 @@ pub struct PullDiagnosticsResult {
     pub diagnostics: Vec<pg_diagnostics::serde::Diagnostic>,
     pub errors: usize,
     pub skipped_diagnostics: u64,
+    pub skipped_db_checks: bool,
 }
 
 #[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, PartialEq)]

@@ -9,6 +9,7 @@ use crate::reporter::github::{GithubReporter, GithubReporterVisitor};
 use crate::reporter::gitlab::{GitLabReporter, GitLabReporterVisitor};
 use crate::reporter::junit::{JunitReporter, JunitReporterVisitor};
 use crate::reporter::terminal::{ConsoleReporter, ConsoleReporterVisitor};
+use crate::reporter::UserHintsPayload;
 use crate::{CliDiagnostic, CliSession, DiagnosticsPayload, Reporter};
 use pg_diagnostics::{category, Category};
 use pg_fs::PgLspPath;
@@ -242,6 +243,7 @@ pub fn execute_mode(
             summary,
             evaluated_paths,
             diagnostics,
+            user_hints,
         } = traverse(&execution, &mut session, cli_options, paths)?;
         let console = session.app.console;
         let errors = summary.errors;
@@ -260,6 +262,7 @@ pub fn execute_mode(
                     },
                     execution: execution.clone(),
                     evaluated_paths,
+                    user_hints_payload: UserHintsPayload { hints: user_hints },
                 };
                 reporter.write(&mut ConsoleReporterVisitor(console))?;
             }
@@ -271,6 +274,7 @@ pub fn execute_mode(
                         diagnostics,
                     },
                     execution: execution.clone(),
+                    user_hints: UserHintsPayload { hints: user_hints },
                 };
                 reporter.write(&mut GithubReporterVisitor(console))?;
             }
@@ -282,6 +286,7 @@ pub fn execute_mode(
                         diagnostics,
                     },
                     execution: execution.clone(),
+                    user_hints: UserHintsPayload { hints: user_hints },
                 };
                 reporter.write(&mut GitLabReporterVisitor::new(
                     console,
@@ -297,6 +302,7 @@ pub fn execute_mode(
                         diagnostics,
                     },
                     execution: execution.clone(),
+                    user_hints: UserHintsPayload { hints: user_hints },
                 };
                 reporter.write(&mut JunitReporterVisitor::new(console))?;
             }
