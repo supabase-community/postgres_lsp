@@ -2191,266 +2191,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pg_analyse"
-version = "0.0.0"
-dependencies = [
- "biome_deserialize",
- "biome_deserialize_macros",
- "enumflags2",
- "pg_console",
- "pg_diagnostics",
- "pg_query_ext",
- "pg_schema_cache",
- "rustc-hash 2.1.0",
- "schemars",
- "serde",
- "text-size",
-]
-
-[[package]]
-name = "pg_analyser"
-version = "0.0.0"
-dependencies = [
- "pg_analyse",
- "pg_console",
- "pg_query_ext",
- "serde",
-]
-
-[[package]]
-name = "pg_base_db"
-version = "0.0.0"
-dependencies = [
- "line_index",
- "pg_fs",
- "pg_statement_splitter",
- "text-size",
-]
-
-[[package]]
-name = "pg_cli"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "biome_deserialize",
- "biome_deserialize_macros",
- "bpaf",
- "crossbeam",
- "dashmap 5.5.3",
- "hdrhistogram",
- "libc",
- "mimalloc",
- "path-absolutize",
- "pg_analyse",
- "pg_configuration",
- "pg_console",
- "pg_diagnostics",
- "pg_flags",
- "pg_fs",
- "pg_lsp",
- "pg_text_edit",
- "pg_workspace",
- "quick-junit",
- "rayon",
- "rustc-hash 2.1.0",
- "serde",
- "serde_json",
- "tikv-jemallocator",
- "tokio",
- "tracing",
- "tracing-appender",
- "tracing-subscriber",
- "tracing-tree",
-]
-
-[[package]]
-name = "pg_commands"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-std",
- "sqlx",
- "text-size",
-]
-
-[[package]]
-name = "pg_completions"
-version = "0.0.0"
-dependencies = [
- "async-std",
- "pg_schema_cache",
- "pg_test_utils",
- "pg_treesitter_queries",
- "serde",
- "serde_json",
- "sqlx",
- "text-size",
- "tokio",
- "tree-sitter",
- "tree_sitter_sql",
-]
-
-[[package]]
-name = "pg_configuration"
-version = "0.0.0"
-dependencies = [
- "biome_deserialize",
- "biome_deserialize_macros",
- "bpaf",
- "pg_analyse",
- "pg_analyser",
- "pg_console",
- "pg_diagnostics",
- "rustc-hash 2.1.0",
- "schemars",
- "serde",
- "serde_json",
- "text-size",
- "toml",
-]
-
-[[package]]
-name = "pg_console"
-version = "0.0.0"
-dependencies = [
- "pg_markup",
- "schemars",
- "serde",
- "termcolor",
- "text-size",
- "trybuild",
- "unicode-segmentation",
- "unicode-width",
-]
-
-[[package]]
-name = "pg_diagnostics"
-version = "0.0.0"
-dependencies = [
- "backtrace",
- "bpaf",
- "enumflags2",
- "pg_console",
- "pg_diagnostics_categories",
- "pg_diagnostics_macros",
- "pg_text_edit",
- "schemars",
- "serde",
- "serde_json",
- "termcolor",
- "text-size",
- "unicode-width",
-]
-
-[[package]]
-name = "pg_diagnostics_categories"
-version = "0.0.0"
-dependencies = [
- "quote",
- "schemars",
- "serde",
-]
-
-[[package]]
-name = "pg_diagnostics_macros"
-version = "0.0.0"
-dependencies = [
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "pg_flags"
-version = "0.0.0"
-dependencies = [
- "pg_console",
-]
-
-[[package]]
-name = "pg_fs"
-version = "0.0.0"
-dependencies = [
- "crossbeam",
- "directories",
- "enumflags2",
- "parking_lot",
- "pg_diagnostics",
- "rayon",
- "rustc-hash 2.1.0",
- "schemars",
- "serde",
- "smallvec",
- "tracing",
-]
-
-[[package]]
-name = "pg_lexer"
-version = "0.0.0"
-dependencies = [
- "cstree",
- "insta",
- "pg_lexer_codegen",
- "pg_query",
- "regex",
- "text-size",
-]
-
-[[package]]
-name = "pg_lexer_codegen"
-version = "0.0.0"
-dependencies = [
- "pg_query_proto_parser",
- "proc-macro2",
- "quote",
-]
-
-[[package]]
-name = "pg_lsp"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "biome_deserialize",
- "futures",
- "pg_analyse",
- "pg_completions",
- "pg_configuration",
- "pg_console",
- "pg_diagnostics",
- "pg_fs",
- "pg_lsp_converters",
- "pg_text_edit",
- "pg_workspace",
- "rustc-hash 2.1.0",
- "serde",
- "serde_json",
- "text-size",
- "tokio",
- "tower-lsp",
- "tracing",
-]
-
-[[package]]
-name = "pg_lsp_converters"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "rustc-hash 2.1.0",
- "text-size",
- "tower-lsp",
-]
-
-[[package]]
-name = "pg_markup"
-version = "0.0.0"
-dependencies = [
- "proc-macro-error",
- "proc-macro2",
- "quote",
-]
-
-[[package]]
 name = "pg_query"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2469,28 +2209,288 @@ dependencies = [
 ]
 
 [[package]]
-name = "pg_query_ext"
+name = "pglt_analyse"
 version = "0.0.0"
 dependencies = [
- "petgraph",
- "pg_diagnostics",
- "pg_lexer",
- "pg_query",
- "pg_query_ext_codegen",
+ "biome_deserialize",
+ "biome_deserialize_macros",
+ "enumflags2",
+ "pglt_console",
+ "pglt_diagnostics",
+ "pglt_query_ext",
+ "pglt_schema_cache",
+ "rustc-hash 2.1.0",
+ "schemars",
+ "serde",
  "text-size",
 ]
 
 [[package]]
-name = "pg_query_ext_codegen"
+name = "pglt_analyser"
 version = "0.0.0"
 dependencies = [
- "pg_query_proto_parser",
+ "pglt_analyse",
+ "pglt_console",
+ "pglt_query_ext",
+ "serde",
+]
+
+[[package]]
+name = "pglt_base_db"
+version = "0.0.0"
+dependencies = [
+ "line_index",
+ "pglt_fs",
+ "pglt_statement_splitter",
+ "text-size",
+]
+
+[[package]]
+name = "pglt_cli"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "biome_deserialize",
+ "biome_deserialize_macros",
+ "bpaf",
+ "crossbeam",
+ "dashmap 5.5.3",
+ "hdrhistogram",
+ "libc",
+ "mimalloc",
+ "path-absolutize",
+ "pglt_analyse",
+ "pglt_configuration",
+ "pglt_console",
+ "pglt_diagnostics",
+ "pglt_flags",
+ "pglt_fs",
+ "pglt_lsp",
+ "pglt_text_edit",
+ "pglt_workspace",
+ "quick-junit",
+ "rayon",
+ "rustc-hash 2.1.0",
+ "serde",
+ "serde_json",
+ "tikv-jemallocator",
+ "tokio",
+ "tracing",
+ "tracing-appender",
+ "tracing-subscriber",
+ "tracing-tree",
+]
+
+[[package]]
+name = "pglt_commands"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "async-std",
+ "sqlx",
+ "text-size",
+]
+
+[[package]]
+name = "pglt_completions"
+version = "0.0.0"
+dependencies = [
+ "async-std",
+ "pglt_schema_cache",
+ "pglt_test_utils",
+ "pglt_treesitter_queries",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "text-size",
+ "tokio",
+ "tree-sitter",
+ "tree_sitter_sql",
+]
+
+[[package]]
+name = "pglt_configuration"
+version = "0.0.0"
+dependencies = [
+ "biome_deserialize",
+ "biome_deserialize_macros",
+ "bpaf",
+ "pglt_analyse",
+ "pglt_analyser",
+ "pglt_console",
+ "pglt_diagnostics",
+ "rustc-hash 2.1.0",
+ "schemars",
+ "serde",
+ "serde_json",
+ "text-size",
+ "toml",
+]
+
+[[package]]
+name = "pglt_console"
+version = "0.0.0"
+dependencies = [
+ "pglt_markup",
+ "schemars",
+ "serde",
+ "termcolor",
+ "text-size",
+ "trybuild",
+ "unicode-segmentation",
+ "unicode-width",
+]
+
+[[package]]
+name = "pglt_diagnostics"
+version = "0.0.0"
+dependencies = [
+ "backtrace",
+ "bpaf",
+ "enumflags2",
+ "pglt_console",
+ "pglt_diagnostics_categories",
+ "pglt_diagnostics_macros",
+ "pglt_text_edit",
+ "schemars",
+ "serde",
+ "serde_json",
+ "termcolor",
+ "text-size",
+ "unicode-width",
+]
+
+[[package]]
+name = "pglt_diagnostics_categories"
+version = "0.0.0"
+dependencies = [
+ "quote",
+ "schemars",
+ "serde",
+]
+
+[[package]]
+name = "pglt_diagnostics_macros"
+version = "0.0.0"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "pglt_flags"
+version = "0.0.0"
+dependencies = [
+ "pglt_console",
+]
+
+[[package]]
+name = "pglt_fs"
+version = "0.0.0"
+dependencies = [
+ "crossbeam",
+ "directories",
+ "enumflags2",
+ "parking_lot",
+ "pglt_diagnostics",
+ "rayon",
+ "rustc-hash 2.1.0",
+ "schemars",
+ "serde",
+ "smallvec",
+ "tracing",
+]
+
+[[package]]
+name = "pglt_lexer"
+version = "0.0.0"
+dependencies = [
+ "cstree",
+ "insta",
+ "pg_query",
+ "pglt_lexer_codegen",
+ "regex",
+ "text-size",
+]
+
+[[package]]
+name = "pglt_lexer_codegen"
+version = "0.0.0"
+dependencies = [
+ "pglt_query_proto_parser",
  "proc-macro2",
  "quote",
 ]
 
 [[package]]
-name = "pg_query_proto_parser"
+name = "pglt_lsp"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "biome_deserialize",
+ "futures",
+ "pglt_analyse",
+ "pglt_completions",
+ "pglt_configuration",
+ "pglt_console",
+ "pglt_diagnostics",
+ "pglt_fs",
+ "pglt_lsp_converters",
+ "pglt_text_edit",
+ "pglt_workspace",
+ "rustc-hash 2.1.0",
+ "serde",
+ "serde_json",
+ "text-size",
+ "tokio",
+ "tower-lsp",
+ "tracing",
+]
+
+[[package]]
+name = "pglt_lsp_converters"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "rustc-hash 2.1.0",
+ "text-size",
+ "tower-lsp",
+]
+
+[[package]]
+name = "pglt_markup"
+version = "0.0.0"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
+name = "pglt_query_ext"
+version = "0.0.0"
+dependencies = [
+ "petgraph",
+ "pg_query",
+ "pglt_diagnostics",
+ "pglt_lexer",
+ "pglt_query_ext_codegen",
+ "text-size",
+]
+
+[[package]]
+name = "pglt_query_ext_codegen"
+version = "0.0.0"
+dependencies = [
+ "pglt_query_proto_parser",
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
+name = "pglt_query_proto_parser"
 version = "0.0.0"
 dependencies = [
  "convert_case",
@@ -2499,15 +2499,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "pg_schema_cache"
+name = "pglt_schema_cache"
 version = "0.0.0"
 dependencies = [
  "anyhow",
  "async-std",
  "futures-util",
- "pg_console",
- "pg_diagnostics",
- "pg_test_utils",
+ "pglt_console",
+ "pglt_diagnostics",
+ "pglt_test_utils",
  "serde",
  "serde_json",
  "sqlx",
@@ -2515,17 +2515,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "pg_statement_splitter"
+name = "pglt_statement_splitter"
 version = "0.0.0"
 dependencies = [
  "ntest",
- "pg_lexer",
  "pg_query",
+ "pglt_lexer",
  "text-size",
 ]
 
 [[package]]
-name = "pg_test_utils"
+name = "pglt_test_utils"
 version = "0.0.0"
 dependencies = [
  "anyhow",
@@ -2538,7 +2538,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pg_text_edit"
+name = "pglt_text_edit"
 version = "0.0.0"
 dependencies = [
  "schemars",
@@ -2548,7 +2548,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pg_treesitter_queries"
+name = "pglt_treesitter_queries"
 version = "0.0.0"
 dependencies = [
  "clap",
@@ -2557,23 +2557,23 @@ dependencies = [
 ]
 
 [[package]]
-name = "pg_type_resolver"
+name = "pglt_type_resolver"
 version = "0.0.0"
 dependencies = [
- "pg_query_ext",
- "pg_schema_cache",
+ "pglt_query_ext",
+ "pglt_schema_cache",
 ]
 
 [[package]]
-name = "pg_typecheck"
+name = "pglt_typecheck"
 version = "0.0.0"
 dependencies = [
  "insta",
- "pg_console",
- "pg_diagnostics",
- "pg_query_ext",
- "pg_schema_cache",
- "pg_test_utils",
+ "pglt_console",
+ "pglt_diagnostics",
+ "pglt_query_ext",
+ "pglt_schema_cache",
+ "pglt_test_utils",
  "sqlx",
  "text-size",
  "tokio",
@@ -2582,24 +2582,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "pg_workspace"
+name = "pglt_workspace"
 version = "0.0.0"
 dependencies = [
  "biome_deserialize",
  "dashmap 5.5.3",
  "futures",
  "ignore",
- "pg_analyse",
- "pg_analyser",
- "pg_completions",
- "pg_configuration",
- "pg_console",
- "pg_diagnostics",
- "pg_fs",
- "pg_query_ext",
- "pg_schema_cache",
- "pg_statement_splitter",
- "pg_typecheck",
+ "pglt_analyse",
+ "pglt_analyser",
+ "pglt_completions",
+ "pglt_configuration",
+ "pglt_console",
+ "pglt_diagnostics",
+ "pglt_fs",
+ "pglt_query_ext",
+ "pglt_schema_cache",
+ "pglt_statement_splitter",
+ "pglt_typecheck",
  "rustc-hash 2.1.0",
  "serde",
  "serde_json",
@@ -3077,13 +3077,13 @@ name = "rules_check"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "pg_analyse",
- "pg_analyser",
- "pg_console",
- "pg_diagnostics",
- "pg_query_ext",
- "pg_statement_splitter",
- "pg_workspace",
+ "pglt_analyse",
+ "pglt_analyser",
+ "pglt_console",
+ "pglt_diagnostics",
+ "pglt_query_ext",
+ "pglt_statement_splitter",
+ "pglt_workspace",
  "pulldown-cmark",
 ]
 
@@ -4703,8 +4703,8 @@ dependencies = [
  "anyhow",
  "biome_string_case",
  "bpaf",
- "pg_analyse",
- "pg_analyser",
+ "pglt_analyse",
+ "pglt_analyser",
  "proc-macro2",
  "pulldown-cmark",
  "quote",

@@ -6,12 +6,12 @@ publish     = false
 version     = "0.0.0"
 
 [dependencies]
-anyhow                = { workspace = true }
-pg_analyse            = { workspace = true }
-pg_analyser           = { workspace = true }
-pg_console            = { workspace = true }
-pg_diagnostics        = { workspace = true }
-pg_query_ext          = { workspace = true }
-pg_statement_splitter = { workspace = true }
-pg_workspace          = { workspace = true }
-pulldown-cmark        = "0.12.2"
+anyhow                  = { workspace = true }
+pglt_analyse            = { workspace = true }
+pglt_analyser           = { workspace = true }
+pglt_console            = { workspace = true }
+pglt_diagnostics        = { workspace = true }
+pglt_query_ext          = { workspace = true }
+pglt_statement_splitter = { workspace = true }
+pglt_workspace          = { workspace = true }
+pulldown-cmark          = "0.12.2"

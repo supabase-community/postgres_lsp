@@ -1,6 +1,6 @@
 use crate::{to_capitalized, update};
 use biome_string_case::Case;
-use pg_analyse::{GroupCategory, RegistryVisitor, Rule, RuleCategory, RuleGroup, RuleMetadata};
+use pglt_analyse::{GroupCategory, RegistryVisitor, Rule, RuleCategory, RuleGroup, RuleMetadata};
 use proc_macro2::{Ident, Literal, Span, TokenStream};
 use pulldown_cmark::{Event, Parser, Tag, TagEnd};
 use quote::quote;
@@ -36,7 +36,7 @@ pub fn generate_rules_configuration(mode: Mode) -> Result<()> {
     let push_rules_directory = project_root().join("crates/pg_configuration/src/generated");
 
     let mut lint_visitor = LintRulesVisitor::default();
-    pg_analyser::visit_registry(&mut lint_visitor);
+    pglt_analyser::visit_registry(&mut lint_visitor);
 
     generate_for_groups(
         lint_visitor.groups,

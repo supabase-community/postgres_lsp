@@ -1,0 +1,47 @@
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pglt_workspace"
+repository.workspace = true
+version              = "0.0.0"
+
+
+[dependencies]
+biome_deserialize         = "0.6.0"
+dashmap                   = "5.5.3"
+futures                   = "0.3.31"
+ignore                    = { workspace = true }
+pglt_analyse              = { workspace = true, features = ["serde"] }
+pglt_analyser             = { workspace = true }
+pglt_completions          = { workspace = true }
+pglt_configuration        = { workspace = true }
+pglt_console              = { workspace = true }
+pglt_diagnostics          = { workspace = true }
+pglt_fs                   = { workspace = true, features = ["serde"] }
+pglt_query_ext            = { workspace = true }
+pglt_schema_cache         = { workspace = true }
+pglt_statement_splitter   = { workspace = true }
+pglt_typecheck            = { workspace = true }
+rustc-hash                = { workspace = true }
+serde                     = { workspace = true, features = ["derive"] }
+serde_json                = { workspace = true, features = ["raw_value"] }
+sqlx.workspace            = true
+text-size.workspace       = true
+tokio                     = { workspace = true, features = ["rt", "rt-multi-thread"] }
+toml                      = { workspace = true }
+tracing                   = { workspace = true, features = ["attributes", "log"] }
+tree-sitter.workspace     = true
+tree_sitter_sql.workspace = true
+
+[dev-dependencies]
+tempfile = "3.15.0"
+
+[lib]
+doctest = false
+
+[features]
