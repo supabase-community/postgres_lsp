@@ -6,20 +6,16 @@ use quick_junit::{NonSuccessKind, Report, TestCase, TestCaseStatus, TestSuite};
 use std::fmt::{Display, Formatter};
 use std::io;
 
-use super::UserHintsPayload;
-
 pub(crate) struct JunitReporter {
     pub(crate) diagnostics_payload: DiagnosticsPayload,
     pub(crate) execution: Execution,
     pub(crate) summary: TraversalSummary,
-    pub(crate) user_hints: UserHintsPayload,
 }
 
 impl Reporter for JunitReporter {
     fn write(self, visitor: &mut dyn ReporterVisitor) -> io::Result<()> {
         visitor.report_summary(&self.execution, self.summary)?;
         visitor.report_diagnostics(&self.execution, self.diagnostics_payload)?;
-        visitor.report_user_hints(&self.execution, self.user_hints)?;
         Ok(())
     }
 }
@@ -120,19 +116,6 @@ impl ReporterVisitor for JunitReporterVisitor<'_> {
             {self.0.to_string().unwrap()}
         });
 
-        Ok(())
-    }
-
-    fn report_user_hints(
-        &mut self,
-        _execution: &Execution,
-        payload: super::UserHintsPayload,
-    ) -> io::Result<()> {
-        for hint in payload.hints {
-            self.1.log(markup! {
-                {hint}
-            });
-        }
         Ok(())
     }
 }

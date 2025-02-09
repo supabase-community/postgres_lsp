@@ -17,10 +17,6 @@ pub struct DiagnosticsPayload {
     pub diagnostic_level: Severity,
 }
 
-pub struct UserHintsPayload {
-    pub hints: Vec<String>,
-}
-
 /// A type that holds the result of the traversal
 #[derive(Debug, Default, Serialize, Copy, Clone)]
 pub struct TraversalSummary {
@@ -63,12 +59,5 @@ pub trait ReporterVisitor {
         &mut self,
         execution: &Execution,
         payload: DiagnosticsPayload,
-    ) -> io::Result<()>;
-
-    /// Writes a diagnostics
-    fn report_user_hints(
-        &mut self,
-        execution: &Execution,
-        payload: UserHintsPayload,
     ) -> io::Result<()>;
 }

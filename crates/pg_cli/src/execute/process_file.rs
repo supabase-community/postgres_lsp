@@ -46,7 +46,6 @@ pub(crate) enum Message {
         diagnostics: Vec<Error>,
         skipped_diagnostics: u32,
     },
-    Hint(String),
 }
 
 impl Message {

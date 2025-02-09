@@ -12,18 +12,14 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use super::UserHintsPayload;
-
 pub struct GitLabReporter {
     pub(crate) execution: Execution,
     pub(crate) diagnostics: DiagnosticsPayload,
-    pub(crate) user_hints: UserHintsPayload,
 }
 
 impl Reporter for GitLabReporter {
     fn write(self, visitor: &mut dyn ReporterVisitor) -> std::io::Result<()> {
         visitor.report_diagnostics(&self.execution, self.diagnostics)?;
-        visitor.report_user_hints(&self.execution, self.user_hints)?;
         Ok(())
     }
 }
@@ -74,17 +70,6 @@ impl ReporterVisitor for GitLabReporterVisitor<'_> {
         let hasher = RwLock::default();
         let diagnostics = GitLabDiagnostics(payload, &hasher, self.repository_root.as_deref());
         self.console.log(markup!({ diagnostics }));
-        Ok(())
-    }
-
-    fn report_user_hints(
-        &mut self,
-        _execution: &Execution,
-        payload: super::UserHintsPayload,
-    ) -> std::io::Result<()> {
-        for hint in payload.hints {
-            self.console.log(markup! {{hint}});
-        }
         Ok(())
     }
 }

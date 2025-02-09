@@ -14,7 +14,7 @@ use pg_workspace::workspace::IsPathIgnoredParams;
 use pg_workspace::{Workspace, WorkspaceError};
 use rustc_hash::FxHashSet;
 use std::collections::BTreeSet;
-use std::sync::atomic::{AtomicBool, AtomicU32};
+use std::sync::atomic::AtomicU32;
 use std::sync::RwLock;
 use std::{
     env::current_dir,
@@ -33,7 +33,6 @@ pub(crate) struct TraverseResult {
     pub(crate) summary: TraversalSummary,
     pub(crate) evaluated_paths: BTreeSet<PgLspPath>,
     pub(crate) diagnostics: Vec<Error>,
-    pub(crate) user_hints: Vec<String>,
 }
 
 pub(crate) fn traverse(
@@ -73,7 +72,6 @@ pub(crate) fn traverse(
     let unchanged = AtomicUsize::new(0);
     let matches = AtomicUsize::new(0);
     let skipped = AtomicUsize::new(0);
-    let skipped_db_conn = AtomicBool::new(false);
 
     let fs = &*session.app.fs;
     let workspace = &*session.app.workspace;
@@ -86,7 +84,7 @@ pub(crate) fn traverse(
         .with_diagnostic_level(cli_options.diagnostic_level)
         .with_max_diagnostics(max_diagnostics);
 
-    let (duration, evaluated_paths, diagnostics, mut user_hints) = thread::scope(|s| {
+    let (duration, evaluated_paths, diagnostics) = thread::scope(|s| {
         let handler = thread::Builder::new()
             .name(String::from("pglsp::console"))
             .spawn_scoped(s, || printer.run(receiver, recv_files))
@@ -106,16 +104,15 @@ pub(crate) fn traverse(
                 changed: &changed,
                 unchanged: &unchanged,
                 skipped: &skipped,
-                skipped_db_conn: &skipped_db_conn,
                 messages: sender,
                 remaining_diagnostics: &remaining_diagnostics,
                 evaluated_paths: RwLock::default(),
             },
         );
         // wait for the main thread to finish
-        let (diagnostics, user_hints) = handler.join().unwrap();
+        let diagnostics = handler.join().unwrap();
 
-        (elapsed, evaluated_paths, diagnostics, user_hints)
+        (elapsed, evaluated_paths, diagnostics)
     });
 
     let errors = printer.errors();
@@ -126,19 +123,6 @@ pub(crate) fn traverse(
     let skipped = skipped.load(Ordering::Relaxed);
     let suggested_fixes_skipped = printer.skipped_fixes();
     let diagnostics_not_printed = printer.not_printed_diagnostics();
-
-    if duration.as_secs() >= 2 {
-        user_hints.push(format!(
-            "The traversal took longer than expected ({}s). Consider using the `--skip-db` option if your Postgres connection is slow.",
-            duration.as_secs()
-        ));
-    }
-
-    if skipped_db_conn.load(Ordering::Relaxed) {
-        user_hints.push(format!(
-            "Skipped all checks requiring database connections.",
-        ));
-    }
 
     Ok(TraverseResult {
         summary: TraversalSummary {
@@ -154,7 +138,6 @@ pub(crate) fn traverse(
         },
         evaluated_paths,
         diagnostics,
-        user_hints,
     })
 }
 
@@ -306,15 +289,10 @@ impl<'ctx> DiagnosticsPrinter<'ctx> {
         should_print
     }
 
-    fn run(
-        &self,
-        receiver: Receiver<Message>,
-        interner: Receiver<PathBuf>,
-    ) -> (Vec<Error>, Vec<String>) {
+    fn run(&self, receiver: Receiver<Message>, interner: Receiver<PathBuf>) -> Vec<Error> {
         let mut paths: FxHashSet<String> = FxHashSet::default();
 
         let mut diagnostics_to_print = vec![];
-        let mut hints_to_print = vec![];
 
         while let Ok(msg) = receiver.recv() {
             match msg {
@@ -327,10 +305,6 @@ impl<'ctx> DiagnosticsPrinter<'ctx> {
 
                 Message::Failure => {
                     self.errors.fetch_add(1, Ordering::Relaxed);
-                }
-
-                Message::Hint(hint) => {
-                    hints_to_print.push(hint);
                 }
 
                 Message::Error(mut err) => {
@@ -409,7 +383,7 @@ impl<'ctx> DiagnosticsPrinter<'ctx> {
             }
         }
 
-        (diagnostics_to_print, hints_to_print)
+        diagnostics_to_print
     }
 }
 
@@ -431,8 +405,6 @@ pub(crate) struct TraversalOptions<'ctx, 'app> {
     matches: &'ctx AtomicUsize,
     /// Shared atomic counter storing the number of skipped files
     skipped: &'ctx AtomicUsize,
-    /// Shared atomic bool tracking whether we used a DB connection
-    skipped_db_conn: &'ctx AtomicBool,
     /// Channel sending messages to the display thread
     pub(crate) messages: Sender<Message>,
     /// The approximate number of diagnostics the console will print before
@@ -462,10 +434,6 @@ impl TraversalOptions<'_, '_> {
     /// Send a message to the display thread
     pub(crate) fn push_message(&self, msg: impl Into<Message>) {
         self.messages.send(msg.into()).ok();
-    }
-
-    pub(crate) fn set_skipped_db_conn(&self, has_skipped: bool) {
-        self.skipped_db_conn.store(has_skipped, Ordering::Relaxed);
     }
 
     pub(crate) fn protected_file(&self, pglsp_path: &PgLspPath) {

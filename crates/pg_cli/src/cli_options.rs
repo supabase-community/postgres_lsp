@@ -18,7 +18,7 @@ pub struct CliOptions {
     #[bpaf(long("use-server"), switch, fallback(false))]
     pub use_server: bool,
 
-    /// Skip over files containing syntax errors instead of emitting an error diagnostic.
+    /// Skip connecting to the database and only run checks that don't require a database connection.
     #[bpaf(long("skip-db"), switch, fallback(false))]
     pub skip_db: bool,
 
