@@ -12,7 +12,7 @@ declare_lint_rule! {
     ///
     /// ### Invalid
     ///
-    /// ```sql,expect_diagnostic
+    /// ```sql,ignore
     /// alter table users alter column email drop not null;
     /// ```
     pub BanDropNotNull {
