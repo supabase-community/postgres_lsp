@@ -25,6 +25,6 @@ recommended = true
 
 [linter.rules.safety.banDropColumn]
 level = "warn"
-options = { test = "HELLO" }
 
-
+[linter.rules.safety.banDropNotNull]
+level = "warn"
