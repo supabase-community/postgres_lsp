@@ -42,10 +42,6 @@ pub(crate) fn check_with_guard<'ctx>(
                     category!("check"),
                 )?;
 
-            if pull_diagnostics_result.skipped_db_checks {
-                ctx.set_skipped_db_conn(true);
-            }
-
             let no_diagnostics = pull_diagnostics_result.diagnostics.is_empty()
                 && pull_diagnostics_result.skipped_diagnostics == 0;
 
