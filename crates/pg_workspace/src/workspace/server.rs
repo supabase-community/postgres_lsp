@@ -300,14 +300,12 @@ impl Workspace for WorkspaceServer {
 
         let mut diagnostics: Vec<SDiagnostic> = vec![];
 
-        let maybe_pool = self
+        if let Some(pool) = self
             .connection
             .read()
             .expect("DbConnection RwLock panicked")
-            .get_pool();
-
-        let skipped_db_checks = maybe_pool.is_none();
-        if let Some(pool) = maybe_pool {
+            .get_pool()
+        {
             let typecheck_params: Vec<_> = doc
                 .iter_statements_with_text_and_range()
                 .map(|(stmt, range, text)| {
@@ -404,7 +402,6 @@ impl Workspace for WorkspaceServer {
             diagnostics,
             errors,
             skipped_diagnostics: 0,
-            skipped_db_checks,
         })
     }
 
