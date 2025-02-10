@@ -123,6 +123,7 @@ pub(crate) fn traverse(
     let skipped = skipped.load(Ordering::Relaxed);
     let suggested_fixes_skipped = printer.skipped_fixes();
     let diagnostics_not_printed = printer.not_printed_diagnostics();
+
     Ok(TraverseResult {
         summary: TraversalSummary {
             changed,
@@ -381,6 +382,7 @@ impl<'ctx> DiagnosticsPrinter<'ctx> {
                 }
             }
         }
+
         diagnostics_to_print
     }
 }

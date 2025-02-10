@@ -12,6 +12,7 @@ port = 5432
 username = "postgres"
 password = "postgres"
 database = "postgres"
+conn_timeout_secs = 10
 
 # [migrations]
 # migrations_dir = "migrations"

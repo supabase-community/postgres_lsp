@@ -266,7 +266,7 @@ mod tests {
                 position: (position as u32).into(),
                 text,
                 tree: Some(&tree),
-                schema: &pg_schema_cache::SchemaCache::new(),
+                schema: &pg_schema_cache::SchemaCache::default(),
             };
 
             let ctx = CompletionContext::new(&params);
@@ -298,7 +298,7 @@ mod tests {
                 position: (position as u32).into(),
                 text,
                 tree: Some(&tree),
-                schema: &pg_schema_cache::SchemaCache::new(),
+                schema: &pg_schema_cache::SchemaCache::default(),
             };
 
             let ctx = CompletionContext::new(&params);
@@ -332,7 +332,7 @@ mod tests {
                 position: (position as u32).into(),
                 text,
                 tree: Some(&tree),
-                schema: &pg_schema_cache::SchemaCache::new(),
+                schema: &pg_schema_cache::SchemaCache::default(),
             };
 
             let ctx = CompletionContext::new(&params);
@@ -357,7 +357,7 @@ mod tests {
                 position: (position as u32).into(),
                 text,
                 tree: Some(&tree),
-                schema: &pg_schema_cache::SchemaCache::new(),
+                schema: &pg_schema_cache::SchemaCache::default(),
             };
 
             let ctx = CompletionContext::new(&params);
@@ -385,7 +385,7 @@ mod tests {
             position: (position as u32).into(),
             text,
             tree: Some(&tree),
-            schema: &pg_schema_cache::SchemaCache::new(),
+            schema: &pg_schema_cache::SchemaCache::default(),
         };
 
         let ctx = CompletionContext::new(&params);
@@ -411,7 +411,7 @@ mod tests {
             position: (position as u32).into(),
             text,
             tree: Some(&tree),
-            schema: &pg_schema_cache::SchemaCache::new(),
+            schema: &pg_schema_cache::SchemaCache::default(),
         };
 
         let ctx = CompletionContext::new(&params);
@@ -436,7 +436,7 @@ mod tests {
             position: (position as u32).into(),
             text,
             tree: Some(&tree),
-            schema: &pg_schema_cache::SchemaCache::new(),
+            schema: &pg_schema_cache::SchemaCache::default(),
         };
 
         let ctx = CompletionContext::new(&params);

@@ -35,8 +35,10 @@ pub enum PgLspCommand {
     Check {
         #[bpaf(external(partial_configuration), hide_usage, optional)]
         configuration: Option<PartialConfiguration>,
+
         #[bpaf(external, hide_usage)]
         cli_options: CliOptions,
+
         /// Use this option when you want to format code piped from `stdin`, and print the output to `stdout`.
         ///
         /// The file doesn't need to exist on disk, what matters is the extension of the file. Based on the extension, we know how to check the code.
@@ -286,6 +288,7 @@ pub(crate) trait CommandRunner: Sized {
             configuration,
             vcs_base_path,
             gitignore_matches,
+            skip_db: cli_options.skip_db,
         })?;
 
         let execution = self.get_execution(cli_options, console, workspace)?;

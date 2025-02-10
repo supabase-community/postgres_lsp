@@ -28,6 +28,7 @@ pub(crate) fn check_with_guard<'ctx>(
             let (only, skip) = (Vec::new(), Vec::new());
 
             let max_diagnostics = ctx.remaining_diagnostics.load(Ordering::Relaxed);
+
             let pull_diagnostics_result = workspace_file
                 .guard()
                 .pull_diagnostics(

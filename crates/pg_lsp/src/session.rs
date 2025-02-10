@@ -464,6 +464,7 @@ impl Session {
                             configuration: fs_configuration,
                             vcs_base_path,
                             gitignore_matches,
+                            skip_db: false,
                         });
 
                         if let Err(error) = result {

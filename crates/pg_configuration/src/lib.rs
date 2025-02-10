@@ -104,6 +104,7 @@ impl PartialConfiguration {
                 username: Some("postgres".to_string()),
                 password: Some("postgres".to_string()),
                 database: Some("postgres".to_string()),
+                conn_timeout_secs: Some(10),
             }),
         }
     }

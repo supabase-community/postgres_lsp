@@ -18,10 +18,6 @@ pub struct SchemaCache {
 }
 
 impl SchemaCache {
-    pub fn new() -> SchemaCache {
-        SchemaCache::default()
-    }
-
     pub async fn load(pool: &PgPool) -> Result<SchemaCache, sqlx::Error> {
         let (schemas, tables, functions, types, versions, columns) = futures_util::try_join!(
             Schema::load(pool),

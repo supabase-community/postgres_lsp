@@ -1,8 +1,10 @@
-use std::{fs, future::Future, panic::RefUnwindSafe, path::Path, sync::RwLock};
+use std::{fs, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
 use analyser::AnalyserVisitorBuilder;
+use async_helper::run_async;
 use change::StatementChange;
 use dashmap::{DashMap, DashSet};
+use db_connection::DbConnection;
 use document::{Document, Statement};
 use futures::{stream, StreamExt};
 use pg_analyse::{AnalyserOptions, AnalysisFilter};
@@ -10,11 +12,8 @@ use pg_analyser::{Analyser, AnalyserConfig, AnalyserContext};
 use pg_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, DiagnosticExt, Severity};
 use pg_fs::{ConfigName, PgLspPath};
 use pg_query::PgQueryStore;
-use pg_schema_cache::SchemaCache;
 use pg_typecheck::TypecheckParams;
-use sqlx::PgPool;
-use std::sync::LazyLock;
-use tokio::runtime::Runtime;
+use schema_cache_manager::SchemaCacheManager;
 use tracing::info;
 use tree_sitter::TreeSitterStore;
 
@@ -31,46 +30,21 @@ use super::{
 };
 
 mod analyser;
+mod async_helper;
 mod change;
+mod db_connection;
 mod document;
 mod migration;
 mod pg_query;
+mod schema_cache_manager;
 mod tree_sitter;
-
-/// Simple helper to manage the db connection and the associated connection string
-#[derive(Default)]
-struct DbConnection {
-    pool: Option<PgPool>,
-    connection_string: Option<String>,
-}
-
-// Global Tokio Runtime
-static RUNTIME: LazyLock<Runtime> =
-    LazyLock::new(|| Runtime::new().expect("Failed to create Tokio runtime"));
-
-impl DbConnection {
-    pub(crate) fn get_pool(&self) -> Option<PgPool> {
-        self.pool.clone()
-    }
-
-    pub(crate) fn set_connection(&mut self, connection_string: &str) -> Result<(), WorkspaceError> {
-        if self.connection_string.is_none()
-            || self.connection_string.as_ref().unwrap() != connection_string
-        {
-            self.connection_string = Some(connection_string.to_string());
-            self.pool = Some(PgPool::connect_lazy(connection_string)?);
-        }
-
-        Ok(())
-    }
-}
 
 pub(super) struct WorkspaceServer {
     /// global settings object for this workspace
     settings: RwLock<Settings>,
 
     /// Stores the schema cache for this workspace
-    schema_cache: RwLock<SchemaCache>,
+    schema_cache: SchemaCacheManager,
 
     /// Stores the document (text content + version number) associated with a URL
     documents: DashMap<PgLspPath, Document>,
@@ -105,7 +79,7 @@ impl WorkspaceServer {
             tree_sitter: TreeSitterStore::new(),
             pg_query: PgQueryStore::new(),
             changed_stmts: DashSet::default(),
-            schema_cache: RwLock::default(),
+            schema_cache: SchemaCacheManager::default(),
             connection: RwLock::default(),
         }
     }
@@ -117,38 +91,6 @@ impl WorkspaceServer {
 
     fn settings_mut(&self) -> SettingsHandleMut {
         SettingsHandleMut::new(&self.settings)
-    }
-
-    fn refresh_db_connection(&self) -> Result<(), WorkspaceError> {
-        let s = self.settings();
-
-        let connection_string = s.as_ref().db.to_connection_string();
-        self.connection
-            .write()
-            .unwrap()
-            .set_connection(&connection_string)?;
-
-        self.reload_schema_cache()?;
-
-        Ok(())
-    }
-
-    fn reload_schema_cache(&self) -> Result<(), WorkspaceError> {
-        tracing::info!("Reloading schema cache");
-        // TODO return error if db connection is not available
-        if let Some(c) = self.connection.read().unwrap().get_pool() {
-            let maybe_schema_cache = run_async(async move { SchemaCache::load(&c).await })?;
-            let schema_cache = maybe_schema_cache?;
-
-            let mut cache = self.schema_cache.write().unwrap();
-            *cache = schema_cache;
-        } else {
-            let mut cache = self.schema_cache.write().unwrap();
-            *cache = SchemaCache::default();
-        }
-        tracing::info!("Schema cache reloaded");
-
-        Ok(())
     }
 
     fn is_ignored_by_migration_config(&self, path: &Path) -> bool {
@@ -201,11 +143,6 @@ impl WorkspaceServer {
 }
 
 impl Workspace for WorkspaceServer {
-    #[tracing::instrument(level = "trace", skip(self))]
-    fn refresh_schema_cache(&self) -> Result<(), WorkspaceError> {
-        self.reload_schema_cache()
-    }
-
     /// Update the global settings for this workspace
     ///
     /// ## Panics
@@ -222,9 +159,16 @@ impl Workspace for WorkspaceServer {
             params.gitignore_matches.as_slice(),
         )?;
 
-        self.refresh_db_connection()?;
-
         tracing::info!("Updated settings in workspace");
+
+        if !params.skip_db {
+            self.connection
+                .write()
+                .unwrap()
+                .set_conn_settings(&self.settings().as_ref().db);
+        }
+
+        tracing::info!("Updated Db connection settings");
 
         Ok(())
     }
@@ -356,53 +300,55 @@ impl Workspace for WorkspaceServer {
 
         let mut diagnostics: Vec<SDiagnostic> = vec![];
 
-        // run diagnostics for each statement in parallel if its mostly i/o work
-        if let Ok(connection) = self.connection.read() {
-            if let Some(pool) = connection.get_pool() {
-                let typecheck_params: Vec<_> = doc
-                    .iter_statements_with_text_and_range()
-                    .map(|(stmt, range, text)| {
-                        let ast = self.pg_query.get_ast(&stmt);
-                        let tree = self.tree_sitter.get_parse_tree(&stmt);
-                        (text.to_string(), ast, tree, *range)
-                    })
-                    .collect();
+        if let Some(pool) = self
+            .connection
+            .read()
+            .expect("DbConnection RwLock panicked")
+            .get_pool()
+        {
+            let typecheck_params: Vec<_> = doc
+                .iter_statements_with_text_and_range()
+                .map(|(stmt, range, text)| {
+                    let ast = self.pg_query.get_ast(&stmt);
+                    let tree = self.tree_sitter.get_parse_tree(&stmt);
+                    (text.to_string(), ast, tree, *range)
+                })
+                .collect();
 
-                let pool_clone = pool.clone();
-                let path_clone = params.path.clone();
-                let async_results = run_async(async move {
-                    stream::iter(typecheck_params)
-                        .map(|(text, ast, tree, range)| {
-                            let pool = pool_clone.clone();
-                            let path = path_clone.clone();
-                            async move {
-                                if let Some(ast) = ast {
-                                    pg_typecheck::check_sql(TypecheckParams {
-                                        conn: &pool,
-                                        sql: &text,
-                                        ast: &ast,
-                                        tree: tree.as_deref(),
-                                    })
-                                    .await
-                                    .map(|d| {
-                                        let r = d.location().span.map(|span| span + range.start());
+            // run diagnostics for each statement in parallel if its mostly i/o work
+            let path_clone = params.path.clone();
+            let async_results = run_async(async move {
+                stream::iter(typecheck_params)
+                    .map(|(text, ast, tree, range)| {
+                        let pool = pool.clone();
+                        let path = path_clone.clone();
+                        async move {
+                            if let Some(ast) = ast {
+                                pg_typecheck::check_sql(TypecheckParams {
+                                    conn: &pool,
+                                    sql: &text,
+                                    ast: &ast,
+                                    tree: tree.as_deref(),
+                                })
+                                .await
+                                .map(|d| {
+                                    let r = d.location().span.map(|span| span + range.start());
 
-                                        d.with_file_path(path.as_path().display().to_string())
-                                            .with_file_span(r.unwrap_or(range))
-                                    })
-                                } else {
-                                    None
-                                }
+                                    d.with_file_path(path.as_path().display().to_string())
+                                        .with_file_span(r.unwrap_or(range))
+                                })
+                            } else {
+                                None
                             }
-                        })
-                        .buffer_unordered(10)
-                        .collect::<Vec<_>>()
-                        .await
-                })?;
+                        }
+                    })
+                    .buffer_unordered(10)
+                    .collect::<Vec<_>>()
+                    .await
+            })?;
 
-                for result in async_results.into_iter().flatten() {
-                    diagnostics.push(SDiagnostic::new(result));
-                }
+            for result in async_results.into_iter().flatten() {
+                diagnostics.push(SDiagnostic::new(result));
             }
         }
 
@@ -470,6 +416,11 @@ impl Workspace for WorkspaceServer {
             &params.position
         );
 
+        let pool = match self.connection.read().unwrap().get_pool() {
+            Some(pool) => pool,
+            None => return Ok(pg_completions::CompletionResult::default()),
+        };
+
         let doc = self
             .documents
             .get(&params.path)
@@ -497,14 +448,11 @@ impl Workspace for WorkspaceServer {
 
         tracing::debug!("Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {}", position, stmt_range.start(), stmt_range.end(), text);
 
-        let schema_cache = self
-            .schema_cache
-            .read()
-            .map_err(|_| WorkspaceError::runtime("Unable to load SchemaCache"))?;
+        let schema_cache = self.schema_cache.load(pool)?;
 
         let result = pg_completions::complete(pg_completions::CompletionParams {
             position,
-            schema: &schema_cache,
+            schema: schema_cache.as_ref(),
             tree: tree.as_deref(),
             text: text.to_string(),
         });
@@ -517,16 +465,4 @@ impl Workspace for WorkspaceServer {
 /// if it is a symlink that resolves to a directory.
 fn is_dir(path: &Path) -> bool {
     path.is_dir() || (path.is_symlink() && fs::read_link(path).is_ok_and(|path| path.is_dir()))
-}
-
-/// Use this function to run async functions in the workspace, which is a sync trait called from an
-/// async context.
-///
-/// Checkout https://greptime.com/blogs/2023-03-09-bridging-async-and-sync-rust for details.
-fn run_async<F, R>(future: F) -> Result<R, WorkspaceError>
-where
-    F: Future<Output = R> + Send + 'static,
-    R: Send + 'static,
-{
-    futures::executor::block_on(async { RUNTIME.spawn(future).await.map_err(|e| e.into()) })
 }
