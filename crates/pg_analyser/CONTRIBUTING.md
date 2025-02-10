@@ -35,6 +35,7 @@ We follow a naming convention according to what the rule does:
 A rule should be informative to the user, and give as much explanation as possible.
 
 When writing a rule, you must adhere to the following **pillars**:
+
 1. Explain to the user the error. Generally, this is the message of the diagnostic.
 1. Explain to the user **why** the error is triggered. Generally, this is implemented with an additional node.
 1. Tell the user what they should do. Generally, this is implemented using a code action. If a code action is not applicable a note should tell the user what they should do to fix the error.
@@ -53,6 +54,7 @@ Let's say we want to create a new **lint** rule called `useMyRuleName`, follow t
    ```shell
    just new-lintrule safety useMyRuleName
    ```
+
    The script will generate a bunch of files inside the `pg_analyser` crate.
    Among the other files, you'll find a file called `use_my_new_rule_name.rs` inside the `pg_analyser/lib/src/lint/safety` folder. You'll implement your rule in this file.
 
@@ -127,6 +129,7 @@ The compiler should warn you that `MyRuleOptions` does not implement some requir
 We currently require implementing _serde_'s traits `Deserialize`/`Serialize`.
 
 Also, we use other `serde` macros to adjust the JSON configuration:
+
 - `rename_all = "snake_case"`: it renames all fields in camel-case, so they are in line with the naming style of the `pglsp.toml`.
 - `deny_unknown_fields`: it raises an error if the configuration contains extraneous fields.
 - `default`: it uses the `Default` value when the field is missing from `pglsp.toml`. This macro makes the field optional.
@@ -158,7 +161,6 @@ pub enum Behavior {
 ### Coding the rule
 
 Below, there are many tips and guidelines on how to create a lint rule using our infrastructure.
-
 
 #### `declare_lint_rule`
 
@@ -235,6 +237,7 @@ impl Rule for BanDropColumn {
 ### Document the rule
 
 The documentation needs to adhere to the following rules:
+
 - The **first** paragraph of the documentation is used as brief description of the rule, and it **must** be written in one single line. Breaking the paragraph in multiple lines will break the table content of the rules page.
 - The next paragraphs can be used to further document the rule with as many details as you see fit.
 - The documentation must have a `## Examples` header, followed by two headers: `### Invalid` and `### Valid`. `### Invalid` must go first because we need to show when the rule is triggered.
@@ -246,7 +249,7 @@ The documentation needs to adhere to the following rules:
 
 Here's an example of how the documentation could look like:
 
-```rust
+````rust
 declare_lint_rule! {
     /// Dropping a column may break existing clients.
     ///
@@ -269,11 +272,25 @@ declare_lint_rule! {
         sources: &[RuleSource::Squawk("ban-drop-column")],
     }
 }
-```
+````
 
 This will cause the documentation generator to ensure the rule does emit
 exactly one diagnostic for this code, and to include a snapshot for the
 diagnostic in the resulting documentation page.
+
+### Testing the Rule
+
+#### Quick Test
+
+To quickly test your rule, head to the `pg_analyser/src/lib.rs` file and modify the `debug_test` function.
+
+You should:
+
+- remove the `#[ignore]` macro if present
+- change the content of the `SQL` static `&str` to whatever you need
+- pass your group and rule to the `RuleFilter::Rule(..)`
+
+If you run the test, you'll see any diagnostics your rule created in your console.
 
 ### Code generation
 
@@ -294,7 +311,6 @@ Stage and commit your changes:
 > git commit -m 'feat(pg_analyser): myRuleName'
 ```
 
-
 ### Deprecate a rule
 
 There are occasions when a rule must be deprecated, to avoid breaking changes. The reason
@@ -302,7 +318,7 @@ of deprecation can be multiple.
 
 In order to do, the macro allows adding additional field to add the reason for deprecation
 
-```rust
+````rust
 use pg_analyse::declare_lint_rule;
 
 declare_lint_rule! {
@@ -328,5 +344,4 @@ declare_lint_rule! {
         sources: &[RuleSource::Squawk("ban-drop-column")],
     }
 }
-```
-
+````

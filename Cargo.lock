@@ -2213,8 +2213,11 @@ version = "0.0.0"
 dependencies = [
  "pg_analyse",
  "pg_console",
+ "pg_diagnostics",
+ "pg_query",
  "pg_query_ext",
  "serde",
+ "termcolor",
 ]
 
 [[package]]
