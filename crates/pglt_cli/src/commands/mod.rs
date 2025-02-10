@@ -396,6 +396,6 @@ mod tests {
     /// Tests that all CLI options adhere to the invariants expected by `bpaf`.
     #[test]
     fn check_options() {
-        pglt_lsp_command().check_invariants(false);
+        pglt_command().check_invariants(false);
     }
 }
