@@ -1,13 +1,6 @@
 use pglt_analyse::{context::RuleContext, declare_lint_rule, Rule, RuleDiagnostic, RuleSource};
 use pglt_console::markup;
 
-#[derive(Clone, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-// #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[serde(rename_all = "camelCase", deny_unknown_fields, default)]
-pub struct Options {
-    test: String,
-}
-
 declare_lint_rule! {
     /// Dropping a column may break existing clients.
     ///
@@ -19,7 +12,7 @@ declare_lint_rule! {
     ///
     /// ### Invalid
     ///
-    /// ```sql,expect_diagnostic
+    /// ```sql,ignore
     /// alter table test drop column id;
     /// ```
     ///
@@ -32,7 +25,7 @@ declare_lint_rule! {
 }
 
 impl Rule for BanDropColumn {
-    type Options = Options;
+    type Options = ();
 
     fn run(ctx: &RuleContext<Self>) -> Vec<RuleDiagnostic> {
         let mut diagnostics = Vec::new();
@@ -47,7 +40,7 @@ impl Rule for BanDropColumn {
                             markup! {
                                 "Dropping a column may break existing clients."
                             },
-                        ).detail(None, format!("[{}] You can leave the column as nullable or delete the column once queries no longer select or modify the column.", ctx.options().test)));
+                        ).detail(None, "You can leave the column as nullable or delete the column once queries no longer select or modify the column."));
                     }
                 }
             }

@@ -13,8 +13,8 @@ use std::{
 };
 
 pub struct GitLabReporter {
-    pub execution: Execution,
-    pub diagnostics: DiagnosticsPayload,
+    pub(crate) execution: Execution,
+    pub(crate) diagnostics: DiagnosticsPayload,
 }
 
 impl Reporter for GitLabReporter {

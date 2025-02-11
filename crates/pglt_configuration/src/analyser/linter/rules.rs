@@ -146,15 +146,22 @@ pub struct Safety {
     #[doc = "Dropping a column may break existing clients."]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ban_drop_column: Option<RuleConfiguration<pglt_analyser::options::BanDropColumn>>,
+    #[doc = "Dropping a NOT NULL constraint may break existing clients."]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ban_drop_not_null: Option<RuleConfiguration<pglt_analyser::options::BanDropNotNull>>,
 }
 impl Safety {
     const GROUP_NAME: &'static str = "safety";
-    pub(crate) const GROUP_RULES: &'static [&'static str] = &["banDropColumn"];
-    const RECOMMENDED_RULES: &'static [&'static str] = &["banDropColumn"];
-    const RECOMMENDED_RULES_AS_FILTERS: &'static [RuleFilter<'static>] =
-        &[RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0])];
-    const ALL_RULES_AS_FILTERS: &'static [RuleFilter<'static>] =
-        &[RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0])];
+    pub(crate) const GROUP_RULES: &'static [&'static str] = &["banDropColumn", "banDropNotNull"];
+    const RECOMMENDED_RULES: &'static [&'static str] = &["banDropColumn", "banDropNotNull"];
+    const RECOMMENDED_RULES_AS_FILTERS: &'static [RuleFilter<'static>] = &[
+        RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0]),
+        RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[1]),
+    ];
+    const ALL_RULES_AS_FILTERS: &'static [RuleFilter<'static>] = &[
+        RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0]),
+        RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[1]),
+    ];
     #[doc = r" Retrieves the recommended rules"]
     pub(crate) fn is_recommended_true(&self) -> bool {
         matches!(self.recommended, Some(true))
@@ -175,6 +182,11 @@ impl Safety {
                 index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0]));
             }
         }
+        if let Some(rule) = self.ban_drop_not_null.as_ref() {
+            if rule.is_enabled() {
+                index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[1]));
+            }
+        }
         index_set
     }
     pub(crate) fn get_disabled_rules(&self) -> FxHashSet<RuleFilter<'static>> {
@@ -182,6 +194,11 @@ impl Safety {
         if let Some(rule) = self.ban_drop_column.as_ref() {
             if rule.is_disabled() {
                 index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0]));
+            }
+        }
+        if let Some(rule) = self.ban_drop_not_null.as_ref() {
+            if rule.is_disabled() {
+                index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[1]));
             }
         }
         index_set
@@ -222,6 +239,10 @@ impl Safety {
         match rule_name {
             "banDropColumn" => self
                 .ban_drop_column
+                .as_ref()
+                .map(|conf| (conf.level(), conf.get_options())),
+            "banDropNotNull" => self
+                .ban_drop_not_null
                 .as_ref()
                 .map(|conf| (conf.level(), conf.get_options())),
             _ => None,

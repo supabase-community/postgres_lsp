@@ -12,6 +12,7 @@ port = 5432
 username = "postgres"
 password = "postgres"
 database = "postgres"
+conn_timeout_secs = 10
 
 # [migrations]
 # migrations_dir = "migrations"
@@ -25,6 +26,6 @@ recommended = true
 
 [linter.rules.safety.banDropColumn]
 level = "warn"
-options = { test = "HELLO" }
 
-
+[linter.rules.safety.banDropNotNull]
+level = "warn"

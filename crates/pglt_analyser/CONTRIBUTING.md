@@ -17,12 +17,14 @@ We follow a naming convention according to what the rule does:
 1. Forbid a concept
 
    ```block
-   no<Concept>
+   ban<Concept>
    ```
 
-   When a rule's sole intention is to **forbid a single concept** the rule should be named using the `no` prefix.
+   When a rule's sole intention is to **forbid a single concept** the rule should be named using the `ban` prefix.
 
-1. Mandate a concept
+   Example: "banDropColumn"
+
+2. Mandate a concept
 
    ```block
    use<Concept>
@@ -35,9 +37,10 @@ We follow a naming convention according to what the rule does:
 A rule should be informative to the user, and give as much explanation as possible.
 
 When writing a rule, you must adhere to the following **pillars**:
+
 1. Explain to the user the error. Generally, this is the message of the diagnostic.
-1. Explain to the user **why** the error is triggered. Generally, this is implemented with an additional node.
-1. Tell the user what they should do. Generally, this is implemented using a code action. If a code action is not applicable a note should tell the user what they should do to fix the error.
+2. Explain to the user **why** the error is triggered. Generally, this is implemented with an additional node.
+3. Tell the user what they should do. Generally, this is implemented using a code action. If a code action is not applicable a note should tell the user what they should do to fix the error.
 
 ### Create and implement the rule
 
@@ -53,10 +56,11 @@ Let's say we want to create a new **lint** rule called `useMyRuleName`, follow t
    ```shell
    just new-lintrule safety useMyRuleName
    ```
+
    The script will generate a bunch of files inside the `pglt_analyser` crate.
    Among the other files, you'll find a file called `use_my_new_rule_name.rs` inside the `pglt_analyser/lib/src/lint/safety` folder. You'll implement your rule in this file.
 
-1. The `Option` type doesn't have to be used, so it can be considered optional. However, it has to be defined as `type Option = ()`.
+1. The `Options` type doesn't have to be used, so it can be considered optional. However, it has to be defined as `type Options = ()`.
 1. Implement the `run` function: The function is called for every statement, and should return zero or more diagnostics. Follow the [pillars](#explain-a-rule-to-the-user) when writing the message of a diagnostic
 
 Don't forget to format your code with `just f` and lint with `just l`.
@@ -107,7 +111,7 @@ pub enum Behavior {
 ```
 
 Note that we use a boxed slice `Box<[Box<str>]>` instead of `Vec<String>`.
-This allows saving memory: [boxed slices and boxed str use 2 words instead of three words](https://nnethercote.github.io/perf-book/type-sizes.html#boxed-slices).
+This allows saving memory: [boxed slices and boxed str use two instead of three words](https://nnethercote.github.io/perf-book/type-sizes.html#boxed-slices).
 
 With these types in place, you can set the associated type `Options` of the rule:
 
@@ -127,6 +131,7 @@ The compiler should warn you that `MyRuleOptions` does not implement some requir
 We currently require implementing _serde_'s traits `Deserialize`/`Serialize`.
 
 Also, we use other `serde` macros to adjust the JSON configuration:
+
 - `rename_all = "snake_case"`: it renames all fields in camel-case, so they are in line with the naming style of the `pglsp.toml`.
 - `deny_unknown_fields`: it raises an error if the configuration contains extraneous fields.
 - `default`: it uses the `Default` value when the field is missing from `pglsp.toml`. This macro makes the field optional.
@@ -158,7 +163,6 @@ pub enum Behavior {
 ### Coding the rule
 
 Below, there are many tips and guidelines on how to create a lint rule using our infrastructure.
-
 
 #### `declare_lint_rule`
 
@@ -235,6 +239,7 @@ impl Rule for BanDropColumn {
 ### Document the rule
 
 The documentation needs to adhere to the following rules:
+
 - The **first** paragraph of the documentation is used as brief description of the rule, and it **must** be written in one single line. Breaking the paragraph in multiple lines will break the table content of the rules page.
 - The next paragraphs can be used to further document the rule with as many details as you see fit.
 - The documentation must have a `## Examples` header, followed by two headers: `### Invalid` and `### Valid`. `### Invalid` must go first because we need to show when the rule is triggered.
@@ -246,7 +251,7 @@ The documentation needs to adhere to the following rules:
 
 Here's an example of how the documentation could look like:
 
-```rust
+````rust
 declare_lint_rule! {
     /// Dropping a column may break existing clients.
     ///
@@ -269,7 +274,7 @@ declare_lint_rule! {
         sources: &[RuleSource::Squawk("ban-drop-column")],
     }
 }
-```
+````
 
 This will cause the documentation generator to ensure the rule does emit
 exactly one diagnostic for this code, and to include a snapshot for the
@@ -294,7 +299,6 @@ Stage and commit your changes:
 > git commit -m 'feat(pglt_analyser): myRuleName'
 ```
 
-
 ### Deprecate a rule
 
 There are occasions when a rule must be deprecated, to avoid breaking changes. The reason
@@ -302,7 +306,7 @@ of deprecation can be multiple.
 
 In order to do, the macro allows adding additional field to add the reason for deprecation
 
-```rust
+````rust
 use pglt_analyse::declare_lint_rule;
 
 declare_lint_rule! {
@@ -328,5 +332,4 @@ declare_lint_rule! {
         sources: &[RuleSource::Squawk("ban-drop-column")],
     }
 }
-```
-
+````

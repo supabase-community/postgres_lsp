@@ -1,6 +1,6 @@
 use crate::session::Session;
 use anyhow::Result;
-use pglt_workspace::workspace;
+use pglt_workspace::{workspace, WorkspaceError};
 use tower_lsp::lsp_types::{self, CompletionItem, CompletionItemLabelDetails};
 
 #[tracing::instrument(level = "trace", skip_all)]
@@ -26,12 +26,22 @@ pub fn get_completions(
         pglt_lsp_converters::negotiated_encoding(client_capabilities),
     )?;
 
-    let completion_result = session
+    let completion_result = match session
         .workspace
         .get_completions(workspace::CompletionParams {
             path,
             position: offset,
-        })?;
+        }) {
+        Ok(result) => result,
+        Err(e) => match e {
+            WorkspaceError::DatabaseConnectionError(_) => {
+                return Ok(lsp_types::CompletionResponse::Array(vec![]));
+            }
+            _ => {
+                return Err(e.into());
+            }
+        },
+    };
 
     let items: Vec<CompletionItem> = completion_result
         .into_iter()

@@ -5,6 +5,7 @@ use std::{
     num::NonZeroU64,
     path::{Path, PathBuf},
     sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
+    time::Duration,
 };
 
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
@@ -269,6 +270,7 @@ pub struct DatabaseSettings {
     pub username: String,
     pub password: String,
     pub database: String,
+    pub conn_timeout_secs: Duration,
 }
 
 impl Default for DatabaseSettings {
@@ -279,16 +281,8 @@ impl Default for DatabaseSettings {
             username: "postgres".to_string(),
             password: "postgres".to_string(),
             database: "postgres".to_string(),
+            conn_timeout_secs: Duration::from_secs(10),
         }
-    }
-}
-
-impl DatabaseSettings {
-    pub fn to_connection_string(&self) -> String {
-        format!(
-            "postgres://{}:{}@{}:{}/{}",
-            self.username, self.password, self.host, self.port, self.database
-        )
     }
 }
 
@@ -301,6 +295,10 @@ impl From<PartialDatabaseConfiguration> for DatabaseSettings {
             username: value.username.unwrap_or(d.username),
             password: value.password.unwrap_or(d.password),
             database: value.database.unwrap_or(d.database),
+            conn_timeout_secs: value
+                .conn_timeout_secs
+                .map(|s| Duration::from_secs(s.into()))
+                .unwrap_or(d.conn_timeout_secs),
         }
     }
 }

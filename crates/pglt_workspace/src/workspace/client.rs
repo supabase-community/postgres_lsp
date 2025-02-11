@@ -117,10 +117,6 @@ where
         self.request("pglsp/get_file_content", params)
     }
 
-    fn refresh_schema_cache(&self) -> Result<(), WorkspaceError> {
-        self.request("pglsp/refresh_schema_cache", ())
-    }
-
     fn pull_diagnostics(
         &self,
         params: super::PullDiagnosticsParams,
