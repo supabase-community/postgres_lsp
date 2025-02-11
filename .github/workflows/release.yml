@@ -68,12 +68,12 @@ jobs:
         if: matrix.config.os == 'windows-latest'
         run: |
           mkdir dist
-          cp target/${{ matrix.config.target }}/release/pg_cli.exe ./dist/pgcli_${{ matrix.config.target }}
+          cp target/${{ matrix.config.target }}/release/pglt.exe ./dist/pglt_${{ matrix.config.target }}
       - name: 👦 Name the Binary
         if: matrix.config.os != 'windows-latest'
         run: |
           mkdir dist
-          cp target/${{ matrix.config.target }}/release/pg_cli ./dist/pgcli_${{ matrix.config.target }}
+          cp target/${{ matrix.config.target }}/release/pglt ./dist/pglt_${{ matrix.config.target }}
 
       # It is not possible to return the artifacts from the matrix jobs individually: Matrix outputs overwrite each other.
       # A common workaround is to upload and download the resulting artifacts.
@@ -81,8 +81,8 @@ jobs:
         id: upload-artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: pgcli_${{ matrix.config.target }}
-          path: ./dist/pgcli_*
+          name: pglt_${{ matrix.config.target }}
+          path: ./dist/pglt_*
           # The default compression level is 6; this took the binary down from 350 to 330MB.
           # It is recommended to use a lower level for binaries, since the compressed result is not much smaller,
           # and the higher levels of compression take much longer.
@@ -113,7 +113,7 @@ jobs:
         id: download
         with:
           merge-multiple: true
-          pattern: pgcli_*
+          pattern: pglt_*
 
       - name: 📂 Create Release
         uses: softprops/action-gh-release@v2
@@ -124,7 +124,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ steps.create_changelog.outputs.content }}
           tag_name: ${{ steps.create_changelog.outputs.version }}
-          files: pgcli_*
+          files: pglt_*
           fail_on_unmatched_files: true
           draft: true
 
