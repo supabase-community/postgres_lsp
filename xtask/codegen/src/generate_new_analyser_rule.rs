@@ -75,11 +75,11 @@ impl Rule for {rule_name_upper_camel} {{
 
 static EXAMPLE_MUTED_SQL: &'static str = r#"
     /** expect-no-diagnostics */
-    ## select 1;
+    -- select 1;
 "#;
 
 static EXAMPLE_SQL: &'static str = r#"
-    ## select 1;
+    -- select 1;
 "#;
 
 pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &str) {
