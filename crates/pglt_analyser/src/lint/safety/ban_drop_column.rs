@@ -12,7 +12,7 @@ declare_lint_rule! {
     ///
     /// ### Invalid
     ///
-    /// ```sql,ignore
+    /// ```sql,expect_diagnostic
     /// alter table test drop column id;
     /// ```
     ///
