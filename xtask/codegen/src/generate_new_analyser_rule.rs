@@ -137,7 +137,7 @@ pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &s
     }
 
     let test_folder = match &category {
-        Category::Lint => crate_folder.join(format!("tests/specs/lint/{group}")),
+        Category::Lint => crate_folder.join(format!("tests/specs/lint/{group}/{rule_name_camel}")),
     };
     if !test_folder.exists() {
         std::fs::create_dir(test_folder.clone()).expect("To create the test folder");
