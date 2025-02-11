@@ -1,0 +1,23 @@
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pglt_commands"
+repository.workspace = true
+version              = "0.0.0"
+
+
+[dependencies]
+anyhow              = "1.0.62"
+async-std           = "1.12.0"
+sqlx.workspace      = true
+text-size.workspace = true
+
+[lib]
+doctest = false
+
+[features]
