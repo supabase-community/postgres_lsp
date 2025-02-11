@@ -136,11 +136,18 @@ pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &s
         std::fs::write(categories_path, categories).unwrap();
     }
 
+    let test_group_folder = match &category {
+        Category::Lint => crate_folder.join(format!("tests/specs/lint/{group}")),
+    };
+    if !test_group_folder.exists() {
+        std::fs::create_dir(test_group_folder.clone()).expect("To create the test group folder");
+    }
+
     let test_folder = match &category {
         Category::Lint => crate_folder.join(format!("tests/specs/lint/{group}/{rule_name_camel}")),
     };
     if !test_folder.exists() {
-        std::fs::create_dir(test_folder.clone()).expect("To create the test folder");
+        std::fs::create_dir(test_folder.clone()).expect("To create the test rule folder");
     }
 
     let test_file_name = format!("{}/query.sql", test_folder.display(),);
