@@ -73,21 +73,33 @@ impl Rule for {rule_name_upper_camel} {{
     )
 }
 
+static EXAMPLE_MUTED_SQL: &'static str = r#"
+    /** expect-no-diagnostics */
+    ## select 1;
+"#;
+
+static EXAMPLE_SQL: &'static str = r#"
+    ## select 1;
+"#;
+
 pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &str) {
     let rule_name_camel = Case::Camel.convert(rule_name);
+
     let crate_folder = project_root().join("crates/pg_analyser");
+
     let rule_folder = match &category {
         Category::Lint => crate_folder.join(format!("src/lint/{group}")),
     };
+    if !rule_folder.exists() {
+        std::fs::create_dir(rule_folder.clone()).expect("To create the rule folder");
+    }
+
     // Generate rule code
     let code = generate_rule_template(
         &category,
         Case::Pascal.convert(rule_name).as_str(),
         rule_name_camel.as_str(),
     );
-    if !rule_folder.exists() {
-        std::fs::create_dir(rule_folder.clone()).expect("To create the rule folder");
-    }
     let file_name = format!(
         "{}/{}.rs",
         rule_folder.display(),
@@ -123,4 +135,19 @@ pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &s
         categories.replace_range(lint_start_index..lint_end_index, &new_lint_rule_text);
         std::fs::write(categories_path, categories).unwrap();
     }
+
+    let test_folder = match &category {
+        Category::Lint => crate_folder.join(format!("tests/specs/lint/{group}")),
+    };
+    if !test_folder.exists() {
+        std::fs::create_dir(test_folder.clone()).expect("To create the test folder");
+    }
+
+    let test_file_name = format!("{}/query.sql", test_folder.display(),);
+    std::fs::write(test_file_name.clone(), EXAMPLE_SQL)
+        .unwrap_or_else(|_| panic!("To write {}", &test_file_name));
+
+    let muted_test_file_name = format!("{}/query_muted.sql", test_folder.display(),);
+    std::fs::write(muted_test_file_name.clone(), EXAMPLE_MUTED_SQL)
+        .unwrap_or_else(|_| panic!("To write {}", &muted_test_file_name));
 }
