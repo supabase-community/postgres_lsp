@@ -23,7 +23,7 @@ impl DbConnection {
             .password(&settings.password)
             .database(&settings.database);
 
-        let timeout = settings.conn_timeout_secs.clone();
+        let timeout = settings.conn_timeout_secs;
 
         let pool = PoolOptions::<Postgres>::new()
             .acquire_timeout(timeout)
