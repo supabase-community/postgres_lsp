@@ -1,0 +1,26 @@
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pglt_text_edit"
+repository.workspace = true
+version              = "0.0.0"
+
+
+[dependencies]
+schemars  = { workspace = true, optional = true }
+serde     = { workspace = true, features = ["derive"] }
+similar   = { workspace = true, features = ["unicode"] }
+text-size = { workspace = true, features = ["serde"] }
+
+[features]
+schemars = ["dep:schemars"]
+
+[dev-dependencies]
+
+[lib]
+doctest = false

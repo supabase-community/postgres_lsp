@@ -1,0 +1,20 @@
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pglt_statement_splitter"
+repository.workspace = true
+version              = "0.0.0"
+
+
+[dependencies]
+pglt_lexer.workspace = true
+text-size.workspace  = true
+
+[dev-dependencies]
+ntest              = "0.9.3"
+pg_query.workspace = true

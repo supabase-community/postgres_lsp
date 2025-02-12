@@ -1,0 +1,35 @@
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pglt_diagnostics"
+repository.workspace = true
+version              = "0.0.0"
+
+
+[dependencies]
+backtrace                   = "0.3.74"
+bpaf                        = { workspace = true }
+enumflags2                  = { workspace = true }
+pglt_console                = { workspace = true, features = ["serde_markup"] }
+pglt_diagnostics_categories = { workspace = true, features = ["serde"] }
+pglt_diagnostics_macros     = { workspace = true }
+pglt_text_edit              = { workspace = true }
+schemars                    = { workspace = true, optional = true }
+serde                       = { workspace = true, features = ["derive"] }
+serde_json                  = { workspace = true }
+termcolor                   = { workspace = true }
+text-size.workspace         = true
+unicode-width               = { workspace = true }
+
+[features]
+schema = ["schemars", "pglt_text_edit/schemars", "pglt_diagnostics_categories/schemars"]
+
+[dev-dependencies]
+
+[lib]
+doctest = false

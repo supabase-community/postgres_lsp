@@ -29,10 +29,10 @@ fn generate_rule_template(
         Category::Lint => "declare_lint_rule",
     };
     format!(
-        r#"use pg_analyse::{{
+        r#"use pglt_analyse::{{
     context::RuleContext, {macro_name}, Rule, RuleDiagnostic
 }};
-use pg_console::markup;
+use pglt_console::markup;
 
 {macro_name}! {{
     /// Succinct description of the rule.
@@ -84,9 +84,7 @@ static EXAMPLE_SQL: &'static str = r#"
 
 pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &str) {
     let rule_name_camel = Case::Camel.convert(rule_name);
-
-    let crate_folder = project_root().join("crates/pg_analyser");
-
+    let crate_folder = project_root().join("crates/pglt_analyser");
     let rule_folder = match &category {
         Category::Lint => crate_folder.join(format!("src/lint/{group}")),
     };
@@ -107,7 +105,7 @@ pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &s
     );
     std::fs::write(file_name.clone(), code).unwrap_or_else(|_| panic!("To write {}", &file_name));
 
-    let categories_path = "crates/pg_diagnostics_categories/src/categories.rs";
+    let categories_path = "crates/pglt_diagnostics_categories/src/categories.rs";
     let mut categories = std::fs::read_to_string(categories_path).unwrap();
 
     if !categories.contains(&rule_name_camel) {
