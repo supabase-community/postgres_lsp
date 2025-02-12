@@ -74,38 +74,34 @@ impl ActionCategory {
         match self {
             ActionCategory::QuickFix(tag) => {
                 if tag.is_empty() {
-                    Cow::Borrowed("quickfix.pglsp")
+                    Cow::Borrowed("quickfix.pglt")
                 } else {
-                    Cow::Owned(format!("quickfix.pglsp.{tag}"))
+                    Cow::Owned(format!("quickfix.pglt.{tag}"))
                 }
             }
 
-            ActionCategory::Refactor(RefactorKind::None) => Cow::Borrowed("refactor.pglsp"),
+            ActionCategory::Refactor(RefactorKind::None) => Cow::Borrowed("refactor.pglt"),
             ActionCategory::Refactor(RefactorKind::Extract) => {
-                Cow::Borrowed("refactor.extract.pglsp")
+                Cow::Borrowed("refactor.extract.pglt")
             }
-            ActionCategory::Refactor(RefactorKind::Inline) => {
-                Cow::Borrowed("refactor.inline.pglsp")
-            }
+            ActionCategory::Refactor(RefactorKind::Inline) => Cow::Borrowed("refactor.inline.pglt"),
             ActionCategory::Refactor(RefactorKind::Rewrite) => {
-                Cow::Borrowed("refactor.rewrite.pglsp")
+                Cow::Borrowed("refactor.rewrite.pglt")
             }
             ActionCategory::Refactor(RefactorKind::Other(tag)) => {
-                Cow::Owned(format!("refactor.{tag}.pglsp"))
+                Cow::Owned(format!("refactor.{tag}.pglt"))
             }
 
-            ActionCategory::Source(SourceActionKind::None) => Cow::Borrowed("source.pglsp"),
-            ActionCategory::Source(SourceActionKind::FixAll) => {
-                Cow::Borrowed("source.fixAll.pglsp")
-            }
+            ActionCategory::Source(SourceActionKind::None) => Cow::Borrowed("source.pglt"),
+            ActionCategory::Source(SourceActionKind::FixAll) => Cow::Borrowed("source.fixAll.pglt"),
             ActionCategory::Source(SourceActionKind::OrganizeImports) => {
-                Cow::Borrowed("source.organizeImports.pglsp")
+                Cow::Borrowed("source.organizeImports.pglt")
             }
             ActionCategory::Source(SourceActionKind::Other(tag)) => {
-                Cow::Owned(format!("source.{tag}.pglsp"))
+                Cow::Owned(format!("source.{tag}.pglt"))
             }
 
-            ActionCategory::Other(tag) => Cow::Owned(format!("{tag}.pglsp")),
+            ActionCategory::Other(tag) => Cow::Owned(format!("{tag}.pglt")),
         }
     }
 }

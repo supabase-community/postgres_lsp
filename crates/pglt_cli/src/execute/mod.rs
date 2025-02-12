@@ -11,7 +11,7 @@ use crate::reporter::junit::{JunitReporter, JunitReporterVisitor};
 use crate::reporter::terminal::{ConsoleReporter, ConsoleReporterVisitor};
 use crate::{CliDiagnostic, CliSession, DiagnosticsPayload, Reporter};
 use pglt_diagnostics::{category, Category};
-use pglt_fs::PgLspPath;
+use pglt_fs::PgLTPath;
 use std::borrow::Borrow;
 use std::ffi::OsString;
 use std::fmt::{Display, Formatter};
@@ -229,11 +229,11 @@ pub fn execute_mode(
 
     // don't do any traversal if there's some content coming from stdin
     if let Some(stdin) = execution.as_stdin_file() {
-        let pglsp_path = PgLspPath::new(stdin.as_path());
+        let pglt_path = PgLTPath::new(stdin.as_path());
         std_in::run(
             session,
             &execution,
-            pglsp_path,
+            pglt_path,
             stdin.as_content(),
             cli_options.verbose,
         )

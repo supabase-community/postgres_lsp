@@ -292,13 +292,13 @@ mod tests {
     use text_size::{TextRange, TextSize};
 
     use crate::{change::Change, document::StatementRef, Document, DocumentChange};
-    use pglt_fs::PgLspPath;
+    use pglt_fs::PgLTPath;
 
     #[test]
     fn test_document_apply_changes() {
         let input = "select id from users;\nselect * from contacts;";
 
-        let mut d = Document::new(PgLspPath::new("test.sql"), Some(input.to_string()));
+        let mut d = Document::new(PgLTPath::new("test.sql"), Some(input.to_string()));
 
         assert_eq!(d.statement_ranges.len(), 2);
 
@@ -317,7 +317,7 @@ mod tests {
         assert_eq!(
             changed[0].statement().to_owned(),
             StatementRef {
-                document_url: PgLspPath::new("test.sql"),
+                document_url: PgLTPath::new("test.sql"),
                 text: "select id from users;".to_string(),
                 idx: 0
             }
@@ -325,7 +325,7 @@ mod tests {
         assert_eq!(
             changed[1].statement().to_owned(),
             StatementRef {
-                document_url: PgLspPath::new("test.sql"),
+                document_url: PgLTPath::new("test.sql"),
                 text: "select * from contacts;".to_string(),
                 idx: 1
             }
@@ -350,7 +350,7 @@ mod tests {
     fn test_document_apply_changes_at_end_of_statement() {
         let input = "select id from\nselect * from contacts;";
 
-        let mut d = Document::new(PgLspPath::new("test.sql"), Some(input.to_string()));
+        let mut d = Document::new(PgLTPath::new("test.sql"), Some(input.to_string()));
 
         assert_eq!(d.statement_ranges.len(), 2);
 
@@ -393,7 +393,7 @@ mod tests {
 
     #[test]
     fn test_document_apply_changes_replacement() {
-        let path = PgLspPath::new("test.sql");
+        let path = PgLTPath::new("test.sql");
 
         let mut doc = Document::new(path, None);
 
@@ -508,7 +508,7 @@ mod tests {
     fn test_document_apply_changes_within_statement() {
         let input = "select id  from users;\nselect * from contacts;";
 
-        let mut d = Document::new(PgLspPath::new("test.sql"), Some(input.to_string()));
+        let mut d = Document::new(PgLTPath::new("test.sql"), Some(input.to_string()));
 
         assert_eq!(d.statement_ranges.len(), 2);
 

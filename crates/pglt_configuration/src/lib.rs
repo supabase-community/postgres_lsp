@@ -1,4 +1,4 @@
-//! This module contains the configuration of `pglsp.toml`
+//! This module contains the configuration of `pglt.toml`
 //!
 //! The configuration is divided by "tool", and then it's possible to further customise it
 //! by language. The language might further options divided by tool.

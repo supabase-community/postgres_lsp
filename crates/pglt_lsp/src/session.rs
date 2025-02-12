@@ -7,7 +7,7 @@ use futures::StreamExt;
 use pglt_analyse::RuleCategoriesBuilder;
 use pglt_configuration::ConfigurationPathHint;
 use pglt_diagnostics::{DiagnosticExt, Error};
-use pglt_fs::{FileSystem, PgLspPath};
+use pglt_fs::{FileSystem, PgLTPath};
 use pglt_lsp_converters::{negotiated_encoding, PositionEncoding, WideEncoding};
 use pglt_workspace::configuration::{load_configuration, LoadedConfiguration};
 use pglt_workspace::settings::PartialConfigurationExt;
@@ -247,7 +247,7 @@ impl Session {
     /// contents changes.
     #[tracing::instrument(level = "trace", skip_all, fields(url = display(&url), diagnostic_count), err)]
     pub(crate) async fn update_diagnostics(&self, url: lsp_types::Url) -> Result<(), LspError> {
-        let pglsp_path = self.file_path(&url)?;
+        let pglt_path = self.file_path(&url)?;
         let doc = self.document(&url)?;
         if self.configuration_status().is_error() && !self.notified_broken_configuration() {
             self.set_notified_broken_configuration();
@@ -260,14 +260,14 @@ impl Session {
 
         let diagnostics: Vec<lsp_types::Diagnostic> = {
             let result = self.workspace.pull_diagnostics(PullDiagnosticsParams {
-                path: pglsp_path.clone(),
+                path: pglt_path.clone(),
                 max_diagnostics: u64::MAX,
                 categories: categories.build(),
                 only: Vec::new(),
                 skip: Vec::new(),
             })?;
 
-            tracing::trace!("pglsp diagnostics: {:#?}", result.diagnostics);
+            tracing::trace!("pglt diagnostics: {:#?}", result.diagnostics);
 
             result
                 .diagnostics
@@ -340,7 +340,7 @@ impl Session {
         self.documents.write().unwrap().remove(url);
     }
 
-    pub(crate) fn file_path(&self, url: &lsp_types::Url) -> Result<PgLspPath> {
+    pub(crate) fn file_path(&self, url: &lsp_types::Url) -> Result<PgLTPath> {
         let path_to_file = match url.to_file_path() {
             Err(_) => {
                 // If we can't create a path, it's probably because the file doesn't exist.
@@ -350,7 +350,7 @@ impl Session {
             Ok(path) => path,
         };
 
-        Ok(PgLspPath::new(path_to_file))
+        Ok(PgLTPath::new(path_to_file))
     }
 
     /// True if the client supports dynamic registration of "workspace/didChangeConfiguration" requests
@@ -398,14 +398,14 @@ impl Session {
             .map(|params| &params.client_capabilities)
     }
 
-    /// This function attempts to read the `pglsp.toml` configuration file from
+    /// This function attempts to read the `pglt.toml` configuration file from
     /// the root URI and update the workspace settings accordingly
     #[tracing::instrument(level = "trace", skip(self))]
     pub(crate) async fn load_workspace_settings(&self) {
         // Providing a custom configuration path will not allow to support workspaces
         if let Some(config_path) = &self.config_path {
             let base_path = ConfigurationPathHint::FromUser(config_path.clone());
-            let status = self.load_pglsp_configuration_file(base_path).await;
+            let status = self.load_pglt_configuration_file(base_path).await;
             self.set_configuration_status(status);
         } else if let Some(folders) = self.get_workspace_folders() {
             info!("Detected workspace folder.");
@@ -416,7 +416,7 @@ impl Session {
                 match base_path {
                     Ok(base_path) => {
                         let status = self
-                            .load_pglsp_configuration_file(ConfigurationPathHint::FromWorkspace(
+                            .load_pglt_configuration_file(ConfigurationPathHint::FromWorkspace(
                                 base_path,
                             ))
                             .await;
@@ -435,12 +435,12 @@ impl Session {
                 None => ConfigurationPathHint::default(),
                 Some(path) => ConfigurationPathHint::FromLsp(path),
             };
-            let status = self.load_pglsp_configuration_file(base_path).await;
+            let status = self.load_pglt_configuration_file(base_path).await;
             self.set_configuration_status(status);
         }
     }
 
-    async fn load_pglsp_configuration_file(
+    async fn load_pglt_configuration_file(
         &self,
         base_path: ConfigurationPathHint,
     ) -> ConfigurationStatus {

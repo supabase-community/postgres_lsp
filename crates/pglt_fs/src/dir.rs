@@ -3,10 +3,10 @@ use std::{env, fs, path::PathBuf};
 use tracing::warn;
 
 pub fn ensure_cache_dir() -> PathBuf {
-    if let Some(proj_dirs) = ProjectDirs::from("dev", "supabase-community", "pglsp") {
-        // Linux: /home/alice/.cache/pglsp
-        // Win: C:\Users\Alice\AppData\Local\supabase-community\pglsp\cache
-        // Mac: /Users/Alice/Library/Caches/dev.supabase-community.pglsp
+    if let Some(proj_dirs) = ProjectDirs::from("dev", "supabase-community", "pglt") {
+        // Linux: /home/alice/.cache/pglt
+        // Win: C:\Users\Alice\AppData\Local\supabase-community\pglt\cache
+        // Mac: /Users/Alice/Library/Caches/dev.supabase-community.pglt
         let cache_dir = proj_dirs.cache_dir().to_path_buf();
         if let Err(err) = fs::create_dir_all(&cache_dir) {
             let temp_dir = env::temp_dir();

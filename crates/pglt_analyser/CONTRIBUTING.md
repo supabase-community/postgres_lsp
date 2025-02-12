@@ -79,7 +79,7 @@ Let's assume that the rule we implement support the following options:
 - `threshold`: an integer between 0 and 255;
 - `behaviorExceptions`: an array of strings.
 
-We would like to set the options in the `pglsp.toml` configuration file:
+We would like to set the options in the `pglt.toml` configuration file:
 
 ```toml
 [linter.rules.safety.myRule]
@@ -132,9 +132,9 @@ We currently require implementing _serde_'s traits `Deserialize`/`Serialize`.
 
 Also, we use other `serde` macros to adjust the JSON configuration:
 
-- `rename_all = "snake_case"`: it renames all fields in camel-case, so they are in line with the naming style of the `pglsp.toml`.
+- `rename_all = "snake_case"`: it renames all fields in camel-case, so they are in line with the naming style of the `pglt.toml`.
 - `deny_unknown_fields`: it raises an error if the configuration contains extraneous fields.
-- `default`: it uses the `Default` value when the field is missing from `pglsp.toml`. This macro makes the field optional.
+- `default`: it uses the `Default` value when the field is missing from `pglt.toml`. This macro makes the field optional.
 
 You can simply use a derive macros:
 

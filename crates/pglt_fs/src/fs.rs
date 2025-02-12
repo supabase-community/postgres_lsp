@@ -1,4 +1,4 @@
-use crate::{PathInterner, PgLspPath};
+use crate::{PathInterner, PgLTPath};
 pub use memory::{ErrorEntry, MemoryFileSystem};
 pub use os::OsFileSystem;
 use pglt_diagnostics::{console, Advices, Diagnostic, LogCategory, Visit};
@@ -18,9 +18,9 @@ mod os;
 pub struct ConfigName;
 
 impl ConfigName {
-    const PGLSP_TOML: [&'static str; 1] = ["pglsp.toml"];
+    const PGLSP_TOML: [&'static str; 1] = ["pglt.toml"];
 
-    pub const fn pglsp_toml() -> &'static str {
+    pub const fn pglt_toml() -> &'static str {
         Self::PGLSP_TOML[0]
     }
 
@@ -302,18 +302,18 @@ pub trait TraversalContext: Sync {
     /// Checks if the traversal context can handle a particular path, used as
     /// an optimization to bail out of scheduling a file handler if it wouldn't
     /// be able to process the file anyway
-    fn can_handle(&self, path: &PgLspPath) -> bool;
+    fn can_handle(&self, path: &PgLTPath) -> bool;
 
     /// This method will be called by the traversal for each file it finds
     /// where [TraversalContext::can_handle] returned true
-    fn handle_path(&self, path: PgLspPath);
+    fn handle_path(&self, path: PgLTPath);
 
     /// This method will be called by the traversal for each file it finds
     /// where [TraversalContext::store_path] returned true
-    fn store_path(&self, path: PgLspPath);
+    fn store_path(&self, path: PgLTPath);
 
     /// Returns the paths that should be handled
-    fn evaluated_paths(&self) -> BTreeSet<PgLspPath>;
+    fn evaluated_paths(&self) -> BTreeSet<PgLTPath>;
 }
 
 impl<T> FileSystem for Arc<T>

@@ -1,7 +1,7 @@
 use crate::execute::diagnostics::{ResultExt, ResultIoExt};
 use crate::execute::process_file::SharedTraversalOptions;
 use pglt_diagnostics::{category, Error};
-use pglt_fs::{File, OpenOptions, PgLspPath};
+use pglt_fs::{File, OpenOptions, PgLTPath};
 use pglt_workspace::workspace::{ChangeParams, FileGuard, OpenFileParams};
 use pglt_workspace::{Workspace, WorkspaceError};
 use std::ffi::OsStr;
@@ -21,7 +21,7 @@ impl<'ctx, 'app> WorkspaceFile<'ctx, 'app> {
         ctx: &SharedTraversalOptions<'ctx, 'app>,
         path: &Path,
     ) -> Result<Self, Error> {
-        let pglsp_path = PgLspPath::new(path);
+        let pglt_path = PgLTPath::new(path);
         let open_options = OpenOptions::default()
             .read(true)
             .write(ctx.execution.requires_write_access());
@@ -37,7 +37,7 @@ impl<'ctx, 'app> WorkspaceFile<'ctx, 'app> {
         let guard = FileGuard::open(
             ctx.workspace,
             OpenFileParams {
-                path: pglsp_path,
+                path: pglt_path,
                 version: 0,
                 content: input.clone(),
             },
