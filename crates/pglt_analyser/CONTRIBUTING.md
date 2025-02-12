@@ -280,6 +280,20 @@ This will cause the documentation generator to ensure the rule does emit
 exactly one diagnostic for this code, and to include a snapshot for the
 diagnostic in the resulting documentation page.
 
+### Testing the Rule
+
+#### Quick Test
+
+To quickly test your rule, head to the `pglt_analyser/src/lib.rs` file and modify the `debug_test` function.
+
+You should:
+
+- remove the `#[ignore]` macro if present
+- change the content of the `SQL` static `&str` to whatever you need
+- pass your group and rule to the `RuleFilter::Rule(..)`
+
+If you run the test, you'll see any diagnostics your rule created in your console.
+
 ### Code generation
 
 For simplicity, use `just` to run all the commands with:

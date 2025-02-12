@@ -105,6 +105,12 @@ mod tests {
     }
 
     #[test]
+    fn alter_column() {
+        Tester::from("alter table users alter column email drop not null;")
+            .expect_statements(vec!["alter table users alter column email drop not null;"]);
+    }
+
+    #[test]
     fn insert_expect_error() {
         Tester::from("\ninsert select 1\n\nselect 3")
             .expect_statements(vec!["insert select 1", "select 3"])

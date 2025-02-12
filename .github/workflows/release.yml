@@ -1,4 +1,4 @@
-name: Release PG_CLI
+name: Release Binary
 
 on:
   workflow_dispatch:
@@ -61,7 +61,7 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
 
       - name: 🛠️ Run Build
-        run: cargo build -p pg_cli --release --target ${{ matrix.config.target }}
+        run: cargo build -p pglt_cli --release --target ${{ matrix.config.target }}
 
       # windows is a special snowflake to, it saves binaries as .exe
       - name: 👦 Name the Binary

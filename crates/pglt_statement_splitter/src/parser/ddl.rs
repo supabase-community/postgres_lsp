@@ -11,5 +11,5 @@ pub(crate) fn create(p: &mut Parser) {
 pub(crate) fn alter(p: &mut Parser) {
     p.expect(SyntaxKind::Alter);
 
-    unknown(p, &[]);
+    unknown(p, &[SyntaxKind::Alter]);
 }
