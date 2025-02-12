@@ -65,3 +65,61 @@ impl<'a> Analyser<'a> {
             .collect::<Vec<_>>()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use core::slice;
+
+    use pglt_analyse::{AnalyserOptions, AnalysisFilter, RuleFilter};
+    use pglt_console::{
+        fmt::{Formatter, Termcolor},
+        markup, Markup,
+    };
+    use pglt_diagnostics::PrintDiagnostic;
+    use termcolor::NoColor;
+
+    use crate::Analyser;
+
+    #[ignore]
+    #[test]
+    fn debug_test() {
+        fn markup_to_string(markup: Markup) -> String {
+            let mut buffer = Vec::new();
+            let mut write = Termcolor(NoColor::new(&mut buffer));
+            let mut fmt = Formatter::new(&mut write);
+            fmt.write_markup(markup).unwrap();
+
+            String::from_utf8(buffer).unwrap()
+        }
+
+        const SQL: &str = r#"alter table test drop column id;"#;
+        let rule_filter = RuleFilter::Rule("safety", "banDropColumn");
+
+        let filter = AnalysisFilter {
+            enabled_rules: Some(slice::from_ref(&rule_filter)),
+            ..Default::default()
+        };
+
+        let ast = pglt_query_ext::parse(SQL).expect("failed to parse SQL");
+
+        let options = AnalyserOptions::default();
+
+        let analyser = Analyser::new(crate::AnalyserConfig {
+            options: &options,
+            filter,
+        });
+
+        let results = analyser.run(crate::AnalyserContext { root: &ast });
+
+        println!("*******************");
+        for result in &results {
+            let text = markup_to_string(markup! {
+                {PrintDiagnostic::simple(result)}
+            });
+            eprintln!("{}", text);
+        }
+        println!("*******************");
+
+        // assert_eq!(results, vec![]);
+    }
+}
