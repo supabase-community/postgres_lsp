@@ -3,14 +3,14 @@ use std::{hash::Hash, hash::Hasher, ops::RangeBounds};
 use line_index::LineIndex;
 use text_size::{TextRange, TextSize};
 
-use pglt_fs::PgLspPath;
+use pglt_fs::PgLTPath;
 
 extern crate test;
 
 /// Represents a sql source file, and contains a list of statements represented by their ranges
 pub struct Document {
     /// The url of the document
-    pub url: PgLspPath,
+    pub url: PgLTPath,
     /// The text of the document
     pub text: String,
     /// The version of the document
@@ -33,7 +33,7 @@ impl Hash for Document {
 /// Note that the ref must include all information needed to uniquely identify the statement, so that it can be used as a key in a hashmap.
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub struct StatementRef {
-    pub document_url: PgLspPath,
+    pub document_url: PgLTPath,
     // TODO use string interner for text
     pub text: String,
     pub idx: usize,
@@ -41,7 +41,7 @@ pub struct StatementRef {
 
 impl Document {
     /// Create a new document
-    pub fn new(url: PgLspPath, text: Option<String>) -> Document {
+    pub fn new(url: PgLTPath, text: Option<String>) -> Document {
         Document {
             version: 0,
             line_index: LineIndex::new(text.as_ref().unwrap_or(&"".to_string())),
@@ -162,14 +162,14 @@ impl Document {
 #[cfg(test)]
 mod tests {
 
-    use pglt_fs::PgLspPath;
+    use pglt_fs::PgLTPath;
     use text_size::{TextRange, TextSize};
 
     use crate::Document;
 
     #[test]
     fn test_statements_at_range() {
-        let url = PgLspPath::new("test.sql");
+        let url = PgLTPath::new("test.sql");
 
         let doc = Document::new(
             url,

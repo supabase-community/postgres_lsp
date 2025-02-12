@@ -85,7 +85,7 @@
                     "default": "off",
                     "description": "Traces the communication between VS Code and the language server."
                 },
-                "pglsp.databaseUrl": {
+                "pglt.databaseUrl": {
                     "type": "string",
                     "default": "",
                     "description": "Your Postgres Database URL"

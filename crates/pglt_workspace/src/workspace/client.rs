@@ -81,7 +81,7 @@ where
     }
 
     pub fn shutdown(self) -> Result<(), WorkspaceError> {
-        self.request("pglsp/shutdown", ())
+        self.request("pglt/shutdown", ())
     }
 }
 
@@ -90,23 +90,23 @@ where
     T: WorkspaceTransport + RefUnwindSafe + Send + Sync,
 {
     fn open_file(&self, params: OpenFileParams) -> Result<(), WorkspaceError> {
-        self.request("pglsp/open_file", params)
+        self.request("pglt/open_file", params)
     }
 
     fn close_file(&self, params: CloseFileParams) -> Result<(), WorkspaceError> {
-        self.request("pglsp/close_file", params)
+        self.request("pglt/close_file", params)
     }
 
     fn change_file(&self, params: super::ChangeFileParams) -> Result<(), WorkspaceError> {
-        self.request("pglsp/change_file", params)
+        self.request("pglt/change_file", params)
     }
 
     fn update_settings(&self, params: super::UpdateSettingsParams) -> Result<(), WorkspaceError> {
-        self.request("pglsp/update_settings", params)
+        self.request("pglt/update_settings", params)
     }
 
     fn is_path_ignored(&self, params: IsPathIgnoredParams) -> Result<bool, WorkspaceError> {
-        self.request("pglsp/is_path_ignored", params)
+        self.request("pglt/is_path_ignored", params)
     }
 
     fn server_info(&self) -> Option<&ServerInfo> {
@@ -114,20 +114,20 @@ where
     }
 
     fn get_file_content(&self, params: GetFileContentParams) -> Result<String, WorkspaceError> {
-        self.request("pglsp/get_file_content", params)
+        self.request("pglt/get_file_content", params)
     }
 
     fn pull_diagnostics(
         &self,
         params: super::PullDiagnosticsParams,
     ) -> Result<super::PullDiagnosticsResult, WorkspaceError> {
-        self.request("pglsp/pull_diagnostics", params)
+        self.request("pglt/pull_diagnostics", params)
     }
 
     fn get_completions(
         &self,
         params: super::CompletionParams,
     ) -> Result<pglt_completions::CompletionResult, WorkspaceError> {
-        self.request("pglsp/get_completions", params)
+        self.request("pglt/get_completions", params)
     }
 }

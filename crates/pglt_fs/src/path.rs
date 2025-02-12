@@ -23,7 +23,7 @@ use crate::ConfigName;
 )]
 // NOTE: The order of the variants is important, the one on the top has the highest priority
 pub enum FileKind {
-    /// A configuration file has the highest priority. It's usually `pglsp.toml`
+    /// A configuration file has the highest priority. It's usually `pglt.toml`
     ///
     /// Other third-party configuration files might be added in the future
     Config,
@@ -89,7 +89,7 @@ impl From<FileKind> for FileKinds {
     feature = "serde",
     derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)
 )]
-pub struct PgLspPath {
+pub struct PgLTPath {
     path: PathBuf,
     /// Determines the kind of the file inside PGLSP. Some files are considered as configuration files, others as manifest files, and others as files to handle
     kind: FileKinds,
@@ -97,7 +97,7 @@ pub struct PgLspPath {
     was_written: bool,
 }
 
-impl Deref for PgLspPath {
+impl Deref for PgLTPath {
     type Target = PathBuf;
 
     fn deref(&self) -> &Self::Target {
@@ -105,13 +105,13 @@ impl Deref for PgLspPath {
     }
 }
 
-impl PartialOrd for PgLspPath {
+impl PartialOrd for PgLTPath {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl Ord for PgLspPath {
+impl Ord for PgLTPath {
     fn cmp(&self, other: &Self) -> Ordering {
         match self.kind.cmp(&other.kind) {
             Ordering::Equal => self.path.cmp(&other.path),
@@ -120,7 +120,7 @@ impl Ord for PgLspPath {
     }
 }
 
-impl PgLspPath {
+impl PgLTPath {
     pub fn new(path_to_file: impl Into<PathBuf>) -> Self {
         let path = path_to_file.into();
         let kind = path.file_name().map(Self::priority).unwrap_or_default();
@@ -141,7 +141,7 @@ impl PgLspPath {
         }
     }
 
-    /// Creates a new [PgLspPath], marked as fixed
+    /// Creates a new [PgLTPath], marked as fixed
     pub fn to_written(&self) -> Self {
         Self {
             path: self.path.clone(),
@@ -177,11 +177,11 @@ impl PgLspPath {
     }
 
     /// The priority of the file.
-    /// - `pglsp.toml` has the highest priority
+    /// - `pglt.toml` has the highest priority
     /// - `package.json` and `tsconfig.json`/`jsconfig.json` have the second-highest priority, and they are considered as manifest files
     /// - Other files are considered as files to handle
     fn priority(file_name: &OsStr) -> FileKinds {
-        if file_name == ConfigName::pglsp_toml() {
+        if file_name == ConfigName::pglt_toml() {
             FileKind::Config.into()
         } else {
             FileKind::Handleable.into()

@@ -1,11 +1,11 @@
-use pglt_fs::PgLspPath;
+use pglt_fs::PgLTPath;
 use text_size::TextRange;
 
 /// Global unique identifier for a statement
 #[derive(Debug, Hash, Eq, PartialEq, Clone)]
 pub(crate) struct Statement {
     /// Path of the document
-    pub(crate) path: PgLspPath,
+    pub(crate) path: PgLTPath,
     /// Unique id within the document
     pub(crate) id: StatementId,
 }
@@ -15,7 +15,7 @@ pub type StatementId = usize;
 type StatementPos = (StatementId, TextRange);
 
 pub(crate) struct Document {
-    pub(crate) path: PgLspPath,
+    pub(crate) path: PgLTPath,
     pub(crate) content: String,
     pub(crate) version: i32,
     /// List of statements sorted by range.start()
@@ -25,7 +25,7 @@ pub(crate) struct Document {
 }
 
 impl Document {
-    pub(crate) fn new(path: PgLspPath, content: String, version: i32) -> Self {
+    pub(crate) fn new(path: PgLTPath, content: String, version: i32) -> Self {
         let mut id_generator = IdGenerator::new();
 
         let ranges: Vec<StatementPos> = pglt_statement_splitter::split(&content)

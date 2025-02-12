@@ -10,7 +10,7 @@ use parking_lot::{lock_api::ArcMutexGuard, Mutex, RawMutex, RwLock};
 use pglt_diagnostics::{Error, Severity};
 
 use crate::fs::OpenOptions;
-use crate::{FileSystem, PgLspPath, TraversalContext, TraversalScope};
+use crate::{FileSystem, PgLTPath, TraversalContext, TraversalScope};
 
 use super::{BoxedTraversal, ErrorKind, File, FileSystemDiagnostic};
 
@@ -297,11 +297,11 @@ impl<'scope> TraversalScope<'scope> for MemoryTraversalScope<'scope> {
 
                 if should_process_file {
                     let _ = ctx.interner().intern_path(path.into());
-                    let pglsp_path = PgLspPath::new(path);
-                    if !ctx.can_handle(&pglsp_path) {
+                    let pglt_path = PgLTPath::new(path);
+                    if !ctx.can_handle(&pglt_path) {
                         continue;
                     }
-                    ctx.store_path(pglsp_path);
+                    ctx.store_path(pglt_path);
                 }
             }
         }
@@ -328,7 +328,7 @@ impl<'scope> TraversalScope<'scope> for MemoryTraversalScope<'scope> {
     }
 
     fn handle(&self, context: &'scope dyn TraversalContext, path: PathBuf) {
-        context.handle_path(PgLspPath::new(path));
+        context.handle_path(PgLTPath::new(path));
     }
 }
 
@@ -345,7 +345,7 @@ mod tests {
     use pglt_diagnostics::Error;
 
     use crate::{fs::FileSystemExt, OpenOptions};
-    use crate::{FileSystem, MemoryFileSystem, PathInterner, PgLspPath, TraversalContext};
+    use crate::{FileSystem, MemoryFileSystem, PathInterner, PgLTPath, TraversalContext};
 
     #[test]
     fn fs_read_only() {
@@ -509,7 +509,7 @@ mod tests {
 
         struct TestContext {
             interner: PathInterner,
-            visited: Mutex<BTreeSet<PgLspPath>>,
+            visited: Mutex<BTreeSet<PgLTPath>>,
         }
 
         impl TraversalContext for TestContext {
@@ -521,19 +521,19 @@ mod tests {
                 panic!("unexpected error {err:?}")
             }
 
-            fn can_handle(&self, _: &PgLspPath) -> bool {
+            fn can_handle(&self, _: &PgLTPath) -> bool {
                 true
             }
 
-            fn handle_path(&self, path: PgLspPath) {
+            fn handle_path(&self, path: PgLTPath) {
                 self.visited.lock().insert(path.to_written());
             }
 
-            fn store_path(&self, path: PgLspPath) {
+            fn store_path(&self, path: PgLTPath) {
                 self.visited.lock().insert(path);
             }
 
-            fn evaluated_paths(&self) -> BTreeSet<PgLspPath> {
+            fn evaluated_paths(&self) -> BTreeSet<PgLTPath> {
                 let lock = self.visited.lock();
                 lock.clone()
             }
@@ -554,8 +554,8 @@ mod tests {
         swap(&mut visited, ctx.visited.get_mut());
 
         assert_eq!(visited.len(), 2);
-        assert!(visited.contains(&PgLspPath::new("dir1/file1")));
-        assert!(visited.contains(&PgLspPath::new("dir1/file2")));
+        assert!(visited.contains(&PgLTPath::new("dir1/file1")));
+        assert!(visited.contains(&PgLTPath::new("dir1/file2")));
 
         // Traverse a single file
         fs.traversal(Box::new(|scope| {
@@ -566,6 +566,6 @@ mod tests {
         swap(&mut visited, ctx.visited.get_mut());
 
         assert_eq!(visited.len(), 1);
-        assert!(visited.contains(&PgLspPath::new("dir2/file2")));
+        assert!(visited.contains(&PgLTPath::new("dir2/file2")));
     }
 }

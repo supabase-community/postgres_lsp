@@ -26,7 +26,7 @@ pub struct CliOptions {
     #[bpaf(long("verbose"), switch, fallback(false))]
     pub verbose: bool,
 
-    /// Set the file path to the configuration file, or the directory path to find `pglsp.toml`.
+    /// Set the file path to the configuration file, or the directory path to find `pglt.toml`.
     /// If used, it disables the default configuration file resolution.
     #[bpaf(long("config-path"), argument("PATH"), optional)]
     pub config_path: Option<String>,

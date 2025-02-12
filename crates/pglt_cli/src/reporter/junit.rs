@@ -34,7 +34,7 @@ pub(crate) struct JunitReporterVisitor<'a>(pub(crate) Report, pub(crate) &'a mut
 
 impl<'a> JunitReporterVisitor<'a> {
     pub(crate) fn new(console: &'a mut dyn Console) -> Self {
-        let report = Report::new("PgLsp");
+        let report = Report::new("PgLT");
         Self(report, console)
     }
 }
@@ -85,7 +85,7 @@ impl ReporterVisitor for JunitReporterVisitor<'_> {
                 ));
                 let mut case = TestCase::new(
                     format!(
-                        "org.pglsp.{}",
+                        "org.pglt.{}",
                         diagnostic
                             .category()
                             .map(|c| c.name())
@@ -103,9 +103,7 @@ impl ReporterVisitor for JunitReporterVisitor<'_> {
                         "column".into(),
                         start.column_number.get().to_string().into(),
                     );
-                    test_suite
-                        .extra
-                        .insert("package".into(), "org.pglsp".into());
+                    test_suite.extra.insert("package".into(), "org.pglt".into());
                     test_suite.add_test_case(case);
                     self.0.add_test_suite(test_suite);
                 }

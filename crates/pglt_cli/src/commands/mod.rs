@@ -24,7 +24,7 @@ pub(crate) mod version;
 
 #[derive(Debug, Clone, Bpaf)]
 #[bpaf(options, version(VERSION))]
-/// PgLsp official CLI. Use it to check the health of your project or run it to check single files.
+/// PgLT official CLI. Use it to check the health of your project or run it to check single files.
 pub enum PgltCommand {
     /// Shows the version information and quit.
     #[bpaf(command)]
@@ -58,7 +58,7 @@ pub enum PgltCommand {
         changed: bool,
 
         /// Use this to specify the base branch to compare against when you're using the --changed
-        /// flag and the `defaultBranch` is not set in your `pglsp.toml`
+        /// flag and the `defaultBranch` is not set in your `pglt.toml`
         #[bpaf(long("since"), argument("REF"))]
         since: Option<String>,
 
@@ -87,11 +87,11 @@ pub enum PgltCommand {
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pglt_fs::ensure_cache_dir().join("pglsp-logs")),
+            fallback(pglt_fs::ensure_cache_dir().join("pglt-logs")),
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglsp.toml`
+        /// or a custom directory path to find `pglt.toml`
         #[bpaf(env("PGLSP_LOG_PREFIX_NAME"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
     },
@@ -123,11 +123,11 @@ pub enum PgltCommand {
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pglt_fs::ensure_cache_dir().join("pglsp-logs")),
+            fallback(pglt_fs::ensure_cache_dir().join("pglt-logs")),
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglsp.toml`
+        /// or a custom directory path to find `pglt.toml`
         #[bpaf(env("PGLSP_CONFIG_PATH"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
         /// Bogus argument to make the command work with vscode-languageclient
@@ -157,14 +157,14 @@ pub enum PgltCommand {
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pglt_fs::ensure_cache_dir().join("pglsp-logs")),
+            fallback(pglt_fs::ensure_cache_dir().join("pglt-logs")),
         )]
         log_path: PathBuf,
 
         #[bpaf(long("stop-on-disconnect"), hide_usage)]
         stop_on_disconnect: bool,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglsp.toml`
+        /// or a custom directory path to find `pglt.toml`
         #[bpaf(env("PGLSP_CONFIG_PATH"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
     },
@@ -197,7 +197,7 @@ impl PgltCommand {
                 }
                 // We want force colors in CI, to give e better UX experience
                 // Unless users explicitly set the colors flag
-                // if matches!(self, PgLspCommand::Ci { .. }) && cli_options.colors.is_none() {
+                // if matches!(self, PgLTCommand::Ci { .. }) && cli_options.colors.is_none() {
                 //     return Some(&ColorsArg::Force);
                 // }
                 // Normal behaviors

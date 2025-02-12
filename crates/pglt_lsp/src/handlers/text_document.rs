@@ -53,11 +53,11 @@ pub(crate) async fn did_change(
     let url = params.text_document.uri;
     let version = params.text_document.version;
 
-    let pglsp_path = session.file_path(&url)?;
+    let pglt_path = session.file_path(&url)?;
 
     let old_doc = session.document(&url)?;
     let old_text = session.workspace.get_file_content(GetFileContentParams {
-        path: pglsp_path.clone(),
+        path: pglt_path.clone(),
     })?;
 
     let start = params
@@ -74,7 +74,7 @@ pub(crate) async fn did_change(
     );
 
     session.workspace.change_file(ChangeFileParams {
-        path: pglsp_path,
+        path: pglt_path,
         version,
         changes: params.content_changes[start..]
             .iter()
@@ -103,11 +103,11 @@ pub(crate) async fn did_close(
     params: lsp_types::DidCloseTextDocumentParams,
 ) -> Result<()> {
     let url = params.text_document.uri;
-    let pglsp_path = session.file_path(&url)?;
+    let pglt_path = session.file_path(&url)?;
 
     session
         .workspace
-        .close_file(CloseFileParams { path: pglsp_path })?;
+        .close_file(CloseFileParams { path: pglt_path })?;
 
     session.remove_document(&url);
 

@@ -57,7 +57,7 @@ impl LSPServer {
         let mut capabilities = CapabilitySet::default();
 
         capabilities.add_capability(
-            "pglsp_did_change_extension_settings",
+            "pglt_did_change_extension_settings",
             "workspace/didChangeConfiguration",
             if self.session.can_register_did_change_configuration() {
                 CapabilityStatus::Enable(None)
@@ -67,13 +67,13 @@ impl LSPServer {
         );
 
         capabilities.add_capability(
-            "pglsp_did_change_workspace_settings",
+            "pglt_did_change_workspace_settings",
             "workspace/didChangeWatchedFiles",
             if let Some(base_path) = self.session.base_path() {
                 CapabilityStatus::Enable(Some(json!(DidChangeWatchedFilesRegistrationOptions {
                     watchers: vec![FileSystemWatcher {
                         glob_pattern: GlobPattern::String(format!(
-                            "{}/pglsp.toml",
+                            "{}/pglt.toml",
                             base_path.display()
                         )),
                         kind: Some(WatchKind::all()),
@@ -147,7 +147,7 @@ impl LanguageServer for LSPServer {
     async fn initialized(&self, params: InitializedParams) {
         let _ = params;
 
-        info!("Attempting to load the configuration from 'pglsp.toml' file");
+        info!("Attempting to load the configuration from 'pglt.toml' file");
 
         futures::join!(self.session.load_workspace_settings());
 
@@ -271,9 +271,9 @@ type Sessions = Arc<Mutex<FxHashMap<SessionKey, SessionHandle>>>;
 macro_rules! workspace_method {
     ( $builder:ident, $method:ident ) => {
         $builder = $builder.custom_method(
-            concat!("pglsp/", stringify!($method)),
+            concat!("pglt/", stringify!($method)),
             |server: &LSPServer, params| {
-                let span = tracing::trace_span!(concat!("pglsp/", stringify!($method)), params = ?params).or_current();
+                let span = tracing::trace_span!(concat!("pglt/", stringify!($method)), params = ?params).or_current();
                 tracing::info!("Received request: {}", stringify!($method));
 
                 let workspace = server.session.workspace.clone();
@@ -382,7 +382,7 @@ impl ServerFactory {
         });
 
         // "shutdown" is not part of the Workspace API
-        builder = builder.custom_method("pglsp/shutdown", |server: &LSPServer, (): ()| {
+        builder = builder.custom_method("pglt/shutdown", |server: &LSPServer, (): ()| {
             info!("Sending shutdown signal");
             server.session.broadcast_shutdown();
             ready(Ok(Some(())))

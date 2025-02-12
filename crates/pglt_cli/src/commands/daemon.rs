@@ -176,9 +176,9 @@ pub(crate) fn read_most_recent_log_file(
     log_path: Option<PathBuf>,
     log_file_name_prefix: String,
 ) -> io::Result<Option<String>> {
-    let pglsp_log_path = log_path.unwrap_or(default_pglsp_log_path());
+    let pglt_log_path = log_path.unwrap_or(default_pglt_log_path());
 
-    let most_recent = fs::read_dir(pglsp_log_path)?
+    let most_recent = fs::read_dir(pglt_log_path)?
         .flatten()
         .filter(|file| file.file_type().is_ok_and(|ty| ty.is_file()))
         .filter_map(|file| {
@@ -203,16 +203,16 @@ pub(crate) fn read_most_recent_log_file(
 /// The events received by the subscriber are filtered at the `info` level,
 /// then printed using the [HierarchicalLayer] layer, and the resulting text
 /// is written to log files rotated on a hourly basis (in
-/// `pglsp-logs/server.log.yyyy-MM-dd-HH` files inside the system temporary
+/// `pglt-logs/server.log.yyyy-MM-dd-HH` files inside the system temporary
 /// directory)
 fn setup_tracing_subscriber(log_path: Option<PathBuf>, log_file_name_prefix: Option<String>) {
-    let pglsp_log_path = log_path.unwrap_or(pglt_fs::ensure_cache_dir().join("pglsp-logs"));
+    let pglt_log_path = log_path.unwrap_or(pglt_fs::ensure_cache_dir().join("pglt-logs"));
     let appender_builder = tracing_appender::rolling::RollingFileAppender::builder();
     let file_appender = appender_builder
         .filename_prefix(log_file_name_prefix.unwrap_or(String::from("server.log")))
         .max_log_files(7)
         .rotation(Rotation::HOURLY)
-        .build(pglsp_log_path)
+        .build(pglt_log_path)
         .expect("Failed to start the logger for the daemon.");
 
     registry()
@@ -229,19 +229,19 @@ fn setup_tracing_subscriber(log_path: Option<PathBuf>, log_file_name_prefix: Opt
         .init();
 }
 
-pub fn default_pglsp_log_path() -> PathBuf {
+pub fn default_pglt_log_path() -> PathBuf {
     match env::var_os("PGLSP_LOG_PATH") {
         Some(directory) => PathBuf::from(directory),
-        None => pglt_fs::ensure_cache_dir().join("pglsp-logs"),
+        None => pglt_fs::ensure_cache_dir().join("pglt-logs"),
     }
 }
 
 /// Tracing filter enabling:
 /// - All spans and events at level info or higher
-/// - All spans and events at level debug in crates whose name starts with `pglsp`
+/// - All spans and events at level debug in crates whose name starts with `pglt`
 struct LoggingFilter;
 
-/// Tracing filter used for spans emitted by `pglsp*` crates
+/// Tracing filter used for spans emitted by `pglt*` crates
 const SELF_FILTER: LevelFilter = if cfg!(debug_assertions) {
     LevelFilter::TRACE
 } else {
@@ -250,7 +250,7 @@ const SELF_FILTER: LevelFilter = if cfg!(debug_assertions) {
 
 impl LoggingFilter {
     fn is_enabled(&self, meta: &Metadata<'_>) -> bool {
-        let filter = if meta.target().starts_with("pglsp") {
+        let filter = if meta.target().starts_with("pglt") {
             SELF_FILTER
         } else {
             LevelFilter::INFO
