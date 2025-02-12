@@ -18,7 +18,7 @@ Our current focus is on refining and enhancing these core features while buildin
 
 ## Contributors
 
-- [psteinroe](https://github.com/psteinroe) (Maintainer)
+- [psteinroe](https://github.com/psteinroe)
 - [juleswritescode](https://github.com/juleswritescode)
 
 ## Acknowledgements
@@ -26,5 +26,5 @@ Our current focus is on refining and enhancing these core features while buildin
 A big thanks to the following projects, without which this project wouldn't have been possible:
 
 - [libpg_query](https://github.com/pganalyze/libpg_query): For extracting the Postgres' parser
-- [Biome](https://github.com/biomejs/biome): For implementing a toolchain infrastructure we could copy from 
+- [Biome](https://github.com/biomejs/biome): For implementing a toolchain infrastructure we could copy from
 - [Squawk](https://github.com/sbdchd/squawk): For the linter inspiration
