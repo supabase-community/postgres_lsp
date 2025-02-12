@@ -1,0 +1,40 @@
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pglt_lsp"
+repository.workspace = true
+version              = "0.0.0"
+
+
+[dependencies]
+anyhow              = { workspace = true }
+biome_deserialize   = { workspace = true }
+futures             = "0.3.31"
+pglt_analyse        = { workspace = true }
+pglt_completions    = { workspace = true }
+pglt_configuration  = { workspace = true }
+pglt_console        = { workspace = true }
+pglt_diagnostics    = { workspace = true }
+pglt_fs             = { workspace = true }
+pglt_lsp_converters = { workspace = true }
+pglt_text_edit      = { workspace = true }
+pglt_workspace      = { workspace = true }
+rustc-hash          = { workspace = true }
+serde               = { workspace = true, features = ["derive"] }
+serde_json          = { workspace = true }
+text-size.workspace = true
+tokio               = { workspace = true, features = ["rt", "io-std"] }
+tower-lsp           = { version = "0.20.0" }
+tracing             = { workspace = true, features = ["attributes"] }
+
+[dev-dependencies]
+
+[lib]
+doctest = false
+
+[features]

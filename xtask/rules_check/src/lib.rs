@@ -3,15 +3,15 @@ use std::str::FromStr;
 use std::{fmt::Write, slice};
 
 use anyhow::bail;
-use pg_analyse::{
+use pglt_analyse::{
     AnalyserOptions, AnalysisFilter, GroupCategory, RegistryVisitor, Rule, RuleCategory,
     RuleFilter, RuleGroup, RuleMetadata,
 };
-use pg_analyser::{Analyser, AnalyserConfig};
-use pg_console::{markup, Console};
-use pg_diagnostics::{Diagnostic, DiagnosticExt, PrintDiagnostic};
-use pg_query_ext::diagnostics::SyntaxDiagnostic;
-use pg_workspace::settings::Settings;
+use pglt_analyser::{Analyser, AnalyserConfig};
+use pglt_console::{markup, Console};
+use pglt_diagnostics::{Diagnostic, DiagnosticExt, PrintDiagnostic};
+use pglt_query_ext::diagnostics::SyntaxDiagnostic;
+use pglt_workspace::settings::Settings;
 use pulldown_cmark::{CodeBlockKind, Event, Parser, Tag, TagEnd};
 
 pub fn check_rules() -> anyhow::Result<()> {
@@ -48,7 +48,7 @@ pub fn check_rules() -> anyhow::Result<()> {
     }
 
     let mut visitor = LintRulesVisitor::default();
-    pg_analyser::visit_registry(&mut visitor);
+    pglt_analyser::visit_registry(&mut visitor);
 
     let LintRulesVisitor { groups } = visitor;
 
@@ -74,16 +74,16 @@ fn assert_lint(
     let mut diagnostic_count = 0;
     let mut all_diagnostics = vec![];
     let mut has_error = false;
-    let mut write_diagnostic = |code: &str, diag: pg_diagnostics::Error| {
+    let mut write_diagnostic = |code: &str, diag: pglt_diagnostics::Error| {
         all_diagnostics.push(diag);
         // Fail the test if the analysis returns more diagnostics than expected
         if test.expect_diagnostic {
             // Print all diagnostics to help the user
             if all_diagnostics.len() > 1 {
-                let mut console = pg_console::EnvConsole::default();
+                let mut console = pglt_console::EnvConsole::default();
                 for diag in all_diagnostics.iter() {
                     console.println(
-                        pg_console::LogLevel::Error,
+                        pglt_console::LogLevel::Error,
                         markup! {
                             {PrintDiagnostic::verbose(diag)}
                         },
@@ -94,10 +94,10 @@ fn assert_lint(
             }
         } else {
             // Print all diagnostics to help the user
-            let mut console = pg_console::EnvConsole::default();
+            let mut console = pglt_console::EnvConsole::default();
             for diag in all_diagnostics.iter() {
                 console.println(
-                    pg_console::LogLevel::Error,
+                    pglt_console::LogLevel::Error,
                     markup! {
                         {PrintDiagnostic::verbose(diag)}
                     },
@@ -127,12 +127,12 @@ fn assert_lint(
     });
 
     // split and parse each statement
-    let stmts = pg_statement_splitter::split(code);
+    let stmts = pglt_statement_splitter::split(code);
     for stmt in stmts.ranges {
-        match pg_query_ext::parse(&code[stmt]) {
+        match pglt_query_ext::parse(&code[stmt]) {
             Ok(ast) => {
-                for rule_diag in analyser.run(pg_analyser::AnalyserContext { root: &ast }) {
-                    let diag = pg_diagnostics::serde::Diagnostic::new(rule_diag);
+                for rule_diag in analyser.run(pglt_analyser::AnalyserContext { root: &ast }) {
+                    let diag = pglt_diagnostics::serde::Diagnostic::new(rule_diag);
 
                     let category = diag.category().expect("linter diagnostic has no code");
                     let severity = settings.get_severity_from_rule_code(category).expect(

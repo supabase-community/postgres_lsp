@@ -1,0 +1,25 @@
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pglt_lsp_converters"
+repository.workspace = true
+version              = "0.0.0"
+
+
+[dependencies]
+anyhow              = { workspace = true }
+rustc-hash          = { workspace = true }
+text-size.workspace = true
+tower-lsp           = { version = "0.20.0" }
+
+[dev-dependencies]
+
+[lib]
+doctest = false
+
+[features]
