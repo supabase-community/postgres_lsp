@@ -19,4 +19,4 @@ serde          = { workspace = true }
 
 [dev-dependencies]
 pglt_diagnostics = { workspace = true }
-termcolor ={ workspace = true }
+termcolor        = { workspace = true }
