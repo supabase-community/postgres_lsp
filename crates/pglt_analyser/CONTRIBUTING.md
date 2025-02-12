@@ -284,7 +284,7 @@ diagnostic in the resulting documentation page.
 
 #### Quick Test
 
-To quickly test your rule, head to the `pg_analyser/src/lib.rs` file and modify the `debug_test` function.
+To quickly test your rule, head to the `pglt_analyser/src/lib.rs` file and modify the `debug_test` function.
 
 You should:
 
@@ -321,11 +321,7 @@ of deprecation can be multiple.
 In order to do, the macro allows adding additional field to add the reason for deprecation
 
 ````rust
-<<<<<<< HEAD:crates/pg_analyser/CONTRIBUTING.md
-use pg_analyse::declare_lint_rule;
-=======
 use pglt_analyse::declare_lint_rule;
->>>>>>> main:crates/pglt_analyser/CONTRIBUTING.md
 
 declare_lint_rule! {
     /// Dropping a column may break existing clients.
