@@ -70,12 +70,12 @@ impl<'a> Analyser<'a> {
 mod tests {
     use core::slice;
 
-    use pg_analyse::{AnalyserOptions, AnalysisFilter, RuleFilter};
-    use pg_console::{
+    use pglt_analyse::{AnalyserOptions, AnalysisFilter, RuleFilter};
+    use pglt_console::{
         fmt::{Formatter, Termcolor},
         markup, Markup,
     };
-    use pg_diagnostics::PrintDiagnostic;
+    use pglt_diagnostics::PrintDiagnostic;
     use termcolor::NoColor;
 
     use crate::Analyser;
@@ -100,7 +100,7 @@ mod tests {
             ..Default::default()
         };
 
-        let ast = pg_query_ext::parse(SQL).expect("failed to parse SQL");
+        let ast = pglt_query_ext::parse(SQL).expect("failed to parse SQL");
 
         let options = AnalyserOptions::default();
 
