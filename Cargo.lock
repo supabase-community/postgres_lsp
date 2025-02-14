@@ -2242,8 +2242,10 @@ version = "0.0.0"
 dependencies = [
  "pglt_analyse",
  "pglt_console",
+ "pglt_diagnostics",
  "pglt_query_ext",
  "serde",
+ "termcolor",
 ]
 
 [[package]]

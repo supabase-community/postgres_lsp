@@ -19,7 +19,7 @@ fn panic_handler(info: &PanicHookInfo) {
     writeln!(error, "Encountered an unexpected error").unwrap();
     writeln!(error).unwrap();
 
-    writeln!(error, "This is a bug in PgLsp, not an error in your code, and we would appreciate it if you could report it along with the following information to help us fixing the issue:").unwrap();
+    writeln!(error, "This is a bug in PgLT, not an error in your code, and we would appreciate it if you could report it along with the following information to help us fixing the issue:").unwrap();
     writeln!(error).unwrap();
 
     if let Some(location) = info.location() {

@@ -11,7 +11,7 @@ use pg_query::PgQueryStore;
 use pglt_analyse::{AnalyserOptions, AnalysisFilter};
 use pglt_analyser::{Analyser, AnalyserConfig, AnalyserContext};
 use pglt_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, DiagnosticExt, Severity};
-use pglt_fs::{ConfigName, PgLspPath};
+use pglt_fs::{ConfigName, PgLTPath};
 use pglt_typecheck::TypecheckParams;
 use schema_cache_manager::SchemaCacheManager;
 use tracing::info;
@@ -47,7 +47,7 @@ pub(super) struct WorkspaceServer {
     schema_cache: SchemaCacheManager,
 
     /// Stores the document (text content + version number) associated with a URL
-    documents: DashMap<PgLspPath, Document>,
+    documents: DashMap<PgLTPath, Document>,
 
     tree_sitter: TreeSitterStore,
     pg_query: PgQueryStore,
@@ -112,7 +112,7 @@ impl WorkspaceServer {
     fn is_ignored(&self, path: &Path) -> bool {
         let file_name = path.file_name().and_then(|s| s.to_str());
         // Never ignore PGLSP's config file regardless `include`/`ignore`
-        (file_name != Some(ConfigName::pglsp_toml())) &&
+        (file_name != Some(ConfigName::pglt_toml())) &&
             // Apply top-level `include`/`ignore
             (self.is_ignored_by_top_level_config(path) || self.is_ignored_by_migration_config(path))
     }
@@ -261,7 +261,7 @@ impl Workspace for WorkspaceServer {
     }
 
     fn is_path_ignored(&self, params: IsPathIgnoredParams) -> Result<bool, WorkspaceError> {
-        Ok(self.is_ignored(params.pglsp_path.as_path()))
+        Ok(self.is_ignored(params.pglt_path.as_path()))
     }
 
     fn pull_diagnostics(

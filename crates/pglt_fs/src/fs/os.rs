@@ -3,7 +3,7 @@ use super::{BoxedTraversal, ErrorKind, File, FileSystemDiagnostic};
 use crate::fs::OpenOptions;
 use crate::{
     fs::{TraversalContext, TraversalScope},
-    FileSystem, PgLspPath,
+    FileSystem, PgLTPath,
 };
 use pglt_diagnostics::{adapters::IoError, DiagnosticExt, Error, Severity};
 use rayon::{scope, Scope};
@@ -190,7 +190,7 @@ impl<'scope> TraversalScope<'scope> for OsTraversalScope<'scope> {
 
     fn handle(&self, context: &'scope dyn TraversalContext, path: PathBuf) {
         self.scope.spawn(move |_| {
-            context.handle_path(PgLspPath::new(path));
+            context.handle_path(PgLTPath::new(path));
         });
     }
 }
@@ -268,7 +268,7 @@ fn handle_any_file<'scope>(
     }
 
     if file_type.is_symlink() {
-        if !ctx.can_handle(&PgLspPath::new(path.clone())) {
+        if !ctx.can_handle(&PgLTPath::new(path.clone())) {
             return;
         }
         let Ok((target_path, target_file_type)) = expand_symbolic_link(path.clone(), ctx) else {
@@ -295,11 +295,11 @@ fn handle_any_file<'scope>(
     // In case the file is inside a directory that is behind a symbolic link,
     // the unresolved origin path is used to construct a new path.
     // This is required to support ignore patterns to symbolic links.
-    let pglsp_path = if let Some(old_origin_path) = &origin_path {
+    let pglt_path = if let Some(old_origin_path) = &origin_path {
         if let Some(file_name) = path.file_name() {
             let new_origin_path = old_origin_path.join(file_name);
             origin_path = Some(new_origin_path.clone());
-            PgLspPath::new(new_origin_path)
+            PgLTPath::new(new_origin_path)
         } else {
             ctx.push_diagnostic(Error::from(FileSystemDiagnostic {
                 path: path.to_string_lossy().to_string(),
@@ -309,7 +309,7 @@ fn handle_any_file<'scope>(
             return;
         }
     } else {
-        PgLspPath::new(&path)
+        PgLTPath::new(&path)
     };
 
     // Performing this check here let's us skip unsupported
@@ -317,7 +317,7 @@ fn handle_any_file<'scope>(
     // doing a directory traversal, but printing an error message if the
     // user explicitly requests an unsupported file to be handled.
     // This check also works for symbolic links.
-    if !ctx.can_handle(&pglsp_path) {
+    if !ctx.can_handle(&pglt_path) {
         return;
     }
 
@@ -330,7 +330,7 @@ fn handle_any_file<'scope>(
 
     if file_type.is_file() {
         scope.spawn(move |_| {
-            ctx.store_path(PgLspPath::new(path));
+            ctx.store_path(PgLTPath::new(path));
         });
         return;
     }

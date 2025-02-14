@@ -28,7 +28,7 @@ pub struct VcsConfiguration {
     pub use_ignore_file: bool,
 
     /// The folder where we should check for VCS files. By default, we will use the same
-    /// folder where `pglsp.toml` was found.
+    /// folder where `pglt.toml` was found.
     ///
     /// If we can't find the configuration, it will attempt to use the current working directory.
     /// If no current working directory can't be found, we won't use the VCS integration, and a diagnostic

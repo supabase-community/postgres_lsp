@@ -6,34 +6,34 @@ use std::env;
 use std::ops::Deref;
 use std::sync::{LazyLock, OnceLock};
 
-/// Returns `true` if this is an unstable build of PgLsp
+/// Returns `true` if this is an unstable build of PgLT
 pub fn is_unstable() -> bool {
     PGLSP_VERSION.deref().is_none()
 }
 
-/// The internal version of PgLsp. This is usually supplied during the CI build
+/// The internal version of PgLT. This is usually supplied during the CI build
 pub static PGLSP_VERSION: LazyLock<Option<&str>> = LazyLock::new(|| option_env!("PGLSP_VERSION"));
 
-pub struct PgLspEnv {
-    pub pglsp_log_path: PgLspEnvVariable,
-    pub pglsp_log_prefix: PgLspEnvVariable,
-    pub pglsp_config_path: PgLspEnvVariable,
+pub struct PgLTEnv {
+    pub pglt_log_path: PgLTEnvVariable,
+    pub pglt_log_prefix: PgLTEnvVariable,
+    pub pglt_config_path: PgLTEnvVariable,
 }
 
-pub static PGLSP_ENV: OnceLock<PgLspEnv> = OnceLock::new();
+pub static PGLSP_ENV: OnceLock<PgLTEnv> = OnceLock::new();
 
-impl PgLspEnv {
+impl PgLTEnv {
     fn new() -> Self {
         Self {
-            pglsp_log_path: PgLspEnvVariable::new(
+            pglt_log_path: PgLTEnvVariable::new(
                 "PGLSP_LOG_PATH",
                 "The directory where the Daemon logs will be saved.",
             ),
-            pglsp_log_prefix: PgLspEnvVariable::new(
+            pglt_log_prefix: PgLTEnvVariable::new(
                 "PGLSP_LOG_PREFIX_NAME",
                 "A prefix that's added to the name of the log. Default: `server.log.`",
             ),
-            pglsp_config_path: PgLspEnvVariable::new(
+            pglt_config_path: PgLTEnvVariable::new(
                 "PGLSP_CONFIG_PATH",
                 "A path to the configuration file",
             ),
@@ -41,7 +41,7 @@ impl PgLspEnv {
     }
 }
 
-pub struct PgLspEnvVariable {
+pub struct PgLTEnvVariable {
     /// The name of the environment variable
     name: &'static str,
     /// The description of the variable.
@@ -49,7 +49,7 @@ pub struct PgLspEnvVariable {
     description: &'static str,
 }
 
-impl PgLspEnvVariable {
+impl PgLTEnvVariable {
     fn new(name: &'static str, description: &'static str) -> Self {
         Self { name, description }
     }
@@ -70,38 +70,37 @@ impl PgLspEnvVariable {
     }
 }
 
-pub fn pglsp_env() -> &'static PgLspEnv {
-    PGLSP_ENV.get_or_init(PgLspEnv::new)
+pub fn pglt_env() -> &'static PgLTEnv {
+    PGLSP_ENV.get_or_init(PgLTEnv::new)
 }
 
-impl Display for PgLspEnv {
+impl Display for PgLTEnv {
     fn fmt(&self, fmt: &mut Formatter) -> std::io::Result<()> {
-        match self.pglsp_log_path.value() {
+        match self.pglt_log_path.value() {
             None => {
-                KeyValuePair(self.pglsp_log_path.name, markup! { <Dim>"unset"</Dim> }).fmt(fmt)?;
+                KeyValuePair(self.pglt_log_path.name, markup! { <Dim>"unset"</Dim> }).fmt(fmt)?;
             }
             Some(value) => {
-                KeyValuePair(self.pglsp_log_path.name, markup! {{DebugDisplay(value)}}).fmt(fmt)?;
+                KeyValuePair(self.pglt_log_path.name, markup! {{DebugDisplay(value)}}).fmt(fmt)?;
             }
         };
-        match self.pglsp_log_prefix.value() {
+        match self.pglt_log_prefix.value() {
             None => {
-                KeyValuePair(self.pglsp_log_prefix.name, markup! { <Dim>"unset"</Dim> })
-                    .fmt(fmt)?;
+                KeyValuePair(self.pglt_log_prefix.name, markup! { <Dim>"unset"</Dim> }).fmt(fmt)?;
             }
             Some(value) => {
-                KeyValuePair(self.pglsp_log_prefix.name, markup! {{DebugDisplay(value)}})
+                KeyValuePair(self.pglt_log_prefix.name, markup! {{DebugDisplay(value)}})
                     .fmt(fmt)?;
             }
         };
 
-        match self.pglsp_config_path.value() {
+        match self.pglt_config_path.value() {
             None => {
-                KeyValuePair(self.pglsp_config_path.name, markup! { <Dim>"unset"</Dim> })
+                KeyValuePair(self.pglt_config_path.name, markup! { <Dim>"unset"</Dim> })
                     .fmt(fmt)?;
             }
             Some(value) => {
-                KeyValuePair(self.pglsp_config_path.name, markup! {{DebugDisplay(value)}})
+                KeyValuePair(self.pglt_config_path.name, markup! {{DebugDisplay(value)}})
                     .fmt(fmt)?;
             }
         };

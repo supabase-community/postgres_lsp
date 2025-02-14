@@ -3,7 +3,7 @@ use std::{panic::RefUnwindSafe, path::PathBuf, sync::Arc};
 pub use self::client::{TransportRequest, WorkspaceClient, WorkspaceTransport};
 use pglt_analyse::RuleCategories;
 use pglt_configuration::{PartialConfiguration, RuleSelector};
-use pglt_fs::PgLspPath;
+use pglt_fs::PgLTPath;
 use serde::{Deserialize, Serialize};
 use text_size::{TextRange, TextSize};
 
@@ -14,26 +14,26 @@ mod server;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct OpenFileParams {
-    pub path: PgLspPath,
+    pub path: PgLTPath,
     pub content: String,
     pub version: i32,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct CloseFileParams {
-    pub path: PgLspPath,
+    pub path: PgLTPath,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ChangeFileParams {
-    pub path: PgLspPath,
+    pub path: PgLTPath,
     pub version: i32,
     pub changes: Vec<ChangeParams>,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct PullDiagnosticsParams {
-    pub path: PgLspPath,
+    pub path: PgLTPath,
     pub categories: RuleCategories,
     pub max_diagnostics: u64,
     pub only: Vec<RuleSelector>,
@@ -43,7 +43,7 @@ pub struct PullDiagnosticsParams {
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct CompletionParams {
     /// The File for which a completion is requested.
-    pub path: PgLspPath,
+    pub path: PgLTPath,
     /// The Cursor position in the file for which a completion is requested.
     pub position: TextSize,
 }
@@ -81,7 +81,7 @@ impl ChangeParams {
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct IsPathIgnoredParams {
-    pub pglsp_path: PgLspPath,
+    pub pglt_path: PgLTPath,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -95,7 +95,7 @@ pub struct UpdateSettingsParams {
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct GetFileContentParams {
-    pub path: PgLspPath,
+    pub path: PgLTPath,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
@@ -170,7 +170,7 @@ where
 /// automatically on drop
 pub struct FileGuard<'app, W: Workspace + ?Sized> {
     workspace: &'app W,
-    path: PgLspPath,
+    path: PgLTPath,
 }
 
 impl<'app, W: Workspace + ?Sized> FileGuard<'app, W> {

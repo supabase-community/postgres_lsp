@@ -152,7 +152,7 @@ pub fn create_config(
     fs: &mut DynRef<dyn FileSystem>,
     configuration: PartialConfiguration,
 ) -> Result<(), WorkspaceError> {
-    let path = PathBuf::from(ConfigName::pglsp_toml());
+    let path = PathBuf::from(ConfigName::pglt_toml());
 
     if fs.path_exists(&path) {
         return Err(ConfigurationDiagnostic::new_already_exists().into());
