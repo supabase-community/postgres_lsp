@@ -976,6 +976,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "docs_codegen"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "bpaf",
+ "pglt_cli",
+ "pglt_configuration",
+ "pglt_flags",
+ "regex",
+ "toml",
+]
+
+[[package]]
 name = "dotenv"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

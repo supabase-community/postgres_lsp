@@ -37,6 +37,8 @@ pglt init
 
 After running the `init` command, you’ll have a new `pglt.toml` file in your directory:
 
+[//]: # (BEGIN DEFAULT_CONFIGURATION)
+
 ```toml
 [vcs]
 enabled = false
@@ -60,6 +62,8 @@ password = "postgres"
 database = "postgres"
 conn_timeout_secs = 10
 ```
+
+[//]: # (END DEFAULT_CONFIGURATION)
 
 Make sure to point the database connection settings at your local development database. To see what else can be configured, run `--help`.
 

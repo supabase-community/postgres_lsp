@@ -1,5 +1,5 @@
 [workspace]
-members  = ["crates/*", "lib/*", "xtask/codegen", "xtask/rules_check"]
+members  = ["crates/*", "lib/*", "xtask/codegen", "xtask/rules_check", "docs/codegen"]
 resolver = "2"
 
 [workspace.package]
@@ -28,6 +28,7 @@ pg_query                 = "6.0.0"
 proc-macro2              = "1.0.66"
 quote                    = "1.0.33"
 rayon                    = "1.10.0"
+regex                    = "1.11.1"
 rustc-hash               = "2.0.0"
 schemars                 = { version = "0.8.21", features = ["indexmap2", "smallvec"] }
 serde                    = "1.0.195"
@@ -79,10 +80,8 @@ pglt_typecheck              = { path = "./crates/pglt_typecheck", version = "0.0
 pglt_workspace              = { path = "./crates/pglt_workspace", version = "0.0.0" }
 
 pglt_test_utils = { path = "./crates/pglt_test_utils" }
-# parser = { path = "./crates/parser", version = "0.0.0" }
-# sql_parser = { path = "./crates/sql_parser", version = "0.0.0" }
-# sql_parser_codegen = { path = "./crates/sql_parser_codegen", version = "0.0.0" }
 
+docs_codegen = { path = "./docs/codegen", version = "0.0.0" }
 
 [profile.dev.package]
 insta.opt-level = 3
