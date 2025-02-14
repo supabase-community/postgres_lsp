@@ -19,4 +19,5 @@ quote = { workspace = true }
 syn = { workspace = true }
 globwalk = { version = "0.9.1"}
 proc-macro2 = { version = '1.0.93' }
+proc-macro-error = { version = "1.0.4" }
 

@@ -135,24 +135,20 @@ pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &s
     }
 
     let test_group_folder = match &category {
-        Category::Lint => crate_folder.join(format!("tests/specs/lint/{group}")),
+        Category::Lint => crate_folder.join(format!("tests/specs/{group}")),
     };
     if !test_group_folder.exists() {
         std::fs::create_dir(test_group_folder.clone()).expect("To create the test group folder");
     }
 
     let test_folder = match &category {
-        Category::Lint => crate_folder.join(format!("tests/specs/lint/{group}/{rule_name_camel}")),
+        Category::Lint => crate_folder.join(format!("tests/specs/{group}/{rule_name_camel}")),
     };
     if !test_folder.exists() {
         std::fs::create_dir(test_folder.clone()).expect("To create the test rule folder");
     }
 
-    let test_file_name = format!("{}/query.sql", test_folder.display(),);
+    let test_file_name = format!("{}/query.sql", test_folder.display());
     std::fs::write(test_file_name.clone(), EXAMPLE_SQL)
         .unwrap_or_else(|_| panic!("To write {}", &test_file_name));
-
-    let muted_test_file_name = format!("{}/query_muted.sql", test_folder.display(),);
-    std::fs::write(muted_test_file_name.clone(), EXAMPLE_MUTED_SQL)
-        .unwrap_or_else(|_| panic!("To write {}", &muted_test_file_name));
 }

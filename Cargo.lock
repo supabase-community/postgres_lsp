@@ -1649,13 +1649,14 @@ dependencies = [
 
 [[package]]
 name = "insta"
-version = "1.41.1"
+version = "1.42.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e9ffc4d4892617c50a928c52b2961cb5174b6fc6ebf252b2fac9d21955c48b8"
+checksum = "71c1b125e30d93896b365e156c33dadfffab45ee8400afcbba4752f59de08a86"
 dependencies = [
  "console",
- "lazy_static",
  "linked-hash-map",
+ "once_cell",
+ "pin-project",
  "similar",
 ]
 
@@ -2240,10 +2241,12 @@ dependencies = [
 name = "pglt_analyser"
 version = "0.0.0"
 dependencies = [
+ "insta",
  "pglt_analyse",
  "pglt_console",
  "pglt_diagnostics",
  "pglt_query_ext",
+ "pglt_test_macros",
  "serde",
  "termcolor",
 ]
@@ -2542,6 +2545,7 @@ name = "pglt_test_macros"
 version = "0.0.0"
 dependencies = [
  "globwalk",
+ "proc-macro-error",
  "proc-macro2",
  "quote",
  "syn 1.0.109",
@@ -2780,6 +2784,7 @@ dependencies = [
  "proc-macro-error-attr",
  "proc-macro2",
  "quote",
+ "syn 1.0.109",
  "version_check",
 ]
 

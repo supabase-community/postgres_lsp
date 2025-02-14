@@ -83,7 +83,3 @@ pglt_test_macros = { path = "./crates/pglt_test_macros" }
 # parser = { path = "./crates/parser", version = "0.0.0" }
 # sql_parser = { path = "./crates/sql_parser", version = "0.0.0" }
 # sql_parser_codegen = { path = "./crates/sql_parser_codegen", version = "0.0.0" }
-
-
-[profile.dev.package]
-insta.opt-level = 3

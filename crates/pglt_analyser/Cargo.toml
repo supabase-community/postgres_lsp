@@ -20,3 +20,5 @@ serde          = { workspace = true }
 [dev-dependencies]
 pglt_diagnostics = { workspace = true }
 termcolor        = { workspace = true }
+pglt_test_macros ={ workspace = true }
+insta = { version =  "1.42.1"}

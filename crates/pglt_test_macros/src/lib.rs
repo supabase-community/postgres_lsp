@@ -1,5 +1,6 @@
 use globwalk::GlobWalkerBuilder;
 use proc_macro::TokenStream;
+use proc_macro_error::*;
 use quote::*;
 use std::{
     collections::HashMap,
@@ -8,12 +9,13 @@ use std::{
 };
 
 #[proc_macro]
-pub fn gen_files_test(input: TokenStream) -> TokenStream {
+#[proc_macro_error]
+pub fn gen_tests(input: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(input as Arguments);
 
     match args.gen() {
         Ok(tokens) => tokens,
-        Err(e) => panic!("{}", e),
+        Err(e) => abort!(e, "{}", e),
     }
 }
 
@@ -117,7 +119,18 @@ impl Arguments {
 
         for entry in walker {
             let entry = entry.map_err(|_| "Error iteraring over entry.")?;
+
+            let filename = entry
+                .file_name()
+                .to_str()
+                .ok_or("Cannot convert filename to string.")?;
+
+            if filename.ends_with(".expected.sql") {
+                continue;
+            }
+
             let meta = entry.metadata().map_err(|_| "Cannot open file.")?;
+
             if meta.is_file() {
                 paths.push(entry.path().to_path_buf());
             }
@@ -169,6 +182,7 @@ impl Arguments {
 
         let mut output = proc_macro2::TokenStream::new();
         modules.print(&mut output);
+
         Ok(output.into())
     }
 }
