@@ -73,11 +73,6 @@ impl Rule for {rule_name_upper_camel} {{
     )
 }
 
-static EXAMPLE_MUTED_SQL: &'static str = r#"
-    /** expect-no-diagnostics */
-    -- select 1;
-"#;
-
 static EXAMPLE_SQL: &'static str = r#"
     -- select 1;
 "#;
