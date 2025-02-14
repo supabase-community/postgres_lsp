@@ -1,0 +1,220 @@
+use globwalk::GlobWalkerBuilder;
+use proc_macro::TokenStream;
+use quote::*;
+use std::{
+    collections::HashMap,
+    ffi::OsStr,
+    path::{Component, Path, PathBuf},
+};
+
+#[proc_macro]
+pub fn gen_files_test(input: TokenStream) -> TokenStream {
+    let args = syn::parse_macro_input!(input as Arguments);
+
+    match args.gen() {
+        Ok(tokens) => tokens,
+        Err(e) => panic!("{}", e),
+    }
+}
+
+/// A Recursive Tree Structure that stores tests per *part* of a Path.
+///
+/* foo
+ * ├── bar
+ * │   ├── testA.sql
+ * ├── testB.sql
+ *
+ * Results in:
+ *
+ * TestModules {
+ *     modules: {
+ *        "foo": TestModules {
+ *             modules: {
+ *                 "bar": TestModules {
+ *                     modules: {},
+ *                     tests: [stream->testA.sql]
+ *                  }
+ *             }
+ *             tests: [stream->testB.sql]
+ *        }
+ *     }
+ *     tests: []
+ * }
+ *
+ * Note that `tests` does not hold actual files but the TokenStreams for the tests for those files.
+*/
+#[derive(Default)]
+struct TestModules {
+    modules: HashMap<String, TestModules>,
+    tests: Vec<proc_macro2::TokenStream>,
+}
+
+impl TestModules {
+    fn insert<'a>(
+        &mut self,
+        mut path: impl Iterator<Item = &'a str>,
+        test: proc_macro2::TokenStream,
+    ) {
+        match path.next() {
+            Some(part) => {
+                let module = self.modules.entry(part.into()).or_default();
+                module.insert(path, test);
+            }
+            None => {
+                self.tests.push(test);
+            }
+        }
+    }
+
+    fn print(self, output: &mut proc_macro2::TokenStream) {
+        for (name, sub_module) in self.modules {
+            let name = syn::Ident::new(&name, proc_macro2::Span::call_site());
+
+            let mut sub_module_stream = proc_macro2::TokenStream::new();
+            sub_module.print(&mut sub_module_stream);
+
+            // wrap the submodule tests in a `mod`
+            output.extend(quote! {
+                    mod #name { #sub_module_stream }
+            });
+        }
+        output.extend(self.tests)
+    }
+}
+
+struct Arguments {
+    pattern: syn::ExprLit,
+    test_function: syn::Path,
+}
+
+impl syn::parse::Parse for Arguments {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let pattern = input.parse()?;
+        let _: syn::Token!(,) = input.parse()?;
+        let test_function = input.parse()?;
+        Ok(Arguments {
+            pattern,
+            test_function,
+        })
+    }
+}
+
+impl Arguments {
+    fn get_filepaths(&self) -> Result<Vec<PathBuf>, &'static str> {
+        let base = std::env::var("CARGO_MANIFEST_DIR")
+            .map_err(|_| "Cannot find CARGO_MANIFEST_DIR. Are you using cargo?")?;
+
+        let pattern = match &self.pattern.lit {
+            syn::Lit::Str(s) => s.value(),
+            _ => return Err("Invalid pattern."),
+        };
+
+        let walker = GlobWalkerBuilder::new(base, pattern)
+            .build()
+            .map_err(|_| "Cannot build walker.")?;
+
+        let mut paths = Vec::new();
+
+        for entry in walker {
+            let entry = entry.map_err(|_| "Error iteraring over entry.")?;
+            let meta = entry.metadata().map_err(|_| "Cannot open file.")?;
+            if meta.is_file() {
+                paths.push(entry.path().to_path_buf());
+            }
+        }
+
+        Ok(paths)
+    }
+
+    fn gen(self) -> Result<TokenStream, &'static str> {
+        let files = self.get_filepaths()?;
+        let mut modules = TestModules::default();
+
+        for file in files {
+            let Variables {
+                test_name,
+                test_fullpath,
+                test_expected_fullpath,
+                test_dir,
+            } = file.try_into()?;
+
+            let path = Path::new(&test_fullpath)
+                .parent()
+                .expect("Do not put tests in root directory.")
+                .components()
+                .map(Component::as_os_str)
+                .skip_while(|c| {
+                    let bytes = c.as_encoded_bytes();
+                    bytes != b"specs" && bytes != b"tests"
+                })
+                .filter_map(OsStr::to_str);
+
+            let span = self.pattern.lit.span();
+            let test_name = syn::Ident::new(&test_name, span);
+            let foo = &self.test_function;
+
+            modules.insert(
+                path,
+                quote! {
+                    #[test]
+                    pub fn #test_name () {
+                        let test_fullpath = #test_fullpath;
+                        let test_expected_fullpath = #test_expected_fullpath;
+                        let test_dir = #test_dir;
+                        #foo(test_fullpath, test_expected_fullpath, test_dir);
+                    }
+                },
+            )
+        }
+
+        let mut output = proc_macro2::TokenStream::new();
+        modules.print(&mut output);
+        Ok(output.into())
+    }
+}
+
+struct Variables {
+    test_name: String,
+    test_fullpath: String,
+    test_expected_fullpath: String,
+    test_dir: String,
+}
+
+impl TryFrom<PathBuf> for Variables {
+    type Error = &'static str;
+
+    fn try_from(path: PathBuf) -> Result<Self, Self::Error> {
+        let test_name = path
+            .file_stem()
+            .ok_or("Cannot get file stem.")?
+            .to_str()
+            .ok_or("Cannot convert file stem to string.")?;
+
+        let ext = path
+            .extension()
+            .ok_or("Cannot get extension.")?
+            .to_str()
+            .ok_or("Cannot convert extension to string.")?;
+        assert_eq!(ext, "sql", "Expected .sql extension but received: {}", ext);
+
+        let test_dir = path
+            .parent()
+            .ok_or("Cannot get parent directory.")?
+            .to_str()
+            .ok_or("Cannot convert parent directory to string.")?;
+
+        let test_fullpath = path.to_str().ok_or("Cannot convert path to string.")?;
+
+        let mut without_ext = test_fullpath.to_string();
+        without_ext.pop();
+
+        let test_expected_fullpath = format!("{}.expected.{}", without_ext, ext);
+
+        Ok(Variables {
+            test_name: test_name.into(),
+            test_fullpath: test_fullpath.into(),
+            test_expected_fullpath: test_expected_fullpath.into(),
+            test_dir: test_dir.into(),
+        })
+    }
+}
