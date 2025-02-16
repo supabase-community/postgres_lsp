@@ -2,8 +2,8 @@ use anyhow::{bail, Result};
 use biome_string_case::Case;
 use pglt_analyse::{AnalyserOptions, AnalysisFilter, RuleFilter, RuleMetadata};
 use pglt_analyser::{Analyser, AnalyserConfig};
-use pglt_console::fmt::{Formatter, HTML};
-use pglt_console::markup;
+use pglt_console::fmt::{Display, Formatter, Termcolor};
+use pglt_diagnostics::termcolor::NoColor;
 use pglt_diagnostics::{Diagnostic, DiagnosticExt, PrintDiagnostic};
 use pglt_query_ext::diagnostics::SyntaxDiagnostic;
 use pglt_workspace::settings::Settings;
@@ -16,6 +16,28 @@ use std::{
     slice,
     str::{self, FromStr},
 };
+
+/// TODO: get this from jules pr
+/// Adapter type providing a std::fmt::Display implementation for any type that
+/// implements pglt_console::fmt::Display.
+pub struct StdDisplay<T: Display>(pub T);
+
+impl<T> std::fmt::Display for StdDisplay<T>
+where
+    T: Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut buffer: Vec<u8> = Vec::new();
+        let mut termcolor = Termcolor(NoColor::new(&mut buffer));
+        let mut formatter = Formatter::new(&mut termcolor);
+
+        self.0.fmt(&mut formatter).map_err(|_| std::fmt::Error)?;
+
+        let content = String::from_utf8(buffer).map_err(|_| std::fmt::Error)?;
+
+        f.write_str(content.as_str())
+    }
+}
 
 /// Generates the documentation page for each lint rule.
 ///
@@ -75,7 +97,7 @@ fn generate_rule_doc(
         writeln!(content, "> [!NOTE]")?;
         writeln!(
             content,
-            "> - This rule is recommended. A diagnostic error will appear when linting your code."
+            "> This rule is recommended. A diagnostic error will appear when linting your code."
         )?;
     }
 
@@ -165,16 +187,13 @@ fn write_documentation(
 
                 if let Some((test, block)) = language.take() {
                     if test.expect_diagnostic {
-                        write!(
-                            content,
-                            "<pre class=\"language-text\"><code class=\"language-text\">"
-                        )?;
+                        writeln!(content, "```sh")?;
                     }
 
                     print_diagnostics(group, rule, &test, &block, content)?;
 
                     if test.expect_diagnostic {
-                        writeln!(content, "</code></pre>")?;
+                        writeln!(content, "```")?;
                         writeln!(content)?;
                     }
                 }
@@ -411,12 +430,10 @@ fn print_diagnostics(
 ) -> Result<()> {
     let file_path = format!("code-block.{}", test.tag);
 
-    let mut write = HTML::new(content).with_mdx();
-
     let mut write_diagnostic = |_: &str, diag: pglt_diagnostics::Error| -> Result<()> {
-        Formatter::new(&mut write).write_markup(markup! {
-            {PrintDiagnostic::verbose(&diag)}
-        })?;
+        let printer = PrintDiagnostic::simple(&diag);
+        writeln!(content, "{}", StdDisplay(printer)).unwrap();
+
         Ok(())
     };
     if test.ignore {
