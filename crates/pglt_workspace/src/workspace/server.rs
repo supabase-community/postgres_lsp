@@ -111,7 +111,7 @@ impl WorkspaceServer {
     /// Check whether a file is ignored in the top-level config `files.ignore`/`files.include`
     fn is_ignored(&self, path: &Path) -> bool {
         let file_name = path.file_name().and_then(|s| s.to_str());
-        // Never ignore PGLSP's config file regardless `include`/`ignore`
+        // Never ignore PgLT's config file regardless `include`/`ignore`
         (file_name != Some(ConfigName::pglt_toml())) &&
             // Apply top-level `include`/`ignore
             (self.is_ignored_by_top_level_config(path) || self.is_ignored_by_migration_config(path))
@@ -130,7 +130,7 @@ impl WorkspaceServer {
                 // `matched_path_or_any_parents` panics if `source` is not under the gitignore root.
                 // This checks excludes absolute paths that are not a prefix of the base root.
                 if !path.has_root() || path.starts_with(ignore.path()) {
-                    // Because PGLSP passes a list of paths,
+                    // Because PgLT passes a list of paths,
                     // we use `matched_path_or_any_parents` instead of `matched`.
                     ignore
                         .matched_path_or_any_parents(path, path.is_dir())

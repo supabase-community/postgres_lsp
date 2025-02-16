@@ -34,7 +34,7 @@ use migrations::{
 use serde::{Deserialize, Serialize};
 use vcs::VcsClientKind;
 
-pub const VERSION: &str = match option_env!("PGLSP_VERSION") {
+pub const VERSION: &str = match option_env!("PGLT_VERSION") {
     Some(version) => version,
     None => "0.0.0",
 };

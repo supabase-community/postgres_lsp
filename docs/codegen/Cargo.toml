@@ -20,4 +20,13 @@ bpaf                     = { workspace = true, features = ["docgen"] }
 pglt_configuration = { workspace = true }
 pglt_flags = { workspace = true }
 pglt_cli = { workspace = true }
+pglt_analyse = { workspace = true }
+pglt_analyser = { workspace = true }
+pglt_diagnostics = { workspace = true }
+pglt_query_ext = { workspace = true }
+pglt_workspace = { workspace = true }
+pglt_statement_splitter = { workspace = true }
+pglt_console = { workspace = true }
+biome_string_case = { workspace = true }
+pulldown-cmark          = "0.12.2"
 

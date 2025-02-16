@@ -72,7 +72,7 @@ Shows the version information and quit.
 - **`    --no-errors-on-unmatched`** &mdash; 
   Silence errors that would be emitted in case no files were processed during the execution of the command.
 - **`    --error-on-warnings`** &mdash; 
-  Tell PGLSP to exit with an error code if some diagnostics emit warnings.
+  Tell PgLT to exit with an error code if some diagnostics emit warnings.
 - **`    --reporter`**=_`<json|json-pretty|github|junit|summary|gitlab>`_ &mdash; 
   Allows to change how diagnostics and summary are reported.
 - **`    --log-level`**=_`<none|debug|info|warn|error>`_ &mdash; 
@@ -86,7 +86,7 @@ Shows the version information and quit.
    
   [default: pretty]
 - **`    --diagnostic-level`**=_`<info|warn|error>`_ &mdash; 
-  The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing `--diagnostic-level=error` will cause PGLSP to print only diagnostics that contain only errors.
+  The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing `--diagnostic-level=error` will cause PgLT to print only diagnostics that contain only errors.
    
   [default: info]
 
@@ -159,7 +159,7 @@ Runs everything to the requested files.
 - **`    --no-errors-on-unmatched`** &mdash; 
   Silence errors that would be emitted in case no files were processed during the execution of the command.
 - **`    --error-on-warnings`** &mdash; 
-  Tell PGLSP to exit with an error code if some diagnostics emit warnings.
+  Tell PgLT to exit with an error code if some diagnostics emit warnings.
 - **`    --reporter`**=_`<json|json-pretty|github|junit|summary|gitlab>`_ &mdash; 
   Allows to change how diagnostics and summary are reported.
 - **`    --log-level`**=_`<none|debug|info|warn|error>`_ &mdash; 
@@ -173,7 +173,7 @@ Runs everything to the requested files.
    
   [default: pretty]
 - **`    --diagnostic-level`**=_`<info|warn|error>`_ &mdash; 
-  The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing `--diagnostic-level=error` will cause PGLSP to print only diagnostics that contain only errors.
+  The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing `--diagnostic-level=error` will cause PgLT to print only diagnostics that contain only errors.
    
   [default: info]
 
@@ -212,17 +212,17 @@ Starts the daemon server process.
 - **`    --log-prefix-name`**=_`STRING`_ &mdash; 
   Allows to change the prefix applied to the file name of the logs.
    
-  Uses environment variable **`PGLSP_LOG_PREFIX_NAME`**
+  Uses environment variable **`PGLT_LOG_PREFIX_NAME`**
    
   [default: server.log]
 - **`    --log-path`**=_`PATH`_ &mdash; 
   Allows to change the folder where logs are stored.
    
-  Uses environment variable **`PGLSP_LOG_PATH`**
+  Uses environment variable **`PGLT_LOG_PATH`**
 - **`    --config-path`**=_`PATH`_ &mdash; 
   Allows to set a custom file path to the configuration file, or a custom directory path to find `pglt.toml`
    
-  Uses environment variable **`PGLSP_LOG_PREFIX_NAME`**
+  Uses environment variable **`PGLT_LOG_PREFIX_NAME`**
 - **`-h`**, **`--help`** &mdash; 
   Prints help information
 
@@ -259,17 +259,17 @@ Acts as a server for the Language Server Protocol over stdin/stdout.
 - **`    --log-prefix-name`**=_`STRING`_ &mdash; 
   Allows to change the prefix applied to the file name of the logs.
    
-  Uses environment variable **`PGLSP_LOG_PREFIX_NAME`**
+  Uses environment variable **`PGLT_LOG_PREFIX_NAME`**
    
   [default: server.log]
 - **`    --log-path`**=_`PATH`_ &mdash; 
   Allows to change the folder where logs are stored.
    
-  Uses environment variable **`PGLSP_LOG_PATH`**
+  Uses environment variable **`PGLT_LOG_PATH`**
 - **`    --config-path`**=_`PATH`_ &mdash; 
   Allows to set a custom file path to the configuration file, or a custom directory path to find `pglt.toml`
    
-  Uses environment variable **`PGLSP_CONFIG_PATH`**
+  Uses environment variable **`PGLT_CONFIG_PATH`**
 - **`-h`**, **`--help`** &mdash; 
   Prints help information
 

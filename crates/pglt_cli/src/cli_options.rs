@@ -48,7 +48,7 @@ pub struct CliOptions {
     #[bpaf(long("no-errors-on-unmatched"), switch)]
     pub no_errors_on_unmatched: bool,
 
-    /// Tell PGLSP to exit with an error code if some diagnostics emit warnings.
+    /// Tell PgLT to exit with an error code if some diagnostics emit warnings.
     #[bpaf(long("error-on-warnings"), switch)]
     pub error_on_warnings: bool,
 
@@ -86,7 +86,7 @@ pub struct CliOptions {
         fallback(Severity::default()),
         display_fallback
     )]
-    /// The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing `--diagnostic-level=error` will cause PGLSP to print only diagnostics that contain only errors.
+    /// The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing `--diagnostic-level=error` will cause PgLT to print only diagnostics that contain only errors.
     pub diagnostic_level: Severity,
 }
 

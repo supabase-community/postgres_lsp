@@ -72,7 +72,7 @@ pub enum PgltCommand {
     Start {
         /// Allows to change the prefix applied to the file name of the logs.
         #[bpaf(
-            env("PGLSP_LOG_PREFIX_NAME"),
+            env("PGLT_LOG_PREFIX_NAME"),
             long("log-prefix-name"),
             argument("STRING"),
             hide_usage,
@@ -83,7 +83,7 @@ pub enum PgltCommand {
 
         /// Allows to change the folder where logs are stored.
         #[bpaf(
-            env("PGLSP_LOG_PATH"),
+            env("PGLT_LOG_PATH"),
             long("log-path"),
             argument("PATH"),
             hide_usage,
@@ -92,7 +92,7 @@ pub enum PgltCommand {
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
         /// or a custom directory path to find `pglt.toml`
-        #[bpaf(env("PGLSP_LOG_PREFIX_NAME"), long("config-path"), argument("PATH"))]
+        #[bpaf(env("PGLT_LOG_PREFIX_NAME"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
     },
 
@@ -109,7 +109,7 @@ pub enum PgltCommand {
     LspProxy {
         /// Allows to change the prefix applied to the file name of the logs.
         #[bpaf(
-            env("PGLSP_LOG_PREFIX_NAME"),
+            env("PGLT_LOG_PREFIX_NAME"),
             long("log-prefix-name"),
             argument("STRING"),
             hide_usage,
@@ -119,7 +119,7 @@ pub enum PgltCommand {
         log_prefix_name: String,
         /// Allows to change the folder where logs are stored.
         #[bpaf(
-            env("PGLSP_LOG_PATH"),
+            env("PGLT_LOG_PATH"),
             long("log-path"),
             argument("PATH"),
             hide_usage,
@@ -128,7 +128,7 @@ pub enum PgltCommand {
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
         /// or a custom directory path to find `pglt.toml`
-        #[bpaf(env("PGLSP_CONFIG_PATH"), long("config-path"), argument("PATH"))]
+        #[bpaf(env("PGLT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
         /// Bogus argument to make the command work with vscode-languageclient
         #[bpaf(long("stdio"), hide, hide_usage, switch)]
@@ -143,7 +143,7 @@ pub enum PgltCommand {
     RunServer {
         /// Allows to change the prefix applied to the file name of the logs.
         #[bpaf(
-            env("PGLSP_LOG_PREFIX_NAME"),
+            env("PGLT_LOG_PREFIX_NAME"),
             long("log-prefix-name"),
             argument("STRING"),
             hide_usage,
@@ -153,7 +153,7 @@ pub enum PgltCommand {
         log_prefix_name: String,
         /// Allows to change the folder where logs are stored.
         #[bpaf(
-            env("PGLSP_LOG_PATH"),
+            env("PGLT_LOG_PATH"),
             long("log-path"),
             argument("PATH"),
             hide_usage,
@@ -165,7 +165,7 @@ pub enum PgltCommand {
         stop_on_disconnect: bool,
         /// Allows to set a custom file path to the configuration file,
         /// or a custom directory path to find `pglt.toml`
-        #[bpaf(env("PGLSP_CONFIG_PATH"), long("config-path"), argument("PATH"))]
+        #[bpaf(env("PGLT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
     },
     #[bpaf(command("__print_socket"), hide)]

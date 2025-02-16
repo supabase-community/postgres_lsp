@@ -15,7 +15,7 @@ fn command_name() -> String {
         .unwrap_or_else(|| String::from("pglt"))
 }
 
-/// A diagnostic that is emitted when running PGLSP via CLI.
+/// A diagnostic that is emitted when running PgLT via CLI.
 ///
 /// When displaying the diagnostic,
 #[derive(Debug, Diagnostic)]
