@@ -91,6 +91,7 @@ fn generate_rule_doc(
 
     writeln!(content)?;
     writeln!(content, "**Since**: `v{}`", meta.version)?;
+    writeln!(content)?;
 
     // add recommended notice
     if is_recommended {
@@ -105,7 +106,7 @@ fn generate_rule_doc(
 
     // add source information
     if !meta.sources.is_empty() {
-        writeln!(content, "Sources: ")?;
+        writeln!(content, "**Sources**: ")?;
 
         for source in meta.sources {
             let rule_name = source.to_namespaced_rule_name();
