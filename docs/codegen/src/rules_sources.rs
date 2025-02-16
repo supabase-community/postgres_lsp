@@ -46,9 +46,6 @@ pub fn generate_rule_sources(docs_dir: &Path) -> anyhow::Result<()> {
     let mut exclusive_rules = BTreeSet::<(String, String)>::new();
 
     for (rule_name, metadata) in rules {
-        if metadata.version == "next" {
-            continue;
-        }
         let kebab_rule_name = Case::Kebab.convert(rule_name);
         if metadata.sources.is_empty() {
             exclusive_rules.insert((rule_name.to_string(), format!("./rules/{kebab_rule_name}")));
