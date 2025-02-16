@@ -1,9 +1,10 @@
 # banDropNotNull
 **Diagnostic Category: `lint/safety/banDropNotNull`**
+
 **Since**: `vnext`
-:::note
-- This rule is recommended. A diagnostic error will appear when linting your code.
-:::
+> [!NOTE]
+> - This rule is recommended. A diagnostic error will appear when linting your code.
+
 Sources: 
 - Inspired from: <a href="https://squawkhq.com/docs/ban-drop-not-null" target="_blank"><code>squawk/ban-drop-not-null</code></a>
 

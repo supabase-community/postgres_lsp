@@ -1,9 +1,10 @@
 # banDropColumn
 **Diagnostic Category: `lint/safety/banDropColumn`**
+
 **Since**: `vnext`
-:::note
-- This rule is recommended. A diagnostic error will appear when linting your code.
-:::
+> [!NOTE]
+> - This rule is recommended. A diagnostic error will appear when linting your code.
+
 Sources: 
 - Inspired from: <a href="https://squawkhq.com/docs/ban-drop-column" target="_blank"><code>squawk/ban-drop-column</code></a>
 

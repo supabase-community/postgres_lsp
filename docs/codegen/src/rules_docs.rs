@@ -17,7 +17,6 @@ use std::{
     str::{self, FromStr},
 };
 
-///
 /// Generates the documentation page for each lint rule.
 ///
 /// * `docs_dir`: Path to the docs directory.
@@ -64,22 +63,23 @@ fn generate_rule_doc(
 
     // add deprecation notice
     if let Some(reason) = &meta.deprecated {
-        writeln!(content, ":::caution[Deprecated]")?;
-        writeln!(content, "This rule is deprecated and will be removed in the next major release.\n**Reason**: {reason}")?;
-        writeln!(content, ":::")?;
+        writeln!(content, "> [!WARNING]")?;
+        writeln!(content, "> This rule is deprecated and will be removed in the next major release.\n**Reason**: {reason}")?;
     }
 
+    writeln!(content)?;
     writeln!(content, "**Since**: `v{}`", meta.version)?;
 
     // add recommended notice
     if is_recommended {
-        writeln!(content, ":::note")?;
+        writeln!(content, "> [!NOTE]")?;
         writeln!(
             content,
-            "- This rule is recommended. A diagnostic error will appear when linting your code."
+            "> - This rule is recommended. A diagnostic error will appear when linting your code."
         )?;
-        writeln!(content, ":::")?;
     }
+
+    writeln!(content)?;
 
     // add source information
     if !meta.sources.is_empty() {
