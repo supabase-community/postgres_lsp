@@ -33,8 +33,6 @@ pub fn generate_schema(docs_dir: &Path) -> anyhow::Result<()> {
     Ok(())
 }
 
-// TODO: publish the schemas in the release assets and update config init to use the latest schema
-
 /// Get the content of the configuration schema
 pub(crate) fn get_configuration_schema_content() -> anyhow::Result<String> {
     let schema = rename_partial_references_in_schema(schema_for!(PartialConfiguration));
