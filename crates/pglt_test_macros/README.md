@@ -39,7 +39,7 @@ You can generate tests like so:
   }
 ```
 
-Given a `crate/tests/queries/some_test_abc.sql` file and a `run_test` function, this will generate the following:
+Given a `crate/tests/queries/some_test_abc.sql` file, this will generate the following:
 
 ```rust
 #[test]
