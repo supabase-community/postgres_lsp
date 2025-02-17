@@ -23,7 +23,7 @@ fn rule_test(full_path: &'static str, _: &str, _: &str) {
     };
 
     let query =
-        read_to_string(full_path).expect(format!("Failed to read file: {} ", full_path).as_str());
+        read_to_string(full_path).unwrap_or_else(|_| panic!("Failed to read file: {} ", full_path));
 
     let ast = pglt_query_ext::parse(&query).expect("failed to parse SQL");
     let options = AnalyserOptions::default();
@@ -51,7 +51,6 @@ fn rule_test(full_path: &'static str, _: &str, _: &str) {
 fn parse_test_path(path: &Path) -> (String, String, String) {
     let mut comps: Vec<&str> = path
         .components()
-        .into_iter()
         .map(|c| c.as_os_str().to_str().unwrap())
         .collect();
 
@@ -97,13 +96,10 @@ impl Expectation {
     }
 
     fn assert(&self, diagnostics: &[RuleDiagnostic]) {
-        match self {
-            Self::NoDiagnostics => {
-                if !diagnostics.is_empty() {
-                    panic!("This test should not have any diagnostics.");
-                }
+        if let Self::NoDiagnostics = self {
+            if !diagnostics.is_empty() {
+                panic!("This test should not have any diagnostics.");
             }
-            _ => {}
         }
     }
 }

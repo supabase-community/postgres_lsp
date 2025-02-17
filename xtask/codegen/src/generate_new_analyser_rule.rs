@@ -73,7 +73,7 @@ impl Rule for {rule_name_upper_camel} {{
     )
 }
 
-static EXAMPLE_SQL: &'static str = r#"
+static EXAMPLE_SQL: &str = r#"
     -- select 1;
 "#;
 

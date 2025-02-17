@@ -227,7 +227,7 @@ impl TryFrom<PathBuf> for Variables {
         Ok(Variables {
             test_name: test_name.into(),
             test_fullpath: test_fullpath.into(),
-            test_expected_fullpath: test_expected_fullpath.into(),
+            test_expected_fullpath,
             test_dir: test_dir.into(),
         })
     }
