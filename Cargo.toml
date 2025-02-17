@@ -78,11 +78,8 @@ pglt_type_resolver          = { path = "./crates/pglt_type_resolver", version = 
 pglt_typecheck              = { path = "./crates/pglt_typecheck", version = "0.0.0" }
 pglt_workspace              = { path = "./crates/pglt_workspace", version = "0.0.0" }
 
-pglt_test_utils = { path = "./crates/pglt_test_utils" }
+pglt_test_macros = { path = "./crates/pglt_test_macros" }
+pglt_test_utils  = { path = "./crates/pglt_test_utils" }
 # parser = { path = "./crates/parser", version = "0.0.0" }
 # sql_parser = { path = "./crates/sql_parser", version = "0.0.0" }
 # sql_parser_codegen = { path = "./crates/sql_parser_codegen", version = "0.0.0" }
-
-
-[profile.dev.package]
-insta.opt-level = 3
