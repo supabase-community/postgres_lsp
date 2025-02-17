@@ -11,17 +11,6 @@ pglt_test_macros::gen_tests! {
   crate::rule_test
 }
 
-mod testibear {
-    pglt_test_macros::gen_tests! {
-      "tests/specs/**/*.sql",
-      crate::printer
-    }
-}
-
-fn printer(fp: &'static str, expected: &str, dir: &str) {
-    println!("{fp}\n{expected}\n{dir}");
-}
-
 fn rule_test(full_path: &'static str, _: &str, _: &str) {
     let input_file = Path::new(full_path);
 
@@ -45,15 +34,15 @@ fn rule_test(full_path: &'static str, _: &str, _: &str) {
 
     let results = analyser.run(AnalyserContext { root: &ast });
 
-    // let mut snapshot = String::new();
-    // write_snapshot(&mut snapshot, query.as_str(), results.as_slice());
+    let mut snapshot = String::new();
+    write_snapshot(&mut snapshot, query.as_str(), results.as_slice());
 
-    // insta::with_settings!({
-    //     prepend_module_to_snapshot => false,
-    //     snapshot_path => input_file.parent().unwrap(),
-    // }, {
-    //     insta::assert_snapshot!(fname, snapshot);
-    // });
+    insta::with_settings!({
+        prepend_module_to_snapshot => false,
+        snapshot_path => input_file.parent().unwrap(),
+    }, {
+        insta::assert_snapshot!(fname, snapshot);
+    });
 
     let expectation = Expectation::from_file(&query);
     expectation.assert(results.as_slice());
