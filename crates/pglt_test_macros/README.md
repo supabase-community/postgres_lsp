@@ -60,7 +60,7 @@ This will be replicated for each file matched by the glob pattern.
 - You might get linting errors if your test files aren't snake case.
 - All files of the glob-pattern must (currently) be `.sql` files.
 - The `.expected.sql` file-name will always be passed, even if the file doesn't exist.
-- The macro will wrap your tests in a `mod tests { .. }` module. If you need multiple generations, wrap them in modules like so: ```mod some_test { tests_macros::gen_tests! { .. } }`.
+- The macro will wrap your tests in a `mod tests { .. }` module. If you need multiple generations, wrap them in modules like so: `mod some_test { tests_macros::gen_tests! { .. } }`.
 
 ## How to run
 
