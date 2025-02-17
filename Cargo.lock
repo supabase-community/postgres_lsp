@@ -363,6 +363,7 @@ dependencies = [
  "biome_rowan",
  "bitflags 2.6.0",
  "indexmap 2.7.0",
+ "schemars",
  "serde",
 ]
 
@@ -994,6 +995,9 @@ dependencies = [
  "pglt_workspace",
  "pulldown-cmark",
  "regex",
+ "schemars",
+ "serde",
+ "serde_json",
  "toml",
 ]
 
@@ -2353,6 +2357,7 @@ dependencies = [
  "biome_deserialize",
  "biome_deserialize_macros",
  "bpaf",
+ "indexmap 2.7.0",
  "pglt_analyse",
  "pglt_analyser",
  "pglt_console",

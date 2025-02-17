@@ -63,7 +63,7 @@ jobs:
       - name: 🛠️ Run Build
         run: cargo build -p pglt_cli --release --target ${{ matrix.config.target }}
 
-      # windows is a special snowflake to, it saves binaries as .exe
+      # windows is a special snowflake too, it saves binaries as .exe
       - name: 👦 Name the Binary
         if: matrix.config.os == 'windows-latest'
         run: |
@@ -124,7 +124,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ steps.create_changelog.outputs.content }}
           tag_name: ${{ steps.create_changelog.outputs.version }}
-          files: pglt_*
+          files: |
+            pglt_*
+            docs/schemas/latest/schema.json
           fail_on_unmatched_files: true
           draft: true
 
