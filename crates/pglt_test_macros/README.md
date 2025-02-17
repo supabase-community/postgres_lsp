@@ -39,22 +39,25 @@ You can generate tests like so:
   }
 ```
 
-Test name is the "snake case" version of the file name.
-this will generate the following for each file:
+Given a `crate/tests/queries/some_test_abc.sql` file and a `run_test` function, this will generate the following:
 
 ```rust
 #[test]
-pub fn somefilename()
+pub fn some_test_abc()
 {
-    let test_file = "<crate's cargo.toml full path>/tests/sometest.txt";
-    let test_expected_file = "<crate's cargo.toml full path>/tests/sometest.expected.txt";
-    run_test(test_file, test_expected_file);
+    let test_file = "<crate>/tests/queries/some_test_abc.sql";
+    let test_expected_file = "<crate>/tests/queries/some_test_abc.expected.sql";
+    let parent = "<crate>/tests/queries";
+    run_test(test_file, test_expected_file, parent);
 }
 ```
+
+This will be replicated for each file matched by the glob pattern.
 
 ## Pitfalls
 
 - If you use a Rust-keyword as a file name, this'll result in invalid syntax for the generated tests.
+- You might get linting errors if your test files aren't snake case.
 - All files of the glob-pattern must (currently) be `.sql` files.
 - The `.expected.sql` file-name will always be passed, even if the file doesn't exist.
 - The macro will wrap your tests in a `mod tests { .. }` module. If you need multiple generations, wrap them in modules like so: ```mod some_test { tests_macros::gen_tests! { .. } }`.
