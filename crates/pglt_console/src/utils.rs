@@ -1,6 +1,29 @@
-use crate::fmt::{Display, Formatter};
+use termcolor::NoColor;
+
+use crate::fmt::{Display, Formatter, Termcolor};
 use crate::{markup, Markup};
 use std::io;
+
+/// Adapter type providing a std::fmt::Display implementation for any type that
+/// implements pglt_console::fmt::Display.
+pub struct StdDisplay<T: Display>(pub T);
+
+impl<T> std::fmt::Display for StdDisplay<T>
+where
+    T: Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut buffer: Vec<u8> = Vec::new();
+        let mut termcolor = Termcolor(NoColor::new(&mut buffer));
+        let mut formatter = Formatter::new(&mut termcolor);
+
+        self.0.fmt(&mut formatter).map_err(|_| std::fmt::Error)?;
+
+        let content = String::from_utf8(buffer).map_err(|_| std::fmt::Error)?;
+
+        f.write_str(content.as_str())
+    }
+}
 
 /// It displays a type that implements [std::fmt::Display]
 pub struct DebugDisplay<T>(pub T);

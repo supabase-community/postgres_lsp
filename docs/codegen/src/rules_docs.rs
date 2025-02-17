@@ -2,8 +2,7 @@ use anyhow::{bail, Result};
 use biome_string_case::Case;
 use pglt_analyse::{AnalyserOptions, AnalysisFilter, RuleFilter, RuleMetadata};
 use pglt_analyser::{Analyser, AnalyserConfig};
-use pglt_console::fmt::{Display, Formatter, Termcolor};
-use pglt_diagnostics::termcolor::NoColor;
+use pglt_console::StdDisplay;
 use pglt_diagnostics::{Diagnostic, DiagnosticExt, PrintDiagnostic};
 use pglt_query_ext::diagnostics::SyntaxDiagnostic;
 use pglt_workspace::settings::Settings;
@@ -16,28 +15,6 @@ use std::{
     slice,
     str::{self, FromStr},
 };
-
-/// TODO: get this from jules pr
-/// Adapter type providing a std::fmt::Display implementation for any type that
-/// implements pglt_console::fmt::Display.
-pub struct StdDisplay<T: Display>(pub T);
-
-impl<T> std::fmt::Display for StdDisplay<T>
-where
-    T: Display,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut buffer: Vec<u8> = Vec::new();
-        let mut termcolor = Termcolor(NoColor::new(&mut buffer));
-        let mut formatter = Formatter::new(&mut termcolor);
-
-        self.0.fmt(&mut formatter).map_err(|_| std::fmt::Error)?;
-
-        let content = String::from_utf8(buffer).map_err(|_| std::fmt::Error)?;
-
-        f.write_str(content.as_str())
-    }
-}
 
 /// Generates the documentation page for each lint rule.
 ///

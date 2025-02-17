@@ -79,7 +79,8 @@ pglt_type_resolver          = { path = "./crates/pglt_type_resolver", version = 
 pglt_typecheck              = { path = "./crates/pglt_typecheck", version = "0.0.0" }
 pglt_workspace              = { path = "./crates/pglt_workspace", version = "0.0.0" }
 
-pglt_test_utils = { path = "./crates/pglt_test_utils" }
+pglt_test_macros = { path = "./crates/pglt_test_macros" }
+pglt_test_utils  = { path = "./crates/pglt_test_utils" }
 
 docs_codegen = { path = "./docs/codegen", version = "0.0.0" }
 
