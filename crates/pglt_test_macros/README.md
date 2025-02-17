@@ -6,7 +6,7 @@ Macros to help auto-generate tests based on files.
 
 Pass a glob pattern that'll identify your files and a test-function that'll run for each file. The glob pattern has to start at the root of your crate.
 
-You can add a `.expected.` file next to your test file. Its path will be passed to your test function so you can outcome-based assertions. (Alternatively, write snapshot tests.)
+You can add a `.expected.` file next to your test file. Its path will be passed to your test function so you can make outcome-based assertions. (Alternatively, write snapshot tests.)
 
 Given the following file structure:
 
@@ -56,6 +56,7 @@ pub fn somefilename()
 
 - If you use a Rust-keyword as a file name, this'll result in invalid syntax for the generated tests.
 - All files of the glob-pattern must (currently) be `.sql` files.
+- The `.expected.sql` file-name will always be passed, even if the file doesn't exist.
 - The macro will wrap your tests in a `mod tests { .. }` module. If you need multiple generations, wrap them in modules like so: ```mod some_test { tests_macros::gen_tests! { .. } }`.
 
 ## How to run
