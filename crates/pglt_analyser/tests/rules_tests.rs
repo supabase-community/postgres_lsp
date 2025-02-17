@@ -83,13 +83,24 @@ fn write_snapshot(snapshot: &mut String, query: &str, diagnostics: &[RuleDiagnos
 enum Expectation {
     NoDiagnostics,
     AnyDiagnostics,
+    OnlyOne(String),
 }
 
 impl Expectation {
     fn from_file(content: &str) -> Self {
         for line in content.lines() {
-            if line.contains("expect-no-diagnostics") {
+            if line.contains("expect_no_diagnostics") {
                 return Self::NoDiagnostics;
+            }
+
+            if line.contains("expect_only_") {
+                let kind = line
+                    .splitn(3, "_")
+                    .last()
+                    .expect("Use pattern: `-- expect_only_<category>`")
+                    .trim();
+
+                return Self::OnlyOne(kind.into());
             }
         }
 
@@ -103,7 +114,20 @@ impl Expectation {
                     panic!("This test should not have any diagnostics.");
                 }
             }
-            _ => {}
+            Self::OnlyOne(category) => {
+                let found_kinds = diagnostics
+                    .iter()
+                    .map(|d| d.get_category_name())
+                    .collect::<Vec<&str>>()
+                    .join(", ");
+
+                if diagnostics.len() != 1 || diagnostics[0].get_category_name() != category {
+                    panic!(
+                        "This test should only have one diagnostic of kind: {category}\nReceived: {found_kinds}"
+                    );
+                }
+            }
+            Self::AnyDiagnostics => {}
         }
     }
 }

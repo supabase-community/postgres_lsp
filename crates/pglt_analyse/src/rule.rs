@@ -263,6 +263,11 @@ impl RuleDiagnostic {
     pub fn advices(&self) -> &RuleAdvice {
         &self.rule_advice
     }
+
+    /// Will return the rule's category name as defined via `define_categories! { .. }`.
+    pub fn get_category_name(&self) -> &'static str {
+        self.category.name()
+    }
 }
 
 #[derive(Debug, Clone, Eq)]
