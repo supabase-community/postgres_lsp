@@ -74,7 +74,7 @@ impl Rule for {rule_name_upper_camel} {{
 }
 
 fn gen_sql(category_name: &str) -> String {
-    format!("-- expect_only_{category_name}\n-- select 1;").into()
+    format!("-- expect_only_{category_name}\n-- select 1;")
 }
 
 pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &str) {
