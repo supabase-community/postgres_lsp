@@ -197,38 +197,50 @@ struct Variables {
 impl TryFrom<PathBuf> for Variables {
     type Error = &'static str;
 
-    fn try_from(path: PathBuf) -> Result<Self, Self::Error> {
-        let test_name = path
+    fn try_from(mut path: PathBuf) -> Result<Self, Self::Error> {
+        let test_name: String = path
             .file_stem()
             .ok_or("Cannot get file stem.")?
             .to_str()
-            .ok_or("Cannot convert file stem to string.")?;
+            .ok_or("Cannot convert file stem to string.")?
+            .into();
 
-        let ext = path
+        let ext: String = path
             .extension()
             .ok_or("Cannot get extension.")?
             .to_str()
-            .ok_or("Cannot convert extension to string.")?;
+            .ok_or("Cannot convert extension to string.")?
+            .into();
         assert_eq!(ext, "sql", "Expected .sql extension but received: {}", ext);
 
-        let test_dir = path
+        let test_dir: String = path
             .parent()
             .ok_or("Cannot get parent directory.")?
             .to_str()
-            .ok_or("Cannot convert parent directory to string.")?;
+            .ok_or("Cannot convert parent directory to string.")?
+            .into();
 
-        let test_fullpath = path.to_str().ok_or("Cannot convert path to string.")?;
+        let test_fullpath: String = path
+            .as_os_str()
+            .to_str()
+            .ok_or("Cannot convert file stem to string.")?
+            .into();
 
-        let mut without_ext = test_fullpath.to_string();
-        without_ext.pop();
+        path.set_extension(OsStr::new(""));
+
+        let without_ext: String = path
+            .as_os_str()
+            .to_str()
+            .ok_or("Cannot convert file stem to string.")?
+            .into();
 
         let test_expected_fullpath = format!("{}.expected.{}", without_ext, ext);
 
         Ok(Variables {
-            test_name: test_name.into(),
-            test_fullpath: test_fullpath.into(),
+            test_name,
+            test_fullpath,
             test_expected_fullpath,
-            test_dir: test_dir.into(),
+            test_dir,
         })
     }
 }
