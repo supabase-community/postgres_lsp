@@ -18,14 +18,14 @@ mod os;
 pub struct ConfigName;
 
 impl ConfigName {
-    const PGLSP_TOML: [&'static str; 1] = ["pglt.toml"];
+    const PGLT_TOML: [&'static str; 1] = ["pglt.toml"];
 
     pub const fn pglt_toml() -> &'static str {
-        Self::PGLSP_TOML[0]
+        Self::PGLT_TOML[0]
     }
 
     pub const fn file_names() -> [&'static str; 1] {
-        Self::PGLSP_TOML
+        Self::PGLT_TOML
     }
 }
 

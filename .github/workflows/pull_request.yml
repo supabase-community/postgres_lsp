@@ -181,6 +181,8 @@ jobs:
         run: cargo run -p xtask_codegen -- analyser
       - name: Run the configuration codegen
         run: cargo run -p xtask_codegen -- configuration
+      - name: Run the docs codegen
+        run: cargo run -p docs_codegen
       - name: Check for git diff
         run: |
           if [[ $(git status --porcelain) ]]; then
