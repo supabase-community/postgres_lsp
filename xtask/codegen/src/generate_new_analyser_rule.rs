@@ -73,9 +73,9 @@ impl Rule for {rule_name_upper_camel} {{
     )
 }
 
-static EXAMPLE_SQL: &str = r#"
-    -- select 1;
-"#;
+fn gen_sql(category_name: &str) -> String {
+    format!("-- expect_only_{category_name}\n-- select 1;")
+}
 
 pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &str) {
     let rule_name_camel = Case::Camel.convert(rule_name);
@@ -143,7 +143,10 @@ pub fn generate_new_analyser_rule(category: Category, rule_name: &str, group: &s
         std::fs::create_dir(test_folder.clone()).expect("To create the test rule folder");
     }
 
-    let test_file_name = format!("{}/query.sql", test_folder.display());
-    std::fs::write(test_file_name.clone(), EXAMPLE_SQL)
-        .unwrap_or_else(|_| panic!("To write {}", &test_file_name));
+    let test_file_name = format!("{}/basic.sql", test_folder.display());
+    std::fs::write(
+        test_file_name.clone(),
+        gen_sql(format!("lint/{group}/{rule_name_camel}").as_str()),
+    )
+    .unwrap_or_else(|_| panic!("To write {}", &test_file_name));
 }
