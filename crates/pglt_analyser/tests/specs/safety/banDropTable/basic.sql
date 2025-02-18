@@ -1,0 +1,2 @@
+-- expect_only_lint/safety/banDropTable
+-- select 1;

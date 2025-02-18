@@ -15,6 +15,7 @@
 define_categories! {
     "lint/safety/banDropColumn": "https://pglt.dev/linter/rules/ban-drop-column",
     "lint/safety/banDropNotNull": "https://pglt.dev/linter/rules/ban-drop-not-null",
+    "lint/safety/banDropTable": "https://pglt.dev/linter/rules/ban-drop-table",
     // end lint rules
     ;
     // General categories
