@@ -18,7 +18,7 @@ declare_lint_rule! {
     pub BanDropTable {
         version: "next",
         name: "banDropTable",
-        recommended: false,
+        recommended: true,
         sources: &[RuleSource::Squawk("ban-drop-table")],
     }
 }

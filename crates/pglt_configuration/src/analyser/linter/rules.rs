@@ -149,7 +149,7 @@ pub struct Safety {
     #[doc = "Dropping a NOT NULL constraint may break existing clients."]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ban_drop_not_null: Option<RuleConfiguration<pglt_analyser::options::BanDropNotNull>>,
-    #[doc = "Succinct description of the rule."]
+    #[doc = "Dropping a table may break existing clients."]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ban_drop_table: Option<RuleConfiguration<pglt_analyser::options::BanDropTable>>,
 }
@@ -157,10 +157,12 @@ impl Safety {
     const GROUP_NAME: &'static str = "safety";
     pub(crate) const GROUP_RULES: &'static [&'static str] =
         &["banDropColumn", "banDropNotNull", "banDropTable"];
-    const RECOMMENDED_RULES: &'static [&'static str] = &["banDropColumn", "banDropNotNull"];
+    const RECOMMENDED_RULES: &'static [&'static str] =
+        &["banDropColumn", "banDropNotNull", "banDropTable"];
     const RECOMMENDED_RULES_AS_FILTERS: &'static [RuleFilter<'static>] = &[
         RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0]),
         RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[1]),
+        RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[2]),
     ];
     const ALL_RULES_AS_FILTERS: &'static [RuleFilter<'static>] = &[
         RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0]),
