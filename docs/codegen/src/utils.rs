@@ -19,9 +19,9 @@ pub(crate) fn replace_section(
 #[derive(Default)]
 pub(crate) struct LintRulesVisitor {
     /// This is mapped to:
-    /// - group (correctness) -> list of rules
-    /// - list or rules is mapped to
-    /// - rule name -> metadata
+    /// group (e.g. "safety") -> <list of rules>
+    /// where <list of rules> is:
+    /// <rule name> -> metadata
     pub(crate) groups: BTreeMap<&'static str, BTreeMap<&'static str, RuleMetadata>>,
 }
 
