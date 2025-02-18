@@ -12,9 +12,10 @@ version              = "0.0.0"
 
 
 [dependencies]
-biome_deserialize        = { workspace = true }
+biome_deserialize        = { workspace = true, features = ["schema"] }
 biome_deserialize_macros = { workspace = true }
 bpaf                     = { workspace = true }
+indexmap                 = { workspace = true }
 pglt_analyse             = { workspace = true }
 pglt_analyser            = { workspace = true }
 pglt_console             = { workspace = true }
@@ -30,4 +31,4 @@ toml                     = { workspace = true }
 doctest = false
 
 [features]
-schema = ["dep:schemars"]
+schema = ["dep:schemars", "schemars/indexmap"]

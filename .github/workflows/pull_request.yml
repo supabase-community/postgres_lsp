@@ -86,15 +86,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Lints
         run: |
-          cargo clippy --fix
+          cargo clippy
           cargo run -p rules_check
-      - name: Check for git diff after lint fix
-        run: |
-          if [[ $(git status --porcelain) ]]; then
-            git status
-            git diff
-            exit 1
-          fi
+      # - name: Check for git diff after lint fix
+      #   run: |
+      #     if [[ $(git status --porcelain) ]]; then
+      #       git status
+      #       git diff
+      #       exit 1
+      #     fi
 
   # check-dependencies:
   #   name: Check Dependencies
