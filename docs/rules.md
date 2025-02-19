@@ -13,6 +13,7 @@ Rules that detect potential safety issues in your code.
 | --- | --- | --- |
 | [banDropColumn](./rules/ban-drop-column) | Dropping a column may break existing clients. | <span class='inline-icon' title="This rule is recommended" ><Icon name="approve-check-circle" size="1.2rem" label="This rule is recommended" /></span> |
 | [banDropNotNull](./rules/ban-drop-not-null) | Dropping a NOT NULL constraint may break existing clients. | <span class='inline-icon' title="This rule is recommended" ><Icon name="approve-check-circle" size="1.2rem" label="This rule is recommended" /></span> |
+| [banDropTable](./rules/ban-drop-table) | Dropping a table may break existing clients. | <span class='inline-icon' title="This rule is recommended" ><Icon name="approve-check-circle" size="1.2rem" label="This rule is recommended" /></span> |
 
 [//]: # (END RULES_INDEX)
 
