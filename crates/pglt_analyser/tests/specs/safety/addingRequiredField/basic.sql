@@ -1,2 +1,3 @@
 -- expect_only_lint/safety/addingRequiredField
--- select 1;
+alter table test
+add column c int not null;
