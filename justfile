@@ -70,7 +70,7 @@ ready:
   git diff --exit-code --quiet
   cargo run -p xtask_codegen -- configuration
   cargo run -p docs_codegen
-  just lint --fix
+  just lint-fix
   just format
   git diff --exit-code --quiet
 
