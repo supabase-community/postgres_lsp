@@ -292,6 +292,17 @@
       "description": "A list of rules that belong to this group",
       "type": "object",
       "properties": {
+        "addingRequiredField": {
+          "description": "Adding a new column that is NOT NULL and has no default value to an existing table effectively makes it required.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleConfiguration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "all": {
           "description": "It enables ALL rules for this group.",
           "type": [
