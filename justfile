@@ -68,7 +68,7 @@ lint-fix:
 # When you finished coding, run this command. Note that you should have already committed your changes.
 ready:
   git diff --exit-code --quiet
-  cargo run -p xtask_codegen -- all
+  cargo run -p xtask_codegen -- configuration
   cargo run -p docs_codegen
   just lint --fix
   just format
