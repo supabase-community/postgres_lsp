@@ -321,6 +321,17 @@
             }
           ]
         },
+        "banDropTable": {
+          "description": "Dropping a table may break existing clients.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleConfiguration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "recommended": {
           "description": "It enables the recommended rules for this group",
           "type": [
