@@ -88,13 +88,6 @@ jobs:
         run: |
           cargo clippy
           cargo run -p rules_check
-      # - name: Check for git diff after lint fix
-      #   run: |
-      #     if [[ $(git status --porcelain) ]]; then
-      #       git status
-      #       git diff
-      #       exit 1
-      #     fi
 
   # check-dependencies:
   #   name: Check Dependencies
@@ -183,7 +176,7 @@ jobs:
         run: cargo run -p xtask_codegen -- configuration
       - name: Run the docs codegen
         run: cargo run -p docs_codegen
-      - name: Check for git diff
+      - name: Check for git diff -- run "just ready" if you see an error
         run: |
           if [[ $(git status --porcelain) ]]; then
             git status
