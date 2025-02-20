@@ -13,6 +13,7 @@
 // must be between `define_categories! {\n` and `\n    ;\n`.
 
 define_categories! {
+    "lint/safety/addingRequiredField": "https://pglt.dev/linter/rules/adding-required-field",
     "lint/safety/banDropColumn": "https://pglt.dev/linter/rules/ban-drop-column",
     "lint/safety/banDropNotNull": "https://pglt.dev/linter/rules/ban-drop-not-null",
     "lint/safety/banDropTable": "https://pglt.dev/linter/rules/ban-drop-table",

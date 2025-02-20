@@ -143,6 +143,10 @@ pub struct Safety {
     #[doc = r" It enables ALL rules for this group."]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub all: Option<bool>,
+    #[doc = "Adding a new column that is NOT NULL and has no default value to an existing table effectively makes it required."]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub adding_required_field:
+        Option<RuleConfiguration<pglt_analyser::options::AddingRequiredField>>,
     #[doc = "Dropping a column may break existing clients."]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ban_drop_column: Option<RuleConfiguration<pglt_analyser::options::BanDropColumn>>,
@@ -155,19 +159,24 @@ pub struct Safety {
 }
 impl Safety {
     const GROUP_NAME: &'static str = "safety";
-    pub(crate) const GROUP_RULES: &'static [&'static str] =
-        &["banDropColumn", "banDropNotNull", "banDropTable"];
+    pub(crate) const GROUP_RULES: &'static [&'static str] = &[
+        "addingRequiredField",
+        "banDropColumn",
+        "banDropNotNull",
+        "banDropTable",
+    ];
     const RECOMMENDED_RULES: &'static [&'static str] =
         &["banDropColumn", "banDropNotNull", "banDropTable"];
     const RECOMMENDED_RULES_AS_FILTERS: &'static [RuleFilter<'static>] = &[
-        RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0]),
         RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[1]),
         RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[2]),
+        RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[3]),
     ];
     const ALL_RULES_AS_FILTERS: &'static [RuleFilter<'static>] = &[
         RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0]),
         RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[1]),
         RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[2]),
+        RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[3]),
     ];
     #[doc = r" Retrieves the recommended rules"]
     pub(crate) fn is_recommended_true(&self) -> bool {
@@ -184,38 +193,48 @@ impl Safety {
     }
     pub(crate) fn get_enabled_rules(&self) -> FxHashSet<RuleFilter<'static>> {
         let mut index_set = FxHashSet::default();
-        if let Some(rule) = self.ban_drop_column.as_ref() {
+        if let Some(rule) = self.adding_required_field.as_ref() {
             if rule.is_enabled() {
                 index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0]));
             }
         }
-        if let Some(rule) = self.ban_drop_not_null.as_ref() {
+        if let Some(rule) = self.ban_drop_column.as_ref() {
             if rule.is_enabled() {
                 index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[1]));
             }
         }
-        if let Some(rule) = self.ban_drop_table.as_ref() {
+        if let Some(rule) = self.ban_drop_not_null.as_ref() {
             if rule.is_enabled() {
                 index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[2]));
+            }
+        }
+        if let Some(rule) = self.ban_drop_table.as_ref() {
+            if rule.is_enabled() {
+                index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[3]));
             }
         }
         index_set
     }
     pub(crate) fn get_disabled_rules(&self) -> FxHashSet<RuleFilter<'static>> {
         let mut index_set = FxHashSet::default();
-        if let Some(rule) = self.ban_drop_column.as_ref() {
+        if let Some(rule) = self.adding_required_field.as_ref() {
             if rule.is_disabled() {
                 index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[0]));
             }
         }
-        if let Some(rule) = self.ban_drop_not_null.as_ref() {
+        if let Some(rule) = self.ban_drop_column.as_ref() {
             if rule.is_disabled() {
                 index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[1]));
             }
         }
-        if let Some(rule) = self.ban_drop_table.as_ref() {
+        if let Some(rule) = self.ban_drop_not_null.as_ref() {
             if rule.is_disabled() {
                 index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[2]));
+            }
+        }
+        if let Some(rule) = self.ban_drop_table.as_ref() {
+            if rule.is_disabled() {
+                index_set.insert(RuleFilter::Rule(Self::GROUP_NAME, Self::GROUP_RULES[3]));
             }
         }
         index_set
@@ -254,6 +273,10 @@ impl Safety {
         rule_name: &str,
     ) -> Option<(RulePlainConfiguration, Option<RuleOptions>)> {
         match rule_name {
+            "addingRequiredField" => self
+                .adding_required_field
+                .as_ref()
+                .map(|conf| (conf.level(), conf.get_options())),
             "banDropColumn" => self
                 .ban_drop_column
                 .as_ref()
