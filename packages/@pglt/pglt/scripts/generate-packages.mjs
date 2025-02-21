@@ -147,7 +147,7 @@ function copySchemaToNativePackage(platform, arch) {
   const buildName = getBuildName(platform, arch);
   const packageRoot = resolve(PACKAGES_PGLT_ROOT, buildName);
 
-  const schemaSrc = resolve(packageRoot, `schema.json`);
+  const schemaSrc = resolve(PGLT_ROOT, `schema.json`);
   const schemaTarget = resolve(packageRoot, `schema.json`);
 
   if (!fs.existsSync(schemaSrc)) {
