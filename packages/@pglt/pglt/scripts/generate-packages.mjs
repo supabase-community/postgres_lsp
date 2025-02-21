@@ -1,13 +1,16 @@
 import assert from "node:assert";
 import * as fs from "node:fs";
+import { pipeline } from "node:stream";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { format } from "node:util";
+import { format, promisify } from "node:util";
 
 const CLI_ROOT = resolve(fileURLToPath(import.meta.url), "../..");
 const PACKAGES_PGLT_ROOT = resolve(CLI_ROOT, "..");
 const PGLT_ROOT = resolve(PACKAGES_PGLT_ROOT, "../..");
 const MANIFEST_PATH = resolve(CLI_ROOT, "package.json");
+
+const streamPipeline = promisify(pipeline);
 
 async function downloadSchema(releaseTag, githubToken) {
   const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/schema.json`;
@@ -26,11 +29,7 @@ async function downloadSchema(releaseTag, githubToken) {
   // download to root.
   const fileStream = fs.createWriteStream(resolve(PGLT_ROOT, "schema.json"));
 
-  await new Promise((res, rej) => {
-    response.body.pipeTo(fileStream);
-    fileStream.on("error", rej);
-    fileStream.on("finish", res);
-  });
+  await streamPipeline(response.body, fileStream);
 
   console.log(`Downloaded schema for ${releaseTag}`);
 }
@@ -53,11 +52,7 @@ async function downloadAsset(platform, os, arch, releaseTag, githubToken) {
   // just download to root.
   const fileStream = fs.createWriteStream(getBinarySource(os, platform, arch));
 
-  await new Promise((res, rej) => {
-    response.body.pipeTo(fileStream);
-    fileStream.on("error", rej);
-    fileStream.on("finish", res);
-  });
+  await streamPipeline(response.body, fileStream);
 
   console.log(`Downloaded asset for ${buildName} (v${releaseTag})`);
 }
