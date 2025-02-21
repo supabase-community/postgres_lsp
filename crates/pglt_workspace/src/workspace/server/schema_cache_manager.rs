@@ -42,23 +42,25 @@ pub struct SchemaCacheManager {
 
 impl SchemaCacheManager {
     pub fn load(&self, pool: PgPool) -> Result<SchemaCacheHandle, WorkspaceError> {
-        let inner = self.inner.read().unwrap();
+        let new_conn_str = pool_to_conn_str(&pool);
 
-        if pool_to_conn_str(&pool) == inner.conn_str {
-            Ok(SchemaCacheHandle::wrap(inner))
-        } else {
-            let new_conn_str = pool_to_conn_str(&pool);
-
-            let maybe_refreshed = run_async(async move { SchemaCache::load(&pool).await })?;
-            let refreshed = maybe_refreshed?;
-
-            let mut inner = self.inner.write().unwrap();
-
-            inner.cache = refreshed;
-            inner.conn_str = new_conn_str;
-
-            Ok(SchemaCacheHandle::new(&self.inner))
+        {
+            // return early if the connection string is the same
+            let inner = self.inner.read().unwrap();
+            if new_conn_str == inner.conn_str {
+                return Ok(SchemaCacheHandle::wrap(inner));
+            }
         }
+
+        let maybe_refreshed = run_async(async move { SchemaCache::load(&pool).await })?;
+        let refreshed = maybe_refreshed?;
+
+        let mut inner = self.inner.write().unwrap();
+
+        inner.cache = refreshed;
+        inner.conn_str = new_conn_str;
+
+        Ok(SchemaCacheHandle::new(&self.inner))
     }
 }
 

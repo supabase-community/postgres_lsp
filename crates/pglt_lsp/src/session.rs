@@ -267,8 +267,6 @@ impl Session {
                 skip: Vec::new(),
             })?;
 
-            tracing::trace!("pglt diagnostics: {:#?}", result.diagnostics);
-
             result
                 .diagnostics
                 .into_iter()
@@ -289,8 +287,6 @@ impl Session {
                 })
                 .collect()
         };
-
-        tracing::Span::current().record("diagnostic_count", diagnostics.len());
 
         self.client
             .publish_diagnostics(url, diagnostics, Some(doc.version))
