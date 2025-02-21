@@ -13,5 +13,4 @@ jobs:
     uses: ./.github/workflows/publish.reusable.yml
     with:
       release-tag: ${{ github.event.inputs.release_tag }}
-    secrets:
-      github_token: ${{ secrets.GITHUB_TOKEN }}
+    secrets: inherit

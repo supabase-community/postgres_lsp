@@ -6,9 +6,6 @@ on:
       release-tag:
         type: string
         required: true
-    secrets:
-      github_token:
-        required: true
 
 jobs:
   publish:
