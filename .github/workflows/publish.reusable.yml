@@ -36,8 +36,8 @@ jobs:
           {
             ls packages
             ls packages/\@pglt
-            ls packages/\@pglt/pglt_aarch64_pc-windows-msvc
-            cat packages/\@pglt/pglt_aarch64_pc-windows-msvc/package.json
+            ls packages/\@pglt/pglt_aarch64-pc-windows-msvc            
+            cat packages/\@pglt/pglt_aarch64-pc-windows-msvc/package.json
           }
 
       # - name: Publish npm packages as latest
