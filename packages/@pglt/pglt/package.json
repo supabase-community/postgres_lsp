@@ -22,12 +22,8 @@
   "license": "MIT or Apache-2.0",
   "description": "",
   "files": [
-    "bin/biome",
-    "config_schema.json",
-    "README.md",
-    "LICENSE-APACHE",
-    "LICENSE-MIT",
-    "ROME-LICENSE-MIT"
+    "bin/pglt",
+    "config_schema.json"
   ],
   "engines": {
     "node": ">=20"
