@@ -1,0 +1,17 @@
+name: Publish NPM (Dispatch)
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        type: string
+        required: true
+        description: Release Tag to Publish
+
+jobs:
+  publish_npm:
+    uses: ./.github/workflows/publish.reusable.yml
+    with:
+      release-tag: ${{ github.event.inputs.release_tag }}
+    secrets:
+      github_token: ${{ secrets.GITHUB_TOKEN }}
