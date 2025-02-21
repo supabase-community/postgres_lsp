@@ -64,12 +64,14 @@ async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
   console.log(`Downloaded asset for ${buildName} (v${releaseTag})`);
 }
 
-async function overwriteManifestVersions(releaseTag) {
+async function overwriteManifestVersions(releaseTag, isPrerelease) {
+  const version = getVersion(releaseTag, isPrerelease);
+
   const manifestClone = structuredClone(rootManifest);
 
-  manifestClone.version = releaseTag;
+  manifestClone.version = version;
   for (const key in manifestClone.optionalDependencies) {
-    manifestClone.optionalDependencies[key] = releaseTag;
+    manifestClone.optionalDependencies[key] = version;
   }
 
   fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifestClone, null, 2));
@@ -174,6 +176,10 @@ function getOs(platform) {
   return platform.split("-").find((_, idx) => idx === 1);
 }
 
+function getVersion(releaseTag, isPrerelease) {
+  return releaseTag + (isPrerelease ? "-rc" : "");
+}
+
 (async function main() {
   const githubToken = process.env.GITHUB_TOKEN;
   let releaseTag = process.env.RELEASE_TAG;
@@ -181,12 +187,9 @@ function getOs(platform) {
   assert(releaseTag, "RELEASE_TAG not defined!");
 
   const isPrerelease = process.env.PRERELEASE === "true";
-  if (isPrerelease) {
-    releaseTag += "-rc";
-  }
 
   await downloadSchema(releaseTag, githubToken);
-  overwriteManifestVersions(releaseTag);
+  overwriteManifestVersions(releaseTag, isPrerelease);
 
   for (const platform of SUPPORTED_PLATFORMS) {
     const os = getOs(platform);
