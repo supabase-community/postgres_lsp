@@ -34,6 +34,8 @@ jobs:
       - name: DEBUG - log assets
         run: |
           {
+            ls packages
+            ls packages/\@pglt
             ls packages/\@pglt/pglt_aarch64_pc-windows-msvc
             cat packages/\@pglt/pglt_aarch64_pc-windows-msvc/package.json
           }
