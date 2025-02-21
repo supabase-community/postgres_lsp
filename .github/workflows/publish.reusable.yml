@@ -1,11 +1,10 @@
 name: Publish to NPM & Brew
 
 on:
-  workflow_call:
-    inputs:
-      release-tag:
-        type: string
-        required: true
+  pull_request:
+    branches:
+      - juleswritescode:chore/add-publish-action
+      - chore/add-publish-action
 
 jobs:
   publish:
@@ -30,7 +29,7 @@ jobs:
         run: node packages/@pglt/pglt/scripts/generate-packages.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ inputs.release-tag }}
+          RELEASE_TAG: "0.1.0"
 
       - name: DEBUG - log assets
         run: |
