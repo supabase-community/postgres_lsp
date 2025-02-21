@@ -75,7 +75,7 @@ function getBinarySource(platform, arch, os) {
 }
 
 function getBuildName(platform, arch) {
-  return `pglt_${arch}_${platform}`;
+  return `pglt_${arch}-${platform}`;
 }
 
 function getPackageName(platform, arch) {
