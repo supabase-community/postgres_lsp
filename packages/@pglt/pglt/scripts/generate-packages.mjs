@@ -36,6 +36,9 @@ async function downloadSchema(releaseTag, githubToken) {
 
 async function downloadAsset(platform, arch, os, releaseTag, githubToken) {
   const buildName = getBuildName(platform, arch);
+
+  // https://github.com/supabase-community/postgres_lsp/releases/download/0.1.0/pglt_x86_64_windows-msvc
+  // https://github.com/supabase-community/postgres_lsp/releases/download/0.1.0/pglt_x86_64-pc-windows-msvc
   const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/${buildName}`;
 
   const response = await fetch(assetUrl, {
@@ -165,7 +168,7 @@ function copySchemaToNativePackage(platform, arch) {
 
   await downloadSchema(releaseTag, githubToken);
 
-  const PLATFORMS = ["windows-msvc", "apple-darwin", "unknown-linux-gnu"];
+  const PLATFORMS = ["pc-windows-msvc", "apple-darwin", "unknown-linux-gnu"];
   const ARCHITECTURES = ["x86_64", "aarch64"];
 
   for (const platform of PLATFORMS) {
