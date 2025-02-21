@@ -20,17 +20,12 @@ use tower::{Service, ServiceExt};
 use tower_lsp::jsonrpc;
 use tower_lsp::jsonrpc::Response;
 use tower_lsp::lsp_types as lsp;
-use tower_lsp::lsp_types::DidCloseTextDocumentParams;
-use tower_lsp::lsp_types::DidOpenTextDocumentParams;
-use tower_lsp::lsp_types::InitializeResult;
-use tower_lsp::lsp_types::InitializedParams;
-use tower_lsp::lsp_types::PublishDiagnosticsParams;
-use tower_lsp::lsp_types::TextDocumentContentChangeEvent;
-use tower_lsp::lsp_types::TextDocumentIdentifier;
-use tower_lsp::lsp_types::TextDocumentItem;
-use tower_lsp::lsp_types::VersionedTextDocumentIdentifier;
-use tower_lsp::lsp_types::{ClientCapabilities, Url};
-use tower_lsp::lsp_types::{DidChangeConfigurationParams, DidChangeTextDocumentParams};
+use tower_lsp::lsp_types::{
+    ClientCapabilities, DidChangeConfigurationParams, DidChangeTextDocumentParams,
+    DidCloseTextDocumentParams, DidOpenTextDocumentParams, InitializeResult, InitializedParams,
+    PublishDiagnosticsParams, TextDocumentContentChangeEvent, TextDocumentIdentifier,
+    TextDocumentItem, Url, VersionedTextDocumentIdentifier,
+};
 use tower_lsp::LspService;
 use tower_lsp::{jsonrpc::Request, lsp_types::InitializeParams};
 
@@ -181,23 +176,8 @@ impl Server {
             "textDocument/didOpen",
             DidOpenTextDocumentParams {
                 text_document: TextDocumentItem {
-                    uri: url!("document.js"),
-                    language_id: String::from("javascript"),
-                    version: 0,
-                    text: text.to_string(),
-                },
-            },
-        )
-        .await
-    }
-
-    async fn open_untitled_document(&mut self, text: impl Display) -> Result<()> {
-        self.notify(
-            "textDocument/didOpen",
-            DidOpenTextDocumentParams {
-                text_document: TextDocumentItem {
-                    uri: url!("untitled-1"),
-                    language_id: String::from("javascript"),
+                    uri: url!("document.sql"),
+                    language_id: String::from("sql"),
                     version: 0,
                     text: text.to_string(),
                 },
@@ -207,18 +187,13 @@ impl Server {
     }
 
     /// Opens a document with given contents and given name. The name must contain the extension too
-    async fn open_named_document(
-        &mut self,
-        text: impl Display,
-        document_name: Url,
-        language: impl Display,
-    ) -> Result<()> {
+    async fn open_named_document(&mut self, text: impl Display, document_name: Url) -> Result<()> {
         self.notify(
             "textDocument/didOpen",
             DidOpenTextDocumentParams {
                 text_document: TextDocumentItem {
                     uri: document_name,
-                    language_id: language.to_string(),
+                    language_id: String::from("sql"),
                     version: 0,
                     text: text.to_string(),
                 },
@@ -247,7 +222,7 @@ impl Server {
             "textDocument/didChange",
             DidChangeTextDocumentParams {
                 text_document: VersionedTextDocumentIdentifier {
-                    uri: url!("document.js"),
+                    uri: url!("document.sql"),
                     version,
                 },
                 content_changes,
@@ -261,7 +236,7 @@ impl Server {
             "textDocument/didClose",
             DidCloseTextDocumentParams {
                 text_document: TextDocumentIdentifier {
-                    uri: url!("document.js"),
+                    uri: url!("document.sql"),
                 },
             },
         )
