@@ -80,13 +80,16 @@ function getPackageName(platform, arch) {
   return format(`@pglt/cli_${name}`, arch);
 }
 
-function copyBinaryToNativePackage(platform, arch) {
+function getOs(platform) {
+  return platform.split("-").find((_, idx) => idx === 1);
+}
+
+function copyBinaryToNativePackage(platform, arch, os) {
   const buildName = getBuildName(platform, arch);
   const packageRoot = resolve(PACKAGES_PGLT_ROOT, buildName);
   const packageName = getPackageName(platform, arch);
 
   // "unknow-linux-gnu", "apple-darwin" – take linux, apple, windows
-  const os = platform.split("-").find((_, idx) => idx === 1);
 
   // Update the package.json manifest
   const { version, license, repository, engines } = rootManifest;
@@ -167,8 +170,9 @@ function copySchemaToNativePackage(platform, arch) {
 
   for (const platform of PLATFORMS) {
     for (const arch of ARCHITECTURES) {
+      const os = getOs(platform);
       await downloadAsset(platform, os, arch, releaseTag, githubToken);
-      copyBinaryToNativePackage(platform, arch);
+      copyBinaryToNativePackage(platform, arch, os);
       copySchemaToNativePackage(platform, arch);
     }
   }
