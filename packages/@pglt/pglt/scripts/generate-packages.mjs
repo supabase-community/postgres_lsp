@@ -176,10 +176,14 @@ function getOs(platform) {
 
 (async function main() {
   const githubToken = process.env.GITHUB_TOKEN;
-  const releaseTag = process.env.RELEASE_TAG;
-
+  let releaseTag = process.env.RELEASE_TAG;
   assert(githubToken, "GITHUB_TOKEN not defined!");
   assert(releaseTag, "RELEASE_TAG not defined!");
+
+  const isPrerelease = process.env.PRERELEASE === "true";
+  if (isPrerelease) {
+    releaseTag += "-rc";
+  }
 
   await downloadSchema(releaseTag, githubToken);
   overwriteManifestVersions(releaseTag);

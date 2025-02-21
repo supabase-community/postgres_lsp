@@ -30,10 +30,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: "0.1.0"
+          PRERELEASE: "true"
 
-      - name: DEBUG
-        run: cat packages/\@pglt/pglt/package.json
-
+      # TODO: use latest/nightly tag depending on prerelease
       # - name: Publish npm packages as latest
       #   run: for package in packages/@biomejs/*; do if [ $package != "packages/@biomejs/js-api" ]; then npm publish $package --tag latest --access public --provenance; fi; done
       #   env:

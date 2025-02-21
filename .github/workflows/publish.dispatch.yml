@@ -1,4 +1,4 @@
-name: Publish NPM (Dispatch)
+name: Publish NPM (Manual)
 
 on:
   workflow_dispatch:
@@ -9,7 +9,41 @@ on:
         description: Release Tag to Publish
 
 jobs:
+  validate_tag:
+    uses: actions/github-script@v7
+    with:
+      script: |
+        const tag = '';
+
+        let exhausted = false;
+        let page = 1;
+        while (!exhausted) {
+          const releases = octokit.rest.repos.listReleases({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            page,
+            per_page: 100,
+          });
+
+          const matchingRelease = releases.find(r => r.tag_name === tag);
+          if (matchingRelease) {
+            core.setOutput('hasRelease', true);
+            core.setOutput('isPrerelease', release.prerelease);
+            return;
+          }
+
+          if (releases.length < 100) {
+            exhausted = true;
+          } else {
+            page++
+          }
+        }
+
+        core.setOutput('hasRelease', false);
+        core.setOutput('isPrerelease', false);
+
   publish_npm:
+    needs: validate_tag
     uses: ./.github/workflows/publish.reusable.yml
     with:
       release-tag: ${{ github.event.inputs.release_tag }}
