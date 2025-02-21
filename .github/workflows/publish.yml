@@ -1,0 +1,53 @@
+name: Publish to NPM & Brew
+
+on:
+  workflow_dispatch:
+  release:
+    types: [released]
+
+jobs:
+  get_release_tag:
+    name: Get Latest Release Tag
+    runs-on: ubuntu-latest
+    outputs:
+      tagName: ${{ steps.get-tag-name.outputs.result }}
+    steps:
+      - uses: actions/github-script@v7
+        id: get-tag-name
+        with:
+          # result-encoding: string
+          retries: 3
+          script: |
+            const release = octokit.rest.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            return {
+              tagName: release.tag_name,
+              assetsUrl: release.assets_url,
+            }
+
+  publish:
+    name: Publish All the Things
+    needs: get_release_tag
+    runs-on: ubuntu-latest
+    # todo: add secrets
+    permissions:
+      contents: write
+      # ? what's this?! required for executing the node script?
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts
+          registry-url: "https://registry.npmjs.org"
+      - name: Generate Packages
+        run: node //todo
+
+      - name: Publish npm packages as latest
+        run: for package in packages/@biomejs/*; do if [ $package != "packages/@biomejs/js-api" ]; then npm publish $package --tag latest --access public --provenance; fi; done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

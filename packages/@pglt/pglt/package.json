@@ -1,0 +1,45 @@
+{
+  "name": "pglt",
+  "version": "0.1.0",
+  "bin": {
+    "pglt": "bin/pglt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/supabase/postgres_lsp.git",
+    "directory": "packages/@pglt/pglt"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Philipp Steinrötter",
+  "contributors": [
+    {
+      "name": "Julian Domke",
+      "url": "https://github.com/juleswritescode"
+    }
+  ],
+  "license": "MIT or Apache-2.0",
+  "description": "",
+  "files": [
+    "bin/biome",
+    "config_schema.json",
+    "README.md",
+    "LICENSE-APACHE",
+    "LICENSE-MIT",
+    "ROME-LICENSE-MIT"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "optionalDependencies": {
+    "@pglt/cli-win32-x64": "1.9.4",
+    "@pglt/cli-win32-arm64": "1.9.4",
+    "@pglt/cli-darwin-x64": "1.9.4",
+    "@pglt/cli-darwin-arm64": "1.9.4",
+    "@pglt/cli-linux-x64": "1.9.4",
+    "@pglt/cli-linux-arm64": "1.9.4",
+    "@pglt/cli-linux-x64-musl": "1.9.4",
+    "@pglt/cli-linux-arm64-musl": "1.9.4"
+  }
+}
