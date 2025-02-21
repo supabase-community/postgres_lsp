@@ -9,6 +9,32 @@ const PACKAGES_PGLT_ROOT = resolve(CLI_ROOT, "..");
 const PGLT_ROOT = resolve(PACKAGES_PGLT_ROOT, "../..");
 const MANIFEST_PATH = resolve(CLI_ROOT, "package.json");
 
+async function downloadSchema(releaseTag, githubToken) {
+  const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/schema.json`;
+
+  const response = await fetch(assetUrl, {
+    headers: {
+      Authorization: `token ${githubToken}`,
+      Accept: `application/octet-stream`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to Fetch Asset from ${assetUrl}`);
+  }
+
+  // download to root.
+  const fileStream = fs.createWriteStream(resolve(PGLT_ROOT, "schema.json"));
+
+  await new Promise((res, rej) => {
+    response.body.pipeTo(fileStream);
+    fileStream.on("error", rej);
+    fileStream.on("finish", res);
+  });
+
+  console.log(`Downloaded schema for ${releaseTag}`);
+}
+
 async function downloadAsset(platform, os, arch, releaseTag, githubToken) {
   const buildName = getBuildName(platform, arch);
   const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/${buildName}`;
@@ -24,6 +50,7 @@ async function downloadAsset(platform, os, arch, releaseTag, githubToken) {
     throw new Error(`Failed to Fetch Asset from ${assetUrl}`);
   }
 
+  // just download to root.
   const fileStream = fs.createWriteStream(getBinarySource(os, platform, arch));
 
   await new Promise((res, rej) => {
@@ -114,14 +141,31 @@ function copyBinaryToNativePackage(platform, arch) {
   fs.chmodSync(binaryTarget, 0o755);
 }
 
+function copySchemaToNativePackage(platform, arch) {
+  const buildName = getBuildName(platform, arch);
+  const packageRoot = resolve(PACKAGES_PGLT_ROOT, buildName);
+
+  const schemaSrc = resolve(packageRoot, `schema.json`);
+  const schemaTarget = resolve(packageRoot, `schema.json`);
+
+  if (!fs.existsSync(schemaSrc)) {
+    console.error(`Schema.json not found at: ${schemaSrc}`);
+    process.exit(1);
+  }
+
+  console.info(`Copying schema.json`);
+  fs.copyFileSync(schemaSrc, schemaTarget);
+  fs.chmodSync(schemaTarget, 0o666);
+}
+
 (async function main() {
   const githubToken = process.env.GITHUB_TOKEN;
-  const assetsUrl = process.env.ASSETS_URL;
   const releaseTag = process.env.RELEASE_TAG;
 
   assert(githubToken, "GITHUB_TOKEN not defined!");
-  assert(assetsUrl, "ASSETS_URL not defined!");
   assert(releaseTag, "RELEASE_TAG not defined!");
+
+  await downloadSchema(releaseTag, githubToken);
 
   const PLATFORMS = ["windows-msvc", "apple-darwin", "unknown-linux-gnu"];
   const ARCHITECTURES = ["x86_64", "aarch64"];
@@ -130,6 +174,7 @@ function copyBinaryToNativePackage(platform, arch) {
     for (const arch of ARCHITECTURES) {
       await downloadAsset(platform, os, arch, releaseTag, githubToken);
       copyBinaryToNativePackage(platform, arch);
+      copySchemaToNativePackage(platform, arch);
     }
   }
 

@@ -23,7 +23,7 @@
   "description": "",
   "files": [
     "bin/pglt",
-    "config_schema.json"
+    "schema.json"
   ],
   "engines": {
     "node": ">=20"
