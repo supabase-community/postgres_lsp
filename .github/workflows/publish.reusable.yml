@@ -31,15 +31,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: "0.1.0"
 
-      - name: DEBUG - log assets
-        run: |
-          {
-            ls packages
-            ls packages/\@pglt
-            ls packages/\@pglt/pglt_aarch64-pc-windows-msvc            
-            cat packages/\@pglt/pglt_aarch64-pc-windows-msvc/package.json
-          }
-
       # - name: Publish npm packages as latest
       #   run: for package in packages/@biomejs/*; do if [ $package != "packages/@biomejs/js-api" ]; then npm publish $package --tag latest --access public --provenance; fi; done
       #   env:
