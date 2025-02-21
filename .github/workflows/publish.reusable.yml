@@ -32,6 +32,13 @@ jobs:
           RELEASE_TAG: "0.1.0"
           PRERELEASE: ${{ env.PRERELEASE }}
 
+      - name: Verify NPM TOKEN exists
+        if: !!secrets.NPM_TOKEN
+        run: |
+          {
+            echo "Found NPM Token"
+          }
+
       - name: Publish npm packages as nightly
         if: false
         run: |
@@ -40,6 +47,7 @@ jobs:
           done
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} #
+
       - name: Publish npm packages as latest
         if: true
         run: |
@@ -47,4 +55,4 @@ jobs:
             npm publish $package --tag latest --access public --provenance
           done
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} #
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
