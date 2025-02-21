@@ -3,8 +3,8 @@ name: Publish to NPM & Brew
 on:
   pull_request:
     branches:
-      - juleswritescode:chore/add-publish-action
-      - chore/add-publish-action
+      - main
+      - supabase-community:main
 
 jobs:
   publish:
