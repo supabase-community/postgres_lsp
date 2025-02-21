@@ -75,13 +75,13 @@ function getBinarySource(platform, arch, os) {
 }
 
 function getBuildName(platform, arch) {
-  return format(`pglt_${arch}_${platform}`, arch);
+  return `pglt_${arch}_${platform}`;
 }
 
 function getPackageName(platform, arch) {
   // trim the "unknown" from linux
   const name = platform.split("-").slice(-2).join("-");
-  return format(`@pglt/cli_${name}`, arch);
+  return `@pglt/cli_${arch}-${name}`;
 }
 
 function getOs(platform) {
