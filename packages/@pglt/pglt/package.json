@@ -9,8 +9,12 @@
     "url": "git+https://github.com/supabase/postgres_lsp.git",
     "directory": "packages/@pglt/pglt"
   },
-  "author": "Philipp Steinrötter",
+  "author": "Supabase Community",
   "contributors": [
+    {
+      "name": "Philipp Steinrötter",
+      "url": "https://github.com/psteinroe"
+    },
     {
       "name": "Julian Domke",
       "url": "https://github.com/juleswritescode"
