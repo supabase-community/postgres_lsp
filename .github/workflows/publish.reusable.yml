@@ -6,9 +6,6 @@ on:
       - main
       - supabase-community:main
 
-env:
-  PRERELEASE: "true"
-
 jobs:
   publish:
     name: Publish All the Things
@@ -35,9 +32,8 @@ jobs:
           RELEASE_TAG: "0.1.0"
           PRERELEASE: ${{ env.PRERELEASE }}
 
-          # TODO: use latest/nightly tag depending on prerelease
       - name: Publish npm packages as nightly
-        if: env.PRELEASE == 'true'
+        if: false
         run: |
           for package in packages/@pglt/*; do 
             npm publish $package --tag nightly --access public --provenance
@@ -45,7 +41,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} #
       - name: Publish npm packages as latest
-        if: env.PRELEASE != 'true'
+        if: true
         run: |
           for package in packages/@pglt/*; do 
             npm publish $package --tag latest --access public --provenance
