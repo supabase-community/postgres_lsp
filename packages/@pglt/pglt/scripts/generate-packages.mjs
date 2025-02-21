@@ -80,7 +80,7 @@ function getBuildName(platform, arch) {
 }
 
 function getPackageName(platform, arch) {
-  // trim the "unknwown" from linux
+  // trim the "unknown" from linux
   const name = platform.split("-").slice(-2).join("-");
   return format(`@pglt/cli_${name}`, arch);
 }
