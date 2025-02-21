@@ -37,7 +37,7 @@ async function downloadSchema(releaseTag, githubToken) {
 async function downloadAsset(platform, arch, os, releaseTag, githubToken) {
   const buildName = getBuildName(platform, arch);
 
-  // https://github.com/supabase-community/postgres_lsp/releases/download/0.1.0/pglt_x86_64_windows-msvc
+  // https://github.com/supabase-community/postgres_lsp/releases/download/0.1.0/pglt_x86_64_pc-windows-msvc
   // https://github.com/supabase-community/postgres_lsp/releases/download/0.1.0/pglt_x86_64-pc-windows-msvc
   const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/${buildName}`;
 
@@ -49,7 +49,8 @@ async function downloadAsset(platform, arch, os, releaseTag, githubToken) {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to Fetch Asset from ${assetUrl}`);
+    const error = await response.text();
+    throw new Error(`Failed to Fetch Asset from ${assetUrl}. Reason: ${error}`);
   }
 
   // just download to root.
