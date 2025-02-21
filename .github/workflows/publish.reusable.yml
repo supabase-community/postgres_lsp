@@ -33,11 +33,13 @@ jobs:
           PRERELEASE: ${{ env.PRERELEASE }}
 
       - name: Verify NPM TOKEN exists
-        if: !!secrets.NPM_TOKEN
         run: |
-          {
-            echo "Found NPM Token"
-          }
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "Secret is not defined"
+            exit 1
+          else
+            echo "Secret is defined"
+          fi
 
       - name: Publish npm packages as nightly
         if: false
