@@ -34,7 +34,7 @@ async function downloadSchema(releaseTag, githubToken) {
   console.log(`Downloaded schema for ${releaseTag}`);
 }
 
-async function downloadAsset(platform, os, arch, releaseTag, githubToken) {
+async function downloadAsset(platform, arch, os, releaseTag, githubToken) {
   const buildName = getBuildName(platform, arch);
   const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/${buildName}`;
 
@@ -50,7 +50,7 @@ async function downloadAsset(platform, os, arch, releaseTag, githubToken) {
   }
 
   // just download to root.
-  const fileStream = fs.createWriteStream(getBinarySource(os, platform, arch));
+  const fileStream = fs.createWriteStream(getBinarySource(platform, arch, os));
 
   await streamPipeline(response.body, fileStream);
 
@@ -65,7 +65,7 @@ function getBinaryExt(os) {
   return os === "windows" ? ".exe" : "";
 }
 
-function getBinarySource(os, platform, arch) {
+function getBinarySource(platform, arch, os) {
   const ext = getBinaryExt(os);
   return resolve(PGLT_ROOT, `${getBuildName(platform, arch)}${ext}`);
 }
@@ -123,7 +123,7 @@ function copyBinaryToNativePackage(platform, arch, os) {
   fs.writeFileSync(manifestPath, manifest);
 
   // Copy the CLI binary
-  const binarySource = getBinarySource(os, platform, arch);
+  const binarySource = getBinarySource(platform, arch, os);
   const ext = getBinaryExt(os);
   const binaryTarget = resolve(packageRoot, `pglt${ext}`);
 
@@ -169,9 +169,10 @@ function copySchemaToNativePackage(platform, arch) {
   const ARCHITECTURES = ["x86_64", "aarch64"];
 
   for (const platform of PLATFORMS) {
+    const os = getOs(platform);
+
     for (const arch of ARCHITECTURES) {
-      const os = getOs(platform);
-      await downloadAsset(platform, os, arch, releaseTag, githubToken);
+      await downloadAsset(platform, arch, os, releaseTag, githubToken);
       copyBinaryToNativePackage(platform, arch, os);
       copySchemaToNativePackage(platform, arch);
     }
