@@ -2488,6 +2488,7 @@ dependencies = [
  "serde_json",
  "text-size",
  "tokio",
+ "tower",
  "tower-lsp",
  "tracing",
 ]
@@ -4023,8 +4024,10 @@ dependencies = [
  "futures-util",
  "pin-project",
  "pin-project-lite",
+ "tokio",
  "tower-layer",
  "tower-service",
+ "tracing",
 ]
 
 [[package]]
