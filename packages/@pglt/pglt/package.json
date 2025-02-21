@@ -29,13 +29,11 @@
     "node": ">=20"
   },
   "optionalDependencies": {
-    "@pglt/cli-win32-x64": "1.9.4",
-    "@pglt/cli-win32-arm64": "1.9.4",
-    "@pglt/cli-darwin-x64": "1.9.4",
-    "@pglt/cli-darwin-arm64": "1.9.4",
-    "@pglt/cli-linux-x64": "1.9.4",
-    "@pglt/cli-linux-arm64": "1.9.4",
-    "@pglt/cli-linux-x64-musl": "1.9.4",
-    "@pglt/cli-linux-arm64-musl": "1.9.4"
+    "@pglt/cli-aarch64-apple-darwin": "0.1.0",
+    "@pglt/cli-aarch64-pc-windows-msvc": "0.1.0",
+    "@pglt/cli-aarch64-unknown-linux-gnu": "0.1.0",
+    "@pglt/cli-x86_64-apple-darwin": "0.1.0",
+    "@pglt/cli-x86_64-pc-windows-msvc": "0.1.0",
+    "@pglt/cli-x86_64-unknown-linux-gnu": "0.1.0"
   }
 }
