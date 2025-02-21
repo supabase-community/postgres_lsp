@@ -14,6 +14,7 @@ jobs:
   publish:
     name: Publish All the Things
     runs-on: ubuntu-latest
+
     # todo: add secrets
     permissions:
       contents: write
@@ -30,6 +31,9 @@ jobs:
 
       - name: Generate Packages
         run: node packages/@pglt/pglt/scripts/generate-packages.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.release-tag }}
 
       - name: DEBUG - log assets
         run: |
