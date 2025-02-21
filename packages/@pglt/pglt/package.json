@@ -1,6 +1,6 @@
 {
   "name": "pglt",
-  "version": "0.1.0",
+  "version": "<placeholder>",
   "bin": {
     "pglt": "bin/pglt"
   },
@@ -30,11 +30,11 @@
     "node": ">=20"
   },
   "optionalDependencies": {
-    "@pglt/cli-aarch64-apple-darwin": "0.1.0",
-    "@pglt/cli-aarch64-windows-msvc": "0.1.0",
-    "@pglt/cli-aarch64-linux-gnu": "0.1.0",
-    "@pglt/cli-x86_64-apple-darwin": "0.1.0",
-    "@pglt/cli-x86_64-windows-msvc": "0.1.0",
-    "@pglt/cli-x86_64-linux-gnu": "0.1.0"
+    "@pglt/cli-aarch64-apple-darwin": "<placeholder>",
+    "@pglt/cli-aarch64-windows-msvc": "<placeholder>",
+    "@pglt/cli-aarch64-linux-gnu": "<placeholder>",
+    "@pglt/cli-x86_64-apple-darwin": "<placeholder>",
+    "@pglt/cli-x86_64-windows-msvc": "<placeholder>",
+    "@pglt/cli-x86_64-linux-gnu": "<placeholder>"
   }
 }

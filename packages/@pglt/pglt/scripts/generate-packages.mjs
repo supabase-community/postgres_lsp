@@ -3,14 +3,19 @@ import * as fs from "node:fs";
 import { pipeline } from "node:stream";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { format, promisify } from "node:util";
+import { promisify } from "node:util";
+const streamPipeline = promisify(pipeline);
 
 const CLI_ROOT = resolve(fileURLToPath(import.meta.url), "../..");
 const PACKAGES_PGLT_ROOT = resolve(CLI_ROOT, "..");
 const PGLT_ROOT = resolve(PACKAGES_PGLT_ROOT, "../..");
 const MANIFEST_PATH = resolve(CLI_ROOT, "package.json");
-
-const streamPipeline = promisify(pipeline);
+const SUPPORTED_PLATFORMS = [
+  "pc-windows-msvc",
+  "apple-darwin",
+  "unknown-linux-gnu",
+];
+const SUPPORTED_ARCHITECTURES = ["x86_64", "aarch64"];
 
 async function downloadSchema(releaseTag, githubToken) {
   const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/schema.json`;
@@ -34,7 +39,7 @@ async function downloadSchema(releaseTag, githubToken) {
   console.log(`Downloaded schema for ${releaseTag}`);
 }
 
-async function downloadAsset(platform, arch, os, releaseTag, githubToken) {
+async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
   const buildName = getBuildName(platform, arch);
 
   const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/${buildName}`;
@@ -59,31 +64,15 @@ async function downloadAsset(platform, arch, os, releaseTag, githubToken) {
   console.log(`Downloaded asset for ${buildName} (v${releaseTag})`);
 }
 
-const rootManifest = JSON.parse(
-  fs.readFileSync(MANIFEST_PATH).toString("utf-8")
-);
+async function overwriteManifestVersions(releaseTag) {
+  const manifestClone = structuredClone(rootManifest);
 
-function getBinaryExt(os) {
-  return os === "windows" ? ".exe" : "";
-}
+  manifestClone.version = releaseTag;
+  for (const key in manifestClone.optionalDependencies) {
+    manifestClone.optionalDependencies[key] = releaseTag;
+  }
 
-function getBinarySource(platform, arch, os) {
-  const ext = getBinaryExt(os);
-  return resolve(PGLT_ROOT, `${getBuildName(platform, arch)}${ext}`);
-}
-
-function getBuildName(platform, arch) {
-  return `pglt_${arch}-${platform}`;
-}
-
-function getPackageName(platform, arch) {
-  // trim the "unknown" from linux
-  const name = platform.split("-").slice(-2).join("-");
-  return `@pglt/cli-${arch}-${name}`;
-}
-
-function getOs(platform) {
-  return platform.split("-").find((_, idx) => idx === 1);
+  fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifestClone, null, 2));
 }
 
 function copyBinaryToNativePackage(platform, arch, os) {
@@ -158,6 +147,33 @@ function copySchemaToNativePackage(platform, arch) {
   fs.chmodSync(schemaTarget, 0o666);
 }
 
+const rootManifest = JSON.parse(
+  fs.readFileSync(MANIFEST_PATH).toString("utf-8")
+);
+
+function getBinaryExt(os) {
+  return os === "windows" ? ".exe" : "";
+}
+
+function getBinarySource(platform, arch, os) {
+  const ext = getBinaryExt(os);
+  return resolve(PGLT_ROOT, `${getBuildName(platform, arch)}${ext}`);
+}
+
+function getBuildName(platform, arch) {
+  return `pglt_${arch}-${platform}`;
+}
+
+function getPackageName(platform, arch) {
+  // trim the "unknown" from linux and the "pc" from windows
+  const name = platform.split("-").slice(-2).join("-");
+  return `@pglt/cli-${arch}-${name}`;
+}
+
+function getOs(platform) {
+  return platform.split("-").find((_, idx) => idx === 1);
+}
+
 (async function main() {
   const githubToken = process.env.GITHUB_TOKEN;
   const releaseTag = process.env.RELEASE_TAG;
@@ -166,15 +182,13 @@ function copySchemaToNativePackage(platform, arch) {
   assert(releaseTag, "RELEASE_TAG not defined!");
 
   await downloadSchema(releaseTag, githubToken);
+  overwriteManifestVersions(releaseTag);
 
-  const PLATFORMS = ["pc-windows-msvc", "apple-darwin", "unknown-linux-gnu"];
-  const ARCHITECTURES = ["x86_64", "aarch64"];
-
-  for (const platform of PLATFORMS) {
+  for (const platform of SUPPORTED_PLATFORMS) {
     const os = getOs(platform);
 
-    for (const arch of ARCHITECTURES) {
-      await downloadAsset(platform, arch, os, releaseTag, githubToken);
+    for (const arch of SUPPORTED_ARCHITECTURES) {
+      await downloadBinary(platform, arch, os, releaseTag, githubToken);
       copyBinaryToNativePackage(platform, arch, os);
       copySchemaToNativePackage(platform, arch);
     }
