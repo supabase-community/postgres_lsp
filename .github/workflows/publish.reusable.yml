@@ -6,6 +6,9 @@ on:
       - main
       - supabase-community:main
 
+env:
+  PRERELEASE: "true"
+
 jobs:
   publish:
     name: Publish All the Things
@@ -30,10 +33,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: "0.1.0"
-          PRERELEASE: "true"
+          PRERELEASE: ${{ env.PRERELEASE }}
 
-      # TODO: use latest/nightly tag depending on prerelease
-      # - name: Publish npm packages as latest
-      #   run: for package in packages/@biomejs/*; do if [ $package != "packages/@biomejs/js-api" ]; then npm publish $package --tag latest --access public --provenance; fi; done
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # TODO: use latest/nightly tag depending on prerelease
+      - name: Publish npm packages as nightly
+        if: env.PRELEASE == 'true'
+        run: |
+          for package in packages/@pglt/*; do 
+            npm publish $package --tag nightly --access public --provenance
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} #
+      - name: Publish npm packages as latest
+        if: env.PRELEASE != 'true'
+        run: |
+          for package in packages/@pglt/*; do 
+            npm publish $package --tag latest --access public --provenance
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} #
