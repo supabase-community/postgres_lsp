@@ -151,7 +151,7 @@ function copySchemaToNativePackage(platform, arch) {
   const schemaTarget = resolve(packageRoot, `schema.json`);
 
   if (!fs.existsSync(schemaSrc)) {
-    console.error(`Schema.json not found at: ${schemaSrc}`);
+    console.error(`schema.json not found at: ${schemaSrc}`);
     process.exit(1);
   }
 
