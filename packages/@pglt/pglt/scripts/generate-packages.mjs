@@ -106,6 +106,35 @@ function copyBinaryToNativePackage(platform, arch, os) {
 
   const { version, license, repository, engines } = rootManifest();
 
+  /**
+   * We need to map rust triplets to NPM-known values.
+   * Otherwise, npm will abort the package installation.
+   */
+  const npm_arch = arch === "aarch64" ? "arm64" : "x64";
+  let libc = undefined;
+  let npm_os = undefined;
+
+  switch (os) {
+    case "linux": {
+      libc = "gnu";
+      npm_os = "linux";
+      break;
+    }
+    case "windows": {
+      libc = "msvc";
+      npm_os = "win32";
+      break;
+    }
+    case "darwin": {
+      libc = undefined;
+      npm_os = "darwin";
+      break;
+    }
+    default: {
+      throw new Error(`Unsupported os: ${os}`);
+    }
+  }
+
   const manifest = JSON.stringify(
     {
       name: packageName,
@@ -113,18 +142,9 @@ function copyBinaryToNativePackage(platform, arch, os) {
       license,
       repository,
       engines,
-      os: [os],
-      cpu: [arch],
-      libc: (() => {
-        switch (os) {
-          case "linux":
-            return "gnu";
-          case "windows":
-            return "msvc";
-          default:
-            return undefined;
-        }
-      })(),
+      os: [npm_os],
+      cpu: [npm_arch],
+      libc,
     },
     null,
     2
