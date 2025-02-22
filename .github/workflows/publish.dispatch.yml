@@ -51,7 +51,7 @@ jobs:
             core.setOutput('is-prerelease', false);
 
       - name: Abort
-        if: ${{ !steps.validate-release.outputs.has-release }}
+        if: !steps.validate-release.outputs.has-release
         run: |
           { 
             echo "Tag ${{ github.event.inputs.release_tag }} not found."
