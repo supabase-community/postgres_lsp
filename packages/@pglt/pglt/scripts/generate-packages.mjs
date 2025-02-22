@@ -89,12 +89,21 @@ async function overwriteManifestVersions(releaseTag, isPrerelease) {
   });
 }
 
+async function makePackageDir(platform, arch) {
+  const buildName = getBuildName(platform, arch);
+  const packageRoot = resolve(PACKAGES_PGLT_ROOT, buildName);
+
+  await new Promise((res, rej) => {
+    fs.mkdir(packageRoot, {}, (e) => (e ? rej(e) : res()));
+  });
+}
+
 function copyBinaryToNativePackage(platform, arch, os) {
+  // Update the package.json manifest
   const buildName = getBuildName(platform, arch);
   const packageRoot = resolve(PACKAGES_PGLT_ROOT, buildName);
   const packageName = getPackageName(platform, arch);
 
-  // Update the package.json manifest
   const { version, license, repository, engines } = rootManifest();
 
   const manifest = JSON.stringify(
@@ -207,6 +216,7 @@ function getVersion(releaseTag, isPrerelease) {
     const os = getOs(platform);
 
     for (const arch of SUPPORTED_ARCHITECTURES) {
+      await makePackageDir(platform, arch);
       await downloadBinary(platform, arch, os, releaseTag, githubToken);
       copyBinaryToNativePackage(platform, arch, os);
       copySchemaToNativePackage(platform, arch);
