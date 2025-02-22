@@ -187,7 +187,7 @@ function getBuildName(platform, arch) {
 function getPackageName(platform, arch) {
   // trim the "unknown" from linux and the "pc" from windows
   const name = platform.split("-").slice(-2).join("-");
-  return `pglt-testrelease-9-cli-${arch}-${name}`;
+  return `pglt-testrelease-nightly-1-cli-${arch}-${name}`;
 }
 
 function getOs(platform) {
