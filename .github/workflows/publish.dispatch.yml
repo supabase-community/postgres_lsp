@@ -35,7 +35,7 @@ jobs:
               const matchingRelease = releases.find(r => r.tag_name === tag);
               if (matchingRelease) {
                 core.setOutput('has-release', 'true');
-                core.setOutput('is-prerelease', release.prerelease.toString());
+                core.setOutput('is-prerelease', matchingRelease.prerelease.toString());
                 return;
               }
 
