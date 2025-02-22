@@ -16,9 +16,10 @@ jobs:
         id: validate-release
         with:
           script: |
-            // the "core" module does not have access to workflow_dispatch inputs
+            /** the "core" module does not have access to workflow_dispatch inputs */
             const tag = '${{ inputs.release_tag }}';
 
+            /** Releases don't have a guaranteed order, so we'll have to paginate */
             let exhausted = false;
             let page = 1;
             while (!exhausted) {
@@ -28,6 +29,8 @@ jobs:
                 page,
                 per_page: 100,
               });
+
+              console.log(releases)
 
               const matchingRelease = releases.find(r => r.tag_name === tag);
               if (matchingRelease) {
