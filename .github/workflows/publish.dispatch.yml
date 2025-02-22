@@ -19,10 +19,12 @@ jobs:
             // the "core" module does not have access to workflow_dispatch inputs
             const tag = '${{ inputs.release_tag }}';
 
+            console.log(tag);
+
             let exhausted = false;
             let page = 1;
             while (!exhausted) {
-              const releases = octokit.rest.repos.listReleases({
+              const releases = github.rest.repos.listReleases({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 page,
