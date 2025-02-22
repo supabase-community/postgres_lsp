@@ -30,9 +30,7 @@ jobs:
                 per_page: 100,
               });
 
-              console.log(releases)
-
-              const matchingRelease = releases.find(r => r.tag_name === tag);
+              const matchingRelease = releases.data.find(r => r.tag_name === tag);
               if (matchingRelease) {
                 core.setOutput('hasRelease', true);
                 core.setOutput('isPrerelease', release.prerelease);
