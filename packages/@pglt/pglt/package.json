@@ -1,5 +1,5 @@
 {
-  "name": "pglt_testrelease-7",
+  "name": "pglt_testrelease-8",
   "version": "<placeholder>",
   "bin": {
     "pglt": "bin/pglt"
@@ -33,11 +33,11 @@
     "provenance": true
   },
   "optionalDependencies": {
-    "pglt-testrelease-7-cli-aarch64-apple-darwin": "<placeholder>",
-    "pglt-testrelease-7-cli-aarch64-windows-msvc": "<placeholder>",
-    "pglt-testrelease-7-cli-aarch64-linux-gnu": "<placeholder>",
-    "pglt-testrelease-7-cli-x86_64-apple-darwin": "<placeholder>",
-    "pglt-testrelease-7-cli-x86_64-windows-msvc": "<placeholder>",
-    "pglt-testrelease-7-cli-x86_64-linux-gnu": "<placeholder>"
+    "pglt-testrelease-8-cli-aarch64-apple-darwin": "<placeholder>",
+    "pglt-testrelease-8-cli-aarch64-windows-msvc": "<placeholder>",
+    "pglt-testrelease-8-cli-aarch64-linux-gnu": "<placeholder>",
+    "pglt-testrelease-8-cli-x86_64-apple-darwin": "<placeholder>",
+    "pglt-testrelease-8-cli-x86_64-windows-msvc": "<placeholder>",
+    "pglt-testrelease-8-cli-x86_64-linux-gnu": "<placeholder>"
   }
 }
