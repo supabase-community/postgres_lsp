@@ -44,6 +44,8 @@ async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
 
   // const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/${buildName}`;
   const assetUrl = `https://github.com/juleswritescode/pglsp_publish_test/releases/download/${releaseTag}/${buildName}`;
+  // https://github.com/juleswritescode/pglsp_publish_test/releases/download/0.1.0/pglt_x86_64-pc-windows-msvc
+  // https://github.com/juleswritescode/pglsp_publish_test/releases/download/0.1.0/pglt_x86_64-pc-windows-msvc
 
   const response = await fetch(assetUrl, {
     headers: {
@@ -54,7 +56,9 @@ async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(`Failed to Fetch Asset from ${assetUrl}. Reason: ${error}`);
+    throw new Error(
+      `Failed to Fetch Asset from ${assetUrl} (Reason: ${error})`
+    );
   }
 
   // just download to root.
