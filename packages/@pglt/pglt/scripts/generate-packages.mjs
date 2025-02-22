@@ -106,16 +106,11 @@ function copyBinaryToNativePackage(platform, arch, os) {
 
   const { version, license, repository, engines } = rootManifest();
 
-  const ext = getBinaryExt(os);
-
   const manifest = JSON.stringify(
     {
       name: packageName,
       version,
       license,
-      bin: {
-        pglt: "./pglt" + ext,
-      },
       repository,
       engines,
       os: [os],
@@ -135,6 +130,7 @@ function copyBinaryToNativePackage(platform, arch, os) {
     2
   );
 
+  const ext = getBinaryExt(os);
   const manifestPath = resolve(packageRoot, "package.json");
   console.info(`Update manifest ${manifestPath}`);
   fs.writeFileSync(manifestPath, manifest);
