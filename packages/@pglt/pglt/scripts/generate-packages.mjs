@@ -42,7 +42,8 @@ async function downloadSchema(releaseTag, githubToken) {
 async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
   const buildName = getBuildName(platform, arch);
 
-  const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/${buildName}`;
+  // const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/${buildName}`;
+  const assetUrl = `https://github.com/juleswritescode/pglsp_publish_test/releases/download/${releaseTag}/${buildName}`;
 
   const response = await fetch(assetUrl, {
     headers: {
