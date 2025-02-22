@@ -29,6 +29,9 @@
   "engines": {
     "node": ">=20"
   },
+  "publishConfig": {
+    "provenance": true
+  },
   "optionalDependencies": {
     "pglt-testrelease-7-cli-aarch64-apple-darwin": "<placeholder>",
     "pglt-testrelease-7-cli-aarch64-windows-msvc": "<placeholder>",
