@@ -69,7 +69,7 @@ async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
   console.log(`Downloaded asset for ${buildName} (v${releaseTag})`);
 }
 
-async function overwriteManifestVersions(releaseTag, isPrerelease) {
+function overwriteManifestVersions(releaseTag, isPrerelease) {
   const version = getVersion(releaseTag, isPrerelease);
 
   const manifestClone = structuredClone(rootManifest);
