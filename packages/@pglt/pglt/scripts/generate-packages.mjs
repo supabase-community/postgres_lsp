@@ -20,7 +20,7 @@ const SUPPORTED_ARCHITECTURES = ["x86_64", "aarch64"];
 async function downloadSchema(releaseTag, githubToken) {
   const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/schema.json`;
 
-  const response = await fetch(assetUrl, {
+  const response = await fetch(assetUrl.trim(), {
     headers: {
       Authorization: `token ${githubToken}`,
       Accept: `application/octet-stream`,
@@ -47,7 +47,7 @@ async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
   // https://github.com/juleswritescode/pglsp_publish_test/releases/download/0.1.0/pglt_x86_64-pc-windows-msvc
   // https://github.com/juleswritescode/pglsp_publish_test/releases/download/0.1.0/pglt_x86_64-pc-windows-msvc
 
-  const response = await fetch(assetUrl, {
+  const response = await fetch(assetUrl.trim(), {
     headers: {
       Authorization: `token ${githubToken}`,
       Accept: `application/octet-stream`,
