@@ -33,9 +33,11 @@ tower-lsp           = { version = "0.20.0" }
 tracing             = { workspace = true, features = ["attributes"] }
 
 [dev-dependencies]
-tokio = { workspace = true, features = ["macros"] }
-tower = { version = "0.4.13", features = ["timeout"] }
-
+pglt_test_utils = { workspace = true }
+sqlx            = { workspace = true }
+tokio           = { workspace = true, features = ["macros"] }
+toml            = { workspace = true }
+tower           = { version = "0.4.13", features = ["timeout"] }
 
 [lib]
 doctest = false
