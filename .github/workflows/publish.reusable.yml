@@ -44,6 +44,10 @@ jobs:
             echo "Secret is defined"
           fi
 
+      - name: Print package.json
+        run: |
+          cat packages/@pglt/pglt/package.json
+
       - name: Publish npm packages as nightly
         if: inputs.is-prerelease == 'true'
         run: |
