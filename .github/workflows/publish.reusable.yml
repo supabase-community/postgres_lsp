@@ -59,7 +59,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} #
 
       - name: Publish npm packages as latest
-        if: inputs.is-prerelease != true
+        if: inputs.is-prerelease != 'true'
         run: |
           for package in packages/@pglt/*; do 
             npm publish $package --tag latest --access public --provenance
