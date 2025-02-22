@@ -45,11 +45,11 @@ jobs:
               }
             }
 
-            core.setOutput('hasRelease', false);
-            core.setOutput('isPrerelease', false);
+            core.setOutput('has-release', false);
+            core.setOutput('is-prerelease', false);
 
       - name: Abort
-        if: ${{ !steps.validate-release.outputs.hasRelease }}
+        if: ${{ !steps.validate-release.outputs.has-release }}
         run: |
           { 
             echo "Tag ${{ github.event.inputs.release_tag }} not found."
@@ -59,8 +59,8 @@ jobs:
       - name: Print Output
         run: |
           {
-            echo "Has Release: ${{ steps.validate-release.outputs.hasRelease }}"
-            echo "Is Prerelease: ${{ steps.validate-release.outputs.isPrerelease }}"
+            echo "Has Release: ${{ steps.validate-release.outputs.has-release }}"
+            echo "Is Prerelease: ${{ steps.validate-release.outputs.is-prerelease }}"
           }
 
   # publish_npm:
