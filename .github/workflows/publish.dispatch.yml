@@ -32,8 +32,8 @@ jobs:
 
               const matchingRelease = releases.find(r => r.tag_name === tag);
               if (matchingRelease) {
-                core.setOutput('has-release', true);
-                core.setOutput('is-prerelease', release.prerelease);
+                core.setOutput('has-release', 'true');
+                core.setOutput('is-prerelease', release.prerelease.toString());
                 return;
               }
 
@@ -47,8 +47,8 @@ jobs:
 
             }
 
-            core.setOutput('has-release', false);
-            core.setOutput('is-prerelease', false);
+            core.setOutput('has-release', 'false');
+            core.setOutput('is-prerelease', 'false');
 
       - name: Abort
         if: steps.validate-release.outputs.has-release != 'true'
