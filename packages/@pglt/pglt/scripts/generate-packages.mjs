@@ -79,9 +79,6 @@ function overwriteManifestVersions(releaseTag, isPrerelease) {
     manifestClone.optionalDependencies[key] = version;
   }
 
-  console.log(MANIFEST_PATH);
-  console.log(manifestClone);
-
   fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifestClone, null, 2));
 }
 
@@ -89,8 +86,6 @@ function copyBinaryToNativePackage(platform, arch, os) {
   const buildName = getBuildName(platform, arch);
   const packageRoot = resolve(PACKAGES_PGLT_ROOT, buildName);
   const packageName = getPackageName(platform, arch);
-
-  // "unknow-linux-gnu", "apple-darwin" – take linux, apple, windows
 
   // Update the package.json manifest
   const { version, license, repository, engines } = rootManifest;

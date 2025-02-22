@@ -1,5 +1,5 @@
 {
-  "name": "pglt",
+  "name": "pglt_test",
   "version": "<placeholder>",
   "bin": {
     "pglt": "bin/pglt"
