@@ -106,13 +106,15 @@ function copyBinaryToNativePackage(platform, arch, os) {
 
   const { version, license, repository, engines } = rootManifest();
 
+  const ext = getBinaryExt(os);
+
   const manifest = JSON.stringify(
     {
       name: packageName,
       version,
       license,
       bin: {
-        pglt: "pglt",
+        pglt: "./pglt" + ext,
       },
       repository,
       engines,
@@ -139,7 +141,6 @@ function copyBinaryToNativePackage(platform, arch, os) {
 
   // Copy the CLI binary
   const binarySource = getBinarySource(platform, arch, os);
-  const ext = getBinaryExt(os);
   const binaryTarget = resolve(packageRoot, `pglt${ext}`);
 
   if (!fs.existsSync(binarySource)) {
