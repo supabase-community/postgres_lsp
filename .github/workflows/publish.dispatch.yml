@@ -12,6 +12,9 @@ jobs:
   validate_tag:
     runs-on: ubuntu-latest
     steps:
+      - name: Echo Input
+        run: echo "$INPUT_RELEASE_TAG"
+
       - uses: actions/github-script@v7
         id: validate-release
         with:
