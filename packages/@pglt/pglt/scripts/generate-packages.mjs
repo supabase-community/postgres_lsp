@@ -102,6 +102,9 @@ function copyBinaryToNativePackage(platform, arch, os) {
       name: packageName,
       version,
       license,
+      bin: {
+        pglt: "pglt",
+      },
       repository,
       engines,
       os: [os],
