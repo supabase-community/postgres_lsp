@@ -37,8 +37,10 @@ jobs:
                 return;
               }
 
-              if (releases.length < 100 || page >= 100 /* sanity */) { 
+              if (releases.length < 100) { 
                 exhausted = true;
+              } else if (page >= 100) {
+                throw new Error("We iterated over 100 pages. Does the script work?");
               } else {
                 page++
               }
