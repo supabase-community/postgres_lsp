@@ -6,7 +6,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/juleswritescode/pglsp_publish_test",
+    "url": "git+https://github.com/juleswritescode/pglsp_publish_test.git",
     "directory": "packages/@pglt/pglt"
   },
   "author": "Supabase Community",

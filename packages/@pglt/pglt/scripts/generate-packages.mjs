@@ -69,7 +69,7 @@ async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
   console.log(`Downloaded asset for ${buildName} (v${releaseTag})`);
 }
 
-function overwriteManifestVersions(releaseTag, isPrerelease) {
+async function overwriteManifestVersions(releaseTag, isPrerelease) {
   const version = getVersion(releaseTag, isPrerelease);
 
   const manifestClone = structuredClone(rootManifest);
@@ -79,7 +79,14 @@ function overwriteManifestVersions(releaseTag, isPrerelease) {
     manifestClone.optionalDependencies[key] = version;
   }
 
-  fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifestClone, null, 2));
+  /**
+   * writeFileSync seemed to not work reliably?
+   */
+  await new Promise((res, rej) => {
+    fs.writeFile(MANIFEST_PATH, JSON.stringify(manifestClone, null, 2), (e) =>
+      e ? rej(e) : res()
+    );
+  });
 }
 
 function copyBinaryToNativePackage(platform, arch, os) {
@@ -192,7 +199,7 @@ function getVersion(releaseTag, isPrerelease) {
   const isPrerelease = process.env.PRERELEASE === "true";
 
   await downloadSchema(releaseTag, githubToken);
-  overwriteManifestVersions(releaseTag, isPrerelease);
+  await overwriteManifestVersions(releaseTag, isPrerelease);
 
   for (const platform of SUPPORTED_PLATFORMS) {
     const os = getOs(platform);
