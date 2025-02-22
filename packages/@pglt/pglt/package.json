@@ -30,11 +30,11 @@
     "node": ">=20"
   },
   "optionalDependencies": {
-    "pglt-testrelease-cli-aarch64-apple-darwin": "<placeholder>",
-    "pglt-testrelease-cli-aarch64-windows-msvc": "<placeholder>",
-    "pglt-testrelease-cli-aarch64-linux-gnu": "<placeholder>",
-    "pglt-testrelease-cli-x86_64-apple-darwin": "<placeholder>",
-    "pglt-testrelease-cli-x86_64-windows-msvc": "<placeholder>",
-    "pglt-testrelease-cli-x86_64-linux-gnu": "<placeholder>"
+    "pglt-testrelease-6-cli-aarch64-apple-darwin": "<placeholder>",
+    "pglt-testrelease-6-cli-aarch64-windows-msvc": "<placeholder>",
+    "pglt-testrelease-6-cli-aarch64-linux-gnu": "<placeholder>",
+    "pglt-testrelease-6-cli-x86_64-apple-darwin": "<placeholder>",
+    "pglt-testrelease-6-cli-x86_64-windows-msvc": "<placeholder>",
+    "pglt-testrelease-6-cli-x86_64-linux-gnu": "<placeholder>"
   }
 }
