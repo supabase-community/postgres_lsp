@@ -79,6 +79,7 @@ async function overwriteManifestVersions(releaseTag, isPrerelease) {
     manifestClone.optionalDependencies[key] = version;
   }
 
+  console.log(MANIFEST_PATH);
   console.log(manifestClone);
 
   fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifestClone, null, 2));
