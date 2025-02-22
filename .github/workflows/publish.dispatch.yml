@@ -13,13 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Echo Input
-        run: echo "$INPUT_RELEASE_TAG"
+        run: echo "$(INPUT_RELEASE_TAG)"
 
       - uses: actions/github-script@v7
         id: validate-release
         with:
           script: |
-            const tag = core.getInput('release_tag', { required: true });
+            // the "core" module does not have access to workflow_dispatch inputs
+            const tag = '${{ inputs.release_tag }}';
 
             let exhausted = false;
             let page = 1;
