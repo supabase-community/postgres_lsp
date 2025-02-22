@@ -7,16 +7,16 @@ const { platform, arch, env } = process;
  */
 const PLATFORMS = {
   win32: {
-    x64: "pglt-testrelease-nightly-2-cli-x86_64-windows-msvc/pglt.exe",
-    arm64: "pglt-testrelease-nightly-2-cli-aarch64-windows-msvc/pglt.exe",
+    x64: "pglt-testrelease-nightly-3-cli-x86_64-windows-msvc/pglt.exe",
+    arm64: "pglt-testrelease-nightly-3-cli-aarch64-windows-msvc/pglt.exe",
   },
   darwin: {
-    x64: "pglt-testrelease-nightly-2-cli-x86_64-apple-darwin/pglt",
-    arm64: "pglt-testrelease-nightly-2-cli-aarch64-apple-darwin/pglt",
+    x64: "pglt-testrelease-nightly-3-cli-x86_64-apple-darwin/pglt",
+    arm64: "pglt-testrelease-nightly-3-cli-aarch64-apple-darwin/pglt",
   },
   linux: {
-    x64: "pglt-testrelease-nightly-2-cli-x86_64-linux-gnu/pglt",
-    arm64: "pglt-testrelease-nightly-2-cli-aarch64-linux-gnu/pglt",
+    x64: "pglt-testrelease-nightly-3-cli-x86_64-linux-gnu/pglt",
+    arm64: "pglt-testrelease-nightly-3-cli-aarch64-linux-gnu/pglt",
   },
 };
 

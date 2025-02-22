@@ -1,5 +1,5 @@
 {
-  "name": "pglt_testrelease-nightly-2",
+  "name": "pglt_testrelease-nightly-3",
   "version": "<placeholder>",
   "bin": {
     "pglt": "bin/pglt"
@@ -33,11 +33,11 @@
     "provenance": true
   },
   "optionalDependencies": {
-    "pglt-testrelease-nightly-2-cli-aarch64-apple-darwin": "<placeholder>",
-    "pglt-testrelease-nightly-2-cli-aarch64-windows-msvc": "<placeholder>",
-    "pglt-testrelease-nightly-2-cli-aarch64-linux-gnu": "<placeholder>",
-    "pglt-testrelease-nightly-2-cli-x86_64-apple-darwin": "<placeholder>",
-    "pglt-testrelease-nightly-2-cli-x86_64-windows-msvc": "<placeholder>",
-    "pglt-testrelease-nightly-2-cli-x86_64-linux-gnu": "<placeholder>"
+    "pglt-testrelease-nightly-3-cli-aarch64-apple-darwin": "<placeholder>",
+    "pglt-testrelease-nightly-3-cli-aarch64-windows-msvc": "<placeholder>",
+    "pglt-testrelease-nightly-3-cli-aarch64-linux-gnu": "<placeholder>",
+    "pglt-testrelease-nightly-3-cli-x86_64-apple-darwin": "<placeholder>",
+    "pglt-testrelease-nightly-3-cli-x86_64-windows-msvc": "<placeholder>",
+    "pglt-testrelease-nightly-3-cli-x86_64-linux-gnu": "<placeholder>"
   }
 }
