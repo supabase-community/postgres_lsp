@@ -72,7 +72,7 @@ async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
 async function overwriteManifestVersions(releaseTag, isPrerelease) {
   const version = getVersion(releaseTag, isPrerelease);
 
-  const manifestClone = structuredClone(rootManifest);
+  const manifestClone = structuredClone(rootManifest());
 
   manifestClone.version = version;
   for (const key in manifestClone.optionalDependencies) {
@@ -95,7 +95,7 @@ function copyBinaryToNativePackage(platform, arch, os) {
   const packageName = getPackageName(platform, arch);
 
   // Update the package.json manifest
-  const { version, license, repository, engines } = rootManifest;
+  const { version, license, repository, engines } = rootManifest();
 
   const manifest = JSON.stringify(
     {
@@ -159,9 +159,8 @@ function copySchemaToNativePackage(platform, arch) {
   fs.chmodSync(schemaTarget, 0o666);
 }
 
-const rootManifest = JSON.parse(
-  fs.readFileSync(MANIFEST_PATH).toString("utf-8")
-);
+const rootManifest = () =>
+  JSON.parse(fs.readFileSync(MANIFEST_PATH).toString("utf-8"));
 
 function getBinaryExt(os) {
   return os === "windows" ? ".exe" : "";

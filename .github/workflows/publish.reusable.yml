@@ -29,6 +29,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Generate Packages
+        id: generate-packages
         run: node packages/@pglt/pglt/scripts/generate-packages.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
