@@ -28,20 +28,21 @@ jobs:
                 repo: context.repo.repo,
                 page,
                 per_page: 100,
-              });
+              }).then(r => r.data);
 
-              const matchingRelease = releases.data.find(r => r.tag_name === tag);
+              const matchingRelease = releases.find(r => r.tag_name === tag);
               if (matchingRelease) {
-                core.setOutput('hasRelease', true);
-                core.setOutput('isPrerelease', release.prerelease);
+                core.setOutput('has-release', true);
+                core.setOutput('is-prerelease', release.prerelease);
                 return;
               }
 
-              if (releases.length < 100) {
+              if (releases.length < 100 || page >= 100 /* sanity */) { 
                 exhausted = true;
               } else {
                 page++
               }
+
             }
 
             core.setOutput('has-release', false);
