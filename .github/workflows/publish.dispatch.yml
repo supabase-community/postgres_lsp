@@ -3,7 +3,7 @@ name: Publish NPM (Manual)
 on:
   workflow_dispatch:
     inputs:
-      release_tag:
+      release-tag:
         type: string
         required: true
         description: Release Tag to Publish
@@ -19,7 +19,7 @@ jobs:
         with:
           script: |
             /** the "core" module does not have access to workflow_dispatch inputs */
-            const tag = '${{ inputs.release_tag }}';
+            const tag = '${{ inputs.release-tag }}';
 
             /** Releases don't have a guaranteed order, so we'll have to paginate */
             let exhausted = false;
@@ -63,7 +63,10 @@ jobs:
   publish_npm:
     needs: validate_tag
     uses: ./.github/workflows/publish.reusable.yml
+    permissions:
+      contents: write
+      id-token: write
     with:
-      release-tag: ${{ github.event.inputs.release_tag }}
+      release-tag: ${{ github.event.inputs.release-tag }}
       is-prerelease: ${{ needs.validate_tag.outputs.is-prerelease }}
     secrets: inherit
