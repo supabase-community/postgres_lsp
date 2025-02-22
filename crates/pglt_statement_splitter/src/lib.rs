@@ -1,13 +1,24 @@
 //! Postgres Statement Splitter
 //!
 //! This crate provides a function to split a SQL source string into individual statements.
+pub mod diagnostics;
 mod parser;
-mod syntax_error;
 
+use diagnostics::ParseDiagnostic;
 use parser::{source, Parse, Parser};
 
 pub fn split(sql: &str) -> Parse {
-    let mut parser = Parser::new(sql);
+    let tokens = match pglt_lexer::lex(sql) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            return Parse {
+                ranges: Vec::new(),
+                errors: ParseDiagnostic::from_pg_query_err(e, sql),
+            };
+        }
+    };
+
+    let mut parser = Parser::new(tokens);
 
     source(&mut parser);
 
@@ -16,9 +27,9 @@ pub fn split(sql: &str) -> Parse {
 
 #[cfg(test)]
 mod tests {
+    use diagnostics::ParseDiagnostic;
     use ntest::timeout;
     use pglt_lexer::SyntaxKind;
-    use syntax_error::SyntaxError;
     use text_size::TextRange;
 
     use super::*;
@@ -64,7 +75,7 @@ mod tests {
             self
         }
 
-        fn expect_errors(&self, expected: Vec<SyntaxError>) -> &Self {
+        fn expect_errors(&self, expected: Vec<ParseDiagnostic>) -> &Self {
             assert_eq!(
                 self.parse.errors.len(),
                 expected.len(),
@@ -80,6 +91,13 @@ mod tests {
 
             self
         }
+    }
+
+    #[test]
+    fn failing_lexer() {
+        let input = "select 1443ddwwd33djwdkjw13331333333333";
+        let res = split(input);
+        assert!(res.errors.iter().any(|d| d.is_fatal));
     }
 
     #[test]
@@ -114,7 +132,7 @@ mod tests {
     fn insert_expect_error() {
         Tester::from("\ninsert select 1\n\nselect 3")
             .expect_statements(vec!["insert select 1", "select 3"])
-            .expect_errors(vec![SyntaxError::new(
+            .expect_errors(vec![ParseDiagnostic::new(
                 format!("Expected {:?}", SyntaxKind::Into),
                 TextRange::new(8.into(), 14.into()),
             )]);

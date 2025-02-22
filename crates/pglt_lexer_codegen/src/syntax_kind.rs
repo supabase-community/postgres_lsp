@@ -26,7 +26,7 @@ pub fn syntax_kind_mod(proto_file: &ProtoFile) -> proc_macro2::TokenStream {
         /// An u32 enum of all valid syntax elements (nodes and tokens) of the postgres
         /// sql dialect, and a few custom ones that are not parsed by pg_query.rs, such
         /// as `Whitespace`.
-        #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Syntax)]
+        #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
         #[repr(u32)]
         pub enum SyntaxKind {
             #(#unique_enum_variants),*,
