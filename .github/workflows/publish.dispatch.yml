@@ -11,6 +11,8 @@ on:
 jobs:
   validate_tag:
     runs-on: ubuntu-latest
+    outputs:
+      is-prerelease: ${{ steps.validate-release.outputs.is-prerelease }}
     steps:
       - uses: actions/github-script@v7
         id: validate-release
@@ -58,16 +60,10 @@ jobs:
             exit 1
           }
 
-      - name: Print Output
-        run: |
-          {
-            echo "Has Release: ${{ steps.validate-release.outputs.has-release }}"
-            echo "Is Prerelease: ${{ steps.validate-release.outputs.is-prerelease }}"
-          }
-
-  # publish_npm:
-  #   needs: validate_tag
-  #   uses: ./.github/workflows/publish.reusable.yml
-  #   with:
-  #     release-tag: ${{ github.event.inputs.release_tag }}
-  #   secrets: inherit
+  publish_npm:
+    needs: validate_tag
+    uses: ./.github/workflows/publish.reusable.yml
+    with:
+      release-tag: ${{ github.event.inputs.release_tag }}
+      is-prerelease: ${{ needs.validate_tag.outputs.is-prerelease }}
+    secrets: inherit
