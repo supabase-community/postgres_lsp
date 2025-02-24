@@ -1,12 +1,12 @@
 {
-  "name": "pglt_testrelease-nightly-3",
+  "name": "pglt",
   "version": "<placeholder>",
   "bin": {
     "pglt": "bin/pglt"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/juleswritescode/pglsp_publish_test.git",
+    "url": "git+https://github.com/supabase-community/postgres_lsp.git",
     "directory": "packages/@pglt/pglt"
   },
   "author": "Supabase Community",
@@ -33,11 +33,11 @@
     "provenance": true
   },
   "optionalDependencies": {
-    "pglt-testrelease-nightly-3-cli-aarch64-apple-darwin": "<placeholder>",
-    "pglt-testrelease-nightly-3-cli-aarch64-windows-msvc": "<placeholder>",
-    "pglt-testrelease-nightly-3-cli-aarch64-linux-gnu": "<placeholder>",
-    "pglt-testrelease-nightly-3-cli-x86_64-apple-darwin": "<placeholder>",
-    "pglt-testrelease-nightly-3-cli-x86_64-windows-msvc": "<placeholder>",
-    "pglt-testrelease-nightly-3-cli-x86_64-linux-gnu": "<placeholder>"
+    "pglt-x86_64-windows-msvc.exe": "<placeholder>",
+    "pglt-aarch64-windows-msvc.exe": "<placeholder>",
+    "pglt-x86_64-apple-darwin": "<placeholder>",
+    "pglt-aarch64-apple-darwin": "<placeholder>",
+    "pglt-x86_64-linux-gnu": "<placeholder>",
+    "pglt-aarch64-linux-gnu": "<placeholder>"
   }
 }

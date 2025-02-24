@@ -42,10 +42,7 @@ async function downloadSchema(releaseTag, githubToken) {
 async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
   const buildName = getBuildName(platform, arch);
 
-  // const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/${buildName}`;
-  const assetUrl = `https://github.com/juleswritescode/pglsp_publish_test/releases/download/${releaseTag}/${buildName}`;
-  // https://github.com/juleswritescode/pglsp_publish_test/releases/download/0.1.0/pglt_x86_64-pc-windows-msvc
-  // https://github.com/juleswritescode/pglsp_publish_test/releases/download/0.1.0/pglt_x86_64-pc-windows-msvc
+  const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/${buildName}`;
 
   const response = await fetch(assetUrl.trim(), {
     headers: {
@@ -75,8 +72,8 @@ async function overwriteManifestVersions(releaseTag, isPrerelease) {
   const manifestClone = structuredClone(rootManifest());
 
   manifestClone.version = version;
-  for (const key in manifestClone.optionalDependencies) {
-    manifestClone.optionalDependencies[key] = version;
+  for (const dep in manifestClone.optionalDependencies) {
+    manifestClone.optionalDependencies[dep] = version;
   }
 
   /**
@@ -206,8 +203,8 @@ function getBuildName(platform, arch) {
 
 function getPackageName(platform, arch) {
   // trim the "unknown" from linux and the "pc" from windows
-  const name = platform.split("-").slice(-2).join("-");
-  return `pglt-testrelease-nightly-3-cli-${arch}-${name}`;
+  const platformName = platform.split("-").slice(-2).join("-");
+  return `pglt-${arch}-${platformName}`;
 }
 
 function getOs(platform) {
