@@ -88,8 +88,8 @@ mod tests {
     #[test]
     fn failing_lexer() {
         let input = "select 1443ddwwd33djwdkjw13331333333333";
-        let res = split(input);
-        assert!(res.errors.iter().any(|d| d.is_fatal));
+        let res = split(input).unwrap_err();
+        assert!(!res.is_empty());
     }
 
     #[test]
