@@ -21,7 +21,7 @@ cstree              = { version = "0.12.0", features = ["derive"] }
 text-size.workspace = true
 
 [dev-dependencies]
-insta = "1.31.0"
+insta.workspace = true
 
 [lib]
 doctest = false
