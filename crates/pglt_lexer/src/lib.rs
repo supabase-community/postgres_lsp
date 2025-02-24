@@ -1,5 +1,7 @@
 mod codegen;
+pub mod diagnostics;
 
+use diagnostics::ScanError;
 use pg_query::protobuf::{KeywordKind, ScanToken};
 use regex::Regex;
 use std::{collections::VecDeque, sync::LazyLock};
@@ -107,14 +109,14 @@ fn whitespace_tokens(input: &str) -> VecDeque<Token> {
 /// Turn a string of potentially valid sql code into a list of tokens, including their range in the source text.
 ///
 /// The implementation is primarily using libpg_querys `scan` method, and fills in the gaps with tokens that are not parsed by the library, e.g. whitespace.
-pub fn lex(text: &str) -> pg_query::Result<Vec<Token>> {
+pub fn lex(text: &str) -> Result<Vec<Token>, Vec<ScanError>> {
     let mut whitespace_tokens = whitespace_tokens(text);
 
     // tokens from pg_query.rs
-    let mut pglt_query_tokens = pg_query::scan(text)?
-        .tokens
-        .into_iter()
-        .collect::<VecDeque<_>>();
+    let mut pglt_query_tokens = match pg_query::scan(text) {
+        Ok(r) => r.tokens.into_iter().collect::<VecDeque<_>>(),
+        Err(err) => return Err(ScanError::from_pg_query_err(err, text)),
+    };
 
     // merge the two token lists
     let mut tokens: Vec<Token> = Vec::new();

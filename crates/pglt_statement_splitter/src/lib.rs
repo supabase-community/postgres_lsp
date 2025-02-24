@@ -4,30 +4,22 @@
 pub mod diagnostics;
 mod parser;
 
-use diagnostics::ParseDiagnostic;
 use parser::{source, Parse, Parser};
+use pglt_lexer::diagnostics::ScanError;
 
-pub fn split(sql: &str) -> Parse {
-    let tokens = match pglt_lexer::lex(sql) {
-        Ok(tokens) => tokens,
-        Err(e) => {
-            return Parse {
-                ranges: Vec::new(),
-                errors: ParseDiagnostic::from_pg_query_err(e, sql),
-            };
-        }
-    };
+pub fn split(sql: &str) -> Result<Parse, Vec<ScanError>> {
+    let tokens = pglt_lexer::lex(sql)?;
 
     let mut parser = Parser::new(tokens);
 
     source(&mut parser);
 
-    parser.finish()
+    Ok(parser.finish())
 }
 
 #[cfg(test)]
 mod tests {
-    use diagnostics::ParseDiagnostic;
+    use diagnostics::SplitDiagnostic;
     use ntest::timeout;
     use pglt_lexer::SyntaxKind;
     use text_size::TextRange;
@@ -42,7 +34,7 @@ mod tests {
     impl From<&str> for Tester {
         fn from(input: &str) -> Self {
             Tester {
-                parse: split(input),
+                parse: split(input).expect("Failed to split"),
                 input: input.to_string(),
             }
         }
@@ -75,7 +67,7 @@ mod tests {
             self
         }
 
-        fn expect_errors(&self, expected: Vec<ParseDiagnostic>) -> &Self {
+        fn expect_errors(&self, expected: Vec<SplitDiagnostic>) -> &Self {
             assert_eq!(
                 self.parse.errors.len(),
                 expected.len(),
@@ -132,7 +124,7 @@ mod tests {
     fn insert_expect_error() {
         Tester::from("\ninsert select 1\n\nselect 3")
             .expect_statements(vec!["insert select 1", "select 3"])
-            .expect_errors(vec![ParseDiagnostic::new(
+            .expect_errors(vec![SplitDiagnostic::new(
                 format!("Expected {:?}", SyntaxKind::Into),
                 TextRange::new(8.into(), 14.into()),
             )]);

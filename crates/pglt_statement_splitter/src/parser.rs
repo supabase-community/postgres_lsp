@@ -8,7 +8,7 @@ pub use common::source;
 use pglt_lexer::{SyntaxKind, Token, WHITESPACE_TOKENS};
 use text_size::{TextRange, TextSize};
 
-use crate::diagnostics::ParseDiagnostic;
+use crate::diagnostics::SplitDiagnostic;
 
 /// Main parser that exposes the `cstree` api, and collects errors and statements
 /// It is modelled after a Pratt Parser. For a gentle introduction to Pratt Parsing, see https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
@@ -16,7 +16,7 @@ pub struct Parser {
     /// The ranges of the statements
     ranges: Vec<(usize, usize)>,
     /// The syntax errors accumulated during parsing
-    errors: Vec<ParseDiagnostic>,
+    errors: Vec<SplitDiagnostic>,
     /// The start of the current statement, if any
     current_stmt_start: Option<usize>,
     /// The tokens to parse
@@ -33,7 +33,7 @@ pub struct Parse {
     /// The ranges of the errors
     pub ranges: Vec<TextRange>,
     /// The syntax errors accumulated during parsing
-    pub errors: Vec<ParseDiagnostic>,
+    pub errors: Vec<SplitDiagnostic>,
 }
 
 impl Parser {
@@ -176,7 +176,7 @@ impl Parser {
             return;
         }
 
-        self.errors.push(ParseDiagnostic::new(
+        self.errors.push(SplitDiagnostic::new(
             format!("Expected {:#?}", kind),
             self.peek().span,
         ));

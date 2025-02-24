@@ -2243,16 +2243,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pglt_base_db"
-version = "0.0.0"
-dependencies = [
- "line_index",
- "pglt_fs",
- "pglt_statement_splitter",
- "text-size",
-]
-
-[[package]]
 name = "pglt_cli"
 version = "0.0.0"
 dependencies = [
