@@ -127,34 +127,51 @@ fn assert_lint(
     });
 
     // split and parse each statement
-    let stmts = pglt_statement_splitter::split(code);
-    for stmt in stmts.ranges {
-        match pglt_query_ext::parse(&code[stmt]) {
-            Ok(ast) => {
-                for rule_diag in analyser.run(pglt_analyser::AnalyserContext { root: &ast }) {
-                    let diag = pglt_diagnostics::serde::Diagnostic::new(rule_diag);
+    match pglt_statement_splitter::split(code) {
+        Ok(stmts) => {
+            for stmt in stmts.ranges {
+                match pglt_query_ext::parse(&code[stmt]) {
+                    Ok(ast) => {
+                        for rule_diag in analyser.run(pglt_analyser::AnalyserContext { root: &ast })
+                        {
+                            let diag = pglt_diagnostics::serde::Diagnostic::new(rule_diag);
 
-                    let category = diag.category().expect("linter diagnostic has no code");
-                    let severity = settings.get_severity_from_rule_code(category).expect(
+                            let category = diag.category().expect("linter diagnostic has no code");
+                            let severity = settings.get_severity_from_rule_code(category).expect(
                                 "If you see this error, it means you need to run cargo codegen-configuration",
                             );
 
-                    let error = diag
-                        .with_severity(severity)
-                        .with_file_path(&file_path)
-                        .with_file_source_code(code);
+                            let error = diag
+                                .with_severity(severity)
+                                .with_file_path(&file_path)
+                                .with_file_source_code(code);
 
-                    write_diagnostic(code, error)?;
-                }
+                            write_diagnostic(code, error)?;
+                        }
+                    }
+                    Err(e) => {
+                        let error = SyntaxDiagnostic::from(e)
+                            .with_file_path(&file_path)
+                            .with_file_source_code(code);
+                        write_diagnostic(code, error)?;
+                    }
+                };
             }
-            Err(e) => {
-                let error = SyntaxDiagnostic::from(e)
-                    .with_file_path(&file_path)
-                    .with_file_source_code(code);
-                write_diagnostic(code, error)?;
+        }
+        Err(errs) => {
+            // Print all diagnostics to help the user
+            let mut console = pglt_console::EnvConsole::default();
+            for err in errs {
+                console.println(
+                    pglt_console::LogLevel::Error,
+                    markup! {
+                        {PrintDiagnostic::verbose(&err)}
+                    },
+                );
             }
-        };
-    }
+            bail!("Analysis of '{group}/{rule}' on the following code block returned a scan diagnostic.\n\n{code}");
+        }
+    };
 
     Ok(())
 }
