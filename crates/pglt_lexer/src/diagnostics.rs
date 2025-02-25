@@ -59,5 +59,9 @@ mod tests {
             "select 1443ddwwd33djwdkjw13331333333333; select 1443ddwwd33djwdkjw13331333333333;";
         let diagnostics = lex(input).unwrap_err();
         assert_eq!(diagnostics.len(), 2);
+        assert_eq!(diagnostics[0].span.unwrap().start(), 7.into());
+        assert_eq!(diagnostics[0].span.unwrap().end(), 39.into());
+        assert_eq!(diagnostics[1].span.unwrap().start(), 48.into());
+        assert_eq!(diagnostics[1].span.unwrap().end(), 80.into());
     }
 }

@@ -103,11 +103,7 @@ impl Document {
         self.diagnostics = diagnostics;
 
         // Do not add any statements if there is a fatal error
-        if self
-            .diagnostics
-            .iter()
-            .any(|d| d.severity() == pglt_diagnostics::Severity::Fatal)
-        {
+        if self.has_fatal_error() {
             return changes;
         }
 
@@ -264,11 +260,7 @@ impl Document {
 
             self.diagnostics = diags;
 
-            if self
-                .diagnostics
-                .iter()
-                .any(|d| d.severity() == pglt_diagnostics::Severity::Fatal)
-            {
+            if self.has_fatal_error() {
                 // cleanup all positions if there is a fatal error
                 changed.extend(self.drain_positions());
                 // still process text change
@@ -333,11 +325,7 @@ impl Document {
 
         self.diagnostics = diags;
 
-        if self
-            .diagnostics
-            .iter()
-            .any(|d| d.severity() == pglt_diagnostics::Severity::Fatal)
-        {
+        if self.has_fatal_error() {
             // cleanup all positions if there is a fatal error
             changed.extend(self.drain_positions());
             // still process text change
