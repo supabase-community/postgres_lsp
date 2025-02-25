@@ -1,0 +1,68 @@
+name: Publish to NPM & Brew
+
+on:
+  workflow_call:
+    inputs:
+      release-tag:
+        type: string
+        required: true
+      is-prerelease:
+        type: string
+        required: true
+        default: "false"
+
+jobs:
+  publish:
+    name: Publish All the Things
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      # ? what's this?! required for executing the node script?
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Generate Packages
+        id: generate-packages
+        run: node packages/@pglt/pglt/scripts/generate-packages.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.release-tag }}
+          PRERELEASE: ${{ inputs.is-prerelease }}
+
+      - name: Verify NPM TOKEN exists
+        run: |
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "Secret is not defined"
+            exit 1
+          else
+            echo "Secret is defined"
+          fi
+
+      - name: Print package.json
+        run: |
+          cat packages/@pglt/pglt/package.json
+
+      - name: Publish npm packages as nightly
+        if: inputs.is-prerelease == 'true'
+        run: |
+          for package in packages/@pglt/*; do 
+            npm publish $package --tag nightly --access public --provenance
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} #
+
+      - name: Publish npm packages as latest
+        if: inputs.is-prerelease != 'true'
+        run: |
+          for package in packages/@pglt/*; do 
+            npm publish $package --tag latest --access public --provenance
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
