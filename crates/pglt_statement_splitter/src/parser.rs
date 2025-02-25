@@ -5,10 +5,10 @@ mod dml;
 
 pub use common::source;
 
-use pglt_lexer::{lex, SyntaxKind, Token, WHITESPACE_TOKENS};
+use pglt_lexer::{SyntaxKind, Token, WHITESPACE_TOKENS};
 use text_size::{TextRange, TextSize};
 
-use crate::syntax_error::SyntaxError;
+use crate::diagnostics::SplitDiagnostic;
 
 /// Main parser that exposes the `cstree` api, and collects errors and statements
 /// It is modelled after a Pratt Parser. For a gentle introduction to Pratt Parsing, see https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
@@ -16,7 +16,7 @@ pub struct Parser {
     /// The ranges of the statements
     ranges: Vec<(usize, usize)>,
     /// The syntax errors accumulated during parsing
-    errors: Vec<SyntaxError>,
+    errors: Vec<SplitDiagnostic>,
     /// The start of the current statement, if any
     current_stmt_start: Option<usize>,
     /// The tokens to parse
@@ -33,13 +33,11 @@ pub struct Parse {
     /// The ranges of the errors
     pub ranges: Vec<TextRange>,
     /// The syntax errors accumulated during parsing
-    pub errors: Vec<SyntaxError>,
+    pub errors: Vec<SplitDiagnostic>,
 }
 
 impl Parser {
-    pub fn new(sql: &str) -> Self {
-        let tokens = lex(sql);
-
+    pub fn new(tokens: Vec<Token>) -> Self {
         let eof_token = Token::eof(usize::from(
             tokens
                 .last()
@@ -178,7 +176,7 @@ impl Parser {
             return;
         }
 
-        self.errors.push(SyntaxError::new(
+        self.errors.push(SplitDiagnostic::new(
             format!("Expected {:#?}", kind),
             self.peek().span,
         ));

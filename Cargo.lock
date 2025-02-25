@@ -860,32 +860,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cstree"
-version = "0.12.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d609e3b8b73dbace666e8a06351fd9062e1ec025e74b27952a932ccb8ec3a25"
-dependencies = [
- "cstree_derive",
- "fxhash",
- "indexmap 2.7.0",
- "parking_lot",
- "sptr",
- "text-size",
- "triomphe",
-]
-
-[[package]]
-name = "cstree_derive"
-version = "0.12.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "84d8f6eaf2917e8bf0173045fe7824c0809e21ef09dc721108da4ee67ce7494b"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.90",
-]
-
-[[package]]
 name = "dashmap"
 version = "5.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1303,15 +1277,6 @@ dependencies = [
  "pin-project-lite",
  "pin-utils",
  "slab",
-]
-
-[[package]]
-name = "fxhash"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c31b6d751ae2c7f11320402d34e41349dd1016f8d5d45e48c4312bc8625af50c"
-dependencies = [
- "byteorder",
 ]
 
 [[package]]
@@ -2278,16 +2243,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pglt_base_db"
-version = "0.0.0"
-dependencies = [
- "line_index",
- "pglt_fs",
- "pglt_statement_splitter",
- "text-size",
-]
-
-[[package]]
 name = "pglt_cli"
 version = "0.0.0"
 dependencies = [
@@ -2450,9 +2405,9 @@ dependencies = [
 name = "pglt_lexer"
 version = "0.0.0"
 dependencies = [
- "cstree",
  "insta",
  "pg_query",
+ "pglt_diagnostics",
  "pglt_lexer_codegen",
  "regex",
  "text-size",
@@ -2566,8 +2521,10 @@ name = "pglt_statement_splitter"
 version = "0.0.0"
 dependencies = [
  "ntest",
- "pg_query",
+ "pglt_diagnostics",
  "pglt_lexer",
+ "pglt_query_ext",
+ "regex",
  "text-size",
 ]
 
@@ -3485,12 +3442,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sptr"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b9b39299b249ad65f3b7e96443bad61c02ca5cd3589f46cb6d610a0fd6c0d6a"
-
-[[package]]
 name = "sqlformat"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4194,15 +4145,6 @@ version = "0.0.0"
 dependencies = [
  "cc",
  "tree-sitter",
-]
-
-[[package]]
-name = "triomphe"
-version = "0.1.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef8f7726da4807b58ea5c96fdc122f80702030edc33b35aff9190a51148ccc85"
-dependencies = [
- "stable_deref_trait",
 ]
 
 [[package]]

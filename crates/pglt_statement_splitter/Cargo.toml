@@ -12,9 +12,11 @@ version              = "0.0.0"
 
 
 [dependencies]
-pglt_lexer.workspace = true
-text-size.workspace  = true
+pglt_diagnostics         = { workspace = true }
+pglt_lexer.workspace     = true
+pglt_query_ext.workspace = true
+regex.workspace          = true
+text-size.workspace      = true
 
 [dev-dependencies]
-ntest              = "0.9.3"
-pg_query.workspace = true
+ntest = "0.9.3"

@@ -1,24 +1,27 @@
 //! Postgres Statement Splitter
 //!
 //! This crate provides a function to split a SQL source string into individual statements.
+pub mod diagnostics;
 mod parser;
-mod syntax_error;
 
 use parser::{source, Parse, Parser};
+use pglt_lexer::diagnostics::ScanError;
 
-pub fn split(sql: &str) -> Parse {
-    let mut parser = Parser::new(sql);
+pub fn split(sql: &str) -> Result<Parse, Vec<ScanError>> {
+    let tokens = pglt_lexer::lex(sql)?;
+
+    let mut parser = Parser::new(tokens);
 
     source(&mut parser);
 
-    parser.finish()
+    Ok(parser.finish())
 }
 
 #[cfg(test)]
 mod tests {
+    use diagnostics::SplitDiagnostic;
     use ntest::timeout;
     use pglt_lexer::SyntaxKind;
-    use syntax_error::SyntaxError;
     use text_size::TextRange;
 
     use super::*;
@@ -31,7 +34,7 @@ mod tests {
     impl From<&str> for Tester {
         fn from(input: &str) -> Self {
             Tester {
-                parse: split(input),
+                parse: split(input).expect("Failed to split"),
                 input: input.to_string(),
             }
         }
@@ -64,7 +67,7 @@ mod tests {
             self
         }
 
-        fn expect_errors(&self, expected: Vec<SyntaxError>) -> &Self {
+        fn expect_errors(&self, expected: Vec<SplitDiagnostic>) -> &Self {
             assert_eq!(
                 self.parse.errors.len(),
                 expected.len(),
@@ -80,6 +83,13 @@ mod tests {
 
             self
         }
+    }
+
+    #[test]
+    fn failing_lexer() {
+        let input = "select 1443ddwwd33djwdkjw13331333333333";
+        let res = split(input).unwrap_err();
+        assert!(!res.is_empty());
     }
 
     #[test]
@@ -114,7 +124,7 @@ mod tests {
     fn insert_expect_error() {
         Tester::from("\ninsert select 1\n\nselect 3")
             .expect_statements(vec!["insert select 1", "select 3"])
-            .expect_errors(vec![SyntaxError::new(
+            .expect_errors(vec![SplitDiagnostic::new(
                 format!("Expected {:?}", SyntaxKind::Into),
                 TextRange::new(8.into(), 14.into()),
             )]);
