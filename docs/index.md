@@ -69,7 +69,9 @@ Make sure to point the database connection settings at your local development da
 
 ## Usage
 
-You can check SQL files using the `check` command:
+You can use the language tools either via CLI or a Language Server.
+
+The CLI exposes a simple `check` command that will run all checks on the given files or paths.
 
 ```sh
 pglt check myfile.sql
