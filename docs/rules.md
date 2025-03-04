@@ -12,10 +12,10 @@ Rules that detect potential safety issues in your code.
 
 | Rule name | Description | Properties |
 | --- | --- | --- |
-| [addingRequiredField](./rules/adding-required-field) | Adding a new column that is NOT NULL and has no default value to an existing table effectively makes it required. |  |
-| [banDropColumn](./rules/ban-drop-column) | Dropping a column may break existing clients. | <span class='inline-icon' title="This rule is recommended" ><Icon name="approve-check-circle" size="1.2rem" label="This rule is recommended" /></span> |
-| [banDropNotNull](./rules/ban-drop-not-null) | Dropping a NOT NULL constraint may break existing clients. | <span class='inline-icon' title="This rule is recommended" ><Icon name="approve-check-circle" size="1.2rem" label="This rule is recommended" /></span> |
-| [banDropTable](./rules/ban-drop-table) | Dropping a table may break existing clients. | <span class='inline-icon' title="This rule is recommended" ><Icon name="approve-check-circle" size="1.2rem" label="This rule is recommended" /></span> |
+| [addingRequiredField](/rules/adding-required-field) | Adding a new column that is NOT NULL and has no default value to an existing table effectively makes it required. |  |
+| [banDropColumn](/rules/ban-drop-column) | Dropping a column may break existing clients. | ✅ |
+| [banDropNotNull](/rules/ban-drop-not-null) | Dropping a NOT NULL constraint may break existing clients. | ✅ |
+| [banDropTable](/rules/ban-drop-table) | Dropping a table may break existing clients. | ✅ |
 
 [//]: # (END RULES_INDEX)
 

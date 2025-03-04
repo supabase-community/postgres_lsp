@@ -4,7 +4,7 @@
 **Since**: `vnext`
 
 
-**Sources**:
+**Sources**: 
 - Inspired from: <a href="https://squawkhq.com/docs/adding-required-field" target="_blank"><code>squawk/adding-required-field</code></a>
 
 ## Description
@@ -24,7 +24,7 @@ alter table test add column count int not null;
 alter table test add column count int not null default 0;
 
 ## How to configure
-```toml title="pglt.toml"
+```toml
 [linter.rules.safety]
 addingRequiredField = "error"
 
