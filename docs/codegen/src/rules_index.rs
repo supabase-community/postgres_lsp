@@ -52,6 +52,7 @@ fn generate_group(
     writeln!(content)?;
     write_markup_to_string(content, description)?;
     writeln!(content)?;
+    writeln!(content)?;
     writeln!(content, "| Rule name | Description | Properties |")?;
     writeln!(content, "| --- | --- | --- |")?;
 
@@ -61,14 +62,14 @@ fn generate_group(
 
         let mut properties = String::new();
         if is_recommended {
-            properties.push_str("<span class='inline-icon' title=\"This rule is recommended\" ><Icon name=\"approve-check-circle\" size=\"1.2rem\" label=\"This rule is recommended\" /></span>");
+            properties.push('✅');
         }
 
         let summary = generate_rule_summary(rule_metadata.docs)?;
 
         write!(
             content,
-            "| [{rule_name}](./rules/{dashed_rule}) | {summary} | {properties} |"
+            "| [{rule_name}](/rules/{dashed_rule}) | {summary} | {properties} |"
         )?;
 
         writeln!(content)?;

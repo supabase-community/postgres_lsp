@@ -4,7 +4,7 @@
 **Since**: `vnext`
 
 
-**Sources**: 
+**Sources**:
 - Inspired from: <a href="https://squawkhq.com/docs/adding-required-field" target="_blank"><code>squawk/adding-required-field</code></a>
 
 ## Description

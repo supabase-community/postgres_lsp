@@ -2,13 +2,14 @@
 
 Below the list of rules supported by Postgres Language Tools, divided by group. Here's a legend of the emojis:
 
-- The icon <span class='inline-icon' title="This rule is recommended"><Icon name="approve-check-circle"x label="This rule is recommended" /></span> indicates that the rule is part of the recommended rules.
+- The icon ✅ indicates that the rule is part of the recommended rules.
 
 [//]: # (BEGIN RULES_INDEX)
 
 ## Safety
 
 Rules that detect potential safety issues in your code.
+
 | Rule name | Description | Properties |
 | --- | --- | --- |
 | [addingRequiredField](./rules/adding-required-field) | Adding a new column that is NOT NULL and has no default value to an existing table effectively makes it required. |  |
