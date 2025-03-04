@@ -1,4 +1,4 @@
-name: Build GitHub Pages
+name: Build and Deploy Documentation
 on:
   push:
     branches:
