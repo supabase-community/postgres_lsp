@@ -10,13 +10,14 @@ alias l := lint
 install-tools:
 	cargo install cargo-binstall
 	cargo binstall cargo-insta taplo-cli
-    cargo binstall --git https://github.com/astral-sh/uv uv
+	cargo binstall --git "https://github.com/astral-sh/uv" uv
+
 
 # Upgrades the tools needed to develop
 upgrade-tools:
 	cargo install cargo-binstall --force
 	cargo binstall cargo-insta taplo-cli --force
-    cargo binstall --git https://github.com/astral-sh/uv uv --force
+	cargo binstall --git "https://github.com/astral-sh/uv" uv --force
 
 # Generates code generated files for the linter
 gen-lint:
