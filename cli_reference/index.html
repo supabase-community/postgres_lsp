@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://pglt.github.io/cli_reference/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>CLI - Postgres Language Tools</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "CLI";
+        var mkdocs_page_input_path = "cli_reference.md";
+        var mkdocs_page_url = "/cli_reference/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Postgres Language Tools
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../linting_migrations/">Linting Migrations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../rules/">Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rule_sources/">Rule Sources</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">CLI</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../env_variables/">Environment Variables</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Postgres Language Tools</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Reference</li>
+      <li class="breadcrumb-item active">CLI</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/supabase-community/postgres_lsp/edit/master/docs/cli_reference.md">Edit on supabase-community/postgres_lsp</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="cli-reference">CLI Reference</h2>
+<h1 id="command-summary">Command summary</h1>
+<ul>
+<li><a href="#pglt"><code>pglt</code>↴</a></li>
+<li><a href="#pglt-version"><code>pglt version</code>↴</a></li>
+<li><a href="#pglt-check"><code>pglt check</code>↴</a></li>
+<li><a href="#pglt-start"><code>pglt start</code>↴</a></li>
+<li><a href="#pglt-stop"><code>pglt stop</code>↴</a></li>
+<li><a href="#pglt-init"><code>pglt init</code>↴</a></li>
+<li><a href="#pglt-lsp-proxy"><code>pglt lsp-proxy</code>↴</a></li>
+<li><a href="#pglt-clean"><code>pglt clean</code>↴</a></li>
+</ul>
+<h2 id="pglt">pglt</h2>
+<p>PgLT official CLI. Use it to check the health of your project or run it to check single files.</p>
+<p><strong>Usage</strong>: <strong><code>pglt</code></strong> <em><code>COMMAND ...</code></em></p>
+<p><strong>Available options:</strong>
+- <strong><code>-h</code></strong>, <strong><code>--help</code></strong> &mdash; 
+  Prints help information
+- <strong><code>-V</code></strong>, <strong><code>--version</code></strong> &mdash; 
+  Prints version information</p>
+<p><strong>Available commands:</strong>
+- <strong><code>version</code></strong> &mdash; 
+  Shows the version information and quit.
+- <strong><code>check</code></strong> &mdash; 
+  Runs everything to the requested files.
+- <strong><code>start</code></strong> &mdash; 
+  Starts the daemon server process.
+- <strong><code>stop</code></strong> &mdash; 
+  Stops the daemon server process.
+- <strong><code>init</code></strong> &mdash; 
+  Bootstraps a new project. Creates a configuration file with some defaults.
+- <strong><code>lsp-proxy</code></strong> &mdash; 
+  Acts as a server for the Language Server Protocol over stdin/stdout.
+- <strong><code>clean</code></strong> &mdash; 
+  Cleans the logs emitted by the daemon.</p>
+<h2 id="pglt-version">pglt version</h2>
+<p>Shows the version information and quit.</p>
+<p><strong>Usage</strong>: <strong><code>pglt</code></strong> <strong><code>version</code></strong> </p>
+<p><strong>Global options applied to all commands</strong>
+- <strong><code>--colors</code></strong>=<em><code>&lt;off|force&gt;</code></em> &mdash; 
+  Set the formatting mode for markup: "off" prints everything as plain text, "force" forces the formatting of markup using ANSI even if the console output is determined to be incompatible
+- <strong><code>--use-server</code></strong> &mdash; 
+  Connect to a running instance of the daemon server.
+- <strong><code>--skip-db</code></strong> &mdash; 
+  Skip connecting to the database and only run checks that don't require a database connection.
+- <strong><code>--verbose</code></strong> &mdash; 
+  Print additional diagnostics, and some diagnostics show more information. Also, print out what files were processed and which ones were modified.
+- <strong><code>--config-path</code></strong>=<em><code>PATH</code></em> &mdash; 
+  Set the file path to the configuration file, or the directory path to find <code>pglt.toml</code>. If used, it disables the default configuration file resolution.
+- <strong><code>--max-diagnostics</code></strong>=<em><code>&lt;none|&lt;NUMBER&gt;&gt;</code></em> &mdash; 
+  Cap the amount of diagnostics displayed. When <code>none</code> is provided, the limit is lifted.</p>
+<p>[default: 20]
+- <strong><code>--skip-errors</code></strong> &mdash; 
+  Skip over files containing syntax errors instead of emitting an error diagnostic.
+- <strong><code>--no-errors-on-unmatched</code></strong> &mdash; 
+  Silence errors that would be emitted in case no files were processed during the execution of the command.
+- <strong><code>--error-on-warnings</code></strong> &mdash; 
+  Tell PgLT to exit with an error code if some diagnostics emit warnings.
+- <strong><code>--reporter</code></strong>=<em><code>&lt;json|json-pretty|github|junit|summary|gitlab&gt;</code></em> &mdash; 
+  Allows to change how diagnostics and summary are reported.
+- <strong><code>--log-level</code></strong>=<em><code>&lt;none|debug|info|warn|error&gt;</code></em> &mdash; 
+  The level of logging. In order, from the most verbose to the least verbose: debug, info, warn, error.</p>
+<p>The value <code>none</code> won't show any logging.</p>
+<p>[default: none]
+- <strong><code>--log-kind</code></strong>=<em><code>&lt;pretty|compact|json&gt;</code></em> &mdash; 
+  How the log should look like.</p>
+<p>[default: pretty]
+- <strong><code>--diagnostic-level</code></strong>=<em><code>&lt;info|warn|error&gt;</code></em> &mdash; 
+  The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing <code>--diagnostic-level=error</code> will cause PgLT to print only diagnostics that contain only errors.</p>
+<p>[default: info]</p>
+<p><strong>Available options:</strong>
+- <strong><code>-h</code></strong>, <strong><code>--help</code></strong> &mdash; 
+  Prints help information</p>
+<h2 id="pglt-check">pglt check</h2>
+<p>Runs everything to the requested files.</p>
+<p><strong>Usage</strong>: <strong><code>pglt</code></strong> <strong><code>check</code></strong> [<strong><code>--staged</code></strong>] [<strong><code>--changed</code></strong>] [<strong><code>--since</code></strong>=<em><code>REF</code></em>] [<em><code>PATH</code></em>]...</p>
+<p><strong>The configuration that is contained inside the configuration file.</strong>
+- <strong><code>--vcs-enabled</code></strong>=<em><code>&lt;true|false&gt;</code></em> &mdash; 
+  Whether we should integrate itself with the VCS client
+- <strong><code>--vcs-client-kind</code></strong>=<em><code>&lt;git&gt;</code></em> &mdash; 
+  The kind of client.
+- <strong><code>--vcs-use-ignore-file</code></strong>=<em><code>&lt;true|false&gt;</code></em> &mdash; 
+  Whether we should use the VCS ignore file. When [true], we will ignore the files specified in the ignore file.
+- <strong><code>--vcs-root</code></strong>=<em><code>PATH</code></em> &mdash; 
+  The folder where we should check for VCS files. By default, we will use the same folder where <code>pglt.toml</code> was found.</p>
+<p>If we can't find the configuration, it will attempt to use the current working directory. If no current working directory can't be found, we won't use the VCS integration, and a diagnostic will be emitted
+- <strong><code>--vcs-default-branch</code></strong>=<em><code>BRANCH</code></em> &mdash; 
+  The main branch of the project
+- <strong><code>--files-max-size</code></strong>=<em><code>NUMBER</code></em> &mdash; 
+  The maximum allowed size for source code files in bytes. Files above this limit will be ignored for performance reasons. Defaults to 1 MiB
+- <strong><code>--migrations-dir</code></strong>=<em><code>ARG</code></em> &mdash; 
+  The directory where the migration files are stored
+- <strong><code>--after</code></strong>=<em><code>ARG</code></em> &mdash; 
+  Ignore any migrations before this timestamp
+- <strong><code>--host</code></strong>=<em><code>ARG</code></em> &mdash; 
+  The host of the database.
+- <strong><code>--port</code></strong>=<em><code>ARG</code></em> &mdash; 
+  The port of the database.
+- <strong><code>--username</code></strong>=<em><code>ARG</code></em> &mdash; 
+  The username to connect to the database.
+- <strong><code>--password</code></strong>=<em><code>ARG</code></em> &mdash; 
+  The password to connect to the database.
+- <strong><code>--database</code></strong>=<em><code>ARG</code></em> &mdash; 
+  The name of the database.
+- <strong><code>--conn_timeout_secs</code></strong>=<em><code>ARG</code></em> &mdash; 
+  The connection timeout in seconds.</p>
+<p>[default: Some(10)]</p>
+<p><strong>Global options applied to all commands</strong>
+- <strong><code>--colors</code></strong>=<em><code>&lt;off|force&gt;</code></em> &mdash; 
+  Set the formatting mode for markup: "off" prints everything as plain text, "force" forces the formatting of markup using ANSI even if the console output is determined to be incompatible
+- <strong><code>--use-server</code></strong> &mdash; 
+  Connect to a running instance of the daemon server.
+- <strong><code>--skip-db</code></strong> &mdash; 
+  Skip connecting to the database and only run checks that don't require a database connection.
+- <strong><code>--verbose</code></strong> &mdash; 
+  Print additional diagnostics, and some diagnostics show more information. Also, print out what files were processed and which ones were modified.
+- <strong><code>--config-path</code></strong>=<em><code>PATH</code></em> &mdash; 
+  Set the file path to the configuration file, or the directory path to find <code>pglt.toml</code>. If used, it disables the default configuration file resolution.
+- <strong><code>--max-diagnostics</code></strong>=<em><code>&lt;none|&lt;NUMBER&gt;&gt;</code></em> &mdash; 
+  Cap the amount of diagnostics displayed. When <code>none</code> is provided, the limit is lifted.</p>
+<p>[default: 20]
+- <strong><code>--skip-errors</code></strong> &mdash; 
+  Skip over files containing syntax errors instead of emitting an error diagnostic.
+- <strong><code>--no-errors-on-unmatched</code></strong> &mdash; 
+  Silence errors that would be emitted in case no files were processed during the execution of the command.
+- <strong><code>--error-on-warnings</code></strong> &mdash; 
+  Tell PgLT to exit with an error code if some diagnostics emit warnings.
+- <strong><code>--reporter</code></strong>=<em><code>&lt;json|json-pretty|github|junit|summary|gitlab&gt;</code></em> &mdash; 
+  Allows to change how diagnostics and summary are reported.
+- <strong><code>--log-level</code></strong>=<em><code>&lt;none|debug|info|warn|error&gt;</code></em> &mdash; 
+  The level of logging. In order, from the most verbose to the least verbose: debug, info, warn, error.</p>
+<p>The value <code>none</code> won't show any logging.</p>
+<p>[default: none]
+- <strong><code>--log-kind</code></strong>=<em><code>&lt;pretty|compact|json&gt;</code></em> &mdash; 
+  How the log should look like.</p>
+<p>[default: pretty]
+- <strong><code>--diagnostic-level</code></strong>=<em><code>&lt;info|warn|error&gt;</code></em> &mdash; 
+  The level of diagnostics to show. In order, from the lowest to the most important: info, warn, error. Passing <code>--diagnostic-level=error</code> will cause PgLT to print only diagnostics that contain only errors.</p>
+<p>[default: info]</p>
+<p><strong>Available positional items:</strong>
+- <em><code>PATH</code></em> &mdash; 
+  Single file, single path or list of paths</p>
+<p><strong>Available options:</strong>
+- <strong><code>--stdin-file-path</code></strong>=<em><code>PATH</code></em> &mdash; 
+  Use this option when you want to format code piped from <code>stdin</code>, and print the output to <code>stdout</code>.</p>
+<p>The file doesn't need to exist on disk, what matters is the extension of the file. Based on the extension, we know how to check the code.</p>
+<p>Example: <code>echo 'let a;' | pglt_cli check --stdin-file-path=test.sql</code>
+- <strong><code>--staged</code></strong> &mdash; 
+  When set to true, only the files that have been staged (the ones prepared to be committed) will be linted. This option should be used when working locally.
+- <strong><code>--changed</code></strong> &mdash; 
+  When set to true, only the files that have been changed compared to your <code>defaultBranch</code> configuration will be linted. This option should be used in CI environments.
+- <strong><code>--since</code></strong>=<em><code>REF</code></em> &mdash; 
+  Use this to specify the base branch to compare against when you're using the --changed flag and the <code>defaultBranch</code> is not set in your <code>pglt.toml</code>
+- <strong><code>-h</code></strong>, <strong><code>--help</code></strong> &mdash; 
+  Prints help information</p>
+<h2 id="pglt-start">pglt start</h2>
+<p>Starts the daemon server process.</p>
+<p><strong>Usage</strong>: <strong><code>pglt</code></strong> <strong><code>start</code></strong> [<strong><code>--config-path</code></strong>=<em><code>PATH</code></em>]</p>
+<p><strong>Available options:</strong>
+- <strong><code>--log-prefix-name</code></strong>=<em><code>STRING</code></em> &mdash; 
+  Allows to change the prefix applied to the file name of the logs.</p>
+<p>Uses environment variable <strong><code>PGLT_LOG_PREFIX_NAME</code></strong></p>
+<p>[default: server.log]
+- <strong><code>--log-path</code></strong>=<em><code>PATH</code></em> &mdash; 
+  Allows to change the folder where logs are stored.</p>
+<p>Uses environment variable <strong><code>PGLT_LOG_PATH</code></strong>
+- <strong><code>--config-path</code></strong>=<em><code>PATH</code></em> &mdash; 
+  Allows to set a custom file path to the configuration file, or a custom directory path to find <code>pglt.toml</code></p>
+<p>Uses environment variable <strong><code>PGLT_LOG_PREFIX_NAME</code></strong>
+- <strong><code>-h</code></strong>, <strong><code>--help</code></strong> &mdash; 
+  Prints help information</p>
+<h2 id="pglt-stop">pglt stop</h2>
+<p>Stops the daemon server process.</p>
+<p><strong>Usage</strong>: <strong><code>pglt</code></strong> <strong><code>stop</code></strong> </p>
+<p><strong>Available options:</strong>
+- <strong><code>-h</code></strong>, <strong><code>--help</code></strong> &mdash; 
+  Prints help information</p>
+<h2 id="pglt-init">pglt init</h2>
+<p>Bootstraps a new project. Creates a configuration file with some defaults.</p>
+<p><strong>Usage</strong>: <strong><code>pglt</code></strong> <strong><code>init</code></strong> </p>
+<p><strong>Available options:</strong>
+- <strong><code>-h</code></strong>, <strong><code>--help</code></strong> &mdash; 
+  Prints help information</p>
+<h2 id="pglt-lsp-proxy">pglt lsp-proxy</h2>
+<p>Acts as a server for the Language Server Protocol over stdin/stdout.</p>
+<p><strong>Usage</strong>: <strong><code>pglt</code></strong> <strong><code>lsp-proxy</code></strong> [<strong><code>--config-path</code></strong>=<em><code>PATH</code></em>]</p>
+<p><strong>Available options:</strong>
+- <strong><code>--log-prefix-name</code></strong>=<em><code>STRING</code></em> &mdash; 
+  Allows to change the prefix applied to the file name of the logs.</p>
+<p>Uses environment variable <strong><code>PGLT_LOG_PREFIX_NAME</code></strong></p>
+<p>[default: server.log]
+- <strong><code>--log-path</code></strong>=<em><code>PATH</code></em> &mdash; 
+  Allows to change the folder where logs are stored.</p>
+<p>Uses environment variable <strong><code>PGLT_LOG_PATH</code></strong>
+- <strong><code>--config-path</code></strong>=<em><code>PATH</code></em> &mdash; 
+  Allows to set a custom file path to the configuration file, or a custom directory path to find <code>pglt.toml</code></p>
+<p>Uses environment variable <strong><code>PGLT_CONFIG_PATH</code></strong>
+- <strong><code>-h</code></strong>, <strong><code>--help</code></strong> &mdash; 
+  Prints help information</p>
+<h2 id="pglt-clean">pglt clean</h2>
+<p>Cleans the logs emitted by the daemon.</p>
+<p><strong>Usage</strong>: <strong><code>pglt</code></strong> <strong><code>clean</code></strong> </p>
+<p><strong>Available options:</strong>
+- <strong><code>-h</code></strong>, <strong><code>--help</code></strong> &mdash; 
+  Prints help information</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../rule_sources/" class="btn btn-neutral float-left" title="Rule Sources"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../env_variables/" class="btn btn-neutral float-right" title="Environment Variables">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/supabase-community/postgres_lsp" class="fa fa-code-fork" style="color: #fcfcfc"> supabase-community/postgres_lsp</a>
+        </span>
+    
+    
+      <span><a href="../rule_sources/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../env_variables/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
