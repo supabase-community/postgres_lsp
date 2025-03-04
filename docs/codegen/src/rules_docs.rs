@@ -116,7 +116,7 @@ fn write_how_to_configure(
 "#
     );
 
-    writeln!(content, "```toml title=\"pglt.toml\"")?;
+    writeln!(content, "```toml")?;
     writeln!(content, "{}", toml)?;
     writeln!(content, "```")?;
 
