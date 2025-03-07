@@ -5,12 +5,12 @@ resolver = "2"
 [workspace.package]
 authors      = ["Supabase Communnity"]
 categories   = ["development-tools", "postgres", "supabase"]
-edition      = "2021"
+edition      = "2024"
 homepage     = "https://supabase.com/"
 keywords     = ["linter", "typechecker", "postgres", "language-server"]
 license      = "MIT"
 repository   = "https://github.com/supabase-community/postgres_lsp"
-rust-version = "1.82.0"
+rust-version = "1.85.0"
 
 [workspace.dependencies]
 # supporting crates unrelated to postgres
