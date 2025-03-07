@@ -24,6 +24,11 @@ fn test_statement_splitter() {
 
         let split = pglt_statement_splitter::split(&contents);
 
+        for (i, range) in split.ranges.iter().enumerate() {
+            let statement = &contents[range.start..range.end];
+            println!("Statement {}: {}", i, statement);
+        }
+
         assert_eq!(
             split.ranges.len(),
             expected_count,
