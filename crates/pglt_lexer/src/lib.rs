@@ -78,7 +78,6 @@ fn whitespace_tokens(input: &str) -> VecDeque<Token> {
     let mut tokens = VecDeque::new();
 
     for cap in PATTERN_LEXER.captures_iter(input) {
-        println!("{:?}", cap);
         if let Some(whitespace) = cap.name("whitespace") {
             tokens.push_back(Token {
                 token_type: TokenType::Whitespace,
