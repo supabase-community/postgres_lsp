@@ -39,7 +39,7 @@ jobs:
                 return;
               }
 
-              if (releases.length < 100) { 
+              if (releases.length < 100) {
                 exhausted = true;
               } else if (page >= 10) {
                 throw new Error("We iterated over 10 pages. Does the script work?");
@@ -55,8 +55,8 @@ jobs:
       - name: Abort
         if: steps.validate-release.outputs.has-release != 'true'
         run: |
-          { 
-            echo "Tag ${{ github.event.inputs.release_tag }} not found."
+          {
+            echo "Tag ${{ github.event.inputs.release-tag }} not found."
             exit 1
           }
 

@@ -61,8 +61,18 @@ pub static WHITESPACE_TOKENS: &[SyntaxKind] = &[
     SyntaxKind::SqlComment,
 ];
 
-static PATTERN_LEXER: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?P<whitespace> +)|(?P<newline>\r?\n+)|(?P<tab>\t+)").unwrap());
+static PATTERN_LEXER: LazyLock<Regex> = LazyLock::new(|| {
+    #[cfg(windows)]
+    {
+        // On Windows, treat \r\n as a single newline token
+        Regex::new(r"(?P<whitespace> +)|(?P<newline>\r\n|\n+)|(?P<tab>\t+)").unwrap()
+    }
+    #[cfg(not(windows))]
+    {
+        // On other platforms, just check for \n
+        Regex::new(r"(?P<whitespace> +)|(?P<newline>\n+)|(?P<tab>\t+)").unwrap()
+    }
+});
 
 fn whitespace_tokens(input: &str) -> VecDeque<Token> {
     let mut tokens = VecDeque::new();
