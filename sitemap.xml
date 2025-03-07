@@ -2,50 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://pglt.github.io/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
     <url>
          <loc>https://pglt.github.io/checking_migrations/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
     <url>
          <loc>https://pglt.github.io/cli_reference/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
     <url>
          <loc>https://pglt.github.io/env_variables/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
     <url>
          <loc>https://pglt.github.io/linting_migrations/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
     <url>
          <loc>https://pglt.github.io/rule_sources/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
     <url>
          <loc>https://pglt.github.io/rules/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
     <url>
          <loc>https://pglt.github.io/troubleshooting/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
     <url>
          <loc>https://pglt.github.io/rules/adding-required-field/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
     <url>
          <loc>https://pglt.github.io/rules/ban-drop-column/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
     <url>
          <loc>https://pglt.github.io/rules/ban-drop-not-null/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
     <url>
          <loc>https://pglt.github.io/rules/ban-drop-table/</loc>
-         <lastmod>2025-03-04</lastmod>
+         <lastmod>2025-03-07</lastmod>
     </url>
 </urlset>
