@@ -189,7 +189,7 @@ impl Parser {
 /// On windows, a newline is represented by `\r\n` which is two characters.
 fn is_irrelevant_token(t: &Token) -> bool {
     WHITESPACE_TOKENS.contains(&t.kind)
-        && (t.kind != SyntaxKind::Newline || t.text == "\r\n" || t.text.chars.count() == 1)
+        && (t.kind != SyntaxKind::Newline || t.text == "\r\n" || t.text.chars().count() == 1)
 }
 
 #[cfg(not(windows))]
