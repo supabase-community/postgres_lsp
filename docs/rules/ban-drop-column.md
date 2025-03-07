@@ -35,7 +35,7 @@ code-block.sql lint/safety/banDropColumn ━━━━━━━━━━━━━
 ```
 
 ## How to configure
-```toml title="pglt.toml"
+```toml
 [linter.rules.safety]
 banDropColumn = "error"
 

@@ -13,7 +13,6 @@ pub fn lexer_codegen(_item: proc_macro::TokenStream) -> proc_macro::TokenStream 
 
     quote! {
         use pg_query::{protobuf, protobuf::ScanToken, protobuf::Token, NodeEnum, NodeRef};
-        use cstree::Syntax;
 
         #syntax_kind
     }

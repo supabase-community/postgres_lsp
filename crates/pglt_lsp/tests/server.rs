@@ -2,19 +2,28 @@ use anyhow::bail;
 use anyhow::Context;
 use anyhow::Error;
 use anyhow::Result;
+use biome_deserialize::Merge;
 use futures::channel::mpsc::{channel, Sender};
 use futures::Sink;
 use futures::SinkExt;
 use futures::Stream;
 use futures::StreamExt;
+use pglt_configuration::database::PartialDatabaseConfiguration;
+use pglt_configuration::PartialConfiguration;
+use pglt_fs::MemoryFileSystem;
 use pglt_lsp::LSPServer;
 use pglt_lsp::ServerFactory;
+use pglt_test_utils::test_database::get_new_test_db;
+use pglt_workspace::DynRef;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use serde_json::{from_value, to_value};
+use sqlx::Executor;
 use std::any::type_name;
 use std::fmt::Display;
+use std::process::id;
 use std::time::Duration;
+use tokio::time::sleep;
 use tower::timeout::Timeout;
 use tower::{Service, ServiceExt};
 use tower_lsp::jsonrpc;
@@ -310,6 +319,118 @@ async fn basic_lifecycle() -> Result<()> {
     server.initialized().await?;
 
     server.shutdown().await?;
+    reader.abort();
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_database_connection() -> Result<()> {
+    let factory = ServerFactory::default();
+    let mut fs = MemoryFileSystem::default();
+    let test_db = get_new_test_db().await;
+
+    let setup = r#"
+            create table public.users (
+                id serial primary key,
+                name varchar(255) not null
+            );
+        "#;
+
+    test_db
+        .execute(setup)
+        .await
+        .expect("Failed to setup test database");
+
+    let mut conf = PartialConfiguration::init();
+    conf.merge_with(PartialConfiguration {
+        db: Some(PartialDatabaseConfiguration {
+            database: Some(
+                test_db
+                    .connect_options()
+                    .get_database()
+                    .unwrap()
+                    .to_string(),
+            ),
+            ..Default::default()
+        }),
+        ..Default::default()
+    });
+    fs.insert(
+        url!("pglt.toml").to_file_path().unwrap(),
+        toml::to_string(&conf).unwrap(),
+    );
+
+    let (service, client) = factory
+        .create_with_fs(None, DynRef::Owned(Box::new(fs)))
+        .into_inner();
+
+    let (stream, sink) = client.split();
+    let mut server = Server::new(service);
+
+    let (sender, mut receiver) = channel(CHANNEL_BUFFER_SIZE);
+    let reader = tokio::spawn(client_handler(stream, sink, sender));
+
+    server.initialize().await?;
+    server.initialized().await?;
+
+    server.load_configuration().await?;
+
+    server
+        .open_document("select unknown from public.users; ")
+        .await?;
+
+    // in this test, we want to ensure a database connection is established and the schema cache is
+    // loaded. This is the case when the server sends typecheck diagnostics for the query above.
+    // so we wait for diagnostics to be sent.
+    let notification = tokio::time::timeout(Duration::from_secs(5), async {
+        loop {
+            match receiver.next().await {
+                Some(ServerNotification::PublishDiagnostics(msg)) => {
+                    if msg
+                        .diagnostics
+                        .iter()
+                        .any(|d| d.message.contains("column \"unknown\" does not exist"))
+                    {
+                        return true;
+                    }
+                }
+                _ => continue,
+            }
+        }
+    })
+    .await
+    .is_ok();
+
+    assert!(notification, "expected diagnostics for unknown column");
+
+    server.shutdown().await?;
+    reader.abort();
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn server_shutdown() -> Result<()> {
+    let factory = ServerFactory::default();
+    let (service, client) = factory.create(None).into_inner();
+    let (stream, sink) = client.split();
+    let mut server = Server::new(service);
+
+    let (sender, _) = channel(CHANNEL_BUFFER_SIZE);
+    let reader = tokio::spawn(client_handler(stream, sink, sender));
+
+    server.initialize().await?;
+    server.initialized().await?;
+
+    let cancellation = factory.cancellation();
+    let cancellation = cancellation.notified();
+
+    // this is called when `pglt stop` is run by the user
+    server.pglt_shutdown().await?;
+
+    cancellation.await;
+
     reader.abort();
 
     Ok(())

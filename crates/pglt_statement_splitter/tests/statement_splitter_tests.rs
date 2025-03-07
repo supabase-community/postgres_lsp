@@ -25,7 +25,7 @@ fn test_statement_splitter() {
         let escaped: String = contents.chars().flat_map(|c| c.escape_debug()).collect();
         println!("{}", escaped);
 
-        let split = pglt_statement_splitter::split(&contents);
+        let split = pglt_statement_splitter::split(&contents).expect("Failed to split");
 
         for (i, range) in split.ranges.iter().enumerate() {
             let statement = &contents[range.start().into()..range.end().into()];

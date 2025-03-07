@@ -12,7 +12,6 @@ version              = "0.0.0"
 
 
 [dependencies]
-insta                       = "1.31.0"
 pglt_console.workspace      = true
 pglt_diagnostics.workspace  = true
 pglt_query_ext.workspace    = true
@@ -24,6 +23,7 @@ tree-sitter.workspace       = true
 tree_sitter_sql.workspace   = true
 
 [dev-dependencies]
+insta.workspace           = true
 pglt_test_utils.workspace = true
 
 [lib]

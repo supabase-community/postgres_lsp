@@ -10,7 +10,7 @@ pub(crate) fn init(mut session: CliSession) -> Result<(), CliDiagnostic> {
     let file_created = ConfigName::pglt_toml();
     session.app.console.log(markup! {
 "
-Welcome to the Postgres Language Server! Let's get you started...
+Welcome to the Postgres Language Tools! Let's get you started...
 
 "<Info><Emphasis>"Files created "</Emphasis></Info>"
 

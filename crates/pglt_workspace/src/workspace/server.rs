@@ -298,7 +298,7 @@ impl Workspace for WorkspaceServer {
             filter,
         });
 
-        let mut diagnostics: Vec<SDiagnostic> = vec![];
+        let mut diagnostics: Vec<SDiagnostic> = doc.diagnostics().to_vec();
 
         if let Some(pool) = self
             .connection
@@ -394,7 +394,7 @@ impl Workspace for WorkspaceServer {
 
         let errors = diagnostics
             .iter()
-            .filter(|d| d.severity() == Severity::Error)
+            .filter(|d| d.severity() == Severity::Error || d.severity() == Severity::Fatal)
             .count();
 
         info!("Pulled {:?} diagnostic(s)", diagnostics.len());

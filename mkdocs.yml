@@ -1,0 +1,39 @@
+site_name: Postgres Language Tools
+site_url: https://pglt.github.io
+site_description: A collection of language tools and a Language Server Protocol (LSP) implementation for Postgres, focusing on developer experience and reliable SQL tooling.
+
+repo_name: supabase-community/postgres_lsp
+repo_url: https://github.com/supabase-community/postgres_lsp
+
+theme:
+    name: 'readthedocs'
+    features:
+      - navigation.expand
+    palette:
+        primary: grey
+        accent: red
+nav:
+  - Introduction: index.md
+  - Guides:
+    - Linting Migrations: linting_migrations.md
+    - Troubleshooting: troubleshooting.md
+  - Reference:
+    - Rules: rules.md
+    - Rule Sources: rule_sources.md
+    - CLI: cli_reference.md
+    - Environment Variables: env_variables.md
+
+plugins:
+  - gh-admonitions
+
+markdown_extensions:
+  - admonition
+  # - pymdownx.highlight:
+  #     anchor_linenums: true
+  #     line_spans: __span
+  #     pygments_lang_class: true
+  # - pymdownx.inlinehilite
+  # - pymdownx.snippets
+  # - pymdownx.superfences
+  # - pymdownx.tabbed:
+  #     alternate_style: true

@@ -24,7 +24,7 @@ alter table test add column count int not null;
 alter table test add column count int not null default 0;
 
 ## How to configure
-```toml title="pglt.toml"
+```toml
 [linter.rules.safety]
 addingRequiredField = "error"
 

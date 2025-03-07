@@ -130,7 +130,7 @@ jobs:
           fail_on_unmatched_files: true
           draft: true
 
-      - name: ✅ Output Link to Worflow Summary
+      - name: ✅ Output Link to Workflow Summary
         run: |
           {
             echo "# 🚀 Release completed!"
