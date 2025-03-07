@@ -183,6 +183,17 @@ impl Parser {
     }
 }
 
+#[cfg(windows)]
+/// Returns true if the token is relevant for the paring process
+///
+/// On windows, a newline is represented by `\r\n` which is two characters.
+fn is_irrelevant_token(t: &Token) -> bool {
+    WHITESPACE_TOKENS.contains(&t.kind)
+        && (t.kind != SyntaxKind::Newline || t.text == "\r\n" || t.text.chars.count() == 1)
+}
+
+#[cfg(not(windows))]
+/// Returns true if the token is relevant for the paring process
 fn is_irrelevant_token(t: &Token) -> bool {
     WHITESPACE_TOKENS.contains(&t.kind)
         && (t.kind != SyntaxKind::Newline || t.text.chars().count() == 1)

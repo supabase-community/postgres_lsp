@@ -115,6 +115,12 @@ mod tests {
     }
 
     #[test]
+    fn single_newlines() {
+        Tester::from("select 1\nfrom contact\n\nselect 3")
+            .expect_statements(vec!["select 1\nfrom contact", "select 3"]);
+    }
+
+    #[test]
     fn alter_column() {
         Tester::from("alter table users alter column email drop not null;")
             .expect_statements(vec!["alter table users alter column email drop not null;"]);
