@@ -2,8 +2,8 @@ use std::collections::{HashMap, HashSet};
 
 use pglt_schema_cache::SchemaCache;
 use pglt_treesitter_queries::{
-    queries::{self, QueryResult},
     TreeSitterQueriesExecutor,
+    queries::{self, QueryResult},
 };
 
 use crate::CompletionParams;
@@ -216,7 +216,7 @@ impl<'a> CompletionContext<'a> {
 mod tests {
     use crate::{
         context::{ClauseType, CompletionContext},
-        test_helper::{get_text_and_position, CURSOR_POS},
+        test_helper::{CURSOR_POS, get_text_and_position},
     };
 
     fn get_tree(input: &str) -> tree_sitter::Tree {

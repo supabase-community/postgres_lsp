@@ -11,8 +11,8 @@ use text_size::{TextLen, TextRange, TextSize};
 use unicode_width::UnicodeWidthChar;
 
 use crate::{
-    location::{BorrowedSourceCode, LineIndex},
     LineIndexBuf, Location,
+    location::{BorrowedSourceCode, LineIndex},
 };
 
 /// A const Option::unwrap without nightly features:
@@ -163,17 +163,13 @@ pub(super) fn print_frame(fmt: &mut fmt::Formatter<'_>, location: Location<'_>) 
         })?;
 
         // Show invisible characters
-        print_invisibles(
-            fmt,
-            line_text,
-            PrintInvisiblesOptions {
-                ignore_trailing_carriage_return: true,
-                ignore_leading_tabs: true,
-                ignore_lone_spaces: true,
-                at_line_start: true,
-                at_line_end: true,
-            },
-        )?;
+        print_invisibles(fmt, line_text, PrintInvisiblesOptions {
+            ignore_trailing_carriage_return: true,
+            ignore_leading_tabs: true,
+            ignore_lone_spaces: true,
+            at_line_start: true,
+            at_line_end: true,
+        })?;
 
         fmt.write_str("\n")?;
 
@@ -725,7 +721,7 @@ impl FusedIterator for IntoIter {}
 mod tests {
     use std::num::NonZeroUsize;
 
-    use super::{calculate_print_width, OneIndexed};
+    use super::{OneIndexed, calculate_print_width};
 
     #[test]
     fn print_width() {

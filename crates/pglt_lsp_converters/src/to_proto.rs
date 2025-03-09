@@ -1,5 +1,5 @@
-use crate::line_index::LineIndex;
 use crate::PositionEncoding;
+use crate::line_index::LineIndex;
 use anyhow::{Context, Result};
 use text_size::{TextRange, TextSize};
 use tower_lsp::lsp_types;

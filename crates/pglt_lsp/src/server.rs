@@ -1,15 +1,15 @@
 use crate::capabilities::server_capabilities;
-use crate::diagnostics::{handle_lsp_error, LspError};
+use crate::diagnostics::{LspError, handle_lsp_error};
 use crate::handlers;
 use crate::session::{
     CapabilitySet, CapabilityStatus, ClientInformation, Session, SessionHandle, SessionKey,
 };
 use crate::utils::{into_lsp_error, panic_to_lsp_error};
-use futures::future::ready;
 use futures::FutureExt;
+use futures::future::ready;
 use pglt_diagnostics::panic::PanicError;
 use pglt_fs::{ConfigName, FileSystem, OsFileSystem};
-use pglt_workspace::{workspace, DynRef, Workspace};
+use pglt_workspace::{DynRef, Workspace, workspace};
 use rustc_hash::FxHashMap;
 use serde_json::json;
 use std::panic::RefUnwindSafe;
@@ -20,7 +20,7 @@ use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::sync::Notify;
 use tokio::task::spawn_blocking;
 use tower_lsp::jsonrpc::Result as LspResult;
-use tower_lsp::{lsp_types::*, ClientSocket};
+use tower_lsp::{ClientSocket, lsp_types::*};
 use tower_lsp::{LanguageServer, LspService, Server};
 use tracing::{error, info};
 
@@ -69,19 +69,20 @@ impl LSPServer {
         capabilities.add_capability(
             "pglt_did_change_workspace_settings",
             "workspace/didChangeWatchedFiles",
-            match self.session.base_path() { Some(base_path) => {
-                CapabilityStatus::Enable(Some(json!(DidChangeWatchedFilesRegistrationOptions {
-                    watchers: vec![FileSystemWatcher {
-                        glob_pattern: GlobPattern::String(format!(
-                            "{}/pglt.toml",
-                            base_path.display()
-                        )),
-                        kind: Some(WatchKind::all()),
-                    },],
-                })))
-            } _ => {
-                CapabilityStatus::Disable
-            }},
+            match self.session.base_path() {
+                Some(base_path) => CapabilityStatus::Enable(Some(json!(
+                    DidChangeWatchedFilesRegistrationOptions {
+                        watchers: vec![FileSystemWatcher {
+                            glob_pattern: GlobPattern::String(format!(
+                                "{}/pglt.toml",
+                                base_path.display()
+                            )),
+                            kind: Some(WatchKind::all()),
+                        },],
+                    }
+                ))),
+                _ => CapabilityStatus::Disable,
+            },
         );
 
         self.session.register_capabilities(capabilities).await;
@@ -203,7 +204,9 @@ impl LanguageServer for LSPServer {
                     }
                 }
                 Err(_) => {
-                    error!("The Workspace root URI {file_path:?} could not be parsed as a filesystem path");
+                    error!(
+                        "The Workspace root URI {file_path:?} could not be parsed as a filesystem path"
+                    );
                     continue;
                 }
             }

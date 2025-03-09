@@ -1,7 +1,7 @@
 use crate::{PathInterner, PgLTPath};
 pub use memory::{ErrorEntry, MemoryFileSystem};
 pub use os::OsFileSystem;
-use pglt_diagnostics::{console, Advices, Diagnostic, LogCategory, Visit};
+use pglt_diagnostics::{Advices, Diagnostic, LogCategory, Visit, console};
 use pglt_diagnostics::{Error, Severity};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;

@@ -1,7 +1,7 @@
 use biome_string_case::Case;
 use pglt_analyse::RuleMetadata;
 use pglt_console::fmt::{Formatter, HTML};
-use pglt_console::{markup, Markup};
+use pglt_console::{Markup, markup};
 use pulldown_cmark::{Event, Parser, Tag, TagEnd};
 use std::{
     collections::BTreeMap,
@@ -80,12 +80,9 @@ fn generate_group(
 
 fn extract_group_metadata(group: &str) -> (&str, Markup) {
     match group {
-        "safety" => (
-            "Safety",
-            markup! {
-                "Rules that detect potential safety issues in your code."
-            },
-        ),
+        "safety" => ("Safety", markup! {
+            "Rules that detect potential safety issues in your code."
+        }),
         _ => panic!("Unknown group ID {group:?}"),
     }
 }

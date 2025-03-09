@@ -1,31 +1,30 @@
-use anyhow::bail;
 use anyhow::Context;
 use anyhow::Error;
 use anyhow::Result;
+use anyhow::bail;
 use biome_deserialize::Merge;
-use futures::channel::mpsc::{channel, Sender};
 use futures::Sink;
 use futures::SinkExt;
 use futures::Stream;
 use futures::StreamExt;
-use pglt_configuration::database::PartialDatabaseConfiguration;
+use futures::channel::mpsc::{Sender, channel};
 use pglt_configuration::PartialConfiguration;
+use pglt_configuration::database::PartialDatabaseConfiguration;
 use pglt_fs::MemoryFileSystem;
 use pglt_lsp::LSPServer;
 use pglt_lsp::ServerFactory;
 use pglt_test_utils::test_database::get_new_test_db;
 use pglt_workspace::DynRef;
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 use serde_json::{from_value, to_value};
 use sqlx::Executor;
 use std::any::type_name;
 use std::fmt::Display;
-use std::process::id;
 use std::time::Duration;
-use tokio::time::sleep;
 use tower::timeout::Timeout;
 use tower::{Service, ServiceExt};
+use tower_lsp::LspService;
 use tower_lsp::jsonrpc;
 use tower_lsp::jsonrpc::Response;
 use tower_lsp::lsp_types as lsp;
@@ -35,7 +34,6 @@ use tower_lsp::lsp_types::{
     PublishDiagnosticsParams, TextDocumentContentChangeEvent, TextDocumentIdentifier,
     TextDocumentItem, Url, VersionedTextDocumentIdentifier,
 };
-use tower_lsp::LspService;
 use tower_lsp::{jsonrpc::Request, lsp_types::InitializeParams};
 
 /// Statically build an [Url] instance that points to the file at `$path`
@@ -80,12 +78,11 @@ impl Server {
             .await
             .map_err(Error::msg)
             .context("call() returned an error")
-            .and_then(|res| {
-                match res { Some(res) => {
+            .and_then(|res| match res {
+                Some(res) => {
                     bail!("shutdown returned {:?}", res)
-                } _ => {
-                    Ok(())
-                }}
+                }
+                _ => Ok(()),
             })
     }
 
@@ -134,21 +131,17 @@ impl Server {
     #[allow(deprecated)]
     async fn initialize(&mut self) -> Result<()> {
         let _res: InitializeResult = self
-            .request(
-                "initialize",
-                "_init",
-                InitializeParams {
-                    process_id: None,
-                    root_path: None,
-                    root_uri: Some(url!("")),
-                    initialization_options: None,
-                    capabilities: ClientCapabilities::default(),
-                    trace: None,
-                    workspace_folders: None,
-                    client_info: None,
-                    locale: None,
-                },
-            )
+            .request("initialize", "_init", InitializeParams {
+                process_id: None,
+                root_path: None,
+                root_uri: Some(url!("")),
+                initialization_options: None,
+                capabilities: ClientCapabilities::default(),
+                trace: None,
+                workspace_folders: None,
+                client_info: None,
+                locale: None,
+            })
             .await?
             .context("initialize returned None")?;
 
@@ -171,43 +164,36 @@ impl Server {
             .await
             .map_err(Error::msg)
             .context("call() returned an error")
-            .and_then(|res| {
-                match res { Some(res) => {
+            .and_then(|res| match res {
+                Some(res) => {
                     bail!("shutdown returned {:?}", res)
-                } _ => {
-                    Ok(())
-                }}
+                }
+                _ => Ok(()),
             })
     }
 
     async fn open_document(&mut self, text: impl Display) -> Result<()> {
-        self.notify(
-            "textDocument/didOpen",
-            DidOpenTextDocumentParams {
-                text_document: TextDocumentItem {
-                    uri: url!("document.sql"),
-                    language_id: String::from("sql"),
-                    version: 0,
-                    text: text.to_string(),
-                },
+        self.notify("textDocument/didOpen", DidOpenTextDocumentParams {
+            text_document: TextDocumentItem {
+                uri: url!("document.sql"),
+                language_id: String::from("sql"),
+                version: 0,
+                text: text.to_string(),
             },
-        )
+        })
         .await
     }
 
     /// Opens a document with given contents and given name. The name must contain the extension too
     async fn open_named_document(&mut self, text: impl Display, document_name: Url) -> Result<()> {
-        self.notify(
-            "textDocument/didOpen",
-            DidOpenTextDocumentParams {
-                text_document: TextDocumentItem {
-                    uri: document_name,
-                    language_id: String::from("sql"),
-                    version: 0,
-                    text: text.to_string(),
-                },
+        self.notify("textDocument/didOpen", DidOpenTextDocumentParams {
+            text_document: TextDocumentItem {
+                uri: document_name,
+                language_id: String::from("sql"),
+                version: 0,
+                text: text.to_string(),
             },
-        )
+        })
         .await
     }
 
@@ -227,28 +213,22 @@ impl Server {
         version: i32,
         content_changes: Vec<TextDocumentContentChangeEvent>,
     ) -> Result<()> {
-        self.notify(
-            "textDocument/didChange",
-            DidChangeTextDocumentParams {
-                text_document: VersionedTextDocumentIdentifier {
-                    uri: url!("document.sql"),
-                    version,
-                },
-                content_changes,
+        self.notify("textDocument/didChange", DidChangeTextDocumentParams {
+            text_document: VersionedTextDocumentIdentifier {
+                uri: url!("document.sql"),
+                version,
             },
-        )
+            content_changes,
+        })
         .await
     }
 
     async fn close_document(&mut self) -> Result<()> {
-        self.notify(
-            "textDocument/didClose",
-            DidCloseTextDocumentParams {
-                text_document: TextDocumentIdentifier {
-                    uri: url!("document.sql"),
-                },
+        self.notify("textDocument/didClose", DidCloseTextDocumentParams {
+            text_document: TextDocumentIdentifier {
+                uri: url!("document.sql"),
             },
-        )
+        })
         .await
     }
 

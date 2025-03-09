@@ -1,4 +1,4 @@
-use crossbeam::channel::{unbounded, Receiver, Sender};
+use crossbeam::channel::{Receiver, Sender, unbounded};
 use rustc_hash::FxHashSet;
 use std::path::PathBuf;
 use std::sync::RwLock;

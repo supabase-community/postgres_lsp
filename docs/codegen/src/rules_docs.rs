@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use biome_string_case::Case;
 use pglt_analyse::{AnalyserOptions, AnalysisFilter, RuleFilter, RuleMetadata};
 use pglt_analyser::{Analyser, AnalyserConfig};
@@ -63,7 +63,10 @@ fn generate_rule_doc(
     // add deprecation notice
     if let Some(reason) = &meta.deprecated {
         writeln!(content, "> [!WARNING]")?;
-        writeln!(content, "> This rule is deprecated and will be removed in the next major release.\n**Reason**: {reason}")?;
+        writeln!(
+            content,
+            "> This rule is deprecated and will be removed in the next major release.\n**Reason**: {reason}"
+        )?;
     }
 
     writeln!(content)?;

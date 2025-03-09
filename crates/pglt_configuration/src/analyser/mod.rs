@@ -3,8 +3,8 @@ pub mod linter;
 pub use crate::analyser::linter::*;
 use biome_deserialize::Merge;
 use biome_deserialize_macros::Deserializable;
-use pglt_analyse::options::RuleOptions;
 use pglt_analyse::RuleFilter;
+use pglt_analyse::options::RuleOptions;
 use pglt_diagnostics::Severity;
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;

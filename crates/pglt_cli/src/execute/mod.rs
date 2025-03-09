@@ -4,13 +4,13 @@ mod std_in;
 pub(crate) mod traverse;
 
 use crate::cli_options::{CliOptions, CliReporter};
-use crate::execute::traverse::{traverse, TraverseResult};
+use crate::execute::traverse::{TraverseResult, traverse};
 use crate::reporter::github::{GithubReporter, GithubReporterVisitor};
 use crate::reporter::gitlab::{GitLabReporter, GitLabReporterVisitor};
 use crate::reporter::junit::{JunitReporter, JunitReporterVisitor};
 use crate::reporter::terminal::{ConsoleReporter, ConsoleReporterVisitor};
 use crate::{CliDiagnostic, CliSession, DiagnosticsPayload, Reporter};
-use pglt_diagnostics::{category, Category};
+use pglt_diagnostics::{Category, category};
 use pglt_fs::PgLTPath;
 use std::borrow::Borrow;
 use std::ffi::OsString;
@@ -223,7 +223,10 @@ pub fn execute_mode(
     execution.max_diagnostics = if cli_options.reporter.is_default() {
         cli_options.max_diagnostics.into()
     } else {
-        info!("Removing the limit of --max-diagnostics, because of a reporter different from the default one: {}", cli_options.reporter);
+        info!(
+            "Removing the limit of --max-diagnostics, because of a reporter different from the default one: {}",
+            cli_options.reporter
+        );
         u32::MAX
     };
 

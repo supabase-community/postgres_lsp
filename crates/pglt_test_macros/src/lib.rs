@@ -166,18 +166,15 @@ impl Arguments {
             let test_name = syn::Ident::new(&test_name, span);
             let foo = &self.test_function;
 
-            modules.insert(
-                path,
-                quote! {
-                    #[test]
-                    pub fn #test_name () {
-                        let test_fullpath = #test_fullpath;
-                        let test_expected_fullpath = #test_expected_fullpath;
-                        let test_dir = #test_dir;
-                        #foo(test_fullpath, test_expected_fullpath, test_dir);
-                    }
-                },
-            )
+            modules.insert(path, quote! {
+                #[test]
+                pub fn #test_name () {
+                    let test_fullpath = #test_fullpath;
+                    let test_expected_fullpath = #test_expected_fullpath;
+                    let test_dir = #test_dir;
+                    #foo(test_fullpath, test_expected_fullpath, test_dir);
+                }
+            })
         }
 
         let mut output = proc_macro2::TokenStream::new();

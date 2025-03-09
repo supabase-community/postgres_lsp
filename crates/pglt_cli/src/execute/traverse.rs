@@ -1,10 +1,10 @@
-use super::process_file::{process_file, FileStatus, Message};
+use super::process_file::{FileStatus, Message, process_file};
 use super::{Execution, TraversalMode};
 use crate::cli_options::CliOptions;
 use crate::execute::diagnostics::PanicDiagnostic;
 use crate::reporter::TraversalSummary;
 use crate::{CliDiagnostic, CliSession};
-use crossbeam::channel::{unbounded, Receiver, Sender};
+use crossbeam::channel::{Receiver, Sender, unbounded};
 use pglt_diagnostics::DiagnosticTags;
 use pglt_diagnostics::{DiagnosticExt, Error, Resource, Severity};
 use pglt_fs::{FileSystem, PathInterner, PgLTPath};
@@ -14,16 +14,16 @@ use pglt_workspace::workspace::IsPathIgnoredParams;
 use pglt_workspace::{Workspace, WorkspaceError};
 use rustc_hash::FxHashSet;
 use std::collections::BTreeSet;
-use std::sync::atomic::AtomicU32;
 use std::sync::RwLock;
+use std::sync::atomic::AtomicU32;
 use std::{
     env::current_dir,
     ffi::OsString,
     panic::catch_unwind,
     path::PathBuf,
     sync::{
-        atomic::{AtomicUsize, Ordering},
         Once,
+        atomic::{AtomicUsize, Ordering},
     },
     thread,
     time::{Duration, Instant},
@@ -92,23 +92,19 @@ pub(crate) fn traverse(
 
         // The traversal context is scoped to ensure all the channels it
         // contains are properly closed once the traversal finishes
-        let (elapsed, evaluated_paths) = traverse_inputs(
+        let (elapsed, evaluated_paths) = traverse_inputs(fs, inputs, &TraversalOptions {
             fs,
-            inputs,
-            &TraversalOptions {
-                fs,
-                workspace,
-                execution,
-                interner,
-                matches: &matches,
-                changed: &changed,
-                unchanged: &unchanged,
-                skipped: &skipped,
-                messages: sender,
-                remaining_diagnostics: &remaining_diagnostics,
-                evaluated_paths: RwLock::default(),
-            },
-        );
+            workspace,
+            execution,
+            interner,
+            matches: &matches,
+            changed: &changed,
+            unchanged: &unchanged,
+            skipped: &skipped,
+            messages: sender,
+            remaining_diagnostics: &remaining_diagnostics,
+            evaluated_paths: RwLock::default(),
+        });
         // wait for the main thread to finish
         let diagnostics = handler.join().unwrap();
 

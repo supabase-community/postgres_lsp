@@ -1,10 +1,10 @@
 use std::{borrow, collections::BTreeSet};
 
 use crate::{
+    AnalyserOptions,
     context::RuleContext,
     filter::{AnalysisFilter, GroupKey, RuleKey},
     rule::{GroupCategory, Rule, RuleDiagnostic, RuleGroup},
-    AnalyserOptions,
 };
 
 pub trait RegistryVisitor {

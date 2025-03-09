@@ -1,8 +1,8 @@
+use crate::Reporter;
 use crate::execute::{Execution, TraversalMode};
 use crate::reporter::{DiagnosticsPayload, ReporterVisitor, TraversalSummary};
-use crate::Reporter;
 use pglt_console::fmt::Formatter;
-use pglt_console::{fmt, markup, Console, ConsoleExt};
+use pglt_console::{Console, ConsoleExt, fmt, markup};
 use pglt_diagnostics::advice::ListAdvice;
 use pglt_diagnostics::{Diagnostic, PrintDiagnostic};
 use pglt_fs::PgLTPath;

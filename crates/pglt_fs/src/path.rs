@@ -1,10 +1,10 @@
-use enumflags2::{bitflags, BitFlags};
+use enumflags2::{BitFlags, bitflags};
 use smallvec::SmallVec;
 use std::{
     cmp::Ordering,
     ffi::OsStr,
-    fs::read_to_string,
     fs::File,
+    fs::read_to_string,
     io,
     io::Write,
     ops::{Deref, DerefMut},

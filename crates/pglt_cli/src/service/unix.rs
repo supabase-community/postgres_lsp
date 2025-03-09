@@ -10,13 +10,13 @@ use pglt_lsp::{ServerConnection, ServerFactory};
 use tokio::{
     io::Interest,
     net::{
-        unix::{OwnedReadHalf, OwnedWriteHalf},
         UnixListener, UnixStream,
+        unix::{OwnedReadHalf, OwnedWriteHalf},
     },
     process::{Child, Command},
     time,
 };
-use tracing::{debug, info, Instrument};
+use tracing::{Instrument, debug, info};
 
 /// Returns the filesystem path of the global socket used to communicate with
 /// the server daemon
@@ -151,30 +151,33 @@ pub(crate) async fn ensure_daemon(
             {
                 last_error = Some(err);
 
-                match &mut current_child { Some(current_child) => {
-                    // If we have a handle to the daemon process, wait for a few
-                    // milliseconds for it to exit, or retry the connection
-                    tokio::select! {
-                        result = current_child.wait() => {
-                            let _status = result?;
-                            return Err(io::Error::new(
-                                io::ErrorKind::ConnectionReset,
-                                "the server process exited before the connection could be established",
-                            ));
+                match &mut current_child {
+                    Some(current_child) => {
+                        // If we have a handle to the daemon process, wait for a few
+                        // milliseconds for it to exit, or retry the connection
+                        tokio::select! {
+                            result = current_child.wait() => {
+                                let _status = result?;
+                                return Err(io::Error::new(
+                                    io::ErrorKind::ConnectionReset,
+                                    "the server process exited before the connection could be established",
+                                ));
+                            }
+                            _ = time::sleep(Duration::from_millis(50)) => {}
                         }
-                        _ = time::sleep(Duration::from_millis(50)) => {}
                     }
-                } _ => {
-                    // Spawn the daemon process and wait a few milliseconds for
-                    // it to become ready then retry the connection
-                    current_child = Some(spawn_daemon(
-                        stop_on_disconnect,
-                        config_path.clone(),
-                        log_path.clone(),
-                        log_file_name_prefix.clone(),
-                    )?);
-                    time::sleep(Duration::from_millis(50)).await;
-                }}
+                    _ => {
+                        // Spawn the daemon process and wait a few milliseconds for
+                        // it to become ready then retry the connection
+                        current_child = Some(spawn_daemon(
+                            stop_on_disconnect,
+                            config_path.clone(),
+                            log_path.clone(),
+                            log_file_name_prefix.clone(),
+                        )?);
+                        time::sleep(Duration::from_millis(50)).await;
+                    }
+                }
             }
 
             Err(err) => return Err(err),

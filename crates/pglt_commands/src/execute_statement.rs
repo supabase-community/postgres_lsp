@@ -1,4 +1,4 @@
-use sqlx::{postgres::PgQueryResult, Executor, PgPool};
+use sqlx::{Executor, PgPool, postgres::PgQueryResult};
 
 use crate::command::{Command, CommandType};
 
@@ -12,14 +12,13 @@ impl ExecuteStatementCommand {
     }
 
     pub async fn run(&self, conn: Option<PgPool>) -> anyhow::Result<PgQueryResult> {
-        match conn { Some(conn) => {
-            match conn.execute(self.statement.as_str()).await {
+        match conn {
+            Some(conn) => match conn.execute(self.statement.as_str()).await {
                 Ok(res) => Ok(res),
                 Err(e) => Err(anyhow::anyhow!(e.to_string())),
-            }
-        } _ => {
-            Err(anyhow::anyhow!("No connection to database".to_string()))
-        }}
+            },
+            _ => Err(anyhow::anyhow!("No connection to database".to_string())),
+        }
     }
 
     pub fn trim_statement(stmt: String, max_length: usize) -> String {

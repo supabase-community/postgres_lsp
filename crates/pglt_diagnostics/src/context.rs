@@ -2,9 +2,9 @@ use pglt_console::fmt;
 
 use crate::context::internal::{SeverityDiagnostic, TagsDiagnostic};
 use crate::{
+    Category, DiagnosticTags, Error, Resource, Severity, SourceCode,
     diagnostic::internal::AsDiagnostic,
     location::{AsResource, AsSourceCode, AsSpan},
-    Category, DiagnosticTags, Error, Resource, Severity, SourceCode,
 };
 
 /// This trait is implemented for all types implementing [Diagnostic](super::Diagnostic)
@@ -254,9 +254,9 @@ mod internal {
     use text_size::TextRange;
 
     use crate::{
-        diagnostic::internal::AsDiagnostic, Advices, Backtrace, Category, Diagnostic,
-        DiagnosticTags, LineIndex, LineIndexBuf, Location, LogCategory, Resource, Severity,
-        SourceCode, Visit,
+        Advices, Backtrace, Category, Diagnostic, DiagnosticTags, LineIndex, LineIndexBuf,
+        Location, LogCategory, Resource, Severity, SourceCode, Visit,
+        diagnostic::internal::AsDiagnostic,
     };
 
     /// This trait is inherited by `DiagnosticExt` and `Context`, since it's

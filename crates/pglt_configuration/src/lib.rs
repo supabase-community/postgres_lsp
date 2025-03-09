@@ -16,20 +16,20 @@ pub use crate::diagnostics::ConfigurationDiagnostic;
 use std::path::PathBuf;
 
 pub use crate::generated::push_to_analyser_rules;
-use crate::vcs::{partial_vcs_configuration, PartialVcsConfiguration, VcsConfiguration};
+use crate::vcs::{PartialVcsConfiguration, VcsConfiguration, partial_vcs_configuration};
 pub use analyser::{
-    partial_linter_configuration, LinterConfiguration, PartialLinterConfiguration,
-    RuleConfiguration, RuleFixConfiguration, RulePlainConfiguration, RuleSelector,
-    RuleWithFixOptions, RuleWithOptions, Rules,
+    LinterConfiguration, PartialLinterConfiguration, RuleConfiguration, RuleFixConfiguration,
+    RulePlainConfiguration, RuleSelector, RuleWithFixOptions, RuleWithOptions, Rules,
+    partial_linter_configuration,
 };
 use biome_deserialize_macros::{Merge, Partial};
 use bpaf::Bpaf;
 use database::{
-    partial_database_configuration, DatabaseConfiguration, PartialDatabaseConfiguration,
+    DatabaseConfiguration, PartialDatabaseConfiguration, partial_database_configuration,
 };
-use files::{partial_files_configuration, FilesConfiguration, PartialFilesConfiguration};
+use files::{FilesConfiguration, PartialFilesConfiguration, partial_files_configuration};
 use migrations::{
-    partial_migrations_configuration, MigrationsConfiguration, PartialMigrationsConfiguration,
+    MigrationsConfiguration, PartialMigrationsConfiguration, partial_migrations_configuration,
 };
 use serde::{Deserialize, Serialize};
 use vcs::VcsClientKind;

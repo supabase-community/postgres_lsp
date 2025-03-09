@@ -1,6 +1,6 @@
-use proc_macro2::{Delimiter, Group, Ident, TokenStream, TokenTree};
 use proc_macro_error::*;
-use quote::{quote, ToTokens};
+use proc_macro2::{Delimiter, Group, Ident, TokenStream, TokenTree};
+use quote::{ToTokens, quote};
 
 struct StackEntry {
     name: Ident,
@@ -104,21 +104,26 @@ pub fn markup(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
                             name: name.clone(),
                             attributes: attributes.clone(),
                         });
-                    } else { match stack.last() { Some(top) => {
-                        // Only verify the coherence of the top element on the
-                        // stack with a closing element, skip over the check if
-                        // the stack is empty as that error will be handled
-                        // when the top element gets popped off the stack later
-                        let name_str = name.to_string();
-                        let top_str = top.name.to_string();
-                        if name_str != top_str {
-                            abort!(
-                                name.span(), "closing element mismatch";
-                                close = "found closing element {}", name_str;
-                                open = top.name.span() => "expected {}", top_str
-                            );
+                    } else {
+                        match stack.last() {
+                            Some(top) => {
+                                // Only verify the coherence of the top element on the
+                                // stack with a closing element, skip over the check if
+                                // the stack is empty as that error will be handled
+                                // when the top element gets popped off the stack later
+                                let name_str = name.to_string();
+                                let top_str = top.name.to_string();
+                                if name_str != top_str {
+                                    abort!(
+                                        name.span(), "closing element mismatch";
+                                        close = "found closing element {}", name_str;
+                                        open = top.name.span() => "expected {}", top_str
+                                    );
+                                }
+                            }
+                            _ => {}
                         }
-                    } _ => {}}}
+                    }
 
                     if (is_closing_element || is_self_closing) && stack.pop().is_none() {
                         abort!(name.span(), "unexpected closing element");

@@ -1,16 +1,16 @@
 use std::io;
 
-use pglt_console::{fmt, markup, MarkupBuf};
+use pglt_console::{MarkupBuf, fmt, markup};
 use pglt_text_edit::TextEdit;
 use serde::{
-    de::{self, SeqAccess},
     Deserialize, Deserializer, Serialize, Serializer,
+    de::{self, SeqAccess},
 };
 use text_size::{TextRange, TextSize};
 
 use crate::{
-    diagnostic::internal::AsDiagnostic, diagnostic::DiagnosticTag, Advices as _, Backtrace,
-    Category, DiagnosticTags, LogCategory, Resource, Severity, SourceCode, Visit,
+    Advices as _, Backtrace, Category, DiagnosticTags, LogCategory, Resource, Severity, SourceCode,
+    Visit, diagnostic::DiagnosticTag, diagnostic::internal::AsDiagnostic,
 };
 
 /// Serializable representation for a [Diagnostic](super::Diagnostic).
@@ -358,7 +358,7 @@ impl<'de> Deserialize<'de> for DiagnosticTags {
 mod tests {
     use std::io;
 
-    use serde_json::{json, Value};
+    use serde_json::{Value, json};
     use text_size::{TextRange, TextSize};
 
     use crate::{

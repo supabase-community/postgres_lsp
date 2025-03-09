@@ -12,7 +12,7 @@ use std::{cmp::Ordering, num::NonZeroU32};
 
 use serde::{Deserialize, Serialize};
 pub use similar::ChangeTag;
-use similar::{utils::TextDiffRemapper, TextDiff};
+use similar::{TextDiff, utils::TextDiffRemapper};
 use text_size::{TextRange, TextSize};
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -306,7 +306,7 @@ fn compress_equal_op(text: &str) -> Option<(&str, NonZeroU32, &str)> {
 mod tests {
     use std::num::NonZeroU32;
 
-    use crate::{compress_equal_op, TextEdit};
+    use crate::{TextEdit, compress_equal_op};
 
     #[test]
     fn compress_short() {

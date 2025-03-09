@@ -1,10 +1,10 @@
 use pglt_lexer::{SyntaxKind, Token, TokenType};
 
 use super::{
+    Parser,
     data::at_statement_start,
     ddl::{alter, create},
     dml::{cte, delete, insert, select, update},
-    Parser,
 };
 
 pub fn source(p: &mut Parser) {

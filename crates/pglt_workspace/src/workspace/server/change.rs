@@ -3,7 +3,7 @@ use text_size::{TextLen, TextRange, TextSize};
 
 use crate::workspace::{ChangeFileParams, ChangeParams};
 
-use super::{document, Document, Statement};
+use super::{Document, Statement, document};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum StatementChange {
@@ -449,9 +449,11 @@ mod tests {
 
         assert!(ranges.len() == d.positions.len());
 
-        assert!(ranges
-            .iter()
-            .all(|r| { d.positions.iter().any(|(_, stmt_range)| stmt_range == r) }));
+        assert!(
+            ranges
+                .iter()
+                .all(|r| { d.positions.iter().any(|(_, stmt_range)| stmt_range == r) })
+        );
     }
 
     #[test]

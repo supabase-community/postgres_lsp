@@ -10,15 +10,15 @@ use std::{
 
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
 use pglt_configuration::{
+    ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration,
     database::PartialDatabaseConfiguration,
     diagnostics::InvalidIgnorePattern,
     files::FilesConfiguration,
     migrations::{MigrationsConfiguration, PartialMigrationsConfiguration},
-    ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration,
 };
 use pglt_fs::FileSystem;
 
-use crate::{matcher::Matcher, DynRef, WorkspaceError};
+use crate::{DynRef, WorkspaceError, matcher::Matcher};
 
 /// Global settings for the entire workspace
 #[derive(Debug, Default)]
@@ -163,28 +163,30 @@ fn to_file_settings(
     vcs_config_path: Option<PathBuf>,
     gitignore_matches: &[String],
 ) -> Result<Option<FilesSettings>, WorkspaceError> {
-    let config = match config { Some(config) => {
-        Some(config)
-    } _ => if vcs_config_path.is_some() {
-        Some(FilesConfiguration::default())
-    } else {
-        None
-    }};
+    let config = match config {
+        Some(config) => Some(config),
+        _ => {
+            if vcs_config_path.is_some() {
+                Some(FilesConfiguration::default())
+            } else {
+                None
+            }
+        }
+    };
     let git_ignore = if let Some(vcs_config_path) = vcs_config_path {
         Some(to_git_ignore(vcs_config_path, gitignore_matches)?)
     } else {
         None
     };
-    Ok(match config { Some(config) => {
-        Some(FilesSettings {
+    Ok(match config {
+        Some(config) => Some(FilesSettings {
             max_size: config.max_size,
             git_ignore,
             ignored_files: to_matcher(working_directory.clone(), Some(&config.ignore))?,
             included_files: to_matcher(working_directory, Some(&config.include))?,
-        })
-    } _ => {
-        None
-    }})
+        }),
+        _ => None,
+    })
 }
 
 fn to_git_ignore(path: PathBuf, matches: &[String]) -> Result<Gitignore, WorkspaceError> {

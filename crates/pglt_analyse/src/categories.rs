@@ -1,4 +1,4 @@
-use enumflags2::{bitflags, BitFlags};
+use enumflags2::{BitFlags, bitflags};
 use std::borrow::Cow;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]

@@ -1,11 +1,11 @@
 mod diagnostics;
 
-use diagnostics::create_type_error;
 pub use diagnostics::TypecheckDiagnostic;
-use sqlx::postgres::PgDatabaseError;
-pub use sqlx::postgres::PgSeverity;
+use diagnostics::create_type_error;
 use sqlx::Executor;
 use sqlx::PgPool;
+use sqlx::postgres::PgDatabaseError;
+pub use sqlx::postgres::PgSeverity;
 use text_size::TextRange;
 
 #[derive(Debug)]
