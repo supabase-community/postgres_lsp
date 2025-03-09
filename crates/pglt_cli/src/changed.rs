@@ -18,7 +18,11 @@ pub(crate) fn get_changed_files(
         (Some(since), Some(_)) => since,
         (Some(since), None) => since,
         (None, Some(branch)) => branch,
-        (None, None) => return Err(CliDiagnostic::incompatible_end_configuration("The `--changed` flag was set, but couldn't determine the base to compare against. Either set configuration.vcs.default_branch or use the --since argument.")),
+        (None, None) => {
+            return Err(CliDiagnostic::incompatible_end_configuration(
+                "The `--changed` flag was set, but couldn't determine the base to compare against. Either set configuration.vcs.default_branch or use the --since argument.",
+            ));
+        }
     };
 
     let changed_files = fs.get_changed_files(base)?;

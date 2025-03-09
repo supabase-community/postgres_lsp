@@ -218,7 +218,7 @@ fn update_linter_registry_builder(rules: BTreeMap<&'static str, TokenStream>) ->
 }
 
 /// Returns file paths of the given directory.
-fn list_entry_paths(dir: &Path) -> Result<impl Iterator<Item = PathBuf>> {
+fn list_entry_paths(dir: &Path) -> Result<impl Iterator<Item = PathBuf> + use<>> {
     Ok(fs2::read_dir(dir)
         .context("A directory is expected")?
         .filter_map(|entry| entry.ok())

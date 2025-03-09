@@ -1,11 +1,11 @@
 use crate::Applicability;
 use crate::{
+    Location,
     display::Backtrace,
     location::{AsResource, AsSourceCode, AsSpan},
-    Location,
 };
 use pglt_console::fmt::{self, Display};
-use pglt_console::{markup, MarkupBuf};
+use pglt_console::{MarkupBuf, markup};
 use pglt_text_edit::TextEdit;
 use serde::{Deserialize, Serialize};
 use std::io;

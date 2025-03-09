@@ -1,21 +1,21 @@
 use crate::{
-    open_transport,
+    CliDiagnostic, CliSession, open_transport,
     service::{self, ensure_daemon, open_socket, run_daemon},
-    CliDiagnostic, CliSession,
 };
-use pglt_console::{markup, ConsoleExt};
+use pglt_console::{ConsoleExt, markup};
 use pglt_lsp::ServerFactory;
-use pglt_workspace::{workspace::WorkspaceClient, TransportError, WorkspaceError};
+use pglt_workspace::{TransportError, WorkspaceError, workspace::WorkspaceClient};
 use std::{env, fs, path::PathBuf};
 use tokio::io;
 use tokio::runtime::Runtime;
 use tracing::subscriber::Interest;
-use tracing::{debug_span, metadata::LevelFilter, Instrument, Metadata};
+use tracing::{Instrument, Metadata, debug_span, metadata::LevelFilter};
 use tracing_appender::rolling::Rotation;
 use tracing_subscriber::{
+    Layer,
     layer::{Context, Filter},
     prelude::*,
-    registry, Layer,
+    registry,
 };
 use tracing_tree::HierarchicalLayer;
 
@@ -49,22 +49,25 @@ pub(crate) fn start(
 pub(crate) fn stop(session: CliSession) -> Result<(), CliDiagnostic> {
     let rt = Runtime::new()?;
 
-    if let Some(transport) = open_transport(rt)? {
-        let client = WorkspaceClient::new(transport)?;
-        match client.shutdown() {
-            // The `ChannelClosed` error is expected since the server can
-            // shutdown before sending a response
-            Ok(()) | Err(WorkspaceError::TransportError(TransportError::ChannelClosed)) => {}
-            Err(err) => return Err(CliDiagnostic::from(err)),
-        };
+    match open_transport(rt)? {
+        Some(transport) => {
+            let client = WorkspaceClient::new(transport)?;
+            match client.shutdown() {
+                // The `ChannelClosed` error is expected since the server can
+                // shutdown before sending a response
+                Ok(()) | Err(WorkspaceError::TransportError(TransportError::ChannelClosed)) => {}
+                Err(err) => return Err(CliDiagnostic::from(err)),
+            };
 
-        session.app.console.log(markup! {
-            "The server was successfully stopped"
-        });
-    } else {
-        session.app.console.log(markup! {
-            "The server was not running"
-        });
+            session.app.console.log(markup! {
+                "The server was successfully stopped"
+            });
+        }
+        _ => {
+            session.app.console.log(markup! {
+                "The server was not running"
+            });
+        }
     }
 
     Ok(())

@@ -1,6 +1,6 @@
 use crate::{
-    builder::CompletionBuilder, context::CompletionContext, relevance::CompletionRelevanceData,
-    CompletionItem, CompletionItemKind,
+    CompletionItem, CompletionItemKind, builder::CompletionBuilder, context::CompletionContext,
+    relevance::CompletionRelevanceData,
 };
 
 pub fn complete_columns(ctx: &CompletionContext, builder: &mut CompletionBuilder) {
@@ -22,9 +22,8 @@ pub fn complete_columns(ctx: &CompletionContext, builder: &mut CompletionBuilder
 #[cfg(test)]
 mod tests {
     use crate::{
-        complete,
-        test_helper::{get_test_deps, get_test_params, InputQuery, CURSOR_POS},
-        CompletionItem,
+        CompletionItem, complete,
+        test_helper::{CURSOR_POS, InputQuery, get_test_deps, get_test_params},
     };
 
     struct TestCase {

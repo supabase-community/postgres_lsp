@@ -1,4 +1,4 @@
-use pglt_analyse::{context::RuleContext, declare_lint_rule, Rule, RuleDiagnostic, RuleSource};
+use pglt_analyse::{Rule, RuleDiagnostic, RuleSource, context::RuleContext, declare_lint_rule};
 use pglt_console::markup;
 
 declare_lint_rule! {

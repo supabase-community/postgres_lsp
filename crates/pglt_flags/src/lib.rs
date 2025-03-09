@@ -1,7 +1,7 @@
 //! A simple implementation of feature flags.
 
 use pglt_console::fmt::{Display, Formatter};
-use pglt_console::{markup, DebugDisplay, KeyValuePair};
+use pglt_console::{DebugDisplay, KeyValuePair, markup};
 use std::env;
 use std::ops::Deref;
 use std::sync::{LazyLock, OnceLock};

@@ -11,7 +11,7 @@ pub use pglt_diagnostics::category_concat;
 
 pub use crate::categories::{
     ActionCategory, RefactorKind, RuleCategories, RuleCategoriesBuilder, RuleCategory,
-    SourceActionKind, SUPPRESSION_ACTION_CATEGORY,
+    SUPPRESSION_ACTION_CATEGORY, SourceActionKind,
 };
 pub use crate::filter::{AnalysisFilter, GroupKey, RuleFilter, RuleKey};
 pub use crate::options::{AnalyserOptions, AnalyserRules};

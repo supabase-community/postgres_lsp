@@ -1,4 +1,4 @@
-use pglt_lsp_converters::{negotiated_encoding, PositionEncoding, WideEncoding};
+use pglt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
 use tower_lsp::lsp_types::{
     ClientCapabilities, CompletionOptions, PositionEncodingKind, SaveOptions, ServerCapabilities,
     TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions,

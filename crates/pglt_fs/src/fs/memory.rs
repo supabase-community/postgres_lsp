@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use std::str;
 use std::sync::Arc;
 
-use parking_lot::{lock_api::ArcMutexGuard, Mutex, RawMutex, RwLock};
+use parking_lot::{Mutex, RawMutex, RwLock, lock_api::ArcMutexGuard};
 use pglt_diagnostics::{Error, Severity};
 
 use crate::fs::OpenOptions;
@@ -344,8 +344,8 @@ mod tests {
     use parking_lot::Mutex;
     use pglt_diagnostics::Error;
 
-    use crate::{fs::FileSystemExt, OpenOptions};
     use crate::{FileSystem, MemoryFileSystem, PathInterner, PgLTPath, TraversalContext};
+    use crate::{OpenOptions, fs::FileSystemExt};
 
     #[test]
     fn fs_read_only() {
@@ -371,7 +371,9 @@ mod tests {
         }
 
         match fs.open_with_options(path, OpenOptions::default().read(true).write(true)) {
-            Ok(_) => panic!("fs.open_with_options(read + write) for a read-only filesystem should return an error"),
+            Ok(_) => panic!(
+                "fs.open_with_options(read + write) for a read-only filesystem should return an error"
+            ),
             Err(error) => {
                 assert_eq!(error.kind(), io::ErrorKind::PermissionDenied);
             }

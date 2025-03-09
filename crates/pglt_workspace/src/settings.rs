@@ -10,15 +10,15 @@ use std::{
 
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
 use pglt_configuration::{
+    ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration,
     database::PartialDatabaseConfiguration,
     diagnostics::InvalidIgnorePattern,
     files::FilesConfiguration,
     migrations::{MigrationsConfiguration, PartialMigrationsConfiguration},
-    ConfigurationDiagnostic, LinterConfiguration, PartialConfiguration,
 };
 use pglt_fs::FileSystem;
 
-use crate::{matcher::Matcher, DynRef, WorkspaceError};
+use crate::{DynRef, WorkspaceError, matcher::Matcher};
 
 /// Global settings for the entire workspace
 #[derive(Debug, Default)]
@@ -163,27 +163,29 @@ fn to_file_settings(
     vcs_config_path: Option<PathBuf>,
     gitignore_matches: &[String],
 ) -> Result<Option<FilesSettings>, WorkspaceError> {
-    let config = if let Some(config) = config {
-        Some(config)
-    } else if vcs_config_path.is_some() {
-        Some(FilesConfiguration::default())
-    } else {
-        None
+    let config = match config {
+        Some(config) => Some(config),
+        _ => {
+            if vcs_config_path.is_some() {
+                Some(FilesConfiguration::default())
+            } else {
+                None
+            }
+        }
     };
     let git_ignore = if let Some(vcs_config_path) = vcs_config_path {
         Some(to_git_ignore(vcs_config_path, gitignore_matches)?)
     } else {
         None
     };
-    Ok(if let Some(config) = config {
-        Some(FilesSettings {
+    Ok(match config {
+        Some(config) => Some(FilesSettings {
             max_size: config.max_size,
             git_ignore,
             ignored_files: to_matcher(working_directory.clone(), Some(&config.ignore))?,
             included_files: to_matcher(working_directory, Some(&config.include))?,
-        })
-    } else {
-        None
+        }),
+        _ => None,
     })
 }
 
@@ -348,7 +350,7 @@ fn to_migration_settings(
 /// Limit the size of files to 1.0 MiB by default
 pub(crate) const DEFAULT_FILE_SIZE_LIMIT: NonZeroU64 =
     // SAFETY: This constant is initialized with a non-zero value
-    unsafe { NonZeroU64::new_unchecked(1024 * 1024) };
+    NonZeroU64::new(1024 * 1024).unwrap();
 
 impl Default for FilesSettings {
     fn default() -> Self {

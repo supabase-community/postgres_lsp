@@ -1,6 +1,6 @@
 use pglt_console::fmt::MarkupElements;
 use pglt_console::{
-    fmt, markup, HorizontalLine, Markup, MarkupBuf, MarkupElement, MarkupNode, Padding,
+    HorizontalLine, Markup, MarkupBuf, MarkupElement, MarkupNode, Padding, fmt, markup,
 };
 use pglt_text_edit::TextEdit;
 use std::path::Path;
@@ -14,11 +14,11 @@ mod message;
 
 pub use crate::display::frame::{SourceFile, SourceLocation};
 use crate::{
-    diagnostic::internal::AsDiagnostic, Advices, Diagnostic, DiagnosticTags, Location, LogCategory,
-    Resource, Severity, Visit,
+    Advices, Diagnostic, DiagnosticTags, Location, LogCategory, Resource, Severity, Visit,
+    diagnostic::internal::AsDiagnostic,
 };
 
-pub use self::backtrace::{set_bottom_frame, Backtrace};
+pub use self::backtrace::{Backtrace, set_bottom_frame};
 pub use self::message::MessageAndDescription;
 
 /// Helper struct from printing the description of a diagnostic into any
@@ -667,7 +667,7 @@ mod tests {
 
     use pglt_console::{fmt, markup};
     use pglt_diagnostics::{DiagnosticTags, Severity};
-    use pglt_diagnostics_categories::{category, Category};
+    use pglt_diagnostics_categories::{Category, category};
     use pglt_text_edit::TextEdit;
     use serde_json::{from_value, json};
     use text_size::{TextRange, TextSize};

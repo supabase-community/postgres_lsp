@@ -1,8 +1,8 @@
 use pglt_lexer::SyntaxKind;
 
 use super::{
-    common::{parenthesis, statement, unknown},
     Parser,
+    common::{parenthesis, statement, unknown},
 };
 
 pub(crate) fn cte(p: &mut Parser) {

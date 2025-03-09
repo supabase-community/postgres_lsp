@@ -1,10 +1,10 @@
-use super::process_file::{process_file, FileStatus, Message};
+use super::process_file::{FileStatus, Message, process_file};
 use super::{Execution, TraversalMode};
 use crate::cli_options::CliOptions;
 use crate::execute::diagnostics::PanicDiagnostic;
 use crate::reporter::TraversalSummary;
 use crate::{CliDiagnostic, CliSession};
-use crossbeam::channel::{unbounded, Receiver, Sender};
+use crossbeam::channel::{Receiver, Sender, unbounded};
 use pglt_diagnostics::DiagnosticTags;
 use pglt_diagnostics::{DiagnosticExt, Error, Resource, Severity};
 use pglt_fs::{FileSystem, PathInterner, PgLTPath};
@@ -14,16 +14,16 @@ use pglt_workspace::workspace::IsPathIgnoredParams;
 use pglt_workspace::{Workspace, WorkspaceError};
 use rustc_hash::FxHashSet;
 use std::collections::BTreeSet;
-use std::sync::atomic::AtomicU32;
 use std::sync::RwLock;
+use std::sync::atomic::AtomicU32;
 use std::{
     env::current_dir,
     ffi::OsString,
     panic::catch_unwind,
     path::PathBuf,
     sync::{
-        atomic::{AtomicUsize, Ordering},
         Once,
+        atomic::{AtomicUsize, Ordering},
     },
     thread,
     time::{Duration, Instant},
@@ -487,7 +487,7 @@ impl TraversalContext for TraversalOptions<'_, '_> {
         }
 
         match self.execution.traversal_mode() {
-            TraversalMode::Dummy { .. } => true,
+            TraversalMode::Dummy => true,
             TraversalMode::Check { .. } => true,
         }
     }

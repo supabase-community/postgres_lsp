@@ -1,5 +1,5 @@
 use pglt_analyse::RuleCategoriesBuilder;
-use pglt_diagnostics::{category, Error};
+use pglt_diagnostics::{Error, category};
 
 use crate::execute::diagnostics::ResultExt;
 use crate::execute::process_file::workspace_file::WorkspaceFile;

@@ -1,5 +1,5 @@
 use pglt_console::fmt::Formatter;
-use pglt_console::{fmt, markup, ConsoleExt};
+use pglt_console::{ConsoleExt, fmt, markup};
 use pglt_workspace::workspace::ServerInfo;
 
 use crate::{CliDiagnostic, CliSession, VERSION};

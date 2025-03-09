@@ -9,7 +9,7 @@ use pglt_console::{
     markup,
 };
 
-use crate::{category, Category, Diagnostic, DiagnosticTags};
+use crate::{Category, Diagnostic, DiagnosticTags, category};
 
 /// Implements [Diagnostic] over types implementing [std::error::Error].
 #[derive(Debug)]

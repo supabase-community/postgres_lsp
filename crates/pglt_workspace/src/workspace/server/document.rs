@@ -1,4 +1,4 @@
-use pglt_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, DiagnosticExt, Severity};
+use pglt_diagnostics::{Diagnostic, DiagnosticExt, Severity, serde::Diagnostic as SDiagnostic};
 use pglt_fs::PgLTPath;
 use text_size::{TextRange, TextSize};
 

@@ -84,7 +84,7 @@ mod tests {
     use pglt_test_utils::test_database::get_new_test_db;
     use sqlx::Executor;
 
-    use crate::{columns::ColumnClassKind, SchemaCache};
+    use crate::{SchemaCache, columns::ColumnClassKind};
 
     #[tokio::test]
     async fn loads_columns() {

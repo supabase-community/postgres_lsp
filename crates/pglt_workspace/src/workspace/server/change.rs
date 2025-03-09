@@ -1,10 +1,9 @@
-use pglt_diagnostics::Diagnostic;
 use std::ops::{Add, Sub};
 use text_size::{TextLen, TextRange, TextSize};
 
 use crate::workspace::{ChangeFileParams, ChangeParams};
 
-use super::{document, Document, Statement};
+use super::{Document, Statement, document};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum StatementChange {
@@ -429,6 +428,7 @@ impl ChangeParams {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pglt_diagnostics::Diagnostic;
     use text_size::TextRange;
 
     use crate::workspace::{ChangeFileParams, ChangeParams};
@@ -449,9 +449,11 @@ mod tests {
 
         assert!(ranges.len() == d.positions.len());
 
-        assert!(ranges
-            .iter()
-            .all(|r| { d.positions.iter().any(|(_, stmt_range)| stmt_range == r) }));
+        assert!(
+            ranges
+                .iter()
+                .all(|r| { d.positions.iter().any(|(_, stmt_range)| stmt_range == r) })
+        );
     }
 
     #[test]

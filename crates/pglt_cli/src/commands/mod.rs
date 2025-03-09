@@ -1,15 +1,15 @@
 use crate::changed::{get_changed_files, get_staged_files};
-use crate::cli_options::{cli_options, CliOptions, CliReporter, ColorsArg};
+use crate::cli_options::{CliOptions, CliReporter, ColorsArg, cli_options};
 use crate::execute::Stdin;
 use crate::logging::LoggingKind;
 use crate::{
-    execute_mode, setup_cli_subscriber, CliDiagnostic, CliSession, Execution, LoggingLevel, VERSION,
+    CliDiagnostic, CliSession, Execution, LoggingLevel, VERSION, execute_mode, setup_cli_subscriber,
 };
 use bpaf::Bpaf;
-use pglt_configuration::{partial_configuration, PartialConfiguration};
+use pglt_configuration::{PartialConfiguration, partial_configuration};
 use pglt_console::Console;
 use pglt_fs::FileSystem;
-use pglt_workspace::configuration::{load_configuration, LoadedConfiguration};
+use pglt_workspace::configuration::{LoadedConfiguration, load_configuration};
 use pglt_workspace::settings::PartialConfigurationExt;
 use pglt_workspace::workspace::UpdateSettingsParams;
 use pglt_workspace::{DynRef, Workspace, WorkspaceError};
@@ -183,7 +183,7 @@ impl PgltCommand {
             | PgltCommand::Stop
             | PgltCommand::Init
             | PgltCommand::RunServer { .. }
-            | PgltCommand::Clean { .. }
+            | PgltCommand::Clean
             | PgltCommand::PrintSocket => None,
         }
     }

@@ -1,4 +1,4 @@
-use crate::{item::CompletionItem, CompletionResult};
+use crate::{CompletionResult, item::CompletionItem};
 
 pub(crate) struct CompletionBuilder {
     items: Vec<CompletionItem>,

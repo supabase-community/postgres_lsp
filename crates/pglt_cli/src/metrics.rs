@@ -9,12 +9,12 @@ use std::{
 use hdrhistogram::Histogram;
 use rustc_hash::FxHashMap;
 use std::sync::{LazyLock, Mutex, RwLock};
-use tracing::{span, subscriber::Interest, Level, Metadata, Subscriber};
+use tracing::{Level, Metadata, Subscriber, span, subscriber::Interest};
 use tracing_subscriber::{
+    Layer,
     layer::Context,
     prelude::*,
     registry::{LookupSpan, SpanRef},
-    Layer,
 };
 
 /// Implementation of a tracing [Layer] that collects timing information for spans into [Histogram]s
@@ -305,7 +305,7 @@ mod tests {
     use tracing::Level;
     use tracing_subscriber::prelude::*;
 
-    use super::{CallsiteEntry, CallsiteKey, MetricsLayer, Timepoint, Timings, METRICS};
+    use super::{CallsiteEntry, CallsiteKey, METRICS, MetricsLayer, Timepoint, Timings};
 
     #[derive(Clone, Copy)]
     struct TestTime(u64);

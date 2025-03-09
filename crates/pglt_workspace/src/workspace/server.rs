@@ -6,11 +6,11 @@ use change::StatementChange;
 use dashmap::{DashMap, DashSet};
 use db_connection::DbConnection;
 use document::{Document, Statement};
-use futures::{stream, StreamExt};
+use futures::{StreamExt, stream};
 use pg_query::PgQueryStore;
 use pglt_analyse::{AnalyserOptions, AnalysisFilter};
 use pglt_analyser::{Analyser, AnalyserConfig, AnalyserContext};
-use pglt_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, DiagnosticExt, Severity};
+use pglt_diagnostics::{Diagnostic, DiagnosticExt, Severity, serde::Diagnostic as SDiagnostic};
 use pglt_fs::{ConfigName, PgLTPath};
 use pglt_typecheck::TypecheckParams;
 use schema_cache_manager::SchemaCacheManager;
@@ -18,10 +18,10 @@ use tracing::info;
 use tree_sitter::TreeSitterStore;
 
 use crate::{
+    WorkspaceError,
     configuration::to_analyser_rules,
     settings::{Settings, SettingsHandle, SettingsHandleMut},
     workspace::PullDiagnosticsResult,
-    WorkspaceError,
 };
 
 use super::{
@@ -446,7 +446,13 @@ impl Workspace for WorkspaceServer {
 
         let tree = self.tree_sitter.get_parse_tree(&statement);
 
-        tracing::debug!("Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {}", position, stmt_range.start(), stmt_range.end(), text);
+        tracing::debug!(
+            "Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {}",
+            position,
+            stmt_range.start(),
+            stmt_range.end(),
+            text
+        );
 
         let schema_cache = self.schema_cache.load(pool)?;
 

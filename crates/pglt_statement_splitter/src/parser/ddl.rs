@@ -1,6 +1,6 @@
 use pglt_lexer::SyntaxKind;
 
-use super::{common::unknown, Parser};
+use super::{Parser, common::unknown};
 
 pub(crate) fn create(p: &mut Parser) {
     p.expect(SyntaxKind::Create);

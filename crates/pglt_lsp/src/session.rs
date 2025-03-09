@@ -2,25 +2,25 @@ use crate::diagnostics::LspError;
 use crate::documents::Document;
 use crate::utils;
 use anyhow::Result;
-use futures::stream::FuturesUnordered;
 use futures::StreamExt;
+use futures::stream::FuturesUnordered;
 use pglt_analyse::RuleCategoriesBuilder;
 use pglt_configuration::ConfigurationPathHint;
 use pglt_diagnostics::{DiagnosticExt, Error};
 use pglt_fs::{FileSystem, PgLTPath};
-use pglt_lsp_converters::{negotiated_encoding, PositionEncoding, WideEncoding};
-use pglt_workspace::configuration::{load_configuration, LoadedConfiguration};
+use pglt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
+use pglt_workspace::Workspace;
+use pglt_workspace::configuration::{LoadedConfiguration, load_configuration};
 use pglt_workspace::settings::PartialConfigurationExt;
 use pglt_workspace::workspace::{PullDiagnosticsParams, UpdateSettingsParams};
-use pglt_workspace::Workspace;
 use pglt_workspace::{DynRef, WorkspaceError};
 use rustc_hash::FxHashMap;
 use serde_json::Value;
 use std::path::PathBuf;
-use std::sync::atomic::Ordering;
-use std::sync::atomic::{AtomicBool, AtomicU8};
 use std::sync::Arc;
 use std::sync::RwLock;
+use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicBool, AtomicU8};
 use tokio::sync::Notify;
 use tokio::sync::OnceCell;
 use tower_lsp::lsp_types::Url;
@@ -226,19 +226,25 @@ impl Session {
             }
         }
 
-        if let Err(e) = self.client.unregister_capability(unregistrations).await {
-            error!(
-                "Error unregistering {unregister_methods:?} capabilities: {}",
-                e
-            );
-        } else {
-            info!("Unregister capabilities {unregister_methods:?}");
+        match self.client.unregister_capability(unregistrations).await {
+            Err(e) => {
+                error!(
+                    "Error unregistering {unregister_methods:?} capabilities: {}",
+                    e
+                );
+            }
+            _ => {
+                info!("Unregister capabilities {unregister_methods:?}");
+            }
         }
 
-        if let Err(e) = self.client.register_capability(registrations).await {
-            error!("Error registering {register_methods:?} capabilities: {}", e);
-        } else {
-            info!("Register capabilities {register_methods:?}");
+        match self.client.register_capability(registrations).await {
+            Err(e) => {
+                error!("Error registering {register_methods:?} capabilities: {}", e);
+            }
+            _ => {
+                info!("Register capabilities {register_methods:?}");
+            }
         }
     }
 

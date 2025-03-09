@@ -6,12 +6,12 @@ use std::{
 
 use pglt_analyse::AnalyserRules;
 use pglt_configuration::{
-    push_to_analyser_rules, ConfigurationDiagnostic, ConfigurationPathHint, ConfigurationPayload,
-    PartialConfiguration,
+    ConfigurationDiagnostic, ConfigurationPathHint, ConfigurationPayload, PartialConfiguration,
+    push_to_analyser_rules,
 };
 use pglt_fs::{AutoSearchResult, ConfigName, FileSystem, OpenOptions};
 
-use crate::{settings::Settings, DynRef, WorkspaceError};
+use crate::{DynRef, WorkspaceError, settings::Settings};
 
 /// Information regarding the configuration that was found.
 ///

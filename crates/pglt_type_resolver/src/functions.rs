@@ -1,7 +1,7 @@
 use pglt_schema_cache::{Function, SchemaCache};
 
 use crate::{
-    types::{resolve_type, PossibleType},
+    types::{PossibleType, resolve_type},
     util::get_string_from_node,
 };
 
@@ -27,11 +27,7 @@ pub fn resolve_func_call<'b>(
         })
         .collect::<Vec<&Function>>();
 
-    if fns.len() == 1 {
-        Some(fns[0])
-    } else {
-        None
-    }
+    if fns.len() == 1 { Some(fns[0]) } else { None }
 }
 
 fn resolve_func_identifier(node: &pglt_query_ext::protobuf::FuncCall) -> (Option<String>, String) {

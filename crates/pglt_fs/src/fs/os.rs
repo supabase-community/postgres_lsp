@@ -2,11 +2,11 @@
 use super::{BoxedTraversal, ErrorKind, File, FileSystemDiagnostic};
 use crate::fs::OpenOptions;
 use crate::{
-    fs::{TraversalContext, TraversalScope},
     FileSystem, PgLTPath,
+    fs::{TraversalContext, TraversalScope},
 };
-use pglt_diagnostics::{adapters::IoError, DiagnosticExt, Error, Severity};
-use rayon::{scope, Scope};
+use pglt_diagnostics::{DiagnosticExt, Error, Severity, adapters::IoError};
+use rayon::{Scope, scope};
 use std::fs::{DirEntry, FileType};
 use std::process::Command;
 use std::{

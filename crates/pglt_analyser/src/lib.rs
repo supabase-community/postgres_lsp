@@ -72,8 +72,9 @@ mod tests {
 
     use pglt_analyse::{AnalyserOptions, AnalysisFilter, RuleFilter};
     use pglt_console::{
+        Markup,
         fmt::{Formatter, Termcolor},
-        markup, Markup,
+        markup,
     };
     use pglt_diagnostics::PrintDiagnostic;
     use termcolor::NoColor;

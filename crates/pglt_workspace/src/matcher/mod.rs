@@ -135,8 +135,8 @@ impl Diagnostic for PatternError {
 
 #[cfg(test)]
 mod test {
-    use crate::matcher::pattern::MatchOptions;
     use crate::matcher::Matcher;
+    use crate::matcher::pattern::MatchOptions;
     use std::env;
 
     #[test]

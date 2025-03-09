@@ -24,7 +24,7 @@ macro_rules! declare_lint_rule {
     ( $( #[doc = $doc:literal] )+ $vis:vis $id:ident {
         version: $version:literal,
         name: $name:tt,
-        $( $key:ident: $value:expr, )*
+        $( $key:ident: $value:expr_2021, )*
     } ) => {
 
         pglt_analyse::declare_rule!(
@@ -53,7 +53,7 @@ macro_rules! declare_rule {
         ( $( #[doc = $doc:literal] )+ $vis:vis $id:ident {
         version: $version:literal,
         name: $name:tt,
-        $( $key:ident: $value:expr, )*
+        $( $key:ident: $value:expr_2021, )*
     } ) => {
         $( #[doc = $doc] )*
         $vis enum $id {}

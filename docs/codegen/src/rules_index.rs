@@ -1,7 +1,7 @@
 use biome_string_case::Case;
 use pglt_analyse::RuleMetadata;
 use pglt_console::fmt::{Formatter, HTML};
-use pglt_console::{markup, Markup};
+use pglt_console::{Markup, markup};
 use pulldown_cmark::{Event, Parser, Tag, TagEnd};
 use std::{
     collections::BTreeMap,

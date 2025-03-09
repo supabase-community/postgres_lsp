@@ -4,7 +4,7 @@ use pglt_console::{
 };
 use pglt_diagnostics::PrintDiagnostic;
 use pglt_test_utils::test_database::get_new_test_db;
-use pglt_typecheck::{check_sql, TypecheckParams};
+use pglt_typecheck::{TypecheckParams, check_sql};
 use sqlx::Executor;
 
 async fn test(name: &str, query: &str, setup: &str) {

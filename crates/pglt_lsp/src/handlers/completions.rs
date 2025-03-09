@@ -1,6 +1,6 @@
 use crate::session::Session;
 use anyhow::Result;
-use pglt_workspace::{workspace, WorkspaceError};
+use pglt_workspace::{WorkspaceError, workspace};
 use tower_lsp::lsp_types::{self, CompletionItem, CompletionItemLabelDetails};
 
 #[tracing::instrument(level = "trace", skip_all)]
