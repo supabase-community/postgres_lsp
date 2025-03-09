@@ -92,19 +92,23 @@ pub(crate) fn traverse(
 
         // The traversal context is scoped to ensure all the channels it
         // contains are properly closed once the traversal finishes
-        let (elapsed, evaluated_paths) = traverse_inputs(fs, inputs, &TraversalOptions {
+        let (elapsed, evaluated_paths) = traverse_inputs(
             fs,
-            workspace,
-            execution,
-            interner,
-            matches: &matches,
-            changed: &changed,
-            unchanged: &unchanged,
-            skipped: &skipped,
-            messages: sender,
-            remaining_diagnostics: &remaining_diagnostics,
-            evaluated_paths: RwLock::default(),
-        });
+            inputs,
+            &TraversalOptions {
+                fs,
+                workspace,
+                execution,
+                interner,
+                matches: &matches,
+                changed: &changed,
+                unchanged: &unchanged,
+                skipped: &skipped,
+                messages: sender,
+                remaining_diagnostics: &remaining_diagnostics,
+                evaluated_paths: RwLock::default(),
+            },
+        );
         // wait for the main thread to finish
         let diagnostics = handler.join().unwrap();
 

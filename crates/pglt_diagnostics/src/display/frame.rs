@@ -163,13 +163,17 @@ pub(super) fn print_frame(fmt: &mut fmt::Formatter<'_>, location: Location<'_>) 
         })?;
 
         // Show invisible characters
-        print_invisibles(fmt, line_text, PrintInvisiblesOptions {
-            ignore_trailing_carriage_return: true,
-            ignore_leading_tabs: true,
-            ignore_lone_spaces: true,
-            at_line_start: true,
-            at_line_end: true,
-        })?;
+        print_invisibles(
+            fmt,
+            line_text,
+            PrintInvisiblesOptions {
+                ignore_trailing_carriage_return: true,
+                ignore_leading_tabs: true,
+                ignore_lone_spaces: true,
+                at_line_start: true,
+                at_line_end: true,
+            },
+        )?;
 
         fmt.write_str("\n")?;
 

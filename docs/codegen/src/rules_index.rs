@@ -80,9 +80,12 @@ fn generate_group(
 
 fn extract_group_metadata(group: &str) -> (&str, Markup) {
     match group {
-        "safety" => ("Safety", markup! {
-            "Rules that detect potential safety issues in your code."
-        }),
+        "safety" => (
+            "Safety",
+            markup! {
+                "Rules that detect potential safety issues in your code."
+            },
+        ),
         _ => panic!("Unknown group ID {group:?}"),
     }
 }

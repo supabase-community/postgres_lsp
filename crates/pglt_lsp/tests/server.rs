@@ -131,17 +131,21 @@ impl Server {
     #[allow(deprecated)]
     async fn initialize(&mut self) -> Result<()> {
         let _res: InitializeResult = self
-            .request("initialize", "_init", InitializeParams {
-                process_id: None,
-                root_path: None,
-                root_uri: Some(url!("")),
-                initialization_options: None,
-                capabilities: ClientCapabilities::default(),
-                trace: None,
-                workspace_folders: None,
-                client_info: None,
-                locale: None,
-            })
+            .request(
+                "initialize",
+                "_init",
+                InitializeParams {
+                    process_id: None,
+                    root_path: None,
+                    root_uri: Some(url!("")),
+                    initialization_options: None,
+                    capabilities: ClientCapabilities::default(),
+                    trace: None,
+                    workspace_folders: None,
+                    client_info: None,
+                    locale: None,
+                },
+            )
             .await?
             .context("initialize returned None")?;
 
@@ -173,27 +177,33 @@ impl Server {
     }
 
     async fn open_document(&mut self, text: impl Display) -> Result<()> {
-        self.notify("textDocument/didOpen", DidOpenTextDocumentParams {
-            text_document: TextDocumentItem {
-                uri: url!("document.sql"),
-                language_id: String::from("sql"),
-                version: 0,
-                text: text.to_string(),
+        self.notify(
+            "textDocument/didOpen",
+            DidOpenTextDocumentParams {
+                text_document: TextDocumentItem {
+                    uri: url!("document.sql"),
+                    language_id: String::from("sql"),
+                    version: 0,
+                    text: text.to_string(),
+                },
             },
-        })
+        )
         .await
     }
 
     /// Opens a document with given contents and given name. The name must contain the extension too
     async fn open_named_document(&mut self, text: impl Display, document_name: Url) -> Result<()> {
-        self.notify("textDocument/didOpen", DidOpenTextDocumentParams {
-            text_document: TextDocumentItem {
-                uri: document_name,
-                language_id: String::from("sql"),
-                version: 0,
-                text: text.to_string(),
+        self.notify(
+            "textDocument/didOpen",
+            DidOpenTextDocumentParams {
+                text_document: TextDocumentItem {
+                    uri: document_name,
+                    language_id: String::from("sql"),
+                    version: 0,
+                    text: text.to_string(),
+                },
             },
-        })
+        )
         .await
     }
 
@@ -213,22 +223,28 @@ impl Server {
         version: i32,
         content_changes: Vec<TextDocumentContentChangeEvent>,
     ) -> Result<()> {
-        self.notify("textDocument/didChange", DidChangeTextDocumentParams {
-            text_document: VersionedTextDocumentIdentifier {
-                uri: url!("document.sql"),
-                version,
+        self.notify(
+            "textDocument/didChange",
+            DidChangeTextDocumentParams {
+                text_document: VersionedTextDocumentIdentifier {
+                    uri: url!("document.sql"),
+                    version,
+                },
+                content_changes,
             },
-            content_changes,
-        })
+        )
         .await
     }
 
     async fn close_document(&mut self) -> Result<()> {
-        self.notify("textDocument/didClose", DidCloseTextDocumentParams {
-            text_document: TextDocumentIdentifier {
-                uri: url!("document.sql"),
+        self.notify(
+            "textDocument/didClose",
+            DidCloseTextDocumentParams {
+                text_document: TextDocumentIdentifier {
+                    uri: url!("document.sql"),
+                },
             },
-        })
+        )
         .await
     }
 

@@ -214,9 +214,12 @@ where
             Applicability::MaybeIncorrect => "Unsafe fix",
         };
 
-        visitor.record_log(LogCategory::Info, &markup! {
-            {applicability}": "{self.msg}
-        })?;
+        visitor.record_log(
+            LogCategory::Info,
+            &markup! {
+                {applicability}": "{self.msg}
+            },
+        )?;
 
         visitor.record_diff(&self.suggestion)
     }

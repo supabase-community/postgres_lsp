@@ -313,9 +313,12 @@ where
 
     // Print a log advice for the message, with a special fallback if the buffer is empty
     if message.is_empty() {
-        visitor.record_log(LogCategory::None, &markup! {
-            <Dim>"no diagnostic message provided"</Dim>
-        })?;
+        visitor.record_log(
+            LogCategory::None,
+            &markup! {
+                <Dim>"no diagnostic message provided"</Dim>
+            },
+        )?;
     } else {
         let category = match diagnostic.severity() {
             Severity::Fatal | Severity::Error => LogCategory::Error,

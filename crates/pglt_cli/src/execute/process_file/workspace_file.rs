@@ -34,11 +34,14 @@ impl<'ctx, 'app> WorkspaceFile<'ctx, 'app> {
         file.read_to_string(&mut input)
             .with_file_path(path.display().to_string())?;
 
-        let guard = FileGuard::open(ctx.workspace, OpenFileParams {
-            path: pglt_path,
-            version: 0,
-            content: input.clone(),
-        })
+        let guard = FileGuard::open(
+            ctx.workspace,
+            OpenFileParams {
+                path: pglt_path,
+                version: 0,
+                content: input.clone(),
+            },
+        )
         .with_file_path_and_code(path.display().to_string(), category!("internalError/fs"))?;
 
         Ok(Self {
@@ -67,10 +70,10 @@ impl<'ctx, 'app> WorkspaceFile<'ctx, 'app> {
         self.file
             .set_content(new_content.as_bytes())
             .with_file_path(self.path.display().to_string())?;
-        self.guard
-            .change_file(self.file.file_version(), vec![ChangeParams::overwrite(
-                new_content,
-            )])?;
+        self.guard.change_file(
+            self.file.file_version(),
+            vec![ChangeParams::overwrite(new_content)],
+        )?;
         Ok(())
     }
 }

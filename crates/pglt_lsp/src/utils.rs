@@ -333,34 +333,37 @@ line 7 new";
 
         let text_edit = super::text_edit(&line_index, diff, PositionEncoding::Utf8, None).unwrap();
 
-        assert_eq!(text_edit.as_slice(), &[
-            lsp::TextEdit {
-                range: lsp::Range {
-                    start: lsp::Position {
-                        line: 0,
-                        character: 7,
+        assert_eq!(
+            text_edit.as_slice(),
+            &[
+                lsp::TextEdit {
+                    range: lsp::Range {
+                        start: lsp::Position {
+                            line: 0,
+                            character: 7,
+                        },
+                        end: lsp::Position {
+                            line: 0,
+                            character: 10,
+                        },
                     },
-                    end: lsp::Position {
-                        line: 0,
-                        character: 10,
-                    },
+                    new_text: String::from("new"),
                 },
-                new_text: String::from("new"),
-            },
-            lsp::TextEdit {
-                range: lsp::Range {
-                    start: lsp::Position {
-                        line: 6,
-                        character: 7
+                lsp::TextEdit {
+                    range: lsp::Range {
+                        start: lsp::Position {
+                            line: 6,
+                            character: 7
+                        },
+                        end: lsp::Position {
+                            line: 6,
+                            character: 10
+                        }
                     },
-                    end: lsp::Position {
-                        line: 6,
-                        character: 10
-                    }
+                    new_text: String::from("new"),
                 },
-                new_text: String::from("new"),
-            },
-        ]);
+            ]
+        );
     }
 
     #[test]
@@ -373,47 +376,50 @@ line 7 new";
 
         let text_edit = super::text_edit(&line_index, diff, PositionEncoding::Utf8, None).unwrap();
 
-        assert_eq!(text_edit.as_slice(), &[
-            lsp::TextEdit {
-                range: lsp::Range {
-                    start: lsp::Position {
-                        line: 0,
-                        character: 12,
+        assert_eq!(
+            text_edit.as_slice(),
+            &[
+                lsp::TextEdit {
+                    range: lsp::Range {
+                        start: lsp::Position {
+                            line: 0,
+                            character: 12,
+                        },
+                        end: lsp::Position {
+                            line: 0,
+                            character: 13,
+                        },
                     },
-                    end: lsp::Position {
-                        line: 0,
-                        character: 13,
-                    },
+                    new_text: String::from("`"),
                 },
-                new_text: String::from("`"),
-            },
-            lsp::TextEdit {
-                range: lsp::Range {
-                    start: lsp::Position {
-                        line: 0,
-                        character: 23
+                lsp::TextEdit {
+                    range: lsp::Range {
+                        start: lsp::Position {
+                            line: 0,
+                            character: 23
+                        },
+                        end: lsp::Position {
+                            line: 0,
+                            character: 27
+                        }
                     },
-                    end: lsp::Position {
-                        line: 0,
-                        character: 27
-                    }
+                    new_text: String::from("${"),
                 },
-                new_text: String::from("${"),
-            },
-            lsp::TextEdit {
-                range: lsp::Range {
-                    start: lsp::Position {
-                        line: 0,
-                        character: 35
+                lsp::TextEdit {
+                    range: lsp::Range {
+                        start: lsp::Position {
+                            line: 0,
+                            character: 35
+                        },
+                        end: lsp::Position {
+                            line: 0,
+                            character: 35
+                        }
                     },
-                    end: lsp::Position {
-                        line: 0,
-                        character: 35
-                    }
+                    new_text: String::from("}`"),
                 },
-                new_text: String::from("}`"),
-            },
-        ]);
+            ]
+        );
     }
 
     // #[test]

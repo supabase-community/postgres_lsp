@@ -74,14 +74,18 @@ impl<'app> CliSession<'app> {
                 staged,
                 changed,
                 since,
-            } => run_command(self, &cli_options, CheckCommandPayload {
-                configuration,
-                paths,
-                stdin_file_path,
-                staged,
-                changed,
-                since,
-            }),
+            } => run_command(
+                self,
+                &cli_options,
+                CheckCommandPayload {
+                    configuration,
+                    paths,
+                    stdin_file_path,
+                    staged,
+                    changed,
+                    since,
+                },
+            ),
             PgltCommand::Clean => commands::clean::clean(self),
             PgltCommand::Start {
                 config_path,
