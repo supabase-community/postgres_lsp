@@ -1,4 +1,3 @@
-use pglt_diagnostics::Diagnostic;
 use std::ops::{Add, Sub};
 use text_size::{TextLen, TextRange, TextSize};
 
@@ -429,6 +428,7 @@ impl ChangeParams {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pglt_diagnostics::Diagnostic;
     use text_size::TextRange;
 
     use crate::workspace::{ChangeFileParams, ChangeParams};
