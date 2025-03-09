@@ -104,24 +104,19 @@ pub fn markup(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
                             name: name.clone(),
                             attributes: attributes.clone(),
                         });
-                    } else {
-                        match stack.last() {
-                            Some(top) => {
-                                // Only verify the coherence of the top element on the
-                                // stack with a closing element, skip over the check if
-                                // the stack is empty as that error will be handled
-                                // when the top element gets popped off the stack later
-                                let name_str = name.to_string();
-                                let top_str = top.name.to_string();
-                                if name_str != top_str {
-                                    abort!(
-                                        name.span(), "closing element mismatch";
-                                        close = "found closing element {}", name_str;
-                                        open = top.name.span() => "expected {}", top_str
-                                    );
-                                }
-                            }
-                            _ => {}
+                    } else if let Some(top) = stack.last() {
+                        // Only verify the coherence of the top element on the
+                        // stack with a closing element, skip over the check if
+                        // the stack is empty as that error will be handled
+                        // when the top element gets popped off the stack later
+                        let name_str = name.to_string();
+                        let top_str = top.name.to_string();
+                        if name_str != top_str {
+                            abort!(
+                                name.span(), "closing element mismatch";
+                                close = "found closing element {}", name_str;
+                                open = top.name.span() => "expected {}", top_str
+                            );
                         }
                     }
 
