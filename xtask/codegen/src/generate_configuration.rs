@@ -173,12 +173,12 @@ fn generate_for_groups(
     let use_rule_configuration = if kind == RuleCategory::Action {
         quote! {
             use crate::analyser::{RuleAssistConfiguration, RuleAssistPlainConfiguration};
-            use pglt_analyse::{RuleFilter, options::RuleOptions};
+            use pglt_analyse::{options::RuleOptions, RuleFilter};
         }
     } else {
         quote! {
             use crate::analyser::{RuleConfiguration, RulePlainConfiguration};
-            use pglt_analyse::{RuleFilter, options::RuleOptions};
+            use pglt_analyse::{options::RuleOptions, RuleFilter};
         }
     };
 
