@@ -207,7 +207,7 @@ impl schemars::JsonSchema for FileKinds {
         String::from("FileKind")
     }
 
-    fn json_schema(gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
-        <Vec<FileKind>>::json_schema(gen)
+    fn json_schema(r#gen: &mut schemars::r#gen::SchemaGenerator) -> schemars::schema::Schema {
+        <Vec<FileKind>>::json_schema(r#gen)
     }
 }

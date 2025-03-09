@@ -226,20 +226,20 @@ impl Session {
             }
         }
 
-        if let Err(e) = self.client.unregister_capability(unregistrations).await {
+        match self.client.unregister_capability(unregistrations).await { Err(e) => {
             error!(
                 "Error unregistering {unregister_methods:?} capabilities: {}",
                 e
             );
-        } else {
+        } _ => {
             info!("Unregister capabilities {unregister_methods:?}");
-        }
+        }}
 
-        if let Err(e) = self.client.register_capability(registrations).await {
+        match self.client.register_capability(registrations).await { Err(e) => {
             error!("Error registering {register_methods:?} capabilities: {}", e);
-        } else {
+        } _ => {
             info!("Register capabilities {register_methods:?}");
-        }
+        }}
     }
 
     /// Computes diagnostics for the file matching the provided url and publishes

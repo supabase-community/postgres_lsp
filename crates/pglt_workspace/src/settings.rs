@@ -163,28 +163,28 @@ fn to_file_settings(
     vcs_config_path: Option<PathBuf>,
     gitignore_matches: &[String],
 ) -> Result<Option<FilesSettings>, WorkspaceError> {
-    let config = if let Some(config) = config {
+    let config = match config { Some(config) => {
         Some(config)
-    } else if vcs_config_path.is_some() {
+    } _ => if vcs_config_path.is_some() {
         Some(FilesConfiguration::default())
     } else {
         None
-    };
+    }};
     let git_ignore = if let Some(vcs_config_path) = vcs_config_path {
         Some(to_git_ignore(vcs_config_path, gitignore_matches)?)
     } else {
         None
     };
-    Ok(if let Some(config) = config {
+    Ok(match config { Some(config) => {
         Some(FilesSettings {
             max_size: config.max_size,
             git_ignore,
             ignored_files: to_matcher(working_directory.clone(), Some(&config.ignore))?,
             included_files: to_matcher(working_directory, Some(&config.include))?,
         })
-    } else {
+    } _ => {
         None
-    })
+    }})
 }
 
 fn to_git_ignore(path: PathBuf, matches: &[String]) -> Result<Gitignore, WorkspaceError> {

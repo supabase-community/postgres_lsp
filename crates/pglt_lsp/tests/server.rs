@@ -81,11 +81,11 @@ impl Server {
             .map_err(Error::msg)
             .context("call() returned an error")
             .and_then(|res| {
-                if let Some(res) = res {
+                match res { Some(res) => {
                     bail!("shutdown returned {:?}", res)
-                } else {
+                } _ => {
                     Ok(())
-                }
+                }}
             })
     }
 
@@ -172,11 +172,11 @@ impl Server {
             .map_err(Error::msg)
             .context("call() returned an error")
             .and_then(|res| {
-                if let Some(res) = res {
+                match res { Some(res) => {
                     bail!("shutdown returned {:?}", res)
-                } else {
+                } _ => {
                     Ok(())
-                }
+                }}
             })
     }
 

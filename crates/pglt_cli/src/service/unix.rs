@@ -151,7 +151,7 @@ pub(crate) async fn ensure_daemon(
             {
                 last_error = Some(err);
 
-                if let Some(current_child) = &mut current_child {
+                match &mut current_child { Some(current_child) => {
                     // If we have a handle to the daemon process, wait for a few
                     // milliseconds for it to exit, or retry the connection
                     tokio::select! {
@@ -164,7 +164,7 @@ pub(crate) async fn ensure_daemon(
                         }
                         _ = time::sleep(Duration::from_millis(50)) => {}
                     }
-                } else {
+                } _ => {
                     // Spawn the daemon process and wait a few milliseconds for
                     // it to become ready then retry the connection
                     current_child = Some(spawn_daemon(
@@ -174,7 +174,7 @@ pub(crate) async fn ensure_daemon(
                         log_file_name_prefix.clone(),
                     )?);
                     time::sleep(Duration::from_millis(50)).await;
-                }
+                }}
             }
 
             Err(err) => return Err(err),

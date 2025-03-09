@@ -12,14 +12,14 @@ impl ExecuteStatementCommand {
     }
 
     pub async fn run(&self, conn: Option<PgPool>) -> anyhow::Result<PgQueryResult> {
-        if let Some(conn) = conn {
+        match conn { Some(conn) => {
             match conn.execute(self.statement.as_str()).await {
                 Ok(res) => Ok(res),
                 Err(e) => Err(anyhow::anyhow!(e.to_string())),
             }
-        } else {
+        } _ => {
             Err(anyhow::anyhow!("No connection to database".to_string()))
-        }
+        }}
     }
 
     pub fn trim_statement(stmt: String, max_length: usize) -> String {

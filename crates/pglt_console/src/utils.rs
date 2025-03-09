@@ -47,11 +47,11 @@ where
     fn fmt(&self, fmt: &mut Formatter) -> io::Result<()> {
         use crate as pglt_console;
 
-        if let Some(value) = &self.0 {
+        match &self.0 { Some(value) => {
             markup!({ DebugDisplay(value) }).fmt(fmt)?;
-        } else {
+        } _ => {
             markup!(<Dim>"unset"</Dim>).fmt(fmt)?;
-        }
+        }}
         Ok(())
     }
 }

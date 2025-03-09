@@ -5,7 +5,7 @@ resolver = "2"
 [workspace.package]
 authors      = ["Supabase Communnity"]
 categories   = ["development-tools", "postgres", "supabase"]
-edition      = "2021"
+edition      = "2024"
 homepage     = "https://supabase.com/"
 keywords     = ["linter", "typechecker", "postgres", "language-server"]
 license      = "MIT"

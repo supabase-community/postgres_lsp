@@ -95,7 +95,7 @@ mod tests {
     use tower_lsp::lsp_types::Position;
 
     macro_rules! check_conversion {
-        ($line_index:ident : $position:expr => $text_size:expr ) => {
+        ($line_index:ident : $position:expr_2021 => $text_size:expr_2021 ) => {
             let position_encoding = PositionEncoding::Wide(WideEncoding::Utf16);
 
             let offset = offset(&$line_index, $position, position_encoding).ok();

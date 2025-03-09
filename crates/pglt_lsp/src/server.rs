@@ -69,7 +69,7 @@ impl LSPServer {
         capabilities.add_capability(
             "pglt_did_change_workspace_settings",
             "workspace/didChangeWatchedFiles",
-            if let Some(base_path) = self.session.base_path() {
+            match self.session.base_path() { Some(base_path) => {
                 CapabilityStatus::Enable(Some(json!(DidChangeWatchedFilesRegistrationOptions {
                     watchers: vec![FileSystemWatcher {
                         glob_pattern: GlobPattern::String(format!(
@@ -79,9 +79,9 @@ impl LSPServer {
                         kind: Some(WatchKind::all()),
                     },],
                 })))
-            } else {
+            } _ => {
                 CapabilityStatus::Disable
-            },
+            }},
         );
 
         self.session.register_capabilities(capabilities).await;

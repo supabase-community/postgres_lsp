@@ -49,7 +49,7 @@ pub(crate) fn start(
 pub(crate) fn stop(session: CliSession) -> Result<(), CliDiagnostic> {
     let rt = Runtime::new()?;
 
-    if let Some(transport) = open_transport(rt)? {
+    match open_transport(rt)? { Some(transport) => {
         let client = WorkspaceClient::new(transport)?;
         match client.shutdown() {
             // The `ChannelClosed` error is expected since the server can
@@ -61,11 +61,11 @@ pub(crate) fn stop(session: CliSession) -> Result<(), CliDiagnostic> {
         session.app.console.log(markup! {
             "The server was successfully stopped"
         });
-    } else {
+    } _ => {
         session.app.console.log(markup! {
             "The server was not running"
         });
-    }
+    }}
 
     Ok(())
 }

@@ -13,11 +13,11 @@ thread_local! {
 impl std::fmt::Display for PanicError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let r = f.write_fmt(format_args!("{}\n", self.info));
-        if let Some(backtrace) = &self.backtrace {
+        match &self.backtrace { Some(backtrace) => {
             f.write_fmt(format_args!("Backtrace: {backtrace}"))
-        } else {
+        } _ => {
             r
-        }
+        }}
     }
 }
 

@@ -104,7 +104,7 @@ pub fn markup(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
                             name: name.clone(),
                             attributes: attributes.clone(),
                         });
-                    } else if let Some(top) = stack.last() {
+                    } else { match stack.last() { Some(top) => {
                         // Only verify the coherence of the top element on the
                         // stack with a closing element, skip over the check if
                         // the stack is empty as that error will be handled
@@ -118,7 +118,7 @@ pub fn markup(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
                                 open = top.name.span() => "expected {}", top_str
                             );
                         }
-                    }
+                    } _ => {}}}
 
                     if (is_closing_element || is_self_closing) && stack.pop().is_none() {
                         abort!(name.span(), "unexpected closing element");
