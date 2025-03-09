@@ -183,7 +183,7 @@ impl PgltCommand {
             | PgltCommand::Stop
             | PgltCommand::Init
             | PgltCommand::RunServer { .. }
-            | PgltCommand::Clean { .. }
+            | PgltCommand::Clean
             | PgltCommand::PrintSocket => None,
         }
     }

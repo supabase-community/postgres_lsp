@@ -487,7 +487,7 @@ impl TraversalContext for TraversalOptions<'_, '_> {
         }
 
         match self.execution.traversal_mode() {
-            TraversalMode::Dummy { .. } => true,
+            TraversalMode::Dummy => true,
             TraversalMode::Check { .. } => true,
         }
     }

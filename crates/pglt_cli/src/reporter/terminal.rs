@@ -151,7 +151,7 @@ impl fmt::Display for SummaryTotal<'_> {
     fn fmt(&self, fmt: &mut Formatter) -> io::Result<()> {
         let files = Files(self.1);
         match self.0 {
-            TraversalMode::Dummy { .. } => fmt.write_markup(markup! {
+            TraversalMode::Dummy => fmt.write_markup(markup! {
                 "Dummy "{files}" in "{self.2}"."
             }),
             TraversalMode::Check { .. } => fmt.write_markup(markup! {

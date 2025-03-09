@@ -122,10 +122,7 @@ impl<'a> CompletionContext<'a> {
 
     pub fn get_ts_node_content(&self, ts_node: tree_sitter::Node<'a>) -> Option<&'a str> {
         let source = self.text;
-        match ts_node.utf8_text(source.as_bytes()) {
-            Ok(content) => Some(content),
-            Err(_) => None,
-        }
+        ts_node.utf8_text(source.as_bytes()).ok()
     }
 
     fn gather_tree_context(&mut self) {

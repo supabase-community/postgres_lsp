@@ -103,7 +103,7 @@ pub enum TraversalMode {
 impl Display for TraversalMode {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            TraversalMode::Dummy { .. } => write!(f, "dummy"),
+            TraversalMode::Dummy => write!(f, "dummy"),
             TraversalMode::Check { .. } => write!(f, "check"),
         }
     }
@@ -165,33 +165,33 @@ impl Execution {
 
     pub(crate) fn as_diagnostic_category(&self) -> &'static Category {
         match self.traversal_mode {
-            TraversalMode::Dummy { .. } => category!("dummy"),
+            TraversalMode::Dummy => category!("dummy"),
             TraversalMode::Check { .. } => category!("check"),
         }
     }
 
     pub(crate) const fn is_dummy(&self) -> bool {
-        matches!(self.traversal_mode, TraversalMode::Dummy { .. })
+        matches!(self.traversal_mode, TraversalMode::Dummy)
     }
 
     /// Whether the traversal mode requires write access to files
     pub(crate) const fn requires_write_access(&self) -> bool {
         match self.traversal_mode {
-            TraversalMode::Dummy { .. } => false,
+            TraversalMode::Dummy => false,
             TraversalMode::Check { .. } => false,
         }
     }
 
     pub(crate) fn as_stdin_file(&self) -> Option<&Stdin> {
         match &self.traversal_mode {
-            TraversalMode::Dummy { .. } => None,
+            TraversalMode::Dummy => None,
             TraversalMode::Check { stdin, .. } => stdin.as_ref(),
         }
     }
 
     pub(crate) fn is_vcs_targeted(&self) -> bool {
         match &self.traversal_mode {
-            TraversalMode::Dummy { .. } => false,
+            TraversalMode::Dummy => false,
             TraversalMode::Check { vcs_targeted, .. } => {
                 vcs_targeted.staged || vcs_targeted.changed
             }
@@ -205,7 +205,7 @@ impl Execution {
     /// Returns [true] if the user used the `--write`/`--fix` option
     pub(crate) fn is_write(&self) -> bool {
         match self.traversal_mode {
-            TraversalMode::Dummy { .. } => false,
+            TraversalMode::Dummy => false,
             TraversalMode::Check { .. } => false,
         }
     }
