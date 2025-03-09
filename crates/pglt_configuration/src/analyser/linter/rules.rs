@@ -2,7 +2,7 @@
 
 use crate::analyser::{RuleConfiguration, RulePlainConfiguration};
 use biome_deserialize_macros::Merge;
-use pglt_analyse::{RuleFilter, options::RuleOptions};
+use pglt_analyse::{options::RuleOptions, RuleFilter};
 use pglt_diagnostics::{Category, Severity};
 use rustc_hash::FxHashSet;
 #[cfg(feature = "schema")]
