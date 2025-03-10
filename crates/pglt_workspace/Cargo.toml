@@ -37,6 +37,7 @@ toml                      = { workspace = true }
 tracing                   = { workspace = true, features = ["attributes", "log"] }
 tree-sitter.workspace     = true
 tree_sitter_sql.workspace = true
+schemars                = { workspace = true, optional = true }
 
 [dev-dependencies]
 tempfile = "3.15.0"
@@ -45,3 +46,8 @@ tempfile = "3.15.0"
 doctest = false
 
 [features]
+schema = [
+  "dep:schemars",
+  "pglt_configuration/schema",
+  "pglt_fs/schema",
+]

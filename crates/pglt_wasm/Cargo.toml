@@ -1,0 +1,35 @@
+[package]
+name = "pglt_wasm"
+version = "0.1.0"
+authors.workspace = true
+categories.workspace = true
+edition.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+pglt_console      = { workspace = true }
+pglt_diagnostics  = { workspace = true }
+pglt_fs           = { workspace = true }
+pglt_workspace      = { workspace = true }
+js-sys             = "0.3.77"
+serde              = { workspace = true }
+serde-wasm-bindgen = "0.6.5"
+wasm-bindgen       = { version = "0.2.100", features = ["serde-serialize"] }
+
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+# code size when deploying.
+console_error_panic_hook = { version = "0.1.7", optional = true }
+
+[build-dependencies]
+biome_js_factory   = { git = "https://github.com/biomejs/biome" }
+biome_js_formatter = { git = "https://github.com/biomejs/biome" }
+pglt_workspace      = { workspace = true, features = ["schema"] }
+quote              = "1.0.14"
+schemars           = { workspace = true }
+
