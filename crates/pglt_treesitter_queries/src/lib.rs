@@ -68,7 +68,7 @@ impl<'a> Iterator for QueryResultIter<'a> {
 #[cfg(test)]
 mod tests {
 
-    use crate::{queries::RelationMatch, TreeSitterQueriesExecutor};
+    use crate::{TreeSitterQueriesExecutor, queries::RelationMatch};
 
     #[test]
     fn finds_all_relations_and_ignores_functions() {

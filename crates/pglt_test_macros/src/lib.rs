@@ -13,7 +13,7 @@ use std::{
 pub fn gen_tests(input: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(input as Arguments);
 
-    match args.gen() {
+    match args.generate() {
         Ok(tokens) => tokens,
         Err(e) => abort!(e, "{}", e),
     }
@@ -139,7 +139,7 @@ impl Arguments {
         Ok(paths)
     }
 
-    fn gen(self) -> Result<TokenStream, &'static str> {
+    fn generate(self) -> Result<TokenStream, &'static str> {
         let files = self.get_filepaths()?;
         let mut modules = TestModules::default();
 

@@ -1,8 +1,8 @@
 mod check;
 pub(crate) mod workspace_file;
 
-use crate::execute::traverse::TraversalOptions;
 use crate::execute::TraversalMode;
+use crate::execute::traverse::TraversalOptions;
 use check::check_file;
 use pglt_diagnostics::Error;
 use pglt_fs::PgLTPath;

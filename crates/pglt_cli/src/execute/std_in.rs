@@ -2,7 +2,7 @@
 //!
 use crate::execute::Execution;
 use crate::{CliDiagnostic, CliSession};
-use pglt_console::{markup, ConsoleExt};
+use pglt_console::{ConsoleExt, markup};
 use pglt_fs::PgLTPath;
 
 pub(crate) fn run<'a>(

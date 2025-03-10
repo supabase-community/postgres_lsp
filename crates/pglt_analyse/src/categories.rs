@@ -1,4 +1,4 @@
-use enumflags2::{bitflags, BitFlags};
+use enumflags2::{BitFlags, bitflags};
 use std::borrow::Cow;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -288,8 +288,8 @@ impl schemars::JsonSchema for RuleCategories {
         String::from("RuleCategories")
     }
 
-    fn json_schema(gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
-        <Vec<RuleCategory>>::json_schema(gen)
+    fn json_schema(r#gen: &mut schemars::r#gen::SchemaGenerator) -> schemars::schema::Schema {
+        <Vec<RuleCategory>>::json_schema(r#gen)
     }
 }
 

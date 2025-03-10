@@ -4,7 +4,7 @@
 pub mod diagnostics;
 mod parser;
 
-use parser::{source, Parse, Parser};
+use parser::{Parse, Parser, source};
 use pglt_lexer::diagnostics::ScanError;
 
 pub fn split(sql: &str) -> Result<Parse, Vec<ScanError>> {
@@ -112,6 +112,12 @@ mod tests {
             "select 1",
             "select 3",
         ]);
+    }
+
+    #[test]
+    fn single_newlines() {
+        Tester::from("select 1\nfrom contact\n\nselect 3")
+            .expect_statements(vec!["select 1\nfrom contact", "select 3"]);
     }
 
     #[test]

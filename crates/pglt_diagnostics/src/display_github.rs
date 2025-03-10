@@ -1,6 +1,6 @@
 use crate::display::frame::SourceFile;
-use crate::{diagnostic::internal::AsDiagnostic, Diagnostic, Resource, Severity};
-use pglt_console::{fmt, markup, MarkupBuf};
+use crate::{Diagnostic, Resource, Severity, diagnostic::internal::AsDiagnostic};
+use pglt_console::{MarkupBuf, fmt, markup};
 use std::io;
 use text_size::{TextRange, TextSize};
 

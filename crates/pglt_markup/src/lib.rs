@@ -1,6 +1,6 @@
-use proc_macro2::{Delimiter, Group, Ident, TokenStream, TokenTree};
 use proc_macro_error::*;
-use quote::{quote, ToTokens};
+use proc_macro2::{Delimiter, Group, Ident, TokenStream, TokenTree};
+use quote::{ToTokens, quote};
 
 struct StackEntry {
     name: Ident,

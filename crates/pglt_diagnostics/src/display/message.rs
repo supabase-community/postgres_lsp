@@ -1,5 +1,5 @@
 use pglt_console::fmt::{Formatter, Termcolor};
-use pglt_console::{markup, MarkupBuf};
+use pglt_console::{MarkupBuf, markup};
 use serde::{Deserialize, Serialize};
 use termcolor::NoColor;
 

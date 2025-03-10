@@ -1,10 +1,10 @@
-use enumflags2::{bitflags, BitFlags};
+use enumflags2::{BitFlags, bitflags};
 use smallvec::SmallVec;
 use std::{
     cmp::Ordering,
     ffi::OsStr,
-    fs::read_to_string,
     fs::File,
+    fs::read_to_string,
     io,
     io::Write,
     ops::{Deref, DerefMut},
@@ -207,7 +207,7 @@ impl schemars::JsonSchema for FileKinds {
         String::from("FileKind")
     }
 
-    fn json_schema(gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
-        <Vec<FileKind>>::json_schema(gen)
+    fn json_schema(r#gen: &mut schemars::r#gen::SchemaGenerator) -> schemars::schema::Schema {
+        <Vec<FileKind>>::json_schema(r#gen)
     }
 }

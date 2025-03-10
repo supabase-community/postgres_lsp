@@ -1,31 +1,30 @@
-use anyhow::bail;
 use anyhow::Context;
 use anyhow::Error;
 use anyhow::Result;
+use anyhow::bail;
 use biome_deserialize::Merge;
-use futures::channel::mpsc::{channel, Sender};
 use futures::Sink;
 use futures::SinkExt;
 use futures::Stream;
 use futures::StreamExt;
-use pglt_configuration::database::PartialDatabaseConfiguration;
+use futures::channel::mpsc::{Sender, channel};
 use pglt_configuration::PartialConfiguration;
+use pglt_configuration::database::PartialDatabaseConfiguration;
 use pglt_fs::MemoryFileSystem;
 use pglt_lsp::LSPServer;
 use pglt_lsp::ServerFactory;
 use pglt_test_utils::test_database::get_new_test_db;
 use pglt_workspace::DynRef;
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 use serde_json::{from_value, to_value};
 use sqlx::Executor;
 use std::any::type_name;
 use std::fmt::Display;
-use std::process::id;
 use std::time::Duration;
-use tokio::time::sleep;
 use tower::timeout::Timeout;
 use tower::{Service, ServiceExt};
+use tower_lsp::LspService;
 use tower_lsp::jsonrpc;
 use tower_lsp::jsonrpc::Response;
 use tower_lsp::lsp_types as lsp;
@@ -35,7 +34,6 @@ use tower_lsp::lsp_types::{
     PublishDiagnosticsParams, TextDocumentContentChangeEvent, TextDocumentIdentifier,
     TextDocumentItem, Url, VersionedTextDocumentIdentifier,
 };
-use tower_lsp::LspService;
 use tower_lsp::{jsonrpc::Request, lsp_types::InitializeParams};
 
 /// Statically build an [Url] instance that points to the file at `$path`
@@ -80,12 +78,11 @@ impl Server {
             .await
             .map_err(Error::msg)
             .context("call() returned an error")
-            .and_then(|res| {
-                if let Some(res) = res {
+            .and_then(|res| match res {
+                Some(res) => {
                     bail!("shutdown returned {:?}", res)
-                } else {
-                    Ok(())
                 }
+                _ => Ok(()),
             })
     }
 
@@ -171,12 +168,11 @@ impl Server {
             .await
             .map_err(Error::msg)
             .context("call() returned an error")
-            .and_then(|res| {
-                if let Some(res) = res {
+            .and_then(|res| match res {
+                Some(res) => {
                     bail!("shutdown returned {:?}", res)
-                } else {
-                    Ok(())
                 }
+                _ => Ok(()),
             })
     }
 

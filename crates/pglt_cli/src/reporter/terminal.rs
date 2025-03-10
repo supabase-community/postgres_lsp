@@ -1,8 +1,8 @@
+use crate::Reporter;
 use crate::execute::{Execution, TraversalMode};
 use crate::reporter::{DiagnosticsPayload, ReporterVisitor, TraversalSummary};
-use crate::Reporter;
 use pglt_console::fmt::Formatter;
-use pglt_console::{fmt, markup, Console, ConsoleExt};
+use pglt_console::{Console, ConsoleExt, fmt, markup};
 use pglt_diagnostics::advice::ListAdvice;
 use pglt_diagnostics::{Diagnostic, PrintDiagnostic};
 use pglt_fs::PgLTPath;
@@ -151,7 +151,7 @@ impl fmt::Display for SummaryTotal<'_> {
     fn fmt(&self, fmt: &mut Formatter) -> io::Result<()> {
         let files = Files(self.1);
         match self.0 {
-            TraversalMode::Dummy { .. } => fmt.write_markup(markup! {
+            TraversalMode::Dummy => fmt.write_markup(markup! {
                 "Dummy "{files}" in "{self.2}"."
             }),
             TraversalMode::Check { .. } => fmt.write_markup(markup! {
