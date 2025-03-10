@@ -5,15 +5,7 @@ use super::{common::unknown, Parser};
 pub(crate) fn create(p: &mut Parser) {
     p.expect(SyntaxKind::Create);
 
-    unknown(
-        p,
-        &[
-            SyntaxKind::Insert,
-            SyntaxKind::Update,
-            SyntaxKind::DeleteP,
-            SyntaxKind::Select,
-        ],
-    );
+    unknown(p, &[]);
 }
 
 pub(crate) fn alter(p: &mut Parser) {

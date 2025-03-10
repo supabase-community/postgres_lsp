@@ -147,6 +147,7 @@ pub(crate) fn unknown(p: &mut Parser, exclude: &[SyntaxKind]) {
                     let prev = p.look_back().map(|t| t.kind);
                     if [
                         // for create trigger
+                        SyntaxKind::Before,
                         SyntaxKind::After,
                         // for create rule
                         SyntaxKind::On,
