@@ -143,6 +143,23 @@ mod tests {
     }
 
     #[test]
+    fn create_trigger() {
+        Tester::from("alter table appointment_status add constraint valid_key check (private.strip_special_chars(key) = key and length(key) > 0 and length(key) < 60);
+
+create trigger default_key before insert on appointment_type for each row when (new.key is null) execute procedure default_key ();
+
+create trigger default_key before insert on appointment_status for each row when (new.key is null) execute procedure default_key ();
+
+alter table deal_type add column key text not null;
+")
+            .expect_statements(vec!["alter table appointment_status add constraint valid_key check (private.strip_special_chars(key) = key and length(key) > 0 and length(key) < 60);",
+                "create trigger default_key before insert on appointment_type for each row when (new.key is null) execute procedure default_key ();",
+                "create trigger default_key before insert on appointment_status for each row when (new.key is null) execute procedure default_key ();",
+                "alter table deal_type add column key text not null;",
+            ]);
+    }
+
+    #[test]
     #[timeout(1000)]
     fn simple_select() {
         Tester::from(
