@@ -5,8 +5,8 @@
 //! execute the traversal of directory and files, based on the command that was passed.
 
 use cli_options::CliOptions;
-use commands::check::CheckCommandPayload;
 use commands::CommandRunner;
+use commands::check::CheckCommandPayload;
 use pglt_console::{ColorMode, Console};
 use pglt_fs::OsFileSystem;
 use pglt_workspace::{App, DynRef, Workspace, WorkspaceRef};
@@ -24,13 +24,13 @@ mod reporter;
 mod service;
 
 use crate::cli_options::ColorsArg;
-pub use crate::commands::{pglt_command, PgltCommand};
-pub use crate::logging::{setup_cli_subscriber, LoggingLevel};
+pub use crate::commands::{PgltCommand, pglt_command};
+pub use crate::logging::{LoggingLevel, setup_cli_subscriber};
 pub use diagnostics::CliDiagnostic;
-pub use execute::{execute_mode, Execution, TraversalMode, VcsTargeted};
+pub use execute::{Execution, TraversalMode, VcsTargeted, execute_mode};
 pub use panic::setup_panic_handler;
 pub use reporter::{DiagnosticsPayload, Reporter, ReporterVisitor, TraversalSummary};
-pub use service::{open_transport, SocketTransport};
+pub use service::{SocketTransport, open_transport};
 
 pub(crate) const VERSION: &str = match option_env!("PGLT_VERSION") {
     Some(version) => version,

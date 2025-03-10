@@ -1,5 +1,5 @@
-use crate::logging::LoggingKind;
 use crate::LoggingLevel;
+use crate::logging::LoggingKind;
 use bpaf::Bpaf;
 use pglt_configuration::ConfigurationPathHint;
 use pglt_diagnostics::Severity;
@@ -208,7 +208,10 @@ impl FromStr for MaxDiagnostics {
                 if let Ok(value) = s.parse::<u32>() {
                     Ok(MaxDiagnostics::Limit(value))
                 } else {
-                    Err(format!("Invalid value provided. Provide 'none' to lift the limit, or a number between 0 and {}.", u32::MAX))
+                    Err(format!(
+                        "Invalid value provided. Provide 'none' to lift the limit, or a number between 0 and {}.",
+                        u32::MAX
+                    ))
                 }
             }
         }

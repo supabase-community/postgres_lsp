@@ -1,11 +1,11 @@
-use anyhow::{ensure, Context, Result};
+use anyhow::{Context, Result, ensure};
+use pglt_console::MarkupBuf;
 use pglt_console::fmt::Termcolor;
 use pglt_console::fmt::{self, Formatter};
-use pglt_console::MarkupBuf;
 use pglt_diagnostics::termcolor::NoColor;
 use pglt_diagnostics::{Diagnostic, DiagnosticTags, Location, PrintDescription, Severity, Visit};
 use pglt_lsp_converters::line_index::LineIndex;
-use pglt_lsp_converters::{from_proto, to_proto, PositionEncoding};
+use pglt_lsp_converters::{PositionEncoding, from_proto, to_proto};
 use pglt_text_edit::{CompressedOp, DiffOp, TextEdit};
 use std::any::Any;
 use std::borrow::Cow;
@@ -305,8 +305,8 @@ pub(crate) fn apply_document_changes(
 #[cfg(test)]
 mod tests {
 
-    use pglt_lsp_converters::line_index::LineIndex;
     use pglt_lsp_converters::PositionEncoding;
+    use pglt_lsp_converters::line_index::LineIndex;
     use pglt_text_edit::TextEdit;
     use tower_lsp::lsp_types as lsp;
 

@@ -56,13 +56,13 @@ pub mod fs2 {
 
 #[macro_export]
 macro_rules! run {
-    ($($expr:expr),*) => {
+    ($($expr:expr_2021),*) => {
         run!($($expr),*; echo = true)
     };
-    ($($expr:expr),* ; echo = $echo:expr) => {
+    ($($expr:expr_2021),* ; echo = $echo:expr_2021) => {
         $crate::glue::run_process(format!($($expr),*), $echo, None)
     };
-    ($($expr:expr),* ;  <$stdin:expr) => {
+    ($($expr:expr_2021),* ;  <$stdin:expr_2021) => {
         $crate::glue::run_process(format!($($expr),*), false, Some($stdin))
     };
 }
@@ -198,13 +198,16 @@ impl Env {
     }
     fn pushenv(&mut self, var: OsString, value: OsString) {
         self.pushenv_stack.push((var.clone(), env::var_os(&var)));
-        env::set_var(var, value)
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { env::set_var(var, value) }
     }
     fn popenv(&mut self) {
         let (var, value) = self.pushenv_stack.pop().unwrap();
         match value {
-            None => env::remove_var(var),
-            Some(value) => env::set_var(var, value),
+            // TODO: Audit that the environment access only happens in single-threaded code.
+            None => unsafe { env::remove_var(var) },
+            // TODO: Audit that the environment access only happens in single-threaded code.
+            Some(value) => unsafe { env::set_var(var, value) },
         }
     }
     fn cwd(&self) -> &Path {

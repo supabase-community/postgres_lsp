@@ -4,10 +4,10 @@ use biome_deserialize::Merge;
 use pglt_configuration::PartialConfiguration;
 use pglt_console::Console;
 use pglt_fs::FileSystem;
-use pglt_workspace::{configuration::LoadedConfiguration, DynRef, Workspace, WorkspaceError};
+use pglt_workspace::{DynRef, Workspace, WorkspaceError, configuration::LoadedConfiguration};
 use std::ffi::OsString;
 
-use super::{get_files_to_process_with_cli_options, CommandRunner};
+use super::{CommandRunner, get_files_to_process_with_cli_options};
 
 pub(crate) struct CheckCommandPayload {
     pub(crate) configuration: Option<PartialConfiguration>,

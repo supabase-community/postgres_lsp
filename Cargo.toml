@@ -5,12 +5,12 @@ resolver = "2"
 [workspace.package]
 authors      = ["Supabase Communnity"]
 categories   = ["development-tools", "postgres", "supabase"]
-edition      = "2021"
+edition      = "2024"
 homepage     = "https://supabase.com/"
 keywords     = ["linter", "typechecker", "postgres", "language-server"]
 license      = "MIT"
 repository   = "https://github.com/supabase-community/postgres_lsp"
-rust-version = "1.82.0"
+rust-version = "1.85.0"
 
 [workspace.dependencies]
 # supporting crates unrelated to postgres
@@ -31,7 +31,7 @@ quote                    = "1.0.33"
 rayon                    = "1.10.0"
 regex                    = "1.11.1"
 rustc-hash               = "2.0.0"
-schemars                 = { version = "0.8.21", features = ["indexmap2", "smallvec"] }
+schemars                 = { version = "0.8.22", features = ["indexmap2", "smallvec"] }
 serde                    = "1.0.195"
 serde_json               = "1.0.114"
 similar                  = "2.6.0"

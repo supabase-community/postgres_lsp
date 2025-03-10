@@ -4,7 +4,7 @@
 pub mod diagnostics;
 mod parser;
 
-use parser::{source, Parse, Parser};
+use parser::{Parse, Parser, source};
 use pglt_lexer::diagnostics::ScanError;
 
 pub fn split(sql: &str) -> Result<Parse, Vec<ScanError>> {

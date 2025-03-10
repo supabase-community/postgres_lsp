@@ -1,6 +1,6 @@
 use crate::execute::diagnostics::{ResultExt, ResultIoExt};
 use crate::execute::process_file::SharedTraversalOptions;
-use pglt_diagnostics::{category, Error};
+use pglt_diagnostics::{Error, category};
 use pglt_fs::{File, OpenOptions, PgLTPath};
 use pglt_workspace::workspace::{ChangeParams, FileGuard, OpenFileParams};
 use pglt_workspace::{Workspace, WorkspaceError};

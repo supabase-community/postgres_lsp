@@ -1,7 +1,7 @@
 use crate::{DiagnosticsPayload, Execution, Reporter, ReporterVisitor, TraversalSummary};
 use path_absolutize::Absolutize;
 use pglt_console::fmt::{Display, Formatter};
-use pglt_console::{markup, Console, ConsoleExt};
+use pglt_console::{Console, ConsoleExt, markup};
 use pglt_diagnostics::display::SourceFile;
 use pglt_diagnostics::{Error, PrintDescription, Resource, Severity};
 use serde::Serialize;

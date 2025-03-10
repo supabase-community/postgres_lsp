@@ -1,5 +1,5 @@
 use crate::{DiagnosticsPayload, Execution, Reporter, ReporterVisitor, TraversalSummary};
-use pglt_console::{markup, Console, ConsoleExt};
+use pglt_console::{Console, ConsoleExt, markup};
 use pglt_diagnostics::display::SourceFile;
 use pglt_diagnostics::{Error, Resource};
 use quick_junit::{NonSuccessKind, Report, TestCase, TestCaseStatus, TestSuite};

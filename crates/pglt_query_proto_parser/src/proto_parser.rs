@@ -1,5 +1,5 @@
 use convert_case::{Case, Casing};
-use protobuf::descriptor::{field_descriptor_proto::Label, FileDescriptorProto};
+use protobuf::descriptor::{FileDescriptorProto, field_descriptor_proto::Label};
 use protobuf_parse::Parser;
 use std::{ffi::OsStr, path::Path};
 
