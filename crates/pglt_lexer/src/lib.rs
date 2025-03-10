@@ -213,6 +213,22 @@ mod tests {
     }
 
     #[test]
+    fn test_consecutive_newlines() {
+        // Test with multiple consecutive newlines
+        #[cfg(windows)]
+        let input = "select\r\n\r\n1";
+        #[cfg(not(windows))]
+        let input = "select\n\n1";
+
+        let tokens = lex(input).unwrap();
+
+        // Check that we have exactly one newline token between "select" and "1"
+        assert_eq!(tokens[0].kind, SyntaxKind::Select);
+        assert_eq!(tokens[1].kind, SyntaxKind::Newline);
+        assert_eq!(tokens[2].kind, SyntaxKind::Iconst);
+    }
+
+    #[test]
     fn test_whitespace_tokens() {
         let input = "select 1";
         let tokens = lex(input).unwrap();
