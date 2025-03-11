@@ -149,6 +149,8 @@ pub(crate) fn unknown(p: &mut Parser, exclude: &[SyntaxKind]) {
                         // for create trigger
                         SyntaxKind::Before,
                         SyntaxKind::After,
+                        // e.g. on insert or delete
+                        SyntaxKind::Or,
                         // for create rule
                         SyntaxKind::On,
                         // for create rule
