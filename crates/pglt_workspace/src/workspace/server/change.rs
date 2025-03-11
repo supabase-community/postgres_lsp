@@ -268,18 +268,6 @@ impl Document {
             }
 
             if new_ranges.len() == 1 {
-                if change.is_whitespace() {
-                    self.move_ranges(
-                        affected_range.end(),
-                        change.diff_size(),
-                        change.is_addition(),
-                    );
-
-                    self.content = new_content;
-
-                    return changed;
-                }
-
                 let affected_idx = affected_indices[0];
                 let new_range = new_ranges[0].add(affected_range.start());
                 let (old_id, old_range) = self.positions[affected_idx];
@@ -290,22 +278,25 @@ impl Document {
                 let new_id = self.id_generator.next();
                 self.positions[affected_idx] = (new_id, new_range);
 
-                changed.push(StatementChange::Modified(ModifiedStatement {
-                    old_stmt: Statement {
-                        id: old_id,
-                        path: self.path.clone(),
-                    },
-                    old_stmt_text: self.content[old_range].to_string(),
+                if !change.is_whitespace() {
+                    // whitespace-only changes should not invalidate the statement
+                    changed.push(StatementChange::Modified(ModifiedStatement {
+                        old_stmt: Statement {
+                            id: old_id,
+                            path: self.path.clone(),
+                        },
+                        old_stmt_text: self.content[old_range].to_string(),
 
-                    new_stmt: Statement {
-                        id: new_id,
-                        path: self.path.clone(),
-                    },
-                    new_stmt_text: changed_content[new_ranges[0]].to_string(),
-                    // change must be relative to the statement
-                    change_text: change.text.clone(),
-                    change_range: change_range.sub(old_range.start()),
-                }));
+                        new_stmt: Statement {
+                            id: new_id,
+                            path: self.path.clone(),
+                        },
+                        new_stmt_text: changed_content[new_ranges[0]].to_string(),
+                        // change must be relative to the statement
+                        change_text: change.text.clone(),
+                        change_range: change_range.sub(old_range.start()),
+                    }));
+                }
 
                 self.content = new_content;
 
@@ -447,12 +438,16 @@ mod tests {
             .expect("Unexpected scan error")
             .ranges;
 
-        assert!(ranges.len() == d.positions.len());
+        assert!(
+            ranges.len() == d.positions.len(),
+            "should have the correct amount of positions"
+        );
 
         assert!(
             ranges
                 .iter()
-                .all(|r| { d.positions.iter().any(|(_, stmt_range)| stmt_range == r) })
+                .all(|r| { d.positions.iter().any(|(_, stmt_range)| stmt_range == r) }),
+            "all ranges should be in positions"
         );
     }
 
@@ -645,6 +640,83 @@ mod tests {
             3
         );
 
+        assert_document_integrity(&d);
+    }
+
+    #[test]
+    fn within_statements_2() {
+        let path = PgLTPath::new("test.sql");
+        let input = "alter table deal alter column value drop not null;\n";
+        let mut d = Document::new(path.clone(), input.to_string(), 0);
+
+        assert_eq!(d.positions.len(), 1);
+
+        let change1 = ChangeFileParams {
+            path: path.clone(),
+            version: 1,
+            changes: vec![ChangeParams {
+                text: " ".to_string(),
+                range: Some(TextRange::new(17.into(), 17.into())),
+            }],
+        };
+
+        let changed1 = d.apply_file_change(&change1);
+        assert_eq!(changed1.len(), 0, "should not emit change");
+        assert_eq!(
+            d.content,
+            "alter table deal  alter column value drop not null;\n"
+        );
+        assert_document_integrity(&d);
+
+        let change2 = ChangeFileParams {
+            path: path.clone(),
+            version: 2,
+            changes: vec![ChangeParams {
+                text: " ".to_string(),
+                range: Some(TextRange::new(18.into(), 18.into())),
+            }],
+        };
+
+        let changed2 = d.apply_file_change(&change2);
+        assert_eq!(changed2.len(), 0);
+        assert_eq!(
+            d.content,
+            "alter table deal   alter column value drop not null;\n"
+        );
+        assert_document_integrity(&d);
+
+        let change3 = ChangeFileParams {
+            path: path.clone(),
+            version: 3,
+            changes: vec![ChangeParams {
+                text: " ".to_string(),
+                range: Some(TextRange::new(19.into(), 19.into())),
+            }],
+        };
+
+        let changed3 = d.apply_file_change(&change3);
+        assert_eq!(changed3.len(), 0);
+        assert_eq!(
+            d.content,
+            "alter table deal    alter column value drop not null;\n"
+        );
+        assert_document_integrity(&d);
+
+        let change4 = ChangeFileParams {
+            path: path.clone(),
+            version: 4,
+            changes: vec![ChangeParams {
+                text: " ".to_string(),
+                range: Some(TextRange::new(20.into(), 20.into())),
+            }],
+        };
+
+        let changed4 = d.apply_file_change(&change4);
+        assert_eq!(changed4.len(), 0);
+        assert_eq!(
+            d.content,
+            "alter table deal     alter column value drop not null;\n"
+        );
         assert_document_integrity(&d);
     }
 
