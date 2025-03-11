@@ -47,9 +47,7 @@ impl SchemaCacheManager {
         {
             // return early if the connection string is the same
             let inner = self.inner.read().unwrap();
-            tracing::debug!("Current connection string: {}", inner.conn_str);
             if new_conn_str == inner.conn_str {
-                tracing::debug!("Connection string is the same, returning cached schema");
                 return Ok(SchemaCacheHandle::wrap(inner));
             }
         }
