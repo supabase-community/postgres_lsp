@@ -456,6 +456,8 @@ impl Workspace for WorkspaceServer {
 
         let schema_cache = self.schema_cache.load(pool)?;
 
+        tracing::debug!("Loaded schema cache for completions");
+
         let result = pglt_completions::complete(pglt_completions::CompletionParams {
             position,
             schema: schema_cache.as_ref(),
