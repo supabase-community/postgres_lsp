@@ -126,6 +126,8 @@ pub(crate) fn unknown(p: &mut Parser, exclude: &[SyntaxKind]) {
                 Some(SyntaxKind::Select) => {
                     let prev = p.look_back().map(|t| t.kind);
                     if [
+                        // for policies, with for select
+                        SyntaxKind::For,
                         // for create view / table as
                         SyntaxKind::As,
                         // for create rule
@@ -149,6 +151,8 @@ pub(crate) fn unknown(p: &mut Parser, exclude: &[SyntaxKind]) {
                         // for create trigger
                         SyntaxKind::Before,
                         SyntaxKind::After,
+                        // for policies, e.g. for insert
+                        SyntaxKind::For,
                         // e.g. on insert or delete
                         SyntaxKind::Or,
                         // for create rule
