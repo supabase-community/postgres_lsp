@@ -2,11 +2,11 @@ mod diagnostics;
 
 pub use diagnostics::TypecheckDiagnostic;
 use diagnostics::create_type_error;
+use pglt_text_size::TextRange;
 use sqlx::Executor;
 use sqlx::PgPool;
 use sqlx::postgres::PgDatabaseError;
 pub use sqlx::postgres::PgSeverity;
-use text_size::TextRange;
 
 #[derive(Debug)]
 pub struct TypecheckParams<'a> {

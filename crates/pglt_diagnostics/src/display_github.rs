@@ -1,8 +1,8 @@
 use crate::display::frame::SourceFile;
 use crate::{Diagnostic, Resource, Severity, diagnostic::internal::AsDiagnostic};
 use pglt_console::{MarkupBuf, fmt, markup};
+use pglt_text_size::{TextRange, TextSize};
 use std::io;
-use text_size::{TextRange, TextSize};
 
 /// Helper struct for printing a diagnostic as markup into any formatter
 /// implementing [pglt_console::fmt::Write].

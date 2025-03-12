@@ -19,11 +19,11 @@ pglt_console                = { workspace = true, features = ["serde_markup"] }
 pglt_diagnostics_categories = { workspace = true, features = ["serde"] }
 pglt_diagnostics_macros     = { workspace = true }
 pglt_text_edit              = { workspace = true }
+pglt_text_size.workspace    = true
 schemars                    = { workspace = true, optional = true }
 serde                       = { workspace = true, features = ["derive"] }
 serde_json                  = { workspace = true }
 termcolor                   = { workspace = true }
-text-size.workspace         = true
 unicode-width               = { workspace = true }
 
 [features]

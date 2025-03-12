@@ -1,6 +1,6 @@
 use pglt_diagnostics::{Diagnostic, DiagnosticExt, Severity, serde::Diagnostic as SDiagnostic};
 use pglt_fs::PgLTPath;
-use text_size::{TextRange, TextSize};
+use pglt_text_size::{TextRange, TextSize};
 
 /// Global unique identifier for a statement
 #[derive(Debug, Hash, Eq, PartialEq, Clone)]

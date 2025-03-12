@@ -2,11 +2,11 @@ use std::io;
 
 use pglt_console::{MarkupBuf, fmt, markup};
 use pglt_text_edit::TextEdit;
+use pglt_text_size::{TextRange, TextSize};
 use serde::{
     Deserialize, Deserializer, Serialize, Serializer,
     de::{self, SeqAccess},
 };
-use text_size::{TextRange, TextSize};
 
 use crate::{
     Advices as _, Backtrace, Category, DiagnosticTags, LogCategory, Resource, Severity, SourceCode,
@@ -358,8 +358,8 @@ impl<'de> Deserialize<'de> for DiagnosticTags {
 mod tests {
     use std::io;
 
+    use pglt_text_size::{TextRange, TextSize};
     use serde_json::{Value, json};
-    use text_size::{TextRange, TextSize};
 
     use crate::{
         self as pglt_diagnostics, {Advices, LogCategory, Visit},

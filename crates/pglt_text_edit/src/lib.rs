@@ -10,10 +10,10 @@
 
 use std::{cmp::Ordering, num::NonZeroU32};
 
+use pglt_text_size::{TextRange, TextSize};
 use serde::{Deserialize, Serialize};
 pub use similar::ChangeTag;
 use similar::{TextDiff, utils::TextDiffRemapper};
-use text_size::{TextRange, TextSize};
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
