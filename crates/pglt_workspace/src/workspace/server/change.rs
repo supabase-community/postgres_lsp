@@ -278,28 +278,25 @@ impl Document {
                 let new_id = self.id_generator.next();
                 self.positions[affected_idx] = (new_id, new_range);
 
-                if !change.is_whitespace() {
-                    // whitespace-only changes should not invalidate the statement
-                    changed.push(StatementChange::Modified(ModifiedStatement {
-                        old_stmt: Statement {
-                            id: old_id,
-                            path: self.path.clone(),
-                        },
-                        old_stmt_text: self.content[old_range].to_string(),
+                changed.push(StatementChange::Modified(ModifiedStatement {
+                    old_stmt: Statement {
+                        id: old_id,
+                        path: self.path.clone(),
+                    },
+                    old_stmt_text: self.content[old_range].to_string(),
 
-                        new_stmt: Statement {
-                            id: new_id,
-                            path: self.path.clone(),
-                        },
-                        new_stmt_text: changed_content[new_ranges[0]].to_string(),
-                        // change must be relative to the statement
-                        change_text: change.text.clone(),
-                        // make sure we always have a valid range >= 0
-                        change_range: change_range
-                            .checked_sub(old_range.start())
-                            .unwrap_or(change_range.sub(change_range.start())),
-                    }));
-                }
+                    new_stmt: Statement {
+                        id: new_id,
+                        path: self.path.clone(),
+                    },
+                    new_stmt_text: changed_content[new_ranges[0]].to_string(),
+                    // change must be relative to the statement
+                    change_text: change.text.clone(),
+                    // make sure we always have a valid range >= 0
+                    change_range: change_range
+                        .checked_sub(old_range.start())
+                        .unwrap_or(change_range.sub(change_range.start())),
+                }));
 
                 self.content = new_content;
 
@@ -375,10 +372,6 @@ impl Document {
 }
 
 impl ChangeParams {
-    pub fn is_whitespace(&self) -> bool {
-        self.text.chars().count() > 0 && self.text.chars().all(char::is_whitespace)
-    }
-
     pub fn diff_size(&self) -> TextSize {
         match self.range {
             Some(range) => {

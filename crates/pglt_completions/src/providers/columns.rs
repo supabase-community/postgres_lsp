@@ -72,13 +72,13 @@ mod tests {
                 message: "correctly handles nested queries",
                 query: format!(
                     r#"
-                select 
+                select
                     *
                 from (
                     select id, na{}
                     from private.audio_books
                 ) as subquery
-                join public.users u 
+                join public.users u
                 on u.id = subquery.id;
                 "#,
                     CURSOR_POS

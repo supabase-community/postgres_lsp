@@ -52,9 +52,6 @@ pub(super) struct WorkspaceServer {
     tree_sitter: TreeSitterStore,
     pg_query: PgQueryStore,
 
-    /// Stores the statements that have changed since the last analysis
-    changed_stmts: DashSet<Statement>,
-
     connection: RwLock<DbConnection>,
 }
 
@@ -78,7 +75,6 @@ impl WorkspaceServer {
             documents: DashMap::default(),
             tree_sitter: TreeSitterStore::new(),
             pg_query: PgQueryStore::new(),
-            changed_stmts: DashSet::default(),
             schema_cache: SchemaCacheManager::default(),
             connection: RwLock::default(),
         }
@@ -224,23 +220,16 @@ impl Workspace for WorkspaceServer {
                     tracing::debug!("Adding statement: {:?}", added);
                     self.tree_sitter.add_statement(&added.stmt, &added.text);
                     self.pg_query.add_statement(&added.stmt, &added.text);
-
-                    self.changed_stmts.insert(added.stmt.clone());
                 }
                 StatementChange::Deleted(s) => {
                     tracing::debug!("Deleting statement: {:?}", s);
                     self.tree_sitter.remove_statement(s);
                     self.pg_query.remove_statement(s);
-
-                    self.changed_stmts.remove(s);
                 }
                 StatementChange::Modified(s) => {
                     tracing::debug!("Modifying statement: {:?}", s);
                     self.tree_sitter.modify_statement(s);
                     self.pg_query.modify_statement(s);
-
-                    self.changed_stmts.remove(&s.old_stmt);
-                    self.changed_stmts.insert(s.new_stmt.clone());
                 }
             }
         }

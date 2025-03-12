@@ -29,7 +29,7 @@ mod tests {
     #[tokio::test]
     async fn completes_fn() {
         let setup = r#"
-          create or replace function cool() 
+          create or replace function cool()
           returns trigger
           language plpgsql
           security invoker
@@ -62,7 +62,7 @@ mod tests {
             name text
           );
 
-          create or replace function cool() 
+          create or replace function cool()
           returns trigger
           language plpgsql
           security invoker
@@ -96,7 +96,7 @@ mod tests {
             name text
           );
 
-          create or replace function cool() 
+          create or replace function cool()
           returns trigger
           language plpgsql
           security invoker
@@ -130,7 +130,7 @@ mod tests {
             name text
           );
 
-          create or replace function cool() 
+          create or replace function cool()
           returns trigger
           language plpgsql
           security invoker
