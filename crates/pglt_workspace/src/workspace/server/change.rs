@@ -294,7 +294,10 @@ impl Document {
                         new_stmt_text: changed_content[new_ranges[0]].to_string(),
                         // change must be relative to the statement
                         change_text: change.text.clone(),
-                        change_range: change_range.sub(old_range.start()),
+                        // make sure we always have a valid range >= 0
+                        change_range: change_range
+                            .checked_sub(old_range.start())
+                            .unwrap_or(change_range.sub(change_range.start())),
                     }));
                 }
 
@@ -927,6 +930,46 @@ mod tests {
         );
 
         assert_eq!("select id,test from users\nselect 1;", d.content);
+
+        assert_document_integrity(&d);
+    }
+
+    #[test]
+    fn removing_newline_at_the_beginning() {
+        let path = PgLTPath::new("test.sql");
+        let input = "\n";
+
+        let mut d = Document::new(path.clone(), input.to_string(), 1);
+
+        assert_eq!(d.positions.len(), 0);
+
+        let change = ChangeFileParams {
+            path: path.clone(),
+            version: 2,
+            changes: vec![ChangeParams {
+                text: "\nbegin;\n\nselect 1\n\nrollback;\n".to_string(),
+                range: Some(TextRange::new(0.into(), 1.into())),
+            }],
+        };
+
+        let changes = d.apply_file_change(&change);
+
+        assert_eq!(changes.len(), 3);
+
+        assert_document_integrity(&d);
+
+        let change2 = ChangeFileParams {
+            path: path.clone(),
+            version: 3,
+            changes: vec![ChangeParams {
+                text: "".to_string(),
+                range: Some(TextRange::new(0.into(), 1.into())),
+            }],
+        };
+
+        let changes2 = d.apply_file_change(&change2);
+
+        assert_eq!(changes2.len(), 1);
 
         assert_document_integrity(&d);
     }
