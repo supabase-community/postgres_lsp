@@ -1,11 +1,10 @@
 use js_sys::Error;
-use wasm_bindgen::prelude::*;
 use pglt_fs::MemoryFileSystem;
 use pglt_workspace::workspace::{
-    self, ChangeFileParams, CloseFileParams, GetFileContentParams,
-    PullDiagnosticsParams,
-    UpdateSettingsParams, CompletionParams
+    self, ChangeFileParams, CloseFileParams, CompletionParams, GetFileContentParams,
+    PullDiagnosticsParams, UpdateSettingsParams,
 };
+use wasm_bindgen::prelude::*;
 
 mod utils;
 
@@ -27,7 +26,7 @@ impl Workspace {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Workspace {
         Workspace {
-            inner:  workspace::server(),
+            inner: workspace::server(),
         }
     }
 

@@ -91,6 +91,17 @@ impl<'de> serde::Deserialize<'de> for Backtrace {
     }
 }
 
+#[cfg(feature = "schema")]
+impl schemars::JsonSchema for Backtrace {
+    fn schema_name() -> String {
+        String::from("Backtrace")
+    }
+
+    fn json_schema(generator: &mut schemars::r#gen::SchemaGenerator) -> schemars::schema::Schema {
+        <Vec<SerializedFrame>>::json_schema(generator)
+    }
+}
+
 /// Internal representation of a [Backtrace], can be either a native backtrace
 /// instance or a vector of serialized frames.
 #[derive(Clone, Debug)]
@@ -292,6 +303,11 @@ pub(super) fn print_backtrace(
 
 /// Serializable representation of a backtrace frame.
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[cfg_attr(
+    feature = "schema",
+    derive(schemars::JsonSchema),
+    schemars(rename = "BacktraceFrame")
+)]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 struct SerializedFrame {
     ip: u64,
@@ -309,6 +325,11 @@ impl From<&'_ backtrace::BacktraceFrame> for SerializedFrame {
 
 /// Serializable representation of a backtrace frame symbol.
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[cfg_attr(
+    feature = "schema",
+    derive(schemars::JsonSchema),
+    schemars(rename = "BacktraceSymbol")
+)]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 struct SerializedSymbol {
     name: Option<String>,

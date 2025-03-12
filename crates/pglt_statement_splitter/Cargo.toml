@@ -15,8 +15,8 @@ version              = "0.0.0"
 pglt_diagnostics         = { workspace = true }
 pglt_lexer.workspace     = true
 pglt_query_ext.workspace = true
+pglt_text_size.workspace = true
 regex.workspace          = true
-text-size.workspace      = true
 
 [dev-dependencies]
 ntest = "0.9.3"

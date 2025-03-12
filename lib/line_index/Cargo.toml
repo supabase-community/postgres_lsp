@@ -4,7 +4,7 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-text-size.workspace = true
+pglt_text_size.workspace = true
 
 [lib]
 doctest = false

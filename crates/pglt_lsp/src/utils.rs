@@ -7,12 +7,12 @@ use pglt_diagnostics::{Diagnostic, DiagnosticTags, Location, PrintDescription, S
 use pglt_lsp_converters::line_index::LineIndex;
 use pglt_lsp_converters::{PositionEncoding, from_proto, to_proto};
 use pglt_text_edit::{CompressedOp, DiffOp, TextEdit};
+use pglt_text_size::{TextRange, TextSize};
 use std::any::Any;
 use std::borrow::Cow;
 use std::fmt::{Debug, Display};
 use std::io;
 use std::ops::{Add, Range};
-use text_size::{TextRange, TextSize};
 use tower_lsp::jsonrpc::Error as LspError;
 use tower_lsp::lsp_types;
 use tower_lsp::lsp_types::{self as lsp, CodeDescription, Url};

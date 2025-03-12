@@ -2,11 +2,11 @@ use std::io;
 
 use pglt_console::{MarkupBuf, fmt, markup};
 use pglt_text_edit::TextEdit;
+use pglt_text_size::{TextRange, TextSize};
 use serde::{
     Deserialize, Deserializer, Serialize, Serializer,
     de::{self, SeqAccess},
 };
-use text_size::{TextRange, TextSize};
 
 use crate::{
     Advices as _, Backtrace, Category, DiagnosticTags, LogCategory, Resource, Severity, SourceCode,
@@ -15,7 +15,7 @@ use crate::{
 
 /// Serializable representation for a [Diagnostic](super::Diagnostic).
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[cfg_attr(not(target_arch = "wasm32"), serde(rename_all = "snake_case"))]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 pub struct Diagnostic {
     category: Option<&'static Category>,
@@ -137,7 +137,7 @@ impl<D: super::Diagnostic + ?Sized> std::fmt::Display for PrintDescription<'_, D
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[cfg_attr(not(target_arch = "wasm32"), serde(rename_all = "snake_case"))]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 struct Location {
     path: Option<Resource<String>>,
@@ -159,7 +159,7 @@ impl From<super::Location<'_>> for Location {
 
 /// Implementation of [Visitor] collecting serializable [Advice] into a vector.
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 struct Advices {
     advices: Vec<Advice>,
@@ -245,7 +245,7 @@ impl super::Advices for Advices {
 /// See the [Visitor] trait for additional documentation on all the supported
 /// advice types.
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 enum Advice {
     Log(LogCategory, MarkupBuf),
@@ -354,12 +354,23 @@ impl<'de> Deserialize<'de> for DiagnosticTags {
     }
 }
 
+#[cfg(feature = "schema")]
+impl schemars::JsonSchema for DiagnosticTags {
+    fn schema_name() -> String {
+        String::from("DiagnosticTags")
+    }
+
+    fn json_schema(generator: &mut schemars::r#gen::SchemaGenerator) -> schemars::schema::Schema {
+        <Vec<DiagnosticTag>>::json_schema(generator)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::io;
 
+    use pglt_text_size::{TextRange, TextSize};
     use serde_json::{Value, json};
-    use text_size::{TextRange, TextSize};
 
     use crate::{
         self as pglt_diagnostics, {Advices, LogCategory, Visit},

@@ -1,8 +1,8 @@
+use pglt_text_size::{TextRange, TextSize};
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use std::ops::Range;
 use std::{borrow::Borrow, ops::Deref};
-use text_size::{TextRange, TextSize};
 
 /// Represents the location of a diagnostic in a resource.
 #[derive(Debug, Default, Clone, Copy)]
@@ -39,6 +39,7 @@ impl Eq for Location<'_> {}
 
 /// Represents the resource a diagnostic is associated with.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Resource<P> {
     /// The diagnostic is related to the content of the command line arguments.
@@ -343,7 +344,7 @@ impl AsSourceCode for String {
 
 #[cfg(test)]
 mod tests {
-    use text_size::TextSize;
+    use pglt_text_size::TextSize;
 
     use super::LineIndexBuf;
 

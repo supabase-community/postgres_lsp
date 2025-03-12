@@ -12,8 +12,8 @@ version              = "0.0.0"
 
 
 [dependencies]
-pglt_markup = { workspace = true }
-text-size   = { workspace = true }
+pglt_markup    = { workspace = true }
+pglt_text_size = { workspace = true }
 
 schemars             = { workspace = true, optional = true }
 serde                = { workspace = true, optional = true, features = ["derive"] }
