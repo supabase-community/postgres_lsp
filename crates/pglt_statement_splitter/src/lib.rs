@@ -166,6 +166,12 @@ alter table deal_type add column key text not null;
     }
 
     #[test]
+    fn policy() {
+        Tester::from("create policy employee_tokenauthed_select on provider_template_approval for select to authenticated, tokenauthed using ( select true );")
+            .expect_statements(vec!["create policy employee_tokenauthed_select on provider_template_approval for select to authenticated, tokenauthed using ( select true );"]);
+    }
+
+    #[test]
     #[timeout(1000)]
     fn simple_select() {
         Tester::from(
