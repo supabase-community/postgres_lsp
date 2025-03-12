@@ -216,26 +216,26 @@ impl Workspace for WorkspaceServer {
                 params.version,
             ));
 
-        tracing::info!("Changing file: {:?}", params.path);
+        tracing::info!("Changing file: {:?}", params);
 
         for c in &doc.apply_file_change(&params) {
             match c {
                 StatementChange::Added(added) => {
-                    tracing::info!("Adding statement: {:?}", added);
+                    tracing::debug!("Adding statement: {:?}", added);
                     self.tree_sitter.add_statement(&added.stmt, &added.text);
                     self.pg_query.add_statement(&added.stmt, &added.text);
 
                     self.changed_stmts.insert(added.stmt.clone());
                 }
                 StatementChange::Deleted(s) => {
-                    tracing::info!("Deleting statement: {:?}", s);
+                    tracing::debug!("Deleting statement: {:?}", s);
                     self.tree_sitter.remove_statement(s);
                     self.pg_query.remove_statement(s);
 
                     self.changed_stmts.remove(s);
                 }
                 StatementChange::Modified(s) => {
-                    tracing::info!("Modifying statement: {:?}", s);
+                    tracing::debug!("Modifying statement: {:?}", s);
                     self.tree_sitter.modify_statement(s);
                     self.pg_query.modify_statement(s);
 
