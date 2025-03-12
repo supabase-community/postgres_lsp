@@ -1,4 +1,4 @@
-use sqlx::{postgres::PgConnectOptions, Executor, PgPool};
+use sqlx::{Executor, PgPool, postgres::PgConnectOptions};
 use uuid::Uuid;
 
 // TODO: Work with proper config objects instead of a connection_string.

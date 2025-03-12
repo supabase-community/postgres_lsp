@@ -1,6 +1,6 @@
 use crate::{CliDiagnostic, CliSession};
 use pglt_configuration::PartialConfiguration;
-use pglt_console::{markup, ConsoleExt};
+use pglt_console::{ConsoleExt, markup};
 use pglt_fs::ConfigName;
 use pglt_workspace::configuration::create_config;
 

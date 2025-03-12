@@ -421,7 +421,7 @@ impl Pattern {
                             AnySequence
                                 if options.require_literal_separator && follows_separator =>
                             {
-                                return SubPatternDoesntMatch
+                                return SubPatternDoesntMatch;
                             }
                             _ => (),
                         }
@@ -641,15 +641,21 @@ mod test {
         assert!(!Pattern::new("a*b*c").unwrap().matches("abcd"));
         assert!(Pattern::new("a*b*c").unwrap().matches("a_b_c"));
         assert!(Pattern::new("a*b*c").unwrap().matches("a___b___c"));
-        assert!(Pattern::new("abc*abc*abc")
-            .unwrap()
-            .matches("abcabcabcabcabcabcabc"));
-        assert!(!Pattern::new("abc*abc*abc")
-            .unwrap()
-            .matches("abcabcabcabcabcabcabca"));
-        assert!(Pattern::new("a*a*a*a*a*a*a*a*a")
-            .unwrap()
-            .matches("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+        assert!(
+            Pattern::new("abc*abc*abc")
+                .unwrap()
+                .matches("abcabcabcabcabcabcabc")
+        );
+        assert!(
+            !Pattern::new("abc*abc*abc")
+                .unwrap()
+                .matches("abcabcabcabcabcabcabca")
+        );
+        assert!(
+            Pattern::new("a*a*a*a*a*a*a*a*a")
+                .unwrap()
+                .matches("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        );
         assert!(Pattern::new("a*b[xyz]c*d").unwrap().matches("abxcdbxcddd"));
     }
 
@@ -829,31 +835,47 @@ mod test {
             require_literal_leading_dot: false,
         };
 
-        assert!(Pattern::new("abc/def")
-            .unwrap()
-            .matches_with("abc/def", options_require_literal));
-        assert!(!Pattern::new("abc?def")
-            .unwrap()
-            .matches_with("abc/def", options_require_literal));
-        assert!(!Pattern::new("abc*def")
-            .unwrap()
-            .matches_with("abc/def", options_require_literal));
-        assert!(!Pattern::new("abc[/]def")
-            .unwrap()
-            .matches_with("abc/def", options_require_literal));
+        assert!(
+            Pattern::new("abc/def")
+                .unwrap()
+                .matches_with("abc/def", options_require_literal)
+        );
+        assert!(
+            !Pattern::new("abc?def")
+                .unwrap()
+                .matches_with("abc/def", options_require_literal)
+        );
+        assert!(
+            !Pattern::new("abc*def")
+                .unwrap()
+                .matches_with("abc/def", options_require_literal)
+        );
+        assert!(
+            !Pattern::new("abc[/]def")
+                .unwrap()
+                .matches_with("abc/def", options_require_literal)
+        );
 
-        assert!(Pattern::new("abc/def")
-            .unwrap()
-            .matches_with("abc/def", options_not_require_literal));
-        assert!(Pattern::new("abc?def")
-            .unwrap()
-            .matches_with("abc/def", options_not_require_literal));
-        assert!(Pattern::new("abc*def")
-            .unwrap()
-            .matches_with("abc/def", options_not_require_literal));
-        assert!(Pattern::new("abc[/]def")
-            .unwrap()
-            .matches_with("abc/def", options_not_require_literal));
+        assert!(
+            Pattern::new("abc/def")
+                .unwrap()
+                .matches_with("abc/def", options_not_require_literal)
+        );
+        assert!(
+            Pattern::new("abc?def")
+                .unwrap()
+                .matches_with("abc/def", options_not_require_literal)
+        );
+        assert!(
+            Pattern::new("abc*def")
+                .unwrap()
+                .matches_with("abc/def", options_not_require_literal)
+        );
+        assert!(
+            Pattern::new("abc[/]def")
+                .unwrap()
+                .matches_with("abc/def", options_not_require_literal)
+        );
     }
 
     #[test]
@@ -949,62 +971,86 @@ mod test {
         assert!(Pattern::new("b").unwrap().matches_path(Path::new("a/b")));
 
         if cfg!(windows) {
-            assert!(Pattern::new(".\\b")
-                .unwrap()
-                .matches_path(Path::new("a\\b")));
+            assert!(
+                Pattern::new(".\\b")
+                    .unwrap()
+                    .matches_path(Path::new("a\\b"))
+            );
             assert!(Pattern::new("b").unwrap().matches_path(Path::new("a\\b")));
         }
     }
 
     #[test]
     fn test_pattern_absolute() {
-        assert!(Pattern::new("/a/b")
-            .unwrap()
-            .matches_path(Path::new("/a/b")));
+        assert!(
+            Pattern::new("/a/b")
+                .unwrap()
+                .matches_path(Path::new("/a/b"))
+        );
 
         if cfg!(windows) {
-            assert!(Pattern::new("c:/a/b")
-                .unwrap()
-                .matches_path(Path::new("c:/a/b")));
-            assert!(Pattern::new("C:\\a\\b")
-                .unwrap()
-                .matches_path(Path::new("C:\\a\\b")));
+            assert!(
+                Pattern::new("c:/a/b")
+                    .unwrap()
+                    .matches_path(Path::new("c:/a/b"))
+            );
+            assert!(
+                Pattern::new("C:\\a\\b")
+                    .unwrap()
+                    .matches_path(Path::new("C:\\a\\b"))
+            );
 
-            assert!(Pattern::new("\\\\?\\c:\\a\\b")
-                .unwrap()
-                .matches_path(Path::new("\\\\?\\c:\\a\\b")));
-            assert!(Pattern::new("\\\\?\\C:/a/b")
-                .unwrap()
-                .matches_path(Path::new("\\\\?\\C:/a/b")));
+            assert!(
+                Pattern::new("\\\\?\\c:\\a\\b")
+                    .unwrap()
+                    .matches_path(Path::new("\\\\?\\c:\\a\\b"))
+            );
+            assert!(
+                Pattern::new("\\\\?\\C:/a/b")
+                    .unwrap()
+                    .matches_path(Path::new("\\\\?\\C:/a/b"))
+            );
         }
     }
 
     #[test]
     fn test_pattern_glob() {
-        assert!(Pattern::new("*.js")
-            .unwrap()
-            .matches_path(Path::new("b/c.js")));
+        assert!(
+            Pattern::new("*.js")
+                .unwrap()
+                .matches_path(Path::new("b/c.js"))
+        );
 
-        assert!(Pattern::new("**/*.js")
-            .unwrap()
-            .matches_path(Path::new("b/c.js")));
+        assert!(
+            Pattern::new("**/*.js")
+                .unwrap()
+                .matches_path(Path::new("b/c.js"))
+        );
 
-        assert!(Pattern::new("*.js")
-            .unwrap()
-            .matches_path(Path::new("/a/b/c.js")));
+        assert!(
+            Pattern::new("*.js")
+                .unwrap()
+                .matches_path(Path::new("/a/b/c.js"))
+        );
 
-        assert!(Pattern::new("**/*.js")
-            .unwrap()
-            .matches_path(Path::new("/a/b/c.js")));
+        assert!(
+            Pattern::new("**/*.js")
+                .unwrap()
+                .matches_path(Path::new("/a/b/c.js"))
+        );
 
         if cfg!(windows) {
-            assert!(Pattern::new("*.js")
-                .unwrap()
-                .matches_path(Path::new("C:\\a\\b\\c.js")));
+            assert!(
+                Pattern::new("*.js")
+                    .unwrap()
+                    .matches_path(Path::new("C:\\a\\b\\c.js"))
+            );
 
-            assert!(Pattern::new("**/*.js")
-                .unwrap()
-                .matches_path(Path::new("\\\\?\\C:\\a\\b\\c.js")));
+            assert!(
+                Pattern::new("**/*.js")
+                    .unwrap()
+                    .matches_path(Path::new("\\\\?\\C:\\a\\b\\c.js"))
+            );
         }
     }
 
@@ -1020,9 +1066,11 @@ mod test {
         assert!(pattern.matches_path(Path::new("bar.js")));
         assert!(!pattern.matches_path(Path::new("baz.js")));
 
-        assert!(Pattern::parse("**/{foo,bar}.js", true)
-            .unwrap()
-            .matches_path(Path::new("a/b/foo.js")));
+        assert!(
+            Pattern::parse("**/{foo,bar}.js", true)
+                .unwrap()
+                .matches_path(Path::new("a/b/foo.js"))
+        );
 
         let pattern = Pattern::parse("src/{a/foo,bar}.js", true).unwrap();
         assert!(pattern.matches_path(Path::new("src/a/foo.js")));

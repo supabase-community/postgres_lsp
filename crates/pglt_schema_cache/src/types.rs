@@ -1,6 +1,6 @@
 use serde::Deserialize;
-use sqlx::types::JsonValue;
 use sqlx::PgPool;
+use sqlx::types::JsonValue;
 
 use crate::schema_cache::SchemaCacheItem;
 

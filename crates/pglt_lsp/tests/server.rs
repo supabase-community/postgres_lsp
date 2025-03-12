@@ -1,41 +1,46 @@
-use anyhow::bail;
 use anyhow::Context;
 use anyhow::Error;
 use anyhow::Result;
+use anyhow::bail;
 use biome_deserialize::Merge;
-use futures::channel::mpsc::{channel, Sender};
 use futures::Sink;
 use futures::SinkExt;
 use futures::Stream;
 use futures::StreamExt;
-use pglt_configuration::database::PartialDatabaseConfiguration;
+use futures::channel::mpsc::{Sender, channel};
 use pglt_configuration::PartialConfiguration;
+use pglt_configuration::database::PartialDatabaseConfiguration;
 use pglt_fs::MemoryFileSystem;
 use pglt_lsp::LSPServer;
 use pglt_lsp::ServerFactory;
 use pglt_test_utils::test_database::get_new_test_db;
 use pglt_workspace::DynRef;
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 use serde_json::{from_value, to_value};
 use sqlx::Executor;
 use std::any::type_name;
 use std::fmt::Display;
-use std::process::id;
 use std::time::Duration;
-use tokio::time::sleep;
 use tower::timeout::Timeout;
 use tower::{Service, ServiceExt};
+use tower_lsp::LspService;
 use tower_lsp::jsonrpc;
 use tower_lsp::jsonrpc::Response;
 use tower_lsp::lsp_types as lsp;
+use tower_lsp::lsp_types::CompletionParams;
+use tower_lsp::lsp_types::CompletionResponse;
+use tower_lsp::lsp_types::PartialResultParams;
+use tower_lsp::lsp_types::Position;
+use tower_lsp::lsp_types::Range;
+use tower_lsp::lsp_types::TextDocumentPositionParams;
+use tower_lsp::lsp_types::WorkDoneProgressParams;
 use tower_lsp::lsp_types::{
     ClientCapabilities, DidChangeConfigurationParams, DidChangeTextDocumentParams,
     DidCloseTextDocumentParams, DidOpenTextDocumentParams, InitializeResult, InitializedParams,
     PublishDiagnosticsParams, TextDocumentContentChangeEvent, TextDocumentIdentifier,
     TextDocumentItem, Url, VersionedTextDocumentIdentifier,
 };
-use tower_lsp::LspService;
 use tower_lsp::{jsonrpc::Request, lsp_types::InitializeParams};
 
 /// Statically build an [Url] instance that points to the file at `$path`
@@ -80,12 +85,11 @@ impl Server {
             .await
             .map_err(Error::msg)
             .context("call() returned an error")
-            .and_then(|res| {
-                if let Some(res) = res {
+            .and_then(|res| match res {
+                Some(res) => {
                     bail!("shutdown returned {:?}", res)
-                } else {
-                    Ok(())
                 }
+                _ => Ok(()),
             })
     }
 
@@ -171,12 +175,11 @@ impl Server {
             .await
             .map_err(Error::msg)
             .context("call() returned an error")
-            .and_then(|res| {
-                if let Some(res) = res {
+            .and_then(|res| match res {
+                Some(res) => {
                     bail!("shutdown returned {:?}", res)
-                } else {
-                    Ok(())
                 }
+                _ => Ok(()),
             })
     }
 
@@ -248,6 +251,18 @@ impl Server {
                     uri: url!("document.sql"),
                 },
             },
+        )
+        .await
+    }
+
+    async fn get_completion(
+        &mut self,
+        params: tower_lsp::lsp_types::CompletionParams,
+    ) -> Result<Option<CompletionResponse>> {
+        self.request::<tower_lsp::lsp_types::CompletionParams, CompletionResponse>(
+            "textDocument/completion",
+            "_get_completion",
+            params,
         )
         .await
     }
@@ -431,6 +446,107 @@ async fn server_shutdown() -> Result<()> {
 
     cancellation.await;
 
+    reader.abort();
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_completions() -> Result<()> {
+    let factory = ServerFactory::default();
+    let mut fs = MemoryFileSystem::default();
+    let test_db = get_new_test_db().await;
+
+    let setup = r#"
+            create table public.users (
+                id serial primary key,
+                name varchar(255) not null
+            );
+        "#;
+
+    test_db
+        .execute(setup)
+        .await
+        .expect("Failed to setup test database");
+
+    let mut conf = PartialConfiguration::init();
+    conf.merge_with(PartialConfiguration {
+        db: Some(PartialDatabaseConfiguration {
+            database: Some(
+                test_db
+                    .connect_options()
+                    .get_database()
+                    .unwrap()
+                    .to_string(),
+            ),
+            ..Default::default()
+        }),
+        ..Default::default()
+    });
+    fs.insert(
+        url!("pglt.toml").to_file_path().unwrap(),
+        toml::to_string(&conf).unwrap(),
+    );
+
+    let (service, client) = factory
+        .create_with_fs(None, DynRef::Owned(Box::new(fs)))
+        .into_inner();
+
+    let (stream, sink) = client.split();
+    let mut server = Server::new(service);
+
+    let (sender, _) = channel(CHANNEL_BUFFER_SIZE);
+    let reader = tokio::spawn(client_handler(stream, sink, sender));
+
+    server.initialize().await?;
+    server.initialized().await?;
+
+    server.load_configuration().await?;
+
+    server
+        .open_document("alter table appointment alter column end_time drop not null;\n")
+        .await?;
+
+    server
+        .change_document(
+            3,
+            vec![TextDocumentContentChangeEvent {
+                range: Some(Range {
+                    start: Position {
+                        line: 0,
+                        character: 24,
+                    },
+                    end: Position {
+                        line: 0,
+                        character: 24,
+                    },
+                }),
+                range_length: Some(0),
+                text: " ".to_string(),
+            }],
+        )
+        .await?;
+
+    let res = server
+        .get_completion(CompletionParams {
+            work_done_progress_params: WorkDoneProgressParams::default(),
+            partial_result_params: PartialResultParams::default(),
+            context: None,
+            text_document_position: TextDocumentPositionParams {
+                text_document: TextDocumentIdentifier {
+                    uri: url!("document.sql"),
+                },
+                position: Position {
+                    line: 0,
+                    character: 25,
+                },
+            },
+        })
+        .await?;
+
+    assert!(res.is_some());
+
+    server.shutdown().await?;
     reader.abort();
 
     Ok(())

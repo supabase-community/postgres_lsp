@@ -16,7 +16,7 @@ pub use pg_query::protobuf;
 pub use pg_query::{Error, NodeEnum, Result};
 
 pub use codegen::{
-    get_location, get_node_properties, get_nodes, ChildrenIterator, Node, TokenProperty,
+    ChildrenIterator, Node, TokenProperty, get_location, get_node_properties, get_nodes,
 };
 
 pub fn parse(sql: &str) -> Result<NodeEnum> {

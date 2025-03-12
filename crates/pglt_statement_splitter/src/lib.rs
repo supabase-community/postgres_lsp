@@ -4,7 +4,7 @@
 pub mod diagnostics;
 mod parser;
 
-use parser::{source, Parse, Parser};
+use parser::{Parse, Parser, source};
 use pglt_lexer::diagnostics::ScanError;
 
 pub fn split(sql: &str) -> Result<Parse, Vec<ScanError>> {
@@ -115,6 +115,12 @@ mod tests {
     }
 
     #[test]
+    fn single_newlines() {
+        Tester::from("select 1\nfrom contact\n\nselect 3")
+            .expect_statements(vec!["select 1\nfrom contact", "select 3"]);
+    }
+
+    #[test]
     fn alter_column() {
         Tester::from("alter table users alter column email drop not null;")
             .expect_statements(vec!["alter table users alter column email drop not null;"]);
@@ -140,6 +146,29 @@ mod tests {
     fn case() {
         Tester::from("select case when select 2 then 1 else 0 end")
             .expect_statements(vec!["select case when select 2 then 1 else 0 end"]);
+    }
+
+    #[test]
+    fn create_trigger() {
+        Tester::from("alter table appointment_status add constraint valid_key check (private.strip_special_chars(key) = key and length(key) > 0 and length(key) < 60);
+
+create trigger default_key before insert on appointment_type for each row when (new.key is null) execute procedure default_key ();
+
+create trigger default_key before insert or update on appointment_status for each row when (new.key is null) execute procedure default_key ();
+
+alter table deal_type add column key text not null;
+")
+            .expect_statements(vec!["alter table appointment_status add constraint valid_key check (private.strip_special_chars(key) = key and length(key) > 0 and length(key) < 60);",
+                "create trigger default_key before insert on appointment_type for each row when (new.key is null) execute procedure default_key ();",
+                "create trigger default_key before insert or update on appointment_status for each row when (new.key is null) execute procedure default_key ();",
+                "alter table deal_type add column key text not null;",
+            ]);
+    }
+
+    #[test]
+    fn policy() {
+        Tester::from("create policy employee_tokenauthed_select on provider_template_approval for select to authenticated, tokenauthed using ( select true );")
+            .expect_statements(vec!["create policy employee_tokenauthed_select on provider_template_approval for select to authenticated, tokenauthed using ( select true );"]);
     }
 
     #[test]

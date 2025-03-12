@@ -25,9 +25,8 @@ pub fn complete_tables(ctx: &CompletionContext, builder: &mut CompletionBuilder)
 mod tests {
 
     use crate::{
-        complete,
-        test_helper::{get_test_deps, get_test_params, CURSOR_POS},
-        CompletionItem, CompletionItemKind,
+        CompletionItem, CompletionItemKind, complete,
+        test_helper::{CURSOR_POS, get_test_deps, get_test_params},
     };
 
     #[tokio::test]
@@ -149,7 +148,7 @@ mod tests {
             name text
           );
 
-          create or replace function cool() 
+          create or replace function cool()
           returns trigger
           language plpgsql
           security invoker

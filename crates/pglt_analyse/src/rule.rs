@@ -1,5 +1,5 @@
 use pglt_console::fmt::Display;
-use pglt_console::{markup, MarkupBuf};
+use pglt_console::{MarkupBuf, markup};
 use pglt_diagnostics::advice::CodeSuggestionAdvice;
 use pglt_diagnostics::{
     Advices, Category, Diagnostic, DiagnosticTags, Location, LogCategory, MessageAndDescription,

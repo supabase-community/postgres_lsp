@@ -55,10 +55,16 @@ impl SchemaCacheManager {
         let maybe_refreshed = run_async(async move { SchemaCache::load(&pool).await })?;
         let refreshed = maybe_refreshed?;
 
-        let mut inner = self.inner.write().unwrap();
+        {
+            // write lock must be dropped before we return the reference below, hence the block
+            let mut inner = self.inner.write().unwrap();
 
-        inner.cache = refreshed;
-        inner.conn_str = new_conn_str;
+            // Double-check that we still need to refresh (another thread might have done it)
+            if new_conn_str != inner.conn_str {
+                inner.cache = refreshed;
+                inner.conn_str = new_conn_str;
+            }
+        }
 
         Ok(SchemaCacheHandle::new(&self.inner))
     }

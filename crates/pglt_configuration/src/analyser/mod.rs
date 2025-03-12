@@ -3,8 +3,8 @@ pub mod linter;
 pub use crate::analyser::linter::*;
 use biome_deserialize::Merge;
 use biome_deserialize_macros::Deserializable;
-use pglt_analyse::options::RuleOptions;
 use pglt_analyse::RuleFilter;
+use pglt_analyse::options::RuleOptions;
 use pglt_diagnostics::Severity;
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;
@@ -383,7 +383,7 @@ impl schemars::JsonSchema for RuleSelector {
     fn schema_name() -> String {
         "RuleCode".to_string()
     }
-    fn json_schema(gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
-        String::json_schema(gen)
+    fn json_schema(r#gen: &mut schemars::r#gen::SchemaGenerator) -> schemars::schema::Schema {
+        String::json_schema(r#gen)
     }
 }

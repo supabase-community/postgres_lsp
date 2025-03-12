@@ -1,10 +1,9 @@
-use pglt_diagnostics::Diagnostic;
 use std::ops::{Add, Sub};
 use text_size::{TextLen, TextRange, TextSize};
 
 use crate::workspace::{ChangeFileParams, ChangeParams};
 
-use super::{document, Document, Statement};
+use super::{Document, Statement, document};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum StatementChange {
@@ -269,18 +268,6 @@ impl Document {
             }
 
             if new_ranges.len() == 1 {
-                if change.is_whitespace() {
-                    self.move_ranges(
-                        affected_range.end(),
-                        change.diff_size(),
-                        change.is_addition(),
-                    );
-
-                    self.content = new_content;
-
-                    return changed;
-                }
-
                 let affected_idx = affected_indices[0];
                 let new_range = new_ranges[0].add(affected_range.start());
                 let (old_id, old_range) = self.positions[affected_idx];
@@ -305,7 +292,10 @@ impl Document {
                     new_stmt_text: changed_content[new_ranges[0]].to_string(),
                     // change must be relative to the statement
                     change_text: change.text.clone(),
-                    change_range: change_range.sub(old_range.start()),
+                    // make sure we always have a valid range >= 0
+                    change_range: change_range
+                        .checked_sub(old_range.start())
+                        .unwrap_or(change_range.sub(change_range.start())),
                 }));
 
                 self.content = new_content;
@@ -382,10 +372,6 @@ impl Document {
 }
 
 impl ChangeParams {
-    pub fn is_whitespace(&self) -> bool {
-        self.text.chars().count() > 0 && self.text.chars().all(char::is_whitespace)
-    }
-
     pub fn diff_size(&self) -> TextSize {
         match self.range {
             Some(range) => {
@@ -429,6 +415,7 @@ impl ChangeParams {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pglt_diagnostics::Diagnostic;
     use text_size::TextRange;
 
     use crate::workspace::{ChangeFileParams, ChangeParams};
@@ -447,11 +434,17 @@ mod tests {
             .expect("Unexpected scan error")
             .ranges;
 
-        assert!(ranges.len() == d.positions.len());
+        assert!(
+            ranges.len() == d.positions.len(),
+            "should have the correct amount of positions"
+        );
 
-        assert!(ranges
-            .iter()
-            .all(|r| { d.positions.iter().any(|(_, stmt_range)| stmt_range == r) }));
+        assert!(
+            ranges
+                .iter()
+                .all(|r| { d.positions.iter().any(|(_, stmt_range)| stmt_range == r) }),
+            "all ranges should be in positions"
+        );
     }
 
     #[test]
@@ -647,6 +640,83 @@ mod tests {
     }
 
     #[test]
+    fn within_statements_2() {
+        let path = PgLTPath::new("test.sql");
+        let input = "alter table deal alter column value drop not null;\n";
+        let mut d = Document::new(path.clone(), input.to_string(), 0);
+
+        assert_eq!(d.positions.len(), 1);
+
+        let change1 = ChangeFileParams {
+            path: path.clone(),
+            version: 1,
+            changes: vec![ChangeParams {
+                text: " ".to_string(),
+                range: Some(TextRange::new(17.into(), 17.into())),
+            }],
+        };
+
+        let changed1 = d.apply_file_change(&change1);
+        assert_eq!(changed1.len(), 1);
+        assert_eq!(
+            d.content,
+            "alter table deal  alter column value drop not null;\n"
+        );
+        assert_document_integrity(&d);
+
+        let change2 = ChangeFileParams {
+            path: path.clone(),
+            version: 2,
+            changes: vec![ChangeParams {
+                text: " ".to_string(),
+                range: Some(TextRange::new(18.into(), 18.into())),
+            }],
+        };
+
+        let changed2 = d.apply_file_change(&change2);
+        assert_eq!(changed2.len(), 1);
+        assert_eq!(
+            d.content,
+            "alter table deal   alter column value drop not null;\n"
+        );
+        assert_document_integrity(&d);
+
+        let change3 = ChangeFileParams {
+            path: path.clone(),
+            version: 3,
+            changes: vec![ChangeParams {
+                text: " ".to_string(),
+                range: Some(TextRange::new(19.into(), 19.into())),
+            }],
+        };
+
+        let changed3 = d.apply_file_change(&change3);
+        assert_eq!(changed3.len(), 1);
+        assert_eq!(
+            d.content,
+            "alter table deal    alter column value drop not null;\n"
+        );
+        assert_document_integrity(&d);
+
+        let change4 = ChangeFileParams {
+            path: path.clone(),
+            version: 4,
+            changes: vec![ChangeParams {
+                text: " ".to_string(),
+                range: Some(TextRange::new(20.into(), 20.into())),
+            }],
+        };
+
+        let changed4 = d.apply_file_change(&change4);
+        assert_eq!(changed4.len(), 1);
+        assert_eq!(
+            d.content,
+            "alter table deal     alter column value drop not null;\n"
+        );
+        assert_document_integrity(&d);
+    }
+
+    #[test]
     fn julians_sample() {
         let path = PgLTPath::new("test.sql");
         let input = "select\n  *\nfrom\n  test;\n\nselect\n\nalter table test\n\ndrop column id;";
@@ -664,11 +734,7 @@ mod tests {
         };
 
         let changed1 = d.apply_file_change(&change1);
-        assert_eq!(
-            changed1.len(),
-            0,
-            "should not emit change if its only whitespace"
-        );
+        assert_eq!(changed1.len(), 1);
         assert_eq!(
             d.content,
             "select\n  *\nfrom\n  test;\n\nselect \n\nalter table test\n\ndrop column id;"
@@ -790,7 +856,7 @@ mod tests {
 
         let changed = d.apply_file_change(&change);
 
-        assert_eq!(changed.len(), 0);
+        assert_eq!(changed.len(), 1);
 
         assert_document_integrity(&d);
     }
@@ -853,6 +919,46 @@ mod tests {
         );
 
         assert_eq!("select id,test from users\nselect 1;", d.content);
+
+        assert_document_integrity(&d);
+    }
+
+    #[test]
+    fn removing_newline_at_the_beginning() {
+        let path = PgLTPath::new("test.sql");
+        let input = "\n";
+
+        let mut d = Document::new(path.clone(), input.to_string(), 1);
+
+        assert_eq!(d.positions.len(), 0);
+
+        let change = ChangeFileParams {
+            path: path.clone(),
+            version: 2,
+            changes: vec![ChangeParams {
+                text: "\nbegin;\n\nselect 1\n\nrollback;\n".to_string(),
+                range: Some(TextRange::new(0.into(), 1.into())),
+            }],
+        };
+
+        let changes = d.apply_file_change(&change);
+
+        assert_eq!(changes.len(), 3);
+
+        assert_document_integrity(&d);
+
+        let change2 = ChangeFileParams {
+            path: path.clone(),
+            version: 3,
+            changes: vec![ChangeParams {
+                text: "".to_string(),
+                range: Some(TextRange::new(0.into(), 1.into())),
+            }],
+        };
+
+        let changes2 = d.apply_file_change(&change2);
+
+        assert_eq!(changes2.len(), 1);
 
         assert_document_integrity(&d);
     }

@@ -1,10 +1,10 @@
 use pglt_lexer::{SyntaxKind, Token, TokenType};
 
 use super::{
+    Parser,
     data::at_statement_start,
     ddl::{alter, create},
     dml::{cte, delete, insert, select, update},
-    Parser,
 };
 
 pub fn source(p: &mut Parser) {
@@ -126,6 +126,8 @@ pub(crate) fn unknown(p: &mut Parser, exclude: &[SyntaxKind]) {
                 Some(SyntaxKind::Select) => {
                     let prev = p.look_back().map(|t| t.kind);
                     if [
+                        // for policies, with for select
+                        SyntaxKind::For,
                         // for create view / table as
                         SyntaxKind::As,
                         // for create rule
@@ -147,7 +149,12 @@ pub(crate) fn unknown(p: &mut Parser, exclude: &[SyntaxKind]) {
                     let prev = p.look_back().map(|t| t.kind);
                     if [
                         // for create trigger
+                        SyntaxKind::Before,
                         SyntaxKind::After,
+                        // for policies, e.g. for insert
+                        SyntaxKind::For,
+                        // e.g. on insert or delete
+                        SyntaxKind::Or,
                         // for create rule
                         SyntaxKind::On,
                         // for create rule

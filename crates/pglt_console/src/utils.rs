@@ -1,7 +1,7 @@
 use termcolor::NoColor;
 
 use crate::fmt::{Display, Formatter, Termcolor};
-use crate::{markup, Markup};
+use crate::{Markup, markup};
 use std::io;
 
 /// Adapter type providing a std::fmt::Display implementation for any type that
@@ -47,10 +47,13 @@ where
     fn fmt(&self, fmt: &mut Formatter) -> io::Result<()> {
         use crate as pglt_console;
 
-        if let Some(value) = &self.0 {
-            markup!({ DebugDisplay(value) }).fmt(fmt)?;
-        } else {
-            markup!(<Dim>"unset"</Dim>).fmt(fmt)?;
+        match &self.0 {
+            Some(value) => {
+                markup!({ DebugDisplay(value) }).fmt(fmt)?;
+            }
+            _ => {
+                markup!(<Dim>"unset"</Dim>).fmt(fmt)?;
+            }
         }
         Ok(())
     }

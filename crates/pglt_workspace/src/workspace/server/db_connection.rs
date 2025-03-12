@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use sqlx::{pool::PoolOptions, postgres::PgConnectOptions, PgPool, Postgres};
+use sqlx::{PgPool, Postgres, pool::PoolOptions, postgres::PgConnectOptions};
 
 use crate::settings::DatabaseSettings;
 

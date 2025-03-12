@@ -6,11 +6,11 @@ use change::StatementChange;
 use dashmap::{DashMap, DashSet};
 use db_connection::DbConnection;
 use document::{Document, Statement};
-use futures::{stream, StreamExt};
+use futures::{StreamExt, stream};
 use pg_query::PgQueryStore;
 use pglt_analyse::{AnalyserOptions, AnalysisFilter};
 use pglt_analyser::{Analyser, AnalyserConfig, AnalyserContext};
-use pglt_diagnostics::{serde::Diagnostic as SDiagnostic, Diagnostic, DiagnosticExt, Severity};
+use pglt_diagnostics::{Diagnostic, DiagnosticExt, Severity, serde::Diagnostic as SDiagnostic};
 use pglt_fs::{ConfigName, PgLTPath};
 use pglt_typecheck::TypecheckParams;
 use schema_cache_manager::SchemaCacheManager;
@@ -18,10 +18,10 @@ use tracing::info;
 use tree_sitter::TreeSitterStore;
 
 use crate::{
+    WorkspaceError,
     configuration::to_analyser_rules,
     settings::{Settings, SettingsHandle, SettingsHandleMut},
     workspace::PullDiagnosticsResult,
-    WorkspaceError,
 };
 
 use super::{
@@ -52,9 +52,6 @@ pub(super) struct WorkspaceServer {
     tree_sitter: TreeSitterStore,
     pg_query: PgQueryStore,
 
-    /// Stores the statements that have changed since the last analysis
-    changed_stmts: DashSet<Statement>,
-
     connection: RwLock<DbConnection>,
 }
 
@@ -78,7 +75,6 @@ impl WorkspaceServer {
             documents: DashMap::default(),
             tree_sitter: TreeSitterStore::new(),
             pg_query: PgQueryStore::new(),
-            changed_stmts: DashSet::default(),
             schema_cache: SchemaCacheManager::default(),
             connection: RwLock::default(),
         }
@@ -216,31 +212,24 @@ impl Workspace for WorkspaceServer {
                 params.version,
             ));
 
-        tracing::info!("Changing file: {:?}", params.path);
+        tracing::info!("Changing file: {:?}", params);
 
         for c in &doc.apply_file_change(&params) {
             match c {
                 StatementChange::Added(added) => {
-                    tracing::info!("Adding statement: {:?}", added);
+                    tracing::debug!("Adding statement: {:?}", added);
                     self.tree_sitter.add_statement(&added.stmt, &added.text);
                     self.pg_query.add_statement(&added.stmt, &added.text);
-
-                    self.changed_stmts.insert(added.stmt.clone());
                 }
                 StatementChange::Deleted(s) => {
-                    tracing::info!("Deleting statement: {:?}", s);
+                    tracing::debug!("Deleting statement: {:?}", s);
                     self.tree_sitter.remove_statement(s);
                     self.pg_query.remove_statement(s);
-
-                    self.changed_stmts.remove(s);
                 }
                 StatementChange::Modified(s) => {
-                    tracing::info!("Modifying statement: {:?}", s);
+                    tracing::debug!("Modifying statement: {:?}", s);
                     self.tree_sitter.modify_statement(s);
                     self.pg_query.modify_statement(s);
-
-                    self.changed_stmts.remove(&s.old_stmt);
-                    self.changed_stmts.insert(s.new_stmt.clone());
                 }
             }
         }
@@ -446,9 +435,17 @@ impl Workspace for WorkspaceServer {
 
         let tree = self.tree_sitter.get_parse_tree(&statement);
 
-        tracing::debug!("Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {}", position, stmt_range.start(), stmt_range.end(), text);
+        tracing::debug!(
+            "Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {}",
+            position,
+            stmt_range.start(),
+            stmt_range.end(),
+            text
+        );
 
         let schema_cache = self.schema_cache.load(pool)?;
+
+        tracing::debug!("Loaded schema cache for completions");
 
         let result = pglt_completions::complete(pglt_completions::CompletionParams {
             position,

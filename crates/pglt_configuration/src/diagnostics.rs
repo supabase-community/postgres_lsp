@@ -1,5 +1,5 @@
 use pglt_console::fmt::Display;
-use pglt_console::{markup, MarkupBuf};
+use pglt_console::{MarkupBuf, markup};
 use pglt_diagnostics::{Advices, Diagnostic, Error, LogCategory, MessageAndDescription, Visit};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Formatter};

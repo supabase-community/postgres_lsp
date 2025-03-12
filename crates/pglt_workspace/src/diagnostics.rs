@@ -2,7 +2,7 @@ use pglt_configuration::ConfigurationDiagnostic;
 use pglt_console::fmt::Bytes;
 use pglt_console::markup;
 use pglt_diagnostics::{
-    category, Advices, Category, Diagnostic, DiagnosticTags, LogCategory, Severity, Visit,
+    Advices, Category, Diagnostic, DiagnosticTags, LogCategory, Severity, Visit, category,
 };
 use pglt_fs::FileSystemDiagnostic;
 use serde::{Deserialize, Serialize};
@@ -343,11 +343,14 @@ impl Diagnostic for FileTooLarge {
     }
 
     fn description(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
-        write!(fmt,
-               "Size of {} is {} which exceeds configured maximum of {} for this project.\n\
+        write!(
+            fmt,
+            "Size of {} is {} which exceeds configured maximum of {} for this project.\n\
                The file size limit exists to prevent us inadvertently slowing down and loading large files that we shouldn't.\n\
                Use the `files.maxSize` configuration to change the maximum size of files processed.",
-               self.path, Bytes(self.size), Bytes(self.limit)
+            self.path,
+            Bytes(self.size),
+            Bytes(self.limit)
         )
     }
 }

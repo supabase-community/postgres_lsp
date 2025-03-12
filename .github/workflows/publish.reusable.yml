@@ -9,7 +9,6 @@ on:
       is-prerelease:
         type: string
         required: true
-        default: "false"
 
 jobs:
   publish:
@@ -52,8 +51,8 @@ jobs:
       - name: Publish npm packages as nightly
         if: inputs.is-prerelease == 'true'
         run: |
-          for package in packages/@pglt/*; do 
-            npm publish $package --tag nightly --access public --provenance
+          for package in packages/@pglt/*; do
+            npm publish "$package" --tag nightly --access public --provenance
           done
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} #
@@ -61,8 +60,8 @@ jobs:
       - name: Publish npm packages as latest
         if: inputs.is-prerelease != 'true'
         run: |
-          for package in packages/@pglt/*; do 
-            npm publish $package --tag latest --access public --provenance
+          for package in packages/@pglt/*; do
+            npm publish "$package" --tag latest --access public --provenance
           done
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
