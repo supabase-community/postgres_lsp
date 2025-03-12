@@ -278,28 +278,25 @@ impl Document {
                 let new_id = self.id_generator.next();
                 self.positions[affected_idx] = (new_id, new_range);
 
-                if !change.is_whitespace() {
-                    // whitespace-only changes should not invalidate the statement
-                    changed.push(StatementChange::Modified(ModifiedStatement {
-                        old_stmt: Statement {
-                            id: old_id,
-                            path: self.path.clone(),
-                        },
-                        old_stmt_text: self.content[old_range].to_string(),
+                changed.push(StatementChange::Modified(ModifiedStatement {
+                    old_stmt: Statement {
+                        id: old_id,
+                        path: self.path.clone(),
+                    },
+                    old_stmt_text: self.content[old_range].to_string(),
 
-                        new_stmt: Statement {
-                            id: new_id,
-                            path: self.path.clone(),
-                        },
-                        new_stmt_text: changed_content[new_ranges[0]].to_string(),
-                        // change must be relative to the statement
-                        change_text: change.text.clone(),
-                        // make sure we always have a valid range >= 0
-                        change_range: change_range
-                            .checked_sub(old_range.start())
-                            .unwrap_or(change_range.sub(change_range.start())),
-                    }));
-                }
+                    new_stmt: Statement {
+                        id: new_id,
+                        path: self.path.clone(),
+                    },
+                    new_stmt_text: changed_content[new_ranges[0]].to_string(),
+                    // change must be relative to the statement
+                    change_text: change.text.clone(),
+                    // make sure we always have a valid range >= 0
+                    change_range: change_range
+                        .checked_sub(old_range.start())
+                        .unwrap_or(change_range.sub(change_range.start())),
+                }));
 
                 self.content = new_content;
 
@@ -375,10 +372,6 @@ impl Document {
 }
 
 impl ChangeParams {
-    pub fn is_whitespace(&self) -> bool {
-        self.text.chars().count() > 0 && self.text.chars().all(char::is_whitespace)
-    }
-
     pub fn diff_size(&self) -> TextSize {
         match self.range {
             Some(range) => {
@@ -664,7 +657,7 @@ mod tests {
         };
 
         let changed1 = d.apply_file_change(&change1);
-        assert_eq!(changed1.len(), 0, "should not emit change");
+        assert_eq!(changed1.len(), 1);
         assert_eq!(
             d.content,
             "alter table deal  alter column value drop not null;\n"
@@ -681,7 +674,7 @@ mod tests {
         };
 
         let changed2 = d.apply_file_change(&change2);
-        assert_eq!(changed2.len(), 0);
+        assert_eq!(changed2.len(), 1);
         assert_eq!(
             d.content,
             "alter table deal   alter column value drop not null;\n"
@@ -698,7 +691,7 @@ mod tests {
         };
 
         let changed3 = d.apply_file_change(&change3);
-        assert_eq!(changed3.len(), 0);
+        assert_eq!(changed3.len(), 1);
         assert_eq!(
             d.content,
             "alter table deal    alter column value drop not null;\n"
@@ -715,7 +708,7 @@ mod tests {
         };
 
         let changed4 = d.apply_file_change(&change4);
-        assert_eq!(changed4.len(), 0);
+        assert_eq!(changed4.len(), 1);
         assert_eq!(
             d.content,
             "alter table deal     alter column value drop not null;\n"
@@ -741,11 +734,7 @@ mod tests {
         };
 
         let changed1 = d.apply_file_change(&change1);
-        assert_eq!(
-            changed1.len(),
-            0,
-            "should not emit change if its only whitespace"
-        );
+        assert_eq!(changed1.len(), 1);
         assert_eq!(
             d.content,
             "select\n  *\nfrom\n  test;\n\nselect \n\nalter table test\n\ndrop column id;"
@@ -867,7 +856,7 @@ mod tests {
 
         let changed = d.apply_file_change(&change);
 
-        assert_eq!(changed.len(), 0);
+        assert_eq!(changed.len(), 1);
 
         assert_document_integrity(&d);
     }

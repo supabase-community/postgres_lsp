@@ -148,7 +148,7 @@ mod tests {
             name text
           );
 
-          create or replace function cool() 
+          create or replace function cool()
           returns trigger
           language plpgsql
           security invoker
