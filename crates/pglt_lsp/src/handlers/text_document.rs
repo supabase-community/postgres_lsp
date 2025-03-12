@@ -10,14 +10,7 @@ use tower_lsp::lsp_types;
 use tracing::{error, field};
 
 /// Handler for `textDocument/didOpen` LSP notification
-#[tracing::instrument(
-    level = "debug",
-    skip_all,
-    fields(
-        text_document_uri = display(params.text_document.uri.as_ref()),
-        text_document_language_id = display(&params.text_document.language_id),
-    )
-)]
+#[tracing::instrument(level = "debug", skip(session), err)]
 pub(crate) async fn did_open(
     session: &Session,
     params: lsp_types::DidOpenTextDocumentParams,
@@ -45,7 +38,7 @@ pub(crate) async fn did_open(
 }
 
 // Handler for `textDocument/didChange` LSP notification
-#[tracing::instrument(level = "debug", skip_all, fields(url = field::display(&params.text_document.uri), version = params.text_document.version), err)]
+#[tracing::instrument(level = "debug", skip(session), err)]
 pub(crate) async fn did_change(
     session: &Session,
     params: lsp_types::DidChangeTextDocumentParams,
