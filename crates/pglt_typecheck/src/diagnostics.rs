@@ -2,8 +2,8 @@ use std::io;
 
 use pglt_console::markup;
 use pglt_diagnostics::{Advices, Diagnostic, LogCategory, MessageAndDescription, Severity, Visit};
+use pglt_text_size::TextRange;
 use sqlx::postgres::{PgDatabaseError, PgSeverity};
-use text_size::TextRange;
 
 /// A specialized diagnostic for the typechecker.
 ///

@@ -4,8 +4,8 @@ pub use self::client::{TransportRequest, WorkspaceClient, WorkspaceTransport};
 use pglt_analyse::RuleCategories;
 use pglt_configuration::{PartialConfiguration, RuleSelector};
 use pglt_fs::PgLTPath;
+use pglt_text_size::{TextRange, TextSize};
 use serde::{Deserialize, Serialize};
-use text_size::{TextRange, TextSize};
 
 use crate::WorkspaceError;
 
@@ -13,6 +13,7 @@ mod client;
 mod server;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct OpenFileParams {
     pub path: PgLTPath,
     pub content: String,
@@ -20,11 +21,13 @@ pub struct OpenFileParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct CloseFileParams {
     pub path: PgLTPath,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ChangeFileParams {
     pub path: PgLTPath,
     pub version: i32,
@@ -32,6 +35,7 @@ pub struct ChangeFileParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct PullDiagnosticsParams {
     pub path: PgLTPath,
     pub categories: RuleCategories,
@@ -41,6 +45,7 @@ pub struct PullDiagnosticsParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct CompletionParams {
     /// The File for which a completion is requested.
     pub path: PgLTPath,
@@ -49,24 +54,15 @@ pub struct CompletionParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct PullDiagnosticsResult {
     pub diagnostics: Vec<pglt_diagnostics::serde::Diagnostic>,
     pub errors: usize,
     pub skipped_diagnostics: u64,
 }
 
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, PartialEq)]
-/// Which fixes should be applied during the analyzing phase
-pub enum FixFileMode {
-    /// Applies [safe](pglt_diagnostics::Applicability::Always) fixes
-    SafeFixes,
-    /// Applies [safe](pglt_diagnostics::Applicability::Always) and [unsafe](pglt_diagnostics::Applicability::MaybeIncorrect) fixes
-    SafeAndUnsafeFixes,
-    /// Applies suppression comments to existing diagnostics when using `--suppress`
-    ApplySuppressions,
-}
-
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ChangeParams {
     /// The range of the file that changed. If `None`, the whole file changed.
     pub range: Option<TextRange>,
@@ -80,11 +76,13 @@ impl ChangeParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct IsPathIgnoredParams {
     pub pglt_path: PgLTPath,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct UpdateSettingsParams {
     pub configuration: PartialConfiguration,
     pub vcs_base_path: Option<PathBuf>,
@@ -94,11 +92,13 @@ pub struct UpdateSettingsParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct GetFileContentParams {
     pub path: PgLTPath,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ServerInfo {
     /// The name of the server as defined by the server.
     pub name: String,
@@ -213,75 +213,6 @@ impl<'app, W: Workspace + ?Sized> FileGuard<'app, W> {
             skip,
         })
     }
-    //
-    // pub fn pull_actions(
-    //     &self,
-    //     range: Option<TextRange>,
-    //     only: Vec<RuleSelector>,
-    //     skip: Vec<RuleSelector>,
-    //     suppression_reason: Option<String>,
-    // ) -> Result<PullActionsResult, WorkspaceError> {
-    //     self.workspace.pull_actions(PullActionsParams {
-    //         path: self.path.clone(),
-    //         range,
-    //         only,
-    //         skip,
-    //         suppression_reason,
-    //     })
-    // }
-    //
-    // pub fn format_file(&self) -> Result<Printed, WorkspaceError> {
-    //     self.workspace.format_file(FormatFileParams {
-    //         path: self.path.clone(),
-    //     })
-    // }
-    //
-    // pub fn format_range(&self, range: TextRange) -> Result<Printed, WorkspaceError> {
-    //     self.workspace.format_range(FormatRangeParams {
-    //         path: self.path.clone(),
-    //         range,
-    //     })
-    // }
-    //
-    // pub fn format_on_type(&self, offset: TextSize) -> Result<Printed, WorkspaceError> {
-    //     self.workspace.format_on_type(FormatOnTypeParams {
-    //         path: self.path.clone(),
-    //         offset,
-    //     })
-    // }
-    //
-    // pub fn fix_file(
-    //     &self,
-    //     fix_file_mode: FixFileMode,
-    //     should_format: bool,
-    //     rule_categories: RuleCategories,
-    //     only: Vec<RuleSelector>,
-    //     skip: Vec<RuleSelector>,
-    //     suppression_reason: Option<String>,
-    // ) -> Result<FixFileResult, WorkspaceError> {
-    //     self.workspace.fix_file(FixFileParams {
-    //         path: self.path.clone(),
-    //         fix_file_mode,
-    //         should_format,
-    //         only,
-    //         skip,
-    //         rule_categories,
-    //         suppression_reason,
-    //     })
-    // }
-    //
-    // pub fn organize_imports(&self) -> Result<OrganizeImportsResult, WorkspaceError> {
-    //     self.workspace.organize_imports(OrganizeImportsParams {
-    //         path: self.path.clone(),
-    //     })
-    // }
-    //
-    // pub fn search_pattern(&self, pattern: &PatternId) -> Result<SearchResults, WorkspaceError> {
-    //     self.workspace.search_pattern(SearchPatternParams {
-    //         path: self.path.clone(),
-    //         pattern: pattern.clone(),
-    //     })
-    // }
 }
 
 impl<W: Workspace + ?Sized> Drop for FileGuard<'_, W> {

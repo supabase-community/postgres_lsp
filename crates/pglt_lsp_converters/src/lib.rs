@@ -1,6 +1,6 @@
 //! The crate contains a set of converters to translate between `lsp-types` and `text_size` (and vice versa) types.
 
-use text_size::TextSize;
+use pglt_text_size::TextSize;
 use tower_lsp::lsp_types::{ClientCapabilities, PositionEncodingKind};
 
 pub mod from_proto;
@@ -91,7 +91,7 @@ mod tests {
     use crate::line_index::LineIndex;
     use crate::to_proto::position;
     use crate::{LineCol, PositionEncoding, WideEncoding};
-    use text_size::TextSize;
+    use pglt_text_size::TextSize;
     use tower_lsp::lsp_types::Position;
 
     macro_rules! check_conversion {

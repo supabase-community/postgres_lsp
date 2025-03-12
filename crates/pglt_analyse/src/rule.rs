@@ -5,9 +5,9 @@ use pglt_diagnostics::{
     Advices, Category, Diagnostic, DiagnosticTags, Location, LogCategory, MessageAndDescription,
     Visit,
 };
+use pglt_text_size::TextRange;
 use std::cmp::Ordering;
 use std::fmt::Debug;
-use text_size::TextRange;
 
 use crate::{categories::RuleCategory, context::RuleContext, registry::RegistryVisitor};
 

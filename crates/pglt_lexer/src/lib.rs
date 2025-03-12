@@ -3,9 +3,9 @@ pub mod diagnostics;
 
 use diagnostics::ScanError;
 use pg_query::protobuf::{KeywordKind, ScanToken};
+use pglt_text_size::{TextLen, TextRange, TextSize};
 use regex::Regex;
 use std::{collections::VecDeque, sync::LazyLock};
-use text_size::{TextLen, TextRange, TextSize};
 
 pub use crate::codegen::SyntaxKind;
 

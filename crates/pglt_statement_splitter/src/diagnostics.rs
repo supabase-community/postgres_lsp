@@ -1,5 +1,5 @@
 use pglt_diagnostics::{Diagnostic, MessageAndDescription};
-use text_size::TextRange;
+use pglt_text_size::TextRange;
 
 /// A specialized diagnostic for the statement splitter parser.
 ///

@@ -1,7 +1,7 @@
 use crate::line_index::LineIndex;
 use crate::{LineCol, PositionEncoding, WideLineCol};
 use anyhow::{Context, Result};
-use text_size::{TextRange, TextSize};
+use pglt_text_size::{TextRange, TextSize};
 use tower_lsp::lsp_types;
 
 /// The function is used to convert a LSP position to TextSize.

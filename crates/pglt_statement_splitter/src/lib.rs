@@ -22,7 +22,7 @@ mod tests {
     use diagnostics::SplitDiagnostic;
     use ntest::timeout;
     use pglt_lexer::SyntaxKind;
-    use text_size::TextRange;
+    use pglt_text_size::TextRange;
 
     use super::*;
 

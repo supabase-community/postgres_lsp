@@ -6,7 +6,7 @@ mod dml;
 pub use common::source;
 
 use pglt_lexer::{SyntaxKind, Token, WHITESPACE_TOKENS};
-use text_size::{TextRange, TextSize};
+use pglt_text_size::{TextRange, TextSize};
 
 use crate::diagnostics::SplitDiagnostic;
 

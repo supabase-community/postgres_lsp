@@ -10,12 +10,13 @@
 
 use std::{cmp::Ordering, num::NonZeroU32};
 
+use pglt_text_size::{TextRange, TextSize};
 use serde::{Deserialize, Serialize};
 pub use similar::ChangeTag;
 use similar::{TextDiff, utils::TextDiffRemapper};
-use text_size::{TextRange, TextSize};
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename_all = "snake_case")]
 pub struct TextEdit {
     dictionary: String,
@@ -23,6 +24,7 @@ pub struct TextEdit {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum CompressedOp {
     DiffOp(DiffOp),
@@ -30,6 +32,7 @@ pub enum CompressedOp {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum DiffOp {
     Equal { range: TextRange },

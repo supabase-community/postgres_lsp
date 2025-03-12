@@ -669,8 +669,8 @@ mod tests {
     use pglt_diagnostics::{DiagnosticTags, Severity};
     use pglt_diagnostics_categories::{Category, category};
     use pglt_text_edit::TextEdit;
+    use pglt_text_size::{TextRange, TextSize};
     use serde_json::{from_value, json};
-    use text_size::{TextRange, TextSize};
 
     use crate::{self as pglt_diagnostics};
     use crate::{

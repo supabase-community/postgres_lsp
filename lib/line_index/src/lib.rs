@@ -4,8 +4,8 @@
 //! representation.
 use std::{collections::HashMap, iter};
 
-use text_size::TextRange;
-use text_size::TextSize;
+use pglt_text_size::TextRange;
+use pglt_text_size::TextSize;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LineIndex {

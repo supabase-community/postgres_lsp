@@ -1,0 +1,27 @@
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "Utilities to treat text sizes/ranges in a more type-safe"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pglt_text_size"
+repository.workspace = true
+
+[dependencies]
+schemars = { workspace = true, optional = true }
+serde    = { workspace = true, optional = true }
+
+[dev-dependencies]
+serde_test        = "1.0.177"
+static_assertions = "1.1"
+
+[features]
+schemars = ["dep:schemars"]
+serde    = ["dep:serde"]
+
+[[test]]
+name              = "serde"
+path              = "tests/serde.rs"
+required-features = ["serde"]
