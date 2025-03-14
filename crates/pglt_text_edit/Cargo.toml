@@ -12,10 +12,10 @@ version              = "0.0.0"
 
 
 [dependencies]
-schemars  = { workspace = true, optional = true }
-serde     = { workspace = true, features = ["derive"] }
-similar   = { workspace = true, features = ["unicode"] }
-text-size = { workspace = true, features = ["serde"] }
+pglt_text_size = { workspace = true, features = ["serde"] }
+schemars       = { workspace = true, optional = true }
+serde          = { workspace = true, features = ["derive"] }
+similar        = { workspace = true, features = ["unicode"] }
 
 [features]
 schemars = ["dep:schemars"]

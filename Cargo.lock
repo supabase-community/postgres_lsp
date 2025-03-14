@@ -1795,13 +1795,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "line_index"
-version = "0.0.0"
-dependencies = [
- "text-size",
-]
-
-[[package]]
 name = "linked-hash-map"
 version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2222,10 +2215,10 @@ dependencies = [
  "pglt_diagnostics",
  "pglt_query_ext",
  "pglt_schema_cache",
+ "pglt_text_size",
  "rustc-hash 2.1.0",
  "schemars",
  "serde",
- "text-size",
 ]
 
 [[package]]
@@ -2284,8 +2277,8 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "async-std",
+ "pglt_text_size",
  "sqlx",
- "text-size",
 ]
 
 [[package]]
@@ -2295,11 +2288,11 @@ dependencies = [
  "async-std",
  "pglt_schema_cache",
  "pglt_test_utils",
+ "pglt_text_size",
  "pglt_treesitter_queries",
  "serde",
  "serde_json",
  "sqlx",
- "text-size",
  "tokio",
  "tree-sitter",
  "tree_sitter_sql",
@@ -2317,11 +2310,11 @@ dependencies = [
  "pglt_analyser",
  "pglt_console",
  "pglt_diagnostics",
+ "pglt_text_size",
  "rustc-hash 2.1.0",
  "schemars",
  "serde",
  "serde_json",
- "text-size",
  "toml",
 ]
 
@@ -2330,10 +2323,10 @@ name = "pglt_console"
 version = "0.0.0"
 dependencies = [
  "pglt_markup",
+ "pglt_text_size",
  "schemars",
  "serde",
  "termcolor",
- "text-size",
  "trybuild",
  "unicode-segmentation",
  "unicode-width",
@@ -2350,11 +2343,11 @@ dependencies = [
  "pglt_diagnostics_categories",
  "pglt_diagnostics_macros",
  "pglt_text_edit",
+ "pglt_text_size",
  "schemars",
  "serde",
  "serde_json",
  "termcolor",
- "text-size",
  "unicode-width",
 ]
 
@@ -2409,8 +2402,8 @@ dependencies = [
  "pg_query",
  "pglt_diagnostics",
  "pglt_lexer_codegen",
+ "pglt_text_size",
  "regex",
- "text-size",
 ]
 
 [[package]]
@@ -2438,12 +2431,12 @@ dependencies = [
  "pglt_lsp_converters",
  "pglt_test_utils",
  "pglt_text_edit",
+ "pglt_text_size",
  "pglt_workspace",
  "rustc-hash 2.1.0",
  "serde",
  "serde_json",
  "sqlx",
- "text-size",
  "tokio",
  "toml",
  "tower",
@@ -2456,8 +2449,8 @@ name = "pglt_lsp_converters"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "pglt_text_size",
  "rustc-hash 2.1.0",
- "text-size",
  "tower-lsp",
 ]
 
@@ -2479,7 +2472,7 @@ dependencies = [
  "pglt_diagnostics",
  "pglt_lexer",
  "pglt_query_ext_codegen",
- "text-size",
+ "pglt_text_size",
 ]
 
 [[package]]
@@ -2524,8 +2517,8 @@ dependencies = [
  "pglt_diagnostics",
  "pglt_lexer",
  "pglt_query_ext",
+ "pglt_text_size",
  "regex",
- "text-size",
 ]
 
 [[package]]
@@ -2556,10 +2549,20 @@ dependencies = [
 name = "pglt_text_edit"
 version = "0.0.0"
 dependencies = [
+ "pglt_text_size",
  "schemars",
  "serde",
  "similar",
- "text-size",
+]
+
+[[package]]
+name = "pglt_text_size"
+version = "0.0.0"
+dependencies = [
+ "schemars",
+ "serde",
+ "serde_test",
+ "static_assertions",
 ]
 
 [[package]]
@@ -2589,8 +2592,8 @@ dependencies = [
  "pglt_query_ext",
  "pglt_schema_cache",
  "pglt_test_utils",
+ "pglt_text_size",
  "sqlx",
- "text-size",
  "tokio",
  "tree-sitter",
  "tree_sitter_sql",
@@ -2614,13 +2617,13 @@ dependencies = [
  "pglt_query_ext",
  "pglt_schema_cache",
  "pglt_statement_splitter",
+ "pglt_text_size",
  "pglt_typecheck",
  "rustc-hash 2.1.0",
  "serde",
  "serde_json",
  "sqlx",
  "tempfile",
- "text-size",
  "tokio",
  "toml",
  "tracing",
@@ -3301,6 +3304,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_test"
+version = "1.0.177"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7f901ee573cab6b3060453d2d5f0bae4e6d628c23c0a962ff9b5f1d7c8d4f1ed"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "serde_urlencoded"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3655,6 +3667,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
+name = "static_assertions"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
+
+[[package]]
 name = "stringprep"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3755,15 +3773,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06794f8f6c5c898b3275aebefa6b8a1cb24cd2c6c79397ab15774837a0bc5755"
 dependencies = [
  "winapi-util",
-]
-
-[[package]]
-name = "text-size"
-version = "1.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f18aa187839b2bdb1ad2fa35ead8c4c2976b64e4363c386d45ac0f7ee85c9233"
-dependencies = [
- "serde",
 ]
 
 [[package]]

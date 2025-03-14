@@ -251,7 +251,7 @@ mod internal {
 
     use pglt_console::{fmt, markup};
     use pglt_text_edit::TextEdit;
-    use text_size::TextRange;
+    use pglt_text_size::TextRange;
 
     use crate::{
         Advices, Backtrace, Category, Diagnostic, DiagnosticTags, LineIndex, LineIndexBuf,

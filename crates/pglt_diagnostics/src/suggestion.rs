@@ -1,7 +1,7 @@
 use ::serde::{Deserialize, Serialize};
 use pglt_console::MarkupBuf;
 use pglt_text_edit::TextEdit;
-use text_size::TextRange;
+use pglt_text_size::TextRange;
 
 /// Indicates how a tool should manage this suggestion.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]

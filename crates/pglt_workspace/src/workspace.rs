@@ -4,8 +4,8 @@ pub use self::client::{TransportRequest, WorkspaceClient, WorkspaceTransport};
 use pglt_analyse::RuleCategories;
 use pglt_configuration::{PartialConfiguration, RuleSelector};
 use pglt_fs::PgLTPath;
+use pglt_text_size::{TextRange, TextSize};
 use serde::{Deserialize, Serialize};
-use text_size::{TextRange, TextSize};
 
 use crate::WorkspaceError;
 

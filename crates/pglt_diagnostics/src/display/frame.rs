@@ -7,7 +7,7 @@ use std::{
 };
 
 use pglt_console::{fmt, markup};
-use text_size::{TextLen, TextRange, TextSize};
+use pglt_text_size::{TextLen, TextRange, TextSize};
 use unicode_width::UnicodeWidthChar;
 
 use crate::{

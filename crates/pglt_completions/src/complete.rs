@@ -1,5 +1,5 @@
+use pglt_text_size::TextSize;
 use serde::{Deserialize, Serialize};
-use text_size::TextSize;
 
 use crate::{
     builder::CompletionBuilder,
