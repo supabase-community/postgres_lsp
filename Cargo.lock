@@ -424,6 +424,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "biome_js_factory"
+version = "0.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c9847f4dfd16ee242d12b90f96f6b2eb33238dfc4eac7b5c045e14eebe717b7"
+dependencies = [
+ "biome_js_syntax",
+ "biome_rowan",
+]
+
+[[package]]
+name = "biome_js_syntax"
+version = "0.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "38a524bd8b1f5f7b3355dfe2744196227ee15e9aa3446d562deb9ed511cf2015"
+dependencies = [
+ "biome_console",
+ "biome_diagnostics",
+ "biome_rowan",
+ "serde",
+]
+
+[[package]]
 name = "biome_json_factory"
 version = "0.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -740,6 +762,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "console_error_panic_hook"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a06aeb73f470f66dcdbf7223caeebb85984942f22f1adb2a088cf9668146bbbc"
+dependencies = [
+ "cfg-if",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "const-oid"
 version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1021,18 +1053,18 @@ checksum = "a357d28ed41a50f9c765dbfe56cbc04a64e53e5fc58ba79fbc34c10ef3df831f"
 
 [[package]]
 name = "enumflags2"
-version = "0.7.10"
+version = "0.7.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d232db7f5956f3f14313dc2f87985c58bd2c695ce124c8cdd984e08e15ac133d"
+checksum = "ba2f4b465f5318854c6f8dd686ede6c0a9dc67d4b1ac241cf0eb51521a309147"
 dependencies = [
  "enumflags2_derive",
 ]
 
 [[package]]
 name = "enumflags2_derive"
-version = "0.7.10"
+version = "0.7.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de0d48a183585823424a4ce1aa132d174a6a81bd540895822eb4c8373a8e49e8"
+checksum = "fc4caf64a58d7a6d65ab00639b046ff54399a39f5f2554728895ace4b297cd79"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2289,6 +2321,7 @@ dependencies = [
  "pglt_test_utils",
  "pglt_text_size",
  "pglt_treesitter_queries",
+ "schemars",
  "serde",
  "serde_json",
  "sqlx",
@@ -2597,10 +2630,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "pglt_wasm"
+version = "0.0.0"
+dependencies = [
+ "biome_js_factory",
+ "biome_rowan",
+ "console_error_panic_hook",
+ "js-sys",
+ "pglt_console",
+ "pglt_diagnostics",
+ "pglt_workspace",
+ "quote",
+ "serde",
+ "serde-wasm-bindgen",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "pglt_workspace"
 version = "0.0.0"
 dependencies = [
  "biome_deserialize",
+ "biome_js_factory",
+ "biome_js_syntax",
+ "biome_rowan",
  "dashmap 5.5.3",
  "futures",
  "ignore",
@@ -3243,6 +3296,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6513c1ad0b11a9376da888e3e0baa0077f1aed55c17f50e7b2397136129fb88f"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-wasm-bindgen"
+version = "0.6.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8302e169f0eddcc139c70f139d19d6467353af16f9fce27e8c30158036a1e16b"
+dependencies = [
+ "js-sys",
+ "serde",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -4356,6 +4420,8 @@ checksum = "a474f6281d1d70c17ae7aa6a613c87fce69a127e2624002df63dcb39d6cf6396"
 dependencies = [
  "cfg-if",
  "once_cell",
+ "serde",
+ "serde_json",
  "wasm-bindgen-macro",
 ]
 

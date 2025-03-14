@@ -19,6 +19,7 @@ pglt_text_size.workspace = true
 
 pglt_schema_cache.workspace       = true
 pglt_treesitter_queries.workspace = true
+schemars                          = { workspace = true, optional = true }
 serde                             = { workspace = true, features = ["derive"] }
 serde_json                        = { workspace = true }
 tree-sitter.workspace             = true
@@ -33,3 +34,6 @@ pglt_test_utils.workspace = true
 
 [lib]
 doctest = false
+
+[features]
+schema = ["dep:schemars"]
