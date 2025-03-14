@@ -7,7 +7,7 @@ use pglt_workspace::workspace::{
     ChangeFileParams, ChangeParams, CloseFileParams, GetFileContentParams, OpenFileParams,
 };
 use tower_lsp::lsp_types;
-use tracing::{error, field};
+use tracing::error;
 
 /// Handler for `textDocument/didOpen` LSP notification
 #[tracing::instrument(level = "debug", skip(session), err)]

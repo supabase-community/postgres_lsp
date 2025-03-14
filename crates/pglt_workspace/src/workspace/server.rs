@@ -3,7 +3,7 @@ use std::{fs, panic::RefUnwindSafe, path::Path, sync::RwLock};
 use analyser::AnalyserVisitorBuilder;
 use async_helper::run_async;
 use change::StatementChange;
-use dashmap::{DashMap, DashSet};
+use dashmap::DashMap;
 use db_connection::DbConnection;
 use document::{Document, Statement};
 use futures::{StreamExt, stream};
