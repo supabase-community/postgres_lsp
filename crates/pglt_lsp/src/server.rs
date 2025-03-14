@@ -76,7 +76,7 @@ impl LSPServer {
                             glob_pattern: GlobPattern::String(format!(
                                 "{}/{}",
                                 base_path.display(),
-                                ConfigName::pglt_json()
+                                ConfigName::pglt_jsonc()
                             )),
                             kind: Some(WatchKind::all()),
                         },],
@@ -151,7 +151,7 @@ impl LanguageServer for LSPServer {
 
         info!(
             "Attempting to load the configuration from '{}' file",
-            ConfigName::pglt_json()
+            ConfigName::pglt_jsonc()
         );
 
         futures::join!(self.session.load_workspace_settings());

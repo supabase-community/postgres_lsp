@@ -400,7 +400,7 @@ impl Session {
             .map(|params| &params.client_capabilities)
     }
 
-    /// This function attempts to read the `pglt.json` configuration file from
+    /// This function attempts to read the `pglt.jsonc` configuration file from
     /// the root URI and update the workspace settings accordingly
     #[tracing::instrument(level = "trace", skip(self))]
     pub(crate) async fn load_workspace_settings(&self) {

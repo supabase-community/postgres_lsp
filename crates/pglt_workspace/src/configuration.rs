@@ -120,7 +120,7 @@ fn load_config(
         ConfigurationPathHint::None => file_system.working_directory().unwrap_or_default(),
     };
 
-    // We first search for `pglt.json`
+    // We first search for `pglt.jsonc`
     if let Some(auto_search_result) = file_system.auto_search(
         &configuration_directory,
         ConfigName::file_names().as_slice(),
@@ -153,7 +153,7 @@ pub fn create_config(
     fs: &mut DynRef<dyn FileSystem>,
     configuration: &mut PartialConfiguration,
 ) -> Result<(), WorkspaceError> {
-    let path = PathBuf::from(ConfigName::pglt_json());
+    let path = PathBuf::from(ConfigName::pglt_jsonc());
 
     if fs.path_exists(&path) {
         return Err(ConfigurationDiagnostic::new_already_exists().into());

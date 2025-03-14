@@ -372,7 +372,7 @@ async fn test_database_connection() -> Result<()> {
         ..Default::default()
     });
     fs.insert(
-        url!("pglt.json").to_file_path().unwrap(),
+        url!("pglt.jsonc").to_file_path().unwrap(),
         serde_json::to_string_pretty(&conf).unwrap(),
     );
 
@@ -484,7 +484,7 @@ async fn test_completions() -> Result<()> {
         ..Default::default()
     });
     fs.insert(
-        url!("pglt.json").to_file_path().unwrap(),
+        url!("pglt.jsonc").to_file_path().unwrap(),
         serde_json::to_string_pretty(&conf).unwrap(),
     );
 

@@ -58,7 +58,7 @@ pub enum PgltCommand {
         changed: bool,
 
         /// Use this to specify the base branch to compare against when you're using the --changed
-        /// flag and the `defaultBranch` is not set in your `pglt.json`
+        /// flag and the `defaultBranch` is not set in your `pglt.jsonc`
         #[bpaf(long("since"), argument("REF"))]
         since: Option<String>,
 
@@ -91,7 +91,7 @@ pub enum PgltCommand {
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglt.json`
+        /// or a custom directory path to find `pglt.jsonc`
         #[bpaf(env("PGLT_LOG_PREFIX_NAME"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
     },
@@ -127,7 +127,7 @@ pub enum PgltCommand {
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglt.json`
+        /// or a custom directory path to find `pglt.jsonc`
         #[bpaf(env("PGLT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
         /// Bogus argument to make the command work with vscode-languageclient
@@ -164,7 +164,7 @@ pub enum PgltCommand {
         #[bpaf(long("stop-on-disconnect"), hide_usage)]
         stop_on_disconnect: bool,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglt.json`
+        /// or a custom directory path to find `pglt.jsonc`
         #[bpaf(env("PGLT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
     },
