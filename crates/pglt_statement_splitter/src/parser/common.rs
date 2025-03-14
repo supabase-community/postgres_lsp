@@ -169,6 +169,19 @@ pub(crate) fn unknown(p: &mut Parser, exclude: &[SyntaxKind]) {
                     }
                     p.advance();
                 }
+                Some(SyntaxKind::With) => {
+                    let next = p.look_ahead().map(|t| t.kind);
+                    if [
+                        // WITH ORDINALITY should not start a new statement
+                        SyntaxKind::Ordinality,
+                    ]
+                    .iter()
+                    .all(|x| Some(x) != next.as_ref())
+                    {
+                        break;
+                    }
+                    p.advance();
+                }
                 Some(_) => {
                     break;
                 }
