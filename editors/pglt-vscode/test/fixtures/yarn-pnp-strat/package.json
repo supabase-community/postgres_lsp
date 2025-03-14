@@ -1,0 +1,8 @@
+{
+  "name": "my-project",
+  "version": "0.0.0",
+  "packageManager": "yarn@4.5.0",
+  "dependencies": {
+    "pglt_testrelease-nightly-3": "0.1.0-rc"
+  }
+}

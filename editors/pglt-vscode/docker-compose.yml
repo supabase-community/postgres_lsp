@@ -1,0 +1,13 @@
+# Use postgres/example user/password credentials
+# postgresql://postgres:example@127.0.0.1:3333/postgres
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - 3333:5432

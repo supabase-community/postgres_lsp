@@ -1,0 +1,6 @@
+{
+  "name": "my-project",
+  "dependencies": {
+    "pglt_testrelease-nightly-3": "0.1.0-rc"
+  }
+}

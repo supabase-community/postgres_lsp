@@ -1,0 +1,21 @@
+[vcs]
+enabled = false
+client_kind = "git"
+use_ignore_file = false
+
+[files]
+ignore = []
+
+[linter]
+enabled = true
+
+[linter.rules]
+recommended = true
+
+[db]
+host = "127.0.0.1"
+port = 3333
+username = "postgres"
+password = "example"
+database = "postgres"
+conn_timeout_secs = 10

@@ -1,0 +1,115 @@
+{
+  "name": "pglt-vscode",
+  "publisher": "supabase",
+  "description": "Postgres Language Server right in your IDE.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.97.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/index.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "title": "PGLT: Start",
+        "command": "pglt.start"
+      },
+      {
+        "title": "PGLT: Stop",
+        "command": "pglt.stop"
+      },
+      {
+        "title": "PGLT: Restart",
+        "command": "pglt.restart"
+      },
+      {
+        "title": "PGLT: Download CLI",
+        "command": "pglt.download"
+      },
+      {
+        "title": "PGLT: Hard Reset (Delete all temp & global binaries)",
+        "command": "pglt.reset"
+      },
+      {
+        "title": "PGLT: Get Current Version",
+        "command": "pglt.currentVersion"
+      }
+    ],
+    "configuration": {
+      "title": "PGLT",
+      "properties": {
+        "pglt.enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the PGLT extension.",
+          "default": true,
+          "scope": "resource"
+        },
+        "pglt.allowDownloadPrereleases": {
+          "type": "boolean",
+          "description": "Allows selecting prereleases when downloading the binary via this extension",
+          "default": false,
+          "scope": "resource"
+        },
+        "pglt.configFile": {
+          "type": "string",
+          "description": "Path to the `pglt.toml` file. You don't need to set this if the file is on root level of your project.",
+          "scope": "resource"
+        },
+        "pglt.workspaceContainingConfigFile": {
+          "type": "string",
+          "description": "Required for Multi-Root workspaces. Name of the workspace containing the config file. The `pglt.configFile` will act relative to it.",
+          "scope": "resource"
+        },
+        "pglt.bin": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Path to the PGLT Language Server binary",
+              "examples": [
+                "/path/to/pglt",
+                "./path/to/pglt"
+              ]
+            },
+            {
+              "type": "object",
+              "description": "Platform-specific paths to the PGLT Language Server binary",
+              "examples": [
+                {
+                  "linux-x64": "/path/to/pglt",
+                  "darwin-arm64": "./path/to/pglt",
+                  "win32-x64": "/path/to/pglt.exe"
+                }
+              ]
+            }
+          ],
+          "scope": "resource"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/node": "20.17.23",
+    "@types/vscode": "^1.97.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "eslint": "^9.19.0",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "vscode-languageclient": "9.0.1",
+    "vscode-uri": "3.1.0"
+  }
+}
