@@ -8,13 +8,16 @@ To run it, simply point at your migrations directory.
 pglt check supabase/migrations
 ```
 
-When you are setting it up in an existing project, you might want to ignore all migrations that are already applied. To do so, add `migrations_dir` and `after` to your `pglt.toml` file
+When you are setting it up in an existing project, you might want to ignore all migrations that are already applied. To do so, add `migrationsDir` and `after` to your `pglt.json` file
 
 
-```toml
-[migrations]
-migrations_dir = "supabase/migrations"
-after = 1740868021
+```json
+{
+    "migrations": {
+        "migrationsDir": "supabase/migrations",
+        "after": 1740868021
+    }
+}
 ```
 
 Alternatively, pass them directly.
@@ -25,5 +28,5 @@ pglt check supabase/migrations --migrations-dir="supabase/migrations" --after=17
 
 This will only check migrations after the specified timestamp.
 
-For pre-commit hooks and when working locally, use `--staged` to only lint files that have been staged. In CI environments, you most likely want to use `--changed` to only lint files that have been changed compared to your `vcs.default_branch` configuration. If `default_branch` is not set in your `pglt.toml`, use `--since=REF` to specify the base branch to compare against.
+For pre-commit hooks and when working locally, use `--staged` to only lint files that have been staged. In CI environments, you most likely want to use `--changed` to only lint files that have been changed compared to your `vcs.default_branch` configuration. If `default_branch` is not set in your `pglt.json`, use `--since=REF` to specify the base branch to compare against.
 

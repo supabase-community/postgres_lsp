@@ -48,7 +48,7 @@ pub enum CliDiagnostic {
     IoError(IoDiagnostic),
     /// The daemon is not running
     ServerNotRunning(ServerNotRunning),
-    /// The end configuration (`pglt.toml` + other options) is incompatible with the command
+    /// The end configuration (`pglt.json` + other options) is incompatible with the command
     IncompatibleEndConfiguration(IncompatibleEndConfiguration),
     /// No files processed during the file system traversal
     NoFilesWereProcessed(NoFilesWereProcessed),
@@ -410,7 +410,7 @@ impl CliDiagnostic {
         Self::ServerNotRunning(ServerNotRunning)
     }
 
-    /// Emitted when the end configuration (`pglt.toml` file + CLI arguments + LSP configuration)
+    /// Emitted when the end configuration (`pglt.json` file + CLI arguments + LSP configuration)
     /// results in a combination of options that doesn't allow to run the command correctly.
     ///
     /// A reason needs to be provided

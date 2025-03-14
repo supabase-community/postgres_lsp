@@ -36,8 +36,16 @@ code-block.sql lint/safety/banDropTable ━━━━━━━━━━━━━�
 ```
 
 ## How to configure
-```toml
-[linter.rules.safety]
-banDropTable = "error"
+```json
+
+{
+  "linter": {
+    "rules": {
+      "safety": {
+        "banDropTable": "error"
+      }
+    }
+  }
+}
 
 ```

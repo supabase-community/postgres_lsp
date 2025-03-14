@@ -99,7 +99,7 @@ fn load_config(
         if file_system.path_is_file(config_file_path) {
             let content = file_system.read_file_from_path(config_file_path)?;
 
-            let deserialized = toml::from_str::<PartialConfiguration>(&content)
+            let deserialized = serde_json::from_str::<PartialConfiguration>(&content)
                 .map_err(ConfigurationDiagnostic::new_deserialization_error)?;
 
             return Ok(Some(ConfigurationPayload {
@@ -120,7 +120,7 @@ fn load_config(
         ConfigurationPathHint::None => file_system.working_directory().unwrap_or_default(),
     };
 
-    // We first search for `pgtoml.json`
+    // We first search for `pglt.json`
     if let Some(auto_search_result) = file_system.auto_search(
         &configuration_directory,
         ConfigName::file_names().as_slice(),
@@ -128,7 +128,7 @@ fn load_config(
     )? {
         let AutoSearchResult { content, file_path } = auto_search_result;
 
-        let deserialized = toml::from_str::<PartialConfiguration>(&content)
+        let deserialized = serde_json::from_str::<PartialConfiguration>(&content)
             .map_err(ConfigurationDiagnostic::new_deserialization_error)?;
 
         Ok(Some(ConfigurationPayload {
@@ -152,7 +152,7 @@ pub fn create_config(
     fs: &mut DynRef<dyn FileSystem>,
     configuration: PartialConfiguration,
 ) -> Result<(), WorkspaceError> {
-    let path = PathBuf::from(ConfigName::pglt_toml());
+    let path = PathBuf::from(ConfigName::pglt_json());
 
     if fs.path_exists(&path) {
         return Err(ConfigurationDiagnostic::new_already_exists().into());
@@ -168,7 +168,7 @@ pub fn create_config(
         }
     })?;
 
-    let contents = toml::ser::to_string_pretty(&configuration)
+    let contents = serde_json::to_string_pretty(&configuration)
         .map_err(|_| ConfigurationDiagnostic::new_serialization_error())?;
 
     config_file

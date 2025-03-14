@@ -1,4 +1,4 @@
-//! This module contains the configuration of `pglt.toml`
+//! This module contains the configuration of `pglt.json`
 //!
 //! The configuration is divided by "tool", and then it's possible to further customise it
 //! by language. The language might further options divided by tool.
@@ -43,7 +43,7 @@ pub const VERSION: &str = match option_env!("PGLT_VERSION") {
 #[derive(Clone, Debug, Default, Deserialize, Eq, Partial, PartialEq, Serialize)]
 #[partial(derive(Bpaf, Clone, Eq, PartialEq, Merge))]
 #[partial(cfg_attr(feature = "schema", derive(schemars::JsonSchema)))]
-#[partial(serde(deny_unknown_fields, rename_all = "snake_case"))]
+#[partial(serde(deny_unknown_fields, rename_all = "camelCase"))]
 pub struct Configuration {
     /// The configuration of the VCS integration
     #[partial(type, bpaf(external(partial_vcs_configuration), optional, hide_usage))]

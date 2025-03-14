@@ -8,8 +8,8 @@ pub fn generate_default_configuration(docs_dir: &Path) -> anyhow::Result<()> {
     let index_path = docs_dir.join("index.md");
 
     let printed_config = format!(
-        "\n```toml\n{}```\n",
-        toml::ser::to_string_pretty(&PartialConfiguration::init())?
+        "\n```json\n{}```\n",
+        serde_json::to_string_pretty(&PartialConfiguration::init())?
     );
 
     let data = fs::read_to_string(&index_path)?;

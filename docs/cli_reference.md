@@ -62,7 +62,7 @@ Shows the version information and quit.
 - **`    --verbose`** &mdash; 
   Print additional diagnostics, and some diagnostics show more information. Also, print out what files were processed and which ones were modified.
 - **`    --config-path`**=_`PATH`_ &mdash; 
-  Set the file path to the configuration file, or the directory path to find `pglt.toml`. If used, it disables the default configuration file resolution.
+  Set the file path to the configuration file, or the directory path to find `pglt.json`. If used, it disables the default configuration file resolution.
 - **`    --max-diagnostics`**=_`<none|<NUMBER>>`_ &mdash; 
   Cap the amount of diagnostics displayed. When `none` is provided, the limit is lifted.
    
@@ -111,7 +111,7 @@ Runs everything to the requested files.
 - **`    --vcs-use-ignore-file`**=_`<true|false>`_ &mdash; 
   Whether we should use the VCS ignore file. When [true], we will ignore the files specified in the ignore file.
 - **`    --vcs-root`**=_`PATH`_ &mdash; 
-  The folder where we should check for VCS files. By default, we will use the same folder where `pglt.toml` was found.
+  The folder where we should check for VCS files. By default, we will use the same folder where `pglt.json` was found.
 
   If we can't find the configuration, it will attempt to use the current working directory. If no current working directory can't be found, we won't use the VCS integration, and a diagnostic will be emitted
 - **`    --vcs-default-branch`**=_`BRANCH`_ &mdash; 
@@ -149,7 +149,7 @@ Runs everything to the requested files.
 - **`    --verbose`** &mdash; 
   Print additional diagnostics, and some diagnostics show more information. Also, print out what files were processed and which ones were modified.
 - **`    --config-path`**=_`PATH`_ &mdash; 
-  Set the file path to the configuration file, or the directory path to find `pglt.toml`. If used, it disables the default configuration file resolution.
+  Set the file path to the configuration file, or the directory path to find `pglt.json`. If used, it disables the default configuration file resolution.
 - **`    --max-diagnostics`**=_`<none|<NUMBER>>`_ &mdash; 
   Cap the amount of diagnostics displayed. When `none` is provided, the limit is lifted.
    
@@ -197,7 +197,7 @@ Runs everything to the requested files.
 - **`    --changed`** &mdash; 
   When set to true, only the files that have been changed compared to your `defaultBranch` configuration will be linted. This option should be used in CI environments.
 - **`    --since`**=_`REF`_ &mdash; 
-  Use this to specify the base branch to compare against when you're using the --changed flag and the `defaultBranch` is not set in your `pglt.toml`
+  Use this to specify the base branch to compare against when you're using the --changed flag and the `defaultBranch` is not set in your `pglt.json`
 - **`-h`**, **`--help`** &mdash; 
   Prints help information
 
@@ -220,7 +220,7 @@ Starts the daemon server process.
    
   Uses environment variable **`PGLT_LOG_PATH`**
 - **`    --config-path`**=_`PATH`_ &mdash; 
-  Allows to set a custom file path to the configuration file, or a custom directory path to find `pglt.toml`
+  Allows to set a custom file path to the configuration file, or a custom directory path to find `pglt.json`
    
   Uses environment variable **`PGLT_LOG_PREFIX_NAME`**
 - **`-h`**, **`--help`** &mdash; 
@@ -267,7 +267,7 @@ Acts as a server for the Language Server Protocol over stdin/stdout.
    
   Uses environment variable **`PGLT_LOG_PATH`**
 - **`    --config-path`**=_`PATH`_ &mdash; 
-  Allows to set a custom file path to the configuration file, or a custom directory path to find `pglt.toml`
+  Allows to set a custom file path to the configuration file, or a custom directory path to find `pglt.json`
    
   Uses environment variable **`PGLT_CONFIG_PATH`**
 - **`-h`**, **`--help`** &mdash; 

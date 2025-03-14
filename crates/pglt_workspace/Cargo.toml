@@ -34,7 +34,6 @@ serde                     = { workspace = true, features = ["derive"] }
 serde_json                = { workspace = true, features = ["raw_value"] }
 sqlx.workspace            = true
 tokio                     = { workspace = true, features = ["rt", "rt-multi-thread"] }
-toml                      = { workspace = true }
 tracing                   = { workspace = true, features = ["attributes", "log"] }
 tree-sitter.workspace     = true
 tree_sitter_sql.workspace = true

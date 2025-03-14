@@ -35,8 +35,16 @@ code-block.sql lint/safety/banDropColumn ━━━━━━━━━━━━━
 ```
 
 ## How to configure
-```toml
-[linter.rules.safety]
-banDropColumn = "error"
+```json
+
+{
+  "linter": {
+    "rules": {
+      "safety": {
+        "banDropColumn": "error"
+      }
+    }
+  }
+}
 
 ```

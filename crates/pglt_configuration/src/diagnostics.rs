@@ -24,9 +24,9 @@ pub enum ConfigurationDiagnostic {
 }
 
 impl ConfigurationDiagnostic {
-    pub fn new_deserialization_error(error: toml::de::Error) -> Self {
+    pub fn new_deserialization_error(error: serde_json::Error) -> Self {
         Self::DeserializationError(DeserializationError {
-            message: error.message().to_string(),
+            message: error.to_string(),
         })
     }
 

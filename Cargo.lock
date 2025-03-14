@@ -972,7 +972,6 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
- "toml",
 ]
 
 [[package]]
@@ -2315,7 +2314,6 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
- "toml",
 ]
 
 [[package]]
@@ -2438,7 +2436,6 @@ dependencies = [
  "serde_json",
  "sqlx",
  "tokio",
- "toml",
  "tower",
  "tower-lsp",
  "tracing",
@@ -2626,7 +2623,6 @@ dependencies = [
  "sqlx",
  "tempfile",
  "tokio",
- "toml",
  "tracing",
  "tree-sitter",
  "tree_sitter_sql",

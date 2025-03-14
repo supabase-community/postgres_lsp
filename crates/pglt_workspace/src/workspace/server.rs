@@ -108,7 +108,7 @@ impl WorkspaceServer {
     fn is_ignored(&self, path: &Path) -> bool {
         let file_name = path.file_name().and_then(|s| s.to_str());
         // Never ignore PgLT's config file regardless `include`/`ignore`
-        (file_name != Some(ConfigName::pglt_toml())) &&
+        (file_name != Some(ConfigName::pglt_json())) &&
             // Apply top-level `include`/`ignore
             (self.is_ignored_by_top_level_config(path) || self.is_ignored_by_migration_config(path))
     }
