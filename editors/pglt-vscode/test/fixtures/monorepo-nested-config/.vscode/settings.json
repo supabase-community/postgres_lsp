@@ -1,0 +1,4 @@
+{
+  "pglt.configFile": "/packages/service-a/pglt.toml",
+  "pglt.allowDownloadPrereleases": true
+}

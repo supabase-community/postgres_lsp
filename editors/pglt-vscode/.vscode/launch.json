@@ -1,0 +1,90 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🧩 Debug Extension (Monorepo w/ Nested Config)",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentKind=node",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--log=supabase.pglt-vscode:debug",
+        "${workspaceFolder}/test/fixtures/monorepo-nested-config"
+      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "internalConsoleOptions": "openOnFirstSessionStart",
+      "sourceMapRenames": true
+    },
+    {
+      "name": "🧩 Debug Extension (Node Modules Strategy)",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentKind=node",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--log=supabase.pglt-vscode:debug",
+        "${workspaceFolder}/test/fixtures/node-modules-strat"
+      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "sourceMapRenames": true
+    },
+    {
+      "name": "🧩 Debug Extension (Simple Project Download)",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentKind=node",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--log=supabase.pglt-vscode:debug",
+        "${workspaceFolder}/test/fixtures/simple-project-download"
+      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "sourceMapRenames": true
+    },
+    {
+      "name": "🧩 Debug Extension (Simple Project Global Binary)",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentKind=node",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--log=supabase.pglt-vscode:debug",
+        "${workspaceFolder}/test/fixtures/simple-project-global-bin"
+      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "sourceMapRenames": true
+    },
+    {
+      "name": "🧩 Debug Extension (Workspace With Settings)",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentKind=node",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--log=supabase.pglt-vscode:debug",
+        "${workspaceFolder}/test/fixtures/workspace-with-settings"
+      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "sourceMapRenames": true
+    },
+    {
+      "name": "🧩 Debug Extension (Yarn PnP Strategy)",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentKind=node",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--log=supabase.pglt-vscode:debug",
+        "${workspaceFolder}/test/fixtures/yarn-pnp-strat"
+      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "sourceMapRenames": true
+    }
+  ]
+}
