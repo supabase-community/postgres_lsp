@@ -2,10 +2,8 @@ use enumflags2::{BitFlags, bitflags};
 use std::borrow::Cow;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)
-)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum RuleCategory {
     /// This rule performs static analysis of the source code to detect
     /// invalid or error-prone patterns, and emits diagnostics along with
@@ -26,10 +24,8 @@ pub const SUPPRESSION_ACTION_CATEGORY: &str = "quickfix.suppressRule";
 ///
 /// [CodeActionKind]: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#codeActionKind
 #[derive(Clone, Debug, PartialEq, Eq)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)
-)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum ActionCategory {
     /// Base kind for quickfix actions: 'quickfix'.
     ///
@@ -110,10 +106,8 @@ impl ActionCategory {
 ///
 /// [Check the LSP spec](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#codeActionKind) for more information:
 #[derive(Clone, Debug, PartialEq, Eq)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)
-)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum RefactorKind {
     /// This action describes a refactor with no particular sub-category
     None,
@@ -150,10 +144,8 @@ pub enum RefactorKind {
 
 /// The sub-category of a source code action
 #[derive(Clone, Debug, PartialEq, Eq)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)
-)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum SourceActionKind {
     /// This action describes a source action with no particular sub-category
     None,
@@ -282,7 +274,7 @@ impl<'de> serde::Deserialize<'de> for RuleCategories {
     }
 }
 
-#[cfg(feature = "serde")]
+#[cfg(feature = "schema")]
 impl schemars::JsonSchema for RuleCategories {
     fn schema_name() -> String {
         String::from("RuleCategories")

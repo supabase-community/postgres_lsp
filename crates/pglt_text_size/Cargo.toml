@@ -15,7 +15,7 @@ schemars = { workspace = true, optional = true }
 serde    = { workspace = true, optional = true }
 
 [features]
-schema = ["dep:schemars", "serde"]
+schema = ["dep:schemars"]
 serde  = ["dep:serde"]
 
 [dev-dependencies]

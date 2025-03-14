@@ -13,6 +13,7 @@ mod client;
 mod server;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct OpenFileParams {
     pub path: PgLTPath,
     pub content: String,
@@ -20,11 +21,13 @@ pub struct OpenFileParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct CloseFileParams {
     pub path: PgLTPath,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ChangeFileParams {
     pub path: PgLTPath,
     pub version: i32,
@@ -32,6 +35,7 @@ pub struct ChangeFileParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct PullDiagnosticsParams {
     pub path: PgLTPath,
     pub categories: RuleCategories,
@@ -41,6 +45,7 @@ pub struct PullDiagnosticsParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct CompletionParams {
     /// The File for which a completion is requested.
     pub path: PgLTPath,
@@ -49,24 +54,15 @@ pub struct CompletionParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct PullDiagnosticsResult {
     pub diagnostics: Vec<pglt_diagnostics::serde::Diagnostic>,
     pub errors: usize,
     pub skipped_diagnostics: u64,
 }
 
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, PartialEq)]
-/// Which fixes should be applied during the analyzing phase
-pub enum FixFileMode {
-    /// Applies [safe](pglt_diagnostics::Applicability::Always) fixes
-    SafeFixes,
-    /// Applies [safe](pglt_diagnostics::Applicability::Always) and [unsafe](pglt_diagnostics::Applicability::MaybeIncorrect) fixes
-    SafeAndUnsafeFixes,
-    /// Applies suppression comments to existing diagnostics when using `--suppress`
-    ApplySuppressions,
-}
-
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ChangeParams {
     /// The range of the file that changed. If `None`, the whole file changed.
     pub range: Option<TextRange>,
@@ -80,11 +76,13 @@ impl ChangeParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct IsPathIgnoredParams {
     pub pglt_path: PgLTPath,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct UpdateSettingsParams {
     pub configuration: PartialConfiguration,
     pub vcs_base_path: Option<PathBuf>,
@@ -94,11 +92,13 @@ pub struct UpdateSettingsParams {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct GetFileContentParams {
     pub path: PgLTPath,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ServerInfo {
     /// The name of the server as defined by the server.
     pub name: String,

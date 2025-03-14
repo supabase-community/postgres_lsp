@@ -19,5 +19,3 @@ sqlx.workspace           = true
 
 [lib]
 doctest = false
-
-[features]

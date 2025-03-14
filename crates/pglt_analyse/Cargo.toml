@@ -27,4 +27,5 @@ schemars                 = { workspace = true, optional = true }
 serde                    = { workspace = true, features = ["derive"], optional = true }
 
 [features]
-serde = ["dep:serde", "dep:schemars", "dep:biome_deserialize", "dep:biome_deserialize_macros"]
+schema = ["dep:schemars"]
+serde  = ["dep:serde", "dep:biome_deserialize", "dep:biome_deserialize_macros"]

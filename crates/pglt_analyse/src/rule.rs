@@ -271,8 +271,8 @@ impl RuleDiagnostic {
 }
 
 #[derive(Debug, Clone, Eq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, schemars::JsonSchema))]
-#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum RuleSource {
     /// Rules from [Squawk](https://squawkhq.com)
     Squawk(&'static str),

@@ -17,10 +17,8 @@ use crate::ConfigName;
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Ord, PartialOrd, Hash)]
 #[repr(u8)]
 #[bitflags]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)
-)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 // NOTE: The order of the variants is important, the one on the top has the highest priority
 pub enum FileKind {
     /// A configuration file has the highest priority. It's usually `pglt.toml`
@@ -85,10 +83,8 @@ impl From<FileKind> for FileKinds {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Default)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)
-)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct PgLTPath {
     path: PathBuf,
     /// Determines the kind of the file inside PgLT. Some files are considered as configuration files, others as manifest files, and others as files to handle
@@ -201,7 +197,7 @@ impl PgLTPath {
     }
 }
 
-#[cfg(feature = "serde")]
+#[cfg(feature = "schema")]
 impl schemars::JsonSchema for FileKinds {
     fn schema_name() -> String {
         String::from("FileKind")
