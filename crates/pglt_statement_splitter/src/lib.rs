@@ -234,6 +234,11 @@ values ('insert', new.id, now());",
     }
 
     #[test]
+    fn with_ordinality() {
+        Tester::from("insert into table (col) select 1 from other t cross join lateral jsonb_array_elements(t.buttons) with ordinality as a(b, nr) where t.buttons is not null;").expect_statements(vec!["insert into table (col) select 1 from other t cross join lateral jsonb_array_elements(t.buttons) with ordinality as a(b, nr) where t.buttons is not null;"]);
+    }
+
+    #[test]
     fn unknown() {
         Tester::from("random stuff\n\nmore randomness\n\nselect 3").expect_statements(vec![
             "random stuff",
