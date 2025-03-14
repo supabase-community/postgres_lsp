@@ -87,9 +87,8 @@ impl Parser {
     pub fn start_stmt(&mut self) {
         assert!(
             self.current_stmt_start.is_none(),
-            "cannot start statement without statement {:?} at {:?}",
-            self.current_stmt_start,
-            self.tokens.get(self.current_stmt_start.unwrap()).unwrap()
+            "cannot start statement within statement at {:?}",
+            self.tokens.get(self.current_stmt_start.unwrap())
         );
         self.current_stmt_start = Some(self.next_pos);
     }
