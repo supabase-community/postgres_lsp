@@ -55,8 +55,6 @@ tikv-jemallocator = "0.6.0"
 [lib]
 doctest = false
 
-[features]
-
 [[bin]]
 name = "pglt"
 path = "src/main.rs"

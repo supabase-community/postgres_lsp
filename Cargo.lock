@@ -2620,6 +2620,7 @@ dependencies = [
  "pglt_text_size",
  "pglt_typecheck",
  "rustc-hash 2.1.0",
+ "schemars",
  "serde",
  "serde_json",
  "sqlx",

@@ -20,14 +20,13 @@ pglt_diagnostics = { workspace = true }
 rayon            = { workspace = true }
 rustc-hash       = { workspace = true }
 schemars         = { workspace = true, optional = true }
-serde            = { workspace = true }
+serde            = { workspace = true, optional = true }
 smallvec         = { workspace = true }
 tracing          = { workspace = true }
 
 [features]
-serde = ["schemars", "pglt_diagnostics/schema"]
-
-[dev-dependencies]
+schema = ["dep:schemars", "pglt_diagnostics/schema"]
+serde  = ["dep:serde"]
 
 [lib]
 doctest = false

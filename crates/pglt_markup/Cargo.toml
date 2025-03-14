@@ -20,5 +20,3 @@ quote            = "1.0.14"
 
 [lib]
 proc-macro = true
-
-[features]

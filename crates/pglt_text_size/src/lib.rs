@@ -26,6 +26,9 @@ mod traits;
 #[cfg(feature = "serde")]
 mod serde_impls;
 
+#[cfg(feature = "schema")]
+mod schemars_impls;
+
 pub use crate::{range::TextRange, size::TextSize, traits::TextLen};
 
 #[cfg(target_pointer_width = "16")]

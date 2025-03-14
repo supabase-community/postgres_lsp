@@ -19,5 +19,3 @@ pglt_schema_cache.workspace = true
 
 [lib]
 doctest = false
-
-[features]
