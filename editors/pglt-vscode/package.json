@@ -60,11 +60,6 @@
           "description": "Path to the `pglt.toml` file. You don't need to set this if the file is on root level of your project.",
           "scope": "resource"
         },
-        "pglt.workspaceContainingConfigFile": {
-          "type": "string",
-          "description": "Required for Multi-Root workspaces. Name of the workspace containing the config file. The `pglt.configFile` will act relative to it.",
-          "scope": "resource"
-        },
         "pglt.bin": {
           "oneOf": [
             {
