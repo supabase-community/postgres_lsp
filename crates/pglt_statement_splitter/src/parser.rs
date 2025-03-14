@@ -85,7 +85,11 @@ impl Parser {
 
     /// Start statement
     pub fn start_stmt(&mut self) {
-        assert!(self.current_stmt_start.is_none());
+        assert!(
+            self.current_stmt_start.is_none(),
+            "cannot start statement within statement at {:?}",
+            self.tokens.get(self.current_stmt_start.unwrap())
+        );
         self.current_stmt_start = Some(self.next_pos);
     }
 
@@ -139,6 +143,21 @@ impl Parser {
         match self.tokens.get(self.next_pos) {
             Some(token) => token,
             None => &self.eof_token,
+        }
+    }
+
+    /// Look ahead to the next relevant token
+    fn look_ahead(&self) -> Option<&Token> {
+        // we need to look ahead to the next relevant token
+        let mut look_ahead_pos = self.next_pos + 1;
+        loop {
+            let token = self.tokens.get(look_ahead_pos)?;
+
+            if !is_irrelevant_token(token) {
+                return Some(token);
+            }
+
+            look_ahead_pos += 1;
         }
     }
 
