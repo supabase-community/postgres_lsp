@@ -146,7 +146,7 @@ impl Parser {
         }
     }
 
-    /// Look ahead to the next relevant token *after the next token*
+    /// Look ahead to the next relevant token
     fn look_ahead(&self) -> Option<&Token> {
         // we need to look ahead to the next relevant token
         let mut look_ahead_pos = self.next_pos + 1;
