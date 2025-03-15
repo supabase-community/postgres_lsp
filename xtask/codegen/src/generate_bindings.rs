@@ -183,7 +183,7 @@ pub fn generate_bindings(mode: Mode) -> Result<()> {
                         make::token(T!['}']),
                     ),
                     make::token(T![from]),
-                    make::js_module_source(make::js_string_literal("./transport")).into(),
+                    make::js_module_source(make::js_string_literal("./transport")),
                 )
                 .with_type_token(make::token(T![type]))
                 .build(),
@@ -316,7 +316,7 @@ pub fn generate_bindings(mode: Mode) -> Result<()> {
         AnyJsExportClause::AnyJsDeclarationClause(AnyJsDeclarationClause::TsTypeAliasDeclaration(
             make::ts_type_alias_declaration(
                 make::token(T![type]),
-                make::ts_identifier_binding(make::ident("Configuration")).into(),
+                make::ts_identifier_binding(make::ident("Configuration")),
                 make::token(T![=]),
                 AnyTsType::TsReferenceType(
                     make::ts_reference_type(AnyTsName::JsReferenceIdentifier(
@@ -335,7 +335,7 @@ pub fn generate_bindings(mode: Mode) -> Result<()> {
         AnyJsExportClause::AnyJsDeclarationClause(AnyJsDeclarationClause::TsInterfaceDeclaration(
             make::ts_interface_declaration(
                 make::token(T![interface]),
-                make::ts_identifier_binding(make::ident("Workspace")).into(),
+                make::ts_identifier_binding(make::ident("Workspace")),
                 make::token(T!['{']),
                 make::ts_type_member_list(member_definitions),
                 make::token(T!['}']),

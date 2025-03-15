@@ -126,6 +126,7 @@ export class Transport {
 	 * @param params Parameters object the remote method should be called with
 	 * @return Promise resolving with the value returned by the remote method, or rejecting with an RPC error if the remote call failed
 	 */
+	// biome-ignore lint/suspicious/noExplicitAny: if i change it to Promise<unknown> typescript breaks
 	request(method: string, params: unknown): Promise<any> {
 		return new Promise((resolve, reject) => {
 			const id = this.nextRequestId++;

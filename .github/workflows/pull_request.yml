@@ -50,7 +50,7 @@ jobs:
         run: |
           cargo fmt --all --check
           taplo format --check
-          biome ci
+          biome format
 
   actionlint:
     name: Lint GitHub Actions
@@ -91,10 +91,15 @@ jobs:
           cache-base: main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
       - name: Run Lints
         run: |
           cargo clippy
           cargo run -p rules_check
+          biome lint
 
   test:
     name: Test

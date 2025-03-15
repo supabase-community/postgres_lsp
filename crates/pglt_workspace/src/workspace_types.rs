@@ -262,7 +262,7 @@ fn schema_object_type<'a>(
     let has_defaults = schema
         .metadata
         .as_ref()
-        .map_or(false, |metadata| metadata.default.is_some());
+        .is_some_and(|metadata| metadata.default.is_some());
 
     (ts_type, is_nullable || has_defaults, description)
 }
@@ -375,7 +375,7 @@ pub fn generate_type<'a>(
             let current_module = AnyJsDeclaration::from(
                 make::ts_interface_declaration(
                     make::token(T![interface]),
-                    make::ts_identifier_binding(make::ident(name)).into(),
+                    make::ts_identifier_binding(make::ident(name)),
                     make::token(T!['{']),
                     make::ts_type_member_list(members),
                     make::token(T!['}']),
@@ -392,7 +392,7 @@ pub fn generate_type<'a>(
             let current_module = AnyJsDeclaration::from(
                 make::ts_type_alias_declaration(
                     make::token(T![type]),
-                    make::ts_identifier_binding(make::ident(name)).into(),
+                    make::ts_identifier_binding(make::ident(name)),
                     make::token(T![=]),
                     ts_type,
                 )

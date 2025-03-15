@@ -22,7 +22,7 @@ async function downloadSchema(releaseTag, githubToken) {
 	const response = await fetch(assetUrl.trim(), {
 		headers: {
 			Authorization: `token ${githubToken}`,
-			Accept: `application/octet-stream`,
+			Accept: "application/octet-stream",
 		},
 	});
 
@@ -46,7 +46,7 @@ async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
 	const response = await fetch(assetUrl.trim(), {
 		headers: {
 			Authorization: `token ${githubToken}`,
-			Accept: `application/octet-stream`,
+			Accept: "application/octet-stream",
 		},
 	});
 
@@ -179,15 +179,15 @@ function copySchemaToNativePackage(platform, arch) {
 	const buildName = getBuildName(platform, arch);
 	const packageRoot = resolve(PACKAGES_PGLT_ROOT, buildName);
 
-	const schemaSrc = resolve(PGLT_ROOT, `schema.json`);
-	const schemaTarget = resolve(packageRoot, `schema.json`);
+	const schemaSrc = resolve(PGLT_ROOT, "schema.json");
+	const schemaTarget = resolve(packageRoot, "schema.json");
 
 	if (!fs.existsSync(schemaSrc)) {
 		console.error(`schema.json not found at: ${schemaSrc}`);
 		process.exit(1);
 	}
 
-	console.info(`Copying schema.json`);
+	console.info("Copying schema.json");
 	fs.copyFileSync(schemaSrc, schemaTarget);
 	fs.chmodSync(schemaTarget, 0o666);
 }
@@ -224,7 +224,7 @@ function getVersion(releaseTag, isPrerelease) {
 
 (async function main() {
 	const githubToken = process.env.GITHUB_TOKEN;
-	let releaseTag = process.env.RELEASE_TAG;
+	const releaseTag = process.env.RELEASE_TAG;
 	assert(githubToken, "GITHUB_TOKEN not defined!");
 	assert(releaseTag, "RELEASE_TAG not defined!");
 
