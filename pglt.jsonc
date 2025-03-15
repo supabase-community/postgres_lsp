@@ -1,0 +1,26 @@
+{
+	"$schema": "./docs/schemas/latest/schema.json",
+	"vcs": {
+		"enabled": false,
+		"clientKind": "git",
+		"useIgnoreFile": false
+	},
+	"files": {
+		"ignore": []
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true
+		}
+	},
+	// YOU CAN COMMENT ME OUT :)
+	"db": {
+		"host": "127.0.0.1",
+		"port": 5432,
+		"username": "postgres",
+		"password": "postgres",
+		"database": "postgres",
+		"connTimeoutSecs": 10
+	}
+}

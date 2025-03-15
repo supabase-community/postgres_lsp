@@ -13,7 +13,6 @@ version              = "0.0.0"
 
 [dependencies]
 regex              = { workspace = true }
-toml                     = { workspace = true }
 anyhow                     = { workspace = true }
 bpaf                     = { workspace = true, features = ["docgen"] }
 schemars       = { workspace = true }

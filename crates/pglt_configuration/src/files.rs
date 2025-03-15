@@ -14,7 +14,7 @@ pub const DEFAULT_FILE_SIZE_LIMIT: NonZeroU64 =
 #[derive(Clone, Debug, Deserialize, Eq, Partial, PartialEq, Serialize)]
 #[partial(derive(Bpaf, Clone, Eq, PartialEq, Merge))]
 #[partial(cfg_attr(feature = "schema", derive(schemars::JsonSchema)))]
-#[partial(serde(rename_all = "snake_case", default, deny_unknown_fields))]
+#[partial(serde(rename_all = "camelCase", default, deny_unknown_fields))]
 pub struct FilesConfiguration {
     /// The maximum allowed size for source code files in bytes. Files above
     /// this limit will be ignored for performance reasons. Defaults to 1 MiB

@@ -35,8 +35,16 @@ code-block.sql lint/safety/banDropNotNull ━━━━━━━━━━━━�
 ```
 
 ## How to configure
-```toml
-[linter.rules.safety]
-banDropNotNull = "error"
+```json
+
+{
+  "linter": {
+    "rules": {
+      "safety": {
+        "banDropNotNull": "error"
+      }
+    }
+  }
+}
 
 ```

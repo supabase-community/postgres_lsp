@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 /// The configuration of the filesystem
 #[derive(Clone, Debug, Deserialize, Eq, Partial, PartialEq, Serialize, Default)]
 #[partial(derive(Bpaf, Clone, Eq, PartialEq, Merge))]
-#[partial(serde(rename_all = "snake_case", default, deny_unknown_fields))]
+#[partial(serde(rename_all = "camelCase", default, deny_unknown_fields))]
 #[partial(cfg_attr(feature = "schema", derive(schemars::JsonSchema)))]
 pub struct MigrationsConfiguration {
     /// The directory where the migration files are stored

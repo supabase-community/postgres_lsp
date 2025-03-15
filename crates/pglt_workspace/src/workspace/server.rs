@@ -3,7 +3,7 @@ use std::{fs, panic::RefUnwindSafe, path::Path, sync::RwLock};
 use analyser::AnalyserVisitorBuilder;
 use async_helper::run_async;
 use change::StatementChange;
-use dashmap::{DashMap, DashSet};
+use dashmap::DashMap;
 use db_connection::DbConnection;
 use document::{Document, Statement};
 use futures::{StreamExt, stream};
@@ -108,7 +108,7 @@ impl WorkspaceServer {
     fn is_ignored(&self, path: &Path) -> bool {
         let file_name = path.file_name().and_then(|s| s.to_str());
         // Never ignore PgLT's config file regardless `include`/`ignore`
-        (file_name != Some(ConfigName::pglt_toml())) &&
+        (file_name != Some(ConfigName::pglt_jsonc())) &&
             // Apply top-level `include`/`ignore
             (self.is_ignored_by_top_level_config(path) || self.is_ignored_by_migration_config(path))
     }

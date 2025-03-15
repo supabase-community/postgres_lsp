@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Deserialize, Eq, Partial, PartialEq, Serialize)]
 #[partial(derive(Bpaf, Clone, Eq, PartialEq, Merge))]
 #[partial(cfg_attr(feature = "schema", derive(schemars::JsonSchema)))]
-#[partial(serde(rename_all = "snake_case", default, deny_unknown_fields))]
+#[partial(serde(rename_all = "camelCase", default, deny_unknown_fields))]
 pub struct DatabaseConfiguration {
     /// The host of the database.
     #[partial(bpaf(long("host")))]
