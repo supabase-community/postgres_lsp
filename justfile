@@ -64,10 +64,12 @@ test-doc:
 lint:
   cargo clippy
   cargo run -p rules_check
+  bun biome lint
 
 lint-fix:
   cargo clippy --fix
   cargo run -p rules_check
+  bun biome lint --write
 
 serve-docs:
     uv sync
