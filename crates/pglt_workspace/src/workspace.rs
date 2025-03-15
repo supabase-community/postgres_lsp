@@ -46,7 +46,7 @@ pub struct PullDiagnosticsParams {
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-pub struct CompletionParams {
+pub struct GetCompletionsParams {
     /// The File for which a completion is requested.
     pub path: PgLTPath,
     /// The Cursor position in the file for which a completion is requested.
@@ -117,7 +117,7 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
 
     fn get_completions(
         &self,
-        params: CompletionParams,
+        params: GetCompletionsParams,
     ) -> Result<pglt_completions::CompletionResult, WorkspaceError>;
 
     /// Update the global settings for this workspace
@@ -213,75 +213,6 @@ impl<'app, W: Workspace + ?Sized> FileGuard<'app, W> {
             skip,
         })
     }
-    //
-    // pub fn pull_actions(
-    //     &self,
-    //     range: Option<TextRange>,
-    //     only: Vec<RuleSelector>,
-    //     skip: Vec<RuleSelector>,
-    //     suppression_reason: Option<String>,
-    // ) -> Result<PullActionsResult, WorkspaceError> {
-    //     self.workspace.pull_actions(PullActionsParams {
-    //         path: self.path.clone(),
-    //         range,
-    //         only,
-    //         skip,
-    //         suppression_reason,
-    //     })
-    // }
-    //
-    // pub fn format_file(&self) -> Result<Printed, WorkspaceError> {
-    //     self.workspace.format_file(FormatFileParams {
-    //         path: self.path.clone(),
-    //     })
-    // }
-    //
-    // pub fn format_range(&self, range: TextRange) -> Result<Printed, WorkspaceError> {
-    //     self.workspace.format_range(FormatRangeParams {
-    //         path: self.path.clone(),
-    //         range,
-    //     })
-    // }
-    //
-    // pub fn format_on_type(&self, offset: TextSize) -> Result<Printed, WorkspaceError> {
-    //     self.workspace.format_on_type(FormatOnTypeParams {
-    //         path: self.path.clone(),
-    //         offset,
-    //     })
-    // }
-    //
-    // pub fn fix_file(
-    //     &self,
-    //     fix_file_mode: FixFileMode,
-    //     should_format: bool,
-    //     rule_categories: RuleCategories,
-    //     only: Vec<RuleSelector>,
-    //     skip: Vec<RuleSelector>,
-    //     suppression_reason: Option<String>,
-    // ) -> Result<FixFileResult, WorkspaceError> {
-    //     self.workspace.fix_file(FixFileParams {
-    //         path: self.path.clone(),
-    //         fix_file_mode,
-    //         should_format,
-    //         only,
-    //         skip,
-    //         rule_categories,
-    //         suppression_reason,
-    //     })
-    // }
-    //
-    // pub fn organize_imports(&self) -> Result<OrganizeImportsResult, WorkspaceError> {
-    //     self.workspace.organize_imports(OrganizeImportsParams {
-    //         path: self.path.clone(),
-    //     })
-    // }
-    //
-    // pub fn search_pattern(&self, pattern: &PatternId) -> Result<SearchResults, WorkspaceError> {
-    //     self.workspace.search_pattern(SearchPatternParams {
-    //         path: self.path.clone(),
-    //         pattern: pattern.clone(),
-    //     })
-    // }
 }
 
 impl<W: Workspace + ?Sized> Drop for FileGuard<'_, W> {

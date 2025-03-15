@@ -241,7 +241,7 @@ pub fn strip_jsonc_comments(jsonc_input: &str) -> String {
                         json_output.push(last_char);
                     }
                 } else {
-                    json_output.push_str(" ");
+                    json_output.push(' ');
                 }
                 last_char = Some(cur_char);
             }

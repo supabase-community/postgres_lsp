@@ -118,6 +118,7 @@ pub trait Diagnostic: Debug {
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, Default,
 )]
 #[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 /// The severity to associate to a diagnostic.
 pub enum Severity {
     /// Reports a hint.
@@ -165,6 +166,7 @@ impl Display for Severity {
 /// and help with the implementation of `serde` and `schemars` for tags.
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[bitflags]
 #[repr(u8)]
 pub(super) enum DiagnosticTag {

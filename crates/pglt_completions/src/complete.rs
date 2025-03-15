@@ -19,6 +19,7 @@ pub struct CompletionParams<'a> {
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct CompletionResult {
     pub(crate) items: Vec<CompletionItem>,
 }

@@ -2,8 +2,8 @@ use xtask::Mode::Overwrite;
 use xtask::{project_root, pushd, Result};
 
 use xtask_codegen::{
-    generate_analyser, generate_crate, generate_new_analyser_rule, generate_rules_configuration,
-    task_command, TaskCommand,
+    generate_analyser, generate_bindings, generate_crate, generate_new_analyser_rule,
+    generate_rules_configuration, task_command, TaskCommand,
 };
 
 fn main() -> Result<()> {
@@ -26,6 +26,9 @@ fn main() -> Result<()> {
         }
         TaskCommand::Configuration => {
             generate_rules_configuration(Overwrite)?;
+        }
+        TaskCommand::Bindings => {
+            generate_bindings(Overwrite)?;
         }
     }
 
