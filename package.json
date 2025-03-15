@@ -1,0 +1,16 @@
+{
+	"name": "@pglt/monorepo",
+	"version": "0.0.0",
+	"private": true,
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"workspaces": ["packages/@pglt/*"],
+	"keywords": [],
+	"author": "Supabase Community",
+	"license": "MIT OR Apache-2.0",
+	"packageManager": "bun@1"
+}

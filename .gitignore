@@ -19,3 +19,5 @@ target/
 desktop.ini
 
 *.log
+
+node_modules/
