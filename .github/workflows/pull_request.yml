@@ -124,6 +124,15 @@ jobs:
   test-js-bindings:
     name: Test JS Bindings
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
