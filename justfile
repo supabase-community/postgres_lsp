@@ -11,33 +11,34 @@ install-tools:
 	cargo install cargo-binstall
 	cargo binstall cargo-insta taplo-cli
 	cargo binstall --git "https://github.com/astral-sh/uv" uv
-
+	bun install
 
 # Upgrades the tools needed to develop
 upgrade-tools:
 	cargo install cargo-binstall --force
-	cargo binstall cargo-insta taplo-cli --force
+	cargo binstall cargo-insta taplo-cli wasm-pack wasm-tools  --force
 	cargo binstall --git "https://github.com/astral-sh/uv" uv --force
+	bun install
 
 # Generates code generated files for the linter
 gen-lint:
   cargo run -p xtask_codegen -- analyser
   cargo run -p xtask_codegen -- configuration
-  # cargo codegen-migrate
-  # just gen-bindings
+  cargo run -p xtask_codegen -- bindings
   cargo run -p rules_check
+  cargo run -p docs_codegen
   just format
 
 # Creates a new lint rule in the given path, with the given name. Name has to be camel case. Group should be lowercase.
 new-lintrule group rulename:
   cargo run -p xtask_codegen -- new-lintrule --category=lint --name={{rulename}} --group={{group}}
   just gen-lint
-  # just documentation
 
-# Format Rust files and TOML files
+# Format Rust, JS and TOML files
 format:
 	cargo fmt
 	taplo format
+	bun biome format --write
 
 [unix]
 _touch file:
@@ -77,6 +78,7 @@ ready:
   git diff --exit-code --quiet
   cargo run -p xtask_codegen -- configuration
   cargo run -p docs_codegen
+  cargo run -p xtask_codegen -- bindings
   just lint-fix
   just format
   git diff --exit-code --quiet

@@ -1,11 +1,13 @@
 //! Codegen tools. Derived from Biome's codegen
 
 mod generate_analyser;
+mod generate_bindings;
 mod generate_configuration;
 mod generate_crate;
 mod generate_new_analyser_rule;
 
 pub use self::generate_analyser::generate_analyser;
+pub use self::generate_bindings::generate_bindings;
 pub use self::generate_configuration::generate_rules_configuration;
 pub use self::generate_crate::generate_crate;
 pub use self::generate_new_analyser_rule::generate_new_analyser_rule;
@@ -52,6 +54,9 @@ pub fn to_capitalized(s: &str) -> String {
 #[derive(Debug, Clone, Bpaf)]
 #[bpaf(options)]
 pub enum TaskCommand {
+    /// Generate TypeScript definitions for the JavaScript bindings to the Workspace API
+    #[bpaf(command)]
+    Bindings,
     /// Generate factory functions for the analyser and the configuration of the analysers
     #[bpaf(command)]
     Analyser,

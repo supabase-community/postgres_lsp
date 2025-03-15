@@ -12,6 +12,8 @@ on:
       - "Cargo.lock"
       - "rust-toolchain.toml"
       - "rustfmt.toml"
+      # or in js packages
+      - "packages/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
@@ -89,32 +91,6 @@ jobs:
           cargo clippy
           cargo run -p rules_check
 
-  # check-dependencies:
-  #   name: Check Dependencies
-  #   runs-on: ubuntu-latest
-  #   services:
-  #     postgres:
-  #       image: postgres:latest
-  #       env:
-  #         POSTGRES_USER: postgres
-  #         POSTGRES_PASSWORD: postgres
-  #         POSTGRES_DB: postgres
-  #       ports:
-  #         - 5432:5432
-  #   steps:
-  #     - name: Checkout PR Branch
-  #       uses: actions/checkout@v4
-  #       with:
-  #         submodules: true
-  #     - name: Free Disk Space
-  #       uses: ./.github/actions/free-disk-space
-  #     - name: Install toolchain
-  #       run: rustup toolchain install nightly
-  #     - name: Install udeps
-  #       run: cargo install cargo-udeps --locked
-  #     - name: Detect unused dependencies using udeps
-  #       run: cargo +nightly udeps --all-targets
-
   test:
     name: Test
     runs-on: ${{ matrix.os }}
@@ -144,6 +120,29 @@ jobs:
         uses: ikalnytskyi/action-setup-postgres@v7
       - name: Run tests
         run: cargo test --workspace
+
+  test-js-bindings:
+    name: Test JS Bindings
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Free Disk Space
+        uses: ./.github/actions/free-disk-space
+      - name: Install toolchain
+        uses: moonrepo/setup-rust@v1
+      - name: Build main binary
+        run: cargo build -p pglt_cli --release
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+      - name: Install JS dependencies
+        run: bun install
+      - name: Build TypeScript code
+        run: bun --filter @pglt/backend-jsonrpc run build
+      - name: Run JS tests
+        run: bun --filter @pglt/backend-jsonrpc run test
 
   codegen:
     name: Check Codegen
