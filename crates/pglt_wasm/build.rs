@@ -7,6 +7,7 @@ use biome_js_factory::{
     make,
     syntax::{AnyJsDeclaration, AnyJsModuleItem, AnyJsStatement},
 };
+use biome_js_formatter::{context::JsFormatOptions, format_node};
 use biome_rowan::AstNode;
 use pglt_workspace::workspace_types::{ModuleQueue, generate_type, methods};
 
@@ -66,10 +67,9 @@ fn main() -> io::Result<()> {
 
     // Wasm-bindgen will paste the generated TS code as-is into the final .d.ts file,
     // ensure it looks good by running it through the formatter
-    let definitions = module.syntax().to_string();
-    // let formatted = format_node(JsFormatOptions::new(JsFileSource::ts()), module.syntax()).unwrap();
-    // let printed = formatted.print().unwrap();
-    // let definitions = printed.into_code();
+    let formatted = format_node(JsFormatOptions::new(JsFileSource::ts()), module.syntax()).unwrap();
+    let printed = formatted.print().unwrap();
+    let definitions = printed.into_code();
 
     // Generate wasm-bindgen extern type imports for all the types defined in the TS code
     let types = queue.visited().iter().map(|name| {

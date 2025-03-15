@@ -11,6 +11,12 @@ name                 = "pglt_wasm"
 repository.workspace = true
 version              = "0.0.0"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["console_error_panic_hook"]
+
 [dependencies]
 js-sys             = "0.3.72"
 pglt_console       = { workspace = true }
@@ -27,10 +33,11 @@ wasm-bindgen       = { version = "0.2.95", features = ["serde-serialize"] }
 console_error_panic_hook = { version = "0.1.7", optional = true }
 
 [build-dependencies]
-biome_js_factory = { workspace = true }
-biome_rowan      = { workspace = true }
-pglt_workspace   = { workspace = true, features = ["schema"] }
-quote            = "1.0.14"
+biome_js_factory   = { workspace = true }
+biome_js_formatter = { workspace = true }
+biome_rowan        = { workspace = true }
+pglt_workspace     = { workspace = true, features = ["schema"] }
+quote              = "1.0.14"
 
 [package.metadata.wasm-pack.profile.profiling]
 wasm-opt = false

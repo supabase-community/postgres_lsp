@@ -40,13 +40,10 @@ impl Workspace {
     ) -> Result<ICompletionResult, Error> {
         let params: GetCompletionsParams =
             serde_wasm_bindgen::from_value(params.into()).map_err(into_error)?;
-        serde_wasm_bindgen::from_value(
-            self.inner
-                .get_completions(params)
-                .map_err(into_error)
-                .into(),
-        )
-        .map_err(into_error)
+        let result = self.inner.get_completions(params).map_err(into_error)?;
+        to_value(&result)
+            .map(ICompletionResult::from)
+            .map_err(into_error)
     }
 
     #[wasm_bindgen(js_name = updateSettings)]
