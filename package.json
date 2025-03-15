@@ -9,7 +9,7 @@
 	"peerDependencies": {
 		"typescript": "^5"
 	},
-	"workspaces": ["packages/@pglt/*"],
+	"workspaces": ["packages/@pglt/pglt", "packages/@pglt/backend-jsonrpc"],
 	"keywords": [],
 	"author": "Supabase Community",
 	"license": "MIT OR Apache-2.0",

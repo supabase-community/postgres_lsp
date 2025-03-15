@@ -42,10 +42,15 @@ jobs:
           cache-base: main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
       - name: Run format
         run: |
           cargo fmt --all --check
           taplo format --check
+          biome format --check
 
   actionlint:
     name: Lint GitHub Actions
@@ -149,9 +154,11 @@ jobs:
       - name: Install JS dependencies
         run: bun install
       - name: Build TypeScript code
-        run: bun --filter @pglt/backend-jsonrpc run build
+        working-directory: packages/@pglt/backend-jsonrpc
+        run: bun run build
       - name: Run JS tests
-        run: bun --filter @pglt/backend-jsonrpc run test
+        working-directory: packages/@pglt/backend-jsonrpc
+        run: bun run test
 
   codegen:
     name: Check Codegen
