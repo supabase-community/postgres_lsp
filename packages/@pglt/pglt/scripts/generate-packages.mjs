@@ -9,7 +9,6 @@ const streamPipeline = promisify(pipeline);
 const CLI_ROOT = resolve(fileURLToPath(import.meta.url), "../..");
 const PACKAGES_PGLT_ROOT = resolve(CLI_ROOT, "..");
 const PGLT_ROOT = resolve(PACKAGES_PGLT_ROOT, "../..");
-const MANIFEST_PATH = resolve(CLI_ROOT, "package.json");
 const SUPPORTED_PLATFORMS = [
 	"pc-windows-msvc",
 	"apple-darwin",
@@ -66,23 +65,31 @@ async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
 	console.log(`Downloaded asset for ${buildName} (v${releaseTag})`);
 }
 
-async function overwriteManifestVersions(releaseTag, isPrerelease) {
-	const version = getVersion(releaseTag, isPrerelease);
+async function writeManifest(packagePath, version) {
+	const manifestPath = resolve(PACKAGES_PGLT_ROOT, packagePath, "package.json");
 
-	const manifestClone = structuredClone(rootManifest());
+	const manifestData = JSON.parse(
+		fs.readFileSync(manifestPath).toString("utf-8"),
+	);
 
-	manifestClone.version = version;
-	for (const dep in manifestClone.optionalDependencies) {
-		manifestClone.optionalDependencies[dep] = version;
-	}
+	const nativePackages = SUPPORTED_PLATFORMS.flatMap((platform) =>
+		SUPPORTED_ARCHITECTURES.map((arch) => [
+			`@pglt/${getName(platform, arch)}`,
+			version,
+		]),
+	);
+
+	manifestData.version = version;
+	manifestData.optionalDependencies = Object.fromEntries(nativePackages);
+
+	console.log(`Update manifest ${manifestPath}`);
+	const content = JSON.stringify(manifestData, null, 2);
 
 	/**
 	 * writeFileSync seemed to not work reliably?
 	 */
 	await new Promise((res, rej) => {
-		fs.writeFile(MANIFEST_PATH, JSON.stringify(manifestClone, null, 2), (e) =>
-			e ? rej(e) : res(),
-		);
+		fs.writeFile(manifestPath, content, (e) => (e ? rej(e) : res()));
 	});
 }
 
@@ -224,7 +231,9 @@ function getVersion(releaseTag, isPrerelease) {
 	const isPrerelease = process.env.PRERELEASE === "true";
 
 	await downloadSchema(releaseTag, githubToken);
-	await overwriteManifestVersions(releaseTag, isPrerelease);
+	const version = getVersion(releaseTag, isPrerelease);
+	await writeManifest("pglt", version);
+	await writeManifest("backend-jsonrpc", version);
 
 	for (const platform of SUPPORTED_PLATFORMS) {
 		const os = getOs(platform);
