@@ -15,10 +15,10 @@ version              = "0.0.0"
 backtrace                   = "0.3.74"
 bpaf                        = { workspace = true }
 enumflags2                  = { workspace = true }
-pglt_console                = { workspace = true, features = ["serde_markup"] }
+pglt_console                = { workspace = true, features = ["serde"] }
 pglt_diagnostics_categories = { workspace = true, features = ["serde"] }
 pglt_diagnostics_macros     = { workspace = true }
-pglt_text_edit              = { workspace = true }
+pglt_text_edit              = { workspace = true, features = ["serde"] }
 pglt_text_size.workspace    = true
 schemars                    = { workspace = true, optional = true }
 serde                       = { workspace = true, features = ["derive"] }
@@ -27,7 +27,7 @@ termcolor                   = { workspace = true }
 unicode-width               = { workspace = true }
 
 [features]
-schema = ["schemars", "pglt_text_edit/schemars", "pglt_diagnostics_categories/schemars"]
+schema = ["dep:schemars", "pglt_text_edit/schema", "pglt_diagnostics_categories/schema", "pglt_console/schema"]
 
 [dev-dependencies]
 

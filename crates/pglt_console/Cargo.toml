@@ -25,7 +25,8 @@ unicode-width        = { workspace = true }
 trybuild = "1.0.99"
 
 [features]
-serde_markup = ["serde", "schemars"]
+schema = ["dep:schemars", "pglt_text_size/schema"]
+serde  = ["dep:serde"]
 
 [lib]
 doctest = false

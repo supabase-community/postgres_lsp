@@ -15,5 +15,3 @@ version              = "0.0.0"
 pglt_console = { workspace = true }
 
 [dev-dependencies]
-
-[features]

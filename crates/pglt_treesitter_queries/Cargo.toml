@@ -20,5 +20,3 @@ tree_sitter_sql.workspace = true
 
 [lib]
 doctest = false
-
-[features]
