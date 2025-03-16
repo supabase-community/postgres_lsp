@@ -29,9 +29,9 @@ function getSocket(command: string): Promise<string> {
 }
 
 /**
- * Ensure the Biome daemon server is running and create a Socket connected to the RPC channel
+ * Ensure the daemon server is running and create a Socket connected to the RPC channel
  *
- * @param command Path to the Biome daemon binary
+ * @param command Path to the daemon binary
  * @returns Socket instance connected to the daemon
  */
 export async function createSocket(command: string): Promise<Socket> {
