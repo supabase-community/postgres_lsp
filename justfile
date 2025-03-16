@@ -16,7 +16,7 @@ install-tools:
 # Upgrades the tools needed to develop
 upgrade-tools:
 	cargo install cargo-binstall --force
-	cargo binstall cargo-insta taplo-cli wasm-pack wasm-tools  --force
+	cargo binstall cargo-insta taplo-cli --force
 	cargo binstall --git "https://github.com/astral-sh/uv" uv --force
 	bun install
 
