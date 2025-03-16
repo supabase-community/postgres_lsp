@@ -27,8 +27,6 @@
 		"@pglt/cli-darwin-x64": "<placeholder>",
 		"@pglt/cli-darwin-arm64": "<placeholder>",
 		"@pglt/cli-linux-x64": "<placeholder>",
-		"@pglt/cli-linux-arm64": "<placeholder>",
-		"@pglt/cli-linux-x64-musl": "<placeholder>",
-		"@pglt/cli-linux-arm64-musl": "<placeholder>"
+		"@pglt/cli-linux-arm64": "<placeholder>"
 	}
 }
