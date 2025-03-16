@@ -41,7 +41,7 @@ After running the `init` command, you’ll have a `pglt.jsonc` file in your dire
 
 ```json
 {
-  "": "https://supabase-community.github.io/postgres_lsp/schemas/0.0.0/schema.json",
+  "$schema": "https://supabase-community.github.io/postgres_lsp/schemas/0.0.0/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
