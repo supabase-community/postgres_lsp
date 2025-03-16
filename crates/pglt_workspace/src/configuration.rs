@@ -265,3 +265,110 @@ pub fn strip_jsonc_comments(jsonc_input: &str) -> String {
 
     json_output
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_strip_jsonc_comments_line_comments() {
+        let input = r#"{
+  "name": "test", // This is a line comment
+  "value": 42 // Another comment
+}"#;
+
+        let expected = r#"{
+  "name": "test",
+  "value": 42
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
+
+    #[test]
+    fn test_strip_jsonc_comments_block_comments() {
+        let input = r#"{
+  /* This is a block comment */
+  "name": "test",
+  "value": /* inline comment */ 42
+}"#;
+
+        let expected = r#"{
+
+  "name": "test",
+  "value":                       42
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
+
+    #[test]
+    fn test_strip_jsonc_comments_nested_block_comments() {
+        let input = r#"{
+  /* Outer comment /* Nested comment */ still outer */
+  "name": "test"
+}"#;
+
+        let expected = r#"{
+
+  "name": "test"
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
+
+    #[test]
+    fn test_strip_jsonc_comments_in_strings() {
+        let input = r#"{
+  "comment_like": "This is not a // comment",
+  "another": "This is not a /* block comment */ either"
+}"#;
+
+        let expected = r#"{
+  "comment_like": "This is not a // comment",
+  "another": "This is not a /* block comment */ either"
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
+
+    #[test]
+    fn test_strip_jsonc_comments_escaped_quotes() {
+        let input = r#"{
+  "escaped\": \"quote": "value", // Comment after escaped quotes
+  "normal": "value" // Normal comment
+}"#;
+
+        let expected = r#"{
+  "escaped\": \"quote": "value",
+  "normal": "value"
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
+
+    #[test]
+    fn test_strip_jsonc_comments_multiline_block() {
+        let input = r#"{
+  /* This is a
+     multiline block
+     comment */
+  "name": "test"
+}"#;
+
+        let expected = r#"{
+
+
+
+  "name": "test"
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
+}
