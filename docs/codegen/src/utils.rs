@@ -12,8 +12,13 @@ pub(crate) fn replace_section(
         section_identifier, section_identifier
     );
     let re = Regex::new(&pattern).unwrap();
-    re.replace_all(content, format!("${{1}}{}${{2}}", replacement))
-        .to_string()
+
+    // Use a replacement function instead of a replacement string to avoid
+    // issues with special characters like $ in the replacement text
+    re.replace_all(content, |caps: &regex::Captures| {
+        format!("{}{}{}", &caps[1], replacement, &caps[2])
+    })
+    .to_string()
 }
 
 #[derive(Default)]
