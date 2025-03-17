@@ -397,7 +397,7 @@ impl Workspace for WorkspaceServer {
     #[tracing::instrument(level = "debug", skip(self))]
     fn get_completions(
         &self,
-        params: super::CompletionParams,
+        params: super::GetCompletionsParams,
     ) -> Result<pglt_completions::CompletionResult, WorkspaceError> {
         tracing::debug!(
             "Getting completions for file {:?} at position {:?}",

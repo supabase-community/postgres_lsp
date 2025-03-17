@@ -1,0 +1,32 @@
+{
+	"name": "@pglt/backend-jsonrpc",
+	"version": "<placeholder>",
+	"main": "dist/index.js",
+	"scripts": {
+		"test": "bun test",
+		"test:ci": "bun build && bun test",
+		"build": "bun build ./src/index.ts --outdir ./dist --target node"
+	},
+	"files": ["dist/", "README.md"],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/supabase-community/postgres_lsp.git",
+		"directory": "packages/@pglt/backend-jsonrpc"
+	},
+	"author": "Supabase Community",
+	"bugs": "ttps://github.com/supabase-community/postgres_lsp/issues",
+	"description": "Bindings to the JSON-RPC Workspace API of the Postgres Language Tools daemon",
+	"keywords": ["TypeScript", "Postgres"],
+	"license": "MIT",
+	"publishConfig": {
+		"provenance": true
+	},
+	"optionalDependencies": {
+		"@pglt/cli-win32-x64": "<placeholder>",
+		"@pglt/cli-win32-arm64": "<placeholder>",
+		"@pglt/cli-darwin-x64": "<placeholder>",
+		"@pglt/cli-darwin-arm64": "<placeholder>",
+		"@pglt/cli-linux-x64": "<placeholder>",
+		"@pglt/cli-linux-arm64": "<placeholder>"
+	}
+}

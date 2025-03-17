@@ -15,7 +15,8 @@ use crate::{
 
 /// Serializable representation for a [Diagnostic](super::Diagnostic).
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[cfg_attr(not(target_arch = "wasm32"), serde(rename_all = "camelCase"))]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 pub struct Diagnostic {
     category: Option<&'static Category>,
@@ -137,7 +138,8 @@ impl<D: super::Diagnostic + ?Sized> std::fmt::Display for PrintDescription<'_, D
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[cfg_attr(not(target_arch = "wasm32"), serde(rename_all = "camelCase"))]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 struct Location {
     path: Option<Resource<String>>,
@@ -160,6 +162,7 @@ impl From<super::Location<'_>> for Location {
 /// Implementation of [Visitor] collecting serializable [Advice] into a vector.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 struct Advices {
     advices: Vec<Advice>,
@@ -246,6 +249,7 @@ impl super::Advices for Advices {
 /// advice types.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 enum Advice {
     Log(LogCategory, MarkupBuf),
@@ -351,6 +355,17 @@ impl<'de> Deserialize<'de> for DiagnosticTags {
         }
 
         deserializer.deserialize_seq(Visitor)
+    }
+}
+
+#[cfg(feature = "schema")]
+impl schemars::JsonSchema for DiagnosticTags {
+    fn schema_name() -> String {
+        String::from("DiagnosticTags")
+    }
+
+    fn json_schema(r#gen: &mut schemars::r#gen::SchemaGenerator) -> schemars::schema::Schema {
+        <Vec<DiagnosticTag>>::json_schema(r#gen)
     }
 }
 
