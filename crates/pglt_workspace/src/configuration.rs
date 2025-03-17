@@ -7,7 +7,7 @@ use std::{
 use pglt_analyse::AnalyserRules;
 use pglt_configuration::{
     ConfigurationDiagnostic, ConfigurationPathHint, ConfigurationPayload, PartialConfiguration,
-    push_to_analyser_rules,
+    VERSION, push_to_analyser_rules,
 };
 use pglt_fs::{AutoSearchResult, ConfigName, FileSystem, OpenOptions};
 
@@ -97,9 +97,9 @@ fn load_config(
     // we'll load it directly
     if let ConfigurationPathHint::FromUser(ref config_file_path) = base_path {
         if file_system.path_is_file(config_file_path) {
-            let content = file_system.read_file_from_path(config_file_path)?;
+            let content = strip_jsonc_comments(&file_system.read_file_from_path(config_file_path)?);
 
-            let deserialized = toml::from_str::<PartialConfiguration>(&content)
+            let deserialized = serde_json::from_str::<PartialConfiguration>(&content)
                 .map_err(ConfigurationDiagnostic::new_deserialization_error)?;
 
             return Ok(Some(ConfigurationPayload {
@@ -120,7 +120,7 @@ fn load_config(
         ConfigurationPathHint::None => file_system.working_directory().unwrap_or_default(),
     };
 
-    // We first search for `pgtoml.json`
+    // We first search for `pglt.jsonc`
     if let Some(auto_search_result) = file_system.auto_search(
         &configuration_directory,
         ConfigName::file_names().as_slice(),
@@ -128,8 +128,9 @@ fn load_config(
     )? {
         let AutoSearchResult { content, file_path } = auto_search_result;
 
-        let deserialized = toml::from_str::<PartialConfiguration>(&content)
-            .map_err(ConfigurationDiagnostic::new_deserialization_error)?;
+        let deserialized =
+            serde_json::from_str::<PartialConfiguration>(&strip_jsonc_comments(&content))
+                .map_err(ConfigurationDiagnostic::new_deserialization_error)?;
 
         Ok(Some(ConfigurationPayload {
             deserialized,
@@ -150,9 +151,9 @@ fn load_config(
 /// - the program doesn't have the write rights
 pub fn create_config(
     fs: &mut DynRef<dyn FileSystem>,
-    configuration: PartialConfiguration,
+    configuration: &mut PartialConfiguration,
 ) -> Result<(), WorkspaceError> {
-    let path = PathBuf::from(ConfigName::pglt_toml());
+    let path = PathBuf::from(ConfigName::pglt_jsonc());
 
     if fs.path_exists(&path) {
         return Err(ConfigurationDiagnostic::new_already_exists().into());
@@ -168,7 +169,20 @@ pub fn create_config(
         }
     })?;
 
-    let contents = toml::ser::to_string_pretty(&configuration)
+    // we now check if pglt is installed inside `node_modules` and if so, we use the schema from there
+    if VERSION == "0.0.0" {
+        let schema_path = Path::new("./node_modules/@pglt/pglt/schema.json");
+        let options = OpenOptions::default().read(true);
+        if fs.open_with_options(schema_path, options).is_ok() {
+            configuration.schema = schema_path.to_str().map(String::from);
+        }
+    } else {
+        configuration.schema = Some(format!(
+            "https://supabase-community.github.io/postgres_lsp/schemas/{VERSION}/schema.json"
+        ));
+    }
+
+    let contents = serde_json::to_string_pretty(&configuration)
         .map_err(|_| ConfigurationDiagnostic::new_serialization_error())?;
 
     config_file
@@ -185,4 +199,176 @@ pub fn to_analyser_rules(settings: &Settings) -> AnalyserRules {
         push_to_analyser_rules(rules, pglt_analyser::METADATA.deref(), &mut analyser_rules);
     }
     analyser_rules
+}
+
+/// Takes a string of jsonc content and returns a comment free version
+/// which should parse fine as regular json.
+/// Nested block comments are supported.
+pub fn strip_jsonc_comments(jsonc_input: &str) -> String {
+    let mut json_output = String::new();
+
+    let mut block_comment_depth: u8 = 0;
+    let mut is_in_string: bool = false; // Comments cannot be in strings
+
+    for line in jsonc_input.split('\n') {
+        let mut last_char: Option<char> = None;
+        for cur_char in line.chars() {
+            // Check whether we're in a string
+            if block_comment_depth == 0 && last_char != Some('\\') && cur_char == '"' {
+                is_in_string = !is_in_string;
+            }
+
+            // Check for line comment start
+            if !is_in_string && last_char == Some('/') && cur_char == '/' {
+                last_char = None;
+                json_output.push_str("  ");
+                break; // Stop outputting or parsing this line
+            }
+            // Check for block comment start
+            if !is_in_string && last_char == Some('/') && cur_char == '*' {
+                block_comment_depth += 1;
+                last_char = None;
+                json_output.push_str("  ");
+            // Check for block comment end
+            } else if !is_in_string && last_char == Some('*') && cur_char == '/' {
+                block_comment_depth = block_comment_depth.saturating_sub(1);
+                last_char = None;
+                json_output.push_str("  ");
+            // Output last char if not in any block comment
+            } else {
+                if block_comment_depth == 0 {
+                    if let Some(last_char) = last_char {
+                        json_output.push(last_char);
+                    }
+                } else {
+                    json_output.push_str(" ");
+                }
+                last_char = Some(cur_char);
+            }
+        }
+
+        // Add last char and newline if not in any block comment
+        if let Some(last_char) = last_char {
+            if block_comment_depth == 0 {
+                json_output.push(last_char);
+            } else {
+                json_output.push(' ');
+            }
+        }
+
+        // Remove trailing whitespace from line
+        while json_output.ends_with(' ') {
+            json_output.pop();
+        }
+        json_output.push('\n');
+    }
+
+    json_output
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_strip_jsonc_comments_line_comments() {
+        let input = r#"{
+  "name": "test", // This is a line comment
+  "value": 42 // Another comment
+}"#;
+
+        let expected = r#"{
+  "name": "test",
+  "value": 42
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
+
+    #[test]
+    fn test_strip_jsonc_comments_block_comments() {
+        let input = r#"{
+  /* This is a block comment */
+  "name": "test",
+  "value": /* inline comment */ 42
+}"#;
+
+        let expected = r#"{
+
+  "name": "test",
+  "value":                       42
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
+
+    #[test]
+    fn test_strip_jsonc_comments_nested_block_comments() {
+        let input = r#"{
+  /* Outer comment /* Nested comment */ still outer */
+  "name": "test"
+}"#;
+
+        let expected = r#"{
+
+  "name": "test"
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
+
+    #[test]
+    fn test_strip_jsonc_comments_in_strings() {
+        let input = r#"{
+  "comment_like": "This is not a // comment",
+  "another": "This is not a /* block comment */ either"
+}"#;
+
+        let expected = r#"{
+  "comment_like": "This is not a // comment",
+  "another": "This is not a /* block comment */ either"
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
+
+    #[test]
+    fn test_strip_jsonc_comments_escaped_quotes() {
+        let input = r#"{
+  "escaped\": \"quote": "value", // Comment after escaped quotes
+  "normal": "value" // Normal comment
+}"#;
+
+        let expected = r#"{
+  "escaped\": \"quote": "value",
+  "normal": "value"
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
+
+    #[test]
+    fn test_strip_jsonc_comments_multiline_block() {
+        let input = r#"{
+  /* This is a
+     multiline block
+     comment */
+  "name": "test"
+}"#;
+
+        let expected = r#"{
+
+
+
+  "name": "test"
+}
+"#;
+
+        assert_eq!(strip_jsonc_comments(input), expected);
+    }
 }

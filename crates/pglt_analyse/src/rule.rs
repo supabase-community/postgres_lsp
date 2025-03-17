@@ -12,7 +12,11 @@ use std::fmt::Debug;
 use crate::{categories::RuleCategory, context::RuleContext, registry::RegistryVisitor};
 
 #[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Serialize),
+    serde(rename_all = "camelCase")
+)]
 /// Static metadata containing information about a rule
 pub struct RuleMetadata {
     /// It marks if a rule is deprecated, and if so a reason has to be provided.

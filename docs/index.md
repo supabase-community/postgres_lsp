@@ -29,39 +29,42 @@ Our current focus is on refining and enhancing these core features while buildin
 
 ## Configuration
 
-We recommend that you create a `pglt.toml` configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the `pglt.toml` file, run the `init` command in the root folder of your project:
+We recommend that you create a `pglt.jsonc` configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the `pglt.jsonc` file, run the `init` command in the root folder of your project:
 
 ```sh
 pglt init
 ```
 
-After running the `init` command, you’ll have a new `pglt.toml` file in your directory:
+After running the `init` command, you’ll have a `pglt.jsonc` file in your directory:
 
 [//]: # (BEGIN DEFAULT_CONFIGURATION)
 
-```toml
-[vcs]
-enabled = false
-client_kind = "git"
-use_ignore_file = false
-
-[files]
-ignore = []
-
-[linter]
-enabled = true
-
-[linter.rules]
-recommended = true
-
-[db]
-host = "127.0.0.1"
-port = 5432
-username = "postgres"
-password = "postgres"
-database = "postgres"
-conn_timeout_secs = 10
-```
+```json
+{
+  "$schema": "https://supabase-community.github.io/postgres_lsp/schemas/0.0.0/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignore": []
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  },
+  "db": {
+    "host": "127.0.0.1",
+    "port": 5432,
+    "username": "postgres",
+    "password": "postgres",
+    "database": "postgres",
+    "connTimeoutSecs": 10
+  }
+}```
 
 [//]: # (END DEFAULT_CONFIGURATION)
 

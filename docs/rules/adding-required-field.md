@@ -24,8 +24,16 @@ alter table test add column count int not null;
 alter table test add column count int not null default 0;
 
 ## How to configure
-```toml
-[linter.rules.safety]
-addingRequiredField = "error"
+```json
+
+{
+  "linter": {
+    "rules": {
+      "safety": {
+        "addingRequiredField": "error"
+      }
+    }
+  }
+}
 
 ```

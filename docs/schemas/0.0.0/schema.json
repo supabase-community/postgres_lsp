@@ -4,6 +4,13 @@
   "description": "The configuration that is contained inside the configuration file.",
   "type": "object",
   "properties": {
+    "$schema": {
+      "description": "A field for the [JSON schema](https://json-schema.org/) specification",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "db": {
       "description": "The configuration of the database connection",
       "anyOf": [
@@ -66,7 +73,7 @@
       "description": "The configuration of the database connection.",
       "type": "object",
       "properties": {
-        "conn_timeout_secs": {
+        "connTimeoutSecs": {
           "description": "The connection timeout in seconds.",
           "type": [
             "integer",
@@ -141,7 +148,7 @@
             }
           ]
         },
-        "max_size": {
+        "maxSize": {
           "description": "The maximum allowed size for source code files in bytes. Files above this limit will be ignored for performance reasons. Defaults to 1 MiB",
           "type": [
             "integer",
@@ -212,7 +219,7 @@
           "format": "uint64",
           "minimum": 0.0
         },
-        "migrations_dir": {
+        "migrationsDir": {
           "description": "The directory where the migration files are stored",
           "type": [
             "string",
@@ -375,7 +382,7 @@
       "description": "Set of properties to integrate with a VCS software.",
       "type": "object",
       "properties": {
-        "client_kind": {
+        "clientKind": {
           "description": "The kind of client.",
           "anyOf": [
             {
@@ -386,7 +393,7 @@
             }
           ]
         },
-        "default_branch": {
+        "defaultBranch": {
           "description": "The main branch of the project",
           "type": [
             "string",
@@ -401,13 +408,13 @@
           ]
         },
         "root": {
-          "description": "The folder where we should check for VCS files. By default, we will use the same folder where `pglt.toml` was found.\n\nIf we can't find the configuration, it will attempt to use the current working directory. If no current working directory can't be found, we won't use the VCS integration, and a diagnostic will be emitted",
+          "description": "The folder where we should check for VCS files. By default, we will use the same folder where `pglt.jsonc` was found.\n\nIf we can't find the configuration, it will attempt to use the current working directory. If no current working directory can't be found, we won't use the VCS integration, and a diagnostic will be emitted",
           "type": [
             "string",
             "null"
           ]
         },
-        "use_ignore_file": {
+        "useIgnoreFile": {
           "description": "Whether we should use the VCS ignore file. When [true], we will ignore the files specified in the ignore file.",
           "type": [
             "boolean",

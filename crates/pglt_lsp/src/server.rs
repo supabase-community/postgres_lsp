@@ -74,8 +74,9 @@ impl LSPServer {
                     DidChangeWatchedFilesRegistrationOptions {
                         watchers: vec![FileSystemWatcher {
                             glob_pattern: GlobPattern::String(format!(
-                                "{}/pglt.toml",
-                                base_path.display()
+                                "{}/{}",
+                                base_path.display(),
+                                ConfigName::pglt_jsonc()
                             )),
                             kind: Some(WatchKind::all()),
                         },],
@@ -148,7 +149,10 @@ impl LanguageServer for LSPServer {
     async fn initialized(&self, params: InitializedParams) {
         let _ = params;
 
-        info!("Attempting to load the configuration from 'pglt.toml' file");
+        info!(
+            "Attempting to load the configuration from '{}' file",
+            ConfigName::pglt_jsonc()
+        );
 
         futures::join!(self.session.load_workspace_settings());
 
@@ -188,8 +192,8 @@ impl LanguageServer for LSPServer {
                 Ok(file_path) => {
                     let base_path = self.session.base_path();
                     if let Some(base_path) = base_path {
-                        let possible_config_toml = file_path.strip_prefix(&base_path);
-                        if let Ok(watched_file) = possible_config_toml {
+                        let possible_config_json = file_path.strip_prefix(&base_path);
+                        if let Ok(watched_file) = possible_config_json {
                             if ConfigName::file_names()
                                 .contains(&&*watched_file.display().to_string())
                             {

@@ -11,7 +11,7 @@ const GIT_IGNORE_FILE_NAME: &str = ".gitignore";
 #[partial(derive(Bpaf, Clone, Deserializable, Eq, Merge, PartialEq))]
 #[partial(deserializable(with_validator))]
 #[partial(cfg_attr(feature = "schema", derive(schemars::JsonSchema)))]
-#[partial(serde(deny_unknown_fields))]
+#[partial(serde(deny_unknown_fields, rename_all = "camelCase"))]
 pub struct VcsConfiguration {
     /// Whether we should integrate itself with the VCS client
     #[partial(bpaf(long("vcs-enabled"), argument("true|false")))]
@@ -28,7 +28,7 @@ pub struct VcsConfiguration {
     pub use_ignore_file: bool,
 
     /// The folder where we should check for VCS files. By default, we will use the same
-    /// folder where `pglt.toml` was found.
+    /// folder where `pglt.jsonc` was found.
     ///
     /// If we can't find the configuration, it will attempt to use the current working directory.
     /// If no current working directory can't be found, we won't use the VCS integration, and a diagnostic
@@ -91,7 +91,7 @@ impl DeserializableValidator for PartialVcsConfiguration {
     Clone, Copy, Debug, Default, Deserialize, Deserializable, Eq, Merge, PartialEq, Serialize,
 )]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "camelCase")]
 pub enum VcsClientKind {
     #[default]
     /// Integration with the git client as VCS
