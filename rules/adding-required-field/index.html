@@ -41,7 +41,7 @@
               </ul>
               <p class="caption"><span class="caption-text">Guides</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../linting_migrations/">Linting Migrations</a>
+                  <li class="toctree-l1"><a class="" href="../../linting_migrations.md">Linting Migrations</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../../troubleshooting/">Troubleshooting</a>
                   </li>
@@ -96,8 +96,16 @@ Alternatively, if using Postgres version 11 or later, add a DEFAULT value that i
 <h2 id="valid-in-postgres-11">Valid in Postgres &gt;= 11</h2>
 <p>alter table test add column count int not null default 0;</p>
 <h2 id="how-to-configure">How to configure</h2>
-<pre><code class="language-toml">[linter.rules.safety]
-addingRequiredField = &quot;error&quot;
+<pre><code class="language-json">
+{
+  &quot;linter&quot;: {
+    &quot;rules&quot;: {
+      &quot;safety&quot;: {
+        &quot;addingRequiredField&quot;: &quot;error&quot;
+      }
+    }
+  }
+}
 
 </code></pre>
               

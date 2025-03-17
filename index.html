@@ -44,8 +44,6 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
-    </li>
     <li class="toctree-l2"><a class="reference internal" href="#install-an-editor-plugin">Install an Editor Plugin</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#ci-setup">CI Setup</a>
@@ -55,7 +53,7 @@
               </ul>
               <p class="caption"><span class="caption-text">Guides</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="linting_migrations/">Linting Migrations</a>
+                  <li class="toctree-l1"><a class="" href="linting_migrations.md">Linting Migrations</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="troubleshooting/">Troubleshooting</a>
                   </li>
@@ -115,37 +113,48 @@
 <p>We will update this section once we have published the binaries.</p>
 </div>
 <h2 id="configuration">Configuration</h2>
-<p>We recommend that you create a <code>pglt.toml</code> configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the <code>pglt.toml</code> file, run the <code>init</code> command in the root folder of your project:</p>
+<p>We recommend that you create a <code>pglt.jsonc</code> configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the <code>pglt.jsonc</code> file, run the <code>init</code> command in the root folder of your project:</p>
 <pre><code class="language-sh">pglt init
 </code></pre>
-<p>After running the <code>init</code> command, you’ll have a new <code>pglt.toml</code> file in your directory:</p>
-<pre><code class="language-toml">[vcs]
-enabled = false
-client_kind = &quot;git&quot;
-use_ignore_file = false
+<p>After running the <code>init</code> command, you’ll have a <code>pglt.jsonc</code> file in your directory:</p>
+<pre><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://supabase-community.github.io/postgres_lsp/schemas/0.0.0/schema.json&quot;,
+  &quot;vcs&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;clientKind&quot;: &quot;git&quot;,
+    &quot;useIgnoreFile&quot;: false
+  },
+  &quot;files&quot;: {
+    &quot;ignore&quot;: []
+  },
+  &quot;linter&quot;: {
+    &quot;enabled&quot;: true,
+    &quot;rules&quot;: {
+      &quot;recommended&quot;: true
+    }
+  },
+  &quot;db&quot;: {
+    &quot;host&quot;: &quot;127.0.0.1&quot;,
+    &quot;port&quot;: 5432,
+    &quot;username&quot;: &quot;postgres&quot;,
+    &quot;password&quot;: &quot;postgres&quot;,
+    &quot;database&quot;: &quot;postgres&quot;,
+    &quot;connTimeoutSecs&quot;: 10
+  }
+}```
 
-[files]
-ignore = []
+[//]: # (END DEFAULT_CONFIGURATION)
 
-[linter]
-enabled = true
+Make sure to point the database connection settings at your local development database. To see what else can be configured, run `--help`.
 
-[linter.rules]
-recommended = true
+## Usage
 
-[db]
-host = &quot;127.0.0.1&quot;
-port = 5432
-username = &quot;postgres&quot;
-password = &quot;postgres&quot;
-database = &quot;postgres&quot;
-conn_timeout_secs = 10
-</code></pre>
-<p>Make sure to point the database connection settings at your local development database. To see what else can be configured, run <code>--help</code>.</p>
-<h2 id="usage">Usage</h2>
-<p>You can use the language tools either via CLI or a Language Server.</p>
-<p>The CLI exposes a simple <code>check</code> command that will run all checks on the given files or paths.</p>
-<pre><code class="language-sh">pglt check myfile.sql
+You can use the language tools either via CLI or a Language Server.
+
+The CLI exposes a simple `check` command that will run all checks on the given files or paths.
+
+```sh
+pglt check myfile.sql
 </code></pre>
 <p>Make sure to check out the other options. We will provide guides for specific use cases like linting migration files soon.</p>
 <h2 id="install-an-editor-plugin">Install an Editor Plugin</h2>
@@ -163,7 +172,7 @@ conn_timeout_secs = 10
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="linting_migrations/" class="btn btn-neutral float-right" title="Linting Migrations">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="troubleshooting/" class="btn btn-neutral float-right" title="Troubleshooting">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -191,7 +200,7 @@ conn_timeout_secs = 10
     
     
     
-      <span><a href="linting_migrations/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="troubleshooting/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
@@ -210,5 +219,5 @@ conn_timeout_secs = 10
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-03-10 14:22:28.916687+00:00
+Build Date UTC : 2025-03-17 10:35:35.448049+00:00
 -->

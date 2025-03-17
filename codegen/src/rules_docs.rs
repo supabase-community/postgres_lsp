@@ -113,14 +113,22 @@ fn write_how_to_configure(
     content: &mut Vec<u8>,
 ) -> io::Result<()> {
     writeln!(content, "## How to configure")?;
-    let toml = format!(
-        r#"[linter.rules.{group}]
-{rule} = "error"
+    let json = format!(
+        r#"
+{{
+  "linter": {{
+    "rules": {{
+      "{group}": {{
+        "{rule}": "error"
+      }}
+    }}
+  }}
+}}
 "#
     );
 
-    writeln!(content, "```toml")?;
-    writeln!(content, "{}", toml)?;
+    writeln!(content, "```json")?;
+    writeln!(content, "{}", json)?;
     writeln!(content, "```")?;
 
     Ok(())

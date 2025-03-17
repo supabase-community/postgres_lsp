@@ -41,7 +41,7 @@
               </ul>
               <p class="caption"><span class="caption-text">Guides</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../linting_migrations/">Linting Migrations</a>
+                  <li class="toctree-l1"><a class="" href="../linting_migrations.md">Linting Migrations</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a>
                   </li>
@@ -132,7 +132,7 @@
 - <strong><code>--verbose</code></strong> &mdash; 
   Print additional diagnostics, and some diagnostics show more information. Also, print out what files were processed and which ones were modified.
 - <strong><code>--config-path</code></strong>=<em><code>PATH</code></em> &mdash; 
-  Set the file path to the configuration file, or the directory path to find <code>pglt.toml</code>. If used, it disables the default configuration file resolution.
+  Set the file path to the configuration file, or the directory path to find <code>pglt.jsonc</code>. If used, it disables the default configuration file resolution.
 - <strong><code>--max-diagnostics</code></strong>=<em><code>&lt;none|&lt;NUMBER&gt;&gt;</code></em> &mdash; 
   Cap the amount of diagnostics displayed. When <code>none</code> is provided, the limit is lifted.</p>
 <p>[default: 20]
@@ -168,7 +168,7 @@
 - <strong><code>--vcs-use-ignore-file</code></strong>=<em><code>&lt;true|false&gt;</code></em> &mdash; 
   Whether we should use the VCS ignore file. When [true], we will ignore the files specified in the ignore file.
 - <strong><code>--vcs-root</code></strong>=<em><code>PATH</code></em> &mdash; 
-  The folder where we should check for VCS files. By default, we will use the same folder where <code>pglt.toml</code> was found.</p>
+  The folder where we should check for VCS files. By default, we will use the same folder where <code>pglt.jsonc</code> was found.</p>
 <p>If we can't find the configuration, it will attempt to use the current working directory. If no current working directory can't be found, we won't use the VCS integration, and a diagnostic will be emitted
 - <strong><code>--vcs-default-branch</code></strong>=<em><code>BRANCH</code></em> &mdash; 
   The main branch of the project
@@ -201,7 +201,7 @@
 - <strong><code>--verbose</code></strong> &mdash; 
   Print additional diagnostics, and some diagnostics show more information. Also, print out what files were processed and which ones were modified.
 - <strong><code>--config-path</code></strong>=<em><code>PATH</code></em> &mdash; 
-  Set the file path to the configuration file, or the directory path to find <code>pglt.toml</code>. If used, it disables the default configuration file resolution.
+  Set the file path to the configuration file, or the directory path to find <code>pglt.jsonc</code>. If used, it disables the default configuration file resolution.
 - <strong><code>--max-diagnostics</code></strong>=<em><code>&lt;none|&lt;NUMBER&gt;&gt;</code></em> &mdash; 
   Cap the amount of diagnostics displayed. When <code>none</code> is provided, the limit is lifted.</p>
 <p>[default: 20]
@@ -236,7 +236,7 @@
 - <strong><code>--changed</code></strong> &mdash; 
   When set to true, only the files that have been changed compared to your <code>defaultBranch</code> configuration will be linted. This option should be used in CI environments.
 - <strong><code>--since</code></strong>=<em><code>REF</code></em> &mdash; 
-  Use this to specify the base branch to compare against when you're using the --changed flag and the <code>defaultBranch</code> is not set in your <code>pglt.toml</code>
+  Use this to specify the base branch to compare against when you're using the --changed flag and the <code>defaultBranch</code> is not set in your <code>pglt.jsonc</code>
 - <strong><code>-h</code></strong>, <strong><code>--help</code></strong> &mdash; 
   Prints help information</p>
 <h2 id="pglt-start">pglt start</h2>
@@ -251,7 +251,7 @@
   Allows to change the folder where logs are stored.</p>
 <p>Uses environment variable <strong><code>PGLT_LOG_PATH</code></strong>
 - <strong><code>--config-path</code></strong>=<em><code>PATH</code></em> &mdash; 
-  Allows to set a custom file path to the configuration file, or a custom directory path to find <code>pglt.toml</code></p>
+  Allows to set a custom file path to the configuration file, or a custom directory path to find <code>pglt.jsonc</code></p>
 <p>Uses environment variable <strong><code>PGLT_LOG_PREFIX_NAME</code></strong>
 - <strong><code>-h</code></strong>, <strong><code>--help</code></strong> &mdash; 
   Prints help information</p>
@@ -279,7 +279,7 @@
   Allows to change the folder where logs are stored.</p>
 <p>Uses environment variable <strong><code>PGLT_LOG_PATH</code></strong>
 - <strong><code>--config-path</code></strong>=<em><code>PATH</code></em> &mdash; 
-  Allows to set a custom file path to the configuration file, or a custom directory path to find <code>pglt.toml</code></p>
+  Allows to set a custom file path to the configuration file, or a custom directory path to find <code>pglt.jsonc</code></p>
 <p>Uses environment variable <strong><code>PGLT_CONFIG_PATH</code></strong>
 - <strong><code>-h</code></strong>, <strong><code>--help</code></strong> &mdash; 
   Prints help information</p>
