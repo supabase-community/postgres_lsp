@@ -7,20 +7,20 @@ const { platform, arch, env } = process;
  */
 const PLATFORMS = {
   win32: {
-    x64: "pglt-x86_64-windows-msvc/pglt.exe",
-    arm64: "pglt-aarch64-windows-msvc/pglt.exe",
+    x64: "postgrestools-x86_64-windows-msvc/postgrestools.exe",
+    arm64: "postgrestools-aarch64-windows-msvc/postgrestools.exe",
   },
   darwin: {
-    x64: "pglt-x86_64-apple-darwin/pglt",
-    arm64: "pglt-aarch64-apple-darwin/pglt",
+    x64: "postgrestools-x86_64-apple-darwin/postgrestools",
+    arm64: "postgrestools-aarch64-apple-darwin/postgrestools",
   },
   linux: {
-    x64: "pglt-x86_64-linux-gnu/pglt",
-    arm64: "pglt-aarch64-linux-gnu/pglt",
+    x64: "postgrestools-x86_64-linux-gnu/postgrestools",
+    arm64: "postgrestools-aarch64-linux-gnu/postgrestools",
   },
 };
 
-const binPath = env.PGLT_BINARY || PLATFORMS?.[platform]?.[arch];
+const binPath = env.POSTGRESTOOLS_BINARY || PLATFORMS?.[platform]?.[arch];
 
 if (binPath) {
   const result = require("child_process").spawnSync(
@@ -40,7 +40,7 @@ if (binPath) {
   process.exitCode = result.status;
 } else {
   console.error(
-    "The pglt CLI package doesn't ship with prebuilt binaries for your platform yet. Please file an issue in the main repository."
+    "The PostgresTools CLI package doesn't ship with prebuilt binaries for your platform yet. Please file an issue in the main repository."
   );
   process.exitCode = 1;
 }
