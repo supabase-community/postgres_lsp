@@ -1,5 +1,5 @@
-use pglt_diagnostics::adapters::{IoError, StdError};
-use pglt_diagnostics::{Category, Diagnostic, DiagnosticExt, DiagnosticTags, Error};
+use pgt_diagnostics::adapters::{IoError, StdError};
+use pgt_diagnostics::{Category, Diagnostic, DiagnosticExt, DiagnosticTags, Error};
 use std::io;
 
 #[derive(Debug, Diagnostic)]

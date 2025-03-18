@@ -1041,16 +1041,16 @@ dependencies = [
  "anyhow",
  "biome_string_case",
  "bpaf",
- "pglt_analyse",
- "pglt_analyser",
- "pglt_configuration",
- "pglt_console",
- "pglt_diagnostics",
- "pglt_flags",
- "pglt_query_ext",
- "pglt_statement_splitter",
- "pglt_workspace",
+ "pgt_analyse",
+ "pgt_analyser",
  "pgt_cli",
+ "pgt_configuration",
+ "pgt_console",
+ "pgt_diagnostics",
+ "pgt_flags",
+ "pgt_query_ext",
+ "pgt_statement_splitter",
+ "pgt_workspace",
  "pulldown-cmark",
  "regex",
  "schemars",
@@ -2308,396 +2308,34 @@ dependencies = [
 ]
 
 [[package]]
-name = "pglt_analyse"
+name = "pgt_analyse"
 version = "0.0.0"
 dependencies = [
  "biome_deserialize 0.6.0",
  "biome_deserialize_macros 0.6.0",
  "enumflags2",
- "pglt_console",
- "pglt_diagnostics",
- "pglt_query_ext",
- "pglt_schema_cache",
- "pglt_text_size",
+ "pgt_console",
+ "pgt_diagnostics",
+ "pgt_query_ext",
+ "pgt_schema_cache",
+ "pgt_text_size",
  "rustc-hash 2.1.0",
  "schemars",
  "serde",
 ]
 
 [[package]]
-name = "pglt_analyser"
+name = "pgt_analyser"
 version = "0.0.0"
 dependencies = [
  "insta",
- "pglt_analyse",
- "pglt_console",
- "pglt_diagnostics",
- "pglt_query_ext",
- "pglt_test_macros",
+ "pgt_analyse",
+ "pgt_console",
+ "pgt_diagnostics",
+ "pgt_query_ext",
+ "pgt_test_macros",
  "serde",
  "termcolor",
-]
-
-[[package]]
-name = "pglt_commands"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-std",
- "pglt_text_size",
- "sqlx",
-]
-
-[[package]]
-name = "pglt_completions"
-version = "0.0.0"
-dependencies = [
- "async-std",
- "pglt_schema_cache",
- "pglt_test_utils",
- "pglt_text_size",
- "pglt_treesitter_queries",
- "schemars",
- "serde",
- "serde_json",
- "sqlx",
- "tokio",
- "tree-sitter",
- "tree_sitter_sql",
-]
-
-[[package]]
-name = "pglt_configuration"
-version = "0.0.0"
-dependencies = [
- "biome_deserialize 0.6.0",
- "biome_deserialize_macros 0.6.0",
- "bpaf",
- "indexmap 2.7.0",
- "pglt_analyse",
- "pglt_analyser",
- "pglt_console",
- "pglt_diagnostics",
- "pglt_text_size",
- "rustc-hash 2.1.0",
- "schemars",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "pglt_console"
-version = "0.0.0"
-dependencies = [
- "pglt_markup",
- "pglt_text_size",
- "schemars",
- "serde",
- "termcolor",
- "trybuild",
- "unicode-segmentation",
- "unicode-width",
-]
-
-[[package]]
-name = "pglt_diagnostics"
-version = "0.0.0"
-dependencies = [
- "backtrace",
- "bpaf",
- "enumflags2",
- "pglt_console",
- "pglt_diagnostics_categories",
- "pglt_diagnostics_macros",
- "pglt_text_edit",
- "pglt_text_size",
- "schemars",
- "serde",
- "serde_json",
- "termcolor",
- "unicode-width",
-]
-
-[[package]]
-name = "pglt_diagnostics_categories"
-version = "0.0.0"
-dependencies = [
- "quote",
- "schemars",
- "serde",
-]
-
-[[package]]
-name = "pglt_diagnostics_macros"
-version = "0.0.0"
-dependencies = [
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "pglt_flags"
-version = "0.0.0"
-dependencies = [
- "pglt_console",
-]
-
-[[package]]
-name = "pglt_fs"
-version = "0.0.0"
-dependencies = [
- "crossbeam",
- "directories",
- "enumflags2",
- "parking_lot",
- "pglt_diagnostics",
- "rayon",
- "rustc-hash 2.1.0",
- "schemars",
- "serde",
- "smallvec",
- "tracing",
-]
-
-[[package]]
-name = "pglt_lexer"
-version = "0.0.0"
-dependencies = [
- "insta",
- "pg_query",
- "pglt_diagnostics",
- "pglt_lexer_codegen",
- "pglt_text_size",
- "regex",
-]
-
-[[package]]
-name = "pglt_lexer_codegen"
-version = "0.0.0"
-dependencies = [
- "pglt_query_proto_parser",
- "proc-macro2",
- "quote",
-]
-
-[[package]]
-name = "pglt_lsp"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "biome_deserialize 0.6.0",
- "futures",
- "pglt_analyse",
- "pglt_completions",
- "pglt_configuration",
- "pglt_console",
- "pglt_diagnostics",
- "pglt_fs",
- "pglt_lsp_converters",
- "pglt_test_utils",
- "pglt_text_edit",
- "pglt_text_size",
- "pglt_workspace",
- "rustc-hash 2.1.0",
- "serde",
- "serde_json",
- "sqlx",
- "tokio",
- "tower",
- "tower-lsp",
- "tracing",
-]
-
-[[package]]
-name = "pglt_lsp_converters"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "pglt_text_size",
- "rustc-hash 2.1.0",
- "tower-lsp",
-]
-
-[[package]]
-name = "pglt_markup"
-version = "0.0.0"
-dependencies = [
- "proc-macro-error",
- "proc-macro2",
- "quote",
-]
-
-[[package]]
-name = "pglt_query_ext"
-version = "0.0.0"
-dependencies = [
- "petgraph",
- "pg_query",
- "pglt_diagnostics",
- "pglt_lexer",
- "pglt_query_ext_codegen",
- "pglt_text_size",
-]
-
-[[package]]
-name = "pglt_query_ext_codegen"
-version = "0.0.0"
-dependencies = [
- "pglt_query_proto_parser",
- "proc-macro2",
- "quote",
-]
-
-[[package]]
-name = "pglt_query_proto_parser"
-version = "0.0.0"
-dependencies = [
- "convert_case",
- "protobuf",
- "protobuf-parse",
-]
-
-[[package]]
-name = "pglt_schema_cache"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-std",
- "futures-util",
- "pglt_console",
- "pglt_diagnostics",
- "pglt_test_utils",
- "serde",
- "serde_json",
- "sqlx",
- "tokio",
-]
-
-[[package]]
-name = "pglt_statement_splitter"
-version = "0.0.0"
-dependencies = [
- "ntest",
- "pglt_diagnostics",
- "pglt_lexer",
- "pglt_query_ext",
- "pglt_text_size",
- "regex",
-]
-
-[[package]]
-name = "pglt_test_macros"
-version = "0.0.0"
-dependencies = [
- "globwalk",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "pglt_test_utils"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "clap",
- "dotenv",
- "sqlx",
- "tree-sitter",
- "tree_sitter_sql",
- "uuid",
-]
-
-[[package]]
-name = "pglt_text_edit"
-version = "0.0.0"
-dependencies = [
- "pglt_text_size",
- "schemars",
- "serde",
- "similar",
-]
-
-[[package]]
-name = "pglt_text_size"
-version = "0.0.0"
-dependencies = [
- "schemars",
- "serde",
- "serde_test",
- "static_assertions",
-]
-
-[[package]]
-name = "pglt_treesitter_queries"
-version = "0.0.0"
-dependencies = [
- "clap",
- "tree-sitter",
- "tree_sitter_sql",
-]
-
-[[package]]
-name = "pglt_type_resolver"
-version = "0.0.0"
-dependencies = [
- "pglt_query_ext",
- "pglt_schema_cache",
-]
-
-[[package]]
-name = "pglt_typecheck"
-version = "0.0.0"
-dependencies = [
- "insta",
- "pglt_console",
- "pglt_diagnostics",
- "pglt_query_ext",
- "pglt_schema_cache",
- "pglt_test_utils",
- "pglt_text_size",
- "sqlx",
- "tokio",
- "tree-sitter",
- "tree_sitter_sql",
-]
-
-[[package]]
-name = "pglt_workspace"
-version = "0.0.0"
-dependencies = [
- "biome_deserialize 0.6.0",
- "biome_js_factory",
- "biome_js_syntax",
- "biome_rowan",
- "dashmap 5.5.3",
- "futures",
- "ignore",
- "pglt_analyse",
- "pglt_analyser",
- "pglt_completions",
- "pglt_configuration",
- "pglt_console",
- "pglt_diagnostics",
- "pglt_fs",
- "pglt_query_ext",
- "pglt_schema_cache",
- "pglt_statement_splitter",
- "pglt_text_size",
- "pglt_typecheck",
- "rustc-hash 2.1.0",
- "schemars",
- "serde",
- "serde_json",
- "sqlx",
- "tempfile",
- "tokio",
- "tracing",
- "tree-sitter",
- "tree_sitter_sql",
 ]
 
 [[package]]
@@ -2714,15 +2352,15 @@ dependencies = [
  "libc",
  "mimalloc",
  "path-absolutize",
- "pglt_analyse",
- "pglt_configuration",
- "pglt_console",
- "pglt_diagnostics",
- "pglt_flags",
- "pglt_fs",
- "pglt_lsp",
- "pglt_text_edit",
- "pglt_workspace",
+ "pgt_analyse",
+ "pgt_configuration",
+ "pgt_console",
+ "pgt_diagnostics",
+ "pgt_flags",
+ "pgt_fs",
+ "pgt_lsp",
+ "pgt_text_edit",
+ "pgt_workspace",
  "quick-junit",
  "rayon",
  "rustc-hash 2.1.0",
@@ -2734,6 +2372,368 @@ dependencies = [
  "tracing-appender",
  "tracing-subscriber",
  "tracing-tree",
+]
+
+[[package]]
+name = "pgt_commands"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "async-std",
+ "pgt_text_size",
+ "sqlx",
+]
+
+[[package]]
+name = "pgt_completions"
+version = "0.0.0"
+dependencies = [
+ "async-std",
+ "pgt_schema_cache",
+ "pgt_test_utils",
+ "pgt_text_size",
+ "pgt_treesitter_queries",
+ "schemars",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "tree-sitter",
+ "tree_sitter_sql",
+]
+
+[[package]]
+name = "pgt_configuration"
+version = "0.0.0"
+dependencies = [
+ "biome_deserialize 0.6.0",
+ "biome_deserialize_macros 0.6.0",
+ "bpaf",
+ "indexmap 2.7.0",
+ "pgt_analyse",
+ "pgt_analyser",
+ "pgt_console",
+ "pgt_diagnostics",
+ "pgt_text_size",
+ "rustc-hash 2.1.0",
+ "schemars",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pgt_console"
+version = "0.0.0"
+dependencies = [
+ "pgt_markup",
+ "pgt_text_size",
+ "schemars",
+ "serde",
+ "termcolor",
+ "trybuild",
+ "unicode-segmentation",
+ "unicode-width",
+]
+
+[[package]]
+name = "pgt_diagnostics"
+version = "0.0.0"
+dependencies = [
+ "backtrace",
+ "bpaf",
+ "enumflags2",
+ "pgt_console",
+ "pgt_diagnostics_categories",
+ "pgt_diagnostics_macros",
+ "pgt_text_edit",
+ "pgt_text_size",
+ "schemars",
+ "serde",
+ "serde_json",
+ "termcolor",
+ "unicode-width",
+]
+
+[[package]]
+name = "pgt_diagnostics_categories"
+version = "0.0.0"
+dependencies = [
+ "quote",
+ "schemars",
+ "serde",
+]
+
+[[package]]
+name = "pgt_diagnostics_macros"
+version = "0.0.0"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "pgt_flags"
+version = "0.0.0"
+dependencies = [
+ "pgt_console",
+]
+
+[[package]]
+name = "pgt_fs"
+version = "0.0.0"
+dependencies = [
+ "crossbeam",
+ "directories",
+ "enumflags2",
+ "parking_lot",
+ "pgt_diagnostics",
+ "rayon",
+ "rustc-hash 2.1.0",
+ "schemars",
+ "serde",
+ "smallvec",
+ "tracing",
+]
+
+[[package]]
+name = "pgt_lexer"
+version = "0.0.0"
+dependencies = [
+ "insta",
+ "pg_query",
+ "pgt_diagnostics",
+ "pgt_lexer_codegen",
+ "pgt_text_size",
+ "regex",
+]
+
+[[package]]
+name = "pgt_lexer_codegen"
+version = "0.0.0"
+dependencies = [
+ "pgt_query_proto_parser",
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
+name = "pgt_lsp"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "biome_deserialize 0.6.0",
+ "futures",
+ "pgt_analyse",
+ "pgt_completions",
+ "pgt_configuration",
+ "pgt_console",
+ "pgt_diagnostics",
+ "pgt_fs",
+ "pgt_lsp_converters",
+ "pgt_test_utils",
+ "pgt_text_edit",
+ "pgt_text_size",
+ "pgt_workspace",
+ "rustc-hash 2.1.0",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "tower",
+ "tower-lsp",
+ "tracing",
+]
+
+[[package]]
+name = "pgt_lsp_converters"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "pgt_text_size",
+ "rustc-hash 2.1.0",
+ "tower-lsp",
+]
+
+[[package]]
+name = "pgt_markup"
+version = "0.0.0"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
+name = "pgt_query_ext"
+version = "0.0.0"
+dependencies = [
+ "petgraph",
+ "pg_query",
+ "pgt_diagnostics",
+ "pgt_lexer",
+ "pgt_query_ext_codegen",
+ "pgt_text_size",
+]
+
+[[package]]
+name = "pgt_query_ext_codegen"
+version = "0.0.0"
+dependencies = [
+ "pgt_query_proto_parser",
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
+name = "pgt_query_proto_parser"
+version = "0.0.0"
+dependencies = [
+ "convert_case",
+ "protobuf",
+ "protobuf-parse",
+]
+
+[[package]]
+name = "pgt_schema_cache"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "async-std",
+ "futures-util",
+ "pgt_console",
+ "pgt_diagnostics",
+ "pgt_test_utils",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tokio",
+]
+
+[[package]]
+name = "pgt_statement_splitter"
+version = "0.0.0"
+dependencies = [
+ "ntest",
+ "pgt_diagnostics",
+ "pgt_lexer",
+ "pgt_query_ext",
+ "pgt_text_size",
+ "regex",
+]
+
+[[package]]
+name = "pgt_test_macros"
+version = "0.0.0"
+dependencies = [
+ "globwalk",
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "pgt_test_utils"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "dotenv",
+ "sqlx",
+ "tree-sitter",
+ "tree_sitter_sql",
+ "uuid",
+]
+
+[[package]]
+name = "pgt_text_edit"
+version = "0.0.0"
+dependencies = [
+ "pgt_text_size",
+ "schemars",
+ "serde",
+ "similar",
+]
+
+[[package]]
+name = "pgt_text_size"
+version = "0.0.0"
+dependencies = [
+ "schemars",
+ "serde",
+ "serde_test",
+ "static_assertions",
+]
+
+[[package]]
+name = "pgt_treesitter_queries"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "tree-sitter",
+ "tree_sitter_sql",
+]
+
+[[package]]
+name = "pgt_type_resolver"
+version = "0.0.0"
+dependencies = [
+ "pgt_query_ext",
+ "pgt_schema_cache",
+]
+
+[[package]]
+name = "pgt_typecheck"
+version = "0.0.0"
+dependencies = [
+ "insta",
+ "pgt_console",
+ "pgt_diagnostics",
+ "pgt_query_ext",
+ "pgt_schema_cache",
+ "pgt_test_utils",
+ "pgt_text_size",
+ "sqlx",
+ "tokio",
+ "tree-sitter",
+ "tree_sitter_sql",
+]
+
+[[package]]
+name = "pgt_workspace"
+version = "0.0.0"
+dependencies = [
+ "biome_deserialize 0.6.0",
+ "biome_js_factory",
+ "biome_js_syntax",
+ "biome_rowan",
+ "dashmap 5.5.3",
+ "futures",
+ "ignore",
+ "pgt_analyse",
+ "pgt_analyser",
+ "pgt_completions",
+ "pgt_configuration",
+ "pgt_console",
+ "pgt_diagnostics",
+ "pgt_fs",
+ "pgt_query_ext",
+ "pgt_schema_cache",
+ "pgt_statement_splitter",
+ "pgt_text_size",
+ "pgt_typecheck",
+ "rustc-hash 2.1.0",
+ "schemars",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "tree-sitter",
+ "tree_sitter_sql",
 ]
 
 [[package]]
@@ -3170,13 +3170,13 @@ name = "rules_check"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "pglt_analyse",
- "pglt_analyser",
- "pglt_console",
- "pglt_diagnostics",
- "pglt_query_ext",
- "pglt_statement_splitter",
- "pglt_workspace",
+ "pgt_analyse",
+ "pgt_analyser",
+ "pgt_console",
+ "pgt_diagnostics",
+ "pgt_query_ext",
+ "pgt_statement_splitter",
+ "pgt_workspace",
  "pulldown-cmark",
 ]
 
@@ -4749,9 +4749,9 @@ dependencies = [
  "biome_rowan",
  "biome_string_case",
  "bpaf",
- "pglt_analyse",
- "pglt_analyser",
- "pglt_workspace",
+ "pgt_analyse",
+ "pgt_analyser",
+ "pgt_workspace",
  "proc-macro2",
  "pulldown-cmark",
  "quote",

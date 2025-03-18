@@ -17,7 +17,7 @@ use std::{
 
 use anyhow::{Context, Error, bail, ensure};
 use dashmap::DashMap;
-use pglt_workspace::{
+use pgt_workspace::{
     TransportError,
     workspace::{TransportRequest, WorkspaceTransport},
 };

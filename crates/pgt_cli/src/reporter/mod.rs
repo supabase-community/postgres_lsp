@@ -4,8 +4,8 @@ pub(crate) mod junit;
 pub(crate) mod terminal;
 
 use crate::execute::Execution;
-use pglt_diagnostics::{Error, Severity};
-use pglt_fs::PgLTPath;
+use pgt_diagnostics::{Error, Severity};
+use pgt_fs::PgLTPath;
 use serde::Serialize;
 use std::collections::BTreeSet;
 use std::io;

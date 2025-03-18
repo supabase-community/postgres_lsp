@@ -13,7 +13,7 @@ use std::{
     time::Duration,
 };
 
-use pglt_lsp::{ServerConnection, ServerFactory};
+use pgt_lsp::{ServerConnection, ServerFactory};
 use tokio::{
     io::{AsyncRead, AsyncWrite, ReadBuf},
     net::windows::named_pipe::{ClientOptions, NamedPipeClient, NamedPipeServer, ServerOptions},
@@ -24,7 +24,7 @@ use tracing::Instrument;
 /// Returns the name of the global named pipe used to communicate with the
 /// server daemon
 fn get_pipe_name() -> String {
-    format!(r"\\.\pipe\pglt-service-{}", pglt_configuration::VERSION)
+    format!(r"\\.\pipe\pglt-service-{}", pgt_configuration::VERSION)
 }
 
 pub(crate) fn enumerate_pipes() -> io::Result<impl Iterator<Item = String>> {

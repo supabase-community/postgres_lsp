@@ -1,10 +1,10 @@
-use pglt_console::fmt::Display;
-use pglt_console::markup;
-use pglt_diagnostics::adapters::{BpafError, IoError, SerdeJsonError};
-use pglt_diagnostics::{
+use pgt_console::fmt::Display;
+use pgt_console::markup;
+use pgt_diagnostics::adapters::{BpafError, IoError, SerdeJsonError};
+use pgt_diagnostics::{
     Advices, Category, Diagnostic, Error, LogCategory, MessageAndDescription, Severity, Visit,
 };
-use pglt_workspace::WorkspaceError;
+use pgt_workspace::WorkspaceError;
 use std::process::{ExitCode, Termination};
 use std::{env::current_exe, fmt::Debug};
 

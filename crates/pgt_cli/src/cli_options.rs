@@ -1,8 +1,8 @@
 use crate::LoggingLevel;
 use crate::logging::LoggingKind;
 use bpaf::Bpaf;
-use pglt_configuration::ConfigurationPathHint;
-use pglt_diagnostics::Severity;
+use pgt_configuration::ConfigurationPathHint;
+use pgt_diagnostics::Severity;
 use std::fmt::{Display, Formatter};
 use std::path::PathBuf;
 use std::str::FromStr;

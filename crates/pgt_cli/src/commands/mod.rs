@@ -6,13 +6,13 @@ use crate::{
     CliDiagnostic, CliSession, Execution, LoggingLevel, VERSION, execute_mode, setup_cli_subscriber,
 };
 use bpaf::Bpaf;
-use pglt_configuration::{PartialConfiguration, partial_configuration};
-use pglt_console::Console;
-use pglt_fs::FileSystem;
-use pglt_workspace::configuration::{LoadedConfiguration, load_configuration};
-use pglt_workspace::settings::PartialConfigurationExt;
-use pglt_workspace::workspace::UpdateSettingsParams;
-use pglt_workspace::{DynRef, Workspace, WorkspaceError};
+use pgt_configuration::{PartialConfiguration, partial_configuration};
+use pgt_console::Console;
+use pgt_fs::FileSystem;
+use pgt_workspace::configuration::{LoadedConfiguration, load_configuration};
+use pgt_workspace::settings::PartialConfigurationExt;
+use pgt_workspace::workspace::UpdateSettingsParams;
+use pgt_workspace::{DynRef, Workspace, WorkspaceError};
 use std::ffi::OsString;
 use std::path::PathBuf;
 
@@ -25,7 +25,7 @@ pub(crate) mod version;
 #[derive(Debug, Clone, Bpaf)]
 #[bpaf(options, version(VERSION))]
 /// PgLT official CLI. Use it to check the health of your project or run it to check single files.
-pub enum PgltCommand {
+pub enum PgtCommand {
     /// Shows the version information and quit.
     #[bpaf(command)]
     Version(#[bpaf(external(cli_options), hide_usage)] CliOptions),
@@ -87,7 +87,7 @@ pub enum PgltCommand {
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pglt_fs::ensure_cache_dir().join("pglt-logs")),
+            fallback(pgt_fs::ensure_cache_dir().join("pglt-logs")),
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
@@ -123,7 +123,7 @@ pub enum PgltCommand {
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pglt_fs::ensure_cache_dir().join("pglt-logs")),
+            fallback(pgt_fs::ensure_cache_dir().join("pglt-logs")),
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
@@ -157,7 +157,7 @@ pub enum PgltCommand {
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pglt_fs::ensure_cache_dir().join("pglt-logs")),
+            fallback(pgt_fs::ensure_cache_dir().join("pglt-logs")),
         )]
         log_path: PathBuf,
 
@@ -172,19 +172,19 @@ pub enum PgltCommand {
     PrintSocket,
 }
 
-impl PgltCommand {
+impl PgtCommand {
     const fn cli_options(&self) -> Option<&CliOptions> {
         match self {
-            PgltCommand::Version(cli_options) | PgltCommand::Check { cli_options, .. } => {
+            PgtCommand::Version(cli_options) | PgtCommand::Check { cli_options, .. } => {
                 Some(cli_options)
             }
-            PgltCommand::LspProxy { .. }
-            | PgltCommand::Start { .. }
-            | PgltCommand::Stop
-            | PgltCommand::Init
-            | PgltCommand::RunServer { .. }
-            | PgltCommand::Clean
-            | PgltCommand::PrintSocket => None,
+            PgtCommand::LspProxy { .. }
+            | PgtCommand::Start { .. }
+            | PgtCommand::Stop
+            | PgtCommand::Init
+            | PgtCommand::RunServer { .. }
+            | PgtCommand::Clean
+            | PgtCommand::PrintSocket => None,
         }
     }
 
@@ -399,6 +399,6 @@ mod tests {
     /// Tests that all CLI options adhere to the invariants expected by `bpaf`.
     #[test]
     fn check_options() {
-        pglt_command().check_invariants(false);
+        pgt_command().check_invariants(false);
     }
 }

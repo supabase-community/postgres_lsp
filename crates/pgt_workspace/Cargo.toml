@@ -1,0 +1,62 @@
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pgt_workspace"
+repository.workspace = true
+version              = "0.0.0"
+
+
+[dependencies]
+biome_deserialize         = "0.6.0"
+dashmap                   = "5.5.3"
+futures                   = "0.3.31"
+ignore                    = { workspace = true }
+pgt_analyse               = { workspace = true, features = ["serde"] }
+pgt_analyser              = { workspace = true }
+pgt_completions           = { workspace = true }
+pgt_configuration         = { workspace = true }
+pgt_console               = { workspace = true }
+pgt_diagnostics           = { workspace = true }
+pgt_fs                    = { workspace = true, features = ["serde"] }
+pgt_query_ext             = { workspace = true }
+pgt_schema_cache          = { workspace = true }
+pgt_statement_splitter    = { workspace = true }
+pgt_text_size.workspace   = true
+pgt_typecheck             = { workspace = true }
+rustc-hash                = { workspace = true }
+schemars                  = { workspace = true, optional = true }
+serde                     = { workspace = true, features = ["derive"] }
+serde_json                = { workspace = true, features = ["raw_value"] }
+sqlx.workspace            = true
+tokio                     = { workspace = true, features = ["rt", "rt-multi-thread"] }
+tracing                   = { workspace = true, features = ["attributes", "log"] }
+tree-sitter.workspace     = true
+tree_sitter_sql.workspace = true
+
+biome_js_factory = { workspace = true, optional = true }
+biome_js_syntax  = { workspace = true, optional = true }
+biome_rowan      = { workspace = true, optional = true }
+
+[features]
+schema = [
+  "dep:schemars",
+  "dep:biome_rowan",
+  "dep:biome_js_syntax",
+  "dep:biome_js_factory",
+  "pgt_configuration/schema",
+  "pgt_diagnostics/schema",
+  "pgt_fs/schema",
+  "pgt_analyse/schema",
+  "pgt_completions/schema",
+]
+
+[dev-dependencies]
+tempfile = "3.15.0"
+
+[lib]
+doctest = false

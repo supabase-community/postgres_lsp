@@ -1,6 +1,6 @@
 use anyhow::Result;
 use biome_string_case::Case;
-use pglt_analyse::RuleMetadata;
+use pgt_analyse::RuleMetadata;
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -31,7 +31,7 @@ pub fn generate_rule_sources(docs_dir: &Path) -> anyhow::Result<()> {
     let rule_sources_file = docs_dir.join("rule_sources.md");
 
     let mut visitor = crate::utils::LintRulesVisitor::default();
-    pglt_analyser::visit_registry(&mut visitor);
+    pgt_analyser::visit_registry(&mut visitor);
 
     let crate::utils::LintRulesVisitor { groups } = visitor;
 

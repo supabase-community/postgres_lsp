@@ -1,0 +1,21 @@
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pgt_commands"
+repository.workspace = true
+version              = "0.0.0"
+
+
+[dependencies]
+anyhow                  = "1.0.62"
+async-std               = "1.12.0"
+pgt_text_size.workspace = true
+sqlx.workspace          = true
+
+[lib]
+doctest = false

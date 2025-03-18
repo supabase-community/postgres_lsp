@@ -1,14 +1,14 @@
 use crate::{CliDiagnostic, CliSession};
-use pglt_configuration::PartialConfiguration;
-use pglt_console::{ConsoleExt, markup};
-use pglt_fs::ConfigName;
-use pglt_workspace::configuration::create_config;
+use pgt_configuration::PartialConfiguration;
+use pgt_console::{ConsoleExt, markup};
+use pgt_fs::ConfigName;
+use pgt_workspace::configuration::create_config;
 
 pub(crate) fn init(mut session: CliSession) -> Result<(), CliDiagnostic> {
     let fs = &mut session.app.fs;
     let config = &mut PartialConfiguration::init();
     create_config(fs, config)?;
-    let file_created = ConfigName::pglt_jsonc();
+    let file_created = ConfigName::pgt_jsonc();
     session.app.console.log(markup! {
 "
 Welcome to the Postgres Language Tools! Let's get you started...

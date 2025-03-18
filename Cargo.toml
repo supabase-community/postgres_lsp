@@ -51,39 +51,39 @@ tree_sitter_sql          = { path = "./lib/tree_sitter_sql", version = "0.0.0" }
 unicode-width            = "0.1.12"
 
 # postgres specific crates
-pglt_analyse                = { path = "./crates/pglt_analyse", version = "0.0.0" }
-pglt_analyser               = { path = "./crates/pglt_analyser", version = "0.0.0" }
-pglt_base_db                = { path = "./crates/pglt_base_db", version = "0.0.0" }
-pglt_commands               = { path = "./crates/pglt_commands", version = "0.0.0" }
-pglt_completions            = { path = "./crates/pglt_completions", version = "0.0.0" }
-pglt_configuration          = { path = "./crates/pglt_configuration", version = "0.0.0" }
-pglt_console                = { path = "./crates/pglt_console", version = "0.0.0" }
-pglt_diagnostics            = { path = "./crates/pglt_diagnostics", version = "0.0.0" }
-pglt_diagnostics_categories = { path = "./crates/pglt_diagnostics_categories", version = "0.0.0" }
-pglt_diagnostics_macros     = { path = "./crates/pglt_diagnostics_macros", version = "0.0.0" }
-pglt_flags                  = { path = "./crates/pglt_flags", version = "0.0.0" }
-pglt_fs                     = { path = "./crates/pglt_fs", version = "0.0.0" }
-pglt_lexer                  = { path = "./crates/pglt_lexer", version = "0.0.0" }
-pglt_lexer_codegen          = { path = "./crates/pglt_lexer_codegen", version = "0.0.0" }
-pglt_lint                   = { path = "./crates/pglt_lint", version = "0.0.0" }
-pglt_lsp                    = { path = "./crates/pglt_lsp", version = "0.0.0" }
-pglt_lsp_converters         = { path = "./crates/pglt_lsp_converters", version = "0.0.0" }
-pglt_markup                 = { path = "./crates/pglt_markup", version = "0.0.0" }
-pglt_query_ext              = { path = "./crates/pglt_query_ext", version = "0.0.0" }
-pglt_query_ext_codegen      = { path = "./crates/pglt_query_ext_codegen", version = "0.0.0" }
-pglt_query_proto_parser     = { path = "./crates/pglt_query_proto_parser", version = "0.0.0" }
-pglt_schema_cache           = { path = "./crates/pglt_schema_cache", version = "0.0.0" }
-pglt_statement_splitter     = { path = "./crates/pglt_statement_splitter", version = "0.0.0" }
-pglt_text_edit              = { path = "./crates/pglt_text_edit", version = "0.0.0" }
-pglt_text_size              = { path = "./crates/pglt_text_size", version = "0.0.0" }
-pglt_treesitter_queries     = { path = "./crates/pglt_treesitter_queries", version = "0.0.0" }
-pglt_type_resolver          = { path = "./crates/pglt_type_resolver", version = "0.0.0" }
-pglt_typecheck              = { path = "./crates/pglt_typecheck", version = "0.0.0" }
-pglt_workspace              = { path = "./crates/pglt_workspace", version = "0.0.0" }
-pgt_cli                     = { path = "./crates/pgt_cli", version = "0.0.0" }
+pgt_analyse                = { path = "./crates/pgt_analyse", version = "0.0.0" }
+pgt_analyser               = { path = "./crates/pgt_analyser", version = "0.0.0" }
+pgt_base_db                = { path = "./crates/pgt_base_db", version = "0.0.0" }
+pgt_cli                    = { path = "./crates/pgt_cli", version = "0.0.0" }
+pgt_commands               = { path = "./crates/pgt_commands", version = "0.0.0" }
+pgt_completions            = { path = "./crates/pgt_completions", version = "0.0.0" }
+pgt_configuration          = { path = "./crates/pgt_configuration", version = "0.0.0" }
+pgt_console                = { path = "./crates/pgt_console", version = "0.0.0" }
+pgt_diagnostics            = { path = "./crates/pgt_diagnostics", version = "0.0.0" }
+pgt_diagnostics_categories = { path = "./crates/pgt_diagnostics_categories", version = "0.0.0" }
+pgt_diagnostics_macros     = { path = "./crates/pgt_diagnostics_macros", version = "0.0.0" }
+pgt_flags                  = { path = "./crates/pgt_flags", version = "0.0.0" }
+pgt_fs                     = { path = "./crates/pgt_fs", version = "0.0.0" }
+pgt_lexer                  = { path = "./crates/pgt_lexer", version = "0.0.0" }
+pgt_lexer_codegen          = { path = "./crates/pgt_lexer_codegen", version = "0.0.0" }
+pgt_lint                   = { path = "./crates/pgt_lint", version = "0.0.0" }
+pgt_lsp                    = { path = "./crates/pgt_lsp", version = "0.0.0" }
+pgt_lsp_converters         = { path = "./crates/pgt_lsp_converters", version = "0.0.0" }
+pgt_markup                 = { path = "./crates/pgt_markup", version = "0.0.0" }
+pgt_query_ext              = { path = "./crates/pgt_query_ext", version = "0.0.0" }
+pgt_query_ext_codegen      = { path = "./crates/pgt_query_ext_codegen", version = "0.0.0" }
+pgt_query_proto_parser     = { path = "./crates/pgt_query_proto_parser", version = "0.0.0" }
+pgt_schema_cache           = { path = "./crates/pgt_schema_cache", version = "0.0.0" }
+pgt_statement_splitter     = { path = "./crates/pgt_statement_splitter", version = "0.0.0" }
+pgt_text_edit              = { path = "./crates/pgt_text_edit", version = "0.0.0" }
+pgt_text_size              = { path = "./crates/pgt_text_size", version = "0.0.0" }
+pgt_treesitter_queries     = { path = "./crates/pgt_treesitter_queries", version = "0.0.0" }
+pgt_type_resolver          = { path = "./crates/pgt_type_resolver", version = "0.0.0" }
+pgt_typecheck              = { path = "./crates/pgt_typecheck", version = "0.0.0" }
+pgt_workspace              = { path = "./crates/pgt_workspace", version = "0.0.0" }
 
-pglt_test_macros = { path = "./crates/pglt_test_macros" }
-pglt_test_utils  = { path = "./crates/pglt_test_utils" }
+pgt_test_macros = { path = "./crates/pgt_test_macros" }
+pgt_test_utils  = { path = "./crates/pgt_test_utils" }
 
 docs_codegen = { path = "./docs/codegen", version = "0.0.0" }
 

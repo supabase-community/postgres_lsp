@@ -10,27 +10,27 @@ pub fn generate_env_variables(docs_dir: &Path) -> Result<()> {
 
     let mut content = vec![];
 
-    let env = pglt_flags::pglt_env();
+    let env = pgt_flags::pgt_env();
 
     writeln!(content, "\n",)?;
 
     writeln!(
         content,
         "### `{}`\n\n {}\n",
-        env.pglt_log_path.name(),
-        env.pglt_log_path.description()
+        env.pgt_log_path.name(),
+        env.pgt_log_path.description()
     )?;
     writeln!(
         content,
         "### `{}`\n\n {}\n",
-        env.pglt_log_prefix.name(),
-        env.pglt_log_prefix.description()
+        env.pgt_log_prefix.name(),
+        env.pgt_log_prefix.description()
     )?;
     writeln!(
         content,
         "### `{}`\n\n {}\n",
-        env.pglt_config_path.name(),
-        env.pglt_config_path.description()
+        env.pgt_config_path.name(),
+        env.pgt_config_path.description()
     )?;
 
     let data = fs::read_to_string(&file_path)?;

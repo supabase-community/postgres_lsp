@@ -1,6 +1,6 @@
-use pglt_console::fmt::Formatter;
-use pglt_console::{ConsoleExt, fmt, markup};
-use pglt_workspace::workspace::ServerInfo;
+use pgt_console::fmt::Formatter;
+use pgt_console::{ConsoleExt, fmt, markup};
+use pgt_workspace::workspace::ServerInfo;
 
 use crate::{CliDiagnostic, CliSession, VERSION};
 

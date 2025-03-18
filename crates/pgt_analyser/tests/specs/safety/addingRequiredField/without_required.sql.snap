@@ -1,0 +1,10 @@
+---
+source: crates/pgt_analyser/tests/rules_tests.rs
+expression: snapshot
+---
+# Input
+```
+-- expect_no_diagnostics
+alter table test
+add column c int;
+```

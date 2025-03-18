@@ -1,6 +1,6 @@
 use crate::{to_capitalized, update};
 use biome_string_case::Case;
-use pglt_analyse::{GroupCategory, RegistryVisitor, Rule, RuleCategory, RuleGroup, RuleMetadata};
+use pgt_analyse::{GroupCategory, RegistryVisitor, Rule, RuleCategory, RuleGroup, RuleMetadata};
 use proc_macro2::{Ident, Literal, Span, TokenStream};
 use pulldown_cmark::{Event, Parser, Tag, TagEnd};
 use quote::quote;
@@ -32,11 +32,11 @@ impl RegistryVisitor for LintRulesVisitor {
 }
 
 pub fn generate_rules_configuration(mode: Mode) -> Result<()> {
-    let linter_config_root = project_root().join("crates/pglt_configuration/src/analyser/linter");
-    let push_rules_directory = project_root().join("crates/pglt_configuration/src/generated");
+    let linter_config_root = project_root().join("crates/pgt_configuration/src/analyser/linter");
+    let push_rules_directory = project_root().join("crates/pgt_configuration/src/generated");
 
     let mut lint_visitor = LintRulesVisitor::default();
-    pglt_analyser::visit_registry(&mut lint_visitor);
+    pgt_analyser::visit_registry(&mut lint_visitor);
 
     generate_for_groups(
         lint_visitor.groups,
@@ -102,8 +102,8 @@ fn generate_for_groups(
 
     let severity_fn = if kind == RuleCategory::Action {
         quote! {
-            /// Given a category coming from [Diagnostic](pglt_diagnostics::Diagnostic), this function returns
-            /// the [Severity](pglt_diagnostics::Severity) associated to the rule, if the configuration changed it.
+            /// Given a category coming from [Diagnostic](pgt_diagnostics::Diagnostic), this function returns
+            /// the [Severity](pgt_diagnostics::Severity) associated to the rule, if the configuration changed it.
             /// If the severity is off or not set, then the function returns the default severity of the rule:
             /// [Severity::Error] for recommended rules and [Severity::Warning] for other rules.
             ///
@@ -133,8 +133,8 @@ fn generate_for_groups(
     } else {
         quote! {
 
-            /// Given a category coming from [Diagnostic](pglt_diagnostics::Diagnostic), this function returns
-            /// the [Severity](pglt_diagnostics::Severity) associated to the rule, if the configuration changed it.
+            /// Given a category coming from [Diagnostic](pgt_diagnostics::Diagnostic), this function returns
+            /// the [Severity](pgt_diagnostics::Severity) associated to the rule, if the configuration changed it.
             /// If the severity is off or not set, then the function returns the default severity of the rule:
             /// [Severity::Error] for recommended rules and [Severity::Warning] for other rules.
             ///
@@ -173,12 +173,12 @@ fn generate_for_groups(
     let use_rule_configuration = if kind == RuleCategory::Action {
         quote! {
             use crate::analyser::{RuleAssistConfiguration, RuleAssistPlainConfiguration};
-            use pglt_analyse::{RuleFilter, options::RuleOptions};
+            use pgt_analyse::{RuleFilter, options::RuleOptions};
         }
     } else {
         quote! {
             use crate::analyser::{RuleConfiguration, RulePlainConfiguration};
-            use pglt_analyse::{RuleFilter, options::RuleOptions};
+            use pgt_analyse::{RuleFilter, options::RuleOptions};
         }
     };
 
@@ -186,7 +186,7 @@ fn generate_for_groups(
         quote! {
             #use_rule_configuration
             use biome_deserialize_macros::Merge;
-            use pglt_diagnostics::{Category, Severity};
+            use pgt_diagnostics::{Category, Severity};
             use rustc_hash::FxHashSet;
             use serde::{Deserialize, Serialize};
             #[cfg(feature = "schema")]
@@ -226,7 +226,7 @@ fn generate_for_groups(
             }
 
             impl Actions {
-                /// Checks if the code coming from [pglt_diagnostics::Diagnostic] corresponds to a rule.
+                /// Checks if the code coming from [pgt_diagnostics::Diagnostic] corresponds to a rule.
                 /// Usually the code is built like {group}/{rule_name}
                 pub fn has_rule(
                     group: RuleGroup,
@@ -266,7 +266,7 @@ fn generate_for_groups(
         quote! {
             #use_rule_configuration
             use biome_deserialize_macros::Merge;
-            use pglt_diagnostics::{Category, Severity};
+            use pgt_diagnostics::{Category, Severity};
             use rustc_hash::FxHashSet;
             use serde::{Deserialize, Serialize};
             #[cfg(feature = "schema")]
@@ -314,7 +314,7 @@ fn generate_for_groups(
             }
 
             impl Rules {
-                /// Checks if the code coming from [pglt_diagnostics::Diagnostic] corresponds to a rule.
+                /// Checks if the code coming from [pgt_diagnostics::Diagnostic] corresponds to a rule.
                 /// Usually the code is built like {group}/{rule_name}
                 pub fn has_rule(
                     group: RuleGroup,
@@ -380,7 +380,7 @@ fn generate_for_groups(
         RuleCategory::Lint => {
             quote! {
                 use crate::analyser::linter::*;
-                use pglt_analyse::{AnalyserRules, MetadataRegistry};
+                use pgt_analyse::{AnalyserRules, MetadataRegistry};
 
                 pub fn push_to_analyser_rules(
                     rules: &Rules,
@@ -404,7 +404,7 @@ fn generate_for_groups(
         RuleCategory::Action => {
             quote! {
                 use crate::analyser::assists::*;
-                use pglt_analyse::{AnalyserRules, MetadataRegistry};
+                use pgt_analyse::{AnalyserRules, MetadataRegistry};
 
                 pub fn push_to_analyser_assists(
                     rules: &Actions,
@@ -534,7 +534,7 @@ fn generate_group_struct(
              #rule
         });
         let rule_option_type = quote! {
-            pglt_analyser::options::#rule_name
+            pgt_analyser::options::#rule_name
         };
         let rule_option = if kind == RuleCategory::Action {
             quote! { Option<#rule_config_type<#rule_option_type>> }
