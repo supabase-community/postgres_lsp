@@ -1,6 +1,6 @@
 use crate::{DiagnosticsPayload, Execution, Reporter, ReporterVisitor, TraversalSummary};
-use pglt_console::{Console, ConsoleExt, markup};
-use pglt_diagnostics::PrintGitHubDiagnostic;
+use pgt_console::{Console, ConsoleExt, markup};
+use pgt_diagnostics::PrintGitHubDiagnostic;
 use std::io;
 
 pub(crate) struct GithubReporter {

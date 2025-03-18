@@ -2,7 +2,7 @@ use std::{fs, path::Path};
 
 use crate::utils::replace_section;
 
-use pglt_configuration::PartialConfiguration;
+use pgt_configuration::PartialConfiguration;
 
 pub fn generate_default_configuration(docs_dir: &Path) -> anyhow::Result<()> {
     let index_path = docs_dir.join("index.md");

@@ -2,9 +2,9 @@ use crate::{
     CliDiagnostic, CliSession, open_transport,
     service::{self, ensure_daemon, open_socket, run_daemon},
 };
-use pglt_console::{ConsoleExt, markup};
-use pglt_lsp::ServerFactory;
-use pglt_workspace::{TransportError, WorkspaceError, workspace::WorkspaceClient};
+use pgt_console::{ConsoleExt, markup};
+use pgt_lsp::ServerFactory;
+use pgt_workspace::{TransportError, WorkspaceError, workspace::WorkspaceClient};
 use std::{env, fs, path::PathBuf};
 use tokio::io;
 use tokio::runtime::Runtime;
@@ -179,9 +179,9 @@ pub(crate) fn read_most_recent_log_file(
     log_path: Option<PathBuf>,
     log_file_name_prefix: String,
 ) -> io::Result<Option<String>> {
-    let pglt_log_path = log_path.unwrap_or(default_pglt_log_path());
+    let pgt_log_path = log_path.unwrap_or(default_pgt_log_path());
 
-    let most_recent = fs::read_dir(pglt_log_path)?
+    let most_recent = fs::read_dir(pgt_log_path)?
         .flatten()
         .filter(|file| file.file_type().is_ok_and(|ty| ty.is_file()))
         .filter_map(|file| {
@@ -209,13 +209,13 @@ pub(crate) fn read_most_recent_log_file(
 /// `pglt-logs/server.log.yyyy-MM-dd-HH` files inside the system temporary
 /// directory)
 fn setup_tracing_subscriber(log_path: Option<PathBuf>, log_file_name_prefix: Option<String>) {
-    let pglt_log_path = log_path.unwrap_or(pglt_fs::ensure_cache_dir().join("pglt-logs"));
+    let pgt_log_path = log_path.unwrap_or(pgt_fs::ensure_cache_dir().join("pglt-logs"));
     let appender_builder = tracing_appender::rolling::RollingFileAppender::builder();
     let file_appender = appender_builder
         .filename_prefix(log_file_name_prefix.unwrap_or(String::from("server.log")))
         .max_log_files(7)
         .rotation(Rotation::HOURLY)
-        .build(pglt_log_path)
+        .build(pgt_log_path)
         .expect("Failed to start the logger for the daemon.");
 
     registry()
@@ -232,10 +232,10 @@ fn setup_tracing_subscriber(log_path: Option<PathBuf>, log_file_name_prefix: Opt
         .init();
 }
 
-pub fn default_pglt_log_path() -> PathBuf {
-    match env::var_os("PGLT_LOG_PATH") {
+pub fn default_pgt_log_path() -> PathBuf {
+    match env::var_os("PGT_LOG_PATH") {
         Some(directory) => PathBuf::from(directory),
-        None => pglt_fs::ensure_cache_dir().join("pglt-logs"),
+        None => pgt_fs::ensure_cache_dir().join("pglt-logs"),
     }
 }
 

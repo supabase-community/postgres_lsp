@@ -1,10 +1,10 @@
 use crate::cli_options::CliOptions;
 use crate::{CliDiagnostic, Execution, TraversalMode};
 use biome_deserialize::Merge;
-use pglt_configuration::PartialConfiguration;
-use pglt_console::Console;
-use pglt_fs::FileSystem;
-use pglt_workspace::{DynRef, Workspace, WorkspaceError, configuration::LoadedConfiguration};
+use pgt_configuration::PartialConfiguration;
+use pgt_console::Console;
+use pgt_fs::FileSystem;
+use pgt_workspace::{DynRef, Workspace, WorkspaceError, configuration::LoadedConfiguration};
 use std::ffi::OsString;
 
 use super::{CommandRunner, get_files_to_process_with_cli_options};

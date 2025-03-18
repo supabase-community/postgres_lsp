@@ -1,8 +1,8 @@
 use crate::LoggingLevel;
 use crate::logging::LoggingKind;
 use bpaf::Bpaf;
-use pglt_configuration::ConfigurationPathHint;
-use pglt_diagnostics::Severity;
+use pgt_configuration::ConfigurationPathHint;
+use pgt_diagnostics::Severity;
 use std::fmt::{Display, Formatter};
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -26,7 +26,7 @@ pub struct CliOptions {
     #[bpaf(long("verbose"), switch, fallback(false))]
     pub verbose: bool,
 
-    /// Set the file path to the configuration file, or the directory path to find `pglt.jsonc`.
+    /// Set the file path to the configuration file, or the directory path to find `postgrestools.jsonc`.
     /// If used, it disables the default configuration file resolution.
     #[bpaf(long("config-path"), argument("PATH"), optional)]
     pub config_path: Option<String>,

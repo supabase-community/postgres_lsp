@@ -4,8 +4,8 @@ pub(crate) mod workspace_file;
 use crate::execute::TraversalMode;
 use crate::execute::traverse::TraversalOptions;
 use check::check_file;
-use pglt_diagnostics::Error;
-use pglt_fs::PgLTPath;
+use pgt_diagnostics::Error;
+use pgt_fs::PgLTPath;
 use std::marker::PhantomData;
 use std::ops::Deref;
 
@@ -111,15 +111,15 @@ impl<'ctx, 'app> Deref for SharedTraversalOptions<'ctx, 'app> {
 /// diagnostics were emitted, or compare the formatted code with the original
 /// content of the file and emit a diff or write the new content to the disk if
 /// write mode is enabled
-pub(crate) fn process_file(ctx: &TraversalOptions, pglt_path: &PgLTPath) -> FileResult {
-    tracing::trace_span!("process_file", path = ?pglt_path).in_scope(move || {
+pub(crate) fn process_file(ctx: &TraversalOptions, pgt_path: &PgLTPath) -> FileResult {
+    tracing::trace_span!("process_file", path = ?pgt_path).in_scope(move || {
         let shared_context = &SharedTraversalOptions::new(ctx);
 
         match ctx.execution.traversal_mode {
             TraversalMode::Dummy => {
                 unreachable!("The dummy mode should not be called for this file")
             }
-            TraversalMode::Check { .. } => check_file(shared_context, pglt_path),
+            TraversalMode::Check { .. } => check_file(shared_context, pgt_path),
         }
     })
 }

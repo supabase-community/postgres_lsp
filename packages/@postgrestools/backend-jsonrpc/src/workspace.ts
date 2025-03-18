@@ -1,7 +1,7 @@
 // Generated file, do not edit by hand, see `xtask/codegen`
 import type { Transport } from "./transport";
 export interface IsPathIgnoredParams {
-	pglt_path: PgLTPath;
+	pgt_path: PgLTPath;
 }
 export interface PgLTPath {
 	/**

@@ -1,11 +1,11 @@
 use crate::Reporter;
 use crate::execute::{Execution, TraversalMode};
 use crate::reporter::{DiagnosticsPayload, ReporterVisitor, TraversalSummary};
-use pglt_console::fmt::Formatter;
-use pglt_console::{Console, ConsoleExt, fmt, markup};
-use pglt_diagnostics::advice::ListAdvice;
-use pglt_diagnostics::{Diagnostic, PrintDiagnostic};
-use pglt_fs::PgLTPath;
+use pgt_console::fmt::Formatter;
+use pgt_console::{Console, ConsoleExt, fmt, markup};
+use pgt_diagnostics::advice::ListAdvice;
+use pgt_diagnostics::{Diagnostic, PrintDiagnostic};
+use pgt_fs::PgLTPath;
 use std::collections::BTreeSet;
 use std::io;
 use std::time::Duration;

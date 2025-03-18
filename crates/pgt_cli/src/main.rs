@@ -1,12 +1,12 @@
 //! This is the main binary
 
-use pglt_console::{ConsoleExt, EnvConsole, markup};
-use pglt_diagnostics::{Diagnostic, PrintDiagnostic, set_bottom_frame};
-use pglt_workspace::workspace;
 use pgt_cli::{
-    CliDiagnostic, CliSession, PgltCommand, open_transport, pglt_command, setup_panic_handler,
+    CliDiagnostic, CliSession, PgtCommand, open_transport, pgt_command, setup_panic_handler,
     to_color_mode,
 };
+use pgt_console::{ConsoleExt, EnvConsole, markup};
+use pgt_diagnostics::{Diagnostic, PrintDiagnostic, set_bottom_frame};
+use pgt_workspace::workspace;
 use std::process::{ExitCode, Termination};
 use tokio::runtime::Runtime;
 
@@ -31,7 +31,7 @@ fn main() -> ExitCode {
     set_bottom_frame(main as usize);
 
     let mut console = EnvConsole::default();
-    let command = pglt_command().fallback_to_usage().run();
+    let command = pgt_command().fallback_to_usage().run();
 
     console.set_color(to_color_mode(command.get_color()));
 
@@ -50,7 +50,7 @@ fn main() -> ExitCode {
     }
 }
 
-fn run_workspace(console: &mut EnvConsole, command: PgltCommand) -> Result<(), CliDiagnostic> {
+fn run_workspace(console: &mut EnvConsole, command: PgtCommand) -> Result<(), CliDiagnostic> {
     // If the `--use-server` CLI flag is set, try to open a connection to an
     // existing server socket
     let workspace = if command.should_use_server() {

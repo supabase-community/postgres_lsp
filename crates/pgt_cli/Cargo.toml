@@ -20,15 +20,15 @@ crossbeam                = { workspace = true }
 dashmap                  = "5.5.3"
 hdrhistogram             = { version = "7.5.4", default-features = false }
 path-absolutize          = { version = "3.1.1", optional = false, features = ["use_unix_paths_on_wasm"] }
-pglt_analyse             = { workspace = true }
-pglt_configuration       = { workspace = true }
-pglt_console             = { workspace = true }
-pglt_diagnostics         = { workspace = true }
-pglt_flags               = { workspace = true }
-pglt_fs                  = { workspace = true }
-pglt_lsp                 = { workspace = true }
-pglt_text_edit           = { workspace = true }
-pglt_workspace           = { workspace = true }
+pgt_analyse              = { workspace = true }
+pgt_configuration        = { workspace = true }
+pgt_console              = { workspace = true }
+pgt_diagnostics          = { workspace = true }
+pgt_flags                = { workspace = true }
+pgt_fs                   = { workspace = true }
+pgt_lsp                  = { workspace = true }
+pgt_text_edit            = { workspace = true }
+pgt_workspace            = { workspace = true }
 quick-junit              = "0.5.0"
 rayon                    = { workspace = true }
 rustc-hash               = { workspace = true }

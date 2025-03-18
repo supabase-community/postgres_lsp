@@ -1,0 +1,24 @@
+
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pgt_analyser"
+repository.workspace = true
+version              = "0.0.0"
+
+[dependencies]
+pgt_analyse   = { workspace = true }
+pgt_console   = { workspace = true }
+pgt_query_ext = { workspace = true }
+serde         = { workspace = true }
+
+[dev-dependencies]
+insta           = { version = "1.42.1" }
+pgt_diagnostics = { workspace = true }
+pgt_test_macros = { workspace = true }
+termcolor       = { workspace = true }

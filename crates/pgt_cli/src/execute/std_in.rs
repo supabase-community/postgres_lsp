@@ -2,13 +2,13 @@
 //!
 use crate::execute::Execution;
 use crate::{CliDiagnostic, CliSession};
-use pglt_console::{ConsoleExt, markup};
-use pglt_fs::PgLTPath;
+use pgt_console::{ConsoleExt, markup};
+use pgt_fs::PgLTPath;
 
 pub(crate) fn run<'a>(
     session: CliSession,
     mode: &'a Execution,
-    pglt_path: PgLTPath,
+    pgt_path: PgLTPath,
     content: &'a str,
     verbose: bool,
 ) -> Result<(), CliDiagnostic> {

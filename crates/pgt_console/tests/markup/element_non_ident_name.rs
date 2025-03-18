@@ -1,0 +1,5 @@
+fn main() {
+    pgt_console::markup! {
+        <"Literal" />
+    }
+}

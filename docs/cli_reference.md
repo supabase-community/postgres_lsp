@@ -202,14 +202,14 @@ Starts the daemon server process.
 
 - **`    --log-prefix-name`**=_`STRING`_ &mdash;
   Allows to change the prefix applied to the file name of the logs.
-  Uses environment variable **`PGLT_LOG_PREFIX_NAME`**
+  Uses environment variable **`PGT_LOG_PREFIX_NAME`**
   [default: server.log]
 - **`    --log-path`**=_`PATH`_ &mdash;
   Allows to change the folder where logs are stored.
-  Uses environment variable **`PGLT_LOG_PATH`**
+  Uses environment variable **`PGT_LOG_PATH`**
 - **`    --config-path`**=_`PATH`_ &mdash;
   Allows to set a custom file path to the configuration file, or a custom directory path to find `postgrestools.jsonc`
-  Uses environment variable **`PGLT_LOG_PREFIX_NAME`**
+  Uses environment variable **`PGT_LOG_PREFIX_NAME`**
 - **`-h`**, **`--help`** &mdash;
   Prints help information
 
@@ -245,14 +245,14 @@ Acts as a server for the Language Server Protocol over stdin/stdout.
 
 - **`    --log-prefix-name`**=_`STRING`_ &mdash;
   Allows to change the prefix applied to the file name of the logs.
-  Uses environment variable **`PGLT_LOG_PREFIX_NAME`**
+  Uses environment variable **`PGT_LOG_PREFIX_NAME`**
   [default: server.log]
 - **`    --log-path`**=_`PATH`_ &mdash;
   Allows to change the folder where logs are stored.
-  Uses environment variable **`PGLT_LOG_PATH`**
+  Uses environment variable **`PGT_LOG_PATH`**
 - **`    --config-path`**=_`PATH`_ &mdash;
   Allows to set a custom file path to the configuration file, or a custom directory path to find `postgrestools.jsonc`
-  Uses environment variable **`PGLT_CONFIG_PATH`**
+  Uses environment variable **`PGT_CONFIG_PATH`**
 - **`-h`**, **`--help`** &mdash;
   Prints help information
 

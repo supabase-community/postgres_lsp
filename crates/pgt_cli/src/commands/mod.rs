@@ -6,13 +6,13 @@ use crate::{
     CliDiagnostic, CliSession, Execution, LoggingLevel, VERSION, execute_mode, setup_cli_subscriber,
 };
 use bpaf::Bpaf;
-use pglt_configuration::{PartialConfiguration, partial_configuration};
-use pglt_console::Console;
-use pglt_fs::FileSystem;
-use pglt_workspace::configuration::{LoadedConfiguration, load_configuration};
-use pglt_workspace::settings::PartialConfigurationExt;
-use pglt_workspace::workspace::UpdateSettingsParams;
-use pglt_workspace::{DynRef, Workspace, WorkspaceError};
+use pgt_configuration::{PartialConfiguration, partial_configuration};
+use pgt_console::Console;
+use pgt_fs::FileSystem;
+use pgt_workspace::configuration::{LoadedConfiguration, load_configuration};
+use pgt_workspace::settings::PartialConfigurationExt;
+use pgt_workspace::workspace::UpdateSettingsParams;
+use pgt_workspace::{DynRef, Workspace, WorkspaceError};
 use std::ffi::OsString;
 use std::path::PathBuf;
 
@@ -25,7 +25,7 @@ pub(crate) mod version;
 #[derive(Debug, Clone, Bpaf)]
 #[bpaf(options, version(VERSION))]
 /// PgLT official CLI. Use it to check the health of your project or run it to check single files.
-pub enum PgltCommand {
+pub enum PgtCommand {
     /// Shows the version information and quit.
     #[bpaf(command)]
     Version(#[bpaf(external(cli_options), hide_usage)] CliOptions),
@@ -58,7 +58,7 @@ pub enum PgltCommand {
         changed: bool,
 
         /// Use this to specify the base branch to compare against when you're using the --changed
-        /// flag and the `defaultBranch` is not set in your `pglt.jsonc`
+        /// flag and the `defaultBranch` is not set in your `postgrestools.jsonc`
         #[bpaf(long("since"), argument("REF"))]
         since: Option<String>,
 
@@ -72,7 +72,7 @@ pub enum PgltCommand {
     Start {
         /// Allows to change the prefix applied to the file name of the logs.
         #[bpaf(
-            env("PGLT_LOG_PREFIX_NAME"),
+            env("PGT_LOG_PREFIX_NAME"),
             long("log-prefix-name"),
             argument("STRING"),
             hide_usage,
@@ -83,16 +83,16 @@ pub enum PgltCommand {
 
         /// Allows to change the folder where logs are stored.
         #[bpaf(
-            env("PGLT_LOG_PATH"),
+            env("PGT_LOG_PATH"),
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pglt_fs::ensure_cache_dir().join("pglt-logs")),
+            fallback(pgt_fs::ensure_cache_dir().join("pglt-logs")),
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglt.jsonc`
-        #[bpaf(env("PGLT_LOG_PREFIX_NAME"), long("config-path"), argument("PATH"))]
+        /// or a custom directory path to find `postgrestools.jsonc`
+        #[bpaf(env("PGT_LOG_PREFIX_NAME"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
     },
 
@@ -109,7 +109,7 @@ pub enum PgltCommand {
     LspProxy {
         /// Allows to change the prefix applied to the file name of the logs.
         #[bpaf(
-            env("PGLT_LOG_PREFIX_NAME"),
+            env("PGT_LOG_PREFIX_NAME"),
             long("log-prefix-name"),
             argument("STRING"),
             hide_usage,
@@ -119,16 +119,16 @@ pub enum PgltCommand {
         log_prefix_name: String,
         /// Allows to change the folder where logs are stored.
         #[bpaf(
-            env("PGLT_LOG_PATH"),
+            env("PGT_LOG_PATH"),
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pglt_fs::ensure_cache_dir().join("pglt-logs")),
+            fallback(pgt_fs::ensure_cache_dir().join("pglt-logs")),
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglt.jsonc`
-        #[bpaf(env("PGLT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
+        /// or a custom directory path to find `postgrestools.jsonc`
+        #[bpaf(env("PGT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
         /// Bogus argument to make the command work with vscode-languageclient
         #[bpaf(long("stdio"), hide, hide_usage, switch)]
@@ -143,7 +143,7 @@ pub enum PgltCommand {
     RunServer {
         /// Allows to change the prefix applied to the file name of the logs.
         #[bpaf(
-            env("PGLT_LOG_PREFIX_NAME"),
+            env("PGT_LOG_PREFIX_NAME"),
             long("log-prefix-name"),
             argument("STRING"),
             hide_usage,
@@ -153,38 +153,38 @@ pub enum PgltCommand {
         log_prefix_name: String,
         /// Allows to change the folder where logs are stored.
         #[bpaf(
-            env("PGLT_LOG_PATH"),
+            env("PGT_LOG_PATH"),
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pglt_fs::ensure_cache_dir().join("pglt-logs")),
+            fallback(pgt_fs::ensure_cache_dir().join("pglt-logs")),
         )]
         log_path: PathBuf,
 
         #[bpaf(long("stop-on-disconnect"), hide_usage)]
         stop_on_disconnect: bool,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglt.jsonc`
-        #[bpaf(env("PGLT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
+        /// or a custom directory path to find `postgrestools.jsonc`
+        #[bpaf(env("PGT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
     },
     #[bpaf(command("__print_socket"), hide)]
     PrintSocket,
 }
 
-impl PgltCommand {
+impl PgtCommand {
     const fn cli_options(&self) -> Option<&CliOptions> {
         match self {
-            PgltCommand::Version(cli_options) | PgltCommand::Check { cli_options, .. } => {
+            PgtCommand::Version(cli_options) | PgtCommand::Check { cli_options, .. } => {
                 Some(cli_options)
             }
-            PgltCommand::LspProxy { .. }
-            | PgltCommand::Start { .. }
-            | PgltCommand::Stop
-            | PgltCommand::Init
-            | PgltCommand::RunServer { .. }
-            | PgltCommand::Clean
-            | PgltCommand::PrintSocket => None,
+            PgtCommand::LspProxy { .. }
+            | PgtCommand::Start { .. }
+            | PgtCommand::Stop
+            | PgtCommand::Init
+            | PgtCommand::RunServer { .. }
+            | PgtCommand::Clean
+            | PgtCommand::PrintSocket => None,
         }
     }
 
@@ -399,6 +399,6 @@ mod tests {
     /// Tests that all CLI options adhere to the invariants expected by `bpaf`.
     #[test]
     fn check_options() {
-        pglt_command().check_invariants(false);
+        pgt_command().check_invariants(false);
     }
 }

@@ -1,9 +1,9 @@
 use crate::{DiagnosticsPayload, Execution, Reporter, ReporterVisitor, TraversalSummary};
 use path_absolutize::Absolutize;
-use pglt_console::fmt::{Display, Formatter};
-use pglt_console::{Console, ConsoleExt, markup};
-use pglt_diagnostics::display::SourceFile;
-use pglt_diagnostics::{Error, PrintDescription, Resource, Severity};
+use pgt_console::fmt::{Display, Formatter};
+use pgt_console::{Console, ConsoleExt, markup};
+use pgt_diagnostics::display::SourceFile;
+use pgt_diagnostics::{Error, PrintDescription, Resource, Severity};
 use serde::Serialize;
 use std::sync::RwLock;
 use std::{
@@ -131,8 +131,8 @@ impl Display for GitLabDiagnostics<'_> {
                     true
                 }
             })
-            .filter_map(|pglt_diagnostic| {
-                let absolute_path = match pglt_diagnostic.location().resource {
+            .filter_map(|pgt_diagnostic| {
+                let absolute_path = match pgt_diagnostic.location().resource {
                     Some(Resource::File(file)) => Some(file),
                     _ => None,
                 }
@@ -143,14 +143,10 @@ impl Display for GitLabDiagnostics<'_> {
                     None => absolute_path.to_owned(),
                 };
 
-                let initial_fingerprint = self.compute_initial_fingerprint(pglt_diagnostic, &path);
+                let initial_fingerprint = self.compute_initial_fingerprint(pgt_diagnostic, &path);
                 let fingerprint = hasher.rehash_until_unique(initial_fingerprint);
 
-                GitLabDiagnostic::try_from_diagnostic(
-                    pglt_diagnostic,
-                    path.to_string(),
-                    fingerprint,
-                )
+                GitLabDiagnostic::try_from_diagnostic(pgt_diagnostic, path.to_string(), fingerprint)
             })
             .collect();
         let serialized = serde_json::to_string_pretty(&gitlab_diagnostics)?;

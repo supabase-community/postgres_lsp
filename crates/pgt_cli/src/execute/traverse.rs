@@ -5,13 +5,13 @@ use crate::execute::diagnostics::PanicDiagnostic;
 use crate::reporter::TraversalSummary;
 use crate::{CliDiagnostic, CliSession};
 use crossbeam::channel::{Receiver, Sender, unbounded};
-use pglt_diagnostics::DiagnosticTags;
-use pglt_diagnostics::{DiagnosticExt, Error, Resource, Severity};
-use pglt_fs::{FileSystem, PathInterner, PgLTPath};
-use pglt_fs::{TraversalContext, TraversalScope};
-use pglt_workspace::dome::Dome;
-use pglt_workspace::workspace::IsPathIgnoredParams;
-use pglt_workspace::{Workspace, WorkspaceError};
+use pgt_diagnostics::DiagnosticTags;
+use pgt_diagnostics::{DiagnosticExt, Error, Resource, Severity};
+use pgt_fs::{FileSystem, PathInterner, PgLTPath};
+use pgt_fs::{TraversalContext, TraversalScope};
+use pgt_workspace::dome::Dome;
+use pgt_workspace::workspace::IsPathIgnoredParams;
+use pgt_workspace::{Workspace, WorkspaceError};
 use rustc_hash::FxHashSet;
 use std::collections::BTreeSet;
 use std::sync::RwLock;
@@ -436,8 +436,8 @@ impl TraversalOptions<'_, '_> {
         self.messages.send(msg.into()).ok();
     }
 
-    pub(crate) fn protected_file(&self, pglt_path: &PgLTPath) {
-        self.push_diagnostic(WorkspaceError::protected_file(pglt_path.display().to_string()).into())
+    pub(crate) fn protected_file(&self, pgt_path: &PgLTPath) {
+        self.push_diagnostic(WorkspaceError::protected_file(pgt_path.display().to_string()).into())
     }
 }
 
@@ -454,8 +454,8 @@ impl TraversalContext for TraversalOptions<'_, '_> {
         self.push_message(error);
     }
 
-    fn can_handle(&self, pglt_path: &PgLTPath) -> bool {
-        let path = pglt_path.as_path();
+    fn can_handle(&self, pgt_path: &PgLTPath) -> bool {
+        let path = pgt_path.as_path();
 
         let is_valid_file = self.fs.path_is_file(path)
             && path
@@ -472,7 +472,7 @@ impl TraversalContext for TraversalOptions<'_, '_> {
             let can_handle = !self
                 .workspace
                 .is_path_ignored(IsPathIgnoredParams {
-                    pglt_path: pglt_path.clone(),
+                    pgt_path: pgt_path.clone(),
                 })
                 .unwrap_or_else(|err| {
                     self.push_diagnostic(err.into());

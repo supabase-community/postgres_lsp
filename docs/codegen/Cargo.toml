@@ -20,15 +20,15 @@ serde       = { workspace = true }
 serde_json       = { workspace = true }
 pulldown-cmark          = "0.12.2"
 
-pglt_configuration = { workspace = true, features = ["schema"] }
-pglt_flags = { workspace = true }
+pgt_configuration = { workspace = true, features = ["schema"] }
+pgt_flags = { workspace = true }
 pgt_cli = { workspace = true }
-pglt_analyse = { workspace = true }
-pglt_analyser = { workspace = true }
-pglt_diagnostics = { workspace = true }
-pglt_query_ext = { workspace = true }
-pglt_workspace = { workspace = true }
-pglt_statement_splitter = { workspace = true }
-pglt_console = { workspace = true }
+pgt_analyse = { workspace = true }
+pgt_analyser = { workspace = true }
+pgt_diagnostics = { workspace = true }
+pgt_query_ext = { workspace = true }
+pgt_workspace = { workspace = true }
+pgt_statement_splitter = { workspace = true }
+pgt_console = { workspace = true }
 biome_string_case = { workspace = true }
 

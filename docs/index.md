@@ -29,13 +29,13 @@ Our current focus is on refining and enhancing these core features while buildin
 
 ## Configuration
 
-We recommend that you create a `pglt.jsonc` configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the `pglt.jsonc` file, run the `init` command in the root folder of your project:
+We recommend that you create a `postgrestools.jsonc` configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the `postgrestools.jsonc` file, run the `init` command in the root folder of your project:
 
 ```sh
 pglt init
 ```
 
-After running the `init` command, you’ll have a `pglt.jsonc` file in your directory:
+After running the `init` command, you’ll have a `postgrestools.jsonc` file in your directory:
 
 [//]: # (BEGIN DEFAULT_CONFIGURATION)
 

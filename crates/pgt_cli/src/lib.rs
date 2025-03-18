@@ -7,9 +7,9 @@
 use cli_options::CliOptions;
 use commands::CommandRunner;
 use commands::check::CheckCommandPayload;
-use pglt_console::{ColorMode, Console};
-use pglt_fs::OsFileSystem;
-use pglt_workspace::{App, DynRef, Workspace, WorkspaceRef};
+use pgt_console::{ColorMode, Console};
+use pgt_fs::OsFileSystem;
+use pgt_workspace::{App, DynRef, Workspace, WorkspaceRef};
 use std::env;
 
 mod changed;
@@ -24,7 +24,7 @@ mod reporter;
 mod service;
 
 use crate::cli_options::ColorsArg;
-pub use crate::commands::{PgltCommand, pglt_command};
+pub use crate::commands::{PgtCommand, pgt_command};
 pub use crate::logging::{LoggingLevel, setup_cli_subscriber};
 pub use diagnostics::CliDiagnostic;
 pub use execute::{Execution, TraversalMode, VcsTargeted, execute_mode};
@@ -32,7 +32,7 @@ pub use panic::setup_panic_handler;
 pub use reporter::{DiagnosticsPayload, Reporter, ReporterVisitor, TraversalSummary};
 pub use service::{SocketTransport, open_transport};
 
-pub(crate) const VERSION: &str = match option_env!("PGLT_VERSION") {
+pub(crate) const VERSION: &str = match option_env!("PGT_VERSION") {
     Some(version) => version,
     None => env!("CARGO_PKG_VERSION"),
 };
@@ -58,15 +58,15 @@ impl<'app> CliSession<'app> {
     }
 
     /// Main function to run the CLI
-    pub fn run(self, command: PgltCommand) -> Result<(), CliDiagnostic> {
+    pub fn run(self, command: PgtCommand) -> Result<(), CliDiagnostic> {
         let has_metrics = command.has_metrics();
         if has_metrics {
             crate::metrics::init_metrics();
         }
 
         let result = match command {
-            PgltCommand::Version(_) => commands::version::full_version(self),
-            PgltCommand::Check {
+            PgtCommand::Version(_) => commands::version::full_version(self),
+            PgtCommand::Check {
                 cli_options,
                 configuration,
                 paths,
@@ -86,21 +86,21 @@ impl<'app> CliSession<'app> {
                     since,
                 },
             ),
-            PgltCommand::Clean => commands::clean::clean(self),
-            PgltCommand::Start {
+            PgtCommand::Clean => commands::clean::clean(self),
+            PgtCommand::Start {
                 config_path,
                 log_path,
                 log_prefix_name,
             } => commands::daemon::start(self, config_path, Some(log_path), Some(log_prefix_name)),
-            PgltCommand::Stop => commands::daemon::stop(self),
-            PgltCommand::Init => commands::init::init(self),
-            PgltCommand::LspProxy {
+            PgtCommand::Stop => commands::daemon::stop(self),
+            PgtCommand::Init => commands::init::init(self),
+            PgtCommand::LspProxy {
                 config_path,
                 log_path,
                 log_prefix_name,
                 ..
             } => commands::daemon::lsp_proxy(config_path, Some(log_path), Some(log_prefix_name)),
-            PgltCommand::RunServer {
+            PgtCommand::RunServer {
                 stop_on_disconnect,
                 config_path,
                 log_path,
@@ -111,7 +111,7 @@ impl<'app> CliSession<'app> {
                 Some(log_path),
                 Some(log_prefix_name),
             ),
-            PgltCommand::PrintSocket => commands::daemon::print_socket(),
+            PgtCommand::PrintSocket => commands::daemon::print_socket(),
         };
 
         if has_metrics {

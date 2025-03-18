@@ -6,7 +6,7 @@ use std::{
     time::Duration,
 };
 
-use pglt_lsp::{ServerConnection, ServerFactory};
+use pgt_lsp::{ServerConnection, ServerFactory};
 use tokio::{
     io::Interest,
     net::{
@@ -21,11 +21,11 @@ use tracing::{Instrument, debug, info};
 /// Returns the filesystem path of the global socket used to communicate with
 /// the server daemon
 fn get_socket_name() -> PathBuf {
-    pglt_fs::ensure_cache_dir().join(format!("pglt-socket-{}", pglt_configuration::VERSION))
+    pgt_fs::ensure_cache_dir().join(format!("pglt-socket-{}", pgt_configuration::VERSION))
 }
 
 pub(crate) fn enumerate_pipes() -> io::Result<impl Iterator<Item = String>> {
-    fs::read_dir(pglt_fs::ensure_cache_dir()).map(|iter| {
+    fs::read_dir(pgt_fs::ensure_cache_dir()).map(|iter| {
         iter.filter_map(|entry| {
             let entry = entry.ok()?.path();
             let file_name = entry.file_name()?;

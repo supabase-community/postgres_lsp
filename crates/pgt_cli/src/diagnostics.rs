@@ -1,10 +1,10 @@
-use pglt_console::fmt::Display;
-use pglt_console::markup;
-use pglt_diagnostics::adapters::{BpafError, IoError, SerdeJsonError};
-use pglt_diagnostics::{
+use pgt_console::fmt::Display;
+use pgt_console::markup;
+use pgt_diagnostics::adapters::{BpafError, IoError, SerdeJsonError};
+use pgt_diagnostics::{
     Advices, Category, Diagnostic, Error, LogCategory, MessageAndDescription, Severity, Visit,
 };
-use pglt_workspace::WorkspaceError;
+use pgt_workspace::WorkspaceError;
 use std::process::{ExitCode, Termination};
 use std::{env::current_exe, fmt::Debug};
 
@@ -48,7 +48,7 @@ pub enum CliDiagnostic {
     IoError(IoDiagnostic),
     /// The daemon is not running
     ServerNotRunning(ServerNotRunning),
-    /// The end configuration (`pglt.jsonc` + other options) is incompatible with the command
+    /// The end configuration (`postgrestools.jsonc` + other options) is incompatible with the command
     IncompatibleEndConfiguration(IncompatibleEndConfiguration),
     /// No files processed during the file system traversal
     NoFilesWereProcessed(NoFilesWereProcessed),
@@ -410,7 +410,7 @@ impl CliDiagnostic {
         Self::ServerNotRunning(ServerNotRunning)
     }
 
-    /// Emitted when the end configuration (`pglt.jsonc` file + CLI arguments + LSP configuration)
+    /// Emitted when the end configuration (`postgrestools.jsonc` file + CLI arguments + LSP configuration)
     /// results in a combination of options that doesn't allow to run the command correctly.
     ///
     /// A reason needs to be provided
