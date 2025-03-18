@@ -1,4 +1,4 @@
-use pglt_cli::pglt_command;
+use pgt_cli::pglt_command;
 use std::{fs, path::Path};
 
 use crate::utils;
