@@ -54,7 +54,6 @@ unicode-width            = "0.1.12"
 pglt_analyse                = { path = "./crates/pglt_analyse", version = "0.0.0" }
 pglt_analyser               = { path = "./crates/pglt_analyser", version = "0.0.0" }
 pglt_base_db                = { path = "./crates/pglt_base_db", version = "0.0.0" }
-pgt_cli                    = { path = "./crates/pgt_cli", version = "0.0.0" }
 pglt_commands               = { path = "./crates/pglt_commands", version = "0.0.0" }
 pglt_completions            = { path = "./crates/pglt_completions", version = "0.0.0" }
 pglt_configuration          = { path = "./crates/pglt_configuration", version = "0.0.0" }
@@ -81,6 +80,7 @@ pglt_treesitter_queries     = { path = "./crates/pglt_treesitter_queries", versi
 pglt_type_resolver          = { path = "./crates/pglt_type_resolver", version = "0.0.0" }
 pglt_typecheck              = { path = "./crates/pglt_typecheck", version = "0.0.0" }
 pglt_workspace              = { path = "./crates/pglt_workspace", version = "0.0.0" }
+pgt_cli                     = { path = "./crates/pgt_cli", version = "0.0.0" }
 
 pglt_test_macros = { path = "./crates/pglt_test_macros" }
 pglt_test_utils  = { path = "./crates/pglt_test_utils" }

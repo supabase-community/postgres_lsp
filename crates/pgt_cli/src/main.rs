@@ -1,12 +1,12 @@
 //! This is the main binary
 
+use pglt_console::{ConsoleExt, EnvConsole, markup};
+use pglt_diagnostics::{Diagnostic, PrintDiagnostic, set_bottom_frame};
+use pglt_workspace::workspace;
 use pgt_cli::{
     CliDiagnostic, CliSession, PgltCommand, open_transport, pglt_command, setup_panic_handler,
     to_color_mode,
 };
-use pglt_console::{ConsoleExt, EnvConsole, markup};
-use pglt_diagnostics::{Diagnostic, PrintDiagnostic, set_bottom_frame};
-use pglt_workspace::workspace;
 use std::process::{ExitCode, Termination};
 use tokio::runtime::Runtime;
 
