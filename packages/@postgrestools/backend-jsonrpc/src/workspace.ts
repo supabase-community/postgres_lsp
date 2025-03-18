@@ -423,28 +423,28 @@ export interface Workspace {
 export function createWorkspace(transport: Transport): Workspace {
 	return {
 		isPathIgnored(params) {
-			return transport.request("pgt/is_path_ignored", params);
+			return transport.request("pglt/is_path_ignored", params);
 		},
 		getFileContent(params) {
-			return transport.request("pgt/get_file_content", params);
+			return transport.request("pglt/get_file_content", params);
 		},
 		pullDiagnostics(params) {
-			return transport.request("pgt/pull_diagnostics", params);
+			return transport.request("pglt/pull_diagnostics", params);
 		},
 		getCompletions(params) {
-			return transport.request("pgt/get_completions", params);
+			return transport.request("pglt/get_completions", params);
 		},
 		updateSettings(params) {
-			return transport.request("pgt/update_settings", params);
+			return transport.request("pglt/update_settings", params);
 		},
 		openFile(params) {
-			return transport.request("pgt/open_file", params);
+			return transport.request("pglt/open_file", params);
 		},
 		changeFile(params) {
-			return transport.request("pgt/change_file", params);
+			return transport.request("pglt/change_file", params);
 		},
 		closeFile(params) {
-			return transport.request("pgt/close_file", params);
+			return transport.request("pglt/close_file", params);
 		},
 		destroy() {
 			transport.destroy();
