@@ -8,11 +8,11 @@ use std::sync::{LazyLock, OnceLock};
 
 /// Returns `true` if this is an unstable build of PgLT
 pub fn is_unstable() -> bool {
-    PGLT_VERSION.deref().is_none()
+    PGT_VERSION.deref().is_none()
 }
 
 /// The internal version of PgLT. This is usually supplied during the CI build
-pub static PGLT_VERSION: LazyLock<Option<&str>> = LazyLock::new(|| option_env!("PGLT_VERSION"));
+pub static PGT_VERSION: LazyLock<Option<&str>> = LazyLock::new(|| option_env!("PGT_VERSION"));
 
 pub struct PgLTEnv {
     pub pgt_log_path: PgLTEnvVariable,
@@ -20,21 +20,21 @@ pub struct PgLTEnv {
     pub pgt_config_path: PgLTEnvVariable,
 }
 
-pub static PGLT_ENV: OnceLock<PgLTEnv> = OnceLock::new();
+pub static PGT_ENV: OnceLock<PgLTEnv> = OnceLock::new();
 
 impl PgLTEnv {
     fn new() -> Self {
         Self {
             pgt_log_path: PgLTEnvVariable::new(
-                "PGLT_LOG_PATH",
+                "PGT_LOG_PATH",
                 "The directory where the Daemon logs will be saved.",
             ),
             pgt_log_prefix: PgLTEnvVariable::new(
-                "PGLT_LOG_PREFIX_NAME",
+                "PGT_LOG_PREFIX_NAME",
                 "A prefix that's added to the name of the log. Default: `server.log.`",
             ),
             pgt_config_path: PgLTEnvVariable::new(
-                "PGLT_CONFIG_PATH",
+                "PGT_CONFIG_PATH",
                 "A path to the configuration file",
             ),
         }
@@ -71,7 +71,7 @@ impl PgLTEnvVariable {
 }
 
 pub fn pgt_env() -> &'static PgLTEnv {
-    PGLT_ENV.get_or_init(PgLTEnv::new)
+    PGT_ENV.get_or_init(PgLTEnv::new)
 }
 
 impl Display for PgLTEnv {

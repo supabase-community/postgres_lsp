@@ -1,4 +1,4 @@
-//! This module contains the configuration of `pglt.jsonc`
+//! This module contains the configuration of `postgrestools.jsonc`
 //!
 //! The configuration is divided by "tool", and then it's possible to further customise it
 //! by language. The language might further options divided by tool.
@@ -34,7 +34,7 @@ use migrations::{
 use serde::{Deserialize, Serialize};
 use vcs::VcsClientKind;
 
-pub const VERSION: &str = match option_env!("PGLT_VERSION") {
+pub const VERSION: &str = match option_env!("PGT_VERSION") {
     Some(version) => version,
     None => "0.0.0",
 };
