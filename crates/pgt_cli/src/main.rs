@@ -1,6 +1,6 @@
 //! This is the main binary
 
-use pglt_cli::{
+use pgt_cli::{
     CliDiagnostic, CliSession, PgltCommand, open_transport, pglt_command, setup_panic_handler,
     to_color_mode,
 };

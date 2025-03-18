@@ -54,7 +54,7 @@ unicode-width            = "0.1.12"
 pglt_analyse                = { path = "./crates/pglt_analyse", version = "0.0.0" }
 pglt_analyser               = { path = "./crates/pglt_analyser", version = "0.0.0" }
 pglt_base_db                = { path = "./crates/pglt_base_db", version = "0.0.0" }
-pglt_cli                    = { path = "./crates/pglt_cli", version = "0.0.0" }
+pgt_cli                    = { path = "./crates/pgt_cli", version = "0.0.0" }
 pglt_commands               = { path = "./crates/pglt_commands", version = "0.0.0" }
 pglt_completions            = { path = "./crates/pglt_completions", version = "0.0.0" }
 pglt_configuration          = { path = "./crates/pglt_configuration", version = "0.0.0" }
