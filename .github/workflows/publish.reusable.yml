@@ -29,7 +29,7 @@ jobs:
 
       - name: Generate Packages
         id: generate-packages
-        run: node packages/@pglt/pglt/scripts/generate-packages.mjs
+        run: node packages/@postgrestools/postgrestools/scripts/generate-packages.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ inputs.release-tag }}
@@ -46,12 +46,12 @@ jobs:
 
       - name: Print package.json
         run: |
-          cat packages/@pglt/pglt/package.json
+          cat packages/@postgrestools/postgrestools/package.json
 
       - name: Publish npm packages as nightly
         if: inputs.is-prerelease == 'true'
         run: |
-          for package in packages/@pglt/*; do
+          for package in packages/@postgrestools/*; do
             npm publish "$package" --tag nightly --access public --provenance
           done
         env:
@@ -60,7 +60,7 @@ jobs:
       - name: Publish npm packages as latest
         if: inputs.is-prerelease != 'true'
         run: |
-          for package in packages/@pglt/*; do
+          for package in packages/@postgrestools/*; do
             npm publish "$package" --tag latest --access public --provenance
           done
         env:
