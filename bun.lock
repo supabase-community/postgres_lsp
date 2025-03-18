@@ -11,31 +11,29 @@
         "typescript": "^5",
       },
     },
-    "packages/@pglt/backend-jsonrpc": {
-      "name": "@pglt/backend-jsonrpc",
+    "packages/@postgrestools/backend-jsonrpc": {
+      "name": "@postgrestools/backend-jsonrpc",
       "optionalDependencies": {
-        "@pglt/cli-darwin-arm64": "<placeholder>",
-        "@pglt/cli-darwin-x64": "<placeholder>",
-        "@pglt/cli-linux-arm64": "<placeholder>",
-        "@pglt/cli-linux-arm64-musl": "<placeholder>",
-        "@pglt/cli-linux-x64": "<placeholder>",
-        "@pglt/cli-linux-x64-musl": "<placeholder>",
-        "@pglt/cli-win32-arm64": "<placeholder>",
-        "@pglt/cli-win32-x64": "<placeholder>",
+        "@postgrestools/cli-darwin-arm64": "<placeholder>",
+        "@postgrestools/cli-darwin-x64": "<placeholder>",
+        "@postgrestools/cli-linux-arm64": "<placeholder>",
+        "@postgrestools/cli-linux-x64": "<placeholder>",
+        "@postgrestools/cli-win32-arm64": "<placeholder>",
+        "@postgrestools/cli-win32-x64": "<placeholder>",
       },
     },
-    "packages/@pglt/pglt": {
-      "name": "pglt",
+    "packages/@postgrestools/postgrestools": {
+      "name": "postgrestools",
       "bin": {
-        "pglt": "bin/pglt",
+        "postgrestools": "bin/postgrestools",
       },
       "optionalDependencies": {
-        "pglt-aarch64-apple-darwin": "<placeholder>",
-        "pglt-aarch64-linux-gnu": "<placeholder>",
-        "pglt-aarch64-windows-msvc": "<placeholder>",
-        "pglt-x86_64-apple-darwin": "<placeholder>",
-        "pglt-x86_64-linux-gnu": "<placeholder>",
-        "pglt-x86_64-windows-msvc": "<placeholder>",
+        "postgrestools-aarch64-apple-darwin": "<placeholder>",
+        "postgrestools-aarch64-linux-gnu": "<placeholder>",
+        "postgrestools-aarch64-windows-msvc": "<placeholder>",
+        "postgrestools-x86_64-apple-darwin": "<placeholder>",
+        "postgrestools-x86_64-linux-gnu": "<placeholder>",
+        "postgrestools-x86_64-windows-msvc": "<placeholder>",
       },
     },
   },
@@ -58,7 +56,7 @@
 
     "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@1.9.4", "", { "os": "win32", "cpu": "x64" }, "sha512-8Y5wMhVIPaWe6jw2H+KlEm4wP/f7EW3810ZLmDlrEEy5KvBsb9ECEfu/kMWD484ijfQ8+nIi0giMgu9g1UAuuA=="],
 
-    "@pglt/backend-jsonrpc": ["@pglt/backend-jsonrpc@workspace:packages/@pglt/backend-jsonrpc"],
+    "@postgrestools/backend-jsonrpc": ["@postgrestools/backend-jsonrpc@workspace:packages/@postgrestools/backend-jsonrpc"],
 
     "@types/bun": ["@types/bun@1.2.5", "", { "dependencies": { "bun-types": "1.2.5" } }, "sha512-w2OZTzrZTVtbnJew1pdFmgV99H0/L+Pvw+z1P67HaR18MHOzYnTYOi6qzErhK8HyT+DB782ADVPPE92Xu2/Opg=="],
 
@@ -68,7 +66,7 @@
 
     "bun-types": ["bun-types@1.2.5", "", { "dependencies": { "@types/node": "*", "@types/ws": "~8.5.10" } }, "sha512-3oO6LVGGRRKI4kHINx5PIdIgnLRb7l/SprhzqXapmoYkFl5m4j6EvALvbDVuuBFaamB46Ap6HCUxIXNLCGy+tg=="],
 
-    "pglt": ["pglt@workspace:packages/@pglt/pglt"],
+    "postgrestools": ["postgrestools@workspace:packages/@postgrestools/postgrestools"],
 
     "typescript": ["typescript@5.8.2", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ=="],
 

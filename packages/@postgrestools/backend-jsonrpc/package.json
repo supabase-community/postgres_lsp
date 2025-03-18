@@ -1,5 +1,5 @@
 {
-	"name": "@pglt/backend-jsonrpc",
+	"name": "@postgrestools/backend-jsonrpc",
 	"version": "<placeholder>",
 	"main": "dist/index.js",
 	"scripts": {
@@ -11,7 +11,7 @@
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/supabase-community/postgres_lsp.git",
-		"directory": "packages/@pglt/backend-jsonrpc"
+		"directory": "packages/@postgrestools/backend-jsonrpc"
 	},
 	"author": "Supabase Community",
 	"bugs": "ttps://github.com/supabase-community/postgres_lsp/issues",
@@ -22,11 +22,11 @@
 		"provenance": true
 	},
 	"optionalDependencies": {
-		"@pglt/cli-win32-x64": "<placeholder>",
-		"@pglt/cli-win32-arm64": "<placeholder>",
-		"@pglt/cli-darwin-x64": "<placeholder>",
-		"@pglt/cli-darwin-arm64": "<placeholder>",
-		"@pglt/cli-linux-x64": "<placeholder>",
-		"@pglt/cli-linux-arm64": "<placeholder>"
+		"@postgrestools/cli-win32-x64": "<placeholder>",
+		"@postgrestools/cli-win32-arm64": "<placeholder>",
+		"@postgrestools/cli-darwin-x64": "<placeholder>",
+		"@postgrestools/cli-darwin-arm64": "<placeholder>",
+		"@postgrestools/cli-linux-x64": "<placeholder>",
+		"@postgrestools/cli-linux-arm64": "<placeholder>"
 	}
 }

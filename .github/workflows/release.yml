@@ -61,19 +61,19 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
 
       - name: 🛠️ Run Build
-        run: cargo build -p pglt_cli --release --target ${{ matrix.config.target }}
+        run: cargo build -p pgt_cli --release --target ${{ matrix.config.target }}
 
       # windows is a special snowflake too, it saves binaries as .exe
       - name: 👦 Name the Binary
         if: matrix.config.os == 'windows-latest'
         run: |
           mkdir dist
-          cp target/${{ matrix.config.target }}/release/pglt.exe ./dist/pglt_${{ matrix.config.target }}
+          cp target/${{ matrix.config.target }}/release/postgrestools.exe ./dist/postgrestools_${{ matrix.config.target }}
       - name: 👦 Name the Binary
         if: matrix.config.os != 'windows-latest'
         run: |
           mkdir dist
-          cp target/${{ matrix.config.target }}/release/pglt ./dist/pglt_${{ matrix.config.target }}
+          cp target/${{ matrix.config.target }}/release/postgrestools ./dist/postgrestools_${{ matrix.config.target }}
 
       # It is not possible to return the artifacts from the matrix jobs individually: Matrix outputs overwrite each other.
       # A common workaround is to upload and download the resulting artifacts.
@@ -81,8 +81,8 @@ jobs:
         id: upload-artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: pglt_${{ matrix.config.target }}
-          path: ./dist/pglt_*
+          name: postgrestools_${{ matrix.config.target }}
+          path: ./dist/postgrestools_*
           # The default compression level is 6; this took the binary down from 350 to 330MB.
           # It is recommended to use a lower level for binaries, since the compressed result is not much smaller,
           # and the higher levels of compression take much longer.
@@ -113,7 +113,7 @@ jobs:
         id: download
         with:
           merge-multiple: true
-          pattern: pglt_*
+          pattern: postgrestools_*
 
       - name: 📂 Create Release
         uses: softprops/action-gh-release@v2
@@ -125,7 +125,7 @@ jobs:
           body: ${{ steps.create_changelog.outputs.content }}
           tag_name: ${{ steps.create_changelog.outputs.version }}
           files: |
-            pglt_*
+            postgrestools_*
             docs/schemas/latest/schema.json
           fail_on_unmatched_files: true
           draft: true

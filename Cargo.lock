@@ -1043,7 +1043,6 @@ dependencies = [
  "bpaf",
  "pglt_analyse",
  "pglt_analyser",
- "pglt_cli",
  "pglt_configuration",
  "pglt_console",
  "pglt_diagnostics",
@@ -1051,6 +1050,7 @@ dependencies = [
  "pglt_query_ext",
  "pglt_statement_splitter",
  "pglt_workspace",
+ "pgt_cli",
  "pulldown-cmark",
  "regex",
  "schemars",
@@ -2339,42 +2339,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pglt_cli"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "biome_deserialize 0.6.0",
- "biome_deserialize_macros 0.6.0",
- "bpaf",
- "crossbeam",
- "dashmap 5.5.3",
- "hdrhistogram",
- "libc",
- "mimalloc",
- "path-absolutize",
- "pglt_analyse",
- "pglt_configuration",
- "pglt_console",
- "pglt_diagnostics",
- "pglt_flags",
- "pglt_fs",
- "pglt_lsp",
- "pglt_text_edit",
- "pglt_workspace",
- "quick-junit",
- "rayon",
- "rustc-hash 2.1.0",
- "serde",
- "serde_json",
- "tikv-jemallocator",
- "tokio",
- "tracing",
- "tracing-appender",
- "tracing-subscriber",
- "tracing-tree",
-]
-
-[[package]]
 name = "pglt_commands"
 version = "0.0.0"
 dependencies = [
@@ -2734,6 +2698,42 @@ dependencies = [
  "tracing",
  "tree-sitter",
  "tree_sitter_sql",
+]
+
+[[package]]
+name = "pgt_cli"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "biome_deserialize 0.6.0",
+ "biome_deserialize_macros 0.6.0",
+ "bpaf",
+ "crossbeam",
+ "dashmap 5.5.3",
+ "hdrhistogram",
+ "libc",
+ "mimalloc",
+ "path-absolutize",
+ "pglt_analyse",
+ "pglt_configuration",
+ "pglt_console",
+ "pglt_diagnostics",
+ "pglt_flags",
+ "pglt_fs",
+ "pglt_lsp",
+ "pglt_text_edit",
+ "pglt_workspace",
+ "quick-junit",
+ "rayon",
+ "rustc-hash 2.1.0",
+ "serde",
+ "serde_json",
+ "tikv-jemallocator",
+ "tokio",
+ "tracing",
+ "tracing-appender",
+ "tracing-subscriber",
+ "tracing-tree",
 ]
 
 [[package]]

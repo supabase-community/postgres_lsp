@@ -14,16 +14,16 @@ export function getCommand(): string | null {
 
 	const PLATFORMS: PlatformPaths = {
 		win32: {
-			x64: "@pglt/cli-win32-x64/pglt.exe",
-			arm64: "@pglt/cli-win32-arm64/pglt.exe",
+			x64: "@postgrestools/cli-win32-x64/postgrestools.exe",
+			arm64: "@postgrestools/cli-win32-arm64/postgrestools.exe",
 		},
 		darwin: {
-			x64: "@pglt/cli-darwin-x64/pglt",
-			arm64: "@pglt/cli-darwin-arm64/pglt",
+			x64: "@postgrestools/cli-darwin-x64/postgrestools",
+			arm64: "@postgrestools/cli-darwin-arm64/postgrestools",
 		},
 		linux: {
-			x64: "@pglt/cli-linux-x64/pglt",
-			arm64: "@pglt/cli-linux-arm64/pglt",
+			x64: "@postgrestools/cli-linux-x64/postgrestools",
+			arm64: "@postgrestools/cli-linux-arm64/postgrestools",
 		},
 	};
 

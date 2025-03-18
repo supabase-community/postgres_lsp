@@ -35,7 +35,7 @@ export async function createWorkspaceWithBinary(
 	await transport.request("initialize", {
 		capabilities: {},
 		client_info: {
-			name: "@pglt/backend-jsonrpc",
+			name: "@postgrestools/backend-jsonrpc",
 			version: "0.0.0",
 		},
 	});

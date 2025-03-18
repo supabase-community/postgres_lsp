@@ -7,8 +7,8 @@ import { promisify } from "node:util";
 const streamPipeline = promisify(pipeline);
 
 const CLI_ROOT = resolve(fileURLToPath(import.meta.url), "../..");
-const PACKAGES_PGLT_ROOT = resolve(CLI_ROOT, "..");
-const PGLT_ROOT = resolve(PACKAGES_PGLT_ROOT, "../..");
+const PACKAGES_POSTGRESTOOLS_ROOT = resolve(CLI_ROOT, "..");
+const POSTGRESTOOLS_ROOT = resolve(PACKAGES_POSTGRESTOOLS_ROOT, "../..");
 const SUPPORTED_PLATFORMS = [
 	"pc-windows-msvc",
 	"apple-darwin",
@@ -31,7 +31,9 @@ async function downloadSchema(releaseTag, githubToken) {
 	}
 
 	// download to root.
-	const fileStream = fs.createWriteStream(resolve(PGLT_ROOT, "schema.json"));
+	const fileStream = fs.createWriteStream(
+		resolve(POSTGRESTOOLS_ROOT, "schema.json"),
+	);
 
 	await streamPipeline(response.body, fileStream);
 
@@ -66,7 +68,11 @@ async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
 }
 
 async function writeManifest(packagePath, version) {
-	const manifestPath = resolve(PACKAGES_PGLT_ROOT, packagePath, "package.json");
+	const manifestPath = resolve(
+		PACKAGES_POSTGRESTOOLS_ROOT,
+		packagePath,
+		"package.json",
+	);
 
 	const manifestData = JSON.parse(
 		fs.readFileSync(manifestPath).toString("utf-8"),
@@ -74,7 +80,7 @@ async function writeManifest(packagePath, version) {
 
 	const nativePackages = SUPPORTED_PLATFORMS.flatMap((platform) =>
 		SUPPORTED_ARCHITECTURES.map((arch) => [
-			`@pglt/${getName(platform, arch)}`,
+			`@postgrestools/${getName(platform, arch)}`,
 			version,
 		]),
 	);
@@ -95,7 +101,7 @@ async function writeManifest(packagePath, version) {
 
 async function makePackageDir(platform, arch) {
 	const buildName = getBuildName(platform, arch);
-	const packageRoot = resolve(PACKAGES_PGLT_ROOT, buildName);
+	const packageRoot = resolve(PACKAGES_POSTGRESTOOLS_ROOT, buildName);
 
 	await new Promise((res, rej) => {
 		fs.mkdir(packageRoot, {}, (e) => (e ? rej(e) : res()));
@@ -105,7 +111,7 @@ async function makePackageDir(platform, arch) {
 function copyBinaryToNativePackage(platform, arch, os) {
 	// Update the package.json manifest
 	const buildName = getBuildName(platform, arch);
-	const packageRoot = resolve(PACKAGES_PGLT_ROOT, buildName);
+	const packageRoot = resolve(PACKAGES_POSTGRESTOOLS_ROOT, buildName);
 	const packageName = getPackageName(platform, arch);
 
 	const { version, license, repository, engines } = rootManifest();
@@ -161,7 +167,7 @@ function copyBinaryToNativePackage(platform, arch, os) {
 
 	// Copy the CLI binary
 	const binarySource = getBinarySource(platform, arch, os);
-	const binaryTarget = resolve(packageRoot, `pglt${ext}`);
+	const binaryTarget = resolve(packageRoot, `postgrestools${ext}`);
 
 	if (!fs.existsSync(binarySource)) {
 		console.error(
@@ -177,9 +183,9 @@ function copyBinaryToNativePackage(platform, arch, os) {
 
 function copySchemaToNativePackage(platform, arch) {
 	const buildName = getBuildName(platform, arch);
-	const packageRoot = resolve(PACKAGES_PGLT_ROOT, buildName);
+	const packageRoot = resolve(PACKAGES_POSTGRESTOOLS_ROOT, buildName);
 
-	const schemaSrc = resolve(PGLT_ROOT, "schema.json");
+	const schemaSrc = resolve(POSTGRESTOOLS_ROOT, "schema.json");
 	const schemaTarget = resolve(packageRoot, "schema.json");
 
 	if (!fs.existsSync(schemaSrc)) {
@@ -201,7 +207,7 @@ function getBinaryExt(os) {
 
 function getBinarySource(platform, arch, os) {
 	const ext = getBinaryExt(os);
-	return resolve(PGLT_ROOT, `${getBuildName(platform, arch)}${ext}`);
+	return resolve(POSTGRESTOOLS_ROOT, `${getBuildName(platform, arch)}${ext}`);
 }
 
 function getBuildName(platform, arch) {
@@ -211,7 +217,7 @@ function getBuildName(platform, arch) {
 function getPackageName(platform, arch) {
 	// trim the "unknown" from linux and the "pc" from windows
 	const platformName = platform.split("-").slice(-2).join("-");
-	return `pglt-${arch}-${platformName}`;
+	return `postgrestools-${arch}-${platformName}`;
 }
 
 function getOs(platform) {
@@ -232,7 +238,7 @@ function getVersion(releaseTag, isPrerelease) {
 
 	await downloadSchema(releaseTag, githubToken);
 	const version = getVersion(releaseTag, isPrerelease);
-	await writeManifest("pglt", version);
+	await writeManifest("postgrestools", version);
 	await writeManifest("backend-jsonrpc", version);
 
 	for (const platform of SUPPORTED_PLATFORMS) {

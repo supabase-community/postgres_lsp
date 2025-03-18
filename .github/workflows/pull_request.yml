@@ -153,16 +153,16 @@ jobs:
       - name: Install toolchain
         uses: moonrepo/setup-rust@v1
       - name: Build main binary
-        run: cargo build -p pglt_cli --release
+        run: cargo build -p pgt_cli --release
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
       - name: Install JS dependencies
         run: bun install
       - name: Build TypeScript code
-        working-directory: packages/@pglt/backend-jsonrpc
+        working-directory: packages/@postgrestools/backend-jsonrpc
         run: bun run build
       - name: Run JS tests
-        working-directory: packages/@pglt/backend-jsonrpc
+        working-directory: packages/@postgrestools/backend-jsonrpc
         run: bun run test
 
   codegen:

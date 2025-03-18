@@ -5,7 +5,7 @@ export interface IsPathIgnoredParams {
 }
 export interface PgLTPath {
 	/**
-	 * Determines the kind of the file inside PgLT. Some files are considered as configuration files, others as manifest files, and others as files to handle
+	 * Determines the kind of the file inside PostgresTools. Some files are considered as configuration files, others as manifest files, and others as files to handle
 	 */
 	kind: FileKind;
 	path: string;
@@ -320,7 +320,7 @@ export interface PartialVcsConfiguration {
 	 */
 	enabled?: boolean;
 	/**
-	* The folder where we should check for VCS files. By default, we will use the same folder where `pglt.jsonc` was found.
+	* The folder where we should check for VCS files. By default, we will use the same folder where `postgrestools.jsonc` was found.
 
 If we can't find the configuration, it will attempt to use the current working directory. If no current working directory can't be found, we won't use the VCS integration, and a diagnostic will be emitted 
 	 */
@@ -337,7 +337,7 @@ export interface Rules {
 	 */
 	all?: boolean;
 	/**
-	 * It enables the lint rules recommended by PgLT. `true` by default.
+	 * It enables the lint rules recommended by PostgresTools. `true` by default.
 	 */
 	recommended?: boolean;
 	safety?: Safety;
