@@ -22,7 +22,7 @@ pulldown-cmark          = "0.12.2"
 
 pglt_configuration = { workspace = true, features = ["schema"] }
 pglt_flags = { workspace = true }
-pglt_cli = { workspace = true }
+pgt_cli = { workspace = true }
 pglt_analyse = { workspace = true }
 pglt_analyser = { workspace = true }
 pglt_diagnostics = { workspace = true }

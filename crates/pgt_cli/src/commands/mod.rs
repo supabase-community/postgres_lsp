@@ -43,7 +43,7 @@ pub enum PgltCommand {
         ///
         /// The file doesn't need to exist on disk, what matters is the extension of the file. Based on the extension, we know how to check the code.
         ///
-        /// Example: `echo 'let a;' | pglt_cli check --stdin-file-path=test.sql`
+        /// Example: `echo 'let a;' | pgt_cli check --stdin-file-path=test.sql`
         #[bpaf(long("stdin-file-path"), argument("PATH"), hide_usage)]
         stdin_file_path: Option<String>,
 

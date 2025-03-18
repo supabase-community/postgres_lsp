@@ -6,7 +6,7 @@ edition.workspace    = true
 homepage.workspace   = true
 keywords.workspace   = true
 license.workspace    = true
-name                 = "pglt_cli"
+name                 = "pgt_cli"
 repository.workspace = true
 version              = "0.0.0"
 
@@ -56,5 +56,5 @@ tikv-jemallocator = "0.6.0"
 doctest = false
 
 [[bin]]
-name = "pglt"
+name = "postgrestools"
 path = "src/main.rs"
