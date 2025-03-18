@@ -233,7 +233,7 @@ fn setup_tracing_subscriber(log_path: Option<PathBuf>, log_file_name_prefix: Opt
 }
 
 pub fn default_pgt_log_path() -> PathBuf {
-    match env::var_os("PGLT_LOG_PATH") {
+    match env::var_os("PGT_LOG_PATH") {
         Some(directory) => PathBuf::from(directory),
         None => pgt_fs::ensure_cache_dir().join("pglt-logs"),
     }

@@ -18,14 +18,14 @@ mod os;
 pub struct ConfigName;
 
 impl ConfigName {
-    const PGLT_JSONC: [&'static str; 1] = ["pglt.jsonc"];
+    const PGT_JSONC: [&'static str; 1] = ["postgrestools.jsonc"];
 
     pub const fn pgt_jsonc() -> &'static str {
-        Self::PGLT_JSONC[0]
+        Self::PGT_JSONC[0]
     }
 
     pub const fn file_names() -> [&'static str; 1] {
-        Self::PGLT_JSONC
+        Self::PGT_JSONC
     }
 }
 

@@ -79,7 +79,7 @@ Let's assume that the rule we implement support the following options:
 - `threshold`: an integer between 0 and 255;
 - `behaviorExceptions`: an array of strings.
 
-We would like to set the options in the `pglt.jsonc` configuration file:
+We would like to set the options in the `postgrestools.jsonc` configuration file:
 
 ```json
 {
@@ -141,9 +141,9 @@ We currently require implementing _serde_'s traits `Deserialize`/`Serialize`.
 
 Also, we use other `serde` macros to adjust the JSON configuration:
 
-- `rename_all = "camelCase"`: it renames all fields in camel-case, so they are in line with the naming style of the `pglt.jsonc`.
+- `rename_all = "camelCase"`: it renames all fields in camel-case, so they are in line with the naming style of the `postgrestools.jsonc`.
 - `deny_unknown_fields`: it raises an error if the configuration contains extraneous fields.
-- `default`: it uses the `Default` value when the field is missing from `pglt.jsonc`. This macro makes the field optional.
+- `default`: it uses the `Default` value when the field is missing from `postgrestools.jsonc`. This macro makes the field optional.
 
 You can simply use a derive macros:
 

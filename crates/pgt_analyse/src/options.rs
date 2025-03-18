@@ -45,7 +45,7 @@ impl AnalyserRules {
 /// A set of information useful to the analyser infrastructure
 #[derive(Debug, Default)]
 pub struct AnalyserOptions {
-    /// A data structured derived from the [`pglt.jsonc`] file
+    /// A data structured derived from the [`postgrestools.jsonc`] file
     pub rules: AnalyserRules,
 }
 

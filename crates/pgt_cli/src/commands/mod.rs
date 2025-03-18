@@ -58,7 +58,7 @@ pub enum PgtCommand {
         changed: bool,
 
         /// Use this to specify the base branch to compare against when you're using the --changed
-        /// flag and the `defaultBranch` is not set in your `pglt.jsonc`
+        /// flag and the `defaultBranch` is not set in your `postgrestools.jsonc`
         #[bpaf(long("since"), argument("REF"))]
         since: Option<String>,
 
@@ -72,7 +72,7 @@ pub enum PgtCommand {
     Start {
         /// Allows to change the prefix applied to the file name of the logs.
         #[bpaf(
-            env("PGLT_LOG_PREFIX_NAME"),
+            env("PGT_LOG_PREFIX_NAME"),
             long("log-prefix-name"),
             argument("STRING"),
             hide_usage,
@@ -83,7 +83,7 @@ pub enum PgtCommand {
 
         /// Allows to change the folder where logs are stored.
         #[bpaf(
-            env("PGLT_LOG_PATH"),
+            env("PGT_LOG_PATH"),
             long("log-path"),
             argument("PATH"),
             hide_usage,
@@ -91,8 +91,8 @@ pub enum PgtCommand {
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglt.jsonc`
-        #[bpaf(env("PGLT_LOG_PREFIX_NAME"), long("config-path"), argument("PATH"))]
+        /// or a custom directory path to find `postgrestools.jsonc`
+        #[bpaf(env("PGT_LOG_PREFIX_NAME"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
     },
 
@@ -109,7 +109,7 @@ pub enum PgtCommand {
     LspProxy {
         /// Allows to change the prefix applied to the file name of the logs.
         #[bpaf(
-            env("PGLT_LOG_PREFIX_NAME"),
+            env("PGT_LOG_PREFIX_NAME"),
             long("log-prefix-name"),
             argument("STRING"),
             hide_usage,
@@ -119,7 +119,7 @@ pub enum PgtCommand {
         log_prefix_name: String,
         /// Allows to change the folder where logs are stored.
         #[bpaf(
-            env("PGLT_LOG_PATH"),
+            env("PGT_LOG_PATH"),
             long("log-path"),
             argument("PATH"),
             hide_usage,
@@ -127,8 +127,8 @@ pub enum PgtCommand {
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglt.jsonc`
-        #[bpaf(env("PGLT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
+        /// or a custom directory path to find `postgrestools.jsonc`
+        #[bpaf(env("PGT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
         /// Bogus argument to make the command work with vscode-languageclient
         #[bpaf(long("stdio"), hide, hide_usage, switch)]
@@ -143,7 +143,7 @@ pub enum PgtCommand {
     RunServer {
         /// Allows to change the prefix applied to the file name of the logs.
         #[bpaf(
-            env("PGLT_LOG_PREFIX_NAME"),
+            env("PGT_LOG_PREFIX_NAME"),
             long("log-prefix-name"),
             argument("STRING"),
             hide_usage,
@@ -153,7 +153,7 @@ pub enum PgtCommand {
         log_prefix_name: String,
         /// Allows to change the folder where logs are stored.
         #[bpaf(
-            env("PGLT_LOG_PATH"),
+            env("PGT_LOG_PATH"),
             long("log-path"),
             argument("PATH"),
             hide_usage,
@@ -164,8 +164,8 @@ pub enum PgtCommand {
         #[bpaf(long("stop-on-disconnect"), hide_usage)]
         stop_on_disconnect: bool,
         /// Allows to set a custom file path to the configuration file,
-        /// or a custom directory path to find `pglt.jsonc`
-        #[bpaf(env("PGLT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
+        /// or a custom directory path to find `postgrestools.jsonc`
+        #[bpaf(env("PGT_CONFIG_PATH"), long("config-path"), argument("PATH"))]
         config_path: Option<PathBuf>,
     },
     #[bpaf(command("__print_socket"), hide)]
