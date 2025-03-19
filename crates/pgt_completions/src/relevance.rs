@@ -30,6 +30,7 @@ pub(crate) struct CompletionRelevance<'a> {
 
 impl CompletionRelevance<'_> {
     pub fn into_score(mut self, ctx: &CompletionContext) -> i32 {
+        self.check_is_user_defined();
         self.check_matches_schema(ctx);
         self.check_matches_query_input(ctx);
         self.check_if_catalog(ctx);
@@ -166,6 +167,20 @@ impl CompletionRelevance<'_> {
             .is_some_and(|tables| tables.contains(table_name))
         {
             self.score += 30;
+        }
+    }
+
+    fn check_is_user_defined(&mut self) {
+        let schema = match self.data {
+            CompletionRelevanceData::Column(c) => &c.schema_name,
+            CompletionRelevanceData::Function(f) => &f.schema,
+            CompletionRelevanceData::Table(t) => &t.schema,
+        };
+
+        let system_schemas = ["pg_catalog", "information_schema", "pg_toast"];
+
+        if system_schemas.contains(&schema.as_str()) {
+            self.score -= 10;
         }
     }
 }

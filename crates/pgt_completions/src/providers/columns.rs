@@ -110,4 +110,45 @@ mod tests {
             assert_eq!(description, q.description, "{}", q.message);
         }
     }
+
+    #[tokio::test]
+    async fn shows_multiple_columns_if_no_relation_specified() {
+        let setup = r#"
+            create schema private;
+
+            create table public.users (
+                id serial primary key,
+                name text
+            );
+
+            create table public.audio_books (
+                id serial primary key,
+                narrator text
+            );
+
+            create table private.audio_books (
+                id serial primary key,
+                narrator_id text
+            );
+        "#;
+
+        let case = TestCase {
+            query: format!(r#"select n{};"#, CURSOR_POS),
+            description: "",
+            label: "",
+            message: "",
+        };
+
+        let (tree, cache) = get_test_deps(setup, case.get_input_query()).await;
+        let params = get_test_params(&tree, &cache, case.get_input_query());
+        let mut results = complete(params);
+
+        let _ = results.items.split_off(3);
+
+        results.items.sort_by(|a, b| a.label.cmp(&b.label));
+
+        let labels: Vec<String> = results.items.into_iter().map(|c| c.label).collect();
+
+        assert_eq!(labels, vec!["name", "narrator", "narrator_id"]);
+    }
 }
