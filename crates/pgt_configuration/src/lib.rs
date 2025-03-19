@@ -84,10 +84,7 @@ impl PartialConfiguration {
     /// Returns the initial configuration.
     pub fn init() -> Self {
         Self {
-            // TODO: Update this once we have a static url
-            schema: Some(format!(
-                "https://supabase-community.github.io/postgres_lsp/schemas/{VERSION}/schema.json"
-            )),
+            schema: Some(format!("https://pgtools.dev/schemas/{VERSION}/schema.json")),
             files: Some(PartialFilesConfiguration {
                 ignore: Some(Default::default()),
                 ..Default::default()

@@ -41,7 +41,7 @@ After running the `init` command, you’ll have a `postgrestools.jsonc` file in 
 
 ```json
 {
-  "$schema": "https://supabase-community.github.io/postgres_lsp/schemas/0.0.0/schema.json",
+  "$schema": "https://pgtools.dev/schemas/0.0.0/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",

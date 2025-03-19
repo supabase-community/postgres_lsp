@@ -177,9 +177,7 @@ pub fn create_config(
             configuration.schema = schema_path.to_str().map(String::from);
         }
     } else {
-        configuration.schema = Some(format!(
-            "https://supabase-community.github.io/postgres_lsp/schemas/{VERSION}/schema.json"
-        ));
+        configuration.schema = Some(format!("https://pgtools.dev/schemas/{VERSION}/schema.json"));
     }
 
     let contents = serde_json::to_string_pretty(&configuration)
