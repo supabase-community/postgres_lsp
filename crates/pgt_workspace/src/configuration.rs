@@ -171,15 +171,13 @@ pub fn create_config(
 
     // we now check if pglt is installed inside `node_modules` and if so, we use the schema from there
     if VERSION == "0.0.0" {
-        let schema_path = Path::new("./node_modules/@pglt/pglt/schema.json");
+        let schema_path = Path::new("./node_modules/@postgrestools/postgrestools/schema.json");
         let options = OpenOptions::default().read(true);
         if fs.open_with_options(schema_path, options).is_ok() {
             configuration.schema = schema_path.to_str().map(String::from);
         }
     } else {
-        configuration.schema = Some(format!(
-            "https://supabase-community.github.io/postgres_lsp/schemas/{VERSION}/schema.json"
-        ));
+        configuration.schema = Some(format!("https://pgtools.dev/schemas/{VERSION}/schema.json"));
     }
 
     let contents = serde_json::to_string_pretty(&configuration)
