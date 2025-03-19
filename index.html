@@ -113,12 +113,12 @@
 <p>We will update this section once we have published the binaries.</p>
 </div>
 <h2 id="configuration">Configuration</h2>
-<p>We recommend that you create a <code>pglt.jsonc</code> configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the <code>pglt.jsonc</code> file, run the <code>init</code> command in the root folder of your project:</p>
+<p>We recommend that you create a <code>postgrestools.jsonc</code> configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the <code>postgrestools.jsonc</code> file, run the <code>init</code> command in the root folder of your project:</p>
 <pre><code class="language-sh">pglt init
 </code></pre>
-<p>After running the <code>init</code> command, you’ll have a <code>pglt.jsonc</code> file in your directory:</p>
+<p>After running the <code>init</code> command, you’ll have a <code>postgrestools.jsonc</code> file in your directory:</p>
 <pre><code class="language-json">{
-  &quot;$schema&quot;: &quot;https://supabase-community.github.io/postgres_lsp/schemas/0.0.0/schema.json&quot;,
+  &quot;$schema&quot;: &quot;https://pgtools.dev/schemas/0.0.0/schema.json&quot;,
   &quot;vcs&quot;: {
     &quot;enabled&quot;: false,
     &quot;clientKind&quot;: &quot;git&quot;,
@@ -219,5 +219,5 @@ pglt check myfile.sql
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-03-18 12:34:41.436777+00:00
+Build Date UTC : 2025-03-19 07:50:15.185195+00:00
 -->
