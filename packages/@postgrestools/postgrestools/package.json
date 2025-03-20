@@ -30,11 +30,11 @@
 		"provenance": true
 	},
 	"optionalDependencies": {
-		"postgrestools-x86_64-windows-msvc": "<placeholder>",
-		"postgrestools-aarch64-windows-msvc": "<placeholder>",
-		"postgrestools-x86_64-apple-darwin": "<placeholder>",
-		"postgrestools-aarch64-apple-darwin": "<placeholder>",
-		"postgrestools-x86_64-linux-gnu": "<placeholder>",
-		"postgrestools-aarch64-linux-gnu": "<placeholder>"
+		"@postgrestools/cli-x86_64-windows-msvc": "<placeholder>",
+		"@postgrestools/cli-aarch64-windows-msvc": "<placeholder>",
+		"@postgrestools/cli-x86_64-apple-darwin": "<placeholder>",
+		"@postgrestools/cli-aarch64-apple-darwin": "<placeholder>",
+		"@postgrestools/cli-x86_64-linux-gnu": "<placeholder>",
+		"@postgrestools/cli-aarch64-linux-gnu": "<placeholder>"
 	}
 }

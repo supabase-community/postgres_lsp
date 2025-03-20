@@ -80,7 +80,7 @@ async function writeManifest(packagePath, version) {
 
 	const nativePackages = SUPPORTED_PLATFORMS.flatMap((platform) =>
 		SUPPORTED_ARCHITECTURES.map((arch) => [
-			`@postgrestools/${getName(platform, arch)}`,
+			getPackageName(platform, arch),
 			version,
 		]),
 	);
@@ -217,7 +217,7 @@ function getBuildName(platform, arch) {
 function getPackageName(platform, arch) {
 	// trim the "unknown" from linux and the "pc" from windows
 	const platformName = platform.split("-").slice(-2).join("-");
-	return `postgrestools-${arch}-${platformName}`;
+	return `@postgrestools/cli-${arch}-${platformName}`;
 }
 
 function getOs(platform) {

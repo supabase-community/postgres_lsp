@@ -7,16 +7,16 @@ const { platform, arch, env } = process;
  */
 const PLATFORMS = {
   win32: {
-    x64: "postgrestools-x86_64-windows-msvc/postgrestools.exe",
-    arm64: "postgrestools-aarch64-windows-msvc/postgrestools.exe",
+    x64: "@postgrestools/cli-x86_64-windows-msvc/postgrestools.exe",
+    arm64: "@postgrestools/cli-aarch64-windows-msvc/postgrestools.exe",
   },
   darwin: {
-    x64: "postgrestools-x86_64-apple-darwin/postgrestools",
-    arm64: "postgrestools-aarch64-apple-darwin/postgrestools",
+    x64: "@postgrestools/cli-x86_64-apple-darwin/postgrestools",
+    arm64: "@postgrestools/cli-aarch64-apple-darwin/postgrestools",
   },
   linux: {
-    x64: "postgrestools-x86_64-linux-gnu/postgrestools",
-    arm64: "postgrestools-aarch64-linux-gnu/postgrestools",
+    x64: "@postgrestools/cli-x86_64-linux-gnu/postgrestools",
+    arm64: "@postgrestools/cli-aarch64-linux-gnu/postgrestools",
   },
 };
 
