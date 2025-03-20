@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="A collection of language tools and a Language Server Protocol (LSP) implementation for Postgres, focusing on developer experience and reliable SQL tooling." /><link rel="canonical" href="https://pglt.github.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="A collection of language tools and a Language Server Protocol (LSP) implementation for Postgres, focusing on developer experience and reliable SQL tooling." /><link rel="canonical" href="https://pgtools.dev/" />
       <link rel="shortcut icon" href="img/favicon.ico" />
     <title>Postgres Language Tools</title>
     <link rel="stylesheet" href="css/theme.css" />
@@ -114,7 +114,7 @@
 </div>
 <h2 id="configuration">Configuration</h2>
 <p>We recommend that you create a <code>postgrestools.jsonc</code> configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the <code>postgrestools.jsonc</code> file, run the <code>init</code> command in the root folder of your project:</p>
-<pre><code class="language-sh">pglt init
+<pre><code class="language-sh">postgrestools init
 </code></pre>
 <p>After running the <code>init</code> command, you’ll have a <code>postgrestools.jsonc</code> file in your directory:</p>
 <pre><code class="language-json">{
@@ -154,7 +154,7 @@ You can use the language tools either via CLI or a Language Server.
 The CLI exposes a simple `check` command that will run all checks on the given files or paths.
 
 ```sh
-pglt check myfile.sql
+postgrestools check myfile.sql
 </code></pre>
 <p>Make sure to check out the other options. We will provide guides for specific use cases like linting migration files soon.</p>
 <h2 id="install-an-editor-plugin">Install an Editor Plugin</h2>
@@ -219,5 +219,5 @@ pglt check myfile.sql
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-03-19 07:50:15.185195+00:00
+Build Date UTC : 2025-03-20 20:01:36.497368+00:00
 -->
