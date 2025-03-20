@@ -211,7 +211,7 @@ function getBinarySource(platform, arch, os) {
 }
 
 function getBuildName(platform, arch) {
-	return `pgt_${arch}-${platform}`;
+	return `postgrestools_${arch}-${platform}`;
 }
 
 function getPackageName(platform, arch) {
