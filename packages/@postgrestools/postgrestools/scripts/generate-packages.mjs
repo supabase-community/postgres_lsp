@@ -80,7 +80,7 @@ async function writeManifest(packagePath, version) {
 
 	const nativePackages = SUPPORTED_PLATFORMS.flatMap((platform) =>
 		SUPPORTED_ARCHITECTURES.map((arch) => [
-			`@postgrestools/${getName(platform, arch)}`,
+			`@postgrestools/${getPackageName(platform, arch)}`,
 			version,
 		]),
 	);
@@ -211,13 +211,7 @@ function getBinarySource(platform, arch, os) {
 }
 
 function getBuildName(platform, arch) {
-	return `pgt_${arch}-${platform}`;
-}
-
-function getPackageName(platform, arch) {
-	// trim the "unknown" from linux and the "pc" from windows
-	const platformName = platform.split("-").slice(-2).join("-");
-	return `postgrestools-${arch}-${platformName}`;
+	return `postgrestools_${arch}-${platform}`;
 }
 
 function getOs(platform) {
@@ -226,6 +220,12 @@ function getOs(platform) {
 
 function getVersion(releaseTag, isPrerelease) {
 	return releaseTag + (isPrerelease ? "-rc" : "");
+}
+
+function getPackageName(platform, arch, prefix = "cli") {
+	// trim the "unknown" from linux and the "pc" from windows
+	const platformName = platform.split("-").slice(-2).join("-");
+	return `${prefix}-${arch}-${platformName}`;
 }
 
 (async function main() {
