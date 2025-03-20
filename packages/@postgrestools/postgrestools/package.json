@@ -1,40 +1,43 @@
 {
-	"name": "postgrestools",
-	"version": "<placeholder>",
-	"bin": {
-		"postgrestools": "bin/postgrestools"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/supabase-community/postgres_lsp.git",
-		"directory": "packages/@postgrestools/postgrestools"
-	},
-	"author": "Supabase Community",
-	"contributors": [
-		{
-			"name": "Philipp Steinrötter",
-			"url": "https://github.com/psteinroe"
-		},
-		{
-			"name": "Julian Domke",
-			"url": "https://github.com/juleswritescode"
-		}
-	],
-	"license": "MIT or Apache-2.0",
-	"description": "A collection of language tools and a Language Server Protocol (LSP) implementation for Postgres, focusing on developer experience and reliable SQL tooling.",
-	"files": ["bin/postgrestools", "schema.json"],
-	"engines": {
-		"node": ">=20"
-	},
-	"publishConfig": {
-		"provenance": true
-	},
-	"optionalDependencies": {
-		"postgrestools-x86_64-windows-msvc": "<placeholder>",
-		"postgrestools-aarch64-windows-msvc": "<placeholder>",
-		"postgrestools-x86_64-apple-darwin": "<placeholder>",
-		"postgrestools-aarch64-apple-darwin": "<placeholder>",
-		"postgrestools-x86_64-linux-gnu": "<placeholder>",
-		"postgrestools-aarch64-linux-gnu": "<placeholder>"
-	}
+  "name": "@postgrestools/postgrestools",
+  "version": "<placeholder>",
+  "bin": {
+    "postgrestools": "bin/postgrestools"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/supabase-community/postgres_lsp.git",
+    "directory": "packages/@postgrestools/postgrestools"
+  },
+  "author": "Supabase Community",
+  "contributors": [
+    {
+      "name": "Philipp Steinrötter",
+      "url": "https://github.com/psteinroe"
+    },
+    {
+      "name": "Julian Domke",
+      "url": "https://github.com/juleswritescode"
+    }
+  ],
+  "license": "MIT or Apache-2.0",
+  "description": "A collection of language tools and a Language Server Protocol (LSP) implementation for Postgres, focusing on developer experience and reliable SQL tooling.",
+  "files": [
+    "bin/postgrestools",
+    "schema.json"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "optionalDependencies": {
+    "postgrestools-x86_64-windows-msvc": "<placeholder>",
+    "postgrestools-aarch64-windows-msvc": "<placeholder>",
+    "postgrestools-x86_64-apple-darwin": "<placeholder>",
+    "postgrestools-aarch64-apple-darwin": "<placeholder>",
+    "postgrestools-x86_64-linux-gnu": "<placeholder>",
+    "postgrestools-aarch64-linux-gnu": "<placeholder>"
+  }
 }
