@@ -2,7 +2,7 @@
 use super::{BoxedTraversal, ErrorKind, File, FileSystemDiagnostic};
 use crate::fs::OpenOptions;
 use crate::{
-    FileSystem, PgLTPath,
+    FileSystem, PgTPath,
     fs::{TraversalContext, TraversalScope},
 };
 use pgt_diagnostics::{DiagnosticExt, Error, Severity, adapters::IoError};
@@ -190,7 +190,7 @@ impl<'scope> TraversalScope<'scope> for OsTraversalScope<'scope> {
 
     fn handle(&self, context: &'scope dyn TraversalContext, path: PathBuf) {
         self.scope.spawn(move |_| {
-            context.handle_path(PgLTPath::new(path));
+            context.handle_path(PgTPath::new(path));
         });
     }
 }
@@ -268,7 +268,7 @@ fn handle_any_file<'scope>(
     }
 
     if file_type.is_symlink() {
-        if !ctx.can_handle(&PgLTPath::new(path.clone())) {
+        if !ctx.can_handle(&PgTPath::new(path.clone())) {
             return;
         }
         let Ok((target_path, target_file_type)) = expand_symbolic_link(path.clone(), ctx) else {
@@ -299,7 +299,7 @@ fn handle_any_file<'scope>(
         if let Some(file_name) = path.file_name() {
             let new_origin_path = old_origin_path.join(file_name);
             origin_path = Some(new_origin_path.clone());
-            PgLTPath::new(new_origin_path)
+            PgTPath::new(new_origin_path)
         } else {
             ctx.push_diagnostic(Error::from(FileSystemDiagnostic {
                 path: path.to_string_lossy().to_string(),
@@ -309,7 +309,7 @@ fn handle_any_file<'scope>(
             return;
         }
     } else {
-        PgLTPath::new(&path)
+        PgTPath::new(&path)
     };
 
     // Performing this check here let's us skip unsupported
@@ -330,7 +330,7 @@ fn handle_any_file<'scope>(
 
     if file_type.is_file() {
         scope.spawn(move |_| {
-            ctx.store_path(PgLTPath::new(path));
+            ctx.store_path(PgTPath::new(path));
         });
         return;
     }

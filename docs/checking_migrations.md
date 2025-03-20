@@ -5,7 +5,7 @@ Postgres Language Tools comes with a `check` command that can be integrated into
 To run it, simply point at your migrations directory.
 
 ```sh
-pglt check supabase/migrations
+postgrestools check supabase/migrations
 ```
 
 When you are setting it up in an existing project, you might want to ignore all migrations that are already applied. To do so, add `migrationsDir` and `after` to your `postgrestools.jsonc` file
@@ -23,7 +23,7 @@ When you are setting it up in an existing project, you might want to ignore all 
 Alternatively, pass them directly.
 
 ```
-pglt check supabase/migrations --migrations-dir="supabase/migrations" --after=1740868021
+postgrestools check supabase/migrations --migrations-dir="supabase/migrations" --after=1740868021
 ```
 
 This will only check migrations after the specified timestamp.

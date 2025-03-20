@@ -267,11 +267,11 @@ impl Server {
         .await
     }
 
-    /// Basic implementation of the `pglt/shutdown` request for tests
+    /// Basic implementation of the `pgt/shutdown` request for tests
     async fn pgt_shutdown(&mut self) -> Result<()> {
-        self.request::<_, ()>("pglt/shutdown", "_pgt_shutdown", ())
+        self.request::<_, ()>("pgt/shutdown", "_pgt_shutdown", ())
             .await?
-            .context("pglt/shutdown returned None")?;
+            .context("pgt/shutdown returned None")?;
         Ok(())
     }
 }
@@ -441,7 +441,7 @@ async fn server_shutdown() -> Result<()> {
     let cancellation = factory.cancellation();
     let cancellation = cancellation.notified();
 
-    // this is called when `pglt stop` is run by the user
+    // this is called when `pgt stop` is run by the user
     server.pgt_shutdown().await?;
 
     cancellation.await;

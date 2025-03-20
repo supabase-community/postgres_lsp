@@ -85,15 +85,15 @@ impl From<FileKind> for FileKinds {
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-pub struct PgLTPath {
+pub struct PgTPath {
     path: PathBuf,
-    /// Determines the kind of the file inside PgLT. Some files are considered as configuration files, others as manifest files, and others as files to handle
+    /// Determines the kind of the file inside Postgres Tools. Some files are considered as configuration files, others as manifest files, and others as files to handle
     kind: FileKinds,
     /// Whether this path (usually a file) was fixed as a result of a format/lint/check command with the `--write` filag.
     was_written: bool,
 }
 
-impl Deref for PgLTPath {
+impl Deref for PgTPath {
     type Target = PathBuf;
 
     fn deref(&self) -> &Self::Target {
@@ -101,13 +101,13 @@ impl Deref for PgLTPath {
     }
 }
 
-impl PartialOrd for PgLTPath {
+impl PartialOrd for PgTPath {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl Ord for PgLTPath {
+impl Ord for PgTPath {
     fn cmp(&self, other: &Self) -> Ordering {
         match self.kind.cmp(&other.kind) {
             Ordering::Equal => self.path.cmp(&other.path),
@@ -116,7 +116,7 @@ impl Ord for PgLTPath {
     }
 }
 
-impl PgLTPath {
+impl PgTPath {
     pub fn new(path_to_file: impl Into<PathBuf>) -> Self {
         let path = path_to_file.into();
         let kind = path.file_name().map(Self::priority).unwrap_or_default();
@@ -137,7 +137,7 @@ impl PgLTPath {
         }
     }
 
-    /// Creates a new [PgLTPath], marked as fixed
+    /// Creates a new [PgTPath], marked as fixed
     pub fn to_written(&self) -> Self {
         Self {
             path: self.path.clone(),
@@ -160,7 +160,7 @@ impl PgLTPath {
     /// Returns the contents of a file, if it exists
     ///
     /// ## Error
-    /// If PgLT doesn't have permissions to read the file
+    /// If Postgres Tools doesn't have permissions to read the file
     pub fn get_buffer_from_file(&mut self) -> String {
         // we assume we have permissions
         read_to_string(&self.path).expect("cannot read the file to format")

@@ -24,7 +24,7 @@ pub(crate) mod version;
 
 #[derive(Debug, Clone, Bpaf)]
 #[bpaf(options, version(VERSION))]
-/// PgLT official CLI. Use it to check the health of your project or run it to check single files.
+/// Postgres Tools official CLI. Use it to check the health of your project or run it to check single files.
 pub enum PgtCommand {
     /// Shows the version information and quit.
     #[bpaf(command)]
@@ -87,7 +87,7 @@ pub enum PgtCommand {
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pgt_fs::ensure_cache_dir().join("pglt-logs")),
+            fallback(pgt_fs::ensure_cache_dir().join("pgt-logs")),
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
@@ -123,7 +123,7 @@ pub enum PgtCommand {
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pgt_fs::ensure_cache_dir().join("pglt-logs")),
+            fallback(pgt_fs::ensure_cache_dir().join("pgt-logs")),
         )]
         log_path: PathBuf,
         /// Allows to set a custom file path to the configuration file,
@@ -157,7 +157,7 @@ pub enum PgtCommand {
             long("log-path"),
             argument("PATH"),
             hide_usage,
-            fallback(pgt_fs::ensure_cache_dir().join("pglt-logs")),
+            fallback(pgt_fs::ensure_cache_dir().join("pgt-logs")),
         )]
         log_path: PathBuf,
 
@@ -197,7 +197,7 @@ impl PgtCommand {
                 }
                 // We want force colors in CI, to give e better UX experience
                 // Unless users explicitly set the colors flag
-                // if matches!(self, PgLTCommand::Ci { .. }) && cli_options.colors.is_none() {
+                // if matches!(self, Postgres ToolsCommand::Ci { .. }) && cli_options.colors.is_none() {
                 //     return Some(&ColorsArg::Force);
                 // }
                 // Normal behaviors

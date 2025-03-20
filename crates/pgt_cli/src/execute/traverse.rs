@@ -7,7 +7,7 @@ use crate::{CliDiagnostic, CliSession};
 use crossbeam::channel::{Receiver, Sender, unbounded};
 use pgt_diagnostics::DiagnosticTags;
 use pgt_diagnostics::{DiagnosticExt, Error, Resource, Severity};
-use pgt_fs::{FileSystem, PathInterner, PgLTPath};
+use pgt_fs::{FileSystem, PathInterner, PgTPath};
 use pgt_fs::{TraversalContext, TraversalScope};
 use pgt_workspace::dome::Dome;
 use pgt_workspace::workspace::IsPathIgnoredParams;
@@ -31,7 +31,7 @@ use std::{
 
 pub(crate) struct TraverseResult {
     pub(crate) summary: TraversalSummary,
-    pub(crate) evaluated_paths: BTreeSet<PgLTPath>,
+    pub(crate) evaluated_paths: BTreeSet<PgTPath>,
     pub(crate) diagnostics: Vec<Error>,
 }
 
@@ -86,7 +86,7 @@ pub(crate) fn traverse(
 
     let (duration, evaluated_paths, diagnostics) = thread::scope(|s| {
         let handler = thread::Builder::new()
-            .name(String::from("pglt::console"))
+            .name(String::from("pgt::console"))
             .spawn_scoped(s, || printer.run(receiver, recv_files))
             .expect("failed to spawn console thread");
 
@@ -148,7 +148,7 @@ fn init_thread_pool() {
     static INIT_ONCE: Once = Once::new();
     INIT_ONCE.call_once(|| {
         rayon::ThreadPoolBuilder::new()
-            .thread_name(|index| format!("pglt::worker_{index}"))
+            .thread_name(|index| format!("pgt::worker_{index}"))
             .build_global()
             .expect("failed to initialize the global thread pool");
     });
@@ -160,7 +160,7 @@ fn traverse_inputs(
     fs: &dyn FileSystem,
     inputs: Vec<OsString>,
     ctx: &TraversalOptions,
-) -> (Duration, BTreeSet<PgLTPath>) {
+) -> (Duration, BTreeSet<PgTPath>) {
     let start = Instant::now();
     fs.traversal(Box::new(move |scope: &dyn TraversalScope| {
         for input in inputs {
@@ -412,11 +412,11 @@ pub(crate) struct TraversalOptions<'ctx, 'app> {
     pub(crate) remaining_diagnostics: &'ctx AtomicU32,
 
     /// List of paths that should be processed
-    pub(crate) evaluated_paths: RwLock<BTreeSet<PgLTPath>>,
+    pub(crate) evaluated_paths: RwLock<BTreeSet<PgTPath>>,
 }
 
 impl TraversalOptions<'_, '_> {
-    pub(crate) fn increment_changed(&self, path: &PgLTPath) {
+    pub(crate) fn increment_changed(&self, path: &PgTPath) {
         self.changed.fetch_add(1, Ordering::Relaxed);
         self.evaluated_paths
             .write()
@@ -436,7 +436,7 @@ impl TraversalOptions<'_, '_> {
         self.messages.send(msg.into()).ok();
     }
 
-    pub(crate) fn protected_file(&self, pgt_path: &PgLTPath) {
+    pub(crate) fn protected_file(&self, pgt_path: &PgTPath) {
         self.push_diagnostic(WorkspaceError::protected_file(pgt_path.display().to_string()).into())
     }
 }
@@ -446,7 +446,7 @@ impl TraversalContext for TraversalOptions<'_, '_> {
         &self.interner
     }
 
-    fn evaluated_paths(&self) -> BTreeSet<PgLTPath> {
+    fn evaluated_paths(&self) -> BTreeSet<PgTPath> {
         self.evaluated_paths.read().unwrap().clone()
     }
 
@@ -454,7 +454,7 @@ impl TraversalContext for TraversalOptions<'_, '_> {
         self.push_message(error);
     }
 
-    fn can_handle(&self, pgt_path: &PgLTPath) -> bool {
+    fn can_handle(&self, pgt_path: &PgTPath) -> bool {
         let path = pgt_path.as_path();
 
         let is_valid_file = self.fs.path_is_file(path)
@@ -492,22 +492,22 @@ impl TraversalContext for TraversalOptions<'_, '_> {
         }
     }
 
-    fn handle_path(&self, path: PgLTPath) {
+    fn handle_path(&self, path: PgTPath) {
         handle_file(self, &path)
     }
 
-    fn store_path(&self, path: PgLTPath) {
+    fn store_path(&self, path: PgTPath) {
         self.evaluated_paths
             .write()
             .unwrap()
-            .insert(PgLTPath::new(path.as_path()));
+            .insert(PgTPath::new(path.as_path()));
     }
 }
 
 /// This function wraps the [process_file] function implementing the traversal
 /// in a [catch_unwind] block and emit diagnostics in case of error (either the
 /// traversal function returns Err or panics)
-fn handle_file(ctx: &TraversalOptions, path: &PgLTPath) {
+fn handle_file(ctx: &TraversalOptions, path: &PgTPath) {
     match catch_unwind(move || process_file(ctx, path)) {
         Ok(Ok(FileStatus::Changed)) => {
             ctx.increment_changed(path);

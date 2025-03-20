@@ -70,34 +70,34 @@ impl ActionCategory {
         match self {
             ActionCategory::QuickFix(tag) => {
                 if tag.is_empty() {
-                    Cow::Borrowed("quickfix.pglt")
+                    Cow::Borrowed("quickfix.pgt")
                 } else {
-                    Cow::Owned(format!("quickfix.pglt.{tag}"))
+                    Cow::Owned(format!("quickfix.pgt.{tag}"))
                 }
             }
 
-            ActionCategory::Refactor(RefactorKind::None) => Cow::Borrowed("refactor.pglt"),
+            ActionCategory::Refactor(RefactorKind::None) => Cow::Borrowed("refactor.pgt"),
             ActionCategory::Refactor(RefactorKind::Extract) => {
-                Cow::Borrowed("refactor.extract.pglt")
+                Cow::Borrowed("refactor.extract.pgt")
             }
-            ActionCategory::Refactor(RefactorKind::Inline) => Cow::Borrowed("refactor.inline.pglt"),
+            ActionCategory::Refactor(RefactorKind::Inline) => Cow::Borrowed("refactor.inline.pgt"),
             ActionCategory::Refactor(RefactorKind::Rewrite) => {
-                Cow::Borrowed("refactor.rewrite.pglt")
+                Cow::Borrowed("refactor.rewrite.pgt")
             }
             ActionCategory::Refactor(RefactorKind::Other(tag)) => {
-                Cow::Owned(format!("refactor.{tag}.pglt"))
+                Cow::Owned(format!("refactor.{tag}.pgt"))
             }
 
-            ActionCategory::Source(SourceActionKind::None) => Cow::Borrowed("source.pglt"),
-            ActionCategory::Source(SourceActionKind::FixAll) => Cow::Borrowed("source.fixAll.pglt"),
+            ActionCategory::Source(SourceActionKind::None) => Cow::Borrowed("source.pgt"),
+            ActionCategory::Source(SourceActionKind::FixAll) => Cow::Borrowed("source.fixAll.pgt"),
             ActionCategory::Source(SourceActionKind::OrganizeImports) => {
-                Cow::Borrowed("source.organizeImports.pglt")
+                Cow::Borrowed("source.organizeImports.pgt")
             }
             ActionCategory::Source(SourceActionKind::Other(tag)) => {
-                Cow::Owned(format!("source.{tag}.pglt"))
+                Cow::Owned(format!("source.{tag}.pgt"))
             }
 
-            ActionCategory::Other(tag) => Cow::Owned(format!("{tag}.pglt")),
+            ActionCategory::Other(tag) => Cow::Owned(format!("{tag}.pgt")),
         }
     }
 }

@@ -1,11 +1,11 @@
 // Generated file, do not edit by hand, see `xtask/codegen`
 import type { Transport } from "./transport";
 export interface IsPathIgnoredParams {
-	pgt_path: PgLTPath;
+	pgt_path: PgTPath;
 }
-export interface PgLTPath {
+export interface PgTPath {
 	/**
-	 * Determines the kind of the file inside PostgresTools. Some files are considered as configuration files, others as manifest files, and others as files to handle
+	 * Determines the kind of the file inside Postgres Tools. Some files are considered as configuration files, others as manifest files, and others as files to handle
 	 */
 	kind: FileKind;
 	path: string;
@@ -20,13 +20,13 @@ export type FileKind = FileKind2[];
  */
 export type FileKind2 = "Config" | "Ignore" | "Inspectable" | "Handleable";
 export interface GetFileContentParams {
-	path: PgLTPath;
+	path: PgTPath;
 }
 export interface PullDiagnosticsParams {
 	categories: RuleCategories;
 	max_diagnostics: number;
 	only: RuleCode[];
-	path: PgLTPath;
+	path: PgTPath;
 	skip: RuleCode[];
 }
 export type RuleCategories = RuleCategory[];
@@ -173,7 +173,7 @@ export interface GetCompletionsParams {
 	/**
 	 * The File for which a completion is requested.
 	 */
-	path: PgLTPath;
+	path: PgTPath;
 	/**
 	 * The Cursor position in the file for which a completion is requested.
 	 */
@@ -337,7 +337,7 @@ export interface Rules {
 	 */
 	all?: boolean;
 	/**
-	 * It enables the lint rules recommended by PostgresTools. `true` by default.
+	 * It enables the lint rules recommended by Postgres Tools. `true` by default.
 	 */
 	recommended?: boolean;
 	safety?: Safety;
@@ -388,12 +388,12 @@ export interface RuleWithOptions_for_Null {
 }
 export interface OpenFileParams {
 	content: string;
-	path: PgLTPath;
+	path: PgTPath;
 	version: number;
 }
 export interface ChangeFileParams {
 	changes: ChangeParams[];
-	path: PgLTPath;
+	path: PgTPath;
 	version: number;
 }
 export interface ChangeParams {
@@ -404,7 +404,7 @@ export interface ChangeParams {
 	text: string;
 }
 export interface CloseFileParams {
-	path: PgLTPath;
+	path: PgTPath;
 }
 export type Configuration = PartialConfiguration;
 export interface Workspace {
@@ -423,28 +423,28 @@ export interface Workspace {
 export function createWorkspace(transport: Transport): Workspace {
 	return {
 		isPathIgnored(params) {
-			return transport.request("pglt/is_path_ignored", params);
+			return transport.request("pgt/is_path_ignored", params);
 		},
 		getFileContent(params) {
-			return transport.request("pglt/get_file_content", params);
+			return transport.request("pgt/get_file_content", params);
 		},
 		pullDiagnostics(params) {
-			return transport.request("pglt/pull_diagnostics", params);
+			return transport.request("pgt/pull_diagnostics", params);
 		},
 		getCompletions(params) {
-			return transport.request("pglt/get_completions", params);
+			return transport.request("pgt/get_completions", params);
 		},
 		updateSettings(params) {
-			return transport.request("pglt/update_settings", params);
+			return transport.request("pgt/update_settings", params);
 		},
 		openFile(params) {
-			return transport.request("pglt/open_file", params);
+			return transport.request("pgt/open_file", params);
 		},
 		changeFile(params) {
-			return transport.request("pglt/change_file", params);
+			return transport.request("pgt/change_file", params);
 		},
 		closeFile(params) {
-			return transport.request("pglt/close_file", params);
+			return transport.request("pgt/close_file", params);
 		},
 		destroy() {
 			transport.destroy();

@@ -14,7 +14,8 @@ use pgt_workspace::workspace_types::{generate_type, methods, ModuleQueue};
 use xtask::{project_root, Mode, Result};
 
 pub fn generate_bindings(mode: Mode) -> Result<()> {
-    let bindings_path = project_root().join("packages/@pglt/backend-jsonrpc/src/workspace.ts");
+    let bindings_path =
+        project_root().join("packages/@postgrestools/backend-jsonrpc/src/workspace.ts");
     let methods = methods();
 
     let mut declarations = Vec::new();
@@ -125,7 +126,7 @@ pub fn generate_bindings(mode: Mode) -> Result<()> {
                                             [
                                                 AnyJsCallArgument::AnyJsExpression(
                                                     AnyJsExpression::AnyJsLiteralExpression(
-                                                        AnyJsLiteralExpression::JsStringLiteralExpression(make::js_string_literal_expression(make::js_string_literal(&format!("pglt/{}", method.name)))),
+                                                        AnyJsLiteralExpression::JsStringLiteralExpression(make::js_string_literal_expression(make::js_string_literal(&format!("pgt/{}", method.name)))),
                                                     ),
                                                 ),
                                                 AnyJsCallArgument::AnyJsExpression(

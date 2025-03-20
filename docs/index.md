@@ -32,7 +32,7 @@ Our current focus is on refining and enhancing these core features while buildin
 We recommend that you create a `postgrestools.jsonc` configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the `postgrestools.jsonc` file, run the `init` command in the root folder of your project:
 
 ```sh
-pglt init
+postgrestools init
 ```
 
 After running the `init` command, you’ll have a `postgrestools.jsonc` file in your directory:
@@ -77,7 +77,7 @@ You can use the language tools either via CLI or a Language Server.
 The CLI exposes a simple `check` command that will run all checks on the given files or paths.
 
 ```sh
-pglt check myfile.sql
+postgrestools check myfile.sql
 ```
 
 Make sure to check out the other options. We will provide guides for specific use cases like linting migration files soon.
