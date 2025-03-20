@@ -80,7 +80,7 @@ async function writeManifest(packagePath, version) {
 
 	const nativePackages = SUPPORTED_PLATFORMS.flatMap((platform) =>
 		SUPPORTED_ARCHITECTURES.map((arch) => [
-			`@postgrestools/${getName(platform, arch)}`,
+			getPackageName(platform, arch),
 			version,
 		]),
 	);
