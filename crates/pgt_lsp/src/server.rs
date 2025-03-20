@@ -278,9 +278,9 @@ type Sessions = Arc<Mutex<FxHashMap<SessionKey, SessionHandle>>>;
 macro_rules! workspace_method {
     ( $builder:ident, $method:ident ) => {
         $builder = $builder.custom_method(
-            concat!("pglt/", stringify!($method)),
+            concat!("pgt/", stringify!($method)),
             |server: &LSPServer, params| {
-                let span = tracing::trace_span!(concat!("pglt/", stringify!($method)), params = ?params).or_current();
+                let span = tracing::trace_span!(concat!("pgt/", stringify!($method)), params = ?params).or_current();
                 tracing::info!("Received request: {}", stringify!($method));
 
                 let workspace = server.session.workspace.clone();
@@ -389,12 +389,15 @@ impl ServerFactory {
         });
 
         // "shutdown" is not part of the Workspace API
-        builder = builder.custom_method("pglt/shutdown", |server: &LSPServer, (): ()| {
+        builder = builder.custom_method("pgt/shutdown", |server: &LSPServer, (): ()| {
             info!("Sending shutdown signal");
             server.session.broadcast_shutdown();
             ready(Ok(Some(())))
         });
 
+        workspace_method!(builder, is_path_ignored);
+        workspace_method!(builder, update_settings);
+        workspace_method!(builder, get_file_content);
         workspace_method!(builder, open_file);
         workspace_method!(builder, change_file);
         workspace_method!(builder, close_file);

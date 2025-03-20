@@ -5,7 +5,7 @@ pub(crate) mod terminal;
 
 use crate::execute::Execution;
 use pgt_diagnostics::{Error, Severity};
-use pgt_fs::PgLTPath;
+use pgt_fs::PgTPath;
 use serde::Serialize;
 use std::collections::BTreeSet;
 use std::io;
@@ -49,7 +49,7 @@ pub trait ReporterVisitor {
     ) -> io::Result<()>;
 
     /// Writes the paths that were handled during a run.
-    fn report_handled_paths(&mut self, evaluated_paths: BTreeSet<PgLTPath>) -> io::Result<()> {
+    fn report_handled_paths(&mut self, evaluated_paths: BTreeSet<PgTPath>) -> io::Result<()> {
         let _ = evaluated_paths;
         Ok(())
     }

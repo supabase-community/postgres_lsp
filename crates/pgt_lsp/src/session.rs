@@ -7,7 +7,7 @@ use futures::stream::FuturesUnordered;
 use pgt_analyse::RuleCategoriesBuilder;
 use pgt_configuration::ConfigurationPathHint;
 use pgt_diagnostics::{DiagnosticExt, Error};
-use pgt_fs::{FileSystem, PgLTPath};
+use pgt_fs::{FileSystem, PgTPath};
 use pgt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
 use pgt_workspace::Workspace;
 use pgt_workspace::configuration::{LoadedConfiguration, load_configuration};
@@ -342,7 +342,7 @@ impl Session {
         self.documents.write().unwrap().remove(url);
     }
 
-    pub(crate) fn file_path(&self, url: &lsp_types::Url) -> Result<PgLTPath> {
+    pub(crate) fn file_path(&self, url: &lsp_types::Url) -> Result<PgTPath> {
         let path_to_file = match url.to_file_path() {
             Err(_) => {
                 // If we can't create a path, it's probably because the file doesn't exist.
@@ -352,7 +352,7 @@ impl Session {
             Ok(path) => path,
         };
 
-        Ok(PgLTPath::new(path_to_file))
+        Ok(PgTPath::new(path_to_file))
     }
 
     /// True if the client supports dynamic registration of "workspace/didChangeConfiguration" requests

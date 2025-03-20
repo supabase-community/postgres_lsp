@@ -1,12 +1,12 @@
 use pgt_diagnostics::{Diagnostic, DiagnosticExt, Severity, serde::Diagnostic as SDiagnostic};
-use pgt_fs::PgLTPath;
+use pgt_fs::PgTPath;
 use pgt_text_size::{TextRange, TextSize};
 
 /// Global unique identifier for a statement
 #[derive(Debug, Hash, Eq, PartialEq, Clone)]
 pub(crate) struct Statement {
     /// Path of the document
-    pub(crate) path: PgLTPath,
+    pub(crate) path: PgTPath,
     /// Unique id within the document
     pub(crate) id: StatementId,
 }
@@ -16,7 +16,7 @@ pub type StatementId = usize;
 type StatementPos = (StatementId, TextRange);
 
 pub(crate) struct Document {
-    pub(crate) path: PgLTPath,
+    pub(crate) path: PgTPath,
     pub(crate) content: String,
     pub(crate) version: i32,
 
@@ -28,7 +28,7 @@ pub(crate) struct Document {
 }
 
 impl Document {
-    pub(crate) fn new(path: PgLTPath, content: String, version: i32) -> Self {
+    pub(crate) fn new(path: PgTPath, content: String, version: i32) -> Self {
         let mut id_generator = IdGenerator::new();
 
         let (ranges, diagnostics) = split_with_diagnostics(&content, None);

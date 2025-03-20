@@ -6,34 +6,34 @@ use std::env;
 use std::ops::Deref;
 use std::sync::{LazyLock, OnceLock};
 
-/// Returns `true` if this is an unstable build of PgLT
+/// Returns `true` if this is an unstable build of Postgres Tools
 pub fn is_unstable() -> bool {
     PGT_VERSION.deref().is_none()
 }
 
-/// The internal version of PgLT. This is usually supplied during the CI build
+/// The internal version of Postgres Tools. This is usually supplied during the CI build
 pub static PGT_VERSION: LazyLock<Option<&str>> = LazyLock::new(|| option_env!("PGT_VERSION"));
 
-pub struct PgLTEnv {
-    pub pgt_log_path: PgLTEnvVariable,
-    pub pgt_log_prefix: PgLTEnvVariable,
-    pub pgt_config_path: PgLTEnvVariable,
+pub struct PgTEnv {
+    pub pgt_log_path: PgTEnvVariable,
+    pub pgt_log_prefix: PgTEnvVariable,
+    pub pgt_config_path: PgTEnvVariable,
 }
 
-pub static PGT_ENV: OnceLock<PgLTEnv> = OnceLock::new();
+pub static PGT_ENV: OnceLock<PgTEnv> = OnceLock::new();
 
-impl PgLTEnv {
+impl PgTEnv {
     fn new() -> Self {
         Self {
-            pgt_log_path: PgLTEnvVariable::new(
+            pgt_log_path: PgTEnvVariable::new(
                 "PGT_LOG_PATH",
                 "The directory where the Daemon logs will be saved.",
             ),
-            pgt_log_prefix: PgLTEnvVariable::new(
+            pgt_log_prefix: PgTEnvVariable::new(
                 "PGT_LOG_PREFIX_NAME",
                 "A prefix that's added to the name of the log. Default: `server.log.`",
             ),
-            pgt_config_path: PgLTEnvVariable::new(
+            pgt_config_path: PgTEnvVariable::new(
                 "PGT_CONFIG_PATH",
                 "A path to the configuration file",
             ),
@@ -41,7 +41,7 @@ impl PgLTEnv {
     }
 }
 
-pub struct PgLTEnvVariable {
+pub struct PgTEnvVariable {
     /// The name of the environment variable
     name: &'static str,
     /// The description of the variable.
@@ -49,7 +49,7 @@ pub struct PgLTEnvVariable {
     description: &'static str,
 }
 
-impl PgLTEnvVariable {
+impl PgTEnvVariable {
     fn new(name: &'static str, description: &'static str) -> Self {
         Self { name, description }
     }
@@ -70,11 +70,11 @@ impl PgLTEnvVariable {
     }
 }
 
-pub fn pgt_env() -> &'static PgLTEnv {
-    PGT_ENV.get_or_init(PgLTEnv::new)
+pub fn pgt_env() -> &'static PgTEnv {
+    PGT_ENV.get_or_init(PgTEnv::new)
 }
 
-impl Display for PgLTEnv {
+impl Display for PgTEnv {
     fn fmt(&self, fmt: &mut Formatter) -> std::io::Result<()> {
         match self.pgt_log_path.value() {
             None => {

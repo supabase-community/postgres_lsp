@@ -11,7 +11,7 @@ use pg_query::PgQueryStore;
 use pgt_analyse::{AnalyserOptions, AnalysisFilter};
 use pgt_analyser::{Analyser, AnalyserConfig, AnalyserContext};
 use pgt_diagnostics::{Diagnostic, DiagnosticExt, Severity, serde::Diagnostic as SDiagnostic};
-use pgt_fs::{ConfigName, PgLTPath};
+use pgt_fs::{ConfigName, PgTPath};
 use pgt_typecheck::TypecheckParams;
 use schema_cache_manager::SchemaCacheManager;
 use tracing::info;
@@ -47,7 +47,7 @@ pub(super) struct WorkspaceServer {
     schema_cache: SchemaCacheManager,
 
     /// Stores the document (text content + version number) associated with a URL
-    documents: DashMap<PgLTPath, Document>,
+    documents: DashMap<PgTPath, Document>,
 
     tree_sitter: TreeSitterStore,
     pg_query: PgQueryStore,
@@ -107,7 +107,7 @@ impl WorkspaceServer {
     /// Check whether a file is ignored in the top-level config `files.ignore`/`files.include`
     fn is_ignored(&self, path: &Path) -> bool {
         let file_name = path.file_name().and_then(|s| s.to_str());
-        // Never ignore PgLT's config file regardless `include`/`ignore`
+        // Never ignore Postgres Tools's config file regardless `include`/`ignore`
         (file_name != Some(ConfigName::pgt_jsonc())) &&
             // Apply top-level `include`/`ignore
             (self.is_ignored_by_top_level_config(path) || self.is_ignored_by_migration_config(path))
@@ -126,7 +126,7 @@ impl WorkspaceServer {
                 // `matched_path_or_any_parents` panics if `source` is not under the gitignore root.
                 // This checks excludes absolute paths that are not a prefix of the base root.
                 if !path.has_root() || path.starts_with(ignore.path()) {
-                    // Because PgLT passes a list of paths,
+                    // Because Postgres Tools passes a list of paths,
                     // we use `matched_path_or_any_parents` instead of `matched`.
                     ignore
                         .matched_path_or_any_parents(path, path.is_dir())

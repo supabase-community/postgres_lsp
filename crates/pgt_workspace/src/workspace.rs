@@ -3,7 +3,7 @@ use std::{panic::RefUnwindSafe, path::PathBuf, sync::Arc};
 pub use self::client::{TransportRequest, WorkspaceClient, WorkspaceTransport};
 use pgt_analyse::RuleCategories;
 use pgt_configuration::{PartialConfiguration, RuleSelector};
-use pgt_fs::PgLTPath;
+use pgt_fs::PgTPath;
 use pgt_text_size::{TextRange, TextSize};
 use serde::{Deserialize, Serialize};
 
@@ -15,7 +15,7 @@ mod server;
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct OpenFileParams {
-    pub path: PgLTPath,
+    pub path: PgTPath,
     pub content: String,
     pub version: i32,
 }
@@ -23,13 +23,13 @@ pub struct OpenFileParams {
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct CloseFileParams {
-    pub path: PgLTPath,
+    pub path: PgTPath,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ChangeFileParams {
-    pub path: PgLTPath,
+    pub path: PgTPath,
     pub version: i32,
     pub changes: Vec<ChangeParams>,
 }
@@ -37,7 +37,7 @@ pub struct ChangeFileParams {
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct PullDiagnosticsParams {
-    pub path: PgLTPath,
+    pub path: PgTPath,
     pub categories: RuleCategories,
     pub max_diagnostics: u64,
     pub only: Vec<RuleSelector>,
@@ -48,7 +48,7 @@ pub struct PullDiagnosticsParams {
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct GetCompletionsParams {
     /// The File for which a completion is requested.
-    pub path: PgLTPath,
+    pub path: PgTPath,
     /// The Cursor position in the file for which a completion is requested.
     pub position: TextSize,
 }
@@ -78,7 +78,7 @@ impl ChangeParams {
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct IsPathIgnoredParams {
-    pub pgt_path: PgLTPath,
+    pub pgt_path: PgTPath,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -94,7 +94,7 @@ pub struct UpdateSettingsParams {
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct GetFileContentParams {
-    pub path: PgLTPath,
+    pub path: PgTPath,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
@@ -170,7 +170,7 @@ where
 /// automatically on drop
 pub struct FileGuard<'app, W: Workspace + ?Sized> {
     workspace: &'app W,
-    path: PgLTPath,
+    path: PgTPath,
 }
 
 impl<'app, W: Workspace + ?Sized> FileGuard<'app, W> {

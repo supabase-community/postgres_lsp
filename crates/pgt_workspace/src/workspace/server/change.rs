@@ -420,7 +420,7 @@ mod tests {
 
     use crate::workspace::{ChangeFileParams, ChangeParams};
 
-    use pgt_fs::PgLTPath;
+    use pgt_fs::PgTPath;
 
     impl Document {
         pub fn get_text(&self, idx: usize) -> String {
@@ -451,7 +451,7 @@ mod tests {
     fn open_doc_with_scan_error() {
         let input = "select id from users;\n\n\n\nselect 1443ddwwd33djwdkjw13331333333333;";
 
-        let d = Document::new(PgLTPath::new("test.sql"), input.to_string(), 0);
+        let d = Document::new(PgTPath::new("test.sql"), input.to_string(), 0);
 
         assert_eq!(d.positions.len(), 0);
         assert!(d.has_fatal_error());
@@ -459,10 +459,10 @@ mod tests {
 
     #[test]
     fn change_into_scan_error_within_statement() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "select id from users;\n\n\n\nselect 1;";
 
-        let mut d = Document::new(PgLTPath::new("test.sql"), input.to_string(), 0);
+        let mut d = Document::new(PgTPath::new("test.sql"), input.to_string(), 0);
 
         assert_eq!(d.positions.len(), 2);
         assert!(!d.has_fatal_error());
@@ -497,10 +497,10 @@ mod tests {
 
     #[test]
     fn change_into_scan_error_across_statements() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "select id from users;\n\n\n\nselect 1;";
 
-        let mut d = Document::new(PgLTPath::new("test.sql"), input.to_string(), 0);
+        let mut d = Document::new(PgTPath::new("test.sql"), input.to_string(), 0);
 
         assert_eq!(d.positions.len(), 2);
         assert!(!d.has_fatal_error());
@@ -535,10 +535,10 @@ mod tests {
 
     #[test]
     fn change_from_invalid_to_invalid() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "select 1d;";
 
-        let mut d = Document::new(PgLTPath::new("test.sql"), input.to_string(), 0);
+        let mut d = Document::new(PgTPath::new("test.sql"), input.to_string(), 0);
 
         assert_eq!(d.positions.len(), 0);
         assert!(d.has_fatal_error());
@@ -569,10 +569,10 @@ mod tests {
 
     #[test]
     fn change_from_invalid_to_valid() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "select 1d;";
 
-        let mut d = Document::new(PgLTPath::new("test.sql"), input.to_string(), 0);
+        let mut d = Document::new(PgTPath::new("test.sql"), input.to_string(), 0);
 
         assert_eq!(d.positions.len(), 0);
         assert!(d.has_fatal_error());
@@ -602,10 +602,10 @@ mod tests {
 
     #[test]
     fn within_statements() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "select id from users;\n\n\n\nselect * from contacts;";
 
-        let mut d = Document::new(PgLTPath::new("test.sql"), input.to_string(), 0);
+        let mut d = Document::new(PgTPath::new("test.sql"), input.to_string(), 0);
 
         assert_eq!(d.positions.len(), 2);
 
@@ -641,7 +641,7 @@ mod tests {
 
     #[test]
     fn within_statements_2() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "alter table deal alter column value drop not null;\n";
         let mut d = Document::new(path.clone(), input.to_string(), 0);
 
@@ -718,7 +718,7 @@ mod tests {
 
     #[test]
     fn julians_sample() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "select\n  *\nfrom\n  test;\n\nselect\n\nalter table test\n\ndrop column id;";
         let mut d = Document::new(path.clone(), input.to_string(), 0);
 
@@ -799,10 +799,10 @@ mod tests {
 
     #[test]
     fn across_statements() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "select id from users;\nselect * from contacts;";
 
-        let mut d = Document::new(PgLTPath::new("test.sql"), input.to_string(), 0);
+        let mut d = Document::new(PgTPath::new("test.sql"), input.to_string(), 0);
 
         assert_eq!(d.positions.len(), 2);
 
@@ -838,10 +838,10 @@ mod tests {
 
     #[test]
     fn append_whitespace_to_statement() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "select id";
 
-        let mut d = Document::new(PgLTPath::new("test.sql"), input.to_string(), 0);
+        let mut d = Document::new(PgTPath::new("test.sql"), input.to_string(), 0);
 
         assert_eq!(d.positions.len(), 1);
 
@@ -863,10 +863,10 @@ mod tests {
 
     #[test]
     fn apply_changes() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "select id from users;\nselect * from contacts;";
 
-        let mut d = Document::new(PgLTPath::new("test.sql"), input.to_string(), 0);
+        let mut d = Document::new(PgTPath::new("test.sql"), input.to_string(), 0);
 
         assert_eq!(d.positions.len(), 2);
 
@@ -925,7 +925,7 @@ mod tests {
 
     #[test]
     fn removing_newline_at_the_beginning() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "\n";
 
         let mut d = Document::new(path.clone(), input.to_string(), 1);
@@ -965,7 +965,7 @@ mod tests {
 
     #[test]
     fn apply_changes_at_end_of_statement() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "select id from\nselect * from contacts;";
 
         let mut d = Document::new(path.clone(), input.to_string(), 1);
@@ -997,7 +997,7 @@ mod tests {
 
     #[test]
     fn apply_changes_replacement() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
 
         let mut doc = Document::new(path.clone(), "".to_string(), 0);
 
@@ -1119,7 +1119,7 @@ mod tests {
     #[test]
     fn apply_changes_within_statement() {
         let input = "select id  from users;\nselect * from contacts;";
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
 
         let mut doc = Document::new(path.clone(), input.to_string(), 0);
 
@@ -1170,7 +1170,7 @@ mod tests {
 
     #[test]
     fn remove_outside_of_content() {
-        let path = PgLTPath::new("test.sql");
+        let path = PgTPath::new("test.sql");
         let input = "select id from contacts;\n\nselect * from contacts;";
 
         let mut d = Document::new(path.clone(), input.to_string(), 1);

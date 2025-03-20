@@ -12,10 +12,10 @@ fn command_name() -> String {
     current_exe()
         .ok()
         .and_then(|path| Some(path.file_name()?.to_str()?.to_string()))
-        .unwrap_or_else(|| String::from("pglt"))
+        .unwrap_or_else(|| String::from("postgrestools"))
 }
 
-/// A diagnostic that is emitted when running PgLT via CLI.
+/// A diagnostic that is emitted when running Postgres Tools via CLI.
 ///
 /// When displaying the diagnostic,
 #[derive(Debug, Diagnostic)]

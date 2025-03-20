@@ -206,10 +206,10 @@ pub(crate) fn read_most_recent_log_file(
 /// The events received by the subscriber are filtered at the `info` level,
 /// then printed using the [HierarchicalLayer] layer, and the resulting text
 /// is written to log files rotated on a hourly basis (in
-/// `pglt-logs/server.log.yyyy-MM-dd-HH` files inside the system temporary
+/// `pgt-logs/server.log.yyyy-MM-dd-HH` files inside the system temporary
 /// directory)
 fn setup_tracing_subscriber(log_path: Option<PathBuf>, log_file_name_prefix: Option<String>) {
-    let pgt_log_path = log_path.unwrap_or(pgt_fs::ensure_cache_dir().join("pglt-logs"));
+    let pgt_log_path = log_path.unwrap_or(pgt_fs::ensure_cache_dir().join("pgt-logs"));
     let appender_builder = tracing_appender::rolling::RollingFileAppender::builder();
     let file_appender = appender_builder
         .filename_prefix(log_file_name_prefix.unwrap_or(String::from("server.log")))
@@ -235,16 +235,16 @@ fn setup_tracing_subscriber(log_path: Option<PathBuf>, log_file_name_prefix: Opt
 pub fn default_pgt_log_path() -> PathBuf {
     match env::var_os("PGT_LOG_PATH") {
         Some(directory) => PathBuf::from(directory),
-        None => pgt_fs::ensure_cache_dir().join("pglt-logs"),
+        None => pgt_fs::ensure_cache_dir().join("pgt-logs"),
     }
 }
 
 /// Tracing filter enabling:
 /// - All spans and events at level info or higher
-/// - All spans and events at level debug in crates whose name starts with `pglt`
+/// - All spans and events at level debug in crates whose name starts with `pgt`
 struct LoggingFilter;
 
-/// Tracing filter used for spans emitted by `pglt*` crates
+/// Tracing filter used for spans emitted by `pgt*` crates
 const SELF_FILTER: LevelFilter = if cfg!(debug_assertions) {
     LevelFilter::TRACE
 } else {
@@ -253,7 +253,7 @@ const SELF_FILTER: LevelFilter = if cfg!(debug_assertions) {
 
 impl LoggingFilter {
     fn is_enabled(&self, meta: &Metadata<'_>) -> bool {
-        let filter = if meta.target().starts_with("pglt") {
+        let filter = if meta.target().starts_with("pgt") {
             SELF_FILTER
         } else {
             LevelFilter::INFO

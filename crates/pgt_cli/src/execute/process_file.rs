@@ -5,7 +5,7 @@ use crate::execute::TraversalMode;
 use crate::execute::traverse::TraversalOptions;
 use check::check_file;
 use pgt_diagnostics::Error;
-use pgt_fs::PgLTPath;
+use pgt_fs::PgTPath;
 use std::marker::PhantomData;
 use std::ops::Deref;
 
@@ -111,7 +111,7 @@ impl<'ctx, 'app> Deref for SharedTraversalOptions<'ctx, 'app> {
 /// diagnostics were emitted, or compare the formatted code with the original
 /// content of the file and emit a diff or write the new content to the disk if
 /// write mode is enabled
-pub(crate) fn process_file(ctx: &TraversalOptions, pgt_path: &PgLTPath) -> FileResult {
+pub(crate) fn process_file(ctx: &TraversalOptions, pgt_path: &PgTPath) -> FileResult {
     tracing::trace_span!("process_file", path = ?pgt_path).in_scope(move || {
         let shared_context = &SharedTraversalOptions::new(ctx);
 

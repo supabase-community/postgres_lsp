@@ -21,7 +21,7 @@ use tracing::{Instrument, debug, info};
 /// Returns the filesystem path of the global socket used to communicate with
 /// the server daemon
 fn get_socket_name() -> PathBuf {
-    pgt_fs::ensure_cache_dir().join(format!("pglt-socket-{}", pgt_configuration::VERSION))
+    pgt_fs::ensure_cache_dir().join(format!("pgt-socket-{}", pgt_configuration::VERSION))
 }
 
 pub(crate) fn enumerate_pipes() -> io::Result<impl Iterator<Item = String>> {
@@ -31,7 +31,7 @@ pub(crate) fn enumerate_pipes() -> io::Result<impl Iterator<Item = String>> {
             let file_name = entry.file_name()?;
             let file_name = file_name.to_str()?;
 
-            let version = file_name.strip_prefix("pglt-socket")?;
+            let version = file_name.strip_prefix("pgt-socket")?;
             if version.is_empty() {
                 Some(String::new())
             } else {

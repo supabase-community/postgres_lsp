@@ -169,7 +169,7 @@ pub fn create_config(
         }
     })?;
 
-    // we now check if pglt is installed inside `node_modules` and if so, we use the schema from there
+    // we now check if postgrestools is installed inside `node_modules` and if so, we use the schema from there
     if VERSION == "0.0.0" {
         let schema_path = Path::new("./node_modules/@postgrestools/postgrestools/schema.json");
         let options = OpenOptions::default().read(true);

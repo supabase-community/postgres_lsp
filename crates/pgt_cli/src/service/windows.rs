@@ -24,7 +24,7 @@ use tracing::Instrument;
 /// Returns the name of the global named pipe used to communicate with the
 /// server daemon
 fn get_pipe_name() -> String {
-    format!(r"\\.\pipe\pglt-service-{}", pgt_configuration::VERSION)
+    format!(r"\\.\pipe\pgt-service-{}", pgt_configuration::VERSION)
 }
 
 pub(crate) fn enumerate_pipes() -> io::Result<impl Iterator<Item = String>> {
@@ -34,7 +34,7 @@ pub(crate) fn enumerate_pipes() -> io::Result<impl Iterator<Item = String>> {
             let file_name = entry.file_name()?;
             let file_name = file_name.to_str()?;
 
-            let version = file_name.strip_prefix("pglt-service")?;
+            let version = file_name.strip_prefix("pgt-service")?;
             if version.is_empty() {
                 Some(String::new())
             } else {

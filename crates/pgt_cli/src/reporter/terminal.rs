@@ -5,7 +5,7 @@ use pgt_console::fmt::Formatter;
 use pgt_console::{Console, ConsoleExt, fmt, markup};
 use pgt_diagnostics::advice::ListAdvice;
 use pgt_diagnostics::{Diagnostic, PrintDiagnostic};
-use pgt_fs::PgLTPath;
+use pgt_fs::PgTPath;
 use std::collections::BTreeSet;
 use std::io;
 use std::time::Duration;
@@ -14,7 +14,7 @@ pub(crate) struct ConsoleReporter {
     pub(crate) summary: TraversalSummary,
     pub(crate) diagnostics_payload: DiagnosticsPayload,
     pub(crate) execution: Execution,
-    pub(crate) evaluated_paths: BTreeSet<PgLTPath>,
+    pub(crate) evaluated_paths: BTreeSet<PgTPath>,
 }
 
 impl Reporter for ConsoleReporter {
@@ -66,7 +66,7 @@ impl ReporterVisitor for ConsoleReporterVisitor<'_> {
         Ok(())
     }
 
-    fn report_handled_paths(&mut self, evaluated_paths: BTreeSet<PgLTPath>) -> io::Result<()> {
+    fn report_handled_paths(&mut self, evaluated_paths: BTreeSet<PgTPath>) -> io::Result<()> {
         let evaluated_paths_diagnostic = EvaluatedPathsDiagnostic {
             advice: ListAdvice {
                 list: evaluated_paths
