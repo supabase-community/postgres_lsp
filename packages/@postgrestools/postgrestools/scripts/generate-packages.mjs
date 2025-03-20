@@ -14,7 +14,7 @@ const SUPPORTED_PLATFORMS = [
 	"apple-darwin",
 	"unknown-linux-gnu",
 ];
-const MANIFEST_PATH = resolve(PACKAGES_POSTGRESTOOLS_ROOT, "package.json");
+const MANIFEST_PATH = resolve(CLI_ROOT, "package.json");
 const SUPPORTED_ARCHITECTURES = ["x86_64", "aarch64"];
 
 async function downloadSchema(releaseTag, githubToken) {
