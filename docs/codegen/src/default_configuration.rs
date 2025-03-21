@@ -8,7 +8,7 @@ pub fn generate_default_configuration(docs_dir: &Path) -> anyhow::Result<()> {
     let index_path = docs_dir.join("index.md");
 
     let printed_config = format!(
-        "\n```json\n{}```\n",
+        "\n```json\n{}\n```\n",
         serde_json::to_string_pretty(&PartialConfiguration::init())?
     );
 

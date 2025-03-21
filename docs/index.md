@@ -64,7 +64,8 @@ After running the `init` command, you’ll have a `postgrestools.jsonc` file in 
     "database": "postgres",
     "connTimeoutSecs": 10
   }
-}```
+}
+```
 
 [//]: # (END DEFAULT_CONFIGURATION)
 
