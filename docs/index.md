@@ -15,6 +15,7 @@ A collection of language tools and a Language Server Protocol (LSP) implementati
 This project provides a toolchain for Postgres development, built on Postgres' own parser `libpg_query` to ensure 100% syntax compatibility. It is built on a Server-Client architecture with a transport-agnostic design. This means all features can be accessed not only through the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/), but also through other interfaces like a CLI, HTTP APIs, or a WebAssembly module. The goal is to make all the great Postgres tooling out there as accessible as possible, and to build anything that is missing ourselves.
 
 Currently, the following features are implemented:
+
 - Autocompletion
 - Syntax Error Highlighting
 - Type-checking (via `EXPLAIN` error insights)
@@ -64,7 +65,8 @@ After running the `init` command, you’ll have a `postgrestools.jsonc` file in 
     "database": "postgres",
     "connTimeoutSecs": 10
   }
-}```
+}
+```
 
 [//]: # (END DEFAULT_CONFIGURATION)
 
