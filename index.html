@@ -44,6 +44,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#install-an-editor-plugin">Install an Editor Plugin</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#ci-setup">CI Setup</a>
@@ -101,11 +103,13 @@
 <hr />
 <h2 id="overview">Overview</h2>
 <p>This project provides a toolchain for Postgres development, built on Postgres' own parser <code>libpg_query</code> to ensure 100% syntax compatibility. It is built on a Server-Client architecture with a transport-agnostic design. This means all features can be accessed not only through the <a href="https://microsoft.github.io/language-server-protocol/">Language Server Protocol</a>, but also through other interfaces like a CLI, HTTP APIs, or a WebAssembly module. The goal is to make all the great Postgres tooling out there as accessible as possible, and to build anything that is missing ourselves.</p>
-<p>Currently, the following features are implemented:
-- Autocompletion
-- Syntax Error Highlighting
-- Type-checking (via <code>EXPLAIN</code> error insights)
-- Linter, inspired by <a href="https://squawkhq.com">Squawk</a></p>
+<p>Currently, the following features are implemented:</p>
+<ul>
+<li>Autocompletion</li>
+<li>Syntax Error Highlighting</li>
+<li>Type-checking (via <code>EXPLAIN</code> error insights)</li>
+<li>Linter, inspired by <a href="https://squawkhq.com">Squawk</a></li>
+</ul>
 <p>Our current focus is on refining and enhancing these core features while building a robust and easily accessible infrastructure. For future plans and opportunities to contribute, please check out the issues and discussions. Any contributions are welcome!</p>
 <h2 id="installation">Installation</h2>
 <div class="admonition note">
@@ -141,20 +145,13 @@
     &quot;database&quot;: &quot;postgres&quot;,
     &quot;connTimeoutSecs&quot;: 10
   }
-}```
-
-[//]: # (END DEFAULT_CONFIGURATION)
-
-Make sure to point the database connection settings at your local development database. To see what else can be configured, run `--help`.
-
-## Usage
-
-You can use the language tools either via CLI or a Language Server.
-
-The CLI exposes a simple `check` command that will run all checks on the given files or paths.
-
-```sh
-postgrestools check myfile.sql
+}
+</code></pre>
+<p>Make sure to point the database connection settings at your local development database. To see what else can be configured, run <code>--help</code>.</p>
+<h2 id="usage">Usage</h2>
+<p>You can use the language tools either via CLI or a Language Server.</p>
+<p>The CLI exposes a simple <code>check</code> command that will run all checks on the given files or paths.</p>
+<pre><code class="language-sh">postgrestools check myfile.sql
 </code></pre>
 <p>Make sure to check out the other options. We will provide guides for specific use cases like linting migration files soon.</p>
 <h2 id="install-an-editor-plugin">Install an Editor Plugin</h2>
@@ -219,5 +216,5 @@ postgrestools check myfile.sql
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-03-21 08:58:18.488673+00:00
+Build Date UTC : 2025-03-21 12:10:02.025359+00:00
 -->
