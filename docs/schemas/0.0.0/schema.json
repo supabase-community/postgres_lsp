@@ -6,10 +6,7 @@
   "properties": {
     "$schema": {
       "description": "A field for the [JSON schema](https://json-schema.org/) specification",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "db": {
       "description": "The configuration of the database connection",
@@ -75,49 +72,43 @@
       "properties": {
         "connTimeoutSecs": {
           "description": "The connection timeout in seconds.",
-          "type": [
-            "integer",
-            "null"
-          ],
+          "type": ["integer", "null"],
           "format": "uint16",
           "minimum": 0.0
         },
         "database": {
           "description": "The name of the database.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "host": {
           "description": "The host of the database.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "password": {
           "description": "The password to connect to the database.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "port": {
           "description": "The port of the database.",
-          "type": [
-            "integer",
-            "null"
-          ],
+          "type": ["integer", "null"],
           "format": "uint16",
           "minimum": 0.0
         },
         "username": {
           "description": "The username to connect to the database.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
+        },
+        "allowStatementExecutionsAgainst": {
+          "description": "A list of <host-glob>/<database-glob> strings. The LSP will offer an 'Execute Statement Under Cursor' command if you're connected to matching hosts/databases. Useful for quickly iterating migrations, for example.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/StringSet"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "examples": ["*.myapp.com/test-db", "localhost/*", "127.0.0.1/*"]
         }
       },
       "additionalProperties": false
@@ -150,10 +141,7 @@
         },
         "maxSize": {
           "description": "The maximum allowed size for source code files in bytes. Files above this limit will be ignored for performance reasons. Defaults to 1 MiB",
-          "type": [
-            "integer",
-            "null"
-          ],
+          "type": ["integer", "null"],
           "format": "uint64",
           "minimum": 1.0
         }
@@ -165,10 +153,7 @@
       "properties": {
         "enabled": {
           "description": "if `false`, it disables the feature and the linter won't be executed. `true` by default",
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         },
         "ignore": {
           "description": "A list of Unix shell style patterns. The formatter will ignore files/folders that will match these patterns.",
@@ -212,19 +197,13 @@
       "properties": {
         "after": {
           "description": "Ignore any migrations before this timestamp",
-          "type": [
-            "integer",
-            "null"
-          ],
+          "type": ["integer", "null"],
           "format": "uint64",
           "minimum": 0.0
         },
         "migrationsDir": {
           "description": "The directory where the migration files are stored",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         }
       },
       "additionalProperties": false
@@ -241,18 +220,11 @@
     },
     "RulePlainConfiguration": {
       "type": "string",
-      "enum": [
-        "warn",
-        "error",
-        "info",
-        "off"
-      ]
+      "enum": ["warn", "error", "info", "off"]
     },
     "RuleWithNoOptions": {
       "type": "object",
-      "required": [
-        "level"
-      ],
+      "required": ["level"],
       "properties": {
         "level": {
           "description": "The severity of the emitted diagnostics by the rule",
@@ -270,17 +242,11 @@
       "properties": {
         "all": {
           "description": "It enables ALL rules. The rules that belong to `nursery` won't be enabled.",
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         },
         "recommended": {
           "description": "It enables the lint rules recommended by Postgres Tools. `true` by default.",
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         },
         "safety": {
           "anyOf": [
@@ -312,10 +278,7 @@
         },
         "all": {
           "description": "It enables ALL rules for this group.",
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         },
         "banDropColumn": {
           "description": "Dropping a column may break existing clients.",
@@ -352,10 +315,7 @@
         },
         "recommended": {
           "description": "It enables the recommended rules for this group",
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         }
       },
       "additionalProperties": false
@@ -372,9 +332,7 @@
         {
           "description": "Integration with the git client as VCS",
           "type": "string",
-          "enum": [
-            "git"
-          ]
+          "enum": ["git"]
         }
       ]
     },
@@ -395,31 +353,19 @@
         },
         "defaultBranch": {
           "description": "The main branch of the project",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "enabled": {
           "description": "Whether we should integrate itself with the VCS client",
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         },
         "root": {
           "description": "The folder where we should check for VCS files. By default, we will use the same folder where `postgrestools.jsonc` was found.\n\nIf we can't find the configuration, it will attempt to use the current working directory. If no current working directory can't be found, we won't use the VCS integration, and a diagnostic will be emitted",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "useIgnoreFile": {
           "description": "Whether we should use the VCS ignore file. When [true], we will ignore the files specified in the ignore file.",
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         }
       },
       "additionalProperties": false

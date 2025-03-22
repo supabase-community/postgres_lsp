@@ -38,7 +38,7 @@ postgrestools init
 
 After running the `init` command, you’ll have a `postgrestools.jsonc` file in your directory:
 
-[//]: # (BEGIN DEFAULT_CONFIGURATION)
+[//]: # "BEGIN DEFAULT_CONFIGURATION"
 
 ```json
 {
@@ -63,12 +63,13 @@ After running the `init` command, you’ll have a `postgrestools.jsonc` file in 
     "username": "postgres",
     "password": "postgres",
     "database": "postgres",
-    "connTimeoutSecs": 10
+    "connTimeoutSecs": 10,
+    "allowStatementExecutionsAgainst": ["127.0.0.1/*", "localhost/*"]
   }
 }
 ```
 
-[//]: # (END DEFAULT_CONFIGURATION)
+[//]: # "END DEFAULT_CONFIGURATION"
 
 Make sure to point the database connection settings at your local development database. To see what else can be configured, run `--help`.
 
@@ -91,9 +92,7 @@ We recommend installing an editor plugin to get the most out of Postgres Languag
 > [!NOTE]
 > We will update this section once we have published the binaries.
 
-
 ## CI Setup
 
 > [!NOTE]
 > We will update this section once we have published the binaries.
-

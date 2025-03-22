@@ -1,6 +1,7 @@
 use std::{panic::RefUnwindSafe, path::PathBuf, sync::Arc};
 
 pub use self::client::{TransportRequest, WorkspaceClient, WorkspaceTransport};
+use crate::code_actions::*;
 use pgt_analyse::RuleCategories;
 use pgt_configuration::{PartialConfiguration, RuleSelector};
 use pgt_fs::PgTPath;
@@ -114,6 +115,12 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
         &self,
         params: PullDiagnosticsParams,
     ) -> Result<PullDiagnosticsResult, WorkspaceError>;
+
+    /// Retrieves a list of available code_actions for a file/cursor_position
+    fn pull_code_actions(
+        &self,
+        params: CodeActionsParams,
+    ) -> Result<CodeActionsResult, WorkspaceError>;
 
     fn get_completions(
         &self,

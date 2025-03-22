@@ -2752,6 +2752,7 @@ dependencies = [
  "ignore",
  "pgt_analyse",
  "pgt_analyser",
+ "pgt_commands",
  "pgt_completions",
  "pgt_configuration",
  "pgt_console",
