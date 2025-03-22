@@ -1,3 +1,4 @@
+use biome_deserialize::StringSet;
 use biome_deserialize_macros::{Merge, Partial};
 use bpaf::Bpaf;
 use serde::{Deserialize, Serialize};
@@ -28,6 +29,9 @@ pub struct DatabaseConfiguration {
     #[partial(bpaf(long("database")))]
     pub database: String,
 
+    #[partial(bpaf(long("allow_statement_executions_against")))]
+    pub allow_statement_executions_against: StringSet,
+
     /// The connection timeout in seconds.
     #[partial(bpaf(long("conn_timeout_secs"), fallback(Some(10)), debug_fallback))]
     pub conn_timeout_secs: u16,
@@ -41,6 +45,7 @@ impl Default for DatabaseConfiguration {
             username: "postgres".to_string(),
             password: "postgres".to_string(),
             database: "postgres".to_string(),
+            allow_statement_executions_against: Default::default(),
             conn_timeout_secs: 10,
         }
     }

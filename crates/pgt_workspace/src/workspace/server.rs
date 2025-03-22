@@ -19,6 +19,7 @@ use tree_sitter::TreeSitterStore;
 
 use crate::{
     WorkspaceError,
+    code_actions::{CodeAction, CodeActionCategory, CodeActionsResult},
     configuration::to_analyser_rules,
     settings::{Settings, SettingsHandle, SettingsHandleMut},
     workspace::PullDiagnosticsResult,
@@ -251,6 +252,35 @@ impl Workspace for WorkspaceServer {
 
     fn is_path_ignored(&self, params: IsPathIgnoredParams) -> Result<bool, WorkspaceError> {
         Ok(self.is_ignored(params.pgt_path.as_path()))
+    }
+
+    fn pull_code_actions(
+        &self,
+        params: crate::code_actions::CodeActionsParams,
+    ) -> Result<crate::code_actions::CodeActionsResult, WorkspaceError> {
+        let cursor_position = params.range;
+
+        let doc = self
+            .documents
+            .get(&params.path)
+            .ok_or(WorkspaceError::not_found())?;
+
+        let eligible_statements = doc.iter_statements_with_text_and_range().filter(
+            |(_, range, _)| match cursor_position {
+                None => true,
+                Some(r) => range.contains(r),
+            },
+        );
+
+        let mut actions: Vec<CodeAction> = vec![];
+
+        for (stmt, range, txt) in eligible_statements {
+            actions.push(CodeAction {
+                category: CodeActionCategory::ExecuteCommand(txt.into()),
+            });
+        }
+
+        Ok(CodeActionsResult { actions })
     }
 
     fn pull_diagnostics(

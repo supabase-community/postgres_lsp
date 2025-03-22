@@ -1,3 +1,0 @@
-[alias]
-snap  = "insta test"
-xtask = "run --package xtask --"

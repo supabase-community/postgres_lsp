@@ -3,6 +3,7 @@ use std::ops::{Deref, DerefMut};
 use pgt_console::Console;
 use pgt_fs::{FileSystem, OsFileSystem};
 
+mod code_actions;
 pub mod configuration;
 pub mod diagnostics;
 pub mod dome;

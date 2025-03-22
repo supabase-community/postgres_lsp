@@ -89,6 +89,13 @@ impl<T> Workspace for WorkspaceClient<T>
 where
     T: WorkspaceTransport + RefUnwindSafe + Send + Sync,
 {
+    fn pull_code_actions(
+        &self,
+        params: crate::code_actions::CodeActionsParams,
+    ) -> Result<crate::code_actions::CodeActionsResult, WorkspaceError> {
+        self.request("pgt/code_actions", params)
+    }
+
     fn open_file(&self, params: OpenFileParams) -> Result<(), WorkspaceError> {
         self.request("pgt/open_file", params)
     }
