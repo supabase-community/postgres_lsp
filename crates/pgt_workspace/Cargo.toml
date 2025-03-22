@@ -18,6 +18,7 @@ futures                   = "0.3.31"
 ignore                    = { workspace = true }
 pgt_analyse               = { workspace = true, features = ["serde"] }
 pgt_analyser              = { workspace = true }
+pgt_commands              = { workspace = true }
 pgt_completions           = { workspace = true }
 pgt_configuration         = { workspace = true }
 pgt_console               = { workspace = true }
@@ -28,7 +29,6 @@ pgt_schema_cache          = { workspace = true }
 pgt_statement_splitter    = { workspace = true }
 pgt_text_size.workspace   = true
 pgt_typecheck             = { workspace = true }
-pgt_commands              = { workspace = true }
 rustc-hash                = { workspace = true }
 schemars                  = { workspace = true, optional = true }
 serde                     = { workspace = true, features = ["derive"] }
