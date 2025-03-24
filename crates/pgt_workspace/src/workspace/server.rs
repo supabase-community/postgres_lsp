@@ -292,7 +292,7 @@ impl Workspace for WorkspaceServer {
                 kind: CodeActionKind::Command(CommandAction {
                     category: CommandActionCategory::ExecuteStatement(txt.into()),
                 }),
-                disabled_reason,
+                disabled_reason: disabled_reason.clone(),
             });
         }
 
