@@ -19,7 +19,9 @@ use tree_sitter::TreeSitterStore;
 
 use crate::{
     WorkspaceError,
-    code_actions::{CodeAction, CodeActionCategory, CodeActionsResult},
+    code_actions::{
+        CodeAction, CodeActionKind, CodeActionsResult, CommandAction, CommandActionCategory,
+    },
     configuration::to_analyser_rules,
     settings::{Settings, SettingsHandle, SettingsHandleMut},
     workspace::PullDiagnosticsResult,
@@ -274,9 +276,23 @@ impl Workspace for WorkspaceServer {
 
         let mut actions: Vec<CodeAction> = vec![];
 
+        let settings = self
+            .settings
+            .read()
+            .expect("Unable to read settings for Code Actions");
+
+        let disabled_reason: Option<String> = if settings.db.allow_statement_executions {
+            None
+        } else {
+            Some("Statement execution not allowed against database.".into())
+        };
+
         for (stmt, range, txt) in eligible_statements {
             actions.push(CodeAction {
-                category: CodeActionCategory::ExecuteCommand(txt.into()),
+                kind: CodeActionKind::Command(CommandAction {
+                    category: CommandActionCategory::ExecuteStatement(txt.into()),
+                }),
+                disabled_reason,
             });
         }
 

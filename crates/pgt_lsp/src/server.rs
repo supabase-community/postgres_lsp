@@ -252,6 +252,11 @@ impl LanguageServer for LSPServer {
             Err(e) => LspResult::Err(into_lsp_error(e)),
         }
     }
+
+    #[tracing::instrument(level = "trace", skip(self))]
+    async fn code_action(&self, params: CodeActionParams) -> Result<Option<CodeActionResponse>> {
+        let actions = handlers::code_actions::get_actions(session, params);
+    }
 }
 
 impl Drop for LSPServer {

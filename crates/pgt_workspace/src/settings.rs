@@ -1,4 +1,5 @@
 use biome_deserialize::StringSet;
+use globset::Glob;
 use pgt_diagnostics::Category;
 use std::{
     borrow::Cow,
@@ -273,6 +274,7 @@ pub struct DatabaseSettings {
     pub password: String,
     pub database: String,
     pub conn_timeout_secs: Duration,
+    pub allow_statement_executions: bool,
 }
 
 impl Default for DatabaseSettings {
@@ -284,6 +286,7 @@ impl Default for DatabaseSettings {
             password: "postgres".to_string(),
             database: "postgres".to_string(),
             conn_timeout_secs: Duration::from_secs(10),
+            allow_statement_executions: true,
         }
     }
 }
@@ -291,16 +294,36 @@ impl Default for DatabaseSettings {
 impl From<PartialDatabaseConfiguration> for DatabaseSettings {
     fn from(value: PartialDatabaseConfiguration) -> Self {
         let d = DatabaseSettings::default();
+
+        let database = value.database.unwrap_or(d.database);
+        let host = value.host.unwrap_or(d.host);
+
+        let allow_statement_executions = value
+            .allow_statement_executions_against
+            .map(|stringset| {
+                stringset.iter().any(|pattern| {
+                    let glob = Glob::new(pattern)
+                        .expect(format!("Invalid pattern: {}", pattern).as_str())
+                        .compile_matcher();
+
+                    glob.is_match(format!("{}/{}", host, database))
+                })
+            })
+            .unwrap_or(false);
+
         Self {
-            host: value.host.unwrap_or(d.host),
             port: value.port.unwrap_or(d.port),
             username: value.username.unwrap_or(d.username),
             password: value.password.unwrap_or(d.password),
-            database: value.database.unwrap_or(d.database),
+            database,
+            host,
+
             conn_timeout_secs: value
                 .conn_timeout_secs
                 .map(|s| Duration::from_secs(s.into()))
                 .unwrap_or(d.conn_timeout_secs),
+
+            allow_statement_executions,
         }
     }
 }

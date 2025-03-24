@@ -2,8 +2,6 @@ use pgt_configuration::RuleSelector;
 use pgt_fs::PgTPath;
 use pgt_text_size::TextRange;
 
-use crate::Workspace;
-
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct CodeActionsParams {
@@ -23,20 +21,42 @@ pub struct CodeActionsResult {
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct CodeAction {
-    pub category: CodeActionCategory,
+    pub kind: CodeActionKind,
+    pub disabled_reason: Option<String>,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-pub enum CodeActionCategory {
-    ExecuteCommand(String),
+#[serde(rename_all = "camelCase")]
+pub enum CodeActionKind {
+    Edit(EditAction),
+    Command(CommandAction),
+    EditAndCommand(EditAction, CommandAction),
 }
 
-impl CodeActionCategory {
-    fn perform(self, workspace: &dyn Workspace) -> Result<(), String> {
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct EditAction {}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct CommandAction {
+    pub category: CommandActionCategory,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub enum CommandActionCategory {
+    ExecuteStatement(String),
+}
+
+impl Into<String> for CommandActionCategory {
+    fn into(self) -> String {
         match self {
-            Self::ExecuteCommand(stmt) => {}
+            Self::ExecuteStatement(_) => "pgt.executeStatement".into(),
         }
-        Ok(())
     }
 }
