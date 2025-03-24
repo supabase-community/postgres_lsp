@@ -1,7 +1,11 @@
 use crate::session::Session;
+use anyhow::Result;
+use pgt_text_size::{TextRange, TextSize};
 use tower_lsp::lsp_types::{self, CodeAction, CodeActionDisabled, CodeActionOrCommand, Command};
 
-use pgt_workspace::code_actions::{CodeActionKind, CommandAction, CommandActionCategory};
+use pgt_workspace::code_actions::{
+    CodeActionKind, CodeActionsParams, CommandAction, CommandActionCategory,
+};
 
 pub fn get_actions(
     session: &Session,
@@ -12,7 +16,10 @@ pub fn get_actions(
 
     let workspace_actions = session.workspace.pull_code_actions(CodeActionsParams {
         path,
-        range: params.range,
+        range: Some(TextRange::new(
+            TextSize::new(params.range.start.character),
+            TextSize::new(params.range.end.character),
+        )),
         only: vec![],
         skip: vec![],
     })?;
@@ -22,20 +29,23 @@ pub fn get_actions(
         .into_iter()
         .filter_map(|action| match action.kind {
             CodeActionKind::Command(command) => {
-                let title = match command.category {
+                let title = match &command.category {
                     CommandActionCategory::ExecuteStatement(stmt) => {
-                        format!("Execute Statement: {}...", stmt[..50])
+                        format!(
+                            "Execute Statement: {}...",
+                            stmt.chars().take(50).collect::<String>()
+                        )
                     }
                 };
 
                 return Some(CodeAction {
-                    title,
+                    title: title.clone(),
                     command: Some(Command {
-                        title,
+                        title: title.clone(),
                         command: command.category.into(),
                         arguments: None,
                     }),
-                    disabled: action
+                    disabled: actio
                         .disabled_reason
                         .map(|reason| CodeActionDisabled { reason }),
                     ..Default::default()

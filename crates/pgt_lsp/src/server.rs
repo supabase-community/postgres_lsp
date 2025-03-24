@@ -254,8 +254,11 @@ impl LanguageServer for LSPServer {
     }
 
     #[tracing::instrument(level = "trace", skip(self))]
-    async fn code_action(&self, params: CodeActionParams) -> Result<Option<CodeActionResponse>> {
-        let actions = handlers::code_actions::get_actions(session, params);
+    async fn code_action(&self, params: CodeActionParams) -> LspResult<Option<CodeActionResponse>> {
+        match handlers::code_actions::get_actions(&self.session, params) {
+            Ok(result) => LspResult::Ok(Some(result)),
+            Err(e) => LspResult::Err(into_lsp_error(e)),
+        }
     }
 }
 
