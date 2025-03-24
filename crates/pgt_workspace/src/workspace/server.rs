@@ -270,7 +270,7 @@ impl Workspace for WorkspaceServer {
         let eligible_statements = doc.iter_statements_with_text_and_range().filter(
             |(_, range, _)| match cursor_position {
                 None => true,
-                Some(r) => range.contains(r),
+                Some(r) => range.contains(r.start()) && range.contains(r.end()),
             },
         );
 
