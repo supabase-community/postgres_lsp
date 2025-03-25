@@ -7,6 +7,8 @@ use pgt_workspace::code_actions::{
     CodeActionKind, CodeActionsParams, CommandAction, CommandActionCategory,
 };
 
+use super::helper;
+
 pub fn get_actions(
     session: &Session,
     params: lsp_types::CodeActionParams,
@@ -14,12 +16,11 @@ pub fn get_actions(
     let url = params.text_document.uri;
     let path = session.file_path(&url)?;
 
+    let cursor_position = helper::get_cursor_position(session, url, params.range.start)?;
+
     let workspace_actions = session.workspace.pull_code_actions(CodeActionsParams {
         path,
-        range: Some(TextRange::new(
-            TextSize::new(params.range.start.character),
-            TextSize::new(params.range.end.character),
-        )),
+        cursor_position,
         only: vec![],
         skip: vec![],
     })?;

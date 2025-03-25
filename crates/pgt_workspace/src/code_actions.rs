@@ -1,12 +1,12 @@
 use pgt_configuration::RuleSelector;
 use pgt_fs::PgTPath;
-use pgt_text_size::TextRange;
+use pgt_text_size::{TextRange, TextSize};
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct CodeActionsParams {
     pub path: PgTPath,
-    pub range: Option<TextRange>,
+    pub cursor_position: TextSize,
     pub only: Vec<RuleSelector>,
     pub skip: Vec<RuleSelector>,
 }

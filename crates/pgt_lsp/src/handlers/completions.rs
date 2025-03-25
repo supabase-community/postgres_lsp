@@ -3,6 +3,8 @@ use anyhow::Result;
 use pgt_workspace::{WorkspaceError, workspace};
 use tower_lsp::lsp_types::{self, CompletionItem, CompletionItemLabelDetails};
 
+use super::helper;
+
 #[tracing::instrument(level = "trace", skip_all)]
 pub fn get_completions(
     session: &Session,
@@ -11,27 +13,16 @@ pub fn get_completions(
     let url = params.text_document_position.text_document.uri;
     let path = session.file_path(&url)?;
 
-    let client_capabilities = session
-        .client_capabilities()
-        .expect("Client capabilities not established for current session.");
-
-    let line_index = session
-        .document(&url)
-        .map(|doc| doc.line_index)
-        .map_err(|_| anyhow::anyhow!("Document not found."))?;
-
-    let offset = pgt_lsp_converters::from_proto::offset(
-        &line_index,
-        params.text_document_position.position,
-        pgt_lsp_converters::negotiated_encoding(client_capabilities),
-    )?;
-
     let completion_result =
         match session
             .workspace
             .get_completions(workspace::GetCompletionsParams {
                 path,
-                position: offset,
+                position: helper::get_cursor_position(
+                    session,
+                    url,
+                    params.text_document_position.position,
+                )?,
             }) {
             Ok(result) => result,
             Err(e) => match e {

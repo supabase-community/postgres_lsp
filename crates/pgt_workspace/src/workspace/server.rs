@@ -260,19 +260,14 @@ impl Workspace for WorkspaceServer {
         &self,
         params: crate::code_actions::CodeActionsParams,
     ) -> Result<crate::code_actions::CodeActionsResult, WorkspaceError> {
-        let cursor_position = params.range;
-
         let doc = self
             .documents
             .get(&params.path)
             .ok_or(WorkspaceError::not_found())?;
 
-        let eligible_statements = doc.iter_statements_with_text_and_range().filter(
-            |(_, range, _)| match cursor_position {
-                None => true,
-                Some(r) => range.contains(r.start()) && range.contains(r.end()),
-            },
-        );
+        let eligible_statements = doc
+            .iter_statements_with_text_and_range()
+            .filter(|(_, range, _)| range.contains(params.cursor_position));
 
         let mut actions: Vec<CodeAction> = vec![];
 
