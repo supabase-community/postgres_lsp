@@ -1,11 +1,23 @@
-select id, name, test1231234123, unknown from co;
+select
+  id,
+  name,
+  test1231234123,
+  unknown
+from
+  co;
 
-select 14433313331333333333
+select
+  14433313331333333333
+select
+  *
+from
+  test;
 
-select * from test;
+alter tqjable test
+drop column id;
 
-alter tqjable test drop column id;
+alter table test
+drop column id;
 
-alter table test drop column id;
-
-select lower();
+select
+  lower();

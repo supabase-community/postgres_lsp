@@ -105,3 +105,8 @@ reset-git:
 merge-main:
     git fetch origin main:main
     git merge main
+
+
+# Make sure to set your PGT_LOG_PATH in your shell profile.
+show-logs:
+    tail -f $(ls $PGT_LOG_PATH/server.log.* | sort -t- -k2,2 -k3,3 -k4,4 | tail -n 1)
