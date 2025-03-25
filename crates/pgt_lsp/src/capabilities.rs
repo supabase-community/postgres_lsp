@@ -1,7 +1,7 @@
 use pgt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
 use tower_lsp::lsp_types::{
-    ClientCapabilities, CompletionOptions, PositionEncodingKind, SaveOptions, ServerCapabilities,
-    TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions,
+    ClientCapabilities, CodeActionOptions, CompletionOptions, PositionEncodingKind, SaveOptions,
+    ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions,
     TextDocumentSyncSaveOptions, WorkDoneProgressOptions,
 };
 
@@ -49,7 +49,9 @@ pub(crate) fn server_capabilities(capabilities: &ClientCapabilities) -> ServerCa
         document_formatting_provider: None,
         document_range_formatting_provider: None,
         document_on_type_formatting_provider: None,
-        code_action_provider: None,
+        code_action_provider: Some(tower_lsp::lsp_types::CodeActionProviderCapability::Simple(
+            true,
+        )),
         rename_provider: None,
         ..Default::default()
     }

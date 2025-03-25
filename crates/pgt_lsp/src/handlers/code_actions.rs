@@ -45,7 +45,7 @@ pub fn get_actions(
                         command: command.category.into(),
                         arguments: None,
                     }),
-                    disabled: actio
+                    disabled: action
                         .disabled_reason
                         .map(|reason| CodeActionDisabled { reason }),
                     ..Default::default()
