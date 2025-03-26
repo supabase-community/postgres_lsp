@@ -47,6 +47,22 @@
     <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#install-an-editor-plugin">Install an Editor Plugin</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#vscode">VSCode</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#neovim">Neovim</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#other">Other</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#use-the-lsp-proxy">Use the LSP Proxy</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#use-the-daemon-with-the-binary">Use the daemon with the binary</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#daemon-logs">Daemon logs</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#ci-setup">CI Setup</a>
     </li>
@@ -55,7 +71,7 @@
               </ul>
               <p class="caption"><span class="caption-text">Guides</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="" href="linting_migrations.md">Linting Migrations</a>
+                  <li class="toctree-l1"><a class="reference internal" href="checking_migrations/">Linting Migrations</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="troubleshooting/">Troubleshooting</a>
                   </li>
@@ -112,10 +128,15 @@
 </ul>
 <p>Our current focus is on refining and enhancing these core features while building a robust and easily accessible infrastructure. For future plans and opportunities to contribute, please check out the issues and discussions. Any contributions are welcome!</p>
 <h2 id="installation">Installation</h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>We will update this section once we have published the binaries.</p>
-</div>
+<p>To install Postgres Tools, grab the executable for your platform from the <a href="https://github.com/supabase-community/postgres_lsp/releases/latest">latest CLI release</a> on GitHub and give it execution permission.</p>
+<pre><code class="language-sh">curl -L https://github.com/supabase-community/postgres_lsp/releases/download/&lt;version&gt;/postgrestools_aarch64-apple-darwin -o postgrestools
+chmod +x postgrestools
+</code></pre>
+<p>Now you can use Postgres Tools by simply running <code>./postgrestools</code>.</p>
+<p>If you are using Node, you can also install the CLI via NPM. Run the following commands in a directory containing a <code>package.json</code> file.</p>
+<pre><code class="language-sh">pnpm add --save-dev --save-exact @postgrestools/postgrestools
+</code></pre>
+<p>To use Postgres Tools in your favorite IDE, we recommend <a href="#install-an-editor-plugin">installing an editor plugin</a>.</p>
 <h2 id="configuration">Configuration</h2>
 <p>We recommend that you create a <code>postgrestools.jsonc</code> configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the <code>postgrestools.jsonc</code> file, run the <code>init</code> command in the root folder of your project:</p>
 <pre><code class="language-sh">postgrestools init
@@ -156,10 +177,34 @@
 <p>Make sure to check out the other options. We will provide guides for specific use cases like linting migration files soon.</p>
 <h2 id="install-an-editor-plugin">Install an Editor Plugin</h2>
 <p>We recommend installing an editor plugin to get the most out of Postgres Language Tools.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>We will update this section once we have published the binaries.</p>
-</div>
+<h3 id="vscode">VSCode</h3>
+<p>TODO</p>
+<h3 id="neovim">Neovim</h3>
+<p>You will have to install <code>nvim-lspconfig</code>, and follow the <a href="https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#postgres_lsp">instructions</a>.</p>
+<h3 id="other">Other</h3>
+<p>Postgres Tools has first-class LSP support. If your editor does implement LSP, then the integration of Postgres Tools should be seamless.</p>
+<h4 id="use-the-lsp-proxy">Use the LSP Proxy</h4>
+<p>Postgres Tools has a command called <code>lsp-proxy</code>. When executed, two processes will spawn:
+- a daemon that does execute the requested operations;
+- a server that functions as a proxy between the requests of the client - the editor - and the server - the daemon;
+If your editor is able to interact with a server and send <a href="https://www.jsonrpc.org">JSON-RPC</a> requests, you only need to configure the editor to run that command.</p>
+<h4 id="use-the-daemon-with-the-binary">Use the daemon with the binary</h4>
+<p>Using the binary via CLI is very efficient, although you won’t be able to provide logs to your users. The CLI allows you to bootstrap a daemon and then use the CLI commands through the daemon itself.
+In order to do so, you first need to start a daemon process with the start command:</p>
+<pre><code class="language-sh">postgrestools start
+</code></pre>
+<p>Then, every command needs to add the <code>--use-server</code> options, e.g.:</p>
+<pre><code class="language-sh">echo &quot;select 1&quot; | biome check --use-server --stdin-file-path=dummy.sql
+</code></pre>
+<h4 id="daemon-logs">Daemon logs</h4>
+<p>The daemon saves logs in your file system. Logs are stored in a folder called <code>pgt-logs</code>. The path of this folder changes based on your operative system:</p>
+<ul>
+<li>Linux: <code>~/.cache/pgt;</code></li>
+<li>Windows: <code>C:\Users\&lt;UserName&gt;\AppData\Local\supabase-community\pgt\cache</code></li>
+<li>macOS: <code>/Users/&lt;UserName&gt;/Library/Caches/dev.supabase-community.pgt</code></li>
+</ul>
+<p>For other operative systems, you can find the folder in the system’s temporary directory.</p>
+<p>You can change the location of the <code>pgt-logs</code> folder via the <code>PGT_LOG_PATH</code> variable.</p>
 <h2 id="ci-setup">CI Setup</h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -169,7 +214,7 @@
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="troubleshooting/" class="btn btn-neutral float-right" title="Troubleshooting">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="checking_migrations/" class="btn btn-neutral float-right" title="Linting Migrations">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -197,7 +242,7 @@
     
     
     
-      <span><a href="troubleshooting/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="checking_migrations/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
@@ -216,5 +261,5 @@
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-03-21 12:10:02.025359+00:00
+Build Date UTC : 2025-03-26 13:55:50.893683+00:00
 -->
