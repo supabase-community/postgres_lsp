@@ -34,7 +34,7 @@ chmod +x postgrestools
 
 Now you can use Postgres Tools by simply running `./postgrestools`.
 
-If you are using Node anyways, you can also install the CLI via NPM. Run the following commands in a directory containing a `package.json` file.
+If you are using Node, you can also install the CLI via NPM. Run the following commands in a directory containing a `package.json` file.
 
 ```sh
 pnpm add --save-dev --save-exact @postgrestools/postgrestools
