@@ -25,8 +25,22 @@ Our current focus is on refining and enhancing these core features while buildin
 
 ## Installation
 
-> [!NOTE]
-> We will update this section once we have published the binaries.
+To install Postgres Tools, grab the executable for your platform from the [latest CLI release](https://github.com/supabase-community/postgres_lsp/releases/latest) on GitHub and give it execution permission.
+
+```sh
+curl -L https://github.com/supabase-community/postgres_lsp/releases/download/<version>/postgrestools_aarch64-apple-darwin -o postgrestools
+chmod +x postgrestools
+```
+
+Now you can use Postgres Tools by simply running `./postgrestools`.
+
+If you are using Node, you can also install the CLI via NPM. Run the following commands in a directory containing a `package.json` file.
+
+```sh
+pnpm add --save-dev --save-exact @postgrestools/postgrestools
+```
+
+To use Postgres Tools in your favorite IDE, we recommend [installing an editor plugin](#install-an-editor-plugin).
 
 ## Configuration
 
@@ -88,9 +102,50 @@ Make sure to check out the other options. We will provide guides for specific us
 
 We recommend installing an editor plugin to get the most out of Postgres Language Tools.
 
-> [!NOTE]
-> We will update this section once we have published the binaries.
+### VSCode
 
+TODO
+
+### Neovim
+
+You will have to install `nvim-lspconfig`, and follow the [instructions](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#postgres_lsp).
+
+
+### Other
+
+Postgres Tools has first-class LSP support. If your editor does implement LSP, then the integration of Postgres Tools should be seamless.
+
+#### Use the LSP Proxy
+
+Postgres Tools has a command called `lsp-proxy`. When executed, two processes will spawn:
+- a daemon that does execute the requested operations;
+- a server that functions as a proxy between the requests of the client - the editor - and the server - the daemon;
+If your editor is able to interact with a server and send [JSON-RPC](https://www.jsonrpc.org) requests, you only need to configure the editor to run that command.
+
+#### Use the daemon with the binary
+Using the binary via CLI is very efficient, although you won’t be able to provide logs to your users. The CLI allows you to bootstrap a daemon and then use the CLI commands through the daemon itself.
+In order to do so, you first need to start a daemon process with the start command:
+
+```sh
+postgrestools start
+```
+
+Then, every command needs to add the `--use-server` options, e.g.:
+
+```sh
+echo "select 1" | biome check --use-server --stdin-file-path=dummy.sql
+```
+
+#### Daemon logs
+The daemon saves logs in your file system. Logs are stored in a folder called `pgt-logs`. The path of this folder changes based on your operative system:
+
+- Linux: `~/.cache/pgt;`
+- Windows: `C:\Users\<UserName>\AppData\Local\supabase-community\pgt\cache`
+- macOS: `/Users/<UserName>/Library/Caches/dev.supabase-community.pgt`
+
+For other operative systems, you can find the folder in the system’s temporary directory.
+
+You can change the location of the `pgt-logs` folder via the `PGT_LOG_PATH` variable.
 
 ## CI Setup
 
