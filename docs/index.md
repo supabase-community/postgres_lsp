@@ -113,7 +113,7 @@ You will have to install `nvim-lspconfig`, and follow the [instructions](https:/
 
 ### Other
 
-Postgres Tools has LSP first-class support. If your editor does implement LSP, then the integration of Postgres Tools should be seamless.
+Postgres Tools has first-class LSP support. If your editor does implement LSP, then the integration of Postgres Tools should be seamless.
 
 #### Use the LSP Proxy
 
