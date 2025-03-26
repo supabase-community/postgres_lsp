@@ -145,6 +145,8 @@ The daemon saves logs in your file system. Logs are stored in a folder called `p
 
 For other operative systems, you can find the folder in the system’s temporary directory.
 
+You can change the location of the `pgt-logs` folder via the `PGT_LOG_PATH` variable.
+
 ## CI Setup
 
 > [!NOTE]
