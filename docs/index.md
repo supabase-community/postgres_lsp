@@ -124,7 +124,7 @@ If your editor is able to interact with a server and send [JSON-RPC](https://www
 
 #### Use the daemon with the binary
 Using the binary via CLI is very efficient, although you won’t be able to provide logs to your users. The CLI allows you to bootstrap a daemon and then use the CLI commands through the daemon itself.
-If order to do so, you first need to start a daemon process with the start command:
+In order to do so, you first need to start a daemon process with the start command:
 
 ```sh
 postgrestools start
