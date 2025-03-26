@@ -120,7 +120,7 @@ Postgres Tools has LSP first-class support. If your editor does implement LSP, t
 Postgres Tools has a command called `lsp-proxy`. When executed, two processes will spawn:
 - a daemon that does execute the requested operations;
 - a server that functions as a proxy between the requests of the client - the editor - and the server - the daemon;
-If your editor is able to interact with a server and send [JSON-RPC](https://www.jsonrpc.org) request, you only need to configure the editor run that command.
+If your editor is able to interact with a server and send [JSON-RPC](https://www.jsonrpc.org) requests, you only need to configure the editor to run that command.
 
 #### Use the daemon with the binary
 Using the binary via CLI is very efficient, although you won’t be able to provide logs to your users. The CLI allows you to bootstrap a daemon and then use the CLI commands through the daemon itself.
