@@ -2413,16 +2413,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pgt_commands"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-std",
- "pgt_text_size",
- "sqlx",
-]
-
-[[package]]
 name = "pgt_completions"
 version = "0.0.0"
 dependencies = [
@@ -2754,7 +2744,6 @@ dependencies = [
  "ignore",
  "pgt_analyse",
  "pgt_analyser",
- "pgt_commands",
  "pgt_completions",
  "pgt_configuration",
  "pgt_console",

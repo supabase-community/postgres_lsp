@@ -57,7 +57,6 @@ pgt_analyse                = { path = "./crates/pgt_analyse", version = "0.0.0" 
 pgt_analyser               = { path = "./crates/pgt_analyser", version = "0.0.0" }
 pgt_base_db                = { path = "./crates/pgt_base_db", version = "0.0.0" }
 pgt_cli                    = { path = "./crates/pgt_cli", version = "0.0.0" }
-pgt_commands               = { path = "./crates/pgt_commands", version = "0.0.0" }
 pgt_completions            = { path = "./crates/pgt_completions", version = "0.0.0" }
 pgt_configuration          = { path = "./crates/pgt_configuration", version = "0.0.0" }
 pgt_console                = { path = "./crates/pgt_console", version = "0.0.0" }

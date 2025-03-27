@@ -20,7 +20,6 @@ globset           = "0.4.16"
 ignore                    = { workspace = true }
 pgt_analyse               = { workspace = true, features = ["serde"] }
 pgt_analyser              = { workspace = true }
-pgt_commands              = { workspace = true }
 pgt_completions           = { workspace = true }
 pgt_configuration         = { workspace = true }
 pgt_console               = { workspace = true }
