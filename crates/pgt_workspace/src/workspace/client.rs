@@ -96,6 +96,13 @@ where
         self.request("pgt/code_actions", params)
     }
 
+    fn execute_statement(
+        &self,
+        params: crate::code_actions::ExecuteStatementParams,
+    ) -> Result<crate::code_actions::ExecuteStatementResult, WorkspaceError> {
+        self.request("pgt/execute_statement", params)
+    }
+
     fn open_file(&self, params: OpenFileParams) -> Result<(), WorkspaceError> {
         self.request("pgt/open_file", params)
     }

@@ -20,7 +20,7 @@ pub fn get_completions(
                 path,
                 position: helper::get_cursor_position(
                     session,
-                    url,
+                    &url,
                     params.text_document_position.position,
                 )?,
             }) {

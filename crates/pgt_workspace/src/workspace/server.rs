@@ -5,6 +5,7 @@ use async_helper::run_async;
 use change::StatementChange;
 use dashmap::DashMap;
 use db_connection::DbConnection;
+pub(crate) use document::StatementId;
 use document::{Document, Statement};
 use futures::{StreamExt, stream};
 use pg_query::PgQueryStore;
@@ -14,13 +15,15 @@ use pgt_diagnostics::{Diagnostic, DiagnosticExt, Severity, serde::Diagnostic as 
 use pgt_fs::{ConfigName, PgTPath};
 use pgt_typecheck::TypecheckParams;
 use schema_cache_manager::SchemaCacheManager;
+use sqlx::Executor;
 use tracing::info;
 use tree_sitter::TreeSitterStore;
 
 use crate::{
     WorkspaceError,
     code_actions::{
-        CodeAction, CodeActionKind, CodeActionsResult, CommandAction, CommandActionCategory,
+        self, CodeAction, CodeActionKind, CodeActionsResult, CommandAction, CommandActionCategory,
+        ExecuteStatementResult,
     },
     configuration::to_analyser_rules,
     settings::{Settings, SettingsHandle, SettingsHandleMut},
@@ -258,8 +261,8 @@ impl Workspace for WorkspaceServer {
 
     fn pull_code_actions(
         &self,
-        params: crate::code_actions::CodeActionsParams,
-    ) -> Result<crate::code_actions::CodeActionsResult, WorkspaceError> {
+        params: code_actions::CodeActionsParams,
+    ) -> Result<code_actions::CodeActionsResult, WorkspaceError> {
         let doc = self
             .documents
             .get(&params.path)
@@ -283,15 +286,59 @@ impl Workspace for WorkspaceServer {
         };
 
         for (stmt, range, txt) in eligible_statements {
+            let title = format!(
+                "Execute Statement: {}...",
+                txt.chars().take(50).collect::<String>()
+            );
+
             actions.push(CodeAction {
+                title,
                 kind: CodeActionKind::Command(CommandAction {
-                    category: CommandActionCategory::ExecuteStatement(txt.into()),
+                    category: CommandActionCategory::ExecuteStatement(stmt.id),
                 }),
                 disabled_reason: disabled_reason.clone(),
             });
         }
 
         Ok(CodeActionsResult { actions })
+    }
+
+    fn execute_statement(
+        &self,
+        params: code_actions::ExecuteStatementParams,
+    ) -> Result<code_actions::ExecuteStatementResult, WorkspaceError> {
+        let doc = self
+            .documents
+            .get(&params.path)
+            .ok_or(WorkspaceError::not_found())?;
+
+        let sql: String = match doc.get_txt(params.statement_id) {
+            Some(txt) => txt,
+            None => {
+                return Ok(ExecuteStatementResult {
+                    message: "Statement was not found in document.".into(),
+                });
+            }
+        };
+
+        let conn = self.connection.write().unwrap();
+        let pool = match conn.get_pool() {
+            Some(p) => p,
+            None => {
+                return Ok(ExecuteStatementResult {
+                    message: "Not connected to database.".into(),
+                });
+            }
+        };
+
+        let result = run_async(async move { pool.execute(sqlx::query(&sql)).await })??;
+
+        Ok(ExecuteStatementResult {
+            message: format!(
+                "Successfully executed statement. Rows affected: {}",
+                result.rows_affected()
+            ),
+        })
     }
 
     fn pull_diagnostics(

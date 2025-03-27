@@ -1,6 +1,7 @@
+use crate::workspace::StatementId;
 use pgt_configuration::RuleSelector;
 use pgt_fs::PgTPath;
-use pgt_text_size::{TextRange, TextSize};
+use pgt_text_size::TextSize;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
@@ -19,15 +20,14 @@ pub struct CodeActionsResult {
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[serde(rename_all = "camelCase")]
 pub struct CodeAction {
+    pub title: String,
     pub kind: CodeActionKind,
     pub disabled_reason: Option<String>,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[serde(rename_all = "camelCase")]
 pub enum CodeActionKind {
     Edit(EditAction),
     Command(CommandAction),
@@ -36,27 +36,39 @@ pub enum CodeActionKind {
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[serde(rename_all = "camelCase")]
 pub struct EditAction {}
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[serde(rename_all = "camelCase")]
 pub struct CommandAction {
     pub category: CommandActionCategory,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[serde(rename_all = "camelCase")]
 pub enum CommandActionCategory {
-    ExecuteStatement(String),
+    ExecuteStatement(StatementId),
 }
 
-impl Into<String> for CommandActionCategory {
-    fn into(self) -> String {
+impl CommandActionCategory {
+    /// Returns the ID for the code action.
+    /// The workspace can parse such IDs into executable actions.
+    pub fn to_id(&self) -> String {
         match self {
-            Self::ExecuteStatement(_) => "pgt.executeStatement".into(),
+            CommandActionCategory::ExecuteStatement(_) => "pgt.executeStatement".into(),
         }
     }
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+pub struct ExecuteStatementParams {
+    pub statement_id: StatementId,
+    pub path: PgTPath,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+pub struct ExecuteStatementResult {
+    pub message: String,
 }

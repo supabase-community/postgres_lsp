@@ -1,10 +1,13 @@
 use crate::session::Session;
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use pgt_text_size::{TextRange, TextSize};
-use tower_lsp::lsp_types::{self, CodeAction, CodeActionDisabled, CodeActionOrCommand, Command};
+use tower_lsp::lsp_types::{
+    self, CodeAction, CodeActionDisabled, CodeActionOrCommand, Command, ExecuteCommandParams,
+    MessageType, notification::Notification, request::ExecuteCommand,
+};
 
 use pgt_workspace::code_actions::{
-    CodeActionKind, CodeActionsParams, CommandAction, CommandActionCategory,
+    CodeActionKind, CodeActionsParams, CommandActionCategory, ExecuteStatementParams,
 };
 
 use super::helper;
@@ -16,7 +19,7 @@ pub fn get_actions(
     let url = params.text_document.uri;
     let path = session.file_path(&url)?;
 
-    let cursor_position = helper::get_cursor_position(session, url, params.range.start)?;
+    let cursor_position = helper::get_cursor_position(session, &url, params.range.start)?;
 
     let workspace_actions = session.workspace.pull_code_actions(CodeActionsParams {
         path,
@@ -30,28 +33,31 @@ pub fn get_actions(
         .into_iter()
         .filter_map(|action| match action.kind {
             CodeActionKind::Command(command) => {
-                let title = match &command.category {
-                    CommandActionCategory::ExecuteStatement(stmt) => {
-                        format!(
-                            "Execute Statement: {}...",
-                            stmt.chars().take(50).collect::<String>()
-                        )
-                    }
-                };
+                let command_id: String = command.category.to_id();
+                let title = action.title;
 
-                return Some(CodeAction {
-                    title: title.clone(),
-                    command: Some(Command {
+                match command.category {
+                    CommandActionCategory::ExecuteStatement(stmt_id) => Some(CodeAction {
                         title: title.clone(),
-                        command: command.category.into(),
-                        arguments: None,
+                        kind: Some(lsp_types::CodeActionKind::EMPTY),
+                        command: Some({
+                            Command {
+                                title: title.clone(),
+                                command: command_id,
+                                arguments: Some(vec![
+                                    serde_json::Value::Number(stmt_id.into()),
+                                    serde_json::to_value(&url).unwrap(),
+                                ]),
+                            }
+                        }),
+                        disabled: action
+                            .disabled_reason
+                            .map(|reason| CodeActionDisabled { reason }),
+                        ..Default::default()
                     }),
-                    disabled: action
-                        .disabled_reason
-                        .map(|reason| CodeActionDisabled { reason }),
-                    ..Default::default()
-                });
+                }
             }
+
             _ => todo!(),
         })
         .collect();
@@ -60,4 +66,36 @@ pub fn get_actions(
         .into_iter()
         .map(|ac| CodeActionOrCommand::CodeAction(ac))
         .collect())
+}
+
+pub async fn execute_command(
+    session: &Session,
+    params: ExecuteCommandParams,
+) -> anyhow::Result<Option<serde_json::Value>> {
+    let command = params.command;
+
+    match command.as_str() {
+        "pgt.executeStatement" => {
+            let id: usize = serde_json::from_value(params.arguments[0].clone())?;
+            let doc_url: lsp_types::Url = serde_json::from_value(params.arguments[1].clone())?;
+
+            let path = session.file_path(&doc_url)?;
+
+            let result = session
+                .workspace
+                .execute_statement(ExecuteStatementParams {
+                    statement_id: id,
+                    path,
+                })?;
+
+            session
+                .client
+                .show_message(MessageType::INFO, result.message)
+                .await;
+
+            Ok(None)
+        }
+
+        any => Err(anyhow!(format!("Unknown command: {}", any))),
+    }
 }

@@ -4,7 +4,7 @@ use tower_lsp::lsp_types;
 
 pub fn get_cursor_position(
     session: &Session,
-    url: lsp_types::Url,
+    url: &lsp_types::Url,
     position: lsp_types::Position,
 ) -> anyhow::Result<TextSize> {
     let client_capabilities = session
@@ -12,7 +12,7 @@ pub fn get_cursor_position(
         .expect("Client capabilities not established for current session.");
 
     let line_index = session
-        .document(&url)
+        .document(url)
         .map(|doc| doc.line_index)
         .map_err(|_| anyhow::anyhow!("Document not found."))?;
 

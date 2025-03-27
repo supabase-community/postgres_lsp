@@ -1,17 +1,23 @@
 use std::{panic::RefUnwindSafe, path::PathBuf, sync::Arc};
 
 pub use self::client::{TransportRequest, WorkspaceClient, WorkspaceTransport};
-use crate::code_actions::*;
 use pgt_analyse::RuleCategories;
 use pgt_configuration::{PartialConfiguration, RuleSelector};
 use pgt_fs::PgTPath;
 use pgt_text_size::{TextRange, TextSize};
 use serde::{Deserialize, Serialize};
 
-use crate::WorkspaceError;
+use crate::{
+    WorkspaceError,
+    code_actions::{
+        CodeActionsParams, CodeActionsResult, ExecuteStatementParams, ExecuteStatementResult,
+    },
+};
 
 mod client;
 mod server;
+
+pub(crate) use server::StatementId;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
@@ -152,6 +158,11 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
     ///
     /// If the file path matches, then `true` is returned, and it should be considered ignored.
     fn is_path_ignored(&self, params: IsPathIgnoredParams) -> Result<bool, WorkspaceError>;
+
+    fn execute_statement(
+        &self,
+        params: ExecuteStatementParams,
+    ) -> Result<ExecuteStatementResult, WorkspaceError>;
 }
 
 /// Convenience function for constructing a server instance of [Workspace]

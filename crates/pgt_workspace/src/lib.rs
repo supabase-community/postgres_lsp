@@ -10,6 +10,7 @@ pub mod dome;
 pub mod matcher;
 pub mod settings;
 pub mod workspace;
+
 #[cfg(feature = "schema")]
 pub mod workspace_types;
 

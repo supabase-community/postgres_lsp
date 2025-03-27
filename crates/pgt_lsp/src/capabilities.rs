@@ -1,8 +1,9 @@
 use pgt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
 use tower_lsp::lsp_types::{
-    ClientCapabilities, CodeActionOptions, CompletionOptions, PositionEncodingKind, SaveOptions,
-    ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions,
-    TextDocumentSyncSaveOptions, WorkDoneProgressOptions,
+    ClientCapabilities, CodeActionOptions, CompletionOptions, ExecuteCommandOptions,
+    PositionEncodingKind, SaveOptions, ServerCapabilities, TextDocumentSyncCapability,
+    TextDocumentSyncKind, TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
+    WorkDoneProgressOptions,
 };
 
 /// The capabilities to send from server as part of [`InitializeResult`]
@@ -45,6 +46,10 @@ pub(crate) fn server_capabilities(capabilities: &ClientCapabilities) -> ServerCa
             work_done_progress_options: WorkDoneProgressOptions {
                 work_done_progress: None,
             },
+        }),
+        execute_command_provider: Some(ExecuteCommandOptions {
+            commands: vec!["pgt.executeStatement".into()],
+            ..Default::default()
         }),
         document_formatting_provider: None,
         document_range_formatting_provider: None,
