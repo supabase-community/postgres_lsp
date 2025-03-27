@@ -1,4 +1,6 @@
 use pgt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
+use pgt_workspace::code_actions::{CommandActionCategory, CommandActionCategoryIter};
+use strum::{EnumIter, IntoEnumIterator};
 use tower_lsp::lsp_types::{
     ClientCapabilities, CodeActionOptions, CompletionOptions, ExecuteCommandOptions,
     PositionEncodingKind, SaveOptions, ServerCapabilities, TextDocumentSyncCapability,
@@ -48,7 +50,10 @@ pub(crate) fn server_capabilities(capabilities: &ClientCapabilities) -> ServerCa
             },
         }),
         execute_command_provider: Some(ExecuteCommandOptions {
-            commands: vec!["pgt.executeStatement".into()],
+            commands: CommandActionCategory::iter()
+                .map(|c| c.to_id())
+                .collect::<Vec<String>>(),
+
             ..Default::default()
         }),
         document_formatting_provider: None,
