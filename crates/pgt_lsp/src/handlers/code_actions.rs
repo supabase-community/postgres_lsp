@@ -88,6 +88,14 @@ pub async fn execute_command(
                     path,
                 })?;
 
+            /**
+             * Updating all diagnostics: the changes caused by the statement execution
+             * might affect many files.
+             *
+             * TODO: in test.sql, this seems to work after create table, but not after drop table.
+             */
+            session.update_all_diagnostics().await;
+
             session
                 .client
                 .show_message(MessageType::INFO, result.message)
