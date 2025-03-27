@@ -51,16 +51,6 @@ pub enum CommandActionCategory {
     ExecuteStatement(StatementId),
 }
 
-impl CommandActionCategory {
-    /// Returns the ID for the code action.
-    /// The workspace can parse such IDs into executable actions.
-    pub fn to_id(&self) -> String {
-        match self {
-            CommandActionCategory::ExecuteStatement(_) => "pgt.executeStatement".into(),
-        }
-    }
-}
-
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ExecuteStatementParams {

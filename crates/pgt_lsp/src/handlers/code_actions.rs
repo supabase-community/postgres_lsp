@@ -33,7 +33,7 @@ pub fn get_actions(
         .into_iter()
         .filter_map(|action| match action.kind {
             CodeActionKind::Command(command) => {
-                let command_id: String = command.category.to_id();
+                let command_id: String = command_id(&command.category);
                 let title = action.title;
 
                 match command.category {
@@ -66,6 +66,12 @@ pub fn get_actions(
         .into_iter()
         .map(|ac| CodeActionOrCommand::CodeAction(ac))
         .collect())
+}
+
+pub fn command_id(command: &CommandActionCategory) -> String {
+    match command {
+        CommandActionCategory::ExecuteStatement(_) => "pgt.executeStatement".into(),
+    }
 }
 
 pub async fn execute_command(

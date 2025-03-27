@@ -8,6 +8,8 @@ use tower_lsp::lsp_types::{
     WorkDoneProgressOptions,
 };
 
+use crate::handlers::code_actions::command_id;
+
 /// The capabilities to send from server as part of [`InitializeResult`]
 ///
 /// [`InitializeResult`]: lspower::lsp::InitializeResult
@@ -51,7 +53,7 @@ pub(crate) fn server_capabilities(capabilities: &ClientCapabilities) -> ServerCa
         }),
         execute_command_provider: Some(ExecuteCommandOptions {
             commands: CommandActionCategory::iter()
-                .map(|c| c.to_id())
+                .map(|c| command_id(&c))
                 .collect::<Vec<String>>(),
 
             ..Default::default()
