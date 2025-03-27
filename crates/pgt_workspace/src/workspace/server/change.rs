@@ -1120,7 +1120,11 @@ mod tests {
     fn comment_at_begin() {
         let path = PgTPath::new("test.sql");
 
-        let mut doc = Document::new(path.clone(), "-- Add new schema named \"private\"\nCREATE SCHEMA \"private\";".to_string(), 0);
+        let mut doc = Document::new(
+            path.clone(),
+            "-- Add new schema named \"private\"\nCREATE SCHEMA \"private\";".to_string(),
+            0,
+        );
 
         let change = ChangeFileParams {
             path: path.clone(),
@@ -1133,7 +1137,10 @@ mod tests {
 
         let changed = doc.apply_file_change(&change);
 
-        assert_eq!(doc.content, "- Add new schema named \"private\"\nCREATE SCHEMA \"private\";");
+        assert_eq!(
+            doc.content,
+            "- Add new schema named \"private\"\nCREATE SCHEMA \"private\";"
+        );
 
         assert_eq!(changed.len(), 3);
         assert!(matches!(
@@ -1160,7 +1167,10 @@ mod tests {
 
         let changed_2 = doc.apply_file_change(&change_2);
 
-        assert_eq!(doc.content, "-- Add new schema named \"private\"\nCREATE SCHEMA \"private\";");
+        assert_eq!(
+            doc.content,
+            "-- Add new schema named \"private\"\nCREATE SCHEMA \"private\";"
+        );
 
         assert_eq!(changed_2.len(), 3);
         assert!(matches!(
