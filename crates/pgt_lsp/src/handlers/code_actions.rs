@@ -1,9 +1,8 @@
 use crate::session::Session;
 use anyhow::{Result, anyhow};
-use pgt_text_size::{TextRange, TextSize};
 use tower_lsp::lsp_types::{
     self, CodeAction, CodeActionDisabled, CodeActionOrCommand, Command, ExecuteCommandParams,
-    MessageType, notification::Notification, request::ExecuteCommand,
+    MessageType,
 };
 
 use pgt_workspace::code_actions::{
