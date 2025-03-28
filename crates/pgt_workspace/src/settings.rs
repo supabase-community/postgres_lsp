@@ -438,3 +438,43 @@ impl PartialConfigurationExt for PartialConfiguration {
         Ok((None, vec![]))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use biome_deserialize::StringSet;
+    use pgt_configuration::database::PartialDatabaseConfiguration;
+
+    use super::DatabaseSettings;
+
+    #[test]
+    fn should_identify_allowed_statement_executions() {
+        let partial_config = PartialDatabaseConfiguration {
+            allow_statement_executions_against: Some(StringSet::from_iter(
+                vec![String::from("localhost/*")].into_iter(),
+            )),
+            host: Some("localhost".into()),
+            database: Some("test-db".into()),
+            ..Default::default()
+        };
+
+        let config = DatabaseSettings::from(partial_config);
+
+        assert_eq!(config.allow_statement_executions, true)
+    }
+
+    #[test]
+    fn should_identify_not_allowed_statement_executions() {
+        let partial_config = PartialDatabaseConfiguration {
+            allow_statement_executions_against: Some(StringSet::from_iter(
+                vec![String::from("localhost/*")].into_iter(),
+            )),
+            host: Some("production".into()),
+            database: Some("test-db".into()),
+            ..Default::default()
+        };
+
+        let config = DatabaseSettings::from(partial_config);
+
+        assert_eq!(config.allow_statement_executions, false)
+    }
+}
