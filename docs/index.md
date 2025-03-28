@@ -104,7 +104,7 @@ We recommend installing an editor plugin to get the most out of Postgres Languag
 
 ### VSCode
 
-TODO
+The language server is available on the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=Supabase.postgrestools-vscode). Its published from [this repo](https://github.com/supabase-community/postgrestools-vscode).
 
 ### Neovim
 
@@ -149,6 +149,5 @@ You can change the location of the `pgt-logs` folder via the `PGT_LOG_PATH` vari
 
 ## CI Setup
 
-> [!NOTE]
-> We will update this section once we have published the binaries.
+To use the CLI in GitHub Actions, you can install it via our [GitHub Action](https://github.com/supabase-community/postgrestools-cli-action).
 
