@@ -6,7 +6,7 @@ A collection of language tools and a Language Server Protocol (LSP) implementati
 
 ---
 
-**Source Code**: <a href="https://github.com/supabase-community/postgres_lsp" target="_blank">https://github.com/supabase-community/postgres_lsp</a>
+**Source Code**: <a href="https://github.com/supabase-community/postgres-language-server" target="_blank">https://github.com/supabase-community/postgres-language-server</a>
 
 ---
 
@@ -25,10 +25,10 @@ Our current focus is on refining and enhancing these core features while buildin
 
 ## Installation
 
-To install Postgres Tools, grab the executable for your platform from the [latest CLI release](https://github.com/supabase-community/postgres_lsp/releases/latest) on GitHub and give it execution permission.
+To install Postgres Tools, grab the executable for your platform from the [latest CLI release](https://github.com/supabase-community/postgres-language-server/releases/latest) on GitHub and give it execution permission.
 
 ```sh
-curl -L https://github.com/supabase-community/postgres_lsp/releases/download/<version>/postgrestools_aarch64-apple-darwin -o postgrestools
+curl -L https://github.com/supabase-community/postgres-language-server/releases/download/<version>/postgrestools_aarch64-apple-darwin -o postgrestools
 chmod +x postgrestools
 ```
 
