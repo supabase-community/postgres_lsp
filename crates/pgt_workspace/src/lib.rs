@@ -3,12 +3,14 @@ use std::ops::{Deref, DerefMut};
 use pgt_console::Console;
 use pgt_fs::{FileSystem, OsFileSystem};
 
+pub mod code_actions;
 pub mod configuration;
 pub mod diagnostics;
 pub mod dome;
 pub mod matcher;
 pub mod settings;
 pub mod workspace;
+
 #[cfg(feature = "schema")]
 pub mod workspace_types;
 

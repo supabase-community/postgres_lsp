@@ -1,11 +1,9 @@
-select id, name, test1231234123, unknown from co;
+create table
+  unknown_users (id serial primary key, address text, email text);
 
-select 14433313331333333333
+drop table unknown_users;
 
-select * from test;
-
-alter tqjable test drop column id;
-
-alter table test drop column id;
-
-select lower();
+select
+  *
+from
+  unknown_users;

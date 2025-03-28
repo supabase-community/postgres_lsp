@@ -1,0 +1,3 @@
+{
+  "postgrestools.bin": "./target/debug/postgrestools"
+}

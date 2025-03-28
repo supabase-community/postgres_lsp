@@ -230,6 +230,7 @@ export interface PartialConfiguration {
  * The configuration of the database connection.
  */
 export interface PartialDatabaseConfiguration {
+	allowStatementExecutionsAgainst?: StringSet;
 	/**
 	 * The connection timeout in seconds.
 	 */

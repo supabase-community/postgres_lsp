@@ -52,7 +52,7 @@ postgrestools init
 
 After running the `init` command, you’ll have a `postgrestools.jsonc` file in your directory:
 
-[//]: # (BEGIN DEFAULT_CONFIGURATION)
+[//]: # "BEGIN DEFAULT_CONFIGURATION"
 
 ```json
 {
@@ -77,12 +77,13 @@ After running the `init` command, you’ll have a `postgrestools.jsonc` file in 
     "username": "postgres",
     "password": "postgres",
     "database": "postgres",
-    "connTimeoutSecs": 10
+    "connTimeoutSecs": 10,
+    "allowStatementExecutionsAgainst": ["127.0.0.1/*", "localhost/*"]
   }
 }
 ```
 
-[//]: # (END DEFAULT_CONFIGURATION)
+[//]: # "END DEFAULT_CONFIGURATION"
 
 Make sure to point the database connection settings at your local development database. To see what else can be configured, run `--help`.
 
@@ -110,7 +111,6 @@ TODO
 
 You will have to install `nvim-lspconfig`, and follow the [instructions](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#postgres_lsp).
 
-
 ### Other
 
 Postgres Tools has first-class LSP support. If your editor does implement LSP, then the integration of Postgres Tools should be seamless.
@@ -118,11 +118,13 @@ Postgres Tools has first-class LSP support. If your editor does implement LSP, t
 #### Use the LSP Proxy
 
 Postgres Tools has a command called `lsp-proxy`. When executed, two processes will spawn:
+
 - a daemon that does execute the requested operations;
 - a server that functions as a proxy between the requests of the client - the editor - and the server - the daemon;
-If your editor is able to interact with a server and send [JSON-RPC](https://www.jsonrpc.org) requests, you only need to configure the editor to run that command.
+  If your editor is able to interact with a server and send [JSON-RPC](https://www.jsonrpc.org) requests, you only need to configure the editor to run that command.
 
 #### Use the daemon with the binary
+
 Using the binary via CLI is very efficient, although you won’t be able to provide logs to your users. The CLI allows you to bootstrap a daemon and then use the CLI commands through the daemon itself.
 In order to do so, you first need to start a daemon process with the start command:
 
@@ -137,6 +139,7 @@ echo "select 1" | biome check --use-server --stdin-file-path=dummy.sql
 ```
 
 #### Daemon logs
+
 The daemon saves logs in your file system. Logs are stored in a folder called `pgt-logs`. The path of this folder changes based on your operative system:
 
 - Linux: `~/.cache/pgt;`
@@ -151,4 +154,3 @@ You can change the location of the `pgt-logs` folder via the `PGT_LOG_PATH` vari
 
 > [!NOTE]
 > We will update this section once we have published the binaries.
-
