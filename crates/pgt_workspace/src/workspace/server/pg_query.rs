@@ -28,7 +28,7 @@ impl PgQueryStore {
         if let Ok(ast) = r {
             self.ast_db.insert(statement.clone(), Arc::new(ast));
         } else {
-            tracing::info!("adding diagnostics");
+            tracing::info!("invalid statement, adding diagnostics.");
             self.diagnostics
                 .insert(statement.clone(), SyntaxDiagnostic::from(r.unwrap_err()));
         }

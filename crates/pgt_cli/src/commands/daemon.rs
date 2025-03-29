@@ -5,19 +5,20 @@ use crate::{
 use pgt_console::{ConsoleExt, markup};
 use pgt_lsp::ServerFactory;
 use pgt_workspace::{TransportError, WorkspaceError, workspace::WorkspaceClient};
-use std::{env, fs, path::PathBuf};
+use std::{alloc::System, env, fs, path::PathBuf};
 use tokio::io;
 use tokio::runtime::Runtime;
-use tracing::subscriber::Interest;
-use tracing::{Instrument, Metadata, debug_span, metadata::LevelFilter};
+use tracing::{Instrument, Level, Metadata, debug_span, metadata::LevelFilter};
+use tracing::{level_filters, subscriber::Interest};
 use tracing_appender::rolling::Rotation;
 use tracing_subscriber::{
     Layer,
+    fmt::time::{FormatTime, SystemTime},
     layer::{Context, Filter},
     prelude::*,
     registry,
 };
-use tracing_tree::HierarchicalLayer;
+use tracing_tree::{HierarchicalLayer, time::UtcDateTime};
 
 pub(crate) fn start(
     session: CliSession,
@@ -78,8 +79,9 @@ pub(crate) fn run_server(
     config_path: Option<PathBuf>,
     log_path: Option<PathBuf>,
     log_file_name_prefix: Option<String>,
+    log_level: Option<String>,
 ) -> Result<(), CliDiagnostic> {
-    setup_tracing_subscriber(log_path, log_file_name_prefix);
+    setup_tracing_subscriber(log_path, log_file_name_prefix, log_level);
 
     let rt = Runtime::new()?;
     let factory = ServerFactory::new(stop_on_disconnect);
@@ -208,8 +210,13 @@ pub(crate) fn read_most_recent_log_file(
 /// is written to log files rotated on a hourly basis (in
 /// `pgt-logs/server.log.yyyy-MM-dd-HH` files inside the system temporary
 /// directory)
-fn setup_tracing_subscriber(log_path: Option<PathBuf>, log_file_name_prefix: Option<String>) {
+fn setup_tracing_subscriber(
+    log_path: Option<PathBuf>,
+    log_file_name_prefix: Option<String>,
+    log_level: Option<String>,
+) {
     let pgt_log_path = log_path.unwrap_or(pgt_fs::ensure_cache_dir().join("pgt-logs"));
+
     let appender_builder = tracing_appender::rolling::RollingFileAppender::builder();
     let file_appender = appender_builder
         .filename_prefix(log_file_name_prefix.unwrap_or(String::from("server.log")))
@@ -226,8 +233,9 @@ fn setup_tracing_subscriber(log_path: Option<PathBuf>, log_file_name_prefix: Opt
                 .with_bracketed_fields(true)
                 .with_targets(true)
                 .with_ansi(false)
+                .with_timer(UtcDateTime::default())
                 .with_writer(file_appender)
-                .with_filter(LoggingFilter),
+                .with_filter(PgtLoggingFilter::from(log_level)),
         )
         .init();
 }
@@ -239,22 +247,34 @@ pub fn default_pgt_log_path() -> PathBuf {
     }
 }
 
-/// Tracing filter enabling:
-/// - All spans and events at level info or higher
-/// - All spans and events at level debug in crates whose name starts with `pgt`
-struct LoggingFilter;
+/// Tracing Filter with two rules:
+/// For all crates starting with pgt*, use `PGT_LOG_LEVEL` or CLI option or "info" as default
+/// For all other crates, use "info"
+struct PgtLoggingFilter(LevelFilter);
 
-/// Tracing filter used for spans emitted by `pgt*` crates
-const SELF_FILTER: LevelFilter = if cfg!(debug_assertions) {
-    LevelFilter::TRACE
-} else {
-    LevelFilter::DEBUG
-};
+impl From<Option<String>> for PgtLoggingFilter {
+    fn from(value: Option<String>) -> Self {
+        Self(
+            value
+                .map(|lv_filter| match lv_filter.as_str() {
+                    "trace" => LevelFilter::TRACE,
+                    "debug" => LevelFilter::DEBUG,
+                    "info" => LevelFilter::INFO,
+                    "warn" => LevelFilter::WARN,
+                    "error" => LevelFilter::ERROR,
+                    "off" => LevelFilter::OFF,
 
-impl LoggingFilter {
+                    _ => LevelFilter::INFO,
+                })
+                .unwrap_or(LevelFilter::INFO),
+        )
+    }
+}
+
+impl PgtLoggingFilter {
     fn is_enabled(&self, meta: &Metadata<'_>) -> bool {
         let filter = if meta.target().starts_with("pgt") {
-            SELF_FILTER
+            self.0
         } else {
             LevelFilter::INFO
         };
@@ -263,7 +283,7 @@ impl LoggingFilter {
     }
 }
 
-impl<S> Filter<S> for LoggingFilter {
+impl<S> Filter<S> for PgtLoggingFilter {
     fn enabled(&self, meta: &Metadata<'_>, _cx: &Context<'_, S>) -> bool {
         self.is_enabled(meta)
     }
@@ -277,6 +297,6 @@ impl<S> Filter<S> for LoggingFilter {
     }
 
     fn max_level_hint(&self) -> Option<LevelFilter> {
-        Some(SELF_FILTER)
+        Some(self.0)
     }
 }

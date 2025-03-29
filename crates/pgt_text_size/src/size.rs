@@ -2,7 +2,8 @@ use {
     crate::TextLen,
     std::{
         convert::TryFrom,
-        fmt, iter,
+        fmt::{self, Display},
+        iter,
         num::TryFromIntError,
         ops::{Add, AddAssign, Sub, SubAssign},
         u32,
@@ -27,6 +28,12 @@ pub struct TextSize {
 }
 
 impl fmt::Debug for TextSize {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.raw)
+    }
+}
+
+impl Display for TextSize {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.raw)
     }

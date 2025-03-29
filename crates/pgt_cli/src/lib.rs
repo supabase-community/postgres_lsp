@@ -105,11 +105,13 @@ impl<'app> CliSession<'app> {
                 config_path,
                 log_path,
                 log_prefix_name,
+                log_level,
             } => commands::daemon::run_server(
                 stop_on_disconnect,
                 config_path,
                 Some(log_path),
                 Some(log_prefix_name),
+                Some(log_level),
             ),
             PgtCommand::PrintSocket => commands::daemon::print_socket(),
         };

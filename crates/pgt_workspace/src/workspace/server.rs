@@ -144,7 +144,7 @@ impl Workspace for WorkspaceServer {
     /// ## Panics
     /// This function may panic if the internal settings mutex has been poisoned
     /// by another thread having previously panicked while holding the lock
-    #[tracing::instrument(level = "trace", skip(self))]
+    #[tracing::instrument(level = "trace", skip(self), err)]
     fn update_settings(&self, params: UpdateSettingsParams) -> Result<(), WorkspaceError> {
         tracing::info!("Updating settings in workspace");
 
@@ -170,10 +170,8 @@ impl Workspace for WorkspaceServer {
     }
 
     /// Add a new file to the workspace
-    #[tracing::instrument(level = "trace", skip(self))]
+    #[tracing::instrument(level = "info", skip_all, fields(path = params.path.as_path().as_os_str().to_str()), err)]
     fn open_file(&self, params: OpenFileParams) -> Result<(), WorkspaceError> {
-        tracing::info!("Opening file: {:?}", params.path);
-
         let doc = Document::new(params.path.clone(), params.content, params.version);
 
         doc.iter_statements_with_text().for_each(|(stmt, content)| {
@@ -202,6 +200,10 @@ impl Workspace for WorkspaceServer {
     }
 
     /// Change the content of an open file
+    #[tracing::instrument(level = "debug", skip_all, fields(
+        path = params.path.as_os_str().to_str(),
+        version = params.version
+    ), err)]
     fn change_file(&self, params: super::ChangeFileParams) -> Result<(), WorkspaceError> {
         let mut doc = self
             .documents
@@ -212,22 +214,39 @@ impl Workspace for WorkspaceServer {
                 params.version,
             ));
 
-        tracing::info!("Changing file: {:?}", params);
-
         for c in &doc.apply_file_change(&params) {
             match c {
                 StatementChange::Added(added) => {
-                    tracing::debug!("Adding statement: {:?}", added);
+                    tracing::debug!(
+                        "Adding statement: id:{:?}, path:{:?}, text:{:?}",
+                        added.stmt.id,
+                        added.stmt.path.as_os_str().to_str(),
+                        added.text
+                    );
                     self.tree_sitter.add_statement(&added.stmt, &added.text);
                     self.pg_query.add_statement(&added.stmt, &added.text);
                 }
                 StatementChange::Deleted(s) => {
-                    tracing::debug!("Deleting statement: {:?}", s);
+                    tracing::debug!(
+                        "Deleting statement: id:{:?}, path:{:?}",
+                        s.id,
+                        s.path.as_os_str()
+                    );
                     self.tree_sitter.remove_statement(s);
                     self.pg_query.remove_statement(s);
                 }
                 StatementChange::Modified(s) => {
-                    tracing::debug!("Modifying statement: {:?}", s);
+                    tracing::debug!(
+                        "Modifying statement with id {:?} (new id {:?}) in {:?}. Range {:?}, Changed from '{:?}' to '{:?}', changed text: {:?}",
+                        s.old_stmt.id,
+                        s.new_stmt.id,
+                        s.old_stmt.path.as_os_str().to_str(),
+                        s.change_range,
+                        s.old_stmt_text,
+                        s.new_stmt_text,
+                        s.change_text
+                    );
+
                     self.tree_sitter.modify_statement(s);
                     self.pg_query.modify_statement(s);
                 }
@@ -394,17 +413,14 @@ impl Workspace for WorkspaceServer {
         })
     }
 
-    #[tracing::instrument(level = "debug", skip(self))]
+    #[tracing::instrument(level = "debug", skip_all, fields(
+        path = params.path.as_os_str().to_str(),
+        position = params.position.to_string()
+    ), err)]
     fn get_completions(
         &self,
         params: super::GetCompletionsParams,
     ) -> Result<pgt_completions::CompletionResult, WorkspaceError> {
-        tracing::debug!(
-            "Getting completions for file {:?} at position {:?}",
-            &params.path,
-            &params.position
-        );
-
         let pool = match self.connection.read().unwrap().get_pool() {
             Some(pool) => pool,
             None => return Ok(pgt_completions::CompletionResult::default()),
@@ -414,12 +430,6 @@ impl Workspace for WorkspaceServer {
             .documents
             .get(&params.path)
             .ok_or(WorkspaceError::not_found())?;
-
-        tracing::debug!(
-            "Found the document. Looking for statement in file {:?} at position: {:?}",
-            &params.path,
-            &params.position
-        );
 
         let (statement, stmt_range, text) = match doc
             .iter_statements_with_text_and_range()
@@ -436,7 +446,7 @@ impl Workspace for WorkspaceServer {
         let tree = self.tree_sitter.get_parse_tree(&statement);
 
         tracing::debug!(
-            "Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {}",
+            "Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {:?}",
             position,
             stmt_range.start(),
             stmt_range.end(),
@@ -444,8 +454,6 @@ impl Workspace for WorkspaceServer {
         );
 
         let schema_cache = self.schema_cache.load(pool)?;
-
-        tracing::debug!("Loaded schema cache for completions");
 
         let result = pgt_completions::complete(pgt_completions::CompletionParams {
             position,
