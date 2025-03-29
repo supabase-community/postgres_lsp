@@ -1,0 +1,21 @@
+{
+	"name": "@postgrestools/wasm-nodejs",
+	"collaborators": ["Supabase Community"],
+	"description": "WebAssembly bindings to the Postgres Tools workspace API",
+	"version": "0.1.2",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/supabase-community/postgres-language-server.git",
+		"directory": "packages/@postgrestools/wasm-nodejs"
+	},
+	"files": [
+		"postgrestools_wasm_bg.wasm",
+		"postgrestools_wasm.js",
+		"postgrestools_wasm.d.ts"
+	],
+	"main": "postgrestools_wasm.js",
+	"homepage": "https://pgtools.dev/",
+	"types": "postgrestools_wasm.d.ts",
+	"keywords": ["parser", "linter", "wasm"]
+}

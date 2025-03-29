@@ -9,7 +9,7 @@ alias t := test
 # Installs the tools needed to develop
 install-tools:
 	cargo install cargo-binstall
-	cargo binstall cargo-insta taplo-cli
+	cargo binstall cargo-insta taplo-cli wasm-pack wasm-tools
 	cargo binstall --git "https://github.com/astral-sh/uv" uv
 	bun install
 
