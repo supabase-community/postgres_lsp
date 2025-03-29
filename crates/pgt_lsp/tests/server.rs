@@ -551,3 +551,206 @@ async fn test_completions() -> Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn test_issue_271() -> Result<()> {
+    let factory = ServerFactory::default();
+    let mut fs = MemoryFileSystem::default();
+    let test_db = get_new_test_db().await;
+
+    let setup = r#"
+            create table public.users (
+                id serial primary key,
+                name varchar(255) not null
+            );
+        "#;
+
+    test_db
+        .execute(setup)
+        .await
+        .expect("Failed to setup test database");
+
+    let mut conf = PartialConfiguration::init();
+    conf.merge_with(PartialConfiguration {
+        db: Some(PartialDatabaseConfiguration {
+            database: Some(
+                test_db
+                    .connect_options()
+                    .get_database()
+                    .unwrap()
+                    .to_string(),
+            ),
+            ..Default::default()
+        }),
+        ..Default::default()
+    });
+    fs.insert(
+        url!("postgrestools.jsonc").to_file_path().unwrap(),
+        serde_json::to_string_pretty(&conf).unwrap(),
+    );
+
+    let (service, client) = factory
+        .create_with_fs(None, DynRef::Owned(Box::new(fs)))
+        .into_inner();
+
+    let (stream, sink) = client.split();
+    let mut server = Server::new(service);
+
+    let (sender, _) = channel(CHANNEL_BUFFER_SIZE);
+    let reader = tokio::spawn(client_handler(stream, sink, sender));
+
+    server.initialize().await?;
+    server.initialized().await?;
+
+    server.load_configuration().await?;
+
+    server
+        .open_document("CREATE COLLATION ignore_accent_case (provider = icu, deterministic = false, locale = 'und-u-ks-level1');\n\n-- CREATE OR REPLACE FUNCTION\n--     add_one(integer)\n-- RETURNS\n--     integer\n-- AS\n--     'add_one.so', 'add_one'\n-- LANGUAGE\n--     C \n-- STRICT;\n\n\nSELECT pwhash, FROM users;")
+        .await?;
+
+    server
+        .change_document(
+            3,
+            vec![TextDocumentContentChangeEvent {
+                range: Some(Range {
+                    start: Position {
+                        line: 13,
+                        character: 13,
+                    },
+                    end: Position {
+                        line: 13,
+                        character: 14,
+                    },
+                }),
+                range_length: Some(0),
+                text: "".to_string(),
+            }],
+        )
+        .await?;
+
+    server
+        .change_document(
+            1,
+            vec![TextDocumentContentChangeEvent {
+                range: Some(Range {
+                    start: Position {
+                        line: 13,
+                        character: 13,
+                    },
+                    end: Position {
+                        line: 13,
+                        character: 13,
+                    },
+                }),
+                range_length: Some(0),
+                text: ",".to_string(),
+            }],
+        )
+        .await?;
+
+    server
+        .change_document(
+            2,
+            vec![TextDocumentContentChangeEvent {
+                range: Some(Range {
+                    start: Position {
+                        line: 13,
+                        character: 14,
+                    },
+                    end: Position {
+                        line: 13,
+                        character: 14,
+                    },
+                }),
+                range_length: Some(0),
+                text: " ".to_string(),
+            }],
+        )
+        .await?;
+
+    server
+        .change_document(
+            3,
+            vec![TextDocumentContentChangeEvent {
+                range: Some(Range {
+                    start: Position {
+                        line: 13,
+                        character: 15,
+                    },
+                    end: Position {
+                        line: 13,
+                        character: 15,
+                    },
+                }),
+                range_length: Some(0),
+                text: "county_name".to_string(),
+            }],
+        )
+        .await?;
+
+    server
+        .change_document(
+            4,
+            vec![TextDocumentContentChangeEvent {
+                range: Some(Range {
+                    start: Position {
+                        line: 13,
+                        character: 13,
+                    },
+                    end: Position {
+                        line: 13,
+                        character: 26,
+                    },
+                }),
+                range_length: Some(13),
+                text: "".to_string(),
+            }],
+        )
+        .await?;
+
+    server
+        .change_document(
+            5,
+            vec![TextDocumentContentChangeEvent {
+                range: Some(Range {
+                    start: Position {
+                        line: 13,
+                        character: 13,
+                    },
+                    end: Position {
+                        line: 13,
+                        character: 13,
+                    },
+                }),
+                range_length: Some(0),
+                text: ",".to_string(),
+            }],
+        )
+        .await?;
+
+    // crashes with range end index 37 out of range for slice of length 26
+    let res = server
+        .get_completion(CompletionParams {
+            work_done_progress_params: WorkDoneProgressParams::default(),
+            partial_result_params: PartialResultParams::default(),
+            context: None,
+            text_document_position: TextDocumentPositionParams {
+                text_document: TextDocumentIdentifier {
+                    uri: url!("document.sql"),
+                },
+                position: Position {
+                    line: 13,
+                    character: 14,
+                },
+            },
+        })
+        .await?;
+
+    assert!(res.is_some());
+
+    server.shutdown().await?;
+    reader.abort();
+
+    Ok(())
+}
+
