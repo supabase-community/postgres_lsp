@@ -15,8 +15,8 @@ Install: [instructions](https://pgtools.dev/#installation)
 ## Overview
 
 <p float="left">
-  <img src="/docs/images/lsp-demo.gif" width="50%" />
-  <img src="/docs/images/cli-demo.png" width="50%" />
+  <img src="/docs/images/lsp-demo.gif" width="45%" />
+  <img src="/docs/images/cli-demo.png" width="45%" />
 </p>
 
 This project provides a toolchain for Postgres development, built on Postgres' own parser `libpg_query` to ensure 100% syntax compatibility. It is built on a Server-Client architecture with a transport-agnostic design. This means all features can be accessed not only through the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/), but also through other interfaces like a CLI, HTTP APIs, or a WebAssembly module. The goal is to make all the great Postgres tooling out there as accessible as possible, and to build anything that is missing ourselves.
