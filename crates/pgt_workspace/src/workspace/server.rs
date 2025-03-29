@@ -312,6 +312,19 @@ impl Workspace for WorkspaceServer {
             .get(&params.path)
             .ok_or(WorkspaceError::not_found())?;
 
+        if self
+            .pg_query
+            .get_ast(&Statement {
+                path: params.path,
+                id: params.statement_id,
+            })
+            .is_none()
+        {
+            return Ok(ExecuteStatementResult {
+                message: "Statement is invalid.".into(),
+            });
+        };
+
         let sql: String = match doc.get_txt(params.statement_id) {
             Some(txt) => txt,
             None => {
