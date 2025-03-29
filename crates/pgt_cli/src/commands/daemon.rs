@@ -5,20 +5,19 @@ use crate::{
 use pgt_console::{ConsoleExt, markup};
 use pgt_lsp::ServerFactory;
 use pgt_workspace::{TransportError, WorkspaceError, workspace::WorkspaceClient};
-use std::{alloc::System, env, fs, path::PathBuf};
+use std::{env, fs, path::PathBuf};
 use tokio::io;
 use tokio::runtime::Runtime;
-use tracing::{Instrument, Level, Metadata, debug_span, metadata::LevelFilter};
-use tracing::{level_filters, subscriber::Interest};
+use tracing::subscriber::Interest;
+use tracing::{Instrument, Metadata, debug_span, metadata::LevelFilter};
 use tracing_appender::rolling::Rotation;
+use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_subscriber::{
-    Layer,
-    fmt::time::{FormatTime, SystemTime},
+    fmt::Layer,
     layer::{Context, Filter},
     prelude::*,
     registry,
 };
-use tracing_tree::{HierarchicalLayer, time::UtcDateTime};
 
 pub(crate) fn start(
     session: CliSession,
@@ -218,6 +217,7 @@ fn setup_tracing_subscriber(
     let pgt_log_path = log_path.unwrap_or(pgt_fs::ensure_cache_dir().join("pgt-logs"));
 
     let appender_builder = tracing_appender::rolling::RollingFileAppender::builder();
+
     let file_appender = appender_builder
         .filename_prefix(log_file_name_prefix.unwrap_or(String::from("server.log")))
         .max_log_files(7)
@@ -226,15 +226,9 @@ fn setup_tracing_subscriber(
         .expect("Failed to start the logger for the daemon.");
 
     registry()
+        .with(JsonStorageLayer)
         .with(
-            HierarchicalLayer::default()
-                .with_indent_lines(true)
-                .with_indent_amount(2)
-                .with_bracketed_fields(true)
-                .with_targets(true)
-                .with_ansi(false)
-                .with_timer(UtcDateTime::default())
-                .with_writer(file_appender)
+            BunyanFormattingLayer::new("pgt_logs".into(), file_appender)
                 .with_filter(PgtLoggingFilter::from(log_level)),
         )
         .init();
