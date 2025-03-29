@@ -16,7 +16,6 @@ version              = "0.0.0"
 pgt_console.workspace      = true
 pgt_diagnostics.workspace  = true
 pgt_query_ext.workspace    = true
-pgt_schema_cache.workspace = true
 rustc-hash                 = { workspace = true }
 
 biome_deserialize        = { workspace = true, optional = true }

@@ -853,6 +853,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "console_error_panic_hook"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a06aeb73f470f66dcdbf7223caeebb85984942f22f1adb2a088cf9668146bbbc"
+dependencies = [
+ "cfg-if",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "const-oid"
 version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1438,8 +1448,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4567c8db10ae91089c99af84c68c38da3ec2f087c3f82960bcdbf3656b6f4d7"
 dependencies = [
  "cfg-if",
+ "js-sys",
  "libc",
  "wasi",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -2353,7 +2365,6 @@ dependencies = [
  "pgt_console",
  "pgt_diagnostics",
  "pgt_query_ext",
- "pgt_schema_cache",
  "pgt_text_size",
  "rustc-hash 2.1.0",
  "schemars",
@@ -2431,10 +2442,6 @@ dependencies = [
  "pgt_test_utils",
  "pgt_text_size",
  "pgt_treesitter_queries",
- "schemars",
- "serde",
- "serde_json",
- "sqlx",
  "tokio",
  "tree-sitter",
  "tree_sitter_sql",
@@ -2737,6 +2744,25 @@ dependencies = [
  "tokio",
  "tree-sitter",
  "tree_sitter_sql",
+]
+
+[[package]]
+name = "pgt_wasm"
+version = "0.0.0"
+dependencies = [
+ "biome_js_factory",
+ "biome_js_formatter",
+ "biome_rowan",
+ "console_error_panic_hook",
+ "getrandom",
+ "js-sys",
+ "pgt_console",
+ "pgt_diagnostics",
+ "pgt_workspace",
+ "quote",
+ "serde",
+ "serde-wasm-bindgen",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -3364,6 +3390,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6513c1ad0b11a9376da888e3e0baa0077f1aed55c17f50e7b2397136129fb88f"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-wasm-bindgen"
+version = "0.6.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8302e169f0eddcc139c70f139d19d6467353af16f9fce27e8c30158036a1e16b"
+dependencies = [
+ "js-sys",
+ "serde",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -4497,6 +4534,8 @@ checksum = "a474f6281d1d70c17ae7aa6a613c87fce69a127e2624002df63dcb39d6cf6396"
 dependencies = [
  "cfg-if",
  "once_cell",
+ "serde",
+ "serde_json",
  "wasm-bindgen-macro",
 ]
 

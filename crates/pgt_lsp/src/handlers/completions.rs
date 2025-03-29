@@ -62,11 +62,15 @@ pub fn get_completions(
 }
 
 fn to_lsp_types_completion_item_kind(
-    pg_comp_kind: pgt_completions::CompletionItemKind,
+    pg_comp_kind: pgt_workspace::workspace::CompletionItemKind,
 ) -> lsp_types::CompletionItemKind {
     match pg_comp_kind {
-        pgt_completions::CompletionItemKind::Function => lsp_types::CompletionItemKind::FUNCTION,
-        pgt_completions::CompletionItemKind::Table => lsp_types::CompletionItemKind::CLASS,
-        pgt_completions::CompletionItemKind::Column => lsp_types::CompletionItemKind::FIELD,
+        pgt_workspace::workspace::CompletionItemKind::Function => {
+            lsp_types::CompletionItemKind::FUNCTION
+        }
+        pgt_workspace::workspace::CompletionItemKind::Table => lsp_types::CompletionItemKind::CLASS,
+        pgt_workspace::workspace::CompletionItemKind::Column => {
+            lsp_types::CompletionItemKind::FIELD
+        }
     }
 }

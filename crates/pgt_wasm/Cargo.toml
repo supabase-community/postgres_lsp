@@ -1,0 +1,44 @@
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "<DESCRIPTION>"
+edition.workspace    = true
+homepage.workspace   = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "pgt_wasm"
+repository.workspace = true
+version              = "0.0.0"
+
+[dependencies]
+pgt_console      = { workspace = true }
+pgt_diagnostics  = { workspace = true }
+pgt_workspace      = { workspace = true  }
+js-sys             = "0.3.72"
+serde              = { workspace = true }
+serde-wasm-bindgen = "0.6.5"
+wasm-bindgen       = { version = "0.2.95", features = ["serde-serialize"] }
+getrandom         = { version = "0.2.15", features = ["js"] }
+
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+# code size when deploying.
+console_error_panic_hook = { version = "0.1.7", optional = true }
+
+[build-dependencies]
+biome_js_factory   = { workspace = true }
+biome_rowan   = { workspace = true }
+biome_js_formatter = { workspace = true }
+pgt_workspace      = { workspace = true, features = ["schema"] }
+quote              = "1.0.14"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default           = ["console_error_panic_hook"]
+
+[package.metadata.wasm-pack.profile.profiling]
+wasm-opt = false
+

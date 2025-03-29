@@ -28,7 +28,7 @@ pgt_flags                = { workspace = true }
 pgt_fs                   = { workspace = true }
 pgt_lsp                  = { workspace = true }
 pgt_text_edit            = { workspace = true }
-pgt_workspace            = { workspace = true }
+pgt_workspace            = { workspace = true, features = ["db-connection"] }
 quick-junit              = "0.5.0"
 rayon                    = { workspace = true }
 rustc-hash               = { workspace = true }

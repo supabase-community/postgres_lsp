@@ -53,6 +53,73 @@ pub struct GetCompletionsParams {
     pub position: TextSize,
 }
 
+#[derive(Debug, Default, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+pub struct CompletionResult {
+    pub(crate) items: Vec<CompletionItem>,
+}
+
+#[cfg(feature = "db-connection")]
+impl IntoIterator for CompletionResult {
+    type Item = CompletionItem;
+    type IntoIter = <Vec<CompletionItem> as IntoIterator>::IntoIter;
+    fn into_iter(self) -> Self::IntoIter {
+        self.items.into_iter()
+    }
+}
+
+#[cfg(feature = "db-connection")]
+impl From<pgt_completions::CompletionResult> for CompletionResult {
+    fn from(external: pgt_completions::CompletionResult) -> Self {
+        CompletionResult {
+            items: external.items.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+#[cfg(feature = "db-connection")]
+impl From<pgt_completions::CompletionItem> for CompletionItem {
+    fn from(external: pgt_completions::CompletionItem) -> Self {
+        CompletionItem {
+            label: external.label,
+            score: external.score,
+            description: external.description,
+            preselected: external.preselected,
+            kind: external.kind.into(),
+        }
+    }
+}
+
+#[cfg(feature = "db-connection")]
+impl From<pgt_completions::CompletionItemKind> for CompletionItemKind {
+    fn from(external: pgt_completions::CompletionItemKind) -> Self {
+        match external {
+            pgt_completions::CompletionItemKind::Table => CompletionItemKind::Table,
+            pgt_completions::CompletionItemKind::Function => CompletionItemKind::Function,
+            pgt_completions::CompletionItemKind::Column => CompletionItemKind::Column,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub enum CompletionItemKind {
+    Table,
+    Function,
+    Column,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+pub struct CompletionItem {
+    pub label: String,
+    pub(crate) score: i32,
+    pub description: String,
+    pub preselected: bool,
+    pub kind: CompletionItemKind,
+}
+
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct PullDiagnosticsResult {
@@ -118,7 +185,7 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
     fn get_completions(
         &self,
         params: GetCompletionsParams,
-    ) -> Result<pgt_completions::CompletionResult, WorkspaceError>;
+    ) -> Result<CompletionResult, WorkspaceError>;
 
     /// Update the global settings for this workspace
     fn update_settings(&self, params: UpdateSettingsParams) -> Result<(), WorkspaceError>;
