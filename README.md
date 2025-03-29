@@ -4,11 +4,19 @@
 
 A collection of language tools and a Language Server Protocol (LSP) implementation for Postgres, focusing on developer experience and reliable SQL tooling.
 
+Docs: [pgtools.dev](https://pgtools.dev/)
+
+Install: [instructions](https://pgtools.dev/#installation)
+
+- [CLI releases](https://github.com/supabase-community/postgres-language-server/releases)
+- [VSCode](https://marketplace.visualstudio.com/items?itemName=Supabase.postgrestools)
+- [Neovim](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#postgres_lsp)
+
 ## Overview
 
 This project provides a toolchain for Postgres development, built on Postgres' own parser `libpg_query` to ensure 100% syntax compatibility. It is built on a Server-Client architecture with a transport-agnostic design. This means all features can be accessed not only through the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/), but also through other interfaces like a CLI, HTTP APIs, or a WebAssembly module. The goal is to make all the great Postgres tooling out there as accessible as possible, and to build anything that is missing ourselves.
 
-Currently, the following features are implemented:
+The following features are implemented:
 - Autocompletion
 - Syntax Error Highlighting
 - Type-checking (via `EXPLAIN` error insights)
