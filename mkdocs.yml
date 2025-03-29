@@ -1,4 +1,4 @@
-site_name: Postgres Language Tools
+site_name: Postgres Language Server
 site_url: https://pgtools.dev
 site_description: A collection of language tools and a Language Server Protocol (LSP) implementation for Postgres, focusing on developer experience and reliable SQL tooling.
 
