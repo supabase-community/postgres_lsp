@@ -13,7 +13,6 @@ Install: [instructions](https://pgtools.dev/#installation)
 - [Neovim](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#postgres_lsp)
 
 ## Overview
-
 LSP Demo             |  CLI Demo
 :-------------------------:|:-------------------------:
 ![LSP Demo](/docs/images/lsp-demo.gif)  |  ![CLI Demo](/docs/images/cli-demo.png)
