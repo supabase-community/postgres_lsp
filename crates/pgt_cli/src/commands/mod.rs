@@ -151,6 +151,7 @@ pub enum PgtCommand {
             display_fallback
         )]
         log_prefix_name: String,
+
         /// Allows to change the folder where logs are stored.
         #[bpaf(
             env("PGT_LOG_PATH"),
@@ -160,6 +161,15 @@ pub enum PgtCommand {
             fallback(pgt_fs::ensure_cache_dir().join("pgt-logs")),
         )]
         log_path: PathBuf,
+
+        /// Allows to change the log level
+        #[bpaf(
+            env("PGT_LOG_LEVEL"),
+            long("log-level"),
+            argument("trace|debug|info|warn|error|none"),
+            fallback(String::from("info"))
+        )]
+        log_level: String,
 
         #[bpaf(long("stop-on-disconnect"), hide_usage)]
         stop_on_disconnect: bool,

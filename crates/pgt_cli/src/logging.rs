@@ -11,6 +11,7 @@ pub fn setup_cli_subscriber(level: LoggingLevel, kind: LoggingKind) {
     if level == LoggingLevel::None {
         return;
     }
+
     let format = tracing_subscriber::fmt::layer()
         .with_level(true)
         .with_target(false)
