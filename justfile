@@ -108,5 +108,7 @@ merge-main:
 
 
 # Make sure to set your PGT_LOG_PATH in your shell profile.
+# We recommend to install `bunyan` (npm i -g bunyan) and pipe the output through there for color-coding:
+# just show-logs | bunyan
 show-logs:
     tail -f $(ls $PGT_LOG_PATH/server.log.* | sort -t- -k2,2 -k3,3 -k4,4 | tail -n 1)
