@@ -127,7 +127,7 @@ where
     fn get_completions(
         &self,
         params: super::GetCompletionsParams,
-    ) -> Result<pgt_completions::CompletionResult, WorkspaceError> {
+    ) -> Result<super::CompletionResult, WorkspaceError> {
         self.request("pgt/get_completions", params)
     }
 }

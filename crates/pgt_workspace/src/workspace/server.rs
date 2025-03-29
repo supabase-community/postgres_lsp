@@ -4,7 +4,6 @@ use analyser::AnalyserVisitorBuilder;
 use async_helper::run_async;
 use change::StatementChange;
 use dashmap::DashMap;
-use db_connection::DbConnection;
 use document::{Document, Statement};
 use futures::{StreamExt, stream};
 use pg_query::PgQueryStore;
@@ -12,8 +11,6 @@ use pgt_analyse::{AnalyserOptions, AnalysisFilter};
 use pgt_analyser::{Analyser, AnalyserConfig, AnalyserContext};
 use pgt_diagnostics::{Diagnostic, DiagnosticExt, Severity, serde::Diagnostic as SDiagnostic};
 use pgt_fs::{ConfigName, PgTPath};
-use pgt_typecheck::TypecheckParams;
-use schema_cache_manager::SchemaCacheManager;
 use tracing::info;
 use tree_sitter::TreeSitterStore;
 
@@ -25,26 +22,30 @@ use crate::{
 };
 
 use super::{
-    GetFileContentParams, IsPathIgnoredParams, OpenFileParams, ServerInfo, UpdateSettingsParams,
-    Workspace,
+    CompletionResult, GetFileContentParams, IsPathIgnoredParams, OpenFileParams, ServerInfo,
+    UpdateSettingsParams, Workspace,
 };
 
 mod analyser;
 mod async_helper;
 mod change;
-mod db_connection;
 mod document;
 mod migration;
 mod pg_query;
-mod schema_cache_manager;
 mod tree_sitter;
+
+#[cfg(feature = "db-connection")]
+mod db_connection;
+#[cfg(feature = "db-connection")]
+mod schema_cache_manager;
 
 pub(super) struct WorkspaceServer {
     /// global settings object for this workspace
     settings: RwLock<Settings>,
 
+    #[cfg(feature = "db-connection")]
     /// Stores the schema cache for this workspace
-    schema_cache: SchemaCacheManager,
+    schema_cache: schema_cache_manager::SchemaCacheManager,
 
     /// Stores the document (text content + version number) associated with a URL
     documents: DashMap<PgTPath, Document>,
@@ -52,7 +53,8 @@ pub(super) struct WorkspaceServer {
     tree_sitter: TreeSitterStore,
     pg_query: PgQueryStore,
 
-    connection: RwLock<DbConnection>,
+    #[cfg(feature = "db-connection")]
+    connection: RwLock<db_connection::DbConnection>,
 }
 
 /// The `Workspace` object is long-lived, so we want it to be able to cross
@@ -75,8 +77,10 @@ impl WorkspaceServer {
             documents: DashMap::default(),
             tree_sitter: TreeSitterStore::new(),
             pg_query: PgQueryStore::new(),
-            schema_cache: SchemaCacheManager::default(),
+            #[cfg(feature = "db-connection")]
             connection: RwLock::default(),
+            #[cfg(feature = "db-connection")]
+            schema_cache: schema_cache_manager::SchemaCacheManager::default(),
         }
     }
 
@@ -157,11 +161,14 @@ impl Workspace for WorkspaceServer {
 
         tracing::info!("Updated settings in workspace");
 
-        if !params.skip_db {
-            self.connection
-                .write()
-                .unwrap()
-                .set_conn_settings(&self.settings().as_ref().db);
+        #[cfg(feature = "db-connection")]
+        {
+            if !params.skip_db {
+                self.connection
+                    .write()
+                    .unwrap()
+                    .set_conn_settings(&self.settings().as_ref().db);
+            }
         }
 
         tracing::info!("Updated Db connection settings");
@@ -289,55 +296,58 @@ impl Workspace for WorkspaceServer {
 
         let mut diagnostics: Vec<SDiagnostic> = doc.diagnostics().to_vec();
 
-        if let Some(pool) = self
-            .connection
-            .read()
-            .expect("DbConnection RwLock panicked")
-            .get_pool()
+        #[cfg(feature = "db-connection")]
         {
-            let typecheck_params: Vec<_> = doc
-                .iter_statements_with_text_and_range()
-                .map(|(stmt, range, text)| {
-                    let ast = self.pg_query.get_ast(&stmt);
-                    let tree = self.tree_sitter.get_parse_tree(&stmt);
-                    (text.to_string(), ast, tree, *range)
-                })
-                .collect();
-
-            // run diagnostics for each statement in parallel if its mostly i/o work
-            let path_clone = params.path.clone();
-            let async_results = run_async(async move {
-                stream::iter(typecheck_params)
-                    .map(|(text, ast, tree, range)| {
-                        let pool = pool.clone();
-                        let path = path_clone.clone();
-                        async move {
-                            if let Some(ast) = ast {
-                                pgt_typecheck::check_sql(TypecheckParams {
-                                    conn: &pool,
-                                    sql: &text,
-                                    ast: &ast,
-                                    tree: tree.as_deref(),
-                                })
-                                .await
-                                .map(|d| {
-                                    let r = d.location().span.map(|span| span + range.start());
-
-                                    d.with_file_path(path.as_path().display().to_string())
-                                        .with_file_span(r.unwrap_or(range))
-                                })
-                            } else {
-                                None
-                            }
-                        }
+            if let Some(pool) = self
+                .connection
+                .read()
+                .expect("DbConnection RwLock panicked")
+                .get_pool()
+            {
+                let typecheck_params: Vec<_> = doc
+                    .iter_statements_with_text_and_range()
+                    .map(|(stmt, range, text)| {
+                        let ast = self.pg_query.get_ast(&stmt);
+                        let tree = self.tree_sitter.get_parse_tree(&stmt);
+                        (text.to_string(), ast, tree, *range)
                     })
-                    .buffer_unordered(10)
-                    .collect::<Vec<_>>()
-                    .await
-            })?;
+                    .collect();
 
-            for result in async_results.into_iter().flatten() {
-                diagnostics.push(SDiagnostic::new(result));
+                // run diagnostics for each statement in parallel if its mostly i/o work
+                let path_clone = params.path.clone();
+                let async_results = run_async(async move {
+                    stream::iter(typecheck_params)
+                        .map(|(text, ast, tree, range)| {
+                            let pool = pool.clone();
+                            let path = path_clone.clone();
+                            async move {
+                                if let Some(ast) = ast {
+                                    pgt_typecheck::check_sql(pgt_typecheck::TypecheckParams {
+                                        conn: &pool,
+                                        sql: &text,
+                                        ast: &ast,
+                                        tree: tree.as_deref(),
+                                    })
+                                    .await
+                                    .map(|d| {
+                                        let r = d.location().span.map(|span| span + range.start());
+
+                                        d.with_file_path(path.as_path().display().to_string())
+                                            .with_file_span(r.unwrap_or(range))
+                                    })
+                                } else {
+                                    None
+                                }
+                            }
+                        })
+                        .buffer_unordered(10)
+                        .collect::<Vec<_>>()
+                        .await
+                })?;
+
+                for result in async_results.into_iter().flatten() {
+                    diagnostics.push(SDiagnostic::new(result));
+                }
             }
         }
 
@@ -398,63 +408,70 @@ impl Workspace for WorkspaceServer {
     fn get_completions(
         &self,
         params: super::GetCompletionsParams,
-    ) -> Result<pgt_completions::CompletionResult, WorkspaceError> {
-        tracing::debug!(
-            "Getting completions for file {:?} at position {:?}",
-            &params.path,
-            &params.position
-        );
-
-        let pool = match self.connection.read().unwrap().get_pool() {
-            Some(pool) => pool,
-            None => return Ok(pgt_completions::CompletionResult::default()),
-        };
-
-        let doc = self
-            .documents
-            .get(&params.path)
-            .ok_or(WorkspaceError::not_found())?;
-
-        tracing::debug!(
-            "Found the document. Looking for statement in file {:?} at position: {:?}",
-            &params.path,
-            &params.position
-        );
-
-        let (statement, stmt_range, text) = match doc
-            .iter_statements_with_text_and_range()
-            .find(|(_, r, _)| r.contains(params.position))
+    ) -> Result<CompletionResult, WorkspaceError> {
+        #[cfg(not(feature = "db-connection"))]
         {
-            Some(s) => s,
-            None => return Ok(pgt_completions::CompletionResult::default()),
-        };
+            return Ok(pgt_completions::CompletionResult::default());
+        }
+        #[cfg(feature = "db-connection")]
+        {
+            tracing::debug!(
+                "Getting completions for file {:?} at position {:?}",
+                &params.path,
+                &params.position
+            );
 
-        // `offset` is the position in the document,
-        // but we need the position within the *statement*.
-        let position = params.position - stmt_range.start();
+            let pool = match self.connection.read().unwrap().get_pool() {
+                Some(pool) => pool,
+                None => return Ok(CompletionResult::default()),
+            };
 
-        let tree = self.tree_sitter.get_parse_tree(&statement);
+            let doc = self
+                .documents
+                .get(&params.path)
+                .ok_or(WorkspaceError::not_found())?;
 
-        tracing::debug!(
-            "Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {}",
-            position,
-            stmt_range.start(),
-            stmt_range.end(),
-            text
-        );
+            tracing::debug!(
+                "Found the document. Looking for statement in file {:?} at position: {:?}",
+                &params.path,
+                &params.position
+            );
 
-        let schema_cache = self.schema_cache.load(pool)?;
+            let (statement, stmt_range, text) = match doc
+                .iter_statements_with_text_and_range()
+                .find(|(_, r, _)| r.contains(params.position))
+            {
+                Some(s) => s,
+                None => return Ok(CompletionResult::default()),
+            };
 
-        tracing::debug!("Loaded schema cache for completions");
+            // `offset` is the position in the document,
+            // but we need the position within the *statement*.
+            let position = params.position - stmt_range.start();
 
-        let result = pgt_completions::complete(pgt_completions::CompletionParams {
-            position,
-            schema: schema_cache.as_ref(),
-            tree: tree.as_deref(),
-            text: text.to_string(),
-        });
+            let tree = self.tree_sitter.get_parse_tree(&statement);
 
-        Ok(result)
+            tracing::debug!(
+                "Found the statement. We're looking for position {:?}. Statement Range {:?} to {:?}. Statement: {}",
+                position,
+                stmt_range.start(),
+                stmt_range.end(),
+                text
+            );
+
+            let schema_cache = self.schema_cache.load(pool)?;
+
+            tracing::debug!("Loaded schema cache for completions");
+
+            let result = pgt_completions::complete(pgt_completions::CompletionParams {
+                position,
+                schema: schema_cache.as_ref(),
+                tree: tree.as_deref(),
+                text: text.to_string(),
+            });
+
+            Ok(result.into())
+        }
     }
 }
 
