@@ -13,5 +13,5 @@ pgt_console            = { workspace = true }
 pgt_diagnostics        = { workspace = true }
 pgt_query_ext          = { workspace = true }
 pgt_statement_splitter = { workspace = true }
-pgt_workspace          = { workspace = true }
+pgt_workspace          = { workspace = true, features = ["db-connection"] }
 pulldown-cmark         = "0.12.2"

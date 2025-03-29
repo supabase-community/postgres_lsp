@@ -14,7 +14,6 @@ version              = "0.0.0"
 [dependencies]
 biome_deserialize         = "0.6.0"
 dashmap                   = "5.5.3"
-futures                   = "0.3.31"
 ignore                    = { workspace = true }
 pgt_analyse               = { workspace = true, features = ["serde"] }
 pgt_analyser              = { workspace = true }
@@ -30,12 +29,13 @@ schemars                  = { workspace = true, optional = true }
 serde                     = { workspace = true, features = ["derive"] }
 serde_json                = { workspace = true, features = ["raw_value"] }
 sqlx.workspace            = true
-tokio                     = { workspace = true, features = ["rt", "rt-multi-thread"] }
 tracing                   = { workspace = true, features = ["attributes", "log"] }
 tree-sitter.workspace     = true
 tree_sitter_sql.workspace = true
 
 # these dependencies require a database connection
+futures                   = { version = "0.3.31", optional = true }
+tokio                     = { workspace = true, features = ["rt", "rt-multi-thread"], optional = true }
 pgt_completions  = { workspace = true, optional = true }
 pgt_schema_cache = { workspace = true, optional = true }
 pgt_typecheck    = { workspace = true, optional = true }
@@ -45,8 +45,7 @@ biome_js_syntax  = { workspace = true, optional = true }
 biome_rowan      = { workspace = true, optional = true }
 
 [features]
-db-connection = ["dep:pgt_completions", "dep:pgt_schema_cache", "dep:pgt_typecheck"]
-default = ["db-connection"]
+db-connection = ["dep:pgt_completions", "dep:pgt_schema_cache", "dep:pgt_typecheck", "dep:tokio", "dep:futures"]
 schema = [
   "dep:schemars",
   "dep:biome_rowan",

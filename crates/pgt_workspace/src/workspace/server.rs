@@ -1,11 +1,9 @@
 use std::{fs, panic::RefUnwindSafe, path::Path, sync::RwLock};
 
 use analyser::AnalyserVisitorBuilder;
-use async_helper::run_async;
 use change::StatementChange;
 use dashmap::DashMap;
 use document::{Document, Statement};
-use futures::{StreamExt, stream};
 use pg_query::PgQueryStore;
 use pgt_analyse::{AnalyserOptions, AnalysisFilter};
 use pgt_analyser::{Analyser, AnalyserConfig, AnalyserContext};
@@ -13,6 +11,9 @@ use pgt_diagnostics::{Diagnostic, DiagnosticExt, Severity, serde::Diagnostic as 
 use pgt_fs::{ConfigName, PgTPath};
 use tracing::info;
 use tree_sitter::TreeSitterStore;
+
+#[cfg(feature = "db-connection")]
+use futures::StreamExt;
 
 use crate::{
     WorkspaceError,
@@ -27,13 +28,14 @@ use super::{
 };
 
 mod analyser;
-mod async_helper;
 mod change;
 mod document;
 mod migration;
 mod pg_query;
 mod tree_sitter;
 
+#[cfg(feature = "db-connection")]
+mod async_helper;
 #[cfg(feature = "db-connection")]
 mod db_connection;
 #[cfg(feature = "db-connection")]
@@ -315,8 +317,8 @@ impl Workspace for WorkspaceServer {
 
                 // run diagnostics for each statement in parallel if its mostly i/o work
                 let path_clone = params.path.clone();
-                let async_results = run_async(async move {
-                    stream::iter(typecheck_params)
+                let async_results = async_helper::run_async(async move {
+                    futures::stream::iter(typecheck_params)
                         .map(|(text, ast, tree, range)| {
                             let pool = pool.clone();
                             let path = path_clone.clone();
