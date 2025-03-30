@@ -1,5 +1,4 @@
 use pgt_text_size::TextSize;
-use serde::{Deserialize, Serialize};
 
 use crate::{
     builder::CompletionBuilder,
@@ -18,21 +17,7 @@ pub struct CompletionParams<'a> {
     pub tree: Option<&'a tree_sitter::Tree>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
-#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-pub struct CompletionResult {
-    pub(crate) items: Vec<CompletionItem>,
-}
-
-impl IntoIterator for CompletionResult {
-    type Item = CompletionItem;
-    type IntoIter = <Vec<CompletionItem> as IntoIterator>::IntoIter;
-    fn into_iter(self) -> Self::IntoIter {
-        self.items.into_iter()
-    }
-}
-
-pub fn complete(params: CompletionParams) -> CompletionResult {
+pub fn complete(params: CompletionParams) -> Vec<CompletionItem> {
     let ctx = CompletionContext::new(&params);
 
     let mut builder = CompletionBuilder::new();

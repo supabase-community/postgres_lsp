@@ -91,15 +91,15 @@ where
 {
     fn pull_code_actions(
         &self,
-        params: crate::code_actions::CodeActionsParams,
-    ) -> Result<crate::code_actions::CodeActionsResult, WorkspaceError> {
+        params: crate::features::code_actions::CodeActionsParams,
+    ) -> Result<crate::features::code_actions::CodeActionsResult, WorkspaceError> {
         self.request("pgt/code_actions", params)
     }
 
     fn execute_statement(
         &self,
-        params: crate::code_actions::ExecuteStatementParams,
-    ) -> Result<crate::code_actions::ExecuteStatementResult, WorkspaceError> {
+        params: crate::features::code_actions::ExecuteStatementParams,
+    ) -> Result<crate::features::code_actions::ExecuteStatementResult, WorkspaceError> {
         self.request("pgt/execute_statement", params)
     }
 
@@ -133,15 +133,15 @@ where
 
     fn pull_diagnostics(
         &self,
-        params: super::PullDiagnosticsParams,
-    ) -> Result<super::PullDiagnosticsResult, WorkspaceError> {
+        params: crate::features::diagnostics::PullDiagnosticsParams,
+    ) -> Result<crate::features::diagnostics::PullDiagnosticsResult, WorkspaceError> {
         self.request("pgt/pull_diagnostics", params)
     }
 
     fn get_completions(
         &self,
         params: super::GetCompletionsParams,
-    ) -> Result<pgt_completions::CompletionResult, WorkspaceError> {
+    ) -> Result<crate::features::completions::CompletionsResult, WorkspaceError> {
         self.request("pgt/get_completions", params)
     }
 }

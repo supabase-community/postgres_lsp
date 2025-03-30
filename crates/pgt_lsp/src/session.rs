@@ -11,8 +11,9 @@ use pgt_fs::{FileSystem, PgTPath};
 use pgt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
 use pgt_workspace::Workspace;
 use pgt_workspace::configuration::{LoadedConfiguration, load_configuration};
+use pgt_workspace::features;
 use pgt_workspace::settings::PartialConfigurationExt;
-use pgt_workspace::workspace::{PullDiagnosticsParams, UpdateSettingsParams};
+use pgt_workspace::workspace::UpdateSettingsParams;
 use pgt_workspace::{DynRef, WorkspaceError};
 use rustc_hash::FxHashMap;
 use serde_json::Value;
@@ -265,13 +266,15 @@ impl Session {
         let categories = RuleCategoriesBuilder::default().all();
 
         let diagnostics: Vec<lsp_types::Diagnostic> = {
-            let result = self.workspace.pull_diagnostics(PullDiagnosticsParams {
-                path: pgt_path.clone(),
-                max_diagnostics: u64::MAX,
-                categories: categories.build(),
-                only: Vec::new(),
-                skip: Vec::new(),
-            })?;
+            let result =
+                self.workspace
+                    .pull_diagnostics(features::diagnostics::PullDiagnosticsParams {
+                        path: pgt_path.clone(),
+                        max_diagnostics: u64::MAX,
+                        categories: categories.build(),
+                        only: Vec::new(),
+                        skip: Vec::new(),
+                    })?;
 
             result
                 .diagnostics

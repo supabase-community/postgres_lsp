@@ -1,6 +1,6 @@
 use crate::session::Session;
 use anyhow::Result;
-use pgt_workspace::{WorkspaceError, workspace};
+use pgt_workspace::{WorkspaceError, features::completions::GetCompletionsParams};
 use tower_lsp::lsp_types::{self, CompletionItem, CompletionItemLabelDetails};
 
 use super::helper;
@@ -13,27 +13,24 @@ pub fn get_completions(
     let url = params.text_document_position.text_document.uri;
     let path = session.file_path(&url)?;
 
-    let completion_result =
-        match session
-            .workspace
-            .get_completions(workspace::GetCompletionsParams {
-                path,
-                position: helper::get_cursor_position(
-                    session,
-                    &url,
-                    params.text_document_position.position,
-                )?,
-            }) {
-            Ok(result) => result,
-            Err(e) => match e {
-                WorkspaceError::DatabaseConnectionError(_) => {
-                    return Ok(lsp_types::CompletionResponse::Array(vec![]));
-                }
-                _ => {
-                    return Err(e.into());
-                }
-            },
-        };
+    let completion_result = match session.workspace.get_completions(GetCompletionsParams {
+        path,
+        position: helper::get_cursor_position(
+            session,
+            &url,
+            params.text_document_position.position,
+        )?,
+    }) {
+        Ok(result) => result,
+        Err(e) => match e {
+            WorkspaceError::DatabaseConnectionError(_) => {
+                return Ok(lsp_types::CompletionResponse::Array(vec![]));
+            }
+            _ => {
+                return Err(e.into());
+            }
+        },
+    };
 
     let items: Vec<CompletionItem> = completion_result
         .into_iter()
