@@ -3,6 +3,8 @@ use anyhow::Result;
 use pgt_workspace::{WorkspaceError, features::completions::GetCompletionsParams};
 use tower_lsp::lsp_types::{self, CompletionItem, CompletionItemLabelDetails};
 
+use super::helper::get_cursor_position;
+
 #[tracing::instrument(level = "debug", skip_all, fields(
     url = params.text_document_position.text_document.uri.as_str(),
     character = params.text_document_position.position.character,
@@ -17,11 +19,7 @@ pub fn get_completions(
 
     let completion_result = match session.workspace.get_completions(GetCompletionsParams {
         path,
-        position: helper::get_cursor_position(
-            session,
-            &url,
-            params.text_document_position.position,
-        )?,
+        position: get_cursor_position(session, &url, params.text_document_position.position)?,
     }) {
         Ok(result) => result,
         Err(e) => match e {
