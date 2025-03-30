@@ -1,7 +1,9 @@
 //! The crate contains a set of converters to translate between `lsp-types` and `text_size` (and vice versa) types.
 
 use pgt_text_size::TextSize;
-use tower_lsp::lsp_types::{ClientCapabilities, PositionEncodingKind};
+use tower_lsp::lsp_types::{ClientCapabilities, Position, PositionEncodingKind, Url};
+
+use crate::session::Session;
 
 pub mod from_lsp;
 pub mod line_index;
@@ -23,6 +25,29 @@ pub fn negotiated_encoding(capabilities: &ClientCapabilities) -> PositionEncodin
     }
 
     PositionEncoding::Wide(WideEncoding::Utf16)
+}
+
+pub fn get_cursor_position(
+    session: &Session,
+    url: &Url,
+    position: Position,
+) -> anyhow::Result<TextSize> {
+    let client_capabilities = session
+        .client_capabilities()
+        .expect("Client capabilities not established for current session.");
+
+    let line_index = session
+        .document(url)
+        .map(|doc| doc.line_index)
+        .map_err(|_| anyhow::anyhow!("Document not found."))?;
+
+    let cursor_pos = from_lsp::offset(
+        &line_index,
+        position,
+        negotiated_encoding(client_capabilities),
+    )?;
+
+    Ok(cursor_pos)
 }
 
 #[derive(Clone, Copy, Debug)]
