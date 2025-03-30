@@ -2575,16 +2575,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pgt_lsp_converters"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "pgt_text_size",
- "rustc-hash 2.1.0",
- "tower-lsp",
-]
-
-[[package]]
 name = "pgt_markup"
 version = "0.0.0"
 dependencies = [
