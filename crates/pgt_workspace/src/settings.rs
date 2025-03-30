@@ -303,7 +303,7 @@ impl From<PartialDatabaseConfiguration> for DatabaseSettings {
             .map(|stringset| {
                 stringset.iter().any(|pattern| {
                     let glob = Glob::new(pattern)
-                        .expect(format!("Invalid pattern: {}", pattern).as_str())
+                        .unwrap_or_else(|_| panic!("Invalid pattern: {}", pattern))
                         .compile_matcher();
 
                     glob.is_match(format!("{}/{}", host, database))

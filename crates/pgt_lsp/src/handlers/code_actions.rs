@@ -61,7 +61,7 @@ pub fn get_actions(
 
     Ok(actions
         .into_iter()
-        .map(|ac| CodeActionOrCommand::CodeAction(ac))
+        .map(CodeActionOrCommand::CodeAction)
         .collect())
 }
 
@@ -91,7 +91,7 @@ pub async fn execute_command(
                     path,
                 })?;
 
-            /**
+            /*
              * Updating all diagnostics: the changes caused by the statement execution
              * might affect many files.
              *

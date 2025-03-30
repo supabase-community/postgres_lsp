@@ -30,14 +30,6 @@ use tower_lsp::lsp_types::{MessageType, Registration};
 use tower_lsp::lsp_types::{Unregistration, WorkspaceFolder};
 use tracing::{error, info};
 
-pub(crate) struct ClientInformation {
-    /// The name of the client
-    pub(crate) name: String,
-
-    /// The version of the client
-    pub(crate) version: Option<String>,
-}
-
 /// Key, uniquely identifying a LSP session.
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
 pub(crate) struct SessionKey(pub u64);
@@ -75,7 +67,6 @@ pub(crate) struct Session {
 struct InitializeParams {
     /// The capabilities provided by the client as part of [`lsp_types::InitializeParams`]
     client_capabilities: lsp_types::ClientCapabilities,
-    client_information: Option<ClientInformation>,
     root_uri: Option<Url>,
     #[allow(unused)]
     workspace_folders: Option<Vec<WorkspaceFolder>>,
@@ -96,10 +87,6 @@ pub(crate) enum ConfigurationStatus {
 impl ConfigurationStatus {
     pub(crate) const fn is_error(&self) -> bool {
         matches!(self, ConfigurationStatus::Error)
-    }
-
-    pub(crate) const fn is_loaded(&self) -> bool {
-        matches!(self, ConfigurationStatus::Loaded)
     }
 }
 
@@ -176,13 +163,11 @@ impl Session {
     pub(crate) fn initialize(
         &self,
         client_capabilities: lsp_types::ClientCapabilities,
-        client_information: Option<ClientInformation>,
         root_uri: Option<Url>,
         workspace_folders: Option<Vec<WorkspaceFolder>>,
     ) {
         let result = self.initialize_params.set(InitializeParams {
             client_capabilities,
-            client_information,
             root_uri,
             workspace_folders,
         });
@@ -389,11 +374,6 @@ impl Session {
                 None
             }
         }
-    }
-
-    /// Returns a reference to the client information for this session
-    pub(crate) fn client_information(&self) -> Option<&ClientInformation> {
-        self.initialize_params.get()?.client_information.as_ref()
     }
 
     /// Returns a reference to the client capabilities for this session

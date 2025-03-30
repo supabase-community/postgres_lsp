@@ -15,29 +15,34 @@ pub(crate) enum FileStatus {
     Changed,
     /// File unchanged, and it was a success
     Unchanged,
-    /// While handling the file, something happened
-    Message(Message),
-    /// A match was found while searching a file
-    SearchResult(usize, Message),
-    /// File ignored, it should not be count as "handled"
-    Ignored,
-    /// Files that belong to other tools and shouldn't be touched
-    Protected(String),
-}
 
-impl FileStatus {
-    pub const fn is_changed(&self) -> bool {
-        matches!(self, Self::Changed)
-    }
+    /// While handling the file, something happened
+    #[allow(unused)]
+    Message(Message),
+
+    /// A match was found while searching a file
+    #[allow(unused)]
+    SearchResult(usize, Message),
+
+    /// File ignored, it should not be count as "handled"
+    #[allow(unused)]
+    Ignored,
+
+    /// Files that belong to other tools and shouldn't be touched
+    #[allow(unused)]
+    Protected(String),
 }
 
 /// Wrapper type for messages that can be printed during the traversal process
 #[derive(Debug)]
 pub(crate) enum Message {
+    #[allow(unused)]
     SkippedFixes {
         /// Suggested fixes skipped during the lint traversal
         skipped_suggested_fixes: u32,
     },
+
+    #[allow(unused)]
     Failure,
     Error(Error),
     Diagnostics {
@@ -46,19 +51,6 @@ pub(crate) enum Message {
         diagnostics: Vec<Error>,
         skipped_diagnostics: u32,
     },
-}
-
-impl Message {
-    pub(crate) const fn is_failure(&self) -> bool {
-        matches!(self, Message::Failure)
-    }
-}
-
-#[derive(Debug)]
-pub(crate) enum DiffKind {
-    Format,
-    OrganizeImports,
-    Assists,
 }
 
 impl<D> From<D> for Message

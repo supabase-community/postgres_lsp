@@ -67,16 +67,6 @@ impl LineIndex {
         }
     }
 
-    /// Return the number of lines in the index, clamped to [u32::MAX]
-    pub fn len(&self) -> u32 {
-        self.newlines.len().try_into().unwrap_or(u32::MAX)
-    }
-
-    /// Return `true` if the index contains no lines.
-    pub fn is_empty(&self) -> bool {
-        self.newlines.is_empty()
-    }
-
     pub fn line_col(&self, offset: TextSize) -> Option<LineCol> {
         let line = self.newlines.partition_point(|&it| it <= offset) - 1;
         let line_start_offset = self.newlines.get(line)?;
