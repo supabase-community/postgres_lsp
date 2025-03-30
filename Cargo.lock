@@ -2559,7 +2559,6 @@ dependencies = [
  "pgt_console",
  "pgt_diagnostics",
  "pgt_fs",
- "pgt_lsp_converters",
  "pgt_test_utils",
  "pgt_text_edit",
  "pgt_text_size",

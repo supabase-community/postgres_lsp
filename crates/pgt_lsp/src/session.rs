@@ -1,3 +1,4 @@
+use crate::adapters::{PositionEncoding, WideEncoding, negotiated_encoding};
 use crate::diagnostics::LspError;
 use crate::documents::Document;
 use crate::utils;
@@ -8,7 +9,6 @@ use pgt_analyse::RuleCategoriesBuilder;
 use pgt_configuration::ConfigurationPathHint;
 use pgt_diagnostics::{DiagnosticExt, Error};
 use pgt_fs::{FileSystem, PgTPath};
-use pgt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
 use pgt_workspace::Workspace;
 use pgt_workspace::configuration::{LoadedConfiguration, load_configuration};
 use pgt_workspace::settings::PartialConfigurationExt;

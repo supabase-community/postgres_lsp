@@ -1,11 +1,10 @@
-use pgt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
+use crate::adapters::{PositionEncoding, WideEncoding, negotiated_encoding};
 use pgt_workspace::code_actions::{CommandActionCategory, CommandActionCategoryIter};
 use strum::{EnumIter, IntoEnumIterator};
 use tower_lsp::lsp_types::{
-    ClientCapabilities, CodeActionOptions, CompletionOptions, ExecuteCommandOptions,
-    PositionEncodingKind, SaveOptions, ServerCapabilities, TextDocumentSyncCapability,
-    TextDocumentSyncKind, TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
-    WorkDoneProgressOptions,
+    ClientCapabilities, CompletionOptions, ExecuteCommandOptions, PositionEncodingKind,
+    SaveOptions, ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind,
+    TextDocumentSyncOptions, TextDocumentSyncSaveOptions, WorkDoneProgressOptions,
 };
 
 use crate::handlers::code_actions::command_id;
