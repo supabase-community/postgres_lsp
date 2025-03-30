@@ -1,3 +1,4 @@
+mod adapters;
 mod capabilities;
 mod diagnostics;
 mod documents;
