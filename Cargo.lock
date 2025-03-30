@@ -2559,7 +2559,6 @@ dependencies = [
  "pgt_console",
  "pgt_diagnostics",
  "pgt_fs",
- "pgt_lsp_converters",
  "pgt_test_utils",
  "pgt_text_edit",
  "pgt_text_size",
@@ -2573,16 +2572,6 @@ dependencies = [
  "tower",
  "tower-lsp",
  "tracing",
-]
-
-[[package]]
-name = "pgt_lsp_converters"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "pgt_text_size",
- "rustc-hash 2.1.0",
- "tower-lsp",
 ]
 
 [[package]]

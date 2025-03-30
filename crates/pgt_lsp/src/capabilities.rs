@@ -1,4 +1,4 @@
-use pgt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
+use crate::adapters::{PositionEncoding, WideEncoding, negotiated_encoding};
 use pgt_workspace::features::code_actions::CommandActionCategory;
 use strum::IntoEnumIterator;
 use tower_lsp::lsp_types::{

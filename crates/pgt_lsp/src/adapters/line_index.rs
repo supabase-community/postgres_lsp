@@ -6,7 +6,7 @@ use std::mem;
 use pgt_text_size::TextSize;
 use rustc_hash::FxHashMap;
 
-use crate::{LineCol, WideChar, WideEncoding, WideLineCol};
+use crate::adapters::{LineCol, WideChar, WideEncoding, WideLineCol};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LineIndex {

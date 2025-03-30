@@ -1,4 +1,7 @@
-use crate::session::Session;
+use crate::{
+    adapters::{self, from_lsp},
+    session::Session,
+};
 use pgt_text_size::TextSize;
 use tower_lsp::lsp_types;
 
@@ -16,10 +19,10 @@ pub fn get_cursor_position(
         .map(|doc| doc.line_index)
         .map_err(|_| anyhow::anyhow!("Document not found."))?;
 
-    let cursor_pos = pgt_lsp_converters::from_proto::offset(
+    let cursor_pos = from_lsp::offset(
         &line_index,
         position,
-        pgt_lsp_converters::negotiated_encoding(client_capabilities),
+        adapters::negotiated_encoding(client_capabilities),
     )?;
 
     Ok(cursor_pos)
