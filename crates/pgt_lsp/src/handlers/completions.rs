@@ -1,9 +1,7 @@
-use crate::session::Session;
+use crate::{adapters::get_cursor_position, session::Session};
 use anyhow::Result;
 use pgt_workspace::{WorkspaceError, features::completions::GetCompletionsParams};
 use tower_lsp::lsp_types::{self, CompletionItem, CompletionItemLabelDetails};
-
-use super::helper;
 
 #[tracing::instrument(level = "trace", skip_all)]
 pub fn get_completions(
@@ -15,11 +13,7 @@ pub fn get_completions(
 
     let completion_result = match session.workspace.get_completions(GetCompletionsParams {
         path,
-        position: helper::get_cursor_position(
-            session,
-            &url,
-            params.text_document_position.position,
-        )?,
+        position: get_cursor_position(session, &url, params.text_document_position.position)?,
     }) {
         Ok(result) => result,
         Err(e) => match e {

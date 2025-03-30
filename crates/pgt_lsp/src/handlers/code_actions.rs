@@ -1,4 +1,4 @@
-use crate::session::Session;
+use crate::{adapters::get_cursor_position, session::Session};
 use anyhow::{Result, anyhow};
 use tower_lsp::lsp_types::{
     self, CodeAction, CodeActionDisabled, CodeActionOrCommand, Command, ExecuteCommandParams,
@@ -9,8 +9,6 @@ use pgt_workspace::features::code_actions::{
     CodeActionKind, CodeActionsParams, CommandActionCategory, ExecuteStatementParams,
 };
 
-use super::helper;
-
 pub fn get_actions(
     session: &Session,
     params: lsp_types::CodeActionParams,
@@ -18,7 +16,7 @@ pub fn get_actions(
     let url = params.text_document.uri;
     let path = session.file_path(&url)?;
 
-    let cursor_position = helper::get_cursor_position(session, &url, params.range.start)?;
+    let cursor_position = get_cursor_position(session, &url, params.range.start)?;
 
     let workspace_actions = session.workspace.pull_code_actions(CodeActionsParams {
         path,
