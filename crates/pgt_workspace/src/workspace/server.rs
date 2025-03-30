@@ -5,6 +5,7 @@ use async_helper::run_async;
 use change::StatementChange;
 use dashmap::DashMap;
 use db_connection::DbConnection;
+pub(crate) use document::StatementId;
 use document::{Document, Statement};
 use futures::{StreamExt, stream};
 use pg_query::PgQueryStore;
@@ -14,11 +15,16 @@ use pgt_diagnostics::{Diagnostic, DiagnosticExt, Severity, serde::Diagnostic as 
 use pgt_fs::{ConfigName, PgTPath};
 use pgt_typecheck::TypecheckParams;
 use schema_cache_manager::SchemaCacheManager;
+use sqlx::Executor;
 use tracing::info;
 use tree_sitter::TreeSitterStore;
 
 use crate::{
     WorkspaceError,
+    code_actions::{
+        self, CodeAction, CodeActionKind, CodeActionsResult, CommandAction, CommandActionCategory,
+        ExecuteStatementResult,
+    },
     configuration::to_analyser_rules,
     settings::{Settings, SettingsHandle, SettingsHandleMut},
     workspace::PullDiagnosticsResult,
@@ -251,6 +257,101 @@ impl Workspace for WorkspaceServer {
 
     fn is_path_ignored(&self, params: IsPathIgnoredParams) -> Result<bool, WorkspaceError> {
         Ok(self.is_ignored(params.pgt_path.as_path()))
+    }
+
+    fn pull_code_actions(
+        &self,
+        params: code_actions::CodeActionsParams,
+    ) -> Result<code_actions::CodeActionsResult, WorkspaceError> {
+        let doc = self
+            .documents
+            .get(&params.path)
+            .ok_or(WorkspaceError::not_found())?;
+
+        let eligible_statements = doc
+            .iter_statements_with_text_and_range()
+            .filter(|(_, range, _)| range.contains(params.cursor_position));
+
+        let mut actions: Vec<CodeAction> = vec![];
+
+        let settings = self
+            .settings
+            .read()
+            .expect("Unable to read settings for Code Actions");
+
+        let disabled_reason: Option<String> = if settings.db.allow_statement_executions {
+            None
+        } else {
+            Some("Statement execution not allowed against database.".into())
+        };
+
+        for (stmt, range, txt) in eligible_statements {
+            let title = format!(
+                "Execute Statement: {}...",
+                txt.chars().take(50).collect::<String>()
+            );
+
+            actions.push(CodeAction {
+                title,
+                kind: CodeActionKind::Command(CommandAction {
+                    category: CommandActionCategory::ExecuteStatement(stmt.id),
+                }),
+                disabled_reason: disabled_reason.clone(),
+            });
+        }
+
+        Ok(CodeActionsResult { actions })
+    }
+
+    fn execute_statement(
+        &self,
+        params: code_actions::ExecuteStatementParams,
+    ) -> Result<code_actions::ExecuteStatementResult, WorkspaceError> {
+        let doc = self
+            .documents
+            .get(&params.path)
+            .ok_or(WorkspaceError::not_found())?;
+
+        if self
+            .pg_query
+            .get_ast(&Statement {
+                path: params.path,
+                id: params.statement_id,
+            })
+            .is_none()
+        {
+            return Ok(ExecuteStatementResult {
+                message: "Statement is invalid.".into(),
+            });
+        };
+
+        let sql: String = match doc.get_txt(params.statement_id) {
+            Some(txt) => txt,
+            None => {
+                return Ok(ExecuteStatementResult {
+                    message: "Statement was not found in document.".into(),
+                });
+            }
+        };
+
+        let conn = self.connection.write().unwrap();
+        let pool = match conn.get_pool() {
+            Some(p) => p,
+            None => {
+                return Ok(ExecuteStatementResult {
+                    message: "Not connected to database.".into(),
+                });
+            }
+        };
+
+        let result = run_async(async move { pool.execute(sqlx::query(&sql)).await })??;
+
+        Ok(ExecuteStatementResult {
+            message: format!(
+                "Successfully executed statement. Rows affected: {}",
+                result.rows_affected()
+            ),
+        })
     }
 
     fn pull_diagnostics(

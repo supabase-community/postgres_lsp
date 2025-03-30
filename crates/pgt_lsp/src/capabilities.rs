@@ -1,9 +1,14 @@
 use pgt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
+use pgt_workspace::code_actions::{CommandActionCategory, CommandActionCategoryIter};
+use strum::{EnumIter, IntoEnumIterator};
 use tower_lsp::lsp_types::{
-    ClientCapabilities, CompletionOptions, PositionEncodingKind, SaveOptions, ServerCapabilities,
-    TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions,
-    TextDocumentSyncSaveOptions, WorkDoneProgressOptions,
+    ClientCapabilities, CodeActionOptions, CompletionOptions, ExecuteCommandOptions,
+    PositionEncodingKind, SaveOptions, ServerCapabilities, TextDocumentSyncCapability,
+    TextDocumentSyncKind, TextDocumentSyncOptions, TextDocumentSyncSaveOptions,
+    WorkDoneProgressOptions,
 };
+
+use crate::handlers::code_actions::command_id;
 
 /// The capabilities to send from server as part of [`InitializeResult`]
 ///
@@ -46,10 +51,19 @@ pub(crate) fn server_capabilities(capabilities: &ClientCapabilities) -> ServerCa
                 work_done_progress: None,
             },
         }),
+        execute_command_provider: Some(ExecuteCommandOptions {
+            commands: CommandActionCategory::iter()
+                .map(|c| command_id(&c))
+                .collect::<Vec<String>>(),
+
+            ..Default::default()
+        }),
         document_formatting_provider: None,
         document_range_formatting_provider: None,
         document_on_type_formatting_provider: None,
-        code_action_provider: None,
+        code_action_provider: Some(tower_lsp::lsp_types::CodeActionProviderCapability::Simple(
+            true,
+        )),
         rename_provider: None,
         ..Default::default()
     }

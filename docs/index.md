@@ -14,7 +14,7 @@ A collection of language tools and a Language Server Protocol (LSP) implementati
 
 This project provides a toolchain for Postgres development
 
-##### Postgres Language Server  
+##### Postgres Language Server
 
 ![LSP Demo](images/lsp-demo.gif)
 
@@ -22,7 +22,7 @@ This project provides a toolchain for Postgres development
 
 ![CLI Demo](images/cli-demo.png)
 
-The toolchain is built on Postgres' own parser `libpg_query` to ensure 100% syntax compatibility. It uses a Server-Client architecture and is a transport-agnostic. This means all features can be accessed through the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) as well as various interfaces like a CLI, HTTP APIs, or a WebAssembly module. 
+The toolchain is built on Postgres' own parser `libpg_query` to ensure 100% syntax compatibility. It uses a Server-Client architecture and is a transport-agnostic. This means all features can be accessed through the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) as well as various interfaces like a CLI, HTTP APIs, or a WebAssembly module.
 
 The following features are implemented:
 
@@ -50,7 +50,7 @@ Now you can use Postgres Tools by simply running `./postgrestools`.
 
 ### NPM
 
-If you are using Node, you can  install the CLI via NPM. Run the following commands in a directory containing a `package.json` file.
+If you are using Node, you can install the CLI via NPM. Run the following commands in a directory containing a `package.json` file.
 
 ```sh
 npm add --save-dev --save-exact @postgrestools/postgrestools
@@ -78,7 +78,7 @@ postgrestools init
 
 You’ll now have a `postgrestools.jsonc` file in your directory:
 
-[//]: # (BEGIN DEFAULT_CONFIGURATION)
+[//]: # "BEGIN DEFAULT_CONFIGURATION"
 
 ```json
 {
@@ -103,12 +103,13 @@ You’ll now have a `postgrestools.jsonc` file in your directory:
     "username": "postgres",
     "password": "postgres",
     "database": "postgres",
-    "connTimeoutSecs": 10
+    "connTimeoutSecs": 10,
+    "allowStatementExecutionsAgainst": ["127.0.0.1/*", "localhost/*"]
   }
 }
 ```
 
-[//]: # (END DEFAULT_CONFIGURATION)
+[//]: # "END DEFAULT_CONFIGURATION"
 
 Make sure to edit the database connection settings to connect to your local development database. To see all options, run `postgrestools --help`.
 
@@ -129,9 +130,10 @@ Make sure to check out the other options by running `postgrestools --help`. We w
 #### Using the LSP Proxy
 
 Postgres Tools has a command called `lsp-proxy`. When executed, two processes will spawn:
+
 - a daemon that does execute the requested operations;
 - a server that functions as a proxy between the requests of the client - the editor - and the server - the daemon;
-If your editor is able to interact with a server and send [JSON-RPC](https://www.jsonrpc.org) requests, you only need to configure the editor to run that command.
+  If your editor is able to interact with a server and send [JSON-RPC](https://www.jsonrpc.org) requests, you only need to configure the editor to run that command.
 
 #### Using the daemon with the binary
 
@@ -159,4 +161,3 @@ The daemon saves logs in your file system. Logs are stored in a folder called `p
 For other operative systems, you can find the folder in the system’s temporary directory.
 
 You can change the location of the `pgt-logs` folder via the `PGT_LOG_PATH` variable.
-

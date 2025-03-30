@@ -7,10 +7,17 @@ use pgt_fs::PgTPath;
 use pgt_text_size::{TextRange, TextSize};
 use serde::{Deserialize, Serialize};
 
-use crate::WorkspaceError;
+use crate::{
+    WorkspaceError,
+    code_actions::{
+        CodeActionsParams, CodeActionsResult, ExecuteStatementParams, ExecuteStatementResult,
+    },
+};
 
 mod client;
 mod server;
+
+pub(crate) use server::StatementId;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
@@ -115,6 +122,12 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
         params: PullDiagnosticsParams,
     ) -> Result<PullDiagnosticsResult, WorkspaceError>;
 
+    /// Retrieves a list of available code_actions for a file/cursor_position
+    fn pull_code_actions(
+        &self,
+        params: CodeActionsParams,
+    ) -> Result<CodeActionsResult, WorkspaceError>;
+
     fn get_completions(
         &self,
         params: GetCompletionsParams,
@@ -145,6 +158,11 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
     ///
     /// If the file path matches, then `true` is returned, and it should be considered ignored.
     fn is_path_ignored(&self, params: IsPathIgnoredParams) -> Result<bool, WorkspaceError>;
+
+    fn execute_statement(
+        &self,
+        params: ExecuteStatementParams,
+    ) -> Result<ExecuteStatementResult, WorkspaceError>;
 }
 
 /// Convenience function for constructing a server instance of [Workspace]
