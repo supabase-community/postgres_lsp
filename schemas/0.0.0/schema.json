@@ -73,6 +73,16 @@
       "description": "The configuration of the database connection.",
       "type": "object",
       "properties": {
+        "allowStatementExecutionsAgainst": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/StringSet"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "connTimeoutSecs": {
           "description": "The connection timeout in seconds.",
           "type": [

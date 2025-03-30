@@ -131,7 +131,7 @@
 <p><img alt="LSP Demo" src="images/lsp-demo.gif" /></p>
 <h5 id="cli-demo">CLI Demo</h5>
 <p><img alt="CLI Demo" src="images/cli-demo.png" /></p>
-<p>The toolchain is built on Postgres' own parser <code>libpg_query</code> to ensure 100% syntax compatibility. It uses a Server-Client architecture and is a transport-agnostic. This means all features can be accessed through the <a href="https://microsoft.github.io/language-server-protocol/">Language Server Protocol</a> as well as various interfaces like a CLI, HTTP APIs, or a WebAssembly module. </p>
+<p>The toolchain is built on Postgres' own parser <code>libpg_query</code> to ensure 100% syntax compatibility. It uses a Server-Client architecture and is a transport-agnostic. This means all features can be accessed through the <a href="https://microsoft.github.io/language-server-protocol/">Language Server Protocol</a> as well as various interfaces like a CLI, HTTP APIs, or a WebAssembly module.</p>
 <p>The following features are implemented:</p>
 <ul>
 <li>Autocompletion</li>
@@ -149,7 +149,7 @@ chmod +x postgrestools
 </code></pre>
 <p>Now you can use Postgres Tools by simply running <code>./postgrestools</code>.</p>
 <h3 id="npm">NPM</h3>
-<p>If you are using Node, you can  install the CLI via NPM. Run the following commands in a directory containing a <code>package.json</code> file.</p>
+<p>If you are using Node, you can install the CLI via NPM. Run the following commands in a directory containing a <code>package.json</code> file.</p>
 <pre><code class="language-sh">npm add --save-dev --save-exact @postgrestools/postgrestools
 </code></pre>
 <h3 id="vscode">VSCode</h3>
@@ -185,7 +185,8 @@ chmod +x postgrestools
     &quot;username&quot;: &quot;postgres&quot;,
     &quot;password&quot;: &quot;postgres&quot;,
     &quot;database&quot;: &quot;postgres&quot;,
-    &quot;connTimeoutSecs&quot;: 10
+    &quot;connTimeoutSecs&quot;: 10,
+    &quot;allowStatementExecutionsAgainst&quot;: [&quot;127.0.0.1/*&quot;, &quot;localhost/*&quot;]
   }
 }
 </code></pre>
@@ -198,10 +199,12 @@ chmod +x postgrestools
 </code></pre>
 <p>Make sure to check out the other options by running <code>postgrestools --help</code>. We will provide guides for specific use cases like linting migration files soon.</p>
 <h4 id="using-the-lsp-proxy">Using the LSP Proxy</h4>
-<p>Postgres Tools has a command called <code>lsp-proxy</code>. When executed, two processes will spawn:
-- a daemon that does execute the requested operations;
-- a server that functions as a proxy between the requests of the client - the editor - and the server - the daemon;
-If your editor is able to interact with a server and send <a href="https://www.jsonrpc.org">JSON-RPC</a> requests, you only need to configure the editor to run that command.</p>
+<p>Postgres Tools has a command called <code>lsp-proxy</code>. When executed, two processes will spawn:</p>
+<ul>
+<li>a daemon that does execute the requested operations;</li>
+<li>a server that functions as a proxy between the requests of the client - the editor - and the server - the daemon;
+  If your editor is able to interact with a server and send <a href="https://www.jsonrpc.org">JSON-RPC</a> requests, you only need to configure the editor to run that command.</li>
+</ul>
 <h4 id="using-the-daemon-with-the-binary">Using the daemon with the binary</h4>
 <p>Using the binary via CLI is very efficient, although you won’t be able to provide logs to your users. The CLI allows you to bootstrap a daemon and then use the CLI commands through the daemon itself.
 In order to do so, you first need to start a daemon process with the start command:</p>
@@ -270,5 +273,5 @@ In order to do so, you first need to start a daemon process with the start comma
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-03-29 21:46:58.787257+00:00
+Build Date UTC : 2025-03-30 11:39:55.230689+00:00
 -->
