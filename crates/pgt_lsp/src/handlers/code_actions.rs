@@ -63,7 +63,7 @@ pub fn get_actions(
 
     Ok(actions
         .into_iter()
-        .map(|ac| CodeActionOrCommand::CodeAction(ac))
+        .map(CodeActionOrCommand::CodeAction)
         .collect())
 }
 

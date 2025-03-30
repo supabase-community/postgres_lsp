@@ -337,7 +337,7 @@ impl Workspace for WorkspaceServer {
             }
         };
 
-        let conn = self.connection.write().unwrap();
+        let conn = self.connection.read().unwrap();
         let pool = match conn.get_pool() {
             Some(p) => p,
             None => {

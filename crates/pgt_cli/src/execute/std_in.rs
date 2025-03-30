@@ -3,7 +3,7 @@
 use crate::{CliDiagnostic, CliSession};
 use pgt_console::{ConsoleExt, markup};
 
-pub(crate) fn run<'a>(session: CliSession, content: &'a str) -> Result<(), CliDiagnostic> {
+pub(crate) fn run(session: CliSession, content: &str) -> Result<(), CliDiagnostic> {
     let console = &mut *session.app.console;
 
     console.append(markup! {{content}});

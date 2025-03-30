@@ -15,7 +15,6 @@ use pgt_workspace::workspace::UpdateSettingsParams;
 use pgt_workspace::{DynRef, Workspace, WorkspaceError};
 use std::ffi::OsString;
 use std::path::PathBuf;
-
 pub(crate) mod check;
 pub(crate) mod clean;
 pub(crate) mod daemon;
@@ -24,6 +23,7 @@ pub(crate) mod version;
 
 #[derive(Debug, Clone, Bpaf)]
 #[bpaf(options, version(VERSION))]
+#[allow(clippy::large_enum_variant)]
 /// Postgres Tools official CLI. Use it to check the health of your project or run it to check single files.
 pub enum PgtCommand {
     /// Shows the version information and quit.

@@ -536,13 +536,7 @@ fn generate_group_struct(
         let rule_option_type = quote! {
             pgt_analyser::options::#rule_name
         };
-        let rule_option = if kind == RuleCategory::Action {
-            quote! { Option<#rule_config_type<#rule_option_type>> }
-        } else {
-            quote! {
-                Option<#rule_config_type<#rule_option_type>>
-            }
-        };
+        let rule_option = quote! { Option<#rule_config_type<#rule_option_type>> };
         schema_lines_rules.push(quote! {
             #[doc = #summary]
             #[serde(skip_serializing_if = "Option::is_none")]
@@ -570,15 +564,9 @@ fn generate_group_struct(
             }
         });
 
-        if kind == RuleCategory::Action {
-            get_rule_configuration_line.push(quote! {
-                #rule => self.#rule_identifier.as_ref().map(|conf| (conf.level(), conf.get_options()))
-            });
-        } else {
-            get_rule_configuration_line.push(quote! {
-                #rule => self.#rule_identifier.as_ref().map(|conf| (conf.level(), conf.get_options()))
-            });
-        }
+        get_rule_configuration_line.push(quote! {
+            #rule => self.#rule_identifier.as_ref().map(|conf| (conf.level(), conf.get_options()))
+        });
     }
 
     let group_pascal_ident = Ident::new(&to_capitalized(group), Span::call_site());
