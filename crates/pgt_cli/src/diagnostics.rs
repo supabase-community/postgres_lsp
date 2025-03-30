@@ -1,4 +1,3 @@
-use pgt_console::fmt::Display;
 use pgt_console::markup;
 use pgt_diagnostics::adapters::{BpafError, IoError, SerdeJsonError};
 use pgt_diagnostics::{
@@ -230,25 +229,6 @@ pub struct IncompatibleEndConfiguration {
     message = "No files were processed in the specified paths."
 )]
 pub struct NoFilesWereProcessed;
-
-#[derive(Debug, Diagnostic)]
-#[diagnostic(
-    category = "internalError/fs",
-    severity = Warning,
-    tags(DEPRECATED_CODE)
-)]
-pub struct DeprecatedArgument {
-    #[message]
-    pub message: MessageAndDescription,
-}
-
-impl DeprecatedArgument {
-    pub fn new(message: impl Display) -> Self {
-        Self {
-            message: MessageAndDescription::from(markup! {{message}}.to_owned()),
-        }
-    }
-}
 
 #[derive(Debug, Diagnostic)]
 pub enum ReportDiagnostic {

@@ -288,7 +288,7 @@ impl Workspace for WorkspaceServer {
             Some("Statement execution not allowed against database.".into())
         };
 
-        for (stmt, range, txt) in eligible_statements {
+        for (stmt, _, txt) in eligible_statements {
             let title = format!(
                 "Execute Statement: {}...",
                 txt.chars().take(50).collect::<String>()

@@ -93,7 +93,7 @@ pub async fn execute_command(
                     path,
                 })?;
 
-            /**
+            /*
              * Updating all diagnostics: the changes caused by the statement execution
              * might affect many files.
              *

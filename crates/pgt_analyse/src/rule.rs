@@ -260,10 +260,6 @@ impl RuleDiagnostic {
         self.footer(LogCategory::Warn, msg)
     }
 
-    pub(crate) fn span(&self) -> Option<TextRange> {
-        self.span
-    }
-
     pub fn advices(&self) -> &RuleAdvice {
         &self.rule_advice
     }

@@ -338,9 +338,6 @@ pub(crate) trait CommandRunner: Sized {
     /// It returns the file path to use in `stdin` mode.
     fn get_stdin_file_path(&self) -> Option<&str>;
 
-    /// Whether the command should write the files.
-    fn should_write(&self) -> bool;
-
     /// Returns the [Execution] mode.
     fn get_execution(
         &self,
@@ -356,11 +353,6 @@ pub(crate) trait CommandRunner: Sized {
     /// The method is called before loading the configuration from disk.
     fn check_incompatible_arguments(&self) -> Result<(), CliDiagnostic> {
         Ok(())
-    }
-
-    /// Checks whether the configuration has errors.
-    fn should_validate_configuration_diagnostics(&self) -> bool {
-        true
     }
 }
 
