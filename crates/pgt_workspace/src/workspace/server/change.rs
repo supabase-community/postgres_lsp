@@ -1117,6 +1117,79 @@ mod tests {
     }
 
     #[test]
+    fn comment_at_begin() {
+        let path = PgTPath::new("test.sql");
+
+        let mut doc = Document::new(
+            path.clone(),
+            "-- Add new schema named \"private\"\nCREATE SCHEMA \"private\";".to_string(),
+            0,
+        );
+
+        let change = ChangeFileParams {
+            path: path.clone(),
+            version: 1,
+            changes: vec![ChangeParams {
+                text: "".to_string(),
+                range: Some(TextRange::new(0.into(), 1.into())),
+            }],
+        };
+
+        let changed = doc.apply_file_change(&change);
+
+        assert_eq!(
+            doc.content,
+            "- Add new schema named \"private\"\nCREATE SCHEMA \"private\";"
+        );
+
+        assert_eq!(changed.len(), 3);
+        assert!(matches!(
+            changed[0],
+            StatementChange::Deleted(Statement { id: 0, .. })
+        ));
+        assert!(matches!(
+            changed[1],
+            StatementChange::Added(AddedStatement { .. })
+        ));
+        assert!(matches!(
+            changed[2],
+            StatementChange::Added(AddedStatement { .. })
+        ));
+
+        let change_2 = ChangeFileParams {
+            path: path.clone(),
+            version: 2,
+            changes: vec![ChangeParams {
+                text: "-".to_string(),
+                range: Some(TextRange::new(0.into(), 0.into())),
+            }],
+        };
+
+        let changed_2 = doc.apply_file_change(&change_2);
+
+        assert_eq!(
+            doc.content,
+            "-- Add new schema named \"private\"\nCREATE SCHEMA \"private\";"
+        );
+
+        assert_eq!(changed_2.len(), 3);
+        assert!(matches!(
+            changed_2[0],
+            StatementChange::Deleted(Statement { .. })
+        ));
+        assert!(matches!(
+            changed_2[1],
+            StatementChange::Deleted(Statement { .. })
+        ));
+        assert!(matches!(
+            changed_2[2],
+            StatementChange::Added(AddedStatement { .. })
+        ));
+
+        assert_document_integrity(&doc);
+    }
+
+    #[test]
     fn apply_changes_within_statement() {
         let input = "select id  from users;\nselect * from contacts;";
         let path = PgTPath::new("test.sql");

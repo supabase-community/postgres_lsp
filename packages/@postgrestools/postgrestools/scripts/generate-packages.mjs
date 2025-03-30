@@ -18,7 +18,7 @@ const MANIFEST_PATH = resolve(CLI_ROOT, "package.json");
 const SUPPORTED_ARCHITECTURES = ["x86_64", "aarch64"];
 
 async function downloadSchema(releaseTag, githubToken) {
-	const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/schema.json`;
+	const assetUrl = `https://github.com/supabase-community/postgres-language-server/releases/download/${releaseTag}/schema.json`;
 
 	const response = await fetch(assetUrl.trim(), {
 		headers: {
@@ -44,7 +44,7 @@ async function downloadSchema(releaseTag, githubToken) {
 async function downloadBinary(platform, arch, os, releaseTag, githubToken) {
 	const buildName = getBuildName(platform, arch);
 
-	const assetUrl = `https://github.com/supabase-community/postgres_lsp/releases/download/${releaseTag}/${buildName}`;
+	const assetUrl = `https://github.com/supabase-community/postgres-language-server/releases/download/${releaseTag}/${buildName}`;
 
 	const response = await fetch(assetUrl.trim(), {
 		headers: {
