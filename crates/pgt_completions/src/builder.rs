@@ -1,4 +1,4 @@
-use crate::{CompletionResult, item::CompletionItem};
+use crate::item::CompletionItem;
 
 pub(crate) struct CompletionBuilder {
     items: Vec<CompletionItem>,
@@ -13,7 +13,7 @@ impl CompletionBuilder {
         self.items.push(item);
     }
 
-    pub fn finish(mut self) -> CompletionResult {
+    pub fn finish(mut self) -> Vec<CompletionItem> {
         self.items
             .sort_by(|a, b| b.score.cmp(&a.score).then_with(|| a.label.cmp(&b.label)));
 
@@ -22,8 +22,7 @@ impl CompletionBuilder {
 
         let should_preselect_first_item = self.should_preselect_first_item();
 
-        let items: Vec<CompletionItem> = self
-            .items
+        self.items
             .into_iter()
             .enumerate()
             .map(|(idx, mut item)| {
@@ -32,9 +31,7 @@ impl CompletionBuilder {
                 }
                 item
             })
-            .collect();
-
-        CompletionResult { items }
+            .collect()
     }
 
     fn should_preselect_first_item(&mut self) -> bool {

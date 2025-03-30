@@ -5,7 +5,7 @@ use tower_lsp::lsp_types::{
     MessageType,
 };
 
-use pgt_workspace::code_actions::{
+use pgt_workspace::features::code_actions::{
     CodeActionKind, CodeActionsParams, CommandActionCategory, ExecuteStatementParams,
 };
 

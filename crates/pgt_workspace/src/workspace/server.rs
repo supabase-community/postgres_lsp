@@ -21,13 +21,16 @@ use tree_sitter::TreeSitterStore;
 
 use crate::{
     WorkspaceError,
-    code_actions::{
-        self, CodeAction, CodeActionKind, CodeActionsResult, CommandAction, CommandActionCategory,
-        ExecuteStatementResult,
-    },
     configuration::to_analyser_rules,
+    features::{
+        code_actions::{
+            self, CodeAction, CodeActionKind, CodeActionsResult, CommandAction,
+            CommandActionCategory, ExecuteStatementParams, ExecuteStatementResult,
+        },
+        completions::{CompletionsResult, GetCompletionsParams},
+        diagnostics::{PullDiagnosticsParams, PullDiagnosticsResult},
+    },
     settings::{Settings, SettingsHandle, SettingsHandleMut},
-    workspace::PullDiagnosticsResult,
 };
 
 use super::{
@@ -193,7 +196,7 @@ impl Workspace for WorkspaceServer {
     }
 
     /// Remove a file from the workspace
-    fn close_file(&self, params: super::CloseFileParams) -> Result<(), crate::WorkspaceError> {
+    fn close_file(&self, params: super::CloseFileParams) -> Result<(), WorkspaceError> {
         let (_, doc) = self
             .documents
             .remove(&params.path)
@@ -272,7 +275,7 @@ impl Workspace for WorkspaceServer {
             .iter_statements_with_text_and_range()
             .filter(|(_, range, _)| range.contains(params.cursor_position));
 
-        let mut actions: Vec<CodeAction> = vec![];
+        let mut actions: Vec<code_actions::CodeAction> = vec![];
 
         let settings = self
             .settings
@@ -305,8 +308,8 @@ impl Workspace for WorkspaceServer {
 
     fn execute_statement(
         &self,
-        params: code_actions::ExecuteStatementParams,
-    ) -> Result<code_actions::ExecuteStatementResult, WorkspaceError> {
+        params: ExecuteStatementParams,
+    ) -> Result<ExecuteStatementResult, WorkspaceError> {
         let doc = self
             .documents
             .get(&params.path)
@@ -356,8 +359,8 @@ impl Workspace for WorkspaceServer {
 
     fn pull_diagnostics(
         &self,
-        params: super::PullDiagnosticsParams,
-    ) -> Result<super::PullDiagnosticsResult, WorkspaceError> {
+        params: PullDiagnosticsParams,
+    ) -> Result<PullDiagnosticsResult, WorkspaceError> {
         // get all statements form the requested document and pull diagnostics out of every
         // source
         let doc = self
@@ -498,8 +501,8 @@ impl Workspace for WorkspaceServer {
     #[tracing::instrument(level = "debug", skip(self))]
     fn get_completions(
         &self,
-        params: super::GetCompletionsParams,
-    ) -> Result<pgt_completions::CompletionResult, WorkspaceError> {
+        params: GetCompletionsParams,
+    ) -> Result<CompletionsResult, WorkspaceError> {
         tracing::debug!(
             "Getting completions for file {:?} at position {:?}",
             &params.path,
@@ -508,7 +511,7 @@ impl Workspace for WorkspaceServer {
 
         let pool = match self.connection.read().unwrap().get_pool() {
             Some(pool) => pool,
-            None => return Ok(pgt_completions::CompletionResult::default()),
+            None => return Ok(CompletionsResult::default()),
         };
 
         let doc = self
@@ -527,7 +530,7 @@ impl Workspace for WorkspaceServer {
             .find(|(_, r, _)| r.contains(params.position))
         {
             Some(s) => s,
-            None => return Ok(pgt_completions::CompletionResult::default()),
+            None => return Ok(CompletionsResult::default()),
         };
 
         // `offset` is the position in the document,
@@ -548,14 +551,14 @@ impl Workspace for WorkspaceServer {
 
         tracing::debug!("Loaded schema cache for completions");
 
-        let result = pgt_completions::complete(pgt_completions::CompletionParams {
+        let items = pgt_completions::complete(pgt_completions::CompletionParams {
             position,
             schema: schema_cache.as_ref(),
             tree: tree.as_deref(),
             text: text.to_string(),
         });
 
-        Ok(result)
+        Ok(CompletionsResult { items })
     }
 }
 

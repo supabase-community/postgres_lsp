@@ -4,13 +4,17 @@ pub use self::client::{TransportRequest, WorkspaceClient, WorkspaceTransport};
 use pgt_analyse::RuleCategories;
 use pgt_configuration::{PartialConfiguration, RuleSelector};
 use pgt_fs::PgTPath;
-use pgt_text_size::{TextRange, TextSize};
+use pgt_text_size::TextRange;
 use serde::{Deserialize, Serialize};
 
 use crate::{
     WorkspaceError,
-    code_actions::{
-        CodeActionsParams, CodeActionsResult, ExecuteStatementParams, ExecuteStatementResult,
+    features::{
+        code_actions::{
+            CodeActionsParams, CodeActionsResult, ExecuteStatementParams, ExecuteStatementResult,
+        },
+        completions::{CompletionsResult, GetCompletionsParams},
+        diagnostics::{PullDiagnosticsParams, PullDiagnosticsResult},
     },
 };
 
@@ -39,33 +43,6 @@ pub struct ChangeFileParams {
     pub path: PgTPath,
     pub version: i32,
     pub changes: Vec<ChangeParams>,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-pub struct PullDiagnosticsParams {
-    pub path: PgTPath,
-    pub categories: RuleCategories,
-    pub max_diagnostics: u64,
-    pub only: Vec<RuleSelector>,
-    pub skip: Vec<RuleSelector>,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-pub struct GetCompletionsParams {
-    /// The File for which a completion is requested.
-    pub path: PgTPath,
-    /// The Cursor position in the file for which a completion is requested.
-    pub position: TextSize,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-pub struct PullDiagnosticsResult {
-    pub diagnostics: Vec<pgt_diagnostics::serde::Diagnostic>,
-    pub errors: usize,
-    pub skipped_diagnostics: u64,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -131,7 +108,7 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
     fn get_completions(
         &self,
         params: GetCompletionsParams,
-    ) -> Result<pgt_completions::CompletionResult, WorkspaceError>;
+    ) -> Result<CompletionsResult, WorkspaceError>;
 
     /// Update the global settings for this workspace
     fn update_settings(&self, params: UpdateSettingsParams) -> Result<(), WorkspaceError>;
