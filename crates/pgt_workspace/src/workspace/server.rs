@@ -559,13 +559,7 @@ impl Workspace for WorkspaceServer {
 
         let schema_cache = self.schema_cache.load(pool)?;
 
-<<<<<<< HEAD
-        let result = pgt_completions::complete(pgt_completions::CompletionParams {
-=======
-        tracing::debug!("Loaded schema cache for completions");
-
         let items = pgt_completions::complete(pgt_completions::CompletionParams {
->>>>>>> 506c8267ef135831faed3facf0fb288bde50c3d9
             position,
             schema: schema_cache.as_ref(),
             tree: tree.as_deref(),
