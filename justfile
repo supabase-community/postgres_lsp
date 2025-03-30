@@ -2,9 +2,9 @@ _default:
   just --list -u
 
 alias f := format
-alias t := test
 alias r := ready
 alias l := lint
+alias t := test
 
 # Installs the tools needed to develop
 install-tools:

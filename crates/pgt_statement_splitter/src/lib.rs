@@ -143,6 +143,12 @@ mod tests {
     }
 
     #[test]
+    fn with_cte() {
+        Tester::from("with test as (select 1 as id) select * from test;")
+            .expect_statements(vec!["with test as (select 1 as id) select * from test;"]);
+    }
+
+    #[test]
     fn case() {
         Tester::from("select case when select 2 then 1 else 0 end")
             .expect_statements(vec!["select case when select 2 then 1 else 0 end"]);

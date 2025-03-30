@@ -6,7 +6,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/supabase-community/postgres_lsp.git",
+		"url": "git+https://github.com/supabase-community/postgres-language-server.git",
 		"directory": "packages/@postgrestools/postgrestools"
 	},
 	"author": "Supabase Community",

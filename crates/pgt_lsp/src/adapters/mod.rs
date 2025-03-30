@@ -3,9 +3,9 @@
 use pgt_text_size::TextSize;
 use tower_lsp::lsp_types::{ClientCapabilities, PositionEncodingKind};
 
-pub mod from_proto;
+pub mod from_lsp;
 pub mod line_index;
-pub mod to_proto;
+pub mod to_lsp;
 
 pub fn negotiated_encoding(capabilities: &ClientCapabilities) -> PositionEncoding {
     let client_encodings = match &capabilities.general {
@@ -86,11 +86,11 @@ impl WideChar {
 
 #[cfg(test)]
 mod tests {
-    use crate::WideEncoding::{Utf16, Utf32};
-    use crate::from_proto::offset;
-    use crate::line_index::LineIndex;
-    use crate::to_proto::position;
-    use crate::{LineCol, PositionEncoding, WideEncoding};
+    use crate::adapters::WideEncoding::{Utf16, Utf32};
+    use crate::adapters::from_lsp::offset;
+    use crate::adapters::line_index::LineIndex;
+    use crate::adapters::to_lsp::position;
+    use crate::adapters::{LineCol, PositionEncoding, WideEncoding};
     use pgt_text_size::TextSize;
     use tower_lsp::lsp_types::Position;
 

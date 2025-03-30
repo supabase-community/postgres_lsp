@@ -21,13 +21,13 @@ pgt_configuration       = { workspace = true }
 pgt_console             = { workspace = true }
 pgt_diagnostics         = { workspace = true }
 pgt_fs                  = { workspace = true }
-pgt_lsp_converters      = { workspace = true }
 pgt_text_edit           = { workspace = true }
 pgt_text_size.workspace = true
 pgt_workspace           = { workspace = true }
 rustc-hash              = { workspace = true }
 serde                   = { workspace = true, features = ["derive"] }
 serde_json              = { workspace = true }
+strum                   = { workspace = true }
 tokio                   = { workspace = true, features = ["rt", "io-std"] }
 tower-lsp               = { version = "0.20.0" }
 tracing                 = { workspace = true, features = ["attributes"] }

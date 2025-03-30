@@ -17,6 +17,7 @@ use pgt_test_utils::test_database::get_new_test_db;
 use pgt_workspace::DynRef;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
+use serde_json::Value;
 use serde_json::{from_value, to_value};
 use sqlx::Executor;
 use std::any::type_name;
@@ -28,8 +29,13 @@ use tower_lsp::LspService;
 use tower_lsp::jsonrpc;
 use tower_lsp::jsonrpc::Response;
 use tower_lsp::lsp_types as lsp;
+use tower_lsp::lsp_types::CodeActionContext;
+use tower_lsp::lsp_types::CodeActionOrCommand;
+use tower_lsp::lsp_types::CodeActionParams;
+use tower_lsp::lsp_types::CodeActionResponse;
 use tower_lsp::lsp_types::CompletionParams;
 use tower_lsp::lsp_types::CompletionResponse;
+use tower_lsp::lsp_types::ExecuteCommandParams;
 use tower_lsp::lsp_types::PartialResultParams;
 use tower_lsp::lsp_types::Position;
 use tower_lsp::lsp_types::Range;
@@ -545,6 +551,146 @@ async fn test_completions() -> Result<()> {
         .await?;
 
     assert!(res.is_some());
+
+    server.shutdown().await?;
+    reader.abort();
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_execute_statement() -> Result<()> {
+    let factory = ServerFactory::default();
+    let mut fs = MemoryFileSystem::default();
+    let test_db = get_new_test_db().await;
+
+    let database = test_db
+        .connect_options()
+        .get_database()
+        .unwrap()
+        .to_string();
+    let host = test_db.connect_options().get_host().to_string();
+
+    let conf = PartialConfiguration {
+        db: Some(PartialDatabaseConfiguration {
+            database: Some(database),
+            host: Some(host),
+            ..Default::default()
+        }),
+        ..Default::default()
+    };
+
+    fs.insert(
+        url!("postgrestools.jsonc").to_file_path().unwrap(),
+        serde_json::to_string_pretty(&conf).unwrap(),
+    );
+
+    let (service, client) = factory
+        .create_with_fs(None, DynRef::Owned(Box::new(fs)))
+        .into_inner();
+
+    let (stream, sink) = client.split();
+    let mut server = Server::new(service);
+
+    let (sender, _) = channel(CHANNEL_BUFFER_SIZE);
+    let reader = tokio::spawn(client_handler(stream, sink, sender));
+
+    server.initialize().await?;
+    server.initialized().await?;
+
+    server.load_configuration().await?;
+
+    let users_tbl_exists = async || {
+        let result = sqlx::query!(
+            r#"
+            select exists (
+                select 1 as exists
+                from pg_catalog.pg_tables
+                where tablename = 'users'
+            );
+        "#
+        )
+        .fetch_one(&test_db.clone())
+        .await;
+
+        result.unwrap().exists.unwrap()
+    };
+
+    assert_eq!(
+        users_tbl_exists().await,
+        false,
+        "The user table shouldn't exist at this point."
+    );
+
+    let doc_content = r#"
+        create table users (
+            id serial primary key, 
+            name text, 
+            email text
+        );
+    "#;
+
+    let doc_url = url!("test.sql");
+
+    server
+        .open_named_document(doc_content.to_string(), doc_url.clone())
+        .await?;
+
+    let code_actions_response = server
+        .request::<CodeActionParams, CodeActionResponse>(
+            "textDocument/codeAction",
+            "_code_action",
+            CodeActionParams {
+                text_document: TextDocumentIdentifier {
+                    uri: doc_url.clone(),
+                },
+                range: Range {
+                    start: Position::new(3, 7),
+                    end: Position::new(3, 7),
+                }, // just somewhere within the statement.
+                context: CodeActionContext::default(),
+                partial_result_params: PartialResultParams::default(),
+                work_done_progress_params: WorkDoneProgressParams::default(),
+            },
+        )
+        .await?
+        .unwrap();
+
+    let exec_statement_command: (String, Vec<Value>) = code_actions_response
+        .iter()
+        .find_map(|action_or_cmd| match action_or_cmd {
+            lsp::CodeActionOrCommand::CodeAction(code_action) => {
+                let command = code_action.command.as_ref();
+                if command.is_some_and(|cmd| &cmd.command == "pgt.executeStatement") {
+                    let command = command.unwrap();
+                    let arguments = command.arguments.as_ref().unwrap().clone();
+                    Some((command.command.clone(), arguments))
+                } else {
+                    None
+                }
+            }
+
+            _ => None,
+        })
+        .expect("Did not find executeStatement command!");
+
+    server
+        .request::<ExecuteCommandParams, Option<Value>>(
+            "workspace/executeCommand",
+            "_execStmt",
+            ExecuteCommandParams {
+                command: exec_statement_command.0,
+                arguments: exec_statement_command.1,
+                ..Default::default()
+            },
+        )
+        .await?;
+
+    assert_eq!(
+        users_tbl_exists().await,
+        true,
+        "Users table did not exists even though it should've been created by the workspace/executeStatement command."
+    );
 
     server.shutdown().await?;
     reader.abort();

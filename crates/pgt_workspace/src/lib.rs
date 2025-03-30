@@ -6,9 +6,11 @@ use pgt_fs::{FileSystem, OsFileSystem};
 pub mod configuration;
 pub mod diagnostics;
 pub mod dome;
+pub mod features;
 pub mod matcher;
 pub mod settings;
 pub mod workspace;
+
 #[cfg(feature = "schema")]
 pub mod workspace_types;
 

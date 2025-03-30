@@ -11,7 +11,7 @@ pub(crate) struct Statement {
     pub(crate) id: StatementId,
 }
 
-pub type StatementId = usize;
+pub(crate) type StatementId = usize;
 
 type StatementPos = (StatementId, TextRange);
 
@@ -102,6 +102,16 @@ impl Document {
                 &self.content[range.start().into()..range.end().into()],
             )
         })
+    }
+
+    pub fn get_txt(&self, stmt_id: StatementId) -> Option<String> {
+        self.positions
+            .iter()
+            .find(|pos| pos.0 == stmt_id)
+            .map(|(_, range)| {
+                let stmt = &self.content[range.start().into()..range.end().into()];
+                stmt.to_owned()
+            })
     }
 }
 

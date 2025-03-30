@@ -1,58 +1,84 @@
 ![Postgres Language Server](images/pls-github.png)
 
-# Postgres Language Server
+# Postgres Tools
 
 A collection of language tools and a Language Server Protocol (LSP) implementation for Postgres, focusing on developer experience and reliable SQL tooling.
 
 ---
 
-**Source Code**: <a href="https://github.com/supabase-community/postgres_lsp" target="_blank">https://github.com/supabase-community/postgres_lsp</a>
+**Source Code**: <a href="https://github.com/supabase-community/postgres-language-server" target="_blank">https://github.com/supabase-community/postgres-language-server</a>
 
 ---
 
 ## Overview
 
-This project provides a toolchain for Postgres development, built on Postgres' own parser `libpg_query` to ensure 100% syntax compatibility. It is built on a Server-Client architecture with a transport-agnostic design. This means all features can be accessed not only through the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/), but also through other interfaces like a CLI, HTTP APIs, or a WebAssembly module. The goal is to make all the great Postgres tooling out there as accessible as possible, and to build anything that is missing ourselves.
+This project provides a toolchain for Postgres development
 
-Currently, the following features are implemented:
+##### Postgres Language Server
+
+![LSP Demo](images/lsp-demo.gif)
+
+##### CLI Demo
+
+![CLI Demo](images/cli-demo.png)
+
+The toolchain is built on Postgres' own parser `libpg_query` to ensure 100% syntax compatibility. It uses a Server-Client architecture and is a transport-agnostic. This means all features can be accessed through the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) as well as various interfaces like a CLI, HTTP APIs, or a WebAssembly module.
+
+The following features are implemented:
 
 - Autocompletion
 - Syntax Error Highlighting
 - Type-checking (via `EXPLAIN` error insights)
 - Linter, inspired by [Squawk](https://squawkhq.com)
 
-Our current focus is on refining and enhancing these core features while building a robust and easily accessible infrastructure. For future plans and opportunities to contribute, please check out the issues and discussions. Any contributions are welcome!
+We are currently focused on refining and enhancing these core features. For future plans and opportunities to contribute, please check out the issues and discussions. Any contributions are welcome!
 
 ## Installation
 
-To install Postgres Tools, grab the executable for your platform from the [latest CLI release](https://github.com/supabase-community/postgres_lsp/releases/latest) on GitHub and give it execution permission.
+There are various ways to use the toolchain.
+
+### CLI
+
+Grab the executable for your platform from the [latest CLI release](https://github.com/supabase-community/postgres-language-server/releases/latest) on GitHub and give it execution permission:
 
 ```sh
-curl -L https://github.com/supabase-community/postgres_lsp/releases/download/<version>/postgrestools_aarch64-apple-darwin -o postgrestools
+curl -L https://github.com/supabase-community/postgres-language-server/releases/download/<version>/postgrestools_aarch64-apple-darwin -o postgrestools
 chmod +x postgrestools
 ```
 
 Now you can use Postgres Tools by simply running `./postgrestools`.
 
-If you are using Node, you can also install the CLI via NPM. Run the following commands in a directory containing a `package.json` file.
+### NPM
+
+If you are using Node, you can install the CLI via NPM. Run the following commands in a directory containing a `package.json` file.
 
 ```sh
-pnpm add --save-dev --save-exact @postgrestools/postgrestools
+npm add --save-dev --save-exact @postgrestools/postgrestools
 ```
 
-To use Postgres Tools in your favorite IDE, we recommend [installing an editor plugin](#install-an-editor-plugin).
+### VSCode
+
+The language server is available on the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=Supabase.postgrestools-vscode). Its published from [this repo](https://github.com/supabase-community/postgrestools-vscode).
+
+### Neovim
+
+You will have to install `nvim-lspconfig`, and follow the [instructions](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#postgres_lsp).
+
+### GitHub Actions
+
+To use the CLI in GitHub Actions, you can install it via our [GitHub Action](https://github.com/supabase-community/postgrestools-cli-action).
 
 ## Configuration
 
-We recommend that you create a `postgrestools.jsonc` configuration file for each project. This eliminates the need to repeat the CLI options each time you run a command, and ensures that we use the same configuration in your editor. Some options are also only available from a configuration file. If you are happy with the defaults, you don’t need to create a configuration file. To create the `postgrestools.jsonc` file, run the `init` command in the root folder of your project:
+We recommend creating a `postgrestools.jsonc` configuration file for each project. This eliminates repetitive CLI options and ensures that consitent configuration in your editor. Some options are only available from a configuration file. This step is optional: if you are happy with the defaults, you don’t need a configuration file. To create the `postgrestools.jsonc` file, run the `init` command in the root folder of your project:
 
 ```sh
 postgrestools init
 ```
 
-After running the `init` command, you’ll have a `postgrestools.jsonc` file in your directory:
+You’ll now have a `postgrestools.jsonc` file in your directory:
 
-[//]: # (BEGIN DEFAULT_CONFIGURATION)
+[//]: # "BEGIN DEFAULT_CONFIGURATION"
 
 ```json
 {
@@ -77,18 +103,21 @@ After running the `init` command, you’ll have a `postgrestools.jsonc` file in 
     "username": "postgres",
     "password": "postgres",
     "database": "postgres",
-    "connTimeoutSecs": 10
+    "connTimeoutSecs": 10,
+    "allowStatementExecutionsAgainst": ["127.0.0.1/*", "localhost/*"]
   }
 }
 ```
 
-[//]: # (END DEFAULT_CONFIGURATION)
+[//]: # "END DEFAULT_CONFIGURATION"
 
-Make sure to point the database connection settings at your local development database. To see what else can be configured, run `--help`.
+Make sure to edit the database connection settings to connect to your local development database. To see all options, run `postgrestools --help`.
 
 ## Usage
 
-You can use the language tools either via CLI or a Language Server.
+You can use Postgres Tools via the command line or a using a code editor that supports an LSP.
+
+#### Using the CLI
 
 The CLI exposes a simple `check` command that will run all checks on the given files or paths.
 
@@ -96,33 +125,18 @@ The CLI exposes a simple `check` command that will run all checks on the given f
 postgrestools check myfile.sql
 ```
 
-Make sure to check out the other options. We will provide guides for specific use cases like linting migration files soon.
+Make sure to check out the other options by running `postgrestools --help`. We will provide guides for specific use cases like linting migration files soon.
 
-## Install an Editor Plugin
-
-We recommend installing an editor plugin to get the most out of Postgres Language Tools.
-
-### VSCode
-
-TODO
-
-### Neovim
-
-You will have to install `nvim-lspconfig`, and follow the [instructions](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#postgres_lsp).
-
-
-### Other
-
-Postgres Tools has first-class LSP support. If your editor does implement LSP, then the integration of Postgres Tools should be seamless.
-
-#### Use the LSP Proxy
+#### Using the LSP Proxy
 
 Postgres Tools has a command called `lsp-proxy`. When executed, two processes will spawn:
+
 - a daemon that does execute the requested operations;
 - a server that functions as a proxy between the requests of the client - the editor - and the server - the daemon;
-If your editor is able to interact with a server and send [JSON-RPC](https://www.jsonrpc.org) requests, you only need to configure the editor to run that command.
+  If your editor is able to interact with a server and send [JSON-RPC](https://www.jsonrpc.org) requests, you only need to configure the editor to run that command.
 
-#### Use the daemon with the binary
+#### Using the daemon with the binary
+
 Using the binary via CLI is very efficient, although you won’t be able to provide logs to your users. The CLI allows you to bootstrap a daemon and then use the CLI commands through the daemon itself.
 In order to do so, you first need to start a daemon process with the start command:
 
@@ -137,6 +151,7 @@ echo "select 1" | biome check --use-server --stdin-file-path=dummy.sql
 ```
 
 #### Daemon logs
+
 The daemon saves logs in your file system. Logs are stored in a folder called `pgt-logs`. The path of this folder changes based on your operative system:
 
 - Linux: `~/.cache/pgt;`
@@ -146,9 +161,3 @@ The daemon saves logs in your file system. Logs are stored in a folder called `p
 For other operative systems, you can find the folder in the system’s temporary directory.
 
 You can change the location of the `pgt-logs` folder via the `PGT_LOG_PATH` variable.
-
-## CI Setup
-
-> [!NOTE]
-> We will update this section once we have published the binaries.
-

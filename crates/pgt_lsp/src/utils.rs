@@ -1,11 +1,11 @@
+use crate::adapters::line_index::LineIndex;
+use crate::adapters::{PositionEncoding, from_lsp, to_lsp};
 use anyhow::{Context, Result, ensure};
 use pgt_console::MarkupBuf;
 use pgt_console::fmt::Termcolor;
 use pgt_console::fmt::{self, Formatter};
 use pgt_diagnostics::termcolor::NoColor;
 use pgt_diagnostics::{Diagnostic, DiagnosticTags, Location, PrintDescription, Severity, Visit};
-use pgt_lsp_converters::line_index::LineIndex;
-use pgt_lsp_converters::{PositionEncoding, from_proto, to_proto};
 use pgt_text_edit::{CompressedOp, DiffOp, TextEdit};
 use pgt_text_size::{TextRange, TextSize};
 use std::any::Any;
@@ -37,7 +37,7 @@ pub(crate) fn text_edit(
                 offset += range.len();
             }
             CompressedOp::DiffOp(DiffOp::Insert { range }) => {
-                let start = to_proto::position(line_index, offset, position_encoding)?;
+                let start = to_lsp::position(line_index, offset, position_encoding)?;
 
                 // Merge with a previous delete operation if possible
                 let last_edit = result.last_mut().filter(|text_edit| {
@@ -54,9 +54,9 @@ pub(crate) fn text_edit(
                 }
             }
             CompressedOp::DiffOp(DiffOp::Delete { range }) => {
-                let start = to_proto::position(line_index, offset, position_encoding)?;
+                let start = to_lsp::position(line_index, offset, position_encoding)?;
                 offset += range.len();
-                let end = to_proto::position(line_index, offset, position_encoding)?;
+                let end = to_lsp::position(line_index, offset, position_encoding)?;
 
                 result.push(lsp::TextEdit {
                     range: lsp::Range::new(start, end),
@@ -108,7 +108,7 @@ pub(crate) fn diagnostic_to_lsp<D: Diagnostic>(
     } else {
         span
     };
-    let span = to_proto::range(line_index, span, position_encoding)
+    let span = to_lsp::range(line_index, span, position_encoding)
         .context("failed to convert diagnostic span to LSP range")?;
 
     let severity = match diagnostic.severity() {
@@ -189,7 +189,7 @@ impl Visit for RelatedInformationVisitor<'_> {
             None => return Ok(()),
         };
 
-        let range = match to_proto::range(self.line_index, span, self.position_encoding) {
+        let range = match to_lsp::range(self.line_index, span, self.position_encoding) {
             Ok(range) => range,
             Err(_) => return Ok(()),
         };
@@ -293,7 +293,7 @@ pub(crate) fn apply_document_changes(
                 line_index = LineIndex::new(&text);
             }
             index_valid = range.start.line;
-            if let Ok(range) = from_proto::text_range(&line_index, range, position_encoding) {
+            if let Ok(range) = from_lsp::text_range(&line_index, range, position_encoding) {
                 text.replace_range(Range::<usize>::from(range), &change.text);
             }
         }
@@ -304,9 +304,8 @@ pub(crate) fn apply_document_changes(
 
 #[cfg(test)]
 mod tests {
-
-    use pgt_lsp_converters::PositionEncoding;
-    use pgt_lsp_converters::line_index::LineIndex;
+    use crate::adapters::PositionEncoding;
+    use crate::adapters::line_index::LineIndex;
     use pgt_text_edit::TextEdit;
     use tower_lsp::lsp_types as lsp;
 

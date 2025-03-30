@@ -10,11 +10,11 @@
 	"files": ["dist/", "README.md"],
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/supabase-community/postgres_lsp.git",
+		"url": "git+https://github.com/supabase-community/postgres-language-server.git",
 		"directory": "packages/@postgrestools/backend-jsonrpc"
 	},
 	"author": "Supabase Community",
-	"bugs": "ttps://github.com/supabase-community/postgres_lsp/issues",
+	"bugs": "ttps://github.com/supabase-community/postgres-language-server/issues",
 	"description": "Bindings to the JSON-RPC Workspace API of the Postgres Language Tools daemon",
 	"keywords": ["TypeScript", "Postgres"],
 	"license": "MIT",

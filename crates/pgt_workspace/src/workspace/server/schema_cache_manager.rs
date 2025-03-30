@@ -48,6 +48,7 @@ impl SchemaCacheManager {
             // return early if the connection string is the same
             let inner = self.inner.read().unwrap();
             if new_conn_str == inner.conn_str {
+                tracing::info!("Same connection string, no updates.");
                 return Ok(SchemaCacheHandle::wrap(inner));
             }
         }
@@ -63,6 +64,7 @@ impl SchemaCacheManager {
             if new_conn_str != inner.conn_str {
                 inner.cache = refreshed;
                 inner.conn_str = new_conn_str;
+                tracing::info!("Refreshed connection.");
             }
         }
 
