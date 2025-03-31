@@ -30,7 +30,6 @@ use tower_lsp::jsonrpc;
 use tower_lsp::jsonrpc::Response;
 use tower_lsp::lsp_types as lsp;
 use tower_lsp::lsp_types::CodeActionContext;
-use tower_lsp::lsp_types::CodeActionOrCommand;
 use tower_lsp::lsp_types::CodeActionParams;
 use tower_lsp::lsp_types::CodeActionResponse;
 use tower_lsp::lsp_types::CompletionParams;
@@ -616,16 +615,15 @@ async fn test_execute_statement() -> Result<()> {
         result.unwrap().exists.unwrap()
     };
 
-    assert_eq!(
-        users_tbl_exists().await,
-        false,
+    assert!(
+        !(users_tbl_exists().await),
         "The user table shouldn't exist at this point."
     );
 
     let doc_content = r#"
         create table users (
-            id serial primary key, 
-            name text, 
+            id serial primary key,
+            name text,
             email text
         );
     "#;
@@ -686,11 +684,90 @@ async fn test_execute_statement() -> Result<()> {
         )
         .await?;
 
-    assert_eq!(
+    assert!(
         users_tbl_exists().await,
-        true,
         "Users table did not exists even though it should've been created by the workspace/executeStatement command."
     );
+
+    server.shutdown().await?;
+    reader.abort();
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_issue_281() -> Result<()> {
+    let factory = ServerFactory::default();
+    let mut fs = MemoryFileSystem::default();
+    let test_db = get_new_test_db().await;
+
+    let setup = r#"
+            create table public.users (
+                id serial primary key,
+                name varchar(255) not null
+            );
+        "#;
+
+    test_db
+        .execute(setup)
+        .await
+        .expect("Failed to setup test database");
+
+    let mut conf = PartialConfiguration::init();
+    conf.merge_with(PartialConfiguration {
+        db: Some(PartialDatabaseConfiguration {
+            database: Some(
+                test_db
+                    .connect_options()
+                    .get_database()
+                    .unwrap()
+                    .to_string(),
+            ),
+            ..Default::default()
+        }),
+        ..Default::default()
+    });
+    fs.insert(
+        url!("postgrestools.jsonc").to_file_path().unwrap(),
+        serde_json::to_string_pretty(&conf).unwrap(),
+    );
+
+    let (service, client) = factory
+        .create_with_fs(None, DynRef::Owned(Box::new(fs)))
+        .into_inner();
+
+    let (stream, sink) = client.split();
+    let mut server = Server::new(service);
+
+    let (sender, _) = channel(CHANNEL_BUFFER_SIZE);
+    let reader = tokio::spawn(client_handler(stream, sink, sender));
+
+    server.initialize().await?;
+    server.initialized().await?;
+
+    server.load_configuration().await?;
+
+    server.open_document("select a").await?;
+
+    server
+        .change_document(
+            3,
+            vec![TextDocumentContentChangeEvent {
+                range: Some(Range {
+                    start: Position {
+                        line: 0,
+                        character: 7,
+                    },
+                    end: Position {
+                        line: 0,
+                        character: 7,
+                    },
+                }),
+                range_length: Some(0),
+                text: "ы".to_string(),
+            }],
+        )
+        .await?;
 
     server.shutdown().await?;
     reader.abort();
