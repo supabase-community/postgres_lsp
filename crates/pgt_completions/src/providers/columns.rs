@@ -141,13 +141,13 @@ mod tests {
 
         let (tree, cache) = get_test_deps(setup, case.get_input_query()).await;
         let params = get_test_params(&tree, &cache, case.get_input_query());
-        let mut results = complete(params);
+        let mut items = complete(params);
 
-        let _ = results.items.split_off(3);
+        let _ = items.split_off(3);
 
-        results.items.sort_by(|a, b| a.label.cmp(&b.label));
+        items.sort_by(|a, b| a.label.cmp(&b.label));
 
-        let labels: Vec<String> = results.items.into_iter().map(|c| c.label).collect();
+        let labels: Vec<String> = items.into_iter().map(|c| c.label).collect();
 
         assert_eq!(labels, vec!["name", "narrator", "narrator_id"]);
     }

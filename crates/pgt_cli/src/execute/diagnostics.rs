@@ -19,6 +19,7 @@ pub(crate) trait ResultExt {
         code: &'static Category,
     ) -> Result<Self::Result, Error>;
 
+    #[allow(unused)]
     fn with_file_path_and_code_and_tags(
         self,
         file_path: String,

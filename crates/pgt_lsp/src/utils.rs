@@ -1,12 +1,11 @@
+use crate::adapters::line_index::LineIndex;
+use crate::adapters::{PositionEncoding, from_lsp, to_lsp};
 use anyhow::{Context, Result, ensure};
 use pgt_console::MarkupBuf;
 use pgt_console::fmt::Termcolor;
 use pgt_console::fmt::{self, Formatter};
 use pgt_diagnostics::termcolor::NoColor;
 use pgt_diagnostics::{Diagnostic, DiagnosticTags, Location, PrintDescription, Severity, Visit};
-use pgt_lsp_converters::line_index::LineIndex;
-use pgt_lsp_converters::{PositionEncoding, from_proto, to_proto};
-use pgt_text_edit::{CompressedOp, DiffOp, TextEdit};
 use pgt_text_size::{TextRange, TextSize};
 use std::any::Any;
 use std::borrow::Cow;
@@ -17,74 +16,6 @@ use tower_lsp::jsonrpc::Error as LspError;
 use tower_lsp::lsp_types;
 use tower_lsp::lsp_types::{self as lsp, CodeDescription, Url};
 use tracing::error;
-
-pub(crate) fn text_edit(
-    line_index: &LineIndex,
-    diff: TextEdit,
-    position_encoding: PositionEncoding,
-    offset: Option<u32>,
-) -> Result<Vec<lsp::TextEdit>> {
-    let mut result: Vec<lsp::TextEdit> = Vec::new();
-    let mut offset = if let Some(offset) = offset {
-        TextSize::from(offset)
-    } else {
-        TextSize::from(0)
-    };
-
-    for op in diff.iter() {
-        match op {
-            CompressedOp::DiffOp(DiffOp::Equal { range }) => {
-                offset += range.len();
-            }
-            CompressedOp::DiffOp(DiffOp::Insert { range }) => {
-                let start = to_proto::position(line_index, offset, position_encoding)?;
-
-                // Merge with a previous delete operation if possible
-                let last_edit = result.last_mut().filter(|text_edit| {
-                    text_edit.range.end == start && text_edit.new_text.is_empty()
-                });
-
-                if let Some(last_edit) = last_edit {
-                    last_edit.new_text = diff.get_text(*range).to_string();
-                } else {
-                    result.push(lsp::TextEdit {
-                        range: lsp::Range::new(start, start),
-                        new_text: diff.get_text(*range).to_string(),
-                    });
-                }
-            }
-            CompressedOp::DiffOp(DiffOp::Delete { range }) => {
-                let start = to_proto::position(line_index, offset, position_encoding)?;
-                offset += range.len();
-                let end = to_proto::position(line_index, offset, position_encoding)?;
-
-                result.push(lsp::TextEdit {
-                    range: lsp::Range::new(start, end),
-                    new_text: String::new(),
-                });
-            }
-
-            CompressedOp::EqualLines { line_count } => {
-                let mut line_col = line_index
-                    .line_col(offset)
-                    .expect("diff length is overflowing the line count in the original file");
-
-                line_col.line += line_count.get() + 1;
-                line_col.col = 0;
-
-                // SAFETY: This should only happen if `line_index` wasn't built
-                // from the same string as the old revision of `diff`
-                let new_offset = line_index
-                    .offset(line_col)
-                    .expect("diff length is overflowing the line count in the original file");
-
-                offset = new_offset;
-            }
-        }
-    }
-
-    Ok(result)
-}
 
 /// Convert an [pgt_diagnostics::Diagnostic] to a [lsp::Diagnostic], using the span
 /// of the diagnostic's primary label as the diagnostic range.
@@ -108,7 +39,7 @@ pub(crate) fn diagnostic_to_lsp<D: Diagnostic>(
     } else {
         span
     };
-    let span = to_proto::range(line_index, span, position_encoding)
+    let span = to_lsp::range(line_index, span, position_encoding)
         .context("failed to convert diagnostic span to LSP range")?;
 
     let severity = match diagnostic.severity() {
@@ -189,7 +120,7 @@ impl Visit for RelatedInformationVisitor<'_> {
             None => return Ok(()),
         };
 
-        let range = match to_proto::range(self.line_index, span, self.position_encoding) {
+        let range = match to_lsp::range(self.line_index, span, self.position_encoding) {
             Ok(range) => range,
             Err(_) => return Ok(()),
         };
@@ -209,6 +140,7 @@ impl Visit for RelatedInformationVisitor<'_> {
 }
 
 /// Convert a piece of markup into a String
+#[allow(unused)]
 fn print_markup(markup: &MarkupBuf) -> String {
     let mut message = Termcolor(NoColor::new(Vec::new()));
     fmt::Display::fmt(markup, &mut Formatter::new(&mut message))
@@ -293,7 +225,7 @@ pub(crate) fn apply_document_changes(
                 line_index = LineIndex::new(&text);
             }
             index_valid = range.start.line;
-            if let Ok(range) = from_proto::text_range(&line_index, range, position_encoding) {
+            if let Ok(range) = from_lsp::text_range(&line_index, range, position_encoding) {
                 text.replace_range(Range::<usize>::from(range), &change.text);
             }
         }
@@ -304,11 +236,80 @@ pub(crate) fn apply_document_changes(
 
 #[cfg(test)]
 mod tests {
-
-    use pgt_lsp_converters::PositionEncoding;
-    use pgt_lsp_converters::line_index::LineIndex;
-    use pgt_text_edit::TextEdit;
+    use crate::adapters::line_index::LineIndex;
+    use crate::adapters::{PositionEncoding, to_lsp};
+    use anyhow::Result;
+    use pgt_text_edit::{CompressedOp, DiffOp, TextEdit};
+    use pgt_text_size::TextSize;
     use tower_lsp::lsp_types as lsp;
+
+    fn text_edit(
+        line_index: &LineIndex,
+        diff: TextEdit,
+        position_encoding: PositionEncoding,
+        offset: Option<u32>,
+    ) -> Result<Vec<lsp::TextEdit>> {
+        let mut result: Vec<lsp::TextEdit> = Vec::new();
+        let mut offset = if let Some(offset) = offset {
+            TextSize::from(offset)
+        } else {
+            TextSize::from(0)
+        };
+
+        for op in diff.iter() {
+            match op {
+                CompressedOp::DiffOp(DiffOp::Equal { range }) => {
+                    offset += range.len();
+                }
+                CompressedOp::DiffOp(DiffOp::Insert { range }) => {
+                    let start = to_lsp::position(line_index, offset, position_encoding)?;
+
+                    // Merge with a previous delete operation if possible
+                    let last_edit = result.last_mut().filter(|text_edit| {
+                        text_edit.range.end == start && text_edit.new_text.is_empty()
+                    });
+
+                    if let Some(last_edit) = last_edit {
+                        last_edit.new_text = diff.get_text(*range).to_string();
+                    } else {
+                        result.push(lsp::TextEdit {
+                            range: lsp::Range::new(start, start),
+                            new_text: diff.get_text(*range).to_string(),
+                        });
+                    }
+                }
+                CompressedOp::DiffOp(DiffOp::Delete { range }) => {
+                    let start = to_lsp::position(line_index, offset, position_encoding)?;
+                    offset += range.len();
+                    let end = to_lsp::position(line_index, offset, position_encoding)?;
+
+                    result.push(lsp::TextEdit {
+                        range: lsp::Range::new(start, end),
+                        new_text: String::new(),
+                    });
+                }
+
+                CompressedOp::EqualLines { line_count } => {
+                    let mut line_col = line_index
+                        .line_col(offset)
+                        .expect("diff length is overflowing the line count in the original file");
+
+                    line_col.line += line_count.get() + 1;
+                    line_col.col = 0;
+
+                    // SAFETY: This should only happen if `line_index` wasn't built
+                    // from the same string as the old revision of `diff`
+                    let new_offset = line_index
+                        .offset(line_col)
+                        .expect("diff length is overflowing the line count in the original file");
+
+                    offset = new_offset;
+                }
+            }
+        }
+
+        Ok(result)
+    }
 
     #[test]
     fn test_diff_1() {
@@ -331,7 +332,7 @@ line 7 new";
         let line_index = LineIndex::new(OLD);
         let diff = TextEdit::from_unicode_words(OLD, NEW);
 
-        let text_edit = super::text_edit(&line_index, diff, PositionEncoding::Utf8, None).unwrap();
+        let text_edit = text_edit(&line_index, diff, PositionEncoding::Utf8, None).unwrap();
 
         assert_eq!(
             text_edit.as_slice(),
@@ -374,7 +375,7 @@ line 7 new";
         let line_index = LineIndex::new(OLD);
         let diff = TextEdit::from_unicode_words(OLD, NEW);
 
-        let text_edit = super::text_edit(&line_index, diff, PositionEncoding::Utf8, None).unwrap();
+        let text_edit = text_edit(&line_index, diff, PositionEncoding::Utf8, None).unwrap();
 
         assert_eq!(
             text_edit.as_slice(),

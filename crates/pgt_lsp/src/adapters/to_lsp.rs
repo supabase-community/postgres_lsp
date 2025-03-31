@@ -1,5 +1,5 @@
-use crate::PositionEncoding;
-use crate::line_index::LineIndex;
+use crate::adapters::PositionEncoding;
+use crate::adapters::line_index::LineIndex;
 use anyhow::{Context, Result};
 use pgt_text_size::{TextRange, TextSize};
 use tower_lsp::lsp_types;

@@ -1,11 +1,13 @@
 //! The crate contains a set of converters to translate between `lsp-types` and `text_size` (and vice versa) types.
 
 use pgt_text_size::TextSize;
-use tower_lsp::lsp_types::{ClientCapabilities, PositionEncodingKind};
+use tower_lsp::lsp_types::{ClientCapabilities, Position, PositionEncodingKind, Url};
 
-pub mod from_proto;
+use crate::session::Session;
+
+pub mod from_lsp;
 pub mod line_index;
-pub mod to_proto;
+pub mod to_lsp;
 
 pub fn negotiated_encoding(capabilities: &ClientCapabilities) -> PositionEncoding {
     let client_encodings = match &capabilities.general {
@@ -23,6 +25,29 @@ pub fn negotiated_encoding(capabilities: &ClientCapabilities) -> PositionEncodin
     }
 
     PositionEncoding::Wide(WideEncoding::Utf16)
+}
+
+pub fn get_cursor_position(
+    session: &Session,
+    url: &Url,
+    position: Position,
+) -> anyhow::Result<TextSize> {
+    let client_capabilities = session
+        .client_capabilities()
+        .expect("Client capabilities not established for current session.");
+
+    let line_index = session
+        .document(url)
+        .map(|doc| doc.line_index)
+        .map_err(|_| anyhow::anyhow!("Document not found."))?;
+
+    let cursor_pos = from_lsp::offset(
+        &line_index,
+        position,
+        negotiated_encoding(client_capabilities),
+    )?;
+
+    Ok(cursor_pos)
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -86,11 +111,11 @@ impl WideChar {
 
 #[cfg(test)]
 mod tests {
-    use crate::WideEncoding::{Utf16, Utf32};
-    use crate::from_proto::offset;
-    use crate::line_index::LineIndex;
-    use crate::to_proto::position;
-    use crate::{LineCol, PositionEncoding, WideEncoding};
+    use crate::adapters::WideEncoding::{Utf16, Utf32};
+    use crate::adapters::from_lsp::offset;
+    use crate::adapters::line_index::LineIndex;
+    use crate::adapters::to_lsp::position;
+    use crate::adapters::{LineCol, PositionEncoding, WideEncoding};
     use pgt_text_size::TextSize;
     use tower_lsp::lsp_types::Position;
 

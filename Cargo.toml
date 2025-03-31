@@ -39,6 +39,7 @@ serde                    = "1.0.195"
 serde_json               = "1.0.114"
 similar                  = "2.6.0"
 smallvec                 = { version = "1.13.2", features = ["union", "const_new", "serde"] }
+strum                    = { version = "0.27.1", features = ["derive"] }
 # this will use tokio if available, otherwise async-std
 sqlx               = { version = "0.8.2", features = ["runtime-tokio", "runtime-async-std", "postgres", "json"] }
 syn                = "1.0.109"
@@ -57,7 +58,6 @@ pgt_analyse                = { path = "./crates/pgt_analyse", version = "0.0.0" 
 pgt_analyser               = { path = "./crates/pgt_analyser", version = "0.0.0" }
 pgt_base_db                = { path = "./crates/pgt_base_db", version = "0.0.0" }
 pgt_cli                    = { path = "./crates/pgt_cli", version = "0.0.0" }
-pgt_commands               = { path = "./crates/pgt_commands", version = "0.0.0" }
 pgt_completions            = { path = "./crates/pgt_completions", version = "0.0.0" }
 pgt_configuration          = { path = "./crates/pgt_configuration", version = "0.0.0" }
 pgt_console                = { path = "./crates/pgt_console", version = "0.0.0" }

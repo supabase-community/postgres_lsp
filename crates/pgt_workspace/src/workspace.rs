@@ -4,13 +4,24 @@ pub use self::client::{TransportRequest, WorkspaceClient, WorkspaceTransport};
 use pgt_analyse::RuleCategories;
 use pgt_configuration::{PartialConfiguration, RuleSelector};
 use pgt_fs::PgTPath;
-use pgt_text_size::{TextRange, TextSize};
+use pgt_text_size::TextRange;
 use serde::{Deserialize, Serialize};
 
-use crate::WorkspaceError;
+use crate::{
+    WorkspaceError,
+    features::{
+        code_actions::{
+            CodeActionsParams, CodeActionsResult, ExecuteStatementParams, ExecuteStatementResult,
+        },
+        completions::{CompletionsResult, GetCompletionsParams},
+        diagnostics::{PullDiagnosticsParams, PullDiagnosticsResult},
+    },
+};
 
 mod client;
 mod server;
+
+pub(crate) use server::StatementId;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
@@ -32,33 +43,6 @@ pub struct ChangeFileParams {
     pub path: PgTPath,
     pub version: i32,
     pub changes: Vec<ChangeParams>,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-pub struct PullDiagnosticsParams {
-    pub path: PgTPath,
-    pub categories: RuleCategories,
-    pub max_diagnostics: u64,
-    pub only: Vec<RuleSelector>,
-    pub skip: Vec<RuleSelector>,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-pub struct GetCompletionsParams {
-    /// The File for which a completion is requested.
-    pub path: PgTPath,
-    /// The Cursor position in the file for which a completion is requested.
-    pub position: TextSize,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-pub struct PullDiagnosticsResult {
-    pub diagnostics: Vec<pgt_diagnostics::serde::Diagnostic>,
-    pub errors: usize,
-    pub skipped_diagnostics: u64,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -115,10 +99,16 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
         params: PullDiagnosticsParams,
     ) -> Result<PullDiagnosticsResult, WorkspaceError>;
 
+    /// Retrieves a list of available code_actions for a file/cursor_position
+    fn pull_code_actions(
+        &self,
+        params: CodeActionsParams,
+    ) -> Result<CodeActionsResult, WorkspaceError>;
+
     fn get_completions(
         &self,
         params: GetCompletionsParams,
-    ) -> Result<pgt_completions::CompletionResult, WorkspaceError>;
+    ) -> Result<CompletionsResult, WorkspaceError>;
 
     /// Update the global settings for this workspace
     fn update_settings(&self, params: UpdateSettingsParams) -> Result<(), WorkspaceError>;
@@ -145,6 +135,11 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
     ///
     /// If the file path matches, then `true` is returned, and it should be considered ignored.
     fn is_path_ignored(&self, params: IsPathIgnoredParams) -> Result<bool, WorkspaceError>;
+
+    fn execute_statement(
+        &self,
+        params: ExecuteStatementParams,
+    ) -> Result<ExecuteStatementResult, WorkspaceError>;
 }
 
 /// Convenience function for constructing a server instance of [Workspace]

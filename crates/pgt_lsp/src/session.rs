@@ -1,3 +1,4 @@
+use crate::adapters::{PositionEncoding, WideEncoding, negotiated_encoding};
 use crate::diagnostics::LspError;
 use crate::documents::Document;
 use crate::utils;
@@ -8,11 +9,11 @@ use pgt_analyse::RuleCategoriesBuilder;
 use pgt_configuration::ConfigurationPathHint;
 use pgt_diagnostics::{DiagnosticExt, Error};
 use pgt_fs::{FileSystem, PgTPath};
-use pgt_lsp_converters::{PositionEncoding, WideEncoding, negotiated_encoding};
 use pgt_workspace::Workspace;
 use pgt_workspace::configuration::{LoadedConfiguration, load_configuration};
+use pgt_workspace::features;
 use pgt_workspace::settings::PartialConfigurationExt;
-use pgt_workspace::workspace::{PullDiagnosticsParams, UpdateSettingsParams};
+use pgt_workspace::workspace::UpdateSettingsParams;
 use pgt_workspace::{DynRef, WorkspaceError};
 use rustc_hash::FxHashMap;
 use serde_json::Value;
@@ -28,14 +29,6 @@ use tower_lsp::lsp_types::{self, ClientCapabilities};
 use tower_lsp::lsp_types::{MessageType, Registration};
 use tower_lsp::lsp_types::{Unregistration, WorkspaceFolder};
 use tracing::{error, info};
-
-pub(crate) struct ClientInformation {
-    /// The name of the client
-    pub(crate) name: String,
-
-    /// The version of the client
-    pub(crate) version: Option<String>,
-}
 
 /// Key, uniquely identifying a LSP session.
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
@@ -74,7 +67,6 @@ pub(crate) struct Session {
 struct InitializeParams {
     /// The capabilities provided by the client as part of [`lsp_types::InitializeParams`]
     client_capabilities: lsp_types::ClientCapabilities,
-    client_information: Option<ClientInformation>,
     root_uri: Option<Url>,
     #[allow(unused)]
     workspace_folders: Option<Vec<WorkspaceFolder>>,
@@ -95,10 +87,6 @@ pub(crate) enum ConfigurationStatus {
 impl ConfigurationStatus {
     pub(crate) const fn is_error(&self) -> bool {
         matches!(self, ConfigurationStatus::Error)
-    }
-
-    pub(crate) const fn is_loaded(&self) -> bool {
-        matches!(self, ConfigurationStatus::Loaded)
     }
 }
 
@@ -175,13 +163,11 @@ impl Session {
     pub(crate) fn initialize(
         &self,
         client_capabilities: lsp_types::ClientCapabilities,
-        client_information: Option<ClientInformation>,
         root_uri: Option<Url>,
         workspace_folders: Option<Vec<WorkspaceFolder>>,
     ) {
         let result = self.initialize_params.set(InitializeParams {
             client_capabilities,
-            client_information,
             root_uri,
             workspace_folders,
         });
@@ -265,13 +251,15 @@ impl Session {
         let categories = RuleCategoriesBuilder::default().all();
 
         let diagnostics: Vec<lsp_types::Diagnostic> = {
-            let result = self.workspace.pull_diagnostics(PullDiagnosticsParams {
-                path: pgt_path.clone(),
-                max_diagnostics: u64::MAX,
-                categories: categories.build(),
-                only: Vec::new(),
-                skip: Vec::new(),
-            })?;
+            let result =
+                self.workspace
+                    .pull_diagnostics(features::diagnostics::PullDiagnosticsParams {
+                        path: pgt_path.clone(),
+                        max_diagnostics: u64::MAX,
+                        categories: categories.build(),
+                        only: Vec::new(),
+                        skip: Vec::new(),
+                    })?;
 
             result
                 .diagnostics
@@ -386,11 +374,6 @@ impl Session {
                 None
             }
         }
-    }
-
-    /// Returns a reference to the client information for this session
-    pub(crate) fn client_information(&self) -> Option<&ClientInformation> {
-        self.initialize_params.get()?.client_information.as_ref()
     }
 
     /// Returns a reference to the client capabilities for this session

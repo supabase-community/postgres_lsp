@@ -9,6 +9,7 @@ use syn::{
     token::Paren,
 };
 
+#[allow(clippy::large_enum_variant)]
 pub(crate) enum DeriveInput {
     DeriveStructInput(DeriveStructInput),
     DeriveEnumInput(DeriveEnumInput),

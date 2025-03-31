@@ -6,7 +6,7 @@ use std::mem;
 use pgt_text_size::TextSize;
 use rustc_hash::FxHashMap;
 
-use crate::{LineCol, WideChar, WideEncoding, WideLineCol};
+use crate::adapters::{LineCol, WideChar, WideEncoding, WideLineCol};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LineIndex {
@@ -65,16 +65,6 @@ impl LineIndex {
             newlines,
             line_wide_chars,
         }
-    }
-
-    /// Return the number of lines in the index, clamped to [u32::MAX]
-    pub fn len(&self) -> u32 {
-        self.newlines.len().try_into().unwrap_or(u32::MAX)
-    }
-
-    /// Return `true` if the index contains no lines.
-    pub fn is_empty(&self) -> bool {
-        self.newlines.is_empty()
     }
 
     pub fn line_col(&self, offset: TextSize) -> Option<LineCol> {

@@ -188,6 +188,7 @@ fn traverse_inputs(
 
 struct DiagnosticsPrinter<'ctx> {
     ///  Execution of the traversal
+    #[allow(dead_code)]
     execution: &'ctx Execution,
     /// The maximum number of diagnostics the console thread is allowed to print
     max_diagnostics: u32,
@@ -434,10 +435,6 @@ impl TraversalOptions<'_, '_> {
     /// Send a message to the display thread
     pub(crate) fn push_message(&self, msg: impl Into<Message>) {
         self.messages.send(msg.into()).ok();
-    }
-
-    pub(crate) fn protected_file(&self, pgt_path: &PgTPath) {
-        self.push_diagnostic(WorkspaceError::protected_file(pgt_path.display().to_string()).into())
     }
 }
 

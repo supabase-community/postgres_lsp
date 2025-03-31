@@ -1,13 +1,9 @@
 use crate::capabilities::server_capabilities;
-use crate::diagnostics::{LspError, handle_lsp_error};
 use crate::handlers;
-use crate::session::{
-    CapabilitySet, CapabilityStatus, ClientInformation, Session, SessionHandle, SessionKey,
-};
+use crate::session::{CapabilitySet, CapabilityStatus, Session, SessionHandle, SessionKey};
 use crate::utils::{into_lsp_error, panic_to_lsp_error};
 use futures::FutureExt;
 use futures::future::ready;
-use pgt_diagnostics::panic::PanicError;
 use pgt_fs::{ConfigName, FileSystem, OsFileSystem};
 use pgt_workspace::{DynRef, Workspace, workspace};
 use rustc_hash::FxHashMap;
@@ -88,20 +84,6 @@ impl LSPServer {
 
         self.session.register_capabilities(capabilities).await;
     }
-
-    async fn map_op_error<T>(
-        &self,
-        result: Result<Result<Option<T>, LspError>, PanicError>,
-    ) -> LspResult<Option<T>> {
-        match result {
-            Ok(result) => match result {
-                Ok(result) => Ok(result),
-                Err(err) => handle_lsp_error(err, &self.session.client).await,
-            },
-
-            Err(err) => Err(into_lsp_error(err)),
-        }
-    }
 }
 
 #[tower_lsp::async_trait]
@@ -125,10 +107,6 @@ impl LanguageServer for LSPServer {
 
         self.session.initialize(
             params.capabilities,
-            params.client_info.map(|client_info| ClientInformation {
-                name: client_info.name,
-                version: client_info.version,
-            }),
             params.root_uri,
             params.workspace_folders,
         );
@@ -232,13 +210,6 @@ impl LanguageServer for LSPServer {
     }
 
     #[tracing::instrument(level = "trace", skip(self))]
-    async fn did_save(&self, params: DidSaveTextDocumentParams) {
-        // handlers::text_document::did_save(&self.session, params)
-        //     .await
-        //     .ok();
-    }
-
-    #[tracing::instrument(level = "trace", skip(self))]
     async fn did_close(&self, params: DidCloseTextDocumentParams) {
         handlers::text_document::did_close(&self.session, params)
             .await
@@ -250,6 +221,29 @@ impl LanguageServer for LSPServer {
         match handlers::completions::get_completions(&self.session, params) {
             Ok(result) => LspResult::Ok(Some(result)),
             Err(e) => LspResult::Err(into_lsp_error(e)),
+        }
+    }
+
+    #[tracing::instrument(level = "trace", skip(self))]
+    async fn code_action(&self, params: CodeActionParams) -> LspResult<Option<CodeActionResponse>> {
+        match handlers::code_actions::get_actions(&self.session, params) {
+            Ok(result) => {
+                tracing::info!("Got Code Actions: {:?}", result);
+                return LspResult::Ok(Some(result));
+            }
+            Err(e) => LspResult::Err(into_lsp_error(e)),
+        }
+    }
+
+    #[tracing::instrument(level = "trace", skip(self))]
+    async fn execute_command(
+        &self,
+        params: ExecuteCommandParams,
+    ) -> LspResult<Option<serde_json::Value>> {
+        match handlers::code_actions::execute_command(&self.session, params).await {
+            // we'll inform the client within `code_actions::execute_command`
+            Ok(_) => LspResult::Ok(None),
+            Err(err) => LspResult::Err(into_lsp_error(err)),
         }
     }
 }

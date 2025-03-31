@@ -1,4 +1,4 @@
-use pgt_lsp_converters::line_index::LineIndex;
+use crate::adapters::line_index::LineIndex;
 
 /// Represents an open [`textDocument`]. Can be cheaply cloned.
 ///

@@ -130,13 +130,13 @@ impl fmt::Display for Files {
     }
 }
 
-struct SummaryDetail<'a>(pub(crate) &'a TraversalMode, usize);
+struct SummaryDetail(usize);
 
-impl fmt::Display for SummaryDetail<'_> {
+impl fmt::Display for SummaryDetail {
     fn fmt(&self, fmt: &mut Formatter) -> io::Result<()> {
-        if self.1 > 0 {
+        if self.0 > 0 {
             fmt.write_markup(markup! {
-                " Fixed "{Files(self.1)}"."
+                " Fixed "{Files(self.0)}"."
             })
         } else {
             fmt.write_markup(markup! {
@@ -168,7 +168,7 @@ pub(crate) struct ConsoleTraversalSummary<'a>(
 impl fmt::Display for ConsoleTraversalSummary<'_> {
     fn fmt(&self, fmt: &mut Formatter) -> io::Result<()> {
         let summary = SummaryTotal(self.0, self.1.changed + self.1.unchanged, &self.1.duration);
-        let detail = SummaryDetail(self.0, self.1.changed);
+        let detail = SummaryDetail(self.1.changed);
         fmt.write_markup(markup!(<Info>{summary}{detail}</Info>))?;
 
         if self.1.errors > 0 {

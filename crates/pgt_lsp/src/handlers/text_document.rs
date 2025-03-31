@@ -1,8 +1,8 @@
+use crate::adapters::from_lsp;
 use crate::{
     diagnostics::LspError, documents::Document, session::Session, utils::apply_document_changes,
 };
 use anyhow::Result;
-use pgt_lsp_converters::from_proto::text_range;
 use pgt_workspace::workspace::{
     ChangeFileParams, ChangeParams, CloseFileParams, GetFileContentParams, OpenFileParams,
 };
@@ -73,7 +73,7 @@ pub(crate) async fn did_change(
             .iter()
             .map(|c| ChangeParams {
                 range: c.range.and_then(|r| {
-                    text_range(&old_doc.line_index, r, session.position_encoding()).ok()
+                    from_lsp::text_range(&old_doc.line_index, r, session.position_encoding()).ok()
                 }),
                 text: c.text.clone(),
             })

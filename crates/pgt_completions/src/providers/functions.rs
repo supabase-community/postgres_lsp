@@ -6,11 +6,11 @@ use crate::{
 pub fn complete_functions(ctx: &CompletionContext, builder: &mut CompletionBuilder) {
     let available_functions = &ctx.schema_cache.functions;
 
-    for foo in available_functions {
+    for func in available_functions {
         let item = CompletionItem {
-            label: foo.name.clone(),
-            score: CompletionRelevanceData::Function(foo).get_score(ctx),
-            description: format!("Schema: {}", foo.schema),
+            label: func.name.clone(),
+            score: CompletionRelevanceData::Function(func).get_score(ctx),
+            description: format!("Schema: {}", func.schema),
             preselected: false,
             kind: CompletionItemKind::Function,
         };

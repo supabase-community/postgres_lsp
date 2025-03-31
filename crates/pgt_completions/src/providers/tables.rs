@@ -43,11 +43,11 @@ mod tests {
 
         let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
         let params = get_test_params(&tree, &cache, query.as_str().into());
-        let results = complete(params);
+        let items = complete(params);
 
-        assert!(!results.items.is_empty());
+        assert!(!items.is_empty());
 
-        let best_match = &results.items[0];
+        let best_match = &items[0];
 
         assert_eq!(
             best_match.label, "users",
@@ -81,11 +81,11 @@ mod tests {
         for (query, expected_label) in test_cases {
             let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
             let params = get_test_params(&tree, &cache, query.as_str().into());
-            let results = complete(params);
+            let items = complete(params);
 
-            assert!(!results.items.is_empty());
+            assert!(!items.is_empty());
 
-            let best_match = &results.items[0];
+            let best_match = &items[0];
 
             assert_eq!(
                 best_match.label, expected_label,
@@ -126,11 +126,11 @@ mod tests {
         for (query, expected_label) in test_cases {
             let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
             let params = get_test_params(&tree, &cache, query.as_str().into());
-            let results = complete(params);
+            let items = complete(params);
 
-            assert!(!results.items.is_empty());
+            assert!(!items.is_empty());
 
-            let best_match = &results.items[0];
+            let best_match = &items[0];
 
             assert_eq!(
                 best_match.label, expected_label,
@@ -163,9 +163,9 @@ mod tests {
 
         let (tree, cache) = get_test_deps(setup, query.as_str().into()).await;
         let params = get_test_params(&tree, &cache, query.as_str().into());
-        let results = complete(params);
+        let items = complete(params);
 
-        let CompletionItem { label, kind, .. } = results
+        let CompletionItem { label, kind, .. } = items
             .into_iter()
             .next()
             .expect("Should return at least one completion item");

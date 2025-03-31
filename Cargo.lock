@@ -1477,9 +1477,9 @@ checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
 name = "globset"
-version = "0.4.15"
+version = "0.4.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "15f1ce686646e7f1e19bf7d5533fe443a45dbfb990e00629110797578b42fb19"
+checksum = "54a1028dfc5f5df5da8a56a73e6c153c9a9708ec57232470703592a3f18e49f5"
 dependencies = [
  "aho-corasick",
  "bstr",
@@ -2433,16 +2433,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pgt_commands"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-std",
- "pgt_text_size",
- "sqlx",
-]
-
-[[package]]
 name = "pgt_completions"
 version = "0.0.0"
 dependencies = [
@@ -2589,7 +2579,6 @@ dependencies = [
  "pgt_console",
  "pgt_diagnostics",
  "pgt_fs",
- "pgt_lsp_converters",
  "pgt_test_utils",
  "pgt_text_edit",
  "pgt_text_size",
@@ -2599,20 +2588,11 @@ dependencies = [
  "serde_json",
  "sqlx",
  "test-log",
+ "strum",
  "tokio",
  "tower",
  "tower-lsp",
  "tracing",
-]
-
-[[package]]
-name = "pgt_lsp_converters"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "pgt_text_size",
- "rustc-hash 2.1.0",
- "tower-lsp",
 ]
 
 [[package]]
@@ -2770,6 +2750,7 @@ dependencies = [
  "biome_rowan",
  "dashmap 5.5.3",
  "futures",
+ "globset",
  "ignore",
  "pgt_analyse",
  "pgt_analyser",
@@ -2788,6 +2769,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sqlx",
+ "strum",
  "tempfile",
  "tokio",
  "tracing",
@@ -3331,6 +3313,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustversion"
+version = "1.0.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eded382c5f5f786b989652c49544c4877d9f015cc22e145a5ea8ea66c2921cd2"
+
+[[package]]
 name = "ryu"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3836,6 +3824,28 @@ name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
+
+[[package]]
+name = "strum"
+version = "0.27.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f64def088c51c9510a8579e3c5d67c65349dcf755e5479ad3d010aa6454e2c32"
+dependencies = [
+ "strum_macros",
+]
+
+[[package]]
+name = "strum_macros"
+version = "0.27.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c77a8c5abcaf0f9ce05d62342b7d298c346515365c36b673df4ebe3ced01fde8"
+dependencies = [
+ "heck 0.5.0",
+ "proc-macro2",
+ "quote",
+ "rustversion",
+ "syn 2.0.90",
+]
 
 [[package]]
 name = "subtle"
