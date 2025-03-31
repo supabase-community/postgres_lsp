@@ -70,7 +70,7 @@ To use the CLI in GitHub Actions, you can install it via our [GitHub Action](htt
 
 ## Configuration
 
-We recommend creating a `postgrestools.jsonc` configuration file for each project. This eliminates repetitive CLI options and ensures that consitent configuration in your editor. Some options are only available from a configuration file. This step is optional: if you are happy with the defaults, you don’t need a configuration file. To create the `postgrestools.jsonc` file, run the `init` command in the root folder of your project:
+We recommend creating a `postgrestools.jsonc` configuration file for each project. This eliminates repetitive CLI options and ensures that consistent configuration in your editor. Some options are only available from a configuration file. This step is optional: if you are happy with the defaults, you don’t need a configuration file. To create the `postgrestools.jsonc` file, run the `init` command in the root folder of your project:
 
 ```sh
 postgrestools init
