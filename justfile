@@ -5,6 +5,7 @@ alias f := format
 alias r := ready
 alias l := lint
 alias t := test
+alias rg := reset-git
 
 # Installs the tools needed to develop
 install-tools:
