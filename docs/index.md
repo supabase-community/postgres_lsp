@@ -58,7 +58,7 @@ npm add --save-dev --save-exact @postgrestools/postgrestools
 
 ### VSCode
 
-The language server is available on the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=Supabase.postgrestools-vscode). Its published from [this repo](https://github.com/supabase-community/postgrestools-vscode).
+The language server is available on the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=Supabase.postgrestools). Its published from [this repo](https://github.com/supabase-community/postgrestools-vscode).
 
 ### Neovim
 
