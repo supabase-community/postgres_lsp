@@ -7,3 +7,5 @@ select
   *
 from
   unknown_users;
+
+sel 1;

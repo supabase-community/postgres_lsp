@@ -23,7 +23,6 @@ use sqlx::Executor;
 use std::any::type_name;
 use std::fmt::Display;
 use std::time::Duration;
-use test_log::test;
 use tower::timeout::Timeout;
 use tower::{Service, ServiceExt};
 use tower_lsp::LspService;
@@ -31,7 +30,6 @@ use tower_lsp::jsonrpc;
 use tower_lsp::jsonrpc::Response;
 use tower_lsp::lsp_types as lsp;
 use tower_lsp::lsp_types::CodeActionContext;
-use tower_lsp::lsp_types::CodeActionOrCommand;
 use tower_lsp::lsp_types::CodeActionParams;
 use tower_lsp::lsp_types::CodeActionResponse;
 use tower_lsp::lsp_types::CompletionParams;
@@ -250,6 +248,7 @@ impl Server {
         .await
     }
 
+    #[allow(unused)]
     async fn close_document(&mut self) -> Result<()> {
         self.notify(
             "textDocument/didClose",
@@ -827,8 +826,8 @@ async fn test_execute_statement() -> Result<()> {
 
     let doc_content = r#"
         create table users (
-            id serial primary key, 
-            name text, 
+            id serial primary key,
+            name text,
             email text
         );
     "#;
