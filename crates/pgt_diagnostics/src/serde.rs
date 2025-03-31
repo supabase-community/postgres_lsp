@@ -374,7 +374,6 @@ mod tests {
     use std::io;
 
     use pgt_text_size::{TextRange, TextSize};
-    use serde_json::{Value, json};
 
     use crate::{
         self as pgt_diagnostics, {Advices, LogCategory, Visit},
