@@ -22,6 +22,7 @@ use sqlx::Executor;
 use std::any::type_name;
 use std::fmt::Display;
 use std::time::Duration;
+use test_log::test;
 use tower::timeout::Timeout;
 use tower::{Service, ServiceExt};
 use tower_lsp::LspService;
@@ -753,4 +754,3 @@ async fn test_issue_271() -> Result<()> {
 
     Ok(())
 }
-
