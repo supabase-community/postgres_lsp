@@ -35,6 +35,7 @@ tracing                 = { workspace = true, features = ["attributes"] }
 [dev-dependencies]
 pgt_test_utils = { workspace = true }
 sqlx           = { workspace = true }
+test-log       = { workspace = true }
 tokio          = { workspace = true, features = ["macros"] }
 tower          = { version = "0.4.13", features = ["timeout"] }
 
