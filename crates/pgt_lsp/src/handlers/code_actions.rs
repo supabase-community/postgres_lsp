@@ -1,3 +1,5 @@
+use std::sync::atomic::Ordering;
+
 use crate::{adapters::get_cursor_position, session::Session};
 use anyhow::{Result, anyhow};
 use tower_lsp::lsp_types::{
@@ -90,6 +92,8 @@ pub async fn execute_command(
                     statement_id: id,
                     path,
                 })?;
+
+            std::sync::atomic::fence(Ordering::SeqCst);
 
             /*
              * Updating all diagnostics: the changes caused by the statement execution

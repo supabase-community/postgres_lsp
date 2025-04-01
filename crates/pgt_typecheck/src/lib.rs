@@ -42,7 +42,14 @@ pub async fn check_sql(params: TypecheckParams<'_>) -> Option<TypecheckDiagnosti
         return None;
     }
 
-    let res = params.conn.prepare(params.sql).await;
+    let mut conn = match params.conn.acquire().await {
+        Ok(c) => c,
+        Err(_) => return None,
+    };
+
+    conn.close_on_drop();
+
+    let res = conn.prepare(params.sql).await;
 
     match res {
         Ok(_) => None,
