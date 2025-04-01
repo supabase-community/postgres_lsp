@@ -58,7 +58,7 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
 
       - name: Set version name
-        run: echo "version=$(git cliff --bumped-version)" >> $GITHUB_ENV
+        run: echo "version=$(git cliff --bumped-version)" >> "$GITHUB_ENV"
 
       - name: 🛠️ Run Build
         run: cargo build -p pgt_cli --release --target ${{ matrix.config.target }}
