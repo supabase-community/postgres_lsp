@@ -7,7 +7,7 @@ use super::QueryTryFrom;
 static TS_QUERY: LazyLock<tree_sitter::Query> = LazyLock::new(|| {
     static QUERY_STR: &str = r#"
     (relation
-        (object_reference 
+        (object_reference
             .
             (identifier) @schema_or_table
             "."?
@@ -38,7 +38,7 @@ impl RelationMatch<'_> {
     pub fn get_table(&self, sql: &str) -> String {
         self.table
             .utf8_text(sql.as_bytes())
-            .expect("Failed to get schema from RelationMatch")
+            .expect("Failed to get table from RelationMatch")
             .to_string()
     }
 }

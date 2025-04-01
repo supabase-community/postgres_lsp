@@ -1,11 +1,10 @@
 name: Build and Deploy Documentation
+
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'docs/**'
+  release:
+    types: [released]
   workflow_dispatch:
+
 permissions:
   contents: write
   pages: write

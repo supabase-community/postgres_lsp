@@ -57,8 +57,17 @@ jobs:
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
 
+      - name: Set version name
+        run: echo "version=$(git cliff --bumped-version)" >> "$GITHUB_ENV"
+
       - name: 🛠️ Run Build
         run: cargo build -p pgt_cli --release --target ${{ matrix.config.target }}
+        env:
+          # Strip all debug symbols from the resulting binaries
+          RUSTFLAGS: "-C strip=symbols -C codegen-units=1"
+          # Inline the version in the CLI binary
+          PGT_VERSION: ${{ env.version }}
+
 
       # windows is a special snowflake too, it saves binaries as .exe
       - name: 👦 Name the Binary

@@ -155,6 +155,16 @@ mod tests {
     }
 
     #[test]
+    fn with_security_invoker() {
+        Tester::from(
+            "create view api.my_view with (security_invoker) as select id from public.my_table;",
+        )
+        .expect_statements(vec![
+            "create view api.my_view with (security_invoker) as select id from public.my_table;",
+        ]);
+    }
+
+    #[test]
     fn create_trigger() {
         Tester::from("alter table appointment_status add constraint valid_key check (private.strip_special_chars(key) = key and length(key) > 0 and length(key) < 60);
 
