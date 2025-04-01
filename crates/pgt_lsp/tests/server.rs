@@ -747,27 +747,31 @@ async fn test_issue_281() -> Result<()> {
 
     server.load_configuration().await?;
 
-    server.open_document("select a").await?;
+    server.open_document("\n------------- Meta -------------\n\n-- name: GetValueFromMetaKVStore :one\nSELECT value FROM meta_kv\nWHERE key = $1;\n\n-- name: SetValueToMetaKVStore :exec\nINSERT INTO meta_kv (key, value)\nVALUES ($1, $2)\nON CONFLICT (key) DO UPDATE\nSET value = excluded.value;\n\n\nasdsadsad\n\nыывфыв khgk\nasdыdsf\ndsdsjdfnfmdsвтьвыаыdsfsmndf,m\nы\n").await?;
 
-    server
-        .change_document(
-            3,
-            vec![TextDocumentContentChangeEvent {
-                range: Some(Range {
-                    start: Position {
-                        line: 0,
-                        character: 7,
-                    },
-                    end: Position {
-                        line: 0,
-                        character: 7,
-                    },
-                }),
-                range_length: Some(0),
-                text: "ы".to_string(),
-            }],
-        )
-        .await?;
+    let chars = ["s", "n", ",", "d", "f", "j", "s", "d", "f", "в"];
+
+    for (i, c) in chars.iter().enumerate() {
+        server
+            .change_document(
+                i as i32 + 4,
+                vec![TextDocumentContentChangeEvent {
+                    range: Some(Range {
+                        start: Position {
+                            line: 20,
+                            character: i as u32,
+                        },
+                        end: Position {
+                            line: 20,
+                            character: i as u32,
+                        },
+                    }),
+                    range_length: Some(0),
+                    text: c.to_string(),
+                }],
+            )
+            .await?;
+    }
 
     server.shutdown().await?;
     reader.abort();

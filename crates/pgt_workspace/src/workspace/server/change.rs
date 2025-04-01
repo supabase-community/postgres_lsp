@@ -249,10 +249,19 @@ impl Document {
 
         // if within a statement, we can modify it if the change results in also a single statement
         if affected_indices.len() == 1 {
-            let changed_content = new_content
-                .as_str()
-                .get(usize::from(affected_range.start())..usize::from(affected_range.end()))
-                .unwrap();
+            let start_byte = new_content
+                .char_indices()
+                .nth(usize::from(affected_range.start()))
+                .map(|(i, _)| i)
+                .unwrap_or(new_content.len());
+
+            let end_byte = new_content
+                .char_indices()
+                .nth(usize::from(affected_range.end()))
+                .map(|(i, _)| i)
+                .unwrap_or(new_content.len());
+
+            let changed_content = &new_content[start_byte..end_byte];
 
             let (new_ranges, diags) =
                 document::split_with_diagnostics(changed_content, Some(affected_range.start()));
@@ -305,10 +314,19 @@ impl Document {
         }
 
         // in any other case, parse the full affected range
-        let changed_content = new_content
-            .as_str()
-            .get(usize::from(full_affected_range.start())..usize::from(full_affected_range.end()))
-            .unwrap();
+        let start_byte = new_content
+            .char_indices()
+            .nth(usize::from(full_affected_range.start()))
+            .map(|(i, _)| i)
+            .unwrap_or(new_content.len());
+
+        let end_byte = new_content
+            .char_indices()
+            .nth(usize::from(full_affected_range.end()))
+            .map(|(i, _)| i)
+            .unwrap_or(new_content.len());
+
+        let changed_content = &new_content[start_byte..end_byte];
 
         let (new_ranges, diags) =
             document::split_with_diagnostics(changed_content, Some(full_affected_range.start()));
