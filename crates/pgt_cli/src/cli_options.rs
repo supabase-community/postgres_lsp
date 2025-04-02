@@ -74,7 +74,6 @@ pub struct CliOptions {
 
     /// How the log should look like.
     #[bpaf(
-        env("PGT_LOG_KIND"),
         long("log-kind"),
         argument("pretty|compact|json"),
         fallback(LoggingKind::default()),
