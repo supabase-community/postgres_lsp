@@ -93,8 +93,6 @@ pub async fn execute_command(
                     path,
                 })?;
 
-            std::sync::atomic::fence(Ordering::SeqCst);
-
             /*
              * Updating all diagnostics: the changes caused by the statement execution
              * might affect many files.
