@@ -13,7 +13,6 @@ use tracing::{Instrument, Metadata, debug_span, metadata::LevelFilter};
 use tracing_appender::rolling::Rotation;
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_subscriber::{
-    fmt::Layer,
     layer::{Context, Filter},
     prelude::*,
     registry,
