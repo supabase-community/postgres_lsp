@@ -162,7 +162,7 @@ pub enum PgtCommand {
         )]
         log_path: PathBuf,
 
-        /// Allows to change the log level
+        /// Allows to change the log level. Default is debug. This will only affect "pgt*" crates. All others are logged with info level.
         #[bpaf(
             env("PGT_LOG_LEVEL"),
             long("log-level"),
