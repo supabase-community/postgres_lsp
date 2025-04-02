@@ -1,5 +1,3 @@
-use std::sync::atomic::Ordering;
-
 use crate::{adapters::get_cursor_position, session::Session};
 use anyhow::{Result, anyhow};
 use tower_lsp::lsp_types::{
