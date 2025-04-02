@@ -167,7 +167,7 @@ pub enum PgtCommand {
             env("PGT_LOG_LEVEL"),
             long("log-level"),
             argument("trace|debug|info|warn|error|none"),
-            fallback(String::from("info"))
+            fallback(String::from("debug"))
         )]
         log_level: String,
 
