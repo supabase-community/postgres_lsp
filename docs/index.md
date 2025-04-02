@@ -58,7 +58,7 @@ npm add --save-dev --save-exact @postgrestools/postgrestools
 
 ### VSCode
 
-The language server is available on the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=Supabase.postgrestools-vscode). Its published from [this repo](https://github.com/supabase-community/postgrestools-vscode).
+The language server is available on the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=Supabase.postgrestools). Its published from [this repo](https://github.com/supabase-community/postgrestools-vscode).
 
 ### Neovim
 
@@ -70,7 +70,7 @@ To use the CLI in GitHub Actions, you can install it via our [GitHub Action](htt
 
 ## Configuration
 
-We recommend creating a `postgrestools.jsonc` configuration file for each project. This eliminates repetitive CLI options and ensures that consitent configuration in your editor. Some options are only available from a configuration file. This step is optional: if you are happy with the defaults, you don’t need a configuration file. To create the `postgrestools.jsonc` file, run the `init` command in the root folder of your project:
+We recommend creating a `postgrestools.jsonc` configuration file for each project. This eliminates repetitive CLI options and ensures that consistent configuration in your editor. Some options are only available from a configuration file. This step is optional: if you are happy with the defaults, you don’t need a configuration file. To create the `postgrestools.jsonc` file, run the `init` command in the root folder of your project:
 
 ```sh
 postgrestools init

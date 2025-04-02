@@ -5,7 +5,7 @@ use crate::{
 use pgt_console::{ConsoleExt, markup};
 use pgt_lsp::ServerFactory;
 use pgt_workspace::{TransportError, WorkspaceError, workspace::WorkspaceClient};
-use std::{env, fs, path::PathBuf};
+use std::{env, path::PathBuf};
 use tokio::io;
 use tokio::runtime::Runtime;
 use tracing::subscriber::Interest;
@@ -173,33 +173,6 @@ async fn start_lsp_proxy(
             Ok(())
         }
         None => Ok(()),
-    }
-}
-
-pub(crate) fn read_most_recent_log_file(
-    log_path: Option<PathBuf>,
-    log_file_name_prefix: String,
-) -> io::Result<Option<String>> {
-    let pgt_log_path = log_path.unwrap_or(default_pgt_log_path());
-
-    let most_recent = fs::read_dir(pgt_log_path)?
-        .flatten()
-        .filter(|file| file.file_type().is_ok_and(|ty| ty.is_file()))
-        .filter_map(|file| {
-            match file
-                .file_name()
-                .to_str()?
-                .split_once(log_file_name_prefix.as_str())
-            {
-                Some((_, date_part)) if date_part.split('-').count() == 4 => Some(file.path()),
-                _ => None,
-            }
-        })
-        .max();
-
-    match most_recent {
-        Some(file) => Ok(Some(fs::read_to_string(file)?)),
-        None => Ok(None),
     }
 }
 

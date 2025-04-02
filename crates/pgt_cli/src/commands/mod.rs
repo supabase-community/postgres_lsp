@@ -15,7 +15,6 @@ use pgt_workspace::workspace::UpdateSettingsParams;
 use pgt_workspace::{DynRef, Workspace, WorkspaceError};
 use std::ffi::OsString;
 use std::path::PathBuf;
-
 pub(crate) mod check;
 pub(crate) mod clean;
 pub(crate) mod daemon;
@@ -24,6 +23,7 @@ pub(crate) mod version;
 
 #[derive(Debug, Clone, Bpaf)]
 #[bpaf(options, version(VERSION))]
+#[allow(clippy::large_enum_variant)]
 /// Postgres Tools official CLI. Use it to check the health of your project or run it to check single files.
 pub enum PgtCommand {
     /// Shows the version information and quit.
@@ -348,9 +348,6 @@ pub(crate) trait CommandRunner: Sized {
     /// It returns the file path to use in `stdin` mode.
     fn get_stdin_file_path(&self) -> Option<&str>;
 
-    /// Whether the command should write the files.
-    fn should_write(&self) -> bool;
-
     /// Returns the [Execution] mode.
     fn get_execution(
         &self,
@@ -366,11 +363,6 @@ pub(crate) trait CommandRunner: Sized {
     /// The method is called before loading the configuration from disk.
     fn check_incompatible_arguments(&self) -> Result<(), CliDiagnostic> {
         Ok(())
-    }
-
-    /// Checks whether the configuration has errors.
-    fn should_validate_configuration_diagnostics(&self) -> bool {
-        true
     }
 }
 

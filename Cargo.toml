@@ -44,6 +44,7 @@ strum                    = { version = "0.27.1", features = ["derive"] }
 sqlx                     = { version = "0.8.2", features = ["runtime-tokio", "runtime-async-std", "postgres", "json"] }
 syn                      = "1.0.109"
 termcolor                = "1.4.1"
+test-log           = "0.2.17"
 tokio                    = { version = "1.40.0", features = ["full"] }
 tower-lsp                = "0.20.0"
 tracing                  = { version = "0.1.40", default-features = false, features = ["std"] }

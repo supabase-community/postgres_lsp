@@ -164,7 +164,7 @@ impl Arguments {
 
             let span = self.pattern.lit.span();
             let test_name = syn::Ident::new(&test_name, span);
-            let foo = &self.test_function;
+            let func = &self.test_function;
 
             modules.insert(
                 path,
@@ -174,7 +174,7 @@ impl Arguments {
                         let test_fullpath = #test_fullpath;
                         let test_expected_fullpath = #test_expected_fullpath;
                         let test_dir = #test_dir;
-                        #foo(test_fullpath, test_expected_fullpath, test_dir);
+                        #func(test_fullpath, test_expected_fullpath, test_dir);
                     }
                 },
             )

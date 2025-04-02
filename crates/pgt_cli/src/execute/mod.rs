@@ -11,11 +11,10 @@ use crate::reporter::junit::{JunitReporter, JunitReporterVisitor};
 use crate::reporter::terminal::{ConsoleReporter, ConsoleReporterVisitor};
 use crate::{CliDiagnostic, CliSession, DiagnosticsPayload, Reporter};
 use pgt_diagnostics::{Category, category};
-use pgt_fs::PgTPath;
 use std::borrow::Borrow;
 use std::ffi::OsString;
 use std::fmt::{Display, Formatter};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use tracing::info;
 
 /// Useful information during the traversal of files and virtual content
@@ -37,14 +36,10 @@ impl Execution {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub enum ExecutionEnvironment {
-    GitHub,
-}
-
 /// A type that holds the information to execute the CLI via `stdin
 #[derive(Debug, Clone)]
 pub struct Stdin(
+    #[allow(unused)]
     /// The virtual path to the file
     PathBuf,
     /// The content of the file
@@ -52,10 +47,6 @@ pub struct Stdin(
 );
 
 impl Stdin {
-    fn as_path(&self) -> &Path {
-        self.0.as_path()
-    }
-
     fn as_content(&self) -> &str {
         self.1.as_str()
     }
@@ -170,10 +161,6 @@ impl Execution {
         }
     }
 
-    pub(crate) const fn is_dummy(&self) -> bool {
-        matches!(self.traversal_mode, TraversalMode::Dummy)
-    }
-
     /// Whether the traversal mode requires write access to files
     pub(crate) const fn requires_write_access(&self) -> bool {
         match self.traversal_mode {
@@ -202,6 +189,7 @@ impl Execution {
         false
     }
 
+    #[allow(unused)]
     /// Returns [true] if the user used the `--write`/`--fix` option
     pub(crate) fn is_write(&self) -> bool {
         match self.traversal_mode {
@@ -232,14 +220,7 @@ pub fn execute_mode(
 
     // don't do any traversal if there's some content coming from stdin
     if let Some(stdin) = execution.as_stdin_file() {
-        let pgt_path = PgTPath::new(stdin.as_path());
-        std_in::run(
-            session,
-            &execution,
-            pgt_path,
-            stdin.as_content(),
-            cli_options.verbose,
-        )
+        std_in::run(session, stdin.as_content())
     } else {
         let TraverseResult {
             summary,

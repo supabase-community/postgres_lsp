@@ -1,4 +1,4 @@
-use crate::session::Session;
+use crate::{adapters::get_cursor_position, session::Session};
 use anyhow::Result;
 use pgt_workspace::{WorkspaceError, features::completions::GetCompletionsParams};
 use tower_lsp::lsp_types::{self, CompletionItem, CompletionItemLabelDetails};

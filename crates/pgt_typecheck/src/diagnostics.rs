@@ -30,12 +30,16 @@ struct TypecheckAdvices {
     column: Option<String>,
     data_type: Option<String>,
     constraint: Option<String>,
-    line: Option<usize>,
-    file: Option<String>,
     detail: Option<String>,
-    routine: Option<String>,
     where_: Option<String>,
     hint: Option<String>,
+
+    #[allow(unused)]
+    line: Option<usize>,
+    #[allow(unused)]
+    file: Option<String>,
+    #[allow(unused)]
+    routine: Option<String>,
 }
 
 impl Advices for TypecheckAdvices {

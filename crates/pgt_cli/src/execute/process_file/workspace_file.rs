@@ -4,7 +4,6 @@ use pgt_diagnostics::{Error, category};
 use pgt_fs::{File, OpenOptions, PgTPath};
 use pgt_workspace::workspace::{ChangeParams, FileGuard, OpenFileParams};
 use pgt_workspace::{Workspace, WorkspaceError};
-use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 
 /// Small wrapper that holds information and operations around the current processed file
@@ -59,11 +58,8 @@ impl<'ctx, 'app> WorkspaceFile<'ctx, 'app> {
         self.guard().get_file_content()
     }
 
-    pub(crate) fn as_extension(&self) -> Option<&OsStr> {
-        self.path.extension()
-    }
-
     /// It updates the workspace file with `new_content`
+    #[allow(dead_code)]
     pub(crate) fn update_file(&mut self, new_content: impl Into<String>) -> Result<(), Error> {
         let new_content = new_content.into();
 

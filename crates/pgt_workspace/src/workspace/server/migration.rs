@@ -3,6 +3,7 @@ use std::path::Path;
 #[derive(Debug)]
 pub(crate) struct Migration {
     pub(crate) timestamp: u64,
+    #[allow(unused)]
     pub(crate) name: String,
 }
 

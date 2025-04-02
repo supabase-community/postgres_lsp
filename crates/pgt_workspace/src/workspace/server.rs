@@ -307,7 +307,7 @@ impl Workspace for WorkspaceServer {
             Some("Statement execution not allowed against database.".into())
         };
 
-        for (stmt, range, txt) in eligible_statements {
+        for (stmt, _, txt) in eligible_statements {
             let title = format!(
                 "Execute Statement: {}...",
                 txt.chars().take(50).collect::<String>()
@@ -356,7 +356,7 @@ impl Workspace for WorkspaceServer {
             }
         };
 
-        let conn = self.connection.write().unwrap();
+        let conn = self.connection.read().unwrap();
         let pool = match conn.get_pool() {
             Some(p) => p,
             None => {

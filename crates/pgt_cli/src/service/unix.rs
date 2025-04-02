@@ -24,6 +24,7 @@ fn get_socket_name() -> PathBuf {
     pgt_fs::ensure_cache_dir().join(format!("pgt-socket-{}", pgt_configuration::VERSION))
 }
 
+#[allow(dead_code)]
 pub(crate) fn enumerate_pipes() -> io::Result<impl Iterator<Item = String>> {
     fs::read_dir(pgt_fs::ensure_cache_dir()).map(|iter| {
         iter.filter_map(|entry| {

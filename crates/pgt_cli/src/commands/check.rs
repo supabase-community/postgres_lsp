@@ -61,10 +61,6 @@ impl CommandRunner for CheckCommandPayload {
         self.stdin_file_path.as_deref()
     }
 
-    fn should_write(&self) -> bool {
-        false
-    }
-
     fn get_execution(
         &self,
         cli_options: &CliOptions,

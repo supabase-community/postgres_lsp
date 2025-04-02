@@ -6,7 +6,6 @@ use {
         iter,
         num::TryFromIntError,
         ops::{Add, AddAssign, Sub, SubAssign},
-        u32,
     },
 };
 

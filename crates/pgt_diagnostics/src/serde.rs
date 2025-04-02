@@ -374,7 +374,6 @@ mod tests {
     use std::io;
 
     use pgt_text_size::{TextRange, TextSize};
-    use serde_json::{Value, json};
 
     use crate::{
         self as pgt_diagnostics, {Advices, LogCategory, Visit},
@@ -426,55 +425,55 @@ mod tests {
         }
     }
 
-    fn serialized() -> Value {
-        let advices = json!([
-            {
-                "log": [
-                    "warn",
-                    [
-                        {
-                            "elements": [],
-                            "content": "log"
-                        }
-                    ]
-                ]
-            }
-        ]);
-
-        json!({
-            "category": "internalError/io",
-            "severity": "warning",
-            "description": "text description",
-            "message": [
-                {
-                    "elements": [
-                        "Emphasis"
-                    ],
-                    "content": "markup message"
-                }
-            ],
-            "advices": {
-                "advices": advices
-            },
-            "verbose_advices": {
-                "advices": advices
-            },
-            "location": {
-                "path": {
-                    "file": "path"
-                },
-                "sourceCode": "source_code",
-                "span": [
-                    0,
-                    6
-                ]
-            },
-            "tags": [
-                "internal"
-            ],
-            "source": null
-        })
-    }
+    // fn serialized() -> Value {
+    //     let advices = json!([
+    //         {
+    //             "log": [
+    //                 "warn",
+    //                 [
+    //                     {
+    //                         "elements": [],
+    //                         "content": "log"
+    //                     }
+    //                 ]
+    //             ]
+    //         }
+    //     ]);
+    //
+    //     json!({
+    //         "category": "internalError/io",
+    //         "severity": "warning",
+    //         "description": "text description",
+    //         "message": [
+    //             {
+    //                 "elements": [
+    //                     "Emphasis"
+    //                 ],
+    //                 "content": "markup message"
+    //             }
+    //         ],
+    //         "advices": {
+    //             "advices": advices
+    //         },
+    //         "verbose_advices": {
+    //             "advices": advices
+    //         },
+    //         "location": {
+    //             "path": {
+    //                 "file": "path"
+    //             },
+    //             "sourceCode": "source_code",
+    //             "span": [
+    //                 0,
+    //                 6
+    //             ]
+    //         },
+    //         "tags": [
+    //             "internal"
+    //         ],
+    //         "source": null
+    //     })
+    // }
 
     // #[test]
     // fn test_serialize() {
