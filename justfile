@@ -66,11 +66,13 @@ lint:
   cargo clippy
   cargo run -p rules_check
   bun biome lint
+  cargo sqlx prepare --check --workspace
 
 lint-fix:
   cargo clippy --fix
   cargo run -p rules_check
   bun biome lint --write
+  cargo sqlx prepare --check --workspace
 
 serve-docs:
     uv sync

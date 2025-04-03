@@ -101,6 +101,7 @@ jobs:
           cargo clippy
           cargo run -p rules_check
           biome lint
+          cargo sqlx prepare --check --workspace
 
   test:
     name: Test
