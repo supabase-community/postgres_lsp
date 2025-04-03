@@ -171,6 +171,15 @@ pub enum PgtCommand {
         )]
         log_level: String,
 
+        /// Allows to change the logging format kind. Default is hierarchical.
+        #[bpaf(
+            env("PGT_LOG_KIND"),
+            long("log-kind"),
+            argument("hierarchical|bunyan"),
+            fallback(String::from("hierarchical"))
+        )]
+        log_kind: String,
+
         #[bpaf(long("stop-on-disconnect"), hide_usage)]
         stop_on_disconnect: bool,
         /// Allows to set a custom file path to the configuration file,

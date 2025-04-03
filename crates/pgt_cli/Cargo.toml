@@ -39,6 +39,7 @@ tracing                  = { workspace = true }
 tracing-appender         = "0.2.3"
 tracing-bunyan-formatter = { workspace = true }
 tracing-subscriber       = { workspace = true, features = ["env-filter", "json"] }
+tracing-tree             = { version = "0.4.0", features = ["time"] }
 
 [target.'cfg(unix)'.dependencies]
 libc  = "0.2.161"

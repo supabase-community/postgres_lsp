@@ -17,6 +17,7 @@ use tracing_subscriber::{
     prelude::*,
     registry,
 };
+use tracing_tree::{HierarchicalLayer, time::UtcDateTime};
 
 pub(crate) fn start(
     session: CliSession,
@@ -78,8 +79,9 @@ pub(crate) fn run_server(
     log_path: Option<PathBuf>,
     log_file_name_prefix: Option<String>,
     log_level: Option<String>,
+    log_kind: Option<String>,
 ) -> Result<(), CliDiagnostic> {
-    setup_tracing_subscriber(log_path, log_file_name_prefix, log_level);
+    setup_tracing_subscriber(log_path, log_file_name_prefix, log_level, log_kind);
 
     let rt = Runtime::new()?;
     let factory = ServerFactory::new(stop_on_disconnect);
@@ -185,6 +187,7 @@ fn setup_tracing_subscriber(
     log_path: Option<PathBuf>,
     log_file_name_prefix: Option<String>,
     log_level: Option<String>,
+    log_kind: Option<String>,
 ) {
     let pgt_log_path = log_path.unwrap_or(pgt_fs::ensure_cache_dir().join("pgt-logs"));
 
@@ -197,13 +200,37 @@ fn setup_tracing_subscriber(
         .build(pgt_log_path)
         .expect("Failed to start the logger for the daemon.");
 
-    registry()
-        .with(JsonStorageLayer)
-        .with(
-            BunyanFormattingLayer::new("pgt_logs".into(), file_appender)
-                .with_filter(PgtLoggingFilter::from(log_level)),
-        )
-        .init();
+    let filter = PgtLoggingFilter::from(log_level);
+
+    let log_kind = log_kind.unwrap_or("hierarchical".into());
+
+    match log_kind.as_str() {
+        "bunyan" => {
+            registry()
+                .with(JsonStorageLayer)
+                .with(
+                    BunyanFormattingLayer::new("pgt_logs".into(), file_appender)
+                        .with_filter(filter),
+                )
+                .init();
+        }
+
+        _ => registry()
+            .with(
+                HierarchicalLayer::default()
+                    .with_indent_lines(true)
+                    .with_indent_amount(2)
+                    .with_bracketed_fields(true)
+                    .with_targets(true)
+                    .with_ansi(false)
+                    .with_timer(UtcDateTime {
+                        higher_precision: false,
+                    })
+                    .with_writer(file_appender)
+                    .with_filter(filter),
+            )
+            .init(),
+    }
 }
 
 pub fn default_pgt_log_path() -> PathBuf {

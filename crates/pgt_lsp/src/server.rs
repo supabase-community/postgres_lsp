@@ -227,7 +227,7 @@ impl LanguageServer for LSPServer {
     async fn code_action(&self, params: CodeActionParams) -> LspResult<Option<CodeActionResponse>> {
         match handlers::code_actions::get_actions(&self.session, params) {
             Ok(result) => {
-                tracing::info!("Got Code Actions: {:?}", result);
+                tracing::trace!("Got {} Code Action(s)", result.len());
                 return LspResult::Ok(Some(result));
             }
             Err(e) => LspResult::Err(into_lsp_error(e)),
