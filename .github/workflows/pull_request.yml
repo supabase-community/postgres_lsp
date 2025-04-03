@@ -92,6 +92,10 @@ jobs:
           cache-base: main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup sqlx-cli
+        run: cargo install sqlx-cli
+
       - name: Setup Biome
         uses: biomejs/setup-biome@v2
         with:
