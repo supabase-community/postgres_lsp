@@ -57,6 +57,9 @@ jobs:
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
 
+      - name: Set up git-cliff
+        uses: kenji-miyake/setup-git-cliff@v1
+
       - name: Set version name
         run: echo "version=$(git cliff --bumped-version)" >> "$GITHUB_ENV"
 
