@@ -61,6 +61,7 @@ pub struct CliOptions {
     pub reporter: CliReporter,
 
     #[bpaf(
+        env("PGT_LOG_LEVEL"),
         long("log-level"),
         argument("none|debug|info|warn|error"),
         fallback(LoggingLevel::default()),

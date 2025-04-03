@@ -3,7 +3,11 @@ use anyhow::Result;
 use pgt_workspace::{WorkspaceError, features::completions::GetCompletionsParams};
 use tower_lsp::lsp_types::{self, CompletionItem, CompletionItemLabelDetails};
 
-#[tracing::instrument(level = "trace", skip_all)]
+#[tracing::instrument(level = "debug", skip_all, fields(
+    url = params.text_document_position.text_document.uri.as_str(),
+    character = params.text_document_position.position.character,
+    line = params.text_document_position.position.line
+), err)]
 pub fn get_completions(
     session: &Session,
     params: lsp_types::CompletionParams,

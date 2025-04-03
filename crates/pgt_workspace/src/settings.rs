@@ -78,7 +78,7 @@ impl AsMut<Settings> for SettingsHandleMut<'_> {
 
 impl Settings {
     /// The [PartialConfiguration] is merged into the workspace
-    #[tracing::instrument(level = "trace", skip(self))]
+    #[tracing::instrument(level = "trace", skip(self), err)]
     pub fn merge_with_configuration(
         &mut self,
         configuration: PartialConfiguration,

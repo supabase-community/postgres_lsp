@@ -152,14 +152,13 @@ impl LanguageServer for LSPServer {
     }
 
     #[tracing::instrument(level = "info", skip_all)]
-    async fn did_change_configuration(&self, params: DidChangeConfigurationParams) {
-        let _ = params;
+    async fn did_change_configuration(&self, _params: DidChangeConfigurationParams) {
         self.session.load_workspace_settings().await;
         self.setup_capabilities().await;
         self.session.update_all_diagnostics().await;
     }
 
-    #[tracing::instrument(level = "trace", skip(self))]
+    #[tracing::instrument(level = "trace", skip_all)]
     async fn did_change_watched_files(&self, params: DidChangeWatchedFilesParams) {
         let file_paths = params
             .changes
@@ -195,28 +194,28 @@ impl LanguageServer for LSPServer {
         }
     }
 
-    #[tracing::instrument(level = "trace", skip(self))]
+    #[tracing::instrument(level = "trace", skip_all)]
     async fn did_open(&self, params: DidOpenTextDocumentParams) {
         handlers::text_document::did_open(&self.session, params)
             .await
             .ok();
     }
 
-    #[tracing::instrument(level = "trace", skip(self, params))]
+    #[tracing::instrument(level = "trace", skip_all)]
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
         if let Err(e) = handlers::text_document::did_change(&self.session, params).await {
             error!("{}", e);
         };
     }
 
-    #[tracing::instrument(level = "trace", skip(self))]
+    #[tracing::instrument(level = "trace", skip_all)]
     async fn did_close(&self, params: DidCloseTextDocumentParams) {
         handlers::text_document::did_close(&self.session, params)
             .await
             .ok();
     }
 
-    #[tracing::instrument(level = "trace", skip(self))]
+    #[tracing::instrument(level = "trace", skip_all)]
     async fn completion(&self, params: CompletionParams) -> LspResult<Option<CompletionResponse>> {
         match handlers::completions::get_completions(&self.session, params) {
             Ok(result) => LspResult::Ok(Some(result)),
@@ -228,7 +227,7 @@ impl LanguageServer for LSPServer {
     async fn code_action(&self, params: CodeActionParams) -> LspResult<Option<CodeActionResponse>> {
         match handlers::code_actions::get_actions(&self.session, params) {
             Ok(result) => {
-                tracing::info!("Got Code Actions: {:?}", result);
+                tracing::trace!("Got {} Code Action(s)", result.len());
                 return LspResult::Ok(Some(result));
             }
             Err(e) => LspResult::Err(into_lsp_error(e)),
