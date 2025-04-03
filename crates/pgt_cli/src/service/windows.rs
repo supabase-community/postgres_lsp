@@ -27,6 +27,7 @@ fn get_pipe_name() -> String {
     format!(r"\\.\pipe\pgt-service-{}", pgt_configuration::VERSION)
 }
 
+#[allow(dead_code)]
 pub(crate) fn enumerate_pipes() -> io::Result<impl Iterator<Item = String>> {
     read_dir(r"\\.\pipe").map(|iter| {
         iter.filter_map(|entry| {

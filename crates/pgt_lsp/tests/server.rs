@@ -818,9 +818,8 @@ async fn test_execute_statement() -> Result<()> {
         result.unwrap().exists.unwrap()
     };
 
-    assert_eq!(
-        users_tbl_exists().await,
-        false,
+    assert!(
+        !(users_tbl_exists().await),
         "The user table shouldn't exist at this point."
     );
 
@@ -888,11 +887,94 @@ async fn test_execute_statement() -> Result<()> {
         )
         .await?;
 
-    assert_eq!(
+    assert!(
         users_tbl_exists().await,
-        true,
         "Users table did not exists even though it should've been created by the workspace/executeStatement command."
     );
+
+    server.shutdown().await?;
+    reader.abort();
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_issue_281() -> Result<()> {
+    let factory = ServerFactory::default();
+    let mut fs = MemoryFileSystem::default();
+    let test_db = get_new_test_db().await;
+
+    let setup = r#"
+            create table public.users (
+                id serial primary key,
+                name varchar(255) not null
+            );
+        "#;
+
+    test_db
+        .execute(setup)
+        .await
+        .expect("Failed to setup test database");
+
+    let mut conf = PartialConfiguration::init();
+    conf.merge_with(PartialConfiguration {
+        db: Some(PartialDatabaseConfiguration {
+            database: Some(
+                test_db
+                    .connect_options()
+                    .get_database()
+                    .unwrap()
+                    .to_string(),
+            ),
+            ..Default::default()
+        }),
+        ..Default::default()
+    });
+    fs.insert(
+        url!("postgrestools.jsonc").to_file_path().unwrap(),
+        serde_json::to_string_pretty(&conf).unwrap(),
+    );
+
+    let (service, client) = factory
+        .create_with_fs(None, DynRef::Owned(Box::new(fs)))
+        .into_inner();
+
+    let (stream, sink) = client.split();
+    let mut server = Server::new(service);
+
+    let (sender, _) = channel(CHANNEL_BUFFER_SIZE);
+    let reader = tokio::spawn(client_handler(stream, sink, sender));
+
+    server.initialize().await?;
+    server.initialized().await?;
+
+    server.load_configuration().await?;
+
+    server.open_document("\n------------- Meta -------------\n\n-- name: GetValueFromMetaKVStore :one\nSELECT value FROM meta_kv\nWHERE key = $1;\n\n-- name: SetValueToMetaKVStore :exec\nINSERT INTO meta_kv (key, value)\nVALUES ($1, $2)\nON CONFLICT (key) DO UPDATE\nSET value = excluded.value;\n\n\nasdsadsad\n\nыывфыв khgk\nasdыdsf\ndsdsjdfnfmdsвтьвыаыdsfsmndf,m\nы\n").await?;
+
+    let chars = ["s", "n", ",", "d", "f", "j", "s", "d", "f", "в"];
+
+    for (i, c) in chars.iter().enumerate() {
+        server
+            .change_document(
+                i as i32 + 4,
+                vec![TextDocumentContentChangeEvent {
+                    range: Some(Range {
+                        start: Position {
+                            line: 20,
+                            character: i as u32,
+                        },
+                        end: Position {
+                            line: 20,
+                            character: i as u32,
+                        },
+                    }),
+                    range_length: Some(0),
+                    text: c.to_string(),
+                }],
+            )
+            .await?;
+    }
 
     server.shutdown().await?;
     reader.abort();

@@ -42,7 +42,18 @@ pub async fn check_sql(params: TypecheckParams<'_>) -> Option<TypecheckDiagnosti
         return None;
     }
 
-    let res = params.conn.prepare(params.sql).await;
+    let mut conn = match params.conn.acquire().await {
+        Ok(c) => c,
+        Err(_) => return None,
+    };
+
+    // Postgres caches prepared statements within the current DB session (connection).
+    // This can cause issues if the underlying table schema changes while statements
+    // are cached. By closing the connection after use, we ensure a fresh state for
+    // each typecheck operation.
+    conn.close_on_drop();
+
+    let res = conn.prepare(params.sql).await;
 
     match res {
         Ok(_) => None,

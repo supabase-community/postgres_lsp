@@ -249,10 +249,7 @@ impl Document {
 
         // if within a statement, we can modify it if the change results in also a single statement
         if affected_indices.len() == 1 {
-            let changed_content = new_content
-                .as_str()
-                .get(usize::from(affected_range.start())..usize::from(affected_range.end()))
-                .unwrap();
+            let changed_content = get_affected(&new_content, affected_range);
 
             let (new_ranges, diags) =
                 document::split_with_diagnostics(changed_content, Some(affected_range.start()));
@@ -305,10 +302,7 @@ impl Document {
         }
 
         // in any other case, parse the full affected range
-        let changed_content = new_content
-            .as_str()
-            .get(usize::from(full_affected_range.start())..usize::from(full_affected_range.end()))
-            .unwrap();
+        let changed_content = get_affected(&new_content, full_affected_range);
 
         let (new_ranges, diags) =
             document::split_with_diagnostics(changed_content, Some(full_affected_range.start()));
@@ -410,6 +404,22 @@ impl ChangeParams {
 
         new_text
     }
+}
+
+fn get_affected(content: &str, range: TextRange) -> &str {
+    let start_byte = content
+        .char_indices()
+        .nth(usize::from(range.start()))
+        .map(|(i, _)| i)
+        .unwrap_or(content.len());
+
+    let end_byte = content
+        .char_indices()
+        .nth(usize::from(range.end()))
+        .map(|(i, _)| i)
+        .unwrap_or(content.len());
+
+    &content[start_byte..end_byte]
 }
 
 #[cfg(test)]
