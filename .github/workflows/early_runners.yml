@@ -140,6 +140,8 @@ jobs:
 
       - name: Add PR Comment
         uses: thollander/actions-comment-pull-request@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           file-path: artifacts.zip
           pr-number: 308
