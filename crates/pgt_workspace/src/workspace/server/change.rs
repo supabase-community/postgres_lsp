@@ -179,13 +179,12 @@ impl Document {
             .unwrap_or_else(|| end);
 
         if is_addition {
-            last_affected_stmt_end = last_affected_stmt_end.add(diff_size)
             end = end.add(diff_size);
+            last_affected_stmt_end = last_affected_stmt_end.add(diff_size);
         } else if !is_trim {
             end = end.sub(diff_size);
             last_affected_stmt_end = last_affected_stmt_end.sub(diff_size)
         };
-
 
         Affected {
             affected_range: {
