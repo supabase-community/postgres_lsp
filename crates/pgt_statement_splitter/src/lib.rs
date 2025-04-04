@@ -143,6 +143,30 @@ mod tests {
     }
 
     #[test]
+    fn with_check() {
+        Tester::from("create policy employee_insert on journey_execution for insert to authenticated with check ((select private.organisation_id()) = organisation_id);")
+            .expect_statements(vec!["create policy employee_insert on journey_execution for insert to authenticated with check ((select private.organisation_id()) = organisation_id);"]);
+    }
+
+    #[test]
+    fn nested_parenthesis() {
+        Tester::from(
+            "create table if not exists journey_node_execution (
+  id uuid default gen_random_uuid() not null primary key,
+
+  constraint uq_node_exec unique (journey_execution_id, journey_node_id)
+);",
+        )
+        .expect_statements(vec![
+            "create table if not exists journey_node_execution (
+  id uuid default gen_random_uuid() not null primary key,
+
+  constraint uq_node_exec unique (journey_execution_id, journey_node_id)
+);",
+        ]);
+    }
+
+    #[test]
     fn with_cte() {
         Tester::from("with test as (select 1 as id) select * from test;")
             .expect_statements(vec!["with test as (select 1 as id) select * from test;"]);
