@@ -65,11 +65,20 @@ pub(crate) fn statement(p: &mut Parser) {
 pub(crate) fn parenthesis(p: &mut Parser) {
     p.expect(SyntaxKind::Ascii40);
 
+    let mut depth = 1;
+
     loop {
         match p.peek().kind {
+            SyntaxKind::Ascii40 => {
+                p.advance();
+                depth += 1;
+            }
             SyntaxKind::Ascii41 | SyntaxKind::Eof => {
                 p.advance();
-                break;
+                depth -= 1;
+                if depth == 0 {
+                    break;
+                }
             }
             _ => {
                 p.advance();
@@ -174,6 +183,8 @@ pub(crate) fn unknown(p: &mut Parser, exclude: &[SyntaxKind]) {
                     if [
                         // WITH ORDINALITY should not start a new statement
                         SyntaxKind::Ordinality,
+                        // WITH CHECK should not start a new statement
+                        SyntaxKind::Check,
                     ]
                     .iter()
                     .all(|x| Some(x) != next.as_ref())
