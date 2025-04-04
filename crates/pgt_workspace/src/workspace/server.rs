@@ -108,7 +108,7 @@ impl WorkspaceServer {
                 let migrations_dir = migration_settings.path.as_ref()?;
                 let migration = migration::get_migration(path, migrations_dir)?;
 
-                Some(&migration.timestamp <= ignore_before)
+                Some(&migration.sequence_number <= ignore_before)
             })
             .unwrap_or(false)
     }
