@@ -195,7 +195,10 @@ impl Document {
             affected_indices,
             prev_index,
             next_index,
-            full_affected_range: TextRange::new(start_incl, end_incl.min(content_size)),
+            full_affected_range: TextRange::new(
+                start_incl,
+                end_incl.min(content_size).max(start_incl),
+            ),
         }
     }
 
