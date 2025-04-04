@@ -142,3 +142,4 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           file-path: artifacts.zip
+          pr-number: 308
