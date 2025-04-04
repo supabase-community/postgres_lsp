@@ -180,15 +180,12 @@ impl Document {
 
         if is_addition {
             last_affected_stmt_end = last_affected_stmt_end.add(diff_size)
-        } else if !is_trim {
-            last_affected_stmt_end = last_affected_stmt_end.sub(diff_size)
-        };
-
-        if is_addition {
             end = end.add(diff_size);
         } else if !is_trim {
             end = end.sub(diff_size);
+            last_affected_stmt_end = last_affected_stmt_end.sub(diff_size)
         };
+
 
         Affected {
             affected_range: {
