@@ -12,6 +12,7 @@ env:
   # Need these guys for cross-compilation
   CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
   CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: aarch64-linux-gnu-gcc
+  CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG: true
 
 jobs:
   # windows does not run git cliff so we need to do it here
