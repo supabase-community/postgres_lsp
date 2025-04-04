@@ -808,6 +808,28 @@ mod tests {
     }
 
     #[test]
+    fn issue_303() {
+        let path = PgTPath::new("test.sql");
+        let input = "create table \"test\"";
+
+        let mut d = Document::new(PgTPath::new("test.sql"), input.to_string(), 0);
+
+        assert_eq!(d.positions.len(), 1);
+
+        let change = ChangeFileParams {
+            path: path.clone(),
+            version: 1,
+            changes: vec![ChangeParams {
+                text: "".to_string(),
+                range: Some(TextRange::new(18.into(), 19.into())),
+            }],
+        };
+
+        assert_eq!(d.content, "create table \"test");
+        assert_document_integrity(&d);
+    }
+
+    #[test]
     fn across_statements() {
         let path = PgTPath::new("test.sql");
         let input = "select id from users;\nselect * from contacts;";

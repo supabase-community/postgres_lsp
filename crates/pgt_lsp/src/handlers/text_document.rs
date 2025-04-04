@@ -10,10 +10,7 @@ use tower_lsp::lsp_types;
 use tracing::error;
 
 /// Handler for `textDocument/didOpen` LSP notification
-#[tracing::instrument(level = "info", skip_all, fields(
-    url = params.text_document.uri.as_str(),
-    version = params.text_document.version
-), err)]
+#[tracing::instrument(level = "debug", skip(session), err)]
 pub(crate) async fn did_open(
     session: &Session,
     params: lsp_types::DidOpenTextDocumentParams,
@@ -41,11 +38,7 @@ pub(crate) async fn did_open(
 }
 
 // Handler for `textDocument/didChange` LSP notification
-#[tracing::instrument(level = "debug", skip_all, fields(
-    uri = params.text_document.uri.as_str(),
-    version = params.text_document.version,
-    num_content_changes = params.content_changes.len()
-), err)]
+#[tracing::instrument(level = "debug", skip(session), err)]
 pub(crate) async fn did_change(
     session: &Session,
     params: lsp_types::DidChangeTextDocumentParams,
@@ -97,9 +90,7 @@ pub(crate) async fn did_change(
 }
 
 /// Handler for `textDocument/didClose` LSP notification
-#[tracing::instrument(level = "info", skip_all, fields(
-        url = params.text_document.uri.as_str(),
-), err)]
+#[tracing::instrument(level = "debug", skip(session), err)]
 pub(crate) async fn did_close(
     session: &Session,
     params: lsp_types::DidCloseTextDocumentParams,

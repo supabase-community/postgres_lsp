@@ -9,6 +9,7 @@ use pgt_workspace::features::code_actions::{
     CodeActionKind, CodeActionsParams, CommandActionCategory, ExecuteStatementParams,
 };
 
+#[tracing::instrument(level = "debug", skip(session), err)]
 pub fn get_actions(
     session: &Session,
     params: lsp_types::CodeActionParams,
@@ -71,6 +72,7 @@ pub fn command_id(command: &CommandActionCategory) -> String {
     }
 }
 
+#[tracing::instrument(level = "debug", skip(session), err)]
 pub async fn execute_command(
     session: &Session,
     params: ExecuteCommandParams,
