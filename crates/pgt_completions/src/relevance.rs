@@ -41,7 +41,10 @@ impl CompletionRelevance<'_> {
     }
 
     fn check_matches_query_input(&mut self, ctx: &CompletionContext) {
-        let node = ctx.ts_node.unwrap();
+        let node = match ctx.node_under_cursor {
+            Some(node) => node,
+            None => return,
+        };
 
         let content = match ctx.get_ts_node_content(node) {
             Some(c) => c,

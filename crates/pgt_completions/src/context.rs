@@ -49,11 +49,28 @@ impl TryFrom<String> for ClauseType {
 }
 
 pub(crate) struct CompletionContext<'a> {
-    pub ts_node: Option<tree_sitter::Node<'a>>,
+    pub node_under_cursor: Option<tree_sitter::Node<'a>>,
+    pub previous_node: Option<tree_sitter::Node<'a>>,
+
     pub tree: Option<&'a tree_sitter::Tree>,
     pub text: &'a str,
     pub schema_cache: &'a SchemaCache,
     pub position: usize,
+
+    /// If the cursor of the user is offset to the right of the statement,
+    /// we'll have to move it back to the last node, otherwise, tree-sitter will break.
+    /// However, knowing that the user is typing on the "next" node lets us prioritize different completion results.
+    /// We consider an offset of up to two characters as valid.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// select * from {}
+    /// ```
+    ///
+    /// We'll adjust the cursor position so it lies on the "from" token – but we're looking
+    /// for table completions.
+    pub cursor_offset_from_end: bool,
 
     pub schema_name: Option<String>,
     pub wrapping_clause_type: Option<ClauseType>,
@@ -70,7 +87,9 @@ impl<'a> CompletionContext<'a> {
             text: &params.text,
             schema_cache: params.schema,
             position: usize::from(params.position),
-            ts_node: None,
+            cursor_offset_from_end: false,
+            previous_node: None,
+            node_under_cursor: None,
             schema_name: None,
             wrapping_clause_type: None,
             wrapping_statement_range: None,
@@ -80,8 +99,6 @@ impl<'a> CompletionContext<'a> {
 
         ctx.gather_tree_context();
         ctx.gather_info_from_ts_queries();
-
-        println!("Here's my node: {:?}", ctx.ts_node.unwrap());
 
         ctx
     }
@@ -147,9 +164,13 @@ impl<'a> CompletionContext<'a> {
          * `select * from use           {}` becomes `select * from use{}`.
          */
         let current_node = cursor.node();
+        let position_cache = self.position.clone();
         while cursor.goto_first_child_for_byte(self.position).is_none() && self.position > 0 {
             self.position -= 1;
         }
+
+        let cursor_offset = position_cache - self.position;
+        self.cursor_offset_from_end = cursor_offset > 0 && cursor_offset <= 2;
 
         self.gather_context_from_node(cursor, current_node);
     }
@@ -157,20 +178,20 @@ impl<'a> CompletionContext<'a> {
     fn gather_context_from_node(
         &mut self,
         mut cursor: tree_sitter::TreeCursor<'a>,
-        previous_node: tree_sitter::Node<'a>,
+        parent_node: tree_sitter::Node<'a>,
     ) {
         let current_node = cursor.node();
 
         // prevent infinite recursion – this can happen if we only have a PROGRAM node
-        if current_node.kind() == previous_node.kind() {
-            self.ts_node = Some(current_node);
+        if current_node.kind() == parent_node.kind() {
+            self.node_under_cursor = Some(current_node);
             return;
         }
 
-        match previous_node.kind() {
+        match parent_node.kind() {
             "statement" | "subquery" => {
                 self.wrapping_clause_type = current_node.kind().try_into().ok();
-                self.wrapping_statement_range = Some(previous_node.range());
+                self.wrapping_statement_range = Some(parent_node.range());
             }
             "invocation" => self.is_invocation = true,
 
@@ -202,7 +223,23 @@ impl<'a> CompletionContext<'a> {
 
         // We have arrived at the leaf node
         if current_node.child_count() == 0 {
-            self.ts_node = Some(current_node);
+            if self.cursor_offset_from_end {
+                self.node_under_cursor = None;
+                self.previous_node = Some(current_node);
+            } else {
+                // for the previous node, either select the previous sibling,
+                // or collect the parent's previous sibling's last child.
+                let previous = match current_node.prev_sibling() {
+                    Some(n) => Some(n),
+                    None => {
+                        let sib_of_parent = parent_node.prev_sibling();
+                        sib_of_parent.and_then(|p| p.children(&mut cursor).last())
+                    }
+                };
+                self.node_under_cursor = Some(current_node);
+                self.previous_node = previous;
+            }
+
             return;
         }
 
@@ -361,7 +398,7 @@ mod tests {
 
             let ctx = CompletionContext::new(&params);
 
-            let node = ctx.ts_node.unwrap();
+            let node = ctx.node_under_cursor.unwrap();
 
             assert_eq!(ctx.get_ts_node_content(node), Some("select"));
 
@@ -389,7 +426,7 @@ mod tests {
 
         let ctx = CompletionContext::new(&params);
 
-        let node = ctx.ts_node.unwrap();
+        let node = ctx.node_under_cursor.unwrap();
 
         assert_eq!(ctx.get_ts_node_content(node), Some("from"));
         assert_eq!(
@@ -415,7 +452,7 @@ mod tests {
 
         let ctx = CompletionContext::new(&params);
 
-        let node = ctx.ts_node.unwrap();
+        let node = ctx.node_under_cursor.unwrap();
 
         assert_eq!(ctx.get_ts_node_content(node), Some(""));
         assert_eq!(ctx.wrapping_clause_type, None);
@@ -440,7 +477,7 @@ mod tests {
 
         let ctx = CompletionContext::new(&params);
 
-        let node = ctx.ts_node.unwrap();
+        let node = ctx.node_under_cursor.unwrap();
 
         assert_eq!(ctx.get_ts_node_content(node), Some("fro"));
         assert_eq!(ctx.wrapping_clause_type, Some(ClauseType::Select));

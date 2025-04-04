@@ -13,6 +13,7 @@ use pgt_analyse::{AnalyserOptions, AnalysisFilter};
 use pgt_analyser::{Analyser, AnalyserConfig, AnalyserContext};
 use pgt_diagnostics::{Diagnostic, DiagnosticExt, Severity, serde::Diagnostic as SDiagnostic};
 use pgt_fs::{ConfigName, PgTPath};
+use pgt_text_size::{TextRange, TextSize};
 use pgt_typecheck::TypecheckParams;
 use schema_cache_manager::SchemaCacheManager;
 use sqlx::Executor;
@@ -535,13 +536,18 @@ impl Workspace for WorkspaceServer {
             .get(&params.path)
             .ok_or(WorkspaceError::not_found())?;
 
-        let (statement, stmt_range, text) = match doc
-            .iter_statements_with_text_and_range()
-            .find(|(_, r, _)| r.contains(params.position))
-        {
-            Some(s) => s,
-            None => return Ok(CompletionsResult::default()),
-        };
+        let (statement, stmt_range, text) =
+            match doc.iter_statements_with_text_and_range().find(|(_, r, _)| {
+                let expanded_range = TextRange::new(
+                    r.start(),
+                    r.end().checked_add(TextSize::new(2)).unwrap_or(r.end()),
+                );
+
+                expanded_range.contains(params.position)
+            }) {
+                Some(s) => s,
+                None => return Ok(CompletionsResult::default()),
+            };
 
         // `offset` is the position in the document,
         // but we need the position within the *statement*.
