@@ -2,7 +2,7 @@ use std::path::Path;
 
 #[derive(Debug)]
 pub(crate) struct Migration {
-    pub(crate) timestamp: u64,
+    pub(crate) sequence_number: u64,
     #[allow(unused)]
     pub(crate) name: String,
 }
@@ -50,13 +50,16 @@ pub(crate) fn get_migration(path: &Path, migrations_dir: &Path) -> Option<Migrat
 fn parse_migration_name(name: &str) -> Option<Migration> {
     let mut parts = name.splitn(2, '_');
     // remove leading zeros to support numeric
-    let timestamp: u64 = parts.next()?.trim_start_matches('0').parse().ok()?;
+    let sequence_number: u64 = parts.next()?.trim_start_matches('0').parse().ok()?;
     let full_name = parts.next()?;
     let name = full_name
         .strip_suffix(".sql")
         .unwrap_or(full_name)
         .to_string();
-    Some(Migration { timestamp, name })
+    Some(Migration {
+        sequence_number,
+        name,
+    })
 }
 
 #[cfg(test)]
@@ -81,7 +84,7 @@ mod tests {
 
         assert!(migration.is_some());
         let migration = migration.unwrap();
-        assert_eq!(migration.timestamp, 1234567890);
+        assert_eq!(migration.sequence_number, 1234567890);
         assert_eq!(migration.name, "create_users");
     }
 
@@ -98,7 +101,7 @@ mod tests {
 
         assert!(migration.is_some());
         let migration = migration.unwrap();
-        assert_eq!(migration.timestamp, 1234567890);
+        assert_eq!(migration.sequence_number, 1234567890);
         assert_eq!(migration.name, "create_users");
     }
 
@@ -113,7 +116,7 @@ mod tests {
 
         assert!(migration.is_some());
         let migration = migration.unwrap();
-        assert_eq!(migration.timestamp, 201);
+        assert_eq!(migration.sequence_number, 201);
         assert_eq!(migration.name, "a_migration");
     }
 
