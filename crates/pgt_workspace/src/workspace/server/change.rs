@@ -276,8 +276,6 @@ impl Document {
                 let new_range = new_ranges[0].add(affected_range.start());
                 let (old_id, old_range) = self.positions[affected_idx];
 
-                println!("{:?}", old_range);
-
                 // move all statements after the affected range
                 self.move_ranges(old_range.end(), change.diff_size(), change.is_addition());
 
