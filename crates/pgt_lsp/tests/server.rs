@@ -981,3 +981,89 @@ async fn test_issue_281() -> Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn test_issue_303() -> Result<()> {
+    let factory = ServerFactory::default();
+    let mut fs = MemoryFileSystem::default();
+    let test_db = get_new_test_db().await;
+
+    let setup = r#"
+            create table public.users (
+                id serial primary key,
+                name varchar(255) not null
+            );
+        "#;
+
+    test_db
+        .execute(setup)
+        .await
+        .expect("Failed to setup test database");
+
+    let mut conf = PartialConfiguration::init();
+    conf.merge_with(PartialConfiguration {
+        db: Some(PartialDatabaseConfiguration {
+            database: Some(
+                test_db
+                    .connect_options()
+                    .get_database()
+                    .unwrap()
+                    .to_string(),
+            ),
+            ..Default::default()
+        }),
+        ..Default::default()
+    });
+    fs.insert(
+        url!("postgrestools.jsonc").to_file_path().unwrap(),
+        serde_json::to_string_pretty(&conf).unwrap(),
+    );
+
+    let (service, client) = factory
+        .create_with_fs(None, DynRef::Owned(Box::new(fs)))
+        .into_inner();
+
+    let (stream, sink) = client.split();
+    let mut server = Server::new(service);
+
+    let (sender, _) = channel(CHANNEL_BUFFER_SIZE);
+    let reader = tokio::spawn(client_handler(stream, sink, sender));
+
+    server.initialize().await?;
+    server.initialized().await?;
+
+    server.load_configuration().await?;
+
+    server.open_document("").await?;
+
+    let chars = [
+        "C", "R", "E", "A", "T", "E", " ", "T", "A", "B", "L", "E", " ", "\"",
+    ];
+
+    for (i, c) in chars.iter().enumerate() {
+        server
+            .change_document(
+                i as i32 + 4,
+                vec![TextDocumentContentChangeEvent {
+                    range: Some(Range {
+                        start: Position {
+                            line: 0,
+                            character: i as u32,
+                        },
+                        end: Position {
+                            line: 0,
+                            character: i as u32,
+                        },
+                    }),
+                    range_length: Some(0),
+                    text: c.to_string(),
+                }],
+            )
+            .await?;
+    }
+
+    server.shutdown().await?;
+    reader.abort();
+
+    Ok(())
+}
