@@ -90,12 +90,12 @@ jobs:
 
       # windows is a special snowflake too, it saves binaries as .exe
       - name: 👦 Name the Binary
-        if: matrix.config.os == 'windows-latest'
+        if: matrix.config.os == 'windows-2022'
         run: |
           mkdir dist
           cp target/${{ matrix.config.target }}/release/postgrestools.exe ./dist/postgrestools_${{ matrix.config.target }}
       - name: 👦 Name the Binary
-        if: matrix.config.os != 'windows-latest'
+        if: matrix.config.os != 'windows-2022'
         run: |
           mkdir dist
           cp target/${{ matrix.config.target }}/release/postgrestools ./dist/postgrestools_${{ matrix.config.target }}
