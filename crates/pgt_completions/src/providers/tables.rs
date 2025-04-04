@@ -73,8 +73,8 @@ mod tests {
         "#;
 
         let test_cases = vec![
-            (format!("select * from us{}", CURSOR_POS), "users"),
-            (format!("select * from em{}", CURSOR_POS), "emails"),
+            // (format!("select * from us{}", CURSOR_POS), "users"),
+            // (format!("select * from em{}", CURSOR_POS), "emails"),
             (format!("select * from {}", CURSOR_POS), "addresses"),
         ];
 

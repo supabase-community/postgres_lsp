@@ -22,6 +22,7 @@ pgt_treesitter_queries.workspace = true
 schemars                         = { workspace = true, optional = true }
 serde                            = { workspace = true, features = ["derive"] }
 serde_json                       = { workspace = true }
+tracing                          = { workspace = true }
 tree-sitter.workspace            = true
 tree_sitter_sql.workspace        = true
 

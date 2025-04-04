@@ -33,7 +33,6 @@ impl CompletionRelevance<'_> {
         self.check_is_user_defined();
         self.check_matches_schema(ctx);
         self.check_matches_query_input(ctx);
-        self.check_if_catalog(ctx);
         self.check_is_invocation(ctx);
         self.check_matching_clause_type(ctx);
         self.check_relations_in_stmt(ctx);
@@ -52,7 +51,10 @@ impl CompletionRelevance<'_> {
         let name = match self.data {
             CompletionRelevanceData::Function(f) => f.name.as_str(),
             CompletionRelevanceData::Table(t) => t.name.as_str(),
-            CompletionRelevanceData::Column(c) => c.name.as_str(),
+            CompletionRelevanceData::Column(c) => {
+                //
+                c.name.as_str()
+            }
         };
 
         if name.starts_with(content) {
@@ -61,7 +63,7 @@ impl CompletionRelevance<'_> {
                 .try_into()
                 .expect("The length of the input exceeds i32 capacity");
 
-            self.score += len * 5;
+            self.score += len * 10;
         };
     }
 
@@ -135,14 +137,6 @@ impl CompletionRelevance<'_> {
         }
     }
 
-    fn check_if_catalog(&mut self, ctx: &CompletionContext) {
-        if ctx.schema_name.as_ref().is_some_and(|n| n == "pg_catalog") {
-            return;
-        }
-
-        self.score -= 5; // unlikely that the user wants schema data
-    }
-
     fn check_relations_in_stmt(&mut self, ctx: &CompletionContext) {
         match self.data {
             CompletionRelevanceData::Table(_) | CompletionRelevanceData::Function(_) => return,
@@ -181,6 +175,12 @@ impl CompletionRelevance<'_> {
 
         if system_schemas.contains(&schema.as_str()) {
             self.score -= 10;
+        }
+
+        // "public" is the default postgres schema where users
+        // create objects. Prefer it by a slight bit.
+        if schema.as_str() == "public" {
+            self.score += 2;
         }
     }
 }

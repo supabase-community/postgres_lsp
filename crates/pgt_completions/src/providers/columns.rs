@@ -143,12 +143,86 @@ mod tests {
         let params = get_test_params(&tree, &cache, case.get_input_query());
         let mut items = complete(params);
 
-        let _ = items.split_off(3);
+        let _ = items.split_off(6);
 
-        items.sort_by(|a, b| a.label.cmp(&b.label));
+        #[derive(Eq, PartialEq, Debug)]
+        struct LabelAndDesc {
+            label: String,
+            desc: String,
+        }
 
-        let labels: Vec<String> = items.into_iter().map(|c| c.label).collect();
+        let labels: Vec<LabelAndDesc> = items
+            .into_iter()
+            .map(|c| LabelAndDesc {
+                label: c.label,
+                desc: c.description,
+            })
+            .collect();
 
-        assert_eq!(labels, vec!["name", "narrator", "narrator_id"]);
+        let expected = vec![
+            ("name", "Table: public.users"),
+            ("narrator", "Table: public.audio_books"),
+            ("narrator_id", "Table: private.audio_books"),
+            ("name", "Schema: pg_catalog"),
+            ("nameconcatoid", "Schema: pg_catalog"),
+            ("nameeq", "Schema: pg_catalog"),
+        ]
+        .into_iter()
+        .map(|(label, schema)| LabelAndDesc {
+            label: label.into(),
+            desc: schema.into(),
+        })
+        .collect::<Vec<LabelAndDesc>>();
+
+        assert_eq!(labels, expected);
+    }
+
+    #[tokio::test]
+    async fn suggests_relevant_columns_without_letters() {
+        let setup = r#"
+            create table users (
+                id serial primary key,
+                name text,
+                address text,
+                email text
+            );
+        "#;
+
+        let test_case = TestCase {
+            message: "suggests user created tables first",
+            query: format!(r#"select {} from users"#, CURSOR_POS),
+            label: "",
+            description: "",
+        };
+
+        let (tree, cache) = get_test_deps(setup, test_case.get_input_query()).await;
+        let params = get_test_params(&tree, &cache, test_case.get_input_query());
+        let results = complete(params);
+
+        let (first_four, _rest) = results.split_at(4);
+
+        let has_column_in_first_four = |col: &'static str| {
+            first_four
+                .iter()
+                .find(|compl_item| compl_item.label.as_str() == col)
+                .is_some()
+        };
+
+        assert!(
+            has_column_in_first_four("id"),
+            "`id` not present in first four completion items."
+        );
+        assert!(
+            has_column_in_first_four("name"),
+            "`name` not present in first four completion items."
+        );
+        assert!(
+            has_column_in_first_four("address"),
+            "`address` not present in first four completion items."
+        );
+        assert!(
+            has_column_in_first_four("email"),
+            "`email` not present in first four completion items."
+        );
     }
 }

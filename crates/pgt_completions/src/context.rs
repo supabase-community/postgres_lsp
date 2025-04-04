@@ -81,6 +81,8 @@ impl<'a> CompletionContext<'a> {
         ctx.gather_tree_context();
         ctx.gather_info_from_ts_queries();
 
+        println!("Here's my node: {:?}", ctx.ts_node.unwrap());
+
         ctx
     }
 

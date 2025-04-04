@@ -17,6 +17,7 @@ pub struct CompletionParams<'a> {
     pub tree: Option<&'a tree_sitter::Tree>,
 }
 
+#[tracing::instrument(level = "debug")]
 pub fn complete(params: CompletionParams) -> Vec<CompletionItem> {
     let ctx = CompletionContext::new(&params);
 
