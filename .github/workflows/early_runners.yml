@@ -1,0 +1,147 @@
+name: Try Out Earlier Runners
+
+on:
+  push:
+    branches:
+      - "early-runners"
+
+permissions:
+  contents: write
+
+env:
+  # Need these guys for cross-compilation
+  CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+  CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: aarch64-linux-gnu-gcc
+  CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG: true
+
+jobs:
+  # windows does not run git cliff so we need to do it here
+  extract_version:
+    name: Extract Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.set_version.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up git-cliff
+        uses: kenji-miyake/setup-git-cliff@v1
+
+      - name: Set version name
+        id: set_version
+        run: echo "version=$(git cliff --bumped-version)" >> "$GITHUB_OUTPUT"
+
+  build_and_test:
+    name: Build & Test for ${{ matrix.config.target }}
+    needs: extract_version
+    strategy:
+      matrix:
+        config:
+          - { os: ubuntu-22.04, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-22.04, target: aarch64-unknown-linux-gnu }
+          - { os: macos-14, target: x86_64-apple-darwin }
+          - { os: macos-14, target: aarch64-apple-darwin }
+          - { os: windows-2022, target: x86_64-pc-windows-msvc }
+          - { os: windows-2022, target: aarch64-pc-windows-msvc }
+
+    runs-on: ${{ matrix.config.os }}
+
+    outputs:
+      artifact_url: ${{ steps.upload-artifacts.outputs.artifact-url }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: ${{ matrix.config.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        id: rust-cache
+
+      # The Aarch64 Linux is a special snowflake, we need to install its toolchain
+      - name: Install arm64 toolchain
+        if: matrix.config.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      # running containers via `services` only works on linux
+      # https://github.com/actions/runner/issues/1866
+      - name: 🐘 Setup postgres
+        uses: ikalnytskyi/action-setup-postgres@v7
+
+      - name: 🧪 Run Tests
+        run: cargo test --release
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+
+      - name: 🛠️ Run Build
+        run: cargo build -p pgt_cli --release --target ${{ matrix.config.target }}
+        env:
+          # Strip all debug symbols from the resulting binaries
+          RUSTFLAGS: "-C strip=symbols -C codegen-units=1"
+          # Inline the version in the CLI binary
+          PGT_VERSION: ${{ needs.extract_version.outputs.version }}
+
+      # windows is a special snowflake too, it saves binaries as .exe
+      - name: 👦 Name the Binary
+        if: matrix.config.os == 'windows-2022'
+        run: |
+          mkdir dist
+          cp target/${{ matrix.config.target }}/release/postgrestools.exe ./dist/postgrestools_${{ matrix.config.target }}
+      - name: 👦 Name the Binary
+        if: matrix.config.os != 'windows-2022'
+        run: |
+          mkdir dist
+          cp target/${{ matrix.config.target }}/release/postgrestools ./dist/postgrestools_${{ matrix.config.target }}
+
+      # It is not possible to return the artifacts from the matrix jobs individually: Matrix outputs overwrite each other.
+      # A common workaround is to upload and download the resulting artifacts.
+      - name: 👆 Upload Artifacts
+        id: upload-artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: postgrestools_${{ matrix.config.target }}
+          path: ./dist/postgrestools_*
+          # The default compression level is 6; this took the binary down from 350 to 330MB.
+          # It is recommended to use a lower level for binaries, since the compressed result is not much smaller,
+          # and the higher levels of compression take much longer.
+          compression-level: 2
+          if-no-files-found: error
+
+  add-pr-comment:
+    runs-on: ubuntu-latest
+    needs: build_and_test # make sure that tests & build work correctly
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          # we need all commits to create a changelog
+          fetch-depth: 0
+
+      - name: Make Artifacts Dir
+        run: mkdir artifacts
+
+      - name: 👇 Download Artifacts
+        uses: actions/download-artifact@v4
+        id: download
+        with:
+          merge-multiple: true
+          path: artifacts
+          pattern: postgrestools_*
+
+      - name: Zip 'Em Up
+        run: zip -r artifacts.zip artifacts
+
+      - name: Add PR Comment
+        uses: thollander/actions-comment-pull-request@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file-path: artifacts.zip
+          pr-number: 308
