@@ -2452,6 +2452,7 @@ dependencies = [
  "serde_json",
  "sqlx",
  "tokio",
+ "tracing",
  "tree-sitter",
  "tree_sitter_sql",
 ]
